@@ -1,0 +1,308 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prestigia | Comparativa Comercial de Planes - Fase 1</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #070A12;
+      color: #FFFFFF;
+      margin: 0;
+      padding: 0;
+    }
+    @media print {
+      @page {
+        margin: 0 !important;
+        size: A4 portrait;
+      }
+      body, html {
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: #070A12 !important;
+        color: #FFFFFF !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .page-slide {
+        page-break-after: always;
+        break-after: page;
+        padding: 14mm 16mm !important;
+        box-sizing: border-box !important;
+        height: 297mm !important;
+        max-height: 297mm !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+      }
+      .no-print { display: none !important; }
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+    .page-slide {
+      box-sizing: border-box;
+      padding: 2.5rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center bg-[#070A12]">
+
+  <!-- BOTÓN FLOTANTE PARA DESCARGA -->
+  <div class="no-print fixed top-4 right-4 z-50 flex items-center gap-2 bg-[#0D1424]/90 backdrop-blur-md p-2 rounded-2xl border border-slate-700 shadow-2xl">
+    <button onclick="window.print()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-indigo-600/30 transition active:scale-95 flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+      <span>Descargar en PDF / Imprimir</span>
+    </button>
+  </div>
+
+  <div class="w-full max-w-4xl">
+
+    <!-- ========================================== -->
+    <!-- SLIDE 1: MATRIZ COMPARATIVA EN MESA -->
+    <!-- ========================================== -->
+    <section class="page-slide">
+      
+      <!-- CONTENIDO SUPERIOR -->
+      <div class="space-y-4">
+        <!-- HEADER CORPORATIVO -->
+        <header class="flex justify-between items-center pb-4 border-b border-slate-800">
+          <div class="flex items-center gap-3">
+            <svg class="w-9 h-9" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M50 8L82 22V52C82 72 68 88 50 94C32 88 18 72 18 52V22L50 8Z" fill="#0B111E" stroke="#6366F1" stroke-width="6" stroke-linejoin="round"/>
+              <path d="M50 28C41.16 28 34 35.16 34 44C34 54.5 47 68 50 71C53 68 66 54.5 66 44C66 35.16 58.84 28 50 28Z" fill="#6366F1"/>
+              <polygon points="50,37 52.5,43 59,43.5 54,47.5 56,54 50,50 44,54 46,47.5 41,43.5 47.5,43" fill="#F59E0B"/>
+            </svg>
+            <div>
+              <h1 class="text-lg font-black tracking-widest text-white">PRESTIGIA</h1>
+              <p class="text-[9px] text-slate-400 font-semibold tracking-wider uppercase">
+                SISTEMA DE BLINDAJE DE REPUTACIÓN Y FIDELIZACIÓN LOCAL
+              </p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+              Dossier Comercial • Fase 1
+            </span>
+            <p class="text-[9px] text-slate-500 mt-0.5">Experiencia en Punto de Venta</p>
+          </div>
+        </header>
+
+        <!-- TITULAR DE VENTA -->
+        <div class="space-y-1">
+          <h2 class="text-xl font-black tracking-tight text-white leading-snug">
+            Arquitectura de Planes Comerciales en Mesa
+          </h2>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Matriz técnica y comercial para presentar al dueño de negocio el valor exacto de cada suscripción en sala.
+          </p>
+        </div>
+
+        <!-- REGLA DE ORO DE PRIVACIDAD -->
+        <div class="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30 flex items-start gap-2.5 text-xs">
+          <span class="text-base">🛡️</span>
+          <div>
+            <strong class="text-indigo-300 font-bold block text-[11px] mb-0.5">Principio de Invisibilidad B2B:</strong>
+            <span class="text-slate-300 text-[10px] leading-snug">
+              El cliente final jamás sabe qué plan tiene contratado el local. En todos los planes la experiencia es 100% neutral, oficial y segura bajo la marca Prestigia con "Filtro Seguro".
+            </span>
+          </div>
+        </div>
+
+        <!-- TABLA COMPARATIVA MAESTRA -->
+        <div class="overflow-hidden rounded-xl border border-slate-800 bg-[#0B111E] shadow-xl">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-900/90 text-[10px] uppercase tracking-wider">
+                <th class="py-2.5 px-3 font-extrabold text-slate-300 w-5/12">Funcionalidad en Sala (Fase 1)</th>
+                <th class="py-2.5 px-2 font-extrabold text-emerald-400 text-center w-2/12 bg-emerald-950/20 border-l border-r border-slate-800">
+                  🟢 BÁSICO<br><span class="text-[8px] font-medium text-slate-400">Blindaje</span>
+                </th>
+                <th class="py-2.5 px-2 font-extrabold text-blue-400 text-center w-2.5/12 bg-blue-950/20 border-r border-slate-800">
+                  🔵 PRO<br><span class="text-[8px] font-medium text-slate-400">Control & Rescate</span>
+                </th>
+                <th class="py-2.5 px-2 font-extrabold text-amber-400 text-center w-2.5/12 bg-amber-950/20">
+                  🟡 ÉLITE<br><span class="text-[8px] font-medium text-slate-400">Fidelización Total</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/80 text-[10px]">
+              <tr>
+                <td class="py-2 px-3 text-slate-200 font-medium">Filtro Inteligente Anti-Google Maps (1 a 3★)</td>
+                <td class="py-2 px-2 text-center text-emerald-400 font-bold bg-emerald-950/10 border-l border-r border-slate-800">✓ Incluido</td>
+                <td class="py-2 px-2 text-center text-blue-400 font-bold bg-blue-950/10 border-r border-slate-800">✓ Incluido</td>
+                <td class="py-2 px-2 text-center text-amber-400 font-bold bg-amber-950/10">✓ Incluido</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 text-slate-200 font-medium">Redirección a Google Maps para Reseñas 5★</td>
+                <td class="py-2 px-2 text-center text-emerald-400 font-bold bg-emerald-950/10 border-l border-r border-slate-800">✓ Incluido</td>
+                <td class="py-2 px-2 text-center text-blue-400 font-bold bg-blue-950/10 border-r border-slate-800">✓ Incluido</td>
+                <td class="py-2 px-2 text-center text-amber-400 font-bold bg-amber-950/10">✓ Incluido</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 text-slate-200 font-medium">Validación de Celular (10 dígitos WhatsApp)</td>
+                <td class="py-2 px-2 text-center text-emerald-400 font-bold bg-emerald-950/10 border-l border-r border-slate-800">✓ Incluido</td>
+                <td class="py-2 px-2 text-center text-blue-400 font-bold bg-blue-950/10 border-r border-slate-800">✓ Incluido</td>
+                <td class="py-2 px-2 text-center text-amber-400 font-bold bg-amber-950/10">✓ Incluido</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 text-slate-200 font-medium">Botón Oficial: Sitio Web de la Marca</td>
+                <td class="py-2 px-2 text-center text-emerald-400 font-bold bg-emerald-950/10 border-l border-r border-slate-800">✓ Incluido</td>
+                <td class="py-2 px-2 text-center text-blue-400 font-bold bg-blue-950/10 border-r border-slate-800">✓ Incluido</td>
+                <td class="py-2 px-2 text-center text-amber-400 font-bold bg-amber-950/10">✓ Incluido</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 text-slate-200 font-medium">Exposición de Redes Sociales en Cierre</td>
+                <td class="py-2 px-2 text-center text-slate-400 bg-emerald-950/10 border-l border-r border-slate-800">1 Sola Red</td>
+                <td class="py-2 px-2 text-center text-blue-400 font-semibold bg-blue-950/10 border-r border-slate-800">Multicanal Total</td>
+                <td class="py-2 px-2 text-center text-amber-400 font-semibold bg-amber-950/10">Multicanal Total</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 text-slate-200 font-medium">Auditoría de Personal: "¿Quién te atendió?"</td>
+                <td class="py-2 px-2 text-center text-slate-500 bg-emerald-950/10 border-l border-r border-slate-800">✕ No disponible</td>
+                <td class="py-2 px-2 text-center text-blue-400 font-bold bg-blue-950/10 border-r border-slate-800">✓ Selector Sala</td>
+                <td class="py-2 px-2 text-center text-amber-400 font-bold bg-amber-950/10">✓ Selector Sala</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 text-slate-200 font-medium">Botón de Rescate Urgente con Gerencia (WhatsApp)</td>
+                <td class="py-2 px-2 text-center text-slate-500 bg-emerald-950/10 border-l border-r border-slate-800">✕ No disponible</td>
+                <td class="py-2 px-2 text-center text-blue-400 font-bold bg-blue-950/10 border-r border-slate-800">✓ En Caliente</td>
+                <td class="py-2 px-2 text-center text-amber-400 font-bold bg-amber-950/10">✓ En Caliente</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 text-slate-200 font-medium">Incentivo Previo de Sorteo (Banner psicológico)</td>
+                <td class="py-2 px-2 text-center text-slate-500 bg-emerald-950/10 border-l border-r border-slate-800">✕ No disponible</td>
+                <td class="py-2 px-2 text-center text-slate-500 bg-blue-950/10 border-r border-slate-800">✕ No disponible</td>
+                <td class="py-2 px-2 text-center text-amber-400 font-bold bg-amber-950/10">✓ Activo en Sala</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 text-slate-200 font-medium">Motor de Sorteos & Confeti Real (Lead Gen)</td>
+                <td class="py-2 px-2 text-center text-slate-500 bg-emerald-950/10 border-l border-r border-slate-800">✕ No disponible</td>
+                <td class="py-2 px-2 text-center text-slate-500 bg-blue-950/10 border-r border-slate-800">✕ No disponible</td>
+                <td class="py-2 px-2 text-center text-amber-400 font-bold bg-amber-950/10">✓ Confeti + Ticket</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 text-slate-200 font-medium">Botón Exclusivo: Club VIP en WhatsApp</td>
+                <td class="py-2 px-2 text-center text-slate-500 bg-emerald-950/10 border-l border-r border-slate-800">✕ No disponible</td>
+                <td class="py-2 px-2 text-center text-slate-500 bg-blue-950/10 border-r border-slate-800">✕ No disponible</td>
+                <td class="py-2 px-2 text-center text-amber-400 font-bold bg-amber-950/10">✓ Comunidad VIP</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- FOOTER DE SLIDE 1 -->
+      <footer class="pt-3 text-center text-[9px] text-slate-500 border-t border-slate-800">
+        Prestigia • Documento de Arquitectura de Producto y Ventas B2B • Página 1 de 2
+      </footer>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SLIDE 2: ARGUMENTARIO COMERCIAL & PITCH -->
+    <!-- ========================================== -->
+    <section class="page-slide">
+      
+      <!-- CONTENIDO SUPERIOR -->
+      <div class="space-y-4">
+        <!-- HEADER SLIDE 2 -->
+        <header class="flex justify-between items-center pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2.5">
+            <svg class="w-8 h-8" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M50 8L82 22V52C82 72 68 88 50 94C32 88 18 72 18 52V22L50 8Z" fill="#0B111E" stroke="#6366F1" stroke-width="6" stroke-linejoin="round"/>
+              <path d="M50 28C41.16 28 34 35.16 34 44C34 54.5 47 68 50 71C53 68 66 54.5 66 44C66 35.16 58.84 28 50 28Z" fill="#6366F1"/>
+              <polygon points="50,37 52.5,43 59,43.5 54,47.5 56,54 50,50 44,54 46,47.5 41,43.5 47.5,43" fill="#F59E0B"/>
+            </svg>
+            <span class="text-sm font-black tracking-widest text-white">PRESTIGIA</span>
+          </div>
+          <span class="text-[10px] font-bold text-slate-400">Argumentario de Venta por Plan</span>
+        </header>
+
+        <!-- 3 TARJETAS DETALLADAS DE PITCH -->
+        <div class="space-y-3">
+
+          <!-- PLAN BÁSICO -->
+          <div class="p-3.5 rounded-xl bg-slate-900/80 border border-emerald-500/30 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                  PLAN BÁSICO
+                </span>
+                <h3 class="text-xs font-bold text-white">"Blindaje Digital Esencial"</h3>
+              </div>
+              <span class="text-[9px] text-slate-400">Cafés, Panaderías y Locales de Mostrador</span>
+            </div>
+            <p class="text-[10px] text-slate-300 leading-relaxed">
+              <strong class="text-emerald-300">El dolor que resuelve:</strong> Elimina el miedo a las malas reseñas públicas en Google Maps. Intercepta la inconformidad y la entrega directamente a gerencia en privado antes de que se convierta en un daño reputacional irreversible.
+            </p>
+            <div class="text-[10px] text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800">
+              💬 <strong class="text-white">Pitch:</strong> <em>"Por menos de lo que cuesta un café al día, blindas tu negocio para que ninguna mala experiencia arruine tu calificación en Google. Tu reputación queda protegida desde hoy."</em>
+            </div>
+          </div>
+
+          <!-- PLAN PRO -->
+          <div class="p-3.5 rounded-xl bg-slate-900/80 border border-blue-500/30 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-500/20 text-blue-400 border border-blue-500/40">
+                  PLAN PRO
+                </span>
+                <h3 class="text-xs font-bold text-white">"Control de Equipo y Rescate en Caliente"</h3>
+              </div>
+              <span class="text-[9px] text-slate-400">Restaurantes, Gastrobares, Barberías & Spas</span>
+            </div>
+            <p class="text-[10px] text-slate-300 leading-relaxed">
+              <strong class="text-blue-300">El dolor que resuelve:</strong> Audita con nombre y apellido quién atendió la mesa e incluye un botón de auxilio para escribirle al Administrador por WhatsApp. Permite acercarse a la mesa antes de que el cliente pague la cuenta y recuperar su lealtad de inmediato.
+            </p>
+            <div class="text-[10px] text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800">
+              💬 <strong class="text-white">Pitch:</strong> <em>"No dejes que un mesero distraído te cueste un cliente recurrente. Con Pro sabes quién atendió y tienes la oportunidad de solucionar el problema en caliente en la mesa antes de que salgan por la puerta."</em>
+            </div>
+          </div>
+
+          <!-- PLAN ÉLITE -->
+          <div class="p-3.5 rounded-xl bg-slate-900/80 border border-amber-500/40 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-400 border border-amber-500/40">
+                  PLAN ÉLITE
+                </span>
+                <h3 class="text-xs font-bold text-white">"La Máquina de Fidelización y Clientes Frecuentes"</h3>
+              </div>
+              <span class="text-[9px] text-slate-400">Franquicias, Cadenas y Negocios en Expansión</span>
+            </div>
+            <p class="text-[10px] text-slate-300 leading-relaxed">
+              <strong class="text-amber-300">El dolor que resuelve:</strong> Transforma el QR en un motor de ventas recurrente. Al premiar con sorteo oficial las 5 estrellas, recopila cientos de números de WhatsApp reales (con confeti festivo y ticket digital) y los canaliza al Club VIP de WhatsApp para enviar promociones sin pagar pauta.
+            </p>
+            <div class="text-[10px] text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800">
+              💬 <strong class="text-white">Pitch:</strong> <em>"Construyes tu propio activo comercial. Cada persona que califica se convierte en un miembro VIP con celular verificado al que puedes invitar a tus eventos y promociones cuando tú quieras."</em>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- CONCLUSIÓN DE CIERRE -->
+        <div class="p-3 rounded-xl bg-gradient-to-r from-indigo-900/30 via-purple-900/30 to-slate-900/30 border border-indigo-500/40 text-center space-y-0.5">
+          <h4 class="text-[11px] font-extrabold text-white">Prestigia transforma una reseña pasiva en una máquina de crecimiento rentable</h4>
+          <p class="text-[9px] text-slate-400">Tecnología de conversión probada, blindaje reputacional y retención de clientes para el comercio local moderno.</p>
+        </div>
+      </div>
+
+      <!-- FOOTER DE SLIDE 2 -->
+      <footer class="pt-3 text-center text-[9px] text-slate-500 border-t border-slate-800">
+        Prestigia • Documento de Arquitectura de Producto y Ventas B2B • Página 2 de 2
+      </footer>
+    </section>
+
+  </div>
+
+</body>
+</html>

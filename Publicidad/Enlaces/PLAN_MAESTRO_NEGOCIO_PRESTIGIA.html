@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prestigia Pro | Plan Maestro de Negocio y Operaciones</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #070A12; color: #FFFFFF; }
+    @media print {
+      @page {
+        margin: 0 !important;
+        size: A4 portrait;
+      }
+      body, html {
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: #070A12 !important;
+        color: #FFFFFF !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .no-print { display: none !important; }
+      .page-break {
+        page-break-after: always;
+        padding: 14mm 16mm !important;
+        box-sizing: border-box !important;
+        min-height: 100vh !important;
+      }
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body class="p-4 sm:p-8 flex flex-col items-center">
+
+  <!-- TOP ACTION BAR (No print) -->
+  <div class="no-print fixed top-4 right-4 z-50 flex items-center gap-2 bg-[#0D1424]/90 backdrop-blur-md p-2 rounded-2xl border border-slate-700 shadow-2xl">
+    <button onclick="window.print()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-indigo-600/30 transition active:scale-95 flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+      <span>Descargar en PDF / Imprimir</span>
+    </button>
+  </div>
+
+  <div class="w-full max-w-4xl space-y-12">
+
+    <!-- ========================================== -->
+    <!-- SLIDE 1: PORTADA & RESUMEN EJECUTIVO -->
+    <!-- ========================================== -->
+    <section class="space-y-8 page-break">
+      <!-- HEADER -->
+      <header class="flex justify-between items-center pb-6 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-800 flex items-center justify-center font-black text-white text-xl shadow-xl shadow-indigo-600/25">
+            P
+          </div>
+          <div>
+            <h1 class="text-xl font-extrabold tracking-tight text-white">
+              PRESTIGIA <span class="text-indigo-400">PRO</span>
+            </h1>
+            <p class="text-xs text-slate-400 font-semibold tracking-wide">
+              PLAN MAESTRO DE NEGOCIO, OPERACIONES & FINANZAS 360°
+            </p>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="inline-block px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+            CONFIDENCIAL • FUNDADOR
+          </span>
+        </div>
+      </header>
+
+      <!-- HERO DIAGNOSIS -->
+      <div class="space-y-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold">
+          <span>🧭 1. ¿QUÉ ES PRESTIGIA PRO Y QUÉ PROBLEMA RESUELVE?</span>
+        </div>
+
+        <h2 class="text-3xl sm:text-4xl font-black text-white leading-tight">
+          El Filtro Inteligente de 2 Vías que <span class="text-indigo-400">blinda y escala negocios</span> locales e internacionales.
+        </h2>
+
+        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+          Prestigia Pro es un SaaS ultraligero que convierte cada interacción del cliente en un motor de reseñas públicas de 5★ o en un canal privado de contención de crisis antes de que llegue a internet.
+        </p>
+      </div>
+
+      <!-- DOS VÍAS DE CONVERSIÓN -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-6 rounded-2xl bg-[#0D1424] border border-emerald-500/30 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black px-2 py-1 rounded bg-emerald-500/20 text-emerald-400">4 ó 5 ESTRELLAS ⭐⭐⭐⭐⭐</span>
+            <span class="text-lg">🚀</span>
+          </div>
+          <h3 class="font-bold text-white text-base">Enrutamiento Directo a Google Maps</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            El cliente satisfecho es redirigido en 1 toque a la ficha oficial de Google Maps con la ventana de reseña pre-abierta. Multiplica reseñas positivas en menos de 10 segundos sin fricción.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-[#0D1424] border border-amber-500/30 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black px-2 py-1 rounded bg-amber-500/20 text-amber-400">1 a 3 ESTRELLAS ⭐☆☆☆☆</span>
+            <span class="text-lg">🛡️</span>
+          </div>
+          <h3 class="font-bold text-white text-base">Canal Privado Anti-Crisis WhatsApp</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            <strong>NUNCA</strong> va a Google. Captura el reclamo internamente y notifica al dueño vía WhatsApp para que resuelva la inconformidad y salve al cliente antes de que publique una queja pública destructiva.
+          </p>
+        </div>
+      </div>
+
+      <!-- CATÁLOGO DE PRODUCTOS -->
+      <div class="p-6 rounded-3xl bg-[#0A0F1D] border border-slate-800 space-y-4">
+        <div class="flex items-center gap-2 text-indigo-400 font-bold text-xs uppercase tracking-wider">
+          <span>📦 2. CATÁLOGO DE PRODUCTOS (4 VERTICALES LISTAS)</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
+          <div class="p-3 rounded-xl bg-slate-900/80 border border-indigo-500/20">
+            <div class="text-[10px] font-bold text-indigo-400">DOSSIER 1</div>
+            <div class="text-xs font-black text-white mt-1">Locales Físicos</div>
+            <div class="text-[11px] text-slate-400">Restaurantes, Spas & Clínicas (COP)</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/80 border border-cyan-500/20">
+            <div class="text-[10px] font-bold text-cyan-400">DOSSIER 2</div>
+            <div class="text-xs font-black text-white mt-1">Servicios Hogar</div>
+            <div class="text-[11px] text-slate-400">Limpieza, Plomería & Técnicos (COP)</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/80 border border-purple-500/20">
+            <div class="text-[10px] font-bold text-purple-400">DOSSIER 3</div>
+            <div class="text-xs font-black text-white mt-1">Global en Español</div>
+            <div class="text-[11px] text-slate-400">Latam, España & Emprendedores (USD)</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/80 border border-amber-500/20">
+            <div class="text-[10px] font-bold text-amber-400">DOSSIER 4</div>
+            <div class="text-xs font-black text-white mt-1">Global en Inglés</div>
+            <div class="text-[11px] text-slate-400">US, UK, Canadá & UE (USD)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SLIDE 2: FINANZAS, UNIT ECONOMICS & GANANCIAS -->
+    <!-- ========================================== -->
+    <section class="space-y-8 page-break">
+      <div class="space-y-2">
+        <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">
+          💰 3. ESTRUCTURA FINANCIERA & UNIT ECONOMICS
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white">
+          Modelo de Alta Rentabilidad con Márgenes Superiores al 85%
+        </h2>
+      </div>
+
+      <!-- TABLA DE PRECIOS -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse border border-slate-800 text-xs sm:text-sm rounded-2xl overflow-hidden">
+          <thead>
+            <tr class="bg-[#0D1424] text-slate-300 border-b border-slate-800">
+              <th class="p-3.5 font-bold">Segmento / Mercado</th>
+              <th class="p-3.5 font-bold text-center">Setup Lanzamiento</th>
+              <th class="p-3.5 font-bold text-center">Plan Básico (1 Sede)</th>
+              <th class="p-3.5 font-bold text-center text-indigo-300 bg-indigo-950/40">Plan Pro (1 Sede)</th>
+              <th class="p-3.5 font-bold text-center text-amber-400 bg-amber-950/30">Plan Élite (Multi-Sede)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60 bg-[#0A0F1D] text-slate-300">
+            <tr>
+              <td class="p-3 font-semibold text-white">Locales Físicos (Colombia - COP)</td>
+              <td class="p-3 text-center font-bold text-emerald-400">$350.000 COP</td>
+              <td class="p-3 text-center"><strong>$89.000</strong>/mes<br><span class="text-[10px] text-slate-400">1 soporte/mes</span></td>
+              <td class="p-3 text-center font-bold text-indigo-300 bg-indigo-950/20">$149.000/mes<br><span class="text-[10px] text-indigo-300 font-normal">2 soportes/mes</span></td>
+              <td class="p-3 text-center font-bold text-amber-400 bg-amber-950/20">$249.000/mes<br><span class="text-[10px] text-amber-300 font-normal">4 soportes/mes (VIP)</span></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-white">Servicios Domicilio (Colombia - COP)</td>
+              <td class="p-3 text-center font-bold text-emerald-400">$199.000 COP</td>
+              <td class="p-3 text-center"><strong>$69.000</strong>/mes<br><span class="text-[10px] text-slate-400">1 soporte/mes</span></td>
+              <td class="p-3 text-center font-bold text-indigo-300 bg-indigo-950/20">$99.000/mes<br><span class="text-[10px] text-indigo-300 font-normal">2 soportes/mes</span></td>
+              <td class="p-3 text-center font-bold text-amber-400 bg-amber-950/20">$189.000/mes<br><span class="text-[10px] text-amber-300 font-normal">4 soportes/mes (VIP)</span></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-white">Internacional Español (USD)</td>
+              <td class="p-3 text-center font-bold text-emerald-400">$99 USD</td>
+              <td class="p-3 text-center"><strong>$29 USD</strong>/mes<br><span class="text-[10px] text-slate-400">1 soporte/mes</span></td>
+              <td class="p-3 text-center font-bold text-indigo-300 bg-indigo-950/20">$49 USD/mes<br><span class="text-[10px] text-indigo-300 font-normal">2 soportes/mes</span></td>
+              <td class="p-3 text-center font-bold text-amber-400 bg-amber-950/20">$69 USD/mes<br><span class="text-[10px] text-amber-300 font-normal">4 soportes/mes (VIP)</span></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-white">Internacional Inglés (USD)</td>
+              <td class="p-3 text-center font-bold text-emerald-400">$99 USD</td>
+              <td class="p-3 text-center"><strong>$29 USD</strong>/mes<br><span class="text-[10px] text-slate-400">1 soporte/mes</span></td>
+              <td class="p-3 text-center font-bold text-indigo-300 bg-indigo-950/20">$49 USD/mes<br><span class="text-[10px] text-indigo-300 font-normal">2 soportes/mes</span></td>
+              <td class="p-3 text-center font-bold text-amber-400 bg-amber-950/20">$69 USD/mes<br><span class="text-[10px] text-amber-300 font-normal">4 soportes/mes (VIP)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- UNIT ECONOMICS & COSTOS -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-5 rounded-2xl bg-[#0D1424] border border-slate-800 space-y-2">
+          <div class="text-xs font-bold text-emerald-400 uppercase">Costo Operativo Base</div>
+          <div class="text-xl font-black text-white">&lt; $0.10 USD / mes</div>
+          <p class="text-xs text-slate-400">
+            Entrega 100% digital en 24h. No hay costos de envío ni de fabricación en el paquete base. Margen bruto de setup &gt; 97%.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-[#0D1424] border border-slate-800 space-y-2">
+          <div class="text-xs font-bold text-indigo-400 uppercase">Upgrade Físico Opcional</div>
+          <div class="text-xl font-black text-white">+$25 USD / +$60K COP</div>
+          <p class="text-xs text-slate-400">
+            Placas acrílicas o tarjetas PVC se cobran aparte como extra. Generan ganancia neta adicional, nunca pérdida absorbida.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-[#0D1424] border border-slate-800 space-y-2">
+          <div class="text-xs font-bold text-amber-400 uppercase">Comisiones Vendedores</div>
+          <div class="text-xl font-black text-white">$30-$45 Setup + Recurrente</div>
+          <p class="text-xs text-slate-400">
+            Incentiva a amigos en otros países a cerrar clientes rápido y retenerlos mes a mes por $3-$6 USD/mes por cliente.
+          </p>
+        </div>
+      </div>
+
+      <!-- PROYECCIÓN 50 CLIENTES -->
+      <div class="p-6 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-[#0D1424] to-indigo-950/40 border border-emerald-500/30 space-y-3">
+        <h4 class="font-bold text-white text-base flex items-center justify-between">
+          <span>Proyección con solo 50 Clientes Activos (30 Colombia + 20 Exterior)</span>
+          <span class="text-emerald-400 font-extrabold text-sm">MARGEN LIMPIO &gt; 85%</span>
+        </h4>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left pt-2 border-t border-slate-800 text-xs">
+          <div>
+            <div class="text-slate-400">Caja Inmediata (Setups):</div>
+            <div class="text-white font-black text-sm mt-0.5">~$4.300 USD ($17M COP)</div>
+          </div>
+          <div>
+            <div class="text-slate-400">Recurrencia Mensual:</div>
+            <div class="text-emerald-400 font-black text-sm mt-0.5">~$1.630 USD/mes ($6.4M COP)</div>
+          </div>
+          <div>
+            <div class="text-slate-400">Costo Total Servidores:</div>
+            <div class="text-slate-300 font-bold text-sm mt-0.5">&lt; $25 USD / mes</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SLIDE 3: REGLAS DE ORO & ROADMAP A FUTURO -->
+    <!-- ========================================== -->
+    <section class="space-y-8 page-break">
+      <div class="space-y-2">
+        <span class="text-xs font-bold uppercase tracking-widest text-purple-400">
+          🛡️ 4. REGLAS DE ORO OPERATIVAS & EL GRAN PLAN
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white">
+          Blindaje contra Morosos y Escalabilidad a Largo Plazo
+        </h2>
+      </div>
+
+      <!-- LAS 2 REGLAS DE ORO -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-6 rounded-2xl bg-[#0D1424] border border-red-500/30 space-y-3">
+          <div class="flex items-center gap-2 text-red-400 font-extrabold text-sm">
+            <span>⚡ REGLA 1: EL KILL SWITCH (PROTECCIÓN RECURRENTE)</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Ningún QR apunta directo a Google. Todos pasan por <code class="text-indigo-300 bg-indigo-950/40 px-1 py-0.5 rounded">prestigia.pro/r/[negocio]</code>. Si el cliente se atrasa en su pago, el enlace muestra la pantalla de <strong>"Servicio Temporalmente Suspendido"</strong>. Esto garantiza que paguen su mensualidad puntualmente sin excusas.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-[#0D1424] border border-indigo-500/30 space-y-3">
+          <div class="flex items-center gap-2 text-indigo-400 font-extrabold text-sm">
+            <span>🌟 REGLA 2: ESTATUS DE MIEMBRO FUNDADOR</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Los primeros 5 cupos por sector o ciudad tienen su <strong>tarifa mensual congelada de por vida</strong> y acceso vitalicio prioritario y gratuito a la futura <strong>Red de Páginas Amarillas y Recomendación Cruzada Prestigia</strong>.
+          </p>
+        </div>
+      </div>
+
+      <!-- EL ROADMAP EN 3 FASES -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-black text-white">El Gran Plan: De Software de Reseñas a Red Global</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+          <div class="p-5 rounded-2xl bg-[#0D1424] border border-emerald-500/40 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-emerald-400">FASE 1 • TERMINADA</span>
+              <span>✅</span>
+            </div>
+            <div class="font-bold text-white text-sm">El Escudo de Reputación</div>
+            <p class="text-xs text-slate-300">
+              Mini App Móvil Dark Luxury, selector táctil de estrellas, enrutamiento a Google 4-5★, quejas privadas 1-3★ y los 4 dossieres comerciales listos.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-[#0D1424] border border-indigo-500/40 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-indigo-400">FASE 2 • SIGUIENTE PASO</span>
+              <span>🚀</span>
+            </div>
+            <div class="font-bold text-white text-sm">Portal del Dueño (/portal)</div>
+            <p class="text-xs text-slate-300">
+              Bandeja de quejas privadas en tiempo real con rescate 1-clic por WhatsApp, centro de descarga de Smart QRs y Asistente de IA para responder reseñas (gancho upsell a Plan Pro).
+            </p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-[#0D1424] border border-purple-500/40 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-purple-400">FASE 3 • EXPANSIÓN</span>
+              <span>🌐</span>
+            </div>
+            <div class="font-bold text-white text-sm">Directorio & Red Prestigia</div>
+            <p class="text-xs text-slate-300">
+              Páginas amarillas verificadas donde los comercios e independientes se refieren entre sí, cobrando por contactos calificados y posiciones destacadas.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="text-center pt-6 border-t border-slate-800 text-xs text-slate-500">
+        Prestigia Pro Ecosystem • Documento Estratégico y Operativo Interno para el Fundador • 2026
+      </footer>
+    </section>
+
+  </div>
+
+</body>
+</html>
