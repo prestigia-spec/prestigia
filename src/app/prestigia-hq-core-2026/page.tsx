@@ -1283,47 +1283,47 @@ export default function MasterAdminPage() {
   // VIEW: AUTHENTICATED MASTER CONSOLE
   // -------------------------------------------------------------
   return (
-    <div className="min-h-screen bg-[#07090E] text-slate-100 flex flex-col font-sans selection:bg-amber-500/20 selection:text-amber-300">
+    <div className="min-h-screen bg-[#07090E] text-slate-100 flex flex-col font-sans selection:bg-amber-500/20 selection:text-amber-300 w-full overflow-x-hidden">
       {/* Top Banking Command Bar */}
-      <header className="sticky top-0 z-40 bg-[#0C101A]/95 backdrop-blur-xl border-b border-slate-800/80 px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-xl shadow-black/40">
+      <header className="sticky top-0 z-40 bg-[#0C101A]/95 backdrop-blur-xl border-b border-slate-800/80 px-3 sm:px-6 py-2.5 flex items-center justify-between gap-3 shadow-xl shadow-black/40 w-full">
         {/* Left Crest & Identification */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-950/40 border border-amber-500/40 flex items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
+        <div className="flex items-center gap-2.5 shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-950/40 border border-amber-500/40 flex items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
             <PrestigiaIcon className="w-full h-full text-amber-400" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-bold text-white text-base tracking-tight">PRESTIGIA MASTER ADMIN</h1>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-semibold tracking-wider uppercase">
+              <h1 className="font-bold text-white text-sm sm:text-base tracking-tight whitespace-nowrap">PRESTIGIA MASTER ADMIN</h1>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[9px] sm:text-[10px] font-semibold tracking-wider uppercase whitespace-nowrap">
                 Bank Guard Live
               </span>
             </div>
-            <p className="text-[11px] text-slate-400">Consola Central de Dirección General & Big Data Lake</p>
+            <p className="text-[10px] text-slate-400 hidden sm:block">Consola Central de Dirección General & Big Data Lake</p>
           </div>
         </div>
 
         {/* Global Stats Micro-badges */}
-        <div className="hidden lg:flex items-center gap-3 text-xs">
-          <div className="px-3 py-1.5 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-2">
+        <div className="hidden xl:flex items-center gap-2 text-[11px]">
+          <div className="px-2.5 py-1 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-1.5 whitespace-nowrap">
             <Building2 className="w-3.5 h-3.5 text-blue-400" />
             <span>Marcas: <strong className="text-white">{businesses.length}</strong></span>
           </div>
-          <div className="px-3 py-1.5 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-2">
+          <div className="px-2.5 py-1 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-1.5 whitespace-nowrap">
             <Store className="w-3.5 h-3.5 text-emerald-400" />
             <span>Sedes: <strong className="text-white">{stats?.totalBranches || 0}</strong></span>
           </div>
-          <div className="px-3 py-1.5 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-2">
+          <div className="px-2.5 py-1 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-1.5 whitespace-nowrap">
             <Users className="w-3.5 h-3.5 text-purple-400" />
             <span>Data Lake: <strong className="text-white">{campaignParticipants.length + feedbacks.length} clientes</strong></span>
           </div>
-          <div className="px-3 py-1.5 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-2">
+          <div className="px-2.5 py-1 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-1.5 whitespace-nowrap">
             <DollarSign className="w-3.5 h-3.5 text-amber-400" />
             <span>MRR Total: <strong className="text-amber-300">{formatMoneyCOP(stats?.mrr?.totalCOP || 1469000)}</strong></span>
           </div>
         </div>
 
         {/* Right Security & Control Buttons */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 shrink-0">
           {/* Privacy Masking Toggle */}
           <button
             type="button"
@@ -1399,12 +1399,12 @@ export default function MasterAdminPage() {
       )}
 
       {/* Main Tabs Navigation Bar */}
-      <nav className="bg-[#0A0D15] border-b border-slate-800/80 px-4 sm:px-8 py-2 overflow-x-auto no-scrollbar">
+      <nav className="bg-[#0A0D15] border-b border-slate-800/80 px-3 sm:px-6 py-1.5 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700 w-full">
         <div className="flex items-center gap-1.5 min-w-max">
           <button
             type="button"
             onClick={() => setActiveTab('directorio')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
               activeTab === 'directorio'
                 ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
@@ -1417,7 +1417,7 @@ export default function MasterAdminPage() {
           <button
             type="button"
             onClick={() => setActiveTab('conmutador')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
               activeTab === 'conmutador'
                 ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
@@ -1430,7 +1430,7 @@ export default function MasterAdminPage() {
           <button
             type="button"
             onClick={() => setActiveTab('casos')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
               activeTab === 'casos'
                 ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
@@ -1446,7 +1446,7 @@ export default function MasterAdminPage() {
           <button
             type="button"
             onClick={() => setActiveTab('bigdata')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
               activeTab === 'bigdata'
                 ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
@@ -1459,7 +1459,7 @@ export default function MasterAdminPage() {
           <button
             type="button"
             onClick={() => setActiveTab('alertas')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
               activeTab === 'alertas'
                 ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
@@ -1472,7 +1472,7 @@ export default function MasterAdminPage() {
           <button
             type="button"
             onClick={() => setActiveTab('mrr')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
               activeTab === 'mrr'
                 ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
@@ -1485,7 +1485,7 @@ export default function MasterAdminPage() {
           <button
             type="button"
             onClick={() => setActiveTab('trafico')}
-            className={`px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
               activeTab === 'trafico'
                 ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
@@ -1503,7 +1503,7 @@ export default function MasterAdminPage() {
       </nav>
 
       {/* Main Work Area */}
-      <main className="flex-1 px-4 sm:px-8 py-6 max-w-7xl w-full mx-auto">
+      <main className="flex-1 px-3 sm:px-6 py-5 w-full max-w-[1600px] mx-auto">
         {/* ============================================================== */}
         {/* TAB 1: DIRECTORIO GLOBAL DE MARCAS & ONBOARDING WIZARD */}
         {/* ============================================================== */}
@@ -1624,15 +1624,15 @@ export default function MasterAdminPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="bg-[#141A26] border-b border-slate-800 text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
-                        <th className="py-3.5 px-4">Marca / Empresa</th>
-                        <th className="py-3.5 px-3">Nicho / Industria</th>
-                        <th className="py-3.5 px-3">Plan</th>
-                        <th className="py-3.5 px-3">Titular / WhatsApp</th>
-                        <th className="py-3.5 px-3">Sedes & Ciudad</th>
-                        <th className="py-3.5 px-3 text-center">Trayectoria Día 1</th>
-                        <th className="py-3.5 px-3 text-center">Estado</th>
-                        <th className="py-3.5 px-4 text-right">Acciones Directas</th>
+                      <tr className="bg-[#141A26] border-b border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+                        <th className="py-2.5 px-3">Marca / Empresa</th>
+                        <th className="py-2.5 px-2">Nicho / Industria</th>
+                        <th className="py-2.5 px-2">Plan</th>
+                        <th className="py-2.5 px-2">Titular / WhatsApp</th>
+                        <th className="py-2.5 px-2">Sedes & Ciudad</th>
+                        <th className="py-2.5 px-2 text-center">Trayectoria Día 1</th>
+                        <th className="py-2.5 px-2 text-center">Estado</th>
+                        <th className="py-2.5 px-3 text-right">Acciones Directas</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60">
@@ -1647,67 +1647,67 @@ export default function MasterAdminPage() {
                         return (
                           <tr key={biz.id} className="hover:bg-[#141A26]/80 transition-colors group">
                             {/* Brand & Category */}
-                            <td className="py-3.5 px-4">
-                              <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500/20 to-amber-950/40 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm shrink-0">
+                            <td className="py-2.5 px-3">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-amber-500/20 to-amber-950/40 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-xs shrink-0">
                                   {biz.name.charAt(0)}
                                 </div>
                                 <div className="min-w-0">
-                                  <p className="font-bold text-white group-hover:text-amber-400 transition-colors truncate">
+                                  <p className="font-bold text-white group-hover:text-amber-400 transition-colors truncate text-xs">
                                     {biz.name}
                                   </p>
-                                  <p className="text-[11px] text-slate-400 truncate">{biz.category}</p>
+                                  <p className="text-[10px] text-slate-400 truncate">{biz.category}</p>
                                 </div>
                               </div>
                             </td>
 
                             {/* Niche / Industry Classification Badge */}
-                            <td className="py-3.5 px-3 whitespace-nowrap">
-                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border inline-flex items-center gap-1.5 ${nicheBadge.color}`}>
+                            <td className="py-2.5 px-2 whitespace-nowrap">
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border inline-flex items-center gap-1 ${nicheBadge.color}`}>
                                 <span>{nicheBadge.icon}</span>
                                 <span>{nicheBadge.label}</span>
                               </span>
                             </td>
 
                             {/* Plan Badge */}
-                            <td className="py-3.5 px-3 whitespace-nowrap">
-                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${badge.color} ${badge.border}`}>
+                            <td className="py-2.5 px-2 whitespace-nowrap">
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${badge.color} ${badge.border}`}>
                                 {badge.label}
                               </span>
                             </td>
 
                             {/* Owner & WhatsApp */}
-                            <td className="py-3.5 px-3 whitespace-nowrap">
-                              <p className="font-medium text-slate-200">{biz.ownerName}</p>
+                            <td className="py-2.5 px-2 whitespace-nowrap">
+                              <p className="font-medium text-slate-200 text-xs">{biz.ownerName}</p>
                               <p className="text-[10px] text-slate-400 font-mono">{maskPhone(biz.ownerPhone)}</p>
                             </td>
 
                             {/* Branches & City */}
-                            <td className="py-3.5 px-3 whitespace-nowrap">
-                              <p className="text-slate-200 font-medium flex items-center gap-1">
-                                <Store className="w-3.5 h-3.5 text-blue-400" />
+                            <td className="py-2.5 px-2 whitespace-nowrap">
+                              <p className="text-slate-200 font-medium text-xs flex items-center gap-1">
+                                <Store className="w-3 h-3 text-blue-400" />
                                 {branchCount} {branchCount === 1 ? 'Sede' : 'Sedes'}
                               </p>
                               <p className="text-[10px] text-slate-400">{biz.branches?.[0]?.city || 'Bogotá'}</p>
                             </td>
 
                             {/* Trayectoria Día 1 */}
-                            <td className="py-3.5 px-3 whitespace-nowrap text-center">
-                              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                                <span className="text-slate-400 line-through text-[11px] font-mono">{baselineRating}★</span>
-                                <ArrowRight className="w-3 h-3 text-amber-400" />
-                                <span className="text-amber-300 font-bold text-xs font-mono flex items-center gap-0.5">
-                                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                            <td className="py-2.5 px-2 whitespace-nowrap text-center">
+                              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[10px]">
+                                <span className="text-slate-400 line-through font-mono">{baselineRating}★</span>
+                                <ArrowRight className="w-2.5 h-2.5 text-amber-400" />
+                                <span className="text-amber-300 font-bold font-mono flex items-center gap-0.5">
+                                  <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
                                   {currentGoogleRating}★
                                 </span>
-                                <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold font-mono">
-                                  +{netGain}★ Neto
+                                <span className="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-bold font-mono">
+                                  +{netGain}★
                                 </span>
                               </div>
                             </td>
 
                             {/* Status */}
-                            <td className="py-3.5 px-3 whitespace-nowrap text-center">
+                            <td className="py-2.5 px-2 whitespace-nowrap text-center">
                               <button
                                 type="button"
                                 onClick={() => handleToggleBusinessStatus(biz)}
@@ -1715,12 +1715,12 @@ export default function MasterAdminPage() {
                                 className="cursor-pointer"
                               >
                                 {biz.status === 'suspended' ? (
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[11px] font-semibold hover:bg-red-500/20 transition">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-semibold hover:bg-red-500/20 transition">
                                     <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
                                     Suspendido
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-medium hover:bg-emerald-500/20 transition">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-medium hover:bg-emerald-500/20 transition">
                                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                                     Activo
                                   </span>
@@ -1729,24 +1729,24 @@ export default function MasterAdminPage() {
                             </td>
 
                             {/* Actions */}
-                            <td className="py-3.5 px-4 whitespace-nowrap text-right">
-                              <div className="inline-flex items-center gap-1.5">
+                            <td className="py-2.5 px-3 whitespace-nowrap text-right">
+                              <div className="inline-flex items-center gap-1">
                                 <button
                                   type="button"
                                   onClick={() => setViewPlaceModalBusiness(biz)}
                                   title="Ver Ficha Oficial de Google Maps y Datos del Negocio"
-                                  className="py-1.5 px-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                                  className="py-1 px-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer"
                                 >
-                                  <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                                  <span>Ficha Google</span>
+                                  <MapPin className="w-3 h-3 text-amber-400" />
+                                  <span>Ficha</span>
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleImpersonate(biz)}
                                   title="Entrar al Portal del Cliente simulando al Dueño"
-                                  className="py-1.5 px-2.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                                  className="py-1 px-2 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-[11px] font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer"
                                 >
-                                  <Eye className="w-3.5 h-3.5 text-blue-400" />
+                                  <Eye className="w-3 h-3 text-blue-400" />
                                   <span>Entrar</span>
                                 </button>
                                 <button
@@ -1756,9 +1756,9 @@ export default function MasterAdminPage() {
                                     setActiveTab('conmutador');
                                   }}
                                   title="Conmutador de Planes & Add-Ons"
-                                  className="p-1.5 rounded-xl bg-[#141A26] hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors cursor-pointer"
+                                  className="p-1 rounded-lg bg-[#141A26] hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors cursor-pointer"
                                 >
-                                  <Sliders className="w-3.5 h-3.5 text-amber-400" />
+                                  <Sliders className="w-3 h-3 text-amber-400" />
                                 </button>
                                 <button
                                   type="button"
@@ -1767,9 +1767,9 @@ export default function MasterAdminPage() {
                                     setActiveTab('casos');
                                   }}
                                   title="Caso de Éxito / Testimonio"
-                                  className="p-1.5 rounded-xl bg-[#141A26] hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors cursor-pointer"
+                                  className="p-1 rounded-lg bg-[#141A26] hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors cursor-pointer"
                                 >
-                                  <Award className="w-3.5 h-3.5 text-emerald-400" />
+                                  <Award className="w-3 h-3 text-emerald-400" />
                                 </button>
                               </div>
                             </td>
