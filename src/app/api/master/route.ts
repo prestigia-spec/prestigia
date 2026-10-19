@@ -101,12 +101,24 @@ export async function GET(request: NextRequest) {
 
     const securitySettings = await getMasterSecuritySettings();
 
-    // Enrich campaign participants with brand name, niche, city, and locality
+    const resolveCountry = (biz?: Business, phone?: string) => {
+      if (phone?.startsWith('+56')) return 'Chile';
+      if (phone?.startsWith('+52')) return 'México';
+      if (phone?.startsWith('+1')) return 'Estados Unidos';
+      if (phone?.startsWith('+34')) return 'España';
+      if (phone?.startsWith('+54')) return 'Argentina';
+      if (phone?.startsWith('+51')) return 'Perú';
+      if (biz?.country?.includes('Colombia') || phone?.startsWith('+57')) return 'Colombia';
+      return biz?.country?.replace(/\s*\(NIT\)/, '').trim() || 'Colombia';
+    };
+
+    // Enrich campaign participants with brand name, niche, city, locality, and country
     const enrichedParticipants = campaignParticipants.map((p) => {
       const biz = businesses.find((b) => b.id === p.businessId);
       const branch = biz?.branches?.find((br) => br.id === p.branchId);
       return {
         ...p,
+        country: resolveCountry(biz, p.customerPhone),
         businessName: biz?.name || p.branchName || 'Negocio Registrado',
         nicheCategory: biz?.category || 'Gastronomía & Servicios',
         city: branch?.city || biz?.branches?.[0]?.city || 'Bogotá',
@@ -114,12 +126,13 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    // Enrich feedbacks with brand name, niche, city, and locality
+    // Enrich feedbacks with brand name, niche, city, locality, and country
     const enrichedFeedbacks = feedbacks.map((f) => {
       const biz = businesses.find((b) => b.id === f.businessId);
       const branch = biz?.branches?.find((br) => br.id === f.branchId);
       return {
         ...f,
+        country: resolveCountry(biz, f.customerPhone),
         businessName: f.businessName || biz?.name || 'Negocio Registrado',
         nicheCategory: biz?.category || 'Gastronomía & Servicios',
         city: branch?.city || biz?.branches?.[0]?.city || 'Bogotá',

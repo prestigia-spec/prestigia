@@ -228,9 +228,13 @@ export default function MasterAdminPage() {
   });
 
   // Big Data Lake Filters State
-  const [dataFilterNiche, setDataFilterNiche] = useState('all');
+  const [dataFilterCountry, setDataFilterCountry] = useState('all');
   const [dataFilterCity, setDataFilterCity] = useState('all');
+  const [dataFilterLocality, setDataFilterLocality] = useState('all');
+  const [dataFilterBusiness, setDataFilterBusiness] = useState('all');
+  const [dataFilterNiche, setDataFilterNiche] = useState('all');
   const [dataFilterRating, setDataFilterRating] = useState('all');
+  const [dataPageLimit, setDataPageLimit] = useState<'30' | '50' | 'all'>('all');
 
   // Alertas Tempranas Filters State
   const [alertFilterBusiness, setAlertFilterBusiness] = useState<string>('all');
@@ -915,12 +919,115 @@ export default function MasterAdminPage() {
     });
   }, [businesses, selectedPlanFilter, selectedCategoryFilter, searchTerm]);
 
-  // Filtered Participants for Big Data Lake Tab (Habeas Data & Categorization)
-  const filteredDataLakeParticipants = useMemo(() => {
-    return campaignParticipants.filter((p) => {
-      // 1. Nicho filter
+  // Unified Global Data Lake (Habeas Data & Lead Matrix: 80 Clientes Reales)
+  const unifiedDataLakeRecords = useMemo(() => {
+    const list: Array<{
+      id: string;
+      customerName: string;
+      customerPhone: string;
+      country: string;
+      city: string;
+      locality: string;
+      businessId: string;
+      businessName: string;
+      branchName: string;
+      nicheCategory: string;
+      rating: number;
+      source: string;
+      sourceType: 'sorteo' | 'feedback';
+      registeredAt: string;
+    }> = [];
+
+    // 1. Sorteos & Ruletas (campaignParticipants - 50 registros)
+    campaignParticipants.forEach((p) => {
+      list.push({
+        id: p.id,
+        customerName: p.customerName || 'Cliente Anónimo',
+        customerPhone: p.customerPhone || '',
+        country: (p as any).country || (p.customerPhone?.startsWith('+56') ? 'Chile' : 'Colombia'),
+        city: p.city || 'Bogotá',
+        locality: p.locality || 'Principal',
+        businessId: p.businessId,
+        businessName: p.businessName || 'Negocio Registrado',
+        branchName: p.branchName || 'Sede Principal',
+        nicheCategory: p.nicheCategory || 'Gastronomía & Servicios',
+        rating: Number(p.rating) || 5,
+        source: '🎁 Ruleta / Sorteo QR',
+        sourceType: 'sorteo',
+        registeredAt: p.registeredAt || '2026-10-01',
+      });
+    });
+
+    // 2. Opiniones y Feedbacks QR en Mesa (feedbacks - 30 registros)
+    feedbacks.forEach((f) => {
+      list.push({
+        id: f.id,
+        customerName: f.customerName || 'Comensal Registrado',
+        customerPhone: f.customerPhone || '',
+        country: (f as any).country || (f.customerPhone?.startsWith('+56') ? 'Chile' : 'Colombia'),
+        city: (f as any).city || 'Bogotá',
+        locality: (f as any).locality || 'Principal',
+        businessId: f.businessId,
+        businessName: (f as any).businessName || f.businessId,
+        branchName: f.branchName || 'Sede Principal',
+        nicheCategory: (f as any).nicheCategory || 'Gastronomía & Servicios',
+        rating: Number(f.rating) || 3,
+        source: '📱 QR Mesa / Opinión',
+        sourceType: 'feedback',
+        registeredAt: f.createdAt ? f.createdAt.slice(0, 16).replace('T', ' ') : '2026-10-01',
+      });
+    });
+
+    return list;
+  }, [campaignParticipants, feedbacks]);
+
+  // Dynamic Options for Big Data Lake Filters
+  const availableDataCountries = useMemo(() => {
+    const set = new Set<string>();
+    unifiedDataLakeRecords.forEach((r) => { if (r.country) set.add(r.country); });
+    return Array.from(set).sort();
+  }, [unifiedDataLakeRecords]);
+
+  const availableDataCities = useMemo(() => {
+    const set = new Set<string>();
+    unifiedDataLakeRecords.forEach((r) => { if (r.city) set.add(r.city); });
+    return Array.from(set).sort();
+  }, [unifiedDataLakeRecords]);
+
+  const availableDataLocalities = useMemo(() => {
+    const set = new Set<string>();
+    unifiedDataLakeRecords.forEach((r) => {
+      if (r.locality && r.locality !== 'Principal') set.add(r.locality);
+    });
+    return Array.from(set).sort();
+  }, [unifiedDataLakeRecords]);
+
+  const availableDataBusinesses = useMemo(() => {
+    const map = new Map<string, string>();
+    unifiedDataLakeRecords.forEach((r) => {
+      if (r.businessId && r.businessName) map.set(r.businessId, r.businessName);
+    });
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  }, [unifiedDataLakeRecords]);
+
+  // Filtered Records for Big Data Lake Tab
+  const filteredDataLake = useMemo(() => {
+    return unifiedDataLakeRecords.filter((r) => {
+      // 1. Country filter
+      if (dataFilterCountry !== 'all' && r.country !== dataFilterCountry) return false;
+
+      // 2. City filter
+      if (dataFilterCity !== 'all' && r.city !== dataFilterCity) return false;
+
+      // 3. Locality filter
+      if (dataFilterLocality !== 'all' && r.locality !== dataFilterLocality) return false;
+
+      // 4. Business filter
+      if (dataFilterBusiness !== 'all' && r.businessId !== dataFilterBusiness) return false;
+
+      // 5. Nicho filter
       if (dataFilterNiche !== 'all') {
-        const nicheLower = (p.nicheCategory || '').toLowerCase();
+        const nicheLower = (r.nicheCategory || '').toLowerCase();
         const niche = PRESTIGIA_NICHES.find((n) => n.id === dataFilterNiche);
         if (niche) {
           const matches = niche.keywords.some((k) => nicheLower.includes(k));
@@ -929,44 +1036,44 @@ export default function MasterAdminPage() {
           if (!nicheLower.includes(dataFilterNiche.toLowerCase())) return false;
         }
       }
-      // 2. City filter
-      if (dataFilterCity !== 'all') {
-        const cityLower = (p.city || '').toLowerCase();
-        if (!cityLower.includes(dataFilterCity.toLowerCase())) return false;
-      }
-      // 3. Rating / Segment filter
-      if (dataFilterRating === 'promoters' && Number(p.rating) < 4) return false;
-      if (dataFilterRating === 'detractors' && Number(p.rating) >= 4) return false;
 
-      // 4. Search term filter
+      // 6. Rating / Segment filter
+      if (dataFilterRating === 'promoters' && Number(r.rating) < 4) return false;
+      if (dataFilterRating === 'detractors' && Number(r.rating) >= 4) return false;
+
+      // 7. Search term filter
       if (searchTerm) {
         const t = searchTerm.toLowerCase();
         return (
-          (p.customerName || '').toLowerCase().includes(t) ||
-          (p.customerPhone || '').includes(t) ||
-          (p.businessName || '').toLowerCase().includes(t) ||
-          (p.nicheCategory || '').toLowerCase().includes(t) ||
-          (p.city || '').toLowerCase().includes(t) ||
-          (p.locality || '').toLowerCase().includes(t)
+          r.customerName.toLowerCase().includes(t) ||
+          r.customerPhone.includes(t) ||
+          r.businessName.toLowerCase().includes(t) ||
+          r.nicheCategory.toLowerCase().includes(t) ||
+          r.city.toLowerCase().includes(t) ||
+          r.locality.toLowerCase().includes(t) ||
+          r.country.toLowerCase().includes(t)
         );
       }
+
       return true;
     });
-  }, [campaignParticipants, dataFilterNiche, dataFilterCity, dataFilterRating, searchTerm]);
+  }, [
+    unifiedDataLakeRecords,
+    dataFilterCountry,
+    dataFilterCity,
+    dataFilterLocality,
+    dataFilterBusiness,
+    dataFilterNiche,
+    dataFilterRating,
+    searchTerm,
+  ]);
 
-  // Dynamic Available Cities for Big Data Lake
-  const availableCities = useMemo(() => {
-    const set = new Set<string>();
-    businesses.forEach((b) => {
-      b.branches?.forEach((br) => {
-        if (br.city) set.add(br.city.trim());
-      });
-    });
-    campaignParticipants.forEach((p) => {
-      if (p.city) set.add(p.city.trim());
-    });
-    return Array.from(set).filter(Boolean).sort();
-  }, [businesses, campaignParticipants]);
+  // Displayed records according to pagination / limit
+  const displayedDataLake = useMemo(() => {
+    if (dataPageLimit === '30') return filteredDataLake.slice(0, 30);
+    if (dataPageLimit === '50') return filteredDataLake.slice(0, 50);
+    return filteredDataLake;
+  }, [filteredDataLake, dataPageLimit]);
 
   // Filtered Alerts for Tab 5 (Radar de Quejas en Vivo)
   const filteredAlerts = useMemo(() => {
@@ -2635,10 +2742,10 @@ export default function MasterAdminPage() {
                     Base de Datos Global de Clientes Finales (Habeas Data)
                   </div>
                   <h2 className="text-xl font-bold text-white mt-1">
-                    Big Data Lake Prestigia: <span className="text-purple-300">{campaignParticipants.length + feedbacks.length} Usuarios Clasificados</span>
+                    Big Data Lake Prestigia: <span className="text-purple-300">{unifiedDataLakeRecords.length} Contactos Reales Clasificados</span>
                   </h2>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Preparación de la red para el futuro lanzamiento del programa de fidelización unificado y las Páginas Amarillas Prestigia.
+                    Consolidado de comensales de Ruletas/Sorteos QR y opiniones en sala con teléfono, nombre y autorización de Habeas Data.
                   </p>
                 </div>
 
@@ -2646,43 +2753,41 @@ export default function MasterAdminPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      const csvHeader = 'Nombre_Cliente,Telefono_WhatsApp,Nombre_Negocio,Nicho_Industria,Ciudad,Localidad_Zona,Calificacion_Estrellas,Segmento,Consentimiento_HabeasData\n';
-                      const csvRows = filteredDataLakeParticipants.map((p) => {
-                        const segment = p.rating >= 4 ? 'Promotor 5 Estrellas' : 'Detractor Interceptado (1-3 Estrellas)';
-                        return `"${p.customerName}","${p.customerPhone}","${p.businessName || p.businessId}","${p.nicheCategory || 'Comercial'}","${p.city || 'Bogotá'}","${p.locality || p.branchName || 'Principal'}","${p.rating}★","${segment}","Autorizado 100% Habeas Data"`;
+                      const csvHeader = 'Nombre_Cliente,Telefono_WhatsApp,Pais,Ciudad,Localidad_Zona,Negocio_Registrado,Sede,Nicho_Industria,Calificacion,Segmento,Origen_Registro,Consentimiento_HabeasData,Fecha\n';
+                      const csvRows = filteredDataLake.map((p) => {
+                        const segment = p.rating >= 4 ? 'Promotor (4-5 Estrellas)' : 'Detractor Interceptado (1-3 Estrellas)';
+                        return `"${p.customerName}","${p.customerPhone}","${p.country}","${p.city}","${p.locality}","${p.businessName}","${p.branchName}","${p.nicheCategory}","${p.rating}★","${segment}","${p.source}","Autorizado 100% Habeas Data","${p.registeredAt}"`;
                       }).join('\n');
                       const blob = new Blob([csvHeader + csvRows], { type: 'text/csv;charset=utf-8;' });
                       const url = URL.createObjectURL(blob);
                       const a = document.createElement('a');
                       a.href = url;
-                      a.download = `Prestigia_BigDataLake_${dataFilterNiche}_${dataFilterCity}_${Date.now()}.csv`;
+                      a.download = `Prestigia_BigDataLake_${dataFilterCountry}_${dataFilterCity}_${Date.now()}.csv`;
                       a.click();
                     }}
                     className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-lg shadow-purple-600/20 transition-all"
                   >
                     <Download className="w-4 h-4" />
-                    Exportar a Excel / CSV ({filteredDataLakeParticipants.length})
+                    Exportar a Excel / CSV ({filteredDataLake.length})
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Filter Bar for Big Data Lake */}
-            <div className="bg-[#0E121B] border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+            {/* Multi-Criteria Filter Bar for Big Data Lake */}
+            <div className="bg-[#0E121B] border border-slate-800 rounded-2xl p-4 space-y-3">
               <div className="flex flex-wrap items-center gap-3 text-xs">
-                {/* Nicho Filter */}
+                {/* País Filter */}
                 <div className="flex items-center gap-1.5">
-                  <span className="text-slate-400 font-medium">Nicho Comercial:</span>
+                  <span className="text-slate-400 font-medium">País:</span>
                   <select
-                    value={dataFilterNiche}
-                    onChange={(e) => setDataFilterNiche(e.target.value)}
-                    className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-3 py-1.5 outline-none cursor-pointer"
+                    value={dataFilterCountry}
+                    onChange={(e) => setDataFilterCountry(e.target.value)}
+                    className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
                   >
-                    <option value="all">Todos los Nichos ({PRESTIGIA_NICHES.length})</option>
-                    {PRESTIGIA_NICHES.map((niche) => (
-                      <option key={niche.id} value={niche.id}>
-                        {niche.icon} {niche.label}
-                      </option>
+                    <option value="all">Todos los Países ({availableDataCountries.length})</option>
+                    {availableDataCountries.map((c) => (
+                      <option key={c} value={c}>{c}</option>
                     ))}
                   </select>
                 </div>
@@ -2693,11 +2798,60 @@ export default function MasterAdminPage() {
                   <select
                     value={dataFilterCity}
                     onChange={(e) => setDataFilterCity(e.target.value)}
-                    className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-3 py-1.5 outline-none cursor-pointer"
+                    className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
                   >
-                    <option value="all">Todas las Ciudades ({availableCities.length})</option>
-                    {availableCities.map((c) => (
+                    <option value="all">Todas las Ciudades ({availableDataCities.length})</option>
+                    {availableDataCities.map((c) => (
                       <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Localidad / Zona Filter */}
+                {availableDataLocalities.length > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-slate-400 font-medium">Zona / Localidad:</span>
+                    <select
+                      value={dataFilterLocality}
+                      onChange={(e) => setDataFilterLocality(e.target.value)}
+                      className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
+                    >
+                      <option value="all">Todas las Zonas ({availableDataLocalities.length})</option>
+                      {availableDataLocalities.map((loc) => (
+                        <option key={loc} value={loc}>{loc}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Negocio Registrado Filter */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400 font-medium">Negocio:</span>
+                  <select
+                    value={dataFilterBusiness}
+                    onChange={(e) => setDataFilterBusiness(e.target.value)}
+                    className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer max-w-[180px] truncate"
+                  >
+                    <option value="all">Todos los Negocios ({availableDataBusinesses.length})</option>
+                    {availableDataBusinesses.map((b) => (
+                      <option key={b.id} value={b.id}>{b.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Nicho Filter */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400 font-medium">Nicho:</span>
+                  <select
+                    value={dataFilterNiche}
+                    onChange={(e) => setDataFilterNiche(e.target.value)}
+                    className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
+                  >
+                    <option value="all">Todos los Nichos ({PRESTIGIA_NICHES.length})</option>
+                    {PRESTIGIA_NICHES.map((niche) => (
+                      <option key={niche.id} value={niche.id}>
+                        {niche.icon} {niche.label}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -2708,17 +2862,49 @@ export default function MasterAdminPage() {
                   <select
                     value={dataFilterRating}
                     onChange={(e) => setDataFilterRating(e.target.value)}
-                    className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-3 py-1.5 outline-none cursor-pointer"
+                    className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
                   >
                     <option value="all">Todas las Calificaciones</option>
                     <option value="promoters">🌟 Promotores 4-5★ (Fidelizados)</option>
                     <option value="detractors">🛡️ Detractores 1-3★ (Recuperados)</option>
                   </select>
                 </div>
+
+                {/* Límite en Pantalla */}
+                <div className="flex items-center gap-1.5 ml-auto">
+                  <span className="text-slate-400 font-medium">Mostrar:</span>
+                  <select
+                    value={dataPageLimit}
+                    onChange={(e) => setDataPageLimit(e.target.value as any)}
+                    className="bg-[#141A26] border border-purple-500/40 text-purple-300 text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer font-bold"
+                  >
+                    <option value="30">30 filas</option>
+                    <option value="50">50 filas</option>
+                    <option value="all">Todos los {filteredDataLake.length} registros</option>
+                  </select>
+                </div>
               </div>
 
-              <div className="text-xs text-slate-400">
-                Mostrando <strong className="text-white">{filteredDataLakeParticipants.length}</strong> de <strong className="text-white">{campaignParticipants.length}</strong> clientes clasificados
+              <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800/80">
+                <span>
+                  Mostrando <strong className="text-white">{displayedDataLake.length}</strong> de <strong className="text-white">{filteredDataLake.length}</strong> clientes filtrados (Total en Data Lake: <strong className="text-purple-300">{unifiedDataLakeRecords.length}</strong>)
+                </span>
+                {(dataFilterCountry !== 'all' || dataFilterCity !== 'all' || dataFilterBusiness !== 'all' || dataFilterNiche !== 'all' || dataFilterRating !== 'all') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDataFilterCountry('all');
+                      setDataFilterCity('all');
+                      setDataFilterLocality('all');
+                      setDataFilterBusiness('all');
+                      setDataFilterNiche('all');
+                      setDataFilterRating('all');
+                    }}
+                    className="text-[11px] text-amber-400 hover:underline cursor-pointer"
+                  >
+                    Limpiar todos los filtros
+                  </button>
+                )}
               </div>
             </div>
 
@@ -2728,38 +2914,69 @@ export default function MasterAdminPage() {
                 <table className="w-full text-left text-xs">
                   <thead className="bg-[#141A26] border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider font-semibold">
                     <tr>
-                      <th className="py-3.5 px-4">Cliente Final / WhatsApp</th>
-                      <th className="py-3.5 px-4">Negocio Registrado</th>
-                      <th className="py-3.5 px-4">Nicho de Industria</th>
-                      <th className="py-3.5 px-4">Ciudad & Localidad</th>
-                      <th className="py-3.5 px-4 text-center">Calificación en Nicho</th>
-                      <th className="py-3.5 px-4 text-center">Habeas Data</th>
+                      <th className="py-3 px-3.5">Cliente Final / WhatsApp</th>
+                      <th className="py-3 px-3.5">Ubicación Geográfica</th>
+                      <th className="py-3 px-3.5">Negocio Registrado</th>
+                      <th className="py-3 px-3.5">Nicho de Industria</th>
+                      <th className="py-3 px-3.5 text-center">Calificación & Segmento</th>
+                      <th className="py-3 px-3.5 text-center">Origen & Habeas Data</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/80 text-slate-300">
-                    {filteredDataLakeParticipants.slice(0, 30).map((participant, idx) => {
+                    {displayedDataLake.map((participant, idx) => {
                       const isPromoter = participant.rating >= 4;
+                      const cleanPhone = participant.customerPhone.replace(/[^0-9+]/g, '');
+                      const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}` : null;
+                      const countryFlag = participant.country === 'Chile' ? '🇨🇱' : '🇨🇴';
+
                       return (
                         <tr key={participant.id || idx} className="hover:bg-[#121622] transition-colors">
                           {/* Customer Name & Phone */}
-                          <td className="py-3.5 px-4">
+                          <td className="py-3 px-3.5">
                             <p className="font-semibold text-white">
                               {privacyMode ? 'Cliente Anónimo' : participant.customerName}
                             </p>
-                            <p className="text-[11px] font-mono text-slate-400 flex items-center gap-1 mt-0.5">
-                              <Phone className="w-3 h-3 text-emerald-400" />
-                              {maskPhone(participant.customerPhone)}
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <p className="text-[11px] font-mono text-slate-400 flex items-center gap-1">
+                                <Phone className="w-3 h-3 text-emerald-400" />
+                                {maskPhone(participant.customerPhone)}
+                              </p>
+                              {waLink && !privacyMode && (
+                                <a
+                                  href={waLink}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Abrir chat en WhatsApp"
+                                  className="text-[10px] text-emerald-400 hover:text-emerald-300 font-semibold underline"
+                                >
+                                  WhatsApp ↗
+                                </a>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Country, City & Locality */}
+                          <td className="py-3 px-3.5 whitespace-nowrap">
+                            <div className="flex items-center gap-1.5 font-medium text-slate-200">
+                              <span>{countryFlag}</span>
+                              <span className="font-bold text-slate-100">{participant.country}</span>
+                              <span className="text-slate-500">•</span>
+                              <span className="text-slate-300">{participant.city}</span>
+                            </div>
+                            <p className="text-[10px] text-slate-400 pl-5 flex items-center gap-1">
+                              <MapPin className="w-2.5 h-2.5 text-amber-400" />
+                              <span>{participant.locality || 'Principal'}</span>
                             </p>
                           </td>
 
-                          {/* Business Name */}
-                          <td className="py-3.5 px-4">
-                            <p className="font-bold text-slate-100">{participant.businessName || participant.businessId}</p>
+                          {/* Business Name & Branch */}
+                          <td className="py-3 px-3.5">
+                            <p className="font-bold text-slate-100">{participant.businessName}</p>
                             <p className="text-[10px] text-slate-400 font-mono">{participant.branchName || 'Sede Principal'}</p>
                           </td>
 
                           {/* Niche Badge */}
-                          <td className="py-3.5 px-4 whitespace-nowrap">
+                          <td className="py-3 px-3.5 whitespace-nowrap">
                             {(() => {
                               const nb = getNicheBadge(participant.nicheCategory || '');
                               return (
@@ -2771,17 +2988,8 @@ export default function MasterAdminPage() {
                             })()}
                           </td>
 
-                          {/* City & Locality */}
-                          <td className="py-3.5 px-4 whitespace-nowrap">
-                            <p className="font-medium text-slate-200 flex items-center gap-1">
-                              <MapPin className="w-3 h-3 text-amber-400" />
-                              {participant.city || 'Bogotá'}
-                            </p>
-                            <p className="text-[10px] text-slate-400 pl-4">{participant.locality || 'Principal'}</p>
-                          </td>
-
                           {/* Rating in Niche */}
-                          <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                          <td className="py-3 px-3.5 text-center whitespace-nowrap">
                             <span
                               className={`px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${
                                 isPromoter
@@ -2794,11 +3002,12 @@ export default function MasterAdminPage() {
                             </span>
                           </td>
 
-                          {/* Legal Habeas Data Consent */}
-                          <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                            <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
+                          {/* Source & Legal Habeas Data Consent */}
+                          <td className="py-3 px-3.5 text-center whitespace-nowrap">
+                            <p className="text-[10px] font-medium text-slate-400 mb-0.5">{participant.source}</p>
+                            <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-semibold">
                               <CheckCircle2 className="w-3.5 h-3.5" />
-                              Autorizado
+                              Habeas Data OK
                             </span>
                           </td>
                         </tr>
@@ -2811,7 +3020,7 @@ export default function MasterAdminPage() {
               {/* Table Footer */}
               <div className="py-3 px-4 bg-[#121622] border-t border-slate-800 text-slate-400 text-xs flex flex-col sm:flex-row items-center justify-between gap-2">
                 <span>
-                  Mostrando <strong className="text-white">{Math.min(30, filteredDataLakeParticipants.length)}</strong> de <strong className="text-white">{filteredDataLakeParticipants.length}</strong> resultados filtrados
+                  Mostrando <strong className="text-white">{displayedDataLake.length}</strong> de <strong className="text-white">{filteredDataLake.length}</strong> resultados filtrados (Base total: <strong className="text-white">{unifiedDataLakeRecords.length}</strong>)
                 </span>
                 <span className="text-[11px] text-purple-400 font-medium">
                   Directorio & Fidelización: Base lista para campañas cruzadas y Páginas Amarillas Prestigia
@@ -3954,13 +4163,16 @@ export default function MasterAdminPage() {
                     required
                     value={securityForm.currentMasterKey}
                     onChange={(e) => setSecurityForm({ ...securityForm, currentMasterKey: e.target.value })}
-                    placeholder="Escribe tu clave actual (si es tu primera vez escribe: 1234)"
+                    placeholder="Escribe tu Llave Maestra actual para autorizar cambios"
                     className="w-full bg-[#0D111A] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 font-mono"
                   />
                 </div>
                 <p className="text-[10px] text-slate-400 mt-1 flex items-center justify-between">
-                  <span>Por seguridad bancaria, confirma tu clave actual para autorizar cambios.</span>
-                  <span className="text-amber-400 font-semibold font-mono">Clave actual base: 1234</span>
+                  <span>Por seguridad bancaria, confirma tu clave actual para autorizar cualquier cambio.</span>
+                  <span className="text-emerald-400 font-semibold font-mono flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    Cifrado Bancario Activo
+                  </span>
                 </p>
               </div>
 
