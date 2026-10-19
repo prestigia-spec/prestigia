@@ -928,6 +928,9 @@ export default function MasterAdminPage() {
       country: string;
       city: string;
       locality: string;
+      customerOriginCountry: string;
+      customerOriginFlag: string;
+      isTourist: boolean;
       businessId: string;
       businessName: string;
       branchName: string;
@@ -940,13 +943,20 @@ export default function MasterAdminPage() {
 
     // 1. Sorteos & Ruletas (campaignParticipants - 50 registros)
     campaignParticipants.forEach((p) => {
+      const isChilePhone = p.customerPhone?.startsWith('+56');
+      const originCountry = (p as any).customerOriginCountry || (isChilePhone ? 'Chile' : 'Colombia');
+      const originFlag = (p as any).customerOriginFlag || (isChilePhone ? '🇨🇱' : '🇨🇴');
+      const estCountry = (p as any).country || 'Colombia';
       list.push({
         id: p.id,
         customerName: p.customerName || 'Cliente Anónimo',
         customerPhone: p.customerPhone || '',
-        country: (p as any).country || (p.customerPhone?.startsWith('+56') ? 'Chile' : 'Colombia'),
+        country: estCountry,
         city: p.city || 'Bogotá',
         locality: p.locality || 'Principal',
+        customerOriginCountry: originCountry,
+        customerOriginFlag: originFlag,
+        isTourist: Boolean((p as any).isTourist || (isChilePhone && estCountry === 'Colombia')),
         businessId: p.businessId,
         businessName: p.businessName || 'Negocio Registrado',
         branchName: p.branchName || 'Sede Principal',
@@ -960,13 +970,20 @@ export default function MasterAdminPage() {
 
     // 2. Opiniones y Feedbacks QR en Mesa (feedbacks - 30 registros)
     feedbacks.forEach((f) => {
+      const isChilePhone = f.customerPhone?.startsWith('+56');
+      const originCountry = (f as any).customerOriginCountry || (isChilePhone ? 'Chile' : 'Colombia');
+      const originFlag = (f as any).customerOriginFlag || (isChilePhone ? '🇨🇱' : '🇨🇴');
+      const estCountry = (f as any).country || 'Colombia';
       list.push({
         id: f.id,
         customerName: f.customerName || 'Comensal Registrado',
         customerPhone: f.customerPhone || '',
-        country: (f as any).country || (f.customerPhone?.startsWith('+56') ? 'Chile' : 'Colombia'),
+        country: estCountry,
         city: (f as any).city || 'Bogotá',
         locality: (f as any).locality || 'Principal',
+        customerOriginCountry: originCountry,
+        customerOriginFlag: originFlag,
+        isTourist: Boolean((f as any).isTourist || (isChilePhone && estCountry === 'Colombia')),
         businessId: f.businessId,
         businessName: (f as any).businessName || f.businessId,
         branchName: f.branchName || 'Sede Principal',
@@ -981,34 +998,48 @@ export default function MasterAdminPage() {
     return list;
   }, [campaignParticipants, feedbacks]);
 
-  // Dynamic Options for Big Data Lake Filters
+  // Cascading Dynamic Options for Big Data Lake Filters
   const availableDataCountries = useMemo(() => {
     const set = new Set<string>();
     unifiedDataLakeRecords.forEach((r) => { if (r.country) set.add(r.country); });
     return Array.from(set).sort();
   }, [unifiedDataLakeRecords]);
 
+  // Cities belonging ONLY to the selected Country (Cascading)
   const availableDataCities = useMemo(() => {
     const set = new Set<string>();
-    unifiedDataLakeRecords.forEach((r) => { if (r.city) set.add(r.city); });
+    unifiedDataLakeRecords.forEach((r) => {
+      if (dataFilterCountry === 'all' || r.country === dataFilterCountry) {
+        if (r.city) set.add(r.city.trim());
+      }
+    });
     return Array.from(set).sort();
-  }, [unifiedDataLakeRecords]);
+  }, [unifiedDataLakeRecords, dataFilterCountry]);
 
+  // Localities belonging ONLY to the selected City and Country (Cascading)
   const availableDataLocalities = useMemo(() => {
     const set = new Set<string>();
     unifiedDataLakeRecords.forEach((r) => {
-      if (r.locality && r.locality !== 'Principal') set.add(r.locality);
+      const matchCountry = dataFilterCountry === 'all' || r.country === dataFilterCountry;
+      const matchCity = dataFilterCity === 'all' || r.city.trim().toLowerCase() === dataFilterCity.trim().toLowerCase();
+      if (matchCountry && matchCity && r.locality && r.locality !== 'Principal') {
+        set.add(r.locality.trim());
+      }
     });
     return Array.from(set).sort();
-  }, [unifiedDataLakeRecords]);
+  }, [unifiedDataLakeRecords, dataFilterCountry, dataFilterCity]);
 
   const availableDataBusinesses = useMemo(() => {
     const map = new Map<string, string>();
     unifiedDataLakeRecords.forEach((r) => {
-      if (r.businessId && r.businessName) map.set(r.businessId, r.businessName);
+      const matchCountry = dataFilterCountry === 'all' || r.country === dataFilterCountry;
+      const matchCity = dataFilterCity === 'all' || r.city.trim().toLowerCase() === dataFilterCity.trim().toLowerCase();
+      if (matchCountry && matchCity && r.businessId && r.businessName) {
+        map.set(r.businessId, r.businessName);
+      }
     });
     return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
-  }, [unifiedDataLakeRecords]);
+  }, [unifiedDataLakeRecords, dataFilterCountry, dataFilterCity]);
 
   // Filtered Records for Big Data Lake Tab
   const filteredDataLake = useMemo(() => {
@@ -2782,7 +2813,11 @@ export default function MasterAdminPage() {
                   <span className="text-slate-400 font-medium">País:</span>
                   <select
                     value={dataFilterCountry}
-                    onChange={(e) => setDataFilterCountry(e.target.value)}
+                    onChange={(e) => {
+                      setDataFilterCountry(e.target.value);
+                      setDataFilterCity('all');
+                      setDataFilterLocality('all');
+                    }}
                     className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
                   >
                     <option value="all">Todos los Países ({availableDataCountries.length})</option>
@@ -2797,7 +2832,10 @@ export default function MasterAdminPage() {
                   <span className="text-slate-400 font-medium">Ciudad:</span>
                   <select
                     value={dataFilterCity}
-                    onChange={(e) => setDataFilterCity(e.target.value)}
+                    onChange={(e) => {
+                      setDataFilterCity(e.target.value);
+                      setDataFilterLocality('all');
+                    }}
                     className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
                   >
                     <option value="all">Todas las Ciudades ({availableDataCities.length})</option>
@@ -2953,6 +2991,14 @@ export default function MasterAdminPage() {
                                 </a>
                               )}
                             </div>
+                            {participant.isTourist && (
+                              <div className="mt-1">
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/30 text-blue-300 text-[10px] font-semibold">
+                                  <span>{participant.customerOriginFlag}</span>
+                                  <span>Turista / Internacional ({participant.customerOriginCountry})</span>
+                                </span>
+                              </div>
+                            )}
                           </td>
 
                           {/* Country, City & Locality */}
@@ -2961,7 +3007,7 @@ export default function MasterAdminPage() {
                               <span>{countryFlag}</span>
                               <span className="font-bold text-slate-100">{participant.country}</span>
                               <span className="text-slate-500">•</span>
-                              <span className="text-slate-300">{participant.city}</span>
+                              <span className="text-slate-300 font-semibold">{participant.city}</span>
                             </div>
                             <p className="text-[10px] text-slate-400 pl-5 flex items-center gap-1">
                               <MapPin className="w-2.5 h-2.5 text-amber-400" />

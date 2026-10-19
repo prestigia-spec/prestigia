@@ -101,24 +101,39 @@ export async function GET(request: NextRequest) {
 
     const securitySettings = await getMasterSecuritySettings();
 
-    const resolveCountry = (biz?: Business, phone?: string) => {
-      if (phone?.startsWith('+56')) return 'Chile';
-      if (phone?.startsWith('+52')) return 'México';
-      if (phone?.startsWith('+1')) return 'Estados Unidos';
-      if (phone?.startsWith('+34')) return 'España';
-      if (phone?.startsWith('+54')) return 'Argentina';
-      if (phone?.startsWith('+51')) return 'Perú';
-      if (biz?.country?.includes('Colombia') || phone?.startsWith('+57')) return 'Colombia';
-      return biz?.country?.replace(/\s*\(NIT\)/, '').trim() || 'Colombia';
+    const resolveEstablishmentCountry = (biz?: Business) => {
+      if (!biz?.country) return 'Colombia';
+      if (biz.country.includes('Colombia')) return 'Colombia';
+      if (biz.country.includes('Chile')) return 'Chile';
+      if (biz.country.includes('México') || biz.country.includes('Mexico')) return 'México';
+      if (biz.country.includes('España') || biz.country.includes('Espana')) return 'España';
+      if (biz.country.includes('Estados Unidos') || biz.country.includes('USA')) return 'Estados Unidos';
+      return biz.country.replace(/\s*\(NIT\)/, '').trim() || 'Colombia';
     };
 
-    // Enrich campaign participants with brand name, niche, city, locality, and country
+    const resolvePhoneCountry = (phone?: string) => {
+      if (phone?.startsWith('+56')) return { name: 'Chile', flag: '🇨🇱', code: 'CL' };
+      if (phone?.startsWith('+52')) return { name: 'México', flag: '🇲🇽', code: 'MX' };
+      if (phone?.startsWith('+1')) return { name: 'Estados Unidos', flag: '🇺🇸', code: 'US' };
+      if (phone?.startsWith('+34')) return { name: 'España', flag: '🇪🇸', code: 'ES' };
+      if (phone?.startsWith('+54')) return { name: 'Argentina', flag: '🇦🇷', code: 'AR' };
+      if (phone?.startsWith('+51')) return { name: 'Perú', flag: '🇵🇪', code: 'PE' };
+      if (phone?.startsWith('+57')) return { name: 'Colombia', flag: '🇨🇴', code: 'CO' };
+      return { name: 'Colombia', flag: '🇨🇴', code: 'CO' };
+    };
+
+    // Enrich campaign participants with physical location and tourist badge
     const enrichedParticipants = campaignParticipants.map((p) => {
       const biz = businesses.find((b) => b.id === p.businessId);
       const branch = biz?.branches?.find((br) => br.id === p.branchId);
+      const estCountry = resolveEstablishmentCountry(biz);
+      const phoneOrigin = resolvePhoneCountry(p.customerPhone);
       return {
         ...p,
-        country: resolveCountry(biz, p.customerPhone),
+        country: estCountry,
+        customerOriginCountry: phoneOrigin.name,
+        customerOriginFlag: phoneOrigin.flag,
+        isTourist: phoneOrigin.name !== estCountry,
         businessName: biz?.name || p.branchName || 'Negocio Registrado',
         nicheCategory: biz?.category || 'Gastronomía & Servicios',
         city: branch?.city || biz?.branches?.[0]?.city || 'Bogotá',
@@ -126,13 +141,18 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    // Enrich feedbacks with brand name, niche, city, locality, and country
+    // Enrich feedbacks with physical location and tourist badge
     const enrichedFeedbacks = feedbacks.map((f) => {
       const biz = businesses.find((b) => b.id === f.businessId);
       const branch = biz?.branches?.find((br) => br.id === f.branchId);
+      const estCountry = resolveEstablishmentCountry(biz);
+      const phoneOrigin = resolvePhoneCountry(f.customerPhone);
       return {
         ...f,
-        country: resolveCountry(biz, f.customerPhone),
+        country: estCountry,
+        customerOriginCountry: phoneOrigin.name,
+        customerOriginFlag: phoneOrigin.flag,
+        isTourist: phoneOrigin.name !== estCountry,
         businessName: f.businessName || biz?.name || 'Negocio Registrado',
         nicheCategory: biz?.category || 'Gastronomía & Servicios',
         city: branch?.city || biz?.branches?.[0]?.city || 'Bogotá',
