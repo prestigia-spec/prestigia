@@ -145,17 +145,55 @@ export default function MasterAdminPage() {
     totpSecret: 'JBSWY3DPEHPK3PXP',
   });
 
-  // Query public gateway security status on load and hydrate local security preferences
+  // Query public gateway security status on load, restore active session from sessionStorage, and hydrate local security preferences
   useEffect(() => {
+    let wasExplicitlyLocked = false;
+
     // Check if coming from a voluntary or inactivity lock
     if (typeof window !== 'undefined') {
       try {
         const params = new URLSearchParams(window.location.search);
         const lockedParam = params.get('locked');
         if (lockedParam === 'voluntary') {
+          wasExplicitlyLocked = true;
+          sessionStorage.removeItem('prestigia_master_session');
           setAuthError('Sesión bloqueada voluntariamente por el Administrador Master.');
+          if (window.history?.replaceState) {
+            window.history.replaceState({}, '', '/prestigia-hq-core-2026');
+          }
         } else if (lockedParam === 'timeout') {
+          wasExplicitlyLocked = true;
+          sessionStorage.removeItem('prestigia_master_session');
           setAuthError('Sesión bloqueada por inactividad prolongada (Seguridad Bancaria Prestigia).');
+          if (window.history?.replaceState) {
+            window.history.replaceState({}, '', '/prestigia-hq-core-2026');
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Hydrate active session across F5 / page reloads
+    if (!wasExplicitlyLocked && typeof window !== 'undefined') {
+      try {
+        const rawSession = sessionStorage.getItem('prestigia_master_session');
+        if (rawSession) {
+          const parsedSession = JSON.parse(rawSession);
+          if (parsedSession?.authenticated && parsedSession?.lastActivity) {
+            const elapsed = Date.now() - Number(parsedSession.lastActivity);
+            if (elapsed < SESSION_INACTIVITY_MS) {
+              // Valid unexpired session: keep user logged in across F5!
+              setIsAuthenticated(true);
+              lastActivityRef.current = Date.now();
+              sessionStorage.setItem('prestigia_master_session', JSON.stringify({
+                authenticated: true,
+                lastActivity: Date.now(),
+              }));
+            } else {
+              // Session expired (> 10 minutes): enforce lock
+              sessionStorage.removeItem('prestigia_master_session');
+              setAuthError('Sesión bloqueada por inactividad prolongada (Seguridad Bancaria Prestigia).');
+            }
+          }
         }
       } catch (e) {}
     }
@@ -313,6 +351,7 @@ export default function MasterAdminPage() {
 
   // Auto-inactivity lock ref
   const lastActivityRef = useRef<number>(Date.now());
+  const lastSessionSaveRef = useRef<number>(Date.now());
 
   // Dynamic TOTP simulation timer (changes every 30s)
   useEffect(() => {
@@ -346,6 +385,7 @@ export default function MasterAdminPage() {
 
     if (typeof window !== 'undefined') {
       try {
+        sessionStorage.removeItem('prestigia_master_session');
         sessionStorage.clear();
       } catch (e) {}
       // Hard navigation to completely wipe React DOM memory and flush any cached form state
@@ -357,7 +397,17 @@ export default function MasterAdminPage() {
   useEffect(() => {
     if (!isAuthenticated) return;
     const updateActivity = () => {
-      lastActivityRef.current = Date.now();
+      const now = Date.now();
+      lastActivityRef.current = now;
+      if (now - lastSessionSaveRef.current > 5000) {
+        lastSessionSaveRef.current = now;
+        try {
+          sessionStorage.setItem('prestigia_master_session', JSON.stringify({
+            authenticated: true,
+            lastActivity: now,
+          }));
+        } catch (e) {}
+      }
     };
 
     window.addEventListener('mousemove', updateActivity);
@@ -543,6 +593,15 @@ export default function MasterAdminPage() {
         setLockoutUntil(null);
         lastActivityRef.current = Date.now();
         localStorage.setItem('prestigia_master_custom_key', keyClean);
+        try {
+          sessionStorage.setItem('prestigia_master_session', JSON.stringify({
+            authenticated: true,
+            lastActivity: Date.now(),
+          }));
+          if (typeof window !== 'undefined' && window.history?.replaceState) {
+            window.history.replaceState({}, '', '/prestigia-hq-core-2026');
+          }
+        } catch (e) {}
       } else {
         const newAttempts = failedAttempts + 1;
         setFailedAttempts(newAttempts);
@@ -744,6 +803,15 @@ export default function MasterAdminPage() {
         setEmergencyOtpSent(false);
         setEmergencyOtpInput('');
         lastActivityRef.current = Date.now();
+        try {
+          sessionStorage.setItem('prestigia_master_session', JSON.stringify({
+            authenticated: true,
+            lastActivity: Date.now(),
+          }));
+          if (typeof window !== 'undefined' && window.history?.replaceState) {
+            window.history.replaceState({}, '', '/prestigia-hq-core-2026');
+          }
+        } catch (e) {}
       } else {
         setAuthError(data.error || 'Clave dinámica inválida.');
       }
