@@ -381,17 +381,9 @@ export async function POST(request: NextRequest) {
 
       console.log(`[PRESTIGIA BANKING OTP DISPATCHED] Code: ${generatedOtp} -> Target: ${targetPhone} & ${targetEmail}`);
 
-      const cleanPhoneDigits = targetPhone.replace(/[^0-9]/g, '');
-      const whatsappText = encodeURIComponent(`[PRESTIGIA DIRECCIÓN GENERAL] Tu Código Dinámico de Rescate de Emergencia es: ${generatedOtp}. Válido por 5 minutos.`);
-      const whatsappUrl = `https://wa.me/${cleanPhoneDigits}?text=${whatsappText}`;
-
       return NextResponse.json({
         success: true,
-        message: 'Clave Dinámica de Emergencia generada con éxito.',
-        code: generatedOtp,
-        whatsappUrl,
-        targetPhone,
-        targetEmail,
+        message: 'Solicitud de rescate bancario registrada exitosamente.',
         maskedPhone: targetPhone.replace(/(\+\d{2}\s?\d{3})\d{4}(\d{3})/, '$1 •••• $2'),
         maskedEmail: targetEmail.replace(/(.{2})(.*)(@.*)/, '$1••••$3'),
         expiresInSeconds: 300,

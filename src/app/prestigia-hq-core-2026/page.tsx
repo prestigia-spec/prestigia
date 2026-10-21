@@ -85,6 +85,17 @@ const PLAN_BADGES: Record<string, { label: string; color: string; border: string
   empresarial: { label: 'Empresarial', color: 'bg-purple-500/10 text-purple-400', border: 'border-purple-500/30' },
 };
 
+// Zero-Trust Masking Helpers for Confidential Contact Channels
+const maskSafePhone = (phone: string) => {
+  if (!phone) return '+57 ••• ••• ••XX';
+  return phone.replace(/(\+\d{2}\s?\d{3})\d{4}(\d{3})/, '$1 •••• $2');
+};
+
+const maskSafeEmail = (email: string) => {
+  if (!email) return '•••@prestigia.app';
+  return email.replace(/(.{2})(.*)(@.*)/, '$1••••$3');
+};
+
 export default function MasterAdminPage() {
   // Authentication & Banking Security State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -98,7 +109,7 @@ export default function MasterAdminPage() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [totpRemainingSec, setTotpRemainingSec] = useState(30);
 
-  // Emergency SOS Dynamic Key State (WhatsApp / Email out-of-band)
+  // Emergency SOS Dynamic Key State (Zero-Trust)
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
   const [emergencyPhone, setEmergencyPhone] = useState('+57 317 260 6093');
   const [emergencyEmail, setEmergencyEmail] = useState('info@prestigia.app');
@@ -107,8 +118,6 @@ export default function MasterAdminPage() {
   const [showEmergencyOtp, setShowEmergencyOtp] = useState(false);
   const [emergencyCountdown, setEmergencyCountdown] = useState(300);
   const [emergencyLoading, setEmergencyLoading] = useState(false);
-  const [dispatchedOtp, setDispatchedOtp] = useState<string | null>(null);
-  const [dispatchedWhatsappUrl, setDispatchedWhatsappUrl] = useState<string | null>(null);
 
   // Master Security Credentials Management Modal
   const [showSecurityConfigModal, setShowSecurityConfigModal] = useState(false);
@@ -766,8 +775,6 @@ export default function MasterAdminPage() {
       const data = await res.json();
       if (data.success) {
         setEmergencyOtpSent(true);
-        setDispatchedOtp(data.code || null);
-        setDispatchedWhatsappUrl(data.whatsappUrl || null);
         setEmergencyCountdown(300);
       } else {
         setAuthError(data.error || 'Error solicitando clave dinámica.');
@@ -1564,7 +1571,7 @@ export default function MasterAdminPage() {
                 className="inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 transition-colors font-medium cursor-pointer"
               >
                 <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
-                ¿Emergencia? Despachar Clave Dinámica a mi WhatsApp personal
+                ¿Emergencia? Rescate Criptográfico de la Consola Master
               </button>
             </div>
           </div>
@@ -1608,62 +1615,33 @@ export default function MasterAdminPage() {
                 <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-xs">
                   <p className="font-semibold flex items-center gap-1.5 text-amber-300">
                     <Smartphone className="w-4 h-4" />
-                    Código Dinámico de Un Solo Uso
+                    Protocolo de Rescate Fuera de Banda
                   </p>
                   <p className="mt-1 text-[11px] text-slate-300">
-                    Generado de forma segura para tus canales de rescate autorizados ({emergencyPhone} / {emergencyEmail}).
+                    {emergencyPhone ? `Se ha despachado una clave temporal a tus canales privados autorizados (${maskSafePhone(emergencyPhone)} / ${maskSafeEmail(emergencyEmail)}). Ningún código se revela en este terminal público.` : 'Introduce tu Llave Maestra o clave temporal para rescate de emergencia.'}
                   </p>
                 </div>
-
-                {/* Direct WhatsApp Link Button */}
-                {dispatchedWhatsappUrl && (
-                  <a
-                    href={dispatchedWhatsappUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-2.5 px-3 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all text-center"
-                  >
-                    <Smartphone className="w-4 h-4 text-emerald-200" />
-                    <span>Recibir / Abrir en mi WhatsApp ({emergencyPhone}) ↗</span>
-                  </a>
-                )}
-
-                {/* Visual OTP Card with 1-click Autocomplete */}
-                {dispatchedOtp && (
-                  <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-transparent border border-amber-500/35 flex items-center justify-between gap-3 animate-in fade-in duration-200">
-                    <div>
-                      <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider block">Código de Rescate Generado:</span>
-                      <span className="font-mono text-xl font-extrabold text-white tracking-[0.25em]">{dispatchedOtp}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setEmergencyOtpInput(dispatchedOtp)}
-                      className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs cursor-pointer shadow-md shadow-amber-500/25 flex items-center gap-1 shrink-0 transition-transform active:scale-95"
-                    >
-                      <Check className="w-3.5 h-3.5" />
-                      <span>Autocompletar</span>
-                    </button>
-                  </div>
-                )}
 
                 <form onSubmit={handleVerifyEmergencyOtp} className="space-y-4">
                   <div>
                     <div className="flex items-center justify-between text-xs text-slate-300 mb-1.5">
-                      <span>Introduce el código recibido o tu Llave Maestra:</span>
-                      <span className="text-amber-400 font-mono text-[11px]">
-                        Vigencia: {Math.floor(emergencyCountdown / 60)}:{(emergencyCountdown % 60).toString().padStart(2, '0')}
-                      </span>
+                      <span>Introduce tu Llave Maestra o Clave de Rescate:</span>
+                      {emergencyCountdown > 0 && (
+                        <span className="text-amber-400 font-mono text-[11px]">
+                          Vigencia: {Math.floor(emergencyCountdown / 60)}:{(emergencyCountdown % 60).toString().padStart(2, '0')}
+                        </span>
+                      )}
                     </div>
                     <div className="relative">
                       <input
                         type={showEmergencyOtp ? 'text' : 'password'}
-                        maxLength={32}
+                        maxLength={64}
                         value={emergencyOtpInput}
                         onChange={(e) => setEmergencyOtpInput(e.target.value)}
-                        placeholder="•••••• o Llave Maestra"
+                        placeholder="••••••••••••••••"
                         required
                         autoFocus
-                        className="w-full bg-[#141A26] border border-amber-500/50 focus:border-amber-400 text-white text-center font-mono text-xl tracking-[0.2em] font-bold rounded-xl py-3 pr-11 outline-none"
+                        className="w-full bg-[#141A26] border border-amber-500/50 focus:border-amber-400 text-white text-center font-mono text-lg tracking-[0.2em] font-bold rounded-xl py-3 pr-11 outline-none"
                       />
                       <button
                         type="button"
@@ -1673,8 +1651,8 @@ export default function MasterAdminPage() {
                         {showEmergencyOtp ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-1 text-center">
-                      💡 Si no tienes acceso a tu WhatsApp, también puedes ingresar tu Llave Maestra como respaldo offline.
+                    <p className="text-[10px] text-slate-400 mt-1.5 text-center">
+                      🔐 Puedes ingresar directamente tu Llave Maestra offline o la clave temporal enviada a tu canal privado.
                     </p>
                   </div>
 
@@ -1688,7 +1666,7 @@ export default function MasterAdminPage() {
                 </form>
 
                 <p className="text-[10px] text-slate-400 text-center">
-                  Por seguridad, esta clave se autodestruye al ser ingresada o tras 5 minutos.
+                  Por seguridad Zero-Trust, ninguna credencial o número de rescate se revela en esta pantalla.
                 </p>
               </div>
             </div>
