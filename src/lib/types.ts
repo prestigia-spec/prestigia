@@ -387,7 +387,7 @@ export const PRESTIGIA_NICHES: PrestigiaNiche[] = [
     shortLabel: 'Gastronomía & Bares',
     icon: '🍔',
     color: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
-    keywords: ['gastro', 'hamburguesa', 'restaurante', 'café', 'cafe', 'comida', 'bar', 'pizzería', 'pizzeria', 'panadería', 'panaderia', 'repostería', 'coctel'],
+    keywords: ['gastro', 'hamburguesa', 'restaurante', 'café', 'cafe', 'comida', 'gastrobar', 'bares', 'cantina', 'pub', 'cervecería', 'cerveceria', 'pizzería', 'pizzeria', 'panadería', 'panaderia', 'repostería', 'coctel'],
   },
   {
     id: 'salud',
