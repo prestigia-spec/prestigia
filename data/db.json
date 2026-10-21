@@ -2625,8 +2625,9 @@
     "masterKey": "PRESTIGIA-MASTER-2026",
     "emergencyPhone": "+57 317 260 6093",
     "emergencyEmail": "info@prestigia.app",
-    "totpSecret": "PRESTIGIA-TOTP-SECRET-HQ",
-    "updatedAt": "2026-10-15T19:54:40.985Z"
+    "totpSecret": "JBSWY3DPEHPK3PXP",
+    "twoFactorEnabled": false,
+    "updatedAt": "2026-10-20T20:00:00.000Z"
   },
   "leads": [
     {

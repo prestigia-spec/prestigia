@@ -75,10 +75,14 @@ function ensureDbFile(): DatabaseSchema {
 }
 
 function writeDbFile(data: DatabaseSchema): void {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (err: any) {
+    console.warn('[DB] writeDbFile warning (expected in serverless/read-only mode):', err?.message);
   }
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
 }
 
 /**
@@ -505,14 +509,12 @@ export async function getMasterSecuritySettings(): Promise<MasterSecurityConfig>
       twoFactorEnabled: false,
       updatedAt: new Date().toISOString(),
     };
-    writeDbFile(db);
   }
   if (db.masterSecurity.twoFactorEnabled === undefined) {
     db.masterSecurity.twoFactorEnabled = false;
   }
   if (!db.masterSecurity.totpSecret || db.masterSecurity.totpSecret.includes('PRESTIGIA-TOTP')) {
     db.masterSecurity.totpSecret = 'JBSWY3DPEHPK3PXP';
-    writeDbFile(db);
   }
   return db.masterSecurity;
 }

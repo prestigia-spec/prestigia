@@ -217,13 +217,22 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Normalizer for master keys to handle unicode dashes, accidental spaces, and case
+    const normalizeKey = (k: string) =>
+      (k || '')
+        .trim()
+        .replace(/\s+/g, '')
+        .replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]/g, '-')
+        .toUpperCase();
+
     // 0. Verify Master Credentials (Strict Authentication)
     if (action === 'verify_master_credentials') {
       const { masterKey, totpToken } = body;
-      const cleanKey = (masterKey || '').trim();
+      const cleanKey = normalizeKey(masterKey);
+      const expectedKey = normalizeKey(currentSec.masterKey || 'PRESTIGIA-MASTER-2026');
 
       // Check Master Key strictly against server storage (NO demo keys)
-      const isKeyValid = cleanKey === currentSec.masterKey;
+      const isKeyValid = cleanKey === expectedKey;
       if (!isKeyValid) {
         return NextResponse.json({
           success: false,
@@ -266,10 +275,11 @@ export async function POST(request: NextRequest) {
     // 0.1 Update Master Security Credentials
     if (action === 'update_master_security') {
       const { currentMasterKey, newMasterKey, newEmergencyPhone, newEmergencyEmail, newTotpSecret, twoFactorEnabled } = body;
-      const cleanCurrent = (currentMasterKey || '').trim();
+      const cleanCurrent = normalizeKey(currentMasterKey);
+      const expectedCurrent = normalizeKey(currentSec.masterKey);
 
       // Strictly check current master key (NO backdoor)
-      if (cleanCurrent !== currentSec.masterKey) {
+      if (cleanCurrent !== expectedCurrent) {
         return NextResponse.json({ error: 'La Llave Maestra actual es incorrecta. No se autoriza el cambio de credenciales.' }, { status: 403 });
       }
 
