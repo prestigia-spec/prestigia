@@ -288,13 +288,9 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Check 2FA if enabled in settings OR if client is in 2FA mode OR if totpToken was sent
+      // Check 2FA strictly if enabled on server settings (server authoritative)
       const cleanToken = (totpToken || '').trim();
-      const is2FAEnforced = Boolean(
-        currentSec.twoFactorEnabled ||
-        requireTwoFactor ||
-        cleanToken.length > 0
-      );
+      const is2FAEnforced = Boolean(currentSec.twoFactorEnabled);
 
       if (is2FAEnforced) {
         if (!cleanToken || cleanToken.length !== 6) {

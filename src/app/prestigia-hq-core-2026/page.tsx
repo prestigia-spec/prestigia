@@ -237,10 +237,6 @@ export default function MasterAdminPage() {
           setEmergencyPhone(parsed.emergencyPhone);
           setSecurityForm((prev) => ({ ...prev, newEmergencyPhone: parsed.emergencyPhone }));
         }
-        if (parsed.twoFactorEnabled !== undefined) {
-          setIsTwoFactorActiveOnServer(Boolean(parsed.twoFactorEnabled));
-          setSecurityForm((prev) => ({ ...prev, twoFactorEnabled: Boolean(parsed.twoFactorEnabled) }));
-        }
       }
     } catch (e) {}
 
@@ -620,7 +616,6 @@ export default function MasterAdminPage() {
           action: 'verify_master_credentials',
           masterKey: keyClean,
           totpToken: tokenClean,
-          requireTwoFactor: isTwoFactorActiveOnServer,
         }),
       });
       const verifyData = await verifyRes.json();
@@ -1683,7 +1678,7 @@ export default function MasterAdminPage() {
             </form>
 
             {/* Emergency SOS Recovery Button */}
-            <div className="mt-6 pt-5 border-t border-slate-800 text-center">
+            <div className="mt-6 pt-5 border-t border-slate-800 flex flex-col gap-2.5 items-center justify-center text-center">
               <button
                 type="button"
                 onClick={() => {
@@ -1694,6 +1689,19 @@ export default function MasterAdminPage() {
               >
                 <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
                 ¿Emergencia? Rescate Criptográfico de la Consola Master
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  localStorage.removeItem('prestigia_master_security_config');
+                  localStorage.removeItem('prestigia_master_custom_key');
+                  sessionStorage.clear();
+                  window.location.reload();
+                }}
+                className="text-[11px] text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
+              >
+                🔄 Limpiar datos locales y restablecer sesión
               </button>
             </div>
           </div>
