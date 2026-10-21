@@ -129,9 +129,13 @@ export default function MasterAdminPage() {
     newEmergencyEmail: 'info@prestigia.app',
     newTotpSecret: 'JBSWY3DPEHPK3PXP',
     twoFactorEnabled: false,
+    resendApiKey: '',
+    resendFromEmail: '',
   });
   const [securityFormLoading, setSecurityFormLoading] = useState(false);
   const [securityFormError, setSecurityFormError] = useState<string | null>(null);
+  const [testNotificationLoading, setTestNotificationLoading] = useState(false);
+  const [testNotificationResult, setTestNotificationResult] = useState<{ success: boolean; message: string } | null>(null);
   const [isVaultUnlocked, setIsVaultUnlocked] = useState(false);
   const [vaultChallengeKey, setVaultChallengeKey] = useState('');
   const [vaultVerifying, setVaultVerifying] = useState(false);
@@ -146,6 +150,10 @@ export default function MasterAdminPage() {
     emergencyEmail: string;
     twoFactorEnabled?: boolean;
     totpSecret?: string;
+    resendApiKey?: string;
+    hasResendConfigured?: boolean;
+    resendFromEmail?: string;
+    hasTwilioConfigured?: boolean;
     updatedAt?: string;
     maskedPhone?: string;
     maskedEmail?: string;
@@ -484,6 +492,8 @@ export default function MasterAdminPage() {
             newEmergencyEmail: effEmail,
             newTotpSecret: effTotp || prev.newTotpSecret,
             twoFactorEnabled: eff2FA,
+            resendApiKey: data.securityConfig.resendApiKey || prev.resendApiKey,
+            resendFromEmail: data.securityConfig.resendFromEmail || prev.resendFromEmail,
           }));
         }
 
@@ -711,6 +721,8 @@ export default function MasterAdminPage() {
           newEmergencyEmail: securityForm.newEmergencyEmail,
           newTotpSecret: securityForm.newTotpSecret,
           twoFactorEnabled: securityForm.twoFactorEnabled,
+          resendApiKey: securityForm.resendApiKey,
+          resendFromEmail: securityForm.resendFromEmail,
         }),
       });
       const data = await res.json();
@@ -755,6 +767,42 @@ export default function MasterAdminPage() {
       setSecurityFormError('Error de conexión con el módulo de seguridad bancaria.');
     } finally {
       setSecurityFormLoading(false);
+    }
+  };
+
+  // Test Live Notification Dispatch
+  const handleTestNotificationDispatch = async () => {
+    setTestNotificationLoading(true);
+    setTestNotificationResult(null);
+    try {
+      const res = await fetch('/api/master', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'test_notification_dispatch',
+          email: securityForm.newEmergencyEmail,
+          phone: securityForm.newEmergencyPhone,
+        }),
+      });
+      const data = await res.json();
+      if (data.emailSent || data.smsSent) {
+        setTestNotificationResult({
+          success: true,
+          message: `✓ ¡Despacho exitoso! Código de prueba enviado vía ${data.provider}. Revisa tu bandeja de entrada en ${securityForm.newEmergencyEmail}.`,
+        });
+      } else {
+        setTestNotificationResult({
+          success: false,
+          message: data.error || data.summary || 'Para habilitar el envío automático real a tu teléfono o bandeja de entrada, ingresa tu API Key de Resend.',
+        });
+      }
+    } catch (err) {
+      setTestNotificationResult({
+        success: false,
+        message: 'Error de conexión probando el despacho.',
+      });
+    } finally {
+      setTestNotificationLoading(false);
     }
   };
 
@@ -4822,6 +4870,81 @@ export default function MasterAdminPage() {
                         </p>
                       </div>
                     )}
+                  </div>
+
+                  {/* Step 4: Transactional Dispatch Gateways (Real Email & WhatsApp) */}
+                  <div className="pt-3 border-t border-slate-800 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-slate-200 font-bold flex items-center gap-1.5">
+                        <Radio className="w-3.5 h-3.5 text-amber-400" />
+                        4. Pasarelas de Despacho Transaccional (Email & WhatsApp Corporativo)
+                      </label>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono border ${
+                        securityConfig.hasResendConfigured || securityForm.resendApiKey
+                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 font-bold'
+                          : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                      }`}>
+                        {securityConfig.hasResendConfigured || securityForm.resendApiKey ? '✓ RESEND CONECTADO' : 'CONFIGURACIÓN OPCIONAL'}
+                      </span>
+                    </div>
+
+                    <p className="text-[11px] text-slate-300">
+                      Para que los códigos de rescate y las alertas de contención de clientes lleguen automáticamente por red a tu bandeja de entrada o teléfono móvil, puedes registrar tu API Key:
+                    </p>
+
+                    <div className="space-y-2.5">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-[11px] text-slate-300 font-medium">Resend API Key (re_...)</label>
+                          <a
+                            href="https://resend.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-amber-400 hover:underline"
+                          >
+                            Obtener gratis en Resend.com ↗
+                          </a>
+                        </div>
+                        <input
+                          type="password"
+                          value={securityForm.resendApiKey}
+                          onChange={(e) => setSecurityForm({ ...securityForm, resendApiKey: e.target.value })}
+                          placeholder="re_123456789abcdef..."
+                          className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2 outline-none font-mono text-xs focus:border-amber-400"
+                        />
+                      </div>
+
+                      {/* Live Test Dispatch Button */}
+                      <div className="pt-1 flex items-center justify-between gap-3">
+                        <button
+                          type="button"
+                          disabled={testNotificationLoading}
+                          onClick={handleTestNotificationDispatch}
+                          className="px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors disabled:opacity-50"
+                        >
+                          <Radio className="w-3.5 h-3.5 text-amber-400" />
+                          <span>{testNotificationLoading ? 'Probando Despacho en Vivo...' : 'Probar Envío a mi Correo / Celular'}</span>
+                        </button>
+                        <span className="text-[10px] text-slate-400">
+                          Prueba la entrega a {securityForm.newEmergencyEmail}
+                        </span>
+                      </div>
+
+                      {testNotificationResult && (
+                        <div className={`p-2.5 rounded-xl text-xs flex items-center gap-2 ${
+                          testNotificationResult.success
+                            ? 'bg-emerald-950/40 border border-emerald-500/40 text-emerald-300'
+                            : 'bg-amber-950/40 border border-amber-500/40 text-amber-300'
+                        }`}>
+                          {testNotificationResult.success ? (
+                            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                          ) : (
+                            <AlertCircle className="w-4 h-4 shrink-0 text-amber-400" />
+                          )}
+                          <span>{testNotificationResult.message}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Submit Buttons */}

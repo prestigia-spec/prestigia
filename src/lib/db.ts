@@ -41,6 +41,12 @@ export interface MasterSecurityConfig {
   emergencyEmail: string;
   totpSecret?: string;
   twoFactorEnabled?: boolean;
+  resendApiKey?: string;
+  resendFromEmail?: string;
+  brevoApiKey?: string;
+  twilioAccountSid?: string;
+  twilioAuthToken?: string;
+  twilioFromPhone?: string;
   activeOtp?: {
     code: string;
     expiresAt: number;

@@ -15,6 +15,7 @@ import {
 } from '@/lib/db';
 import { Business, MasterAddOns, DayOneBaseline } from '@/lib/types';
 import { verifyTOTP, getTOTPAuthUrl } from '@/lib/totp';
+import { dispatchEmergencyOtpNotification } from '@/lib/notifications';
 
 // In-memory Ephemeral Emergency OTP Store (Single use, 5-minute expiry)
 interface EmergencyOtpRecord {
@@ -184,6 +185,10 @@ export async function GET(request: NextRequest) {
         emergencyEmail: securitySettings.emergencyEmail,
         twoFactorEnabled: Boolean(securitySettings.twoFactorEnabled),
         totpSecret: securitySettings.totpSecret || 'JBSWY3DPEHPK3PXP',
+        resendApiKey: securitySettings.resendApiKey ? '••••••••' + securitySettings.resendApiKey.slice(-4) : '',
+        hasResendConfigured: Boolean(securitySettings.resendApiKey || process.env.RESEND_API_KEY),
+        resendFromEmail: securitySettings.resendFromEmail || process.env.RESEND_FROM_EMAIL || 'Prestigia Security <onboarding@resend.dev>',
+        hasTwilioConfigured: Boolean(securitySettings.twilioAccountSid || process.env.TWILIO_ACCOUNT_SID),
         updatedAt: securitySettings.updatedAt,
         maskedPhone: securitySettings.emergencyPhone.replace(/(\+\d{2}\s?\d{3})\d{4}(\d{3})/, '$1 •••• $2'),
         maskedEmail: securitySettings.emergencyEmail.replace(/(.{2})(.*)(@.*)/, '$1••••$3'),
@@ -310,7 +315,19 @@ export async function POST(request: NextRequest) {
 
     // 0.1 Update Master Security Credentials
     if (action === 'update_master_security') {
-      const { currentMasterKey, newMasterKey, newEmergencyPhone, newEmergencyEmail, newTotpSecret, twoFactorEnabled } = body;
+      const {
+        currentMasterKey,
+        newMasterKey,
+        newEmergencyPhone,
+        newEmergencyEmail,
+        newTotpSecret,
+        twoFactorEnabled,
+        resendApiKey,
+        resendFromEmail,
+        twilioAccountSid,
+        twilioAuthToken,
+        twilioFromPhone,
+      } = body;
       const cleanCurrent = normalizeKey(currentMasterKey);
       const expectedCurrent = normalizeKey(currentSec.masterKey);
 
@@ -339,16 +356,25 @@ export async function POST(request: NextRequest) {
         emergencyEmail: newEmergencyEmail ? newEmergencyEmail.trim() : currentSec.emergencyEmail,
         totpSecret: newTotpSecret ? newTotpSecret.trim().toUpperCase() : (currentSec.totpSecret || 'JBSWY3DPEHPK3PXP'),
         twoFactorEnabled: twoFactorEnabled !== undefined ? Boolean(twoFactorEnabled) : currentSec.twoFactorEnabled,
+        resendApiKey: resendApiKey !== undefined ? resendApiKey.trim() : currentSec.resendApiKey,
+        resendFromEmail: resendFromEmail !== undefined ? resendFromEmail.trim() : currentSec.resendFromEmail,
+        twilioAccountSid: twilioAccountSid !== undefined ? twilioAccountSid.trim() : currentSec.twilioAccountSid,
+        twilioAuthToken: twilioAuthToken !== undefined ? twilioAuthToken.trim() : currentSec.twilioAuthToken,
+        twilioFromPhone: twilioFromPhone !== undefined ? twilioFromPhone.trim() : currentSec.twilioFromPhone,
       });
 
       return NextResponse.json({
         success: true,
-        message: 'Credenciales de seguridad bancaria actualizadas exitosamente en el servidor.',
+        message: 'Credenciales de seguridad bancaria y pasarelas de despacho actualizadas exitosamente.',
         securityConfig: {
           emergencyPhone: updated.emergencyPhone,
           emergencyEmail: updated.emergencyEmail,
           twoFactorEnabled: Boolean(updated.twoFactorEnabled),
           totpSecret: updated.totpSecret,
+          resendApiKey: updated.resendApiKey ? '••••••••' + updated.resendApiKey.slice(-4) : '',
+          hasResendConfigured: Boolean(updated.resendApiKey || process.env.RESEND_API_KEY),
+          resendFromEmail: updated.resendFromEmail || process.env.RESEND_FROM_EMAIL || 'Prestigia Security <onboarding@resend.dev>',
+          hasTwilioConfigured: Boolean(updated.twilioAccountSid || process.env.TWILIO_ACCOUNT_SID),
           updatedAt: updated.updatedAt,
           maskedPhone: updated.emergencyPhone.replace(/(\+\d{2}\s?\d{3})\d{4}(\d{3})/, '$1 •••• $2'),
           maskedEmail: updated.emergencyEmail.replace(/(.{2})(.*)(@.*)/, '$1••••$3'),
@@ -356,7 +382,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 1. Dispatch Emergency OTP (Out-of-band to WhatsApp and Email)
     // 1. Dispatch Emergency OTP (Out-of-band to WhatsApp and Email)
     if (action === 'request_emergency_otp') {
       const targetPhone = body.phone || currentSec.emergencyPhone || '+57 317 260 6093';
@@ -379,14 +404,46 @@ export async function POST(request: NextRequest) {
         activeOtp: otpRecord,
       });
 
-      console.log(`[PRESTIGIA BANKING OTP DISPATCHED] Code: ${generatedOtp} -> Target: ${targetPhone} & ${targetEmail}`);
+      // Dispatch live notification via enterprise out-of-band engine
+      const dispatchResult = await dispatchEmergencyOtpNotification({
+        toEmail: targetEmail,
+        toPhone: targetPhone,
+        code: generatedOtp,
+        config: currentSec,
+      });
+
+      console.log(`[PRESTIGIA BANKING OTP DISPATCHED] Code: ${generatedOtp} -> Target: ${targetPhone} & ${targetEmail} | Result: ${dispatchResult.summary}`);
 
       return NextResponse.json({
         success: true,
         message: 'Solicitud de rescate bancario registrada exitosamente.',
-        maskedPhone: targetPhone.replace(/(\+\d{2}\s?\d{3})\d{4}(\d{3})/, '$1 •••• $2'),
-        maskedEmail: targetEmail.replace(/(.{2})(.*)(@.*)/, '$1••••$3'),
+        dispatchSummary: dispatchResult.summary,
+        emailSent: dispatchResult.emailSent,
+        smsSent: dispatchResult.smsSent,
+        provider: dispatchResult.provider,
         expiresInSeconds: 300,
+      });
+    }
+
+    // 1.5 Test Notification Gateway Dispatch (Live Connectivity Test)
+    if (action === 'test_notification_dispatch') {
+      const targetEmail = body.email || currentSec.emergencyEmail || 'luisma0603@gmail.com';
+      const targetPhone = body.phone || currentSec.emergencyPhone || '+57 317 260 6093';
+
+      const dispatchResult = await dispatchEmergencyOtpNotification({
+        toEmail: targetEmail,
+        toPhone: targetPhone,
+        code: '998877',
+        config: currentSec,
+      });
+
+      return NextResponse.json({
+        success: dispatchResult.success,
+        summary: dispatchResult.summary,
+        provider: dispatchResult.provider,
+        emailSent: dispatchResult.emailSent,
+        smsSent: dispatchResult.smsSent,
+        error: dispatchResult.error,
       });
     }
 
