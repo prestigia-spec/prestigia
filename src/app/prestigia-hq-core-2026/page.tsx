@@ -311,6 +311,30 @@ export default function MasterAdminPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Voluntary or Inactivity Lock (Purges credentials and resets unmask state for Zero-Leakage)
+  const handleLockConsole = (message?: string) => {
+    setIsAuthenticated(false);
+    setMasterKeyInput('');
+    setTotpTokenInput('');
+    setShowPassword(false);
+    setShowTotpToken(false);
+    setVaultChallengeKey('');
+    setIsVaultUnlocked(false);
+    setShowSecurityConfigModal(false);
+    setShowEmergencyModal(false);
+    setEmergencyOtpInput('');
+    setShowEmergencyOtp(false);
+    setSecurityForm((prev) => ({
+      ...prev,
+      currentMasterKey: '',
+      newMasterKey: '',
+      confirmNewMasterKey: '',
+    }));
+    if (message) {
+      setAuthError(message);
+    }
+  };
+
   // Inactivity watchdog
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -324,8 +348,7 @@ export default function MasterAdminPage() {
 
     const checkInterval = setInterval(() => {
       if (Date.now() - lastActivityRef.current > SESSION_INACTIVITY_MS) {
-        setIsAuthenticated(false);
-        setAuthError('Sesión bloqueada por inactividad prolongada (Seguridad Bancaria Prestigia).');
+        handleLockConsole('Sesión bloqueada por inactividad prolongada (Seguridad Bancaria Prestigia).');
       }
     }, 15000);
 
@@ -493,6 +516,11 @@ export default function MasterAdminPage() {
 
       if (verifyData.isValid) {
         setIsAuthenticated(true);
+        // Zero-Trust: Purge input state and reset password masks from memory immediately upon login
+        setMasterKeyInput('');
+        setTotpTokenInput('');
+        setShowPassword(false);
+        setShowTotpToken(false);
         setFailedAttempts(0);
         setLockoutUntil(null);
         lastActivityRef.current = Date.now();
@@ -687,6 +715,11 @@ export default function MasterAdminPage() {
       const data = await res.json();
       if (data.success) {
         setIsAuthenticated(true);
+        // Zero-Trust: Purge credentials and masks from memory
+        setMasterKeyInput('');
+        setTotpTokenInput('');
+        setShowPassword(false);
+        setShowTotpToken(false);
         setShowEmergencyModal(false);
         setFailedAttempts(0);
         setLockoutUntil(null);
@@ -1362,6 +1395,7 @@ export default function MasterAdminPage() {
                     onChange={(e) => setMasterKeyInput(e.target.value)}
                     placeholder="••••••••••••••••"
                     required
+                    autoComplete="new-password"
                     disabled={Boolean(lockoutUntil && Date.now() < lockoutUntil)}
                     className="w-full bg-[#141A26] border border-slate-700/80 focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 text-white placeholder-slate-400 text-sm rounded-xl px-4 py-3 pr-11 transition-all outline-none font-mono"
                   />
@@ -1400,6 +1434,7 @@ export default function MasterAdminPage() {
                       onChange={(e) => setTotpTokenInput(e.target.value.replace(/[^0-9]/g, ''))}
                       placeholder="••••••"
                       required
+                      autoComplete="one-time-code"
                       disabled={Boolean(lockoutUntil && Date.now() < lockoutUntil)}
                       className="w-full bg-[#141A26] border border-slate-700/80 focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 text-white placeholder-slate-600 text-center tracking-[0.4em] text-lg font-mono rounded-xl px-4 py-3 pr-11 transition-all outline-none font-bold"
                     />
@@ -1629,10 +1664,7 @@ export default function MasterAdminPage() {
           {/* Lock Session Emergency */}
           <button
             type="button"
-            onClick={() => {
-              setIsAuthenticated(false);
-              setAuthError('Sesión bloqueada voluntariamente por el Administrador Master.');
-            }}
+            onClick={() => handleLockConsole('Sesión bloqueada voluntariamente por el Administrador Master.')}
             className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <Lock className="w-3.5 h-3.5 text-rose-400" />
