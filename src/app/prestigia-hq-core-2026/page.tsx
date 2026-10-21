@@ -486,6 +486,7 @@ export default function MasterAdminPage() {
           action: 'verify_master_credentials',
           masterKey: keyClean,
           totpToken: tokenClean,
+          requireTwoFactor: isTwoFactorActiveOnServer,
         }),
       });
       const verifyData = await verifyRes.json();

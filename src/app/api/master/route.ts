@@ -227,7 +227,7 @@ export async function POST(request: NextRequest) {
 
     // 0. Verify Master Credentials (Strict Authentication)
     if (action === 'verify_master_credentials') {
-      const { masterKey, totpToken } = body;
+      const { masterKey, totpToken, requireTwoFactor } = body;
       const cleanKey = normalizeKey(masterKey);
       const expectedKey = normalizeKey(currentSec.masterKey || 'PRESTIGIA-MASTER-2026');
 
@@ -241,9 +241,15 @@ export async function POST(request: NextRequest) {
         }, { status: 401 });
       }
 
-      // Check 2FA if enabled in settings
-      if (currentSec.twoFactorEnabled) {
-        const cleanToken = (totpToken || '').trim();
+      // Check 2FA if enabled in settings OR if client is in 2FA mode OR if totpToken was sent
+      const cleanToken = (totpToken || '').trim();
+      const is2FAEnforced = Boolean(
+        currentSec.twoFactorEnabled ||
+        requireTwoFactor ||
+        cleanToken.length > 0
+      );
+
+      if (is2FAEnforced) {
         if (!cleanToken || cleanToken.length !== 6) {
           return NextResponse.json({
             success: false,
@@ -259,7 +265,7 @@ export async function POST(request: NextRequest) {
             success: false,
             isValid: false,
             twoFactorRequired: true,
-            error: 'Token TOTP incorrecto o expirado. Verifica la app Google Authenticator de tu celular.',
+            error: 'Token TOTP incorrecto o expirado. Introduce el código actual de tu aplicación Google Authenticator.',
           }, { status: 401 });
         }
       }
@@ -267,7 +273,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         isValid: true,
-        twoFactorRequired: Boolean(currentSec.twoFactorEnabled),
+        twoFactorRequired: is2FAEnforced,
         message: 'Sesión Master autorizada exitosamente.',
       });
     }
