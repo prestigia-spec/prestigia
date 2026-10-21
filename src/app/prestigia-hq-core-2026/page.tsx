@@ -2222,8 +2222,16 @@ export default function MasterAdminPage() {
                             {/* Brand & Category */}
                             <td className="py-2.5 px-3">
                               <div className="flex items-center gap-2.5">
-                                <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-amber-500/20 to-amber-950/40 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-xs shrink-0">
-                                  {biz.name.charAt(0)}
+                                <div className="w-8 h-8 rounded-xl bg-[#141A26] border border-amber-500/30 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                                  {biz.branding?.logoUrl ? (
+                                    <img
+                                      src={biz.branding.logoUrl}
+                                      alt={biz.name}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <span className="text-amber-400 font-bold text-xs">{biz.name.charAt(0)}</span>
+                                  )}
                                 </div>
                                 <div className="min-w-0">
                                   <p className="font-bold text-white group-hover:text-amber-400 transition-colors truncate text-xs">
@@ -2415,10 +2423,23 @@ export default function MasterAdminPage() {
                           </button>
                         </div>
 
-                        {/* Brand Name */}
-                        <h3 className="text-base font-bold text-white group-hover:text-amber-400 transition-colors">
-                          {biz.name}
-                        </h3>
+                        {/* Brand Name & Logo */}
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-[#141A26] border border-amber-500/30 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                            {biz.branding?.logoUrl ? (
+                              <img
+                                src={biz.branding.logoUrl}
+                                alt={biz.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-amber-400 font-bold text-xs">{biz.name.charAt(0)}</span>
+                            )}
+                          </div>
+                          <h3 className="text-base font-bold text-white group-hover:text-amber-400 transition-colors">
+                            {biz.name}
+                          </h3>
+                        </div>
 
                         {/* Metadata Pills */}
                         <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-800/80 text-[11px]">
@@ -5591,8 +5612,16 @@ export default function MasterAdminPage() {
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-500/20 to-blue-950/40 border border-blue-500/40 flex items-center justify-center text-blue-400 font-bold text-lg">
-                  {viewPlaceModalBusiness.name.charAt(0)}
+                <div className="w-12 h-12 rounded-2xl bg-[#141A26] border border-blue-500/40 flex items-center justify-center overflow-hidden shrink-0 shadow-md">
+                  {viewPlaceModalBusiness.branding?.logoUrl ? (
+                    <img
+                      src={viewPlaceModalBusiness.branding.logoUrl}
+                      alt={viewPlaceModalBusiness.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-blue-400 font-bold text-lg">{viewPlaceModalBusiness.name.charAt(0)}</span>
+                  )}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">

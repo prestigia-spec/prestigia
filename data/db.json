@@ -265,7 +265,7 @@
       "taxId": "CC. 1.098.452.120",
       "country": "Colombia (NIT)",
       "branding": {
-        "logoUrl": "",
+        "logoUrl": "/logos/dr-mendoza.svg",
         "primaryColor": "#10B981",
         "accentColor": "#059669"
       },
@@ -351,6 +351,7 @@
       "taxId": "900.887.654-2",
       "country": "Colombia (NIT)",
       "branding": {
+        "logoUrl": "/logos/autoelite.svg",
         "primaryColor": "#2563EB",
         "accentColor": "#2563EB"
       },
@@ -436,6 +437,7 @@
       "taxId": "800.123.456-9",
       "country": "Colombia (NIT)",
       "branding": {
+        "logoUrl": "/logos/soberana.svg",
         "primaryColor": "#7C3AED",
         "accentColor": "#7C3AED"
       },
@@ -545,6 +547,7 @@
       "taxId": "901.789.321-4",
       "country": "Colombia (NIT)",
       "branding": {
+        "logoUrl": "/logos/imperio-barber.svg",
         "primaryColor": "#EC4899",
         "accentColor": "#DB2777"
       },
@@ -605,6 +608,7 @@
       "taxId": "900.654.987-3",
       "country": "Colombia (NIT)",
       "branding": {
+        "logoUrl": "/logos/titan-gym.svg",
         "primaryColor": "#F97316",
         "accentColor": "#EA580C"
       },
@@ -665,6 +669,7 @@
       "taxId": "901.332.114-8",
       "country": "Colombia (NIT)",
       "branding": {
+        "logoUrl": "/logos/san-roque.svg",
         "primaryColor": "#14B8A6",
         "accentColor": "#0D9488"
       },
@@ -725,6 +730,7 @@
       "taxId": "900.445.667-1",
       "country": "Colombia (NIT)",
       "branding": {
+        "logoUrl": "/logos/boutique-monaco.svg",
         "primaryColor": "#F43F5E",
         "accentColor": "#E11D48"
       },
