@@ -137,8 +137,27 @@ export default function MasterAdminPage() {
     totpSecret: 'JBSWY3DPEHPK3PXP',
   });
 
-  // Query public gateway security status on load (e.g. check if 2FA is active)
+  // Query public gateway security status on load and hydrate local security preferences
   useEffect(() => {
+    try {
+      const savedConfig = localStorage.getItem('prestigia_master_security_config');
+      if (savedConfig) {
+        const parsed = JSON.parse(savedConfig);
+        if (parsed.emergencyEmail) {
+          setEmergencyEmail(parsed.emergencyEmail);
+          setSecurityForm((prev) => ({ ...prev, newEmergencyEmail: parsed.emergencyEmail }));
+        }
+        if (parsed.emergencyPhone) {
+          setEmergencyPhone(parsed.emergencyPhone);
+          setSecurityForm((prev) => ({ ...prev, newEmergencyPhone: parsed.emergencyPhone }));
+        }
+        if (parsed.twoFactorEnabled !== undefined) {
+          setIsTwoFactorActiveOnServer(Boolean(parsed.twoFactorEnabled));
+          setSecurityForm((prev) => ({ ...prev, twoFactorEnabled: Boolean(parsed.twoFactorEnabled) }));
+        }
+      }
+    } catch (e) {}
+
     fetch('/api/master', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -147,8 +166,12 @@ export default function MasterAdminPage() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          setIsTwoFactorActiveOnServer(Boolean(data.twoFactorEnabled));
-          if (data.maskedPhone) setEmergencyPhone(data.maskedPhone);
+          // If local doesn't have an override, apply server values
+          const savedConfig = localStorage.getItem('prestigia_master_security_config');
+          if (!savedConfig) {
+            setIsTwoFactorActiveOnServer(Boolean(data.twoFactorEnabled));
+            if (data.maskedPhone) setEmergencyPhone(data.maskedPhone);
+          }
         }
       })
       .catch(() => {});
@@ -320,21 +343,38 @@ export default function MasterAdminPage() {
         setStats(data.stats || null);
 
         if (data.securityConfig) {
-          setSecurityConfig(data.securityConfig);
-          setIsTwoFactorActiveOnServer(Boolean(data.securityConfig.twoFactorEnabled));
-          if (data.securityConfig.emergencyPhone) {
-            setEmergencyPhone(data.securityConfig.emergencyPhone);
-            setSecurityForm((prev) => ({
-              ...prev,
-              newEmergencyPhone: data.securityConfig.emergencyPhone,
-              newEmergencyEmail: data.securityConfig.emergencyEmail || prev.newEmergencyEmail,
-              newTotpSecret: data.securityConfig.totpSecret || prev.newTotpSecret,
-              twoFactorEnabled: Boolean(data.securityConfig.twoFactorEnabled),
-            }));
-          }
-          if (data.securityConfig.emergencyEmail) {
-            setEmergencyEmail(data.securityConfig.emergencyEmail);
-          }
+          let effEmail = data.securityConfig.emergencyEmail;
+          let effPhone = data.securityConfig.emergencyPhone;
+          let eff2FA = Boolean(data.securityConfig.twoFactorEnabled);
+          let effTotp = data.securityConfig.totpSecret;
+
+          try {
+            const savedConfig = localStorage.getItem('prestigia_master_security_config');
+            if (savedConfig) {
+              const p = JSON.parse(savedConfig);
+              if (p.emergencyEmail) effEmail = p.emergencyEmail;
+              if (p.emergencyPhone) effPhone = p.emergencyPhone;
+              if (p.twoFactorEnabled !== undefined) eff2FA = Boolean(p.twoFactorEnabled);
+              if (p.totpSecret) effTotp = p.totpSecret;
+            }
+          } catch (e) {}
+
+          setSecurityConfig({
+            ...data.securityConfig,
+            emergencyEmail: effEmail,
+            emergencyPhone: effPhone,
+            twoFactorEnabled: eff2FA,
+          });
+          setIsTwoFactorActiveOnServer(eff2FA);
+          setEmergencyPhone(effPhone);
+          setEmergencyEmail(effEmail);
+          setSecurityForm((prev) => ({
+            ...prev,
+            newEmergencyPhone: effPhone,
+            newEmergencyEmail: effEmail,
+            newTotpSecret: effTotp || prev.newTotpSecret,
+            twoFactorEnabled: eff2FA,
+          }));
         }
 
         setTrafficVisits(data.trafficVisits || []);
@@ -507,6 +547,20 @@ export default function MasterAdminPage() {
         if (securityForm.newMasterKey) {
           localStorage.setItem('prestigia_master_custom_key', securityForm.newMasterKey.trim());
         }
+
+        const updatedConfig = {
+          emergencyEmail: securityForm.newEmergencyEmail.trim(),
+          emergencyPhone: securityForm.newEmergencyPhone.trim(),
+          twoFactorEnabled: securityForm.twoFactorEnabled,
+          totpSecret: securityForm.newTotpSecret,
+        };
+
+        try {
+          localStorage.setItem('prestigia_master_security_config', JSON.stringify(updatedConfig));
+        } catch (e) {}
+
+        setEmergencyEmail(updatedConfig.emergencyEmail);
+        setEmergencyPhone(updatedConfig.emergencyPhone);
         setIsTwoFactorActiveOnServer(Boolean(securityForm.twoFactorEnabled));
         setShowSecurityConfigModal(false);
         setSecurityForm((prev) => ({
@@ -514,6 +568,9 @@ export default function MasterAdminPage() {
           currentMasterKey: '',
           newMasterKey: '',
           confirmNewMasterKey: '',
+          newEmergencyEmail: updatedConfig.emergencyEmail,
+          newEmergencyPhone: updatedConfig.emergencyPhone,
+          twoFactorEnabled: securityForm.twoFactorEnabled,
         }));
         setNotification({ type: 'success', message: '¡Credenciales bancarias maestras y nivel de blindaje actualizados con éxito!' });
         setTimeout(() => setNotification(null), 4000);

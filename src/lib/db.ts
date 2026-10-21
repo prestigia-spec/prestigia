@@ -16,8 +16,13 @@ import {
   TrafficVisit,
 } from './types';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
+const IS_SERVERLESS = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const DATA_DIR = IS_SERVERLESS ? path.join('/tmp', 'prestigia-data') : path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
+const SEED_DB_FILE = path.join(process.cwd(), 'data', 'db.json');
+
+// In-process memory singleton cache to ensure immediate consistency
+let memoryDb: DatabaseSchema | null = null;
 
 interface DatabaseSchema {
   businesses: Business[];
@@ -40,48 +45,58 @@ export interface MasterSecurityConfig {
 }
 
 function ensureDbFile(): DatabaseSchema {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+  if (memoryDb) {
+    return memoryDb;
   }
 
-  if (fs.existsSync(DB_FILE)) {
+  if (!fs.existsSync(DATA_DIR)) {
     try {
-      const raw = fs.readFileSync(DB_FILE, 'utf-8');
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    } catch (e) {}
+  }
+
+  // In serverless, populate /tmp/prestigia-data/db.json from the seed db.json bundled with the build
+  if (IS_SERVERLESS && !fs.existsSync(DB_FILE) && fs.existsSync(SEED_DB_FILE)) {
+    try {
+      const seedRaw = fs.readFileSync(SEED_DB_FILE, 'utf-8');
+      fs.writeFileSync(DB_FILE, seedRaw, 'utf-8');
+    } catch (e) {
+      console.error('Error seeding serverless db:', e);
+    }
+  }
+
+  const fileToRead = fs.existsSync(DB_FILE) ? DB_FILE : SEED_DB_FILE;
+
+  if (fs.existsSync(fileToRead)) {
+    try {
+      const raw = fs.readFileSync(fileToRead, 'utf-8');
       const parsed = JSON.parse(raw);
-      if (!parsed.googleReviews) {
-        parsed.googleReviews = [];
-      }
-      if (!parsed.incidents) {
-        parsed.incidents = [];
-      }
-      if (!parsed.campaignParticipants) {
-        parsed.campaignParticipants = [];
-      }
-      if (!parsed.leads) {
-        parsed.leads = [];
-      }
-      if (!parsed.trafficVisits) {
-        parsed.trafficVisits = [];
-      }
-      return parsed;
+      if (!parsed.googleReviews) parsed.googleReviews = [];
+      if (!parsed.incidents) parsed.incidents = [];
+      if (!parsed.campaignParticipants) parsed.campaignParticipants = [];
+      if (!parsed.leads) parsed.leads = [];
+      if (!parsed.trafficVisits) parsed.trafficVisits = [];
+      memoryDb = parsed;
+      return memoryDb!;
     } catch (err) {
       console.error('Error reading db.json:', err);
     }
   }
 
   const emptyData: DatabaseSchema = { businesses: [], feedbacks: [], googleReviews: [], incidents: [] };
-  fs.writeFileSync(DB_FILE, JSON.stringify(emptyData, null, 2), 'utf-8');
+  memoryDb = emptyData;
   return emptyData;
 }
 
 function writeDbFile(data: DatabaseSchema): void {
+  memoryDb = data;
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
     fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
   } catch (err: any) {
-    console.warn('[DB] writeDbFile warning (expected in serverless/read-only mode):', err?.message);
+    console.warn('[DB] writeDbFile warning:', err?.message);
   }
 }
 
