@@ -73,7 +73,6 @@ import { Business, BusinessPlan, Branch, MasterAddOns, DayOneBaseline, PRESTIGIA
 
 // Banking Master Credentials & Thresholds
 const MASTER_KEY_DEFAULT = 'PRESTIGIA-MASTER-2026';
-const MASTER_KEY_FALLBACK = '1234';
 const MAX_FAILED_ATTEMPTS = 3;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes lockout
 const SESSION_INACTIVITY_MS = 10 * 60 * 1000; // 10 minutes auto-lock
@@ -89,6 +88,7 @@ const PLAN_BADGES: Record<string, { label: string; color: string; border: string
 export default function MasterAdminPage() {
   // Authentication & Banking Security State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isTwoFactorActiveOnServer, setIsTwoFactorActiveOnServer] = useState(false);
   const [masterKeyInput, setMasterKeyInput] = useState('');
   const [totpTokenInput, setTotpTokenInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -99,12 +99,11 @@ export default function MasterAdminPage() {
 
   // Emergency SOS Dynamic Key State (WhatsApp / Email out-of-band)
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
-  const [emergencyPhone, setEmergencyPhone] = useState('+57 300 892 4110');
-  const [emergencyEmail, setEmergencyEmail] = useState('brayan@prestigia.app');
+  const [emergencyPhone, setEmergencyPhone] = useState('+57 317 260 6093');
+  const [emergencyEmail, setEmergencyEmail] = useState('info@prestigia.app');
   const [emergencyOtpSent, setEmergencyOtpSent] = useState(false);
   const [emergencyOtpInput, setEmergencyOtpInput] = useState('');
   const [emergencyCountdown, setEmergencyCountdown] = useState(300);
-  const [emergencyDemoHint, setEmergencyDemoHint] = useState<string | null>(null);
   const [emergencyLoading, setEmergencyLoading] = useState(false);
 
   // Master Security Credentials Management Modal
@@ -113,9 +112,10 @@ export default function MasterAdminPage() {
     currentMasterKey: '',
     newMasterKey: '',
     confirmNewMasterKey: '',
-    newEmergencyPhone: '+57 300 892 4110',
-    newEmergencyEmail: 'brayan@prestigia.app',
-    newTotpSecret: 'PRESTIGIA-TOTP-HQ-2026',
+    newEmergencyPhone: '+57 317 260 6093',
+    newEmergencyEmail: 'info@prestigia.app',
+    newTotpSecret: 'JBSWY3DPEHPK3PXP',
+    twoFactorEnabled: false,
   });
   const [securityFormLoading, setSecurityFormLoading] = useState(false);
   const [securityFormError, setSecurityFormError] = useState<string | null>(null);
@@ -125,12 +125,34 @@ export default function MasterAdminPage() {
   const [securityConfig, setSecurityConfig] = useState<{
     emergencyPhone: string;
     emergencyEmail: string;
+    twoFactorEnabled?: boolean;
+    totpSecret?: string;
     updatedAt?: string;
     maskedPhone?: string;
+    maskedEmail?: string;
   }>({
-    emergencyPhone: '+57 300 892 4110',
-    emergencyEmail: 'brayan@prestigia.app',
+    emergencyPhone: '+57 317 260 6093',
+    emergencyEmail: 'info@prestigia.app',
+    twoFactorEnabled: false,
+    totpSecret: 'JBSWY3DPEHPK3PXP',
   });
+
+  // Query public gateway security status on load (e.g. check if 2FA is active)
+  useEffect(() => {
+    fetch('/api/master', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'get_gateway_status' }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setIsTwoFactorActiveOnServer(Boolean(data.twoFactorEnabled));
+          if (data.maskedPhone) setEmergencyPhone(data.maskedPhone);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Global Master Data State
   const [businesses, setBusinesses] = useState<Business[]>([]);
@@ -299,12 +321,15 @@ export default function MasterAdminPage() {
 
         if (data.securityConfig) {
           setSecurityConfig(data.securityConfig);
+          setIsTwoFactorActiveOnServer(Boolean(data.securityConfig.twoFactorEnabled));
           if (data.securityConfig.emergencyPhone) {
             setEmergencyPhone(data.securityConfig.emergencyPhone);
             setSecurityForm((prev) => ({
               ...prev,
               newEmergencyPhone: data.securityConfig.emergencyPhone,
               newEmergencyEmail: data.securityConfig.emergencyEmail || prev.newEmergencyEmail,
+              newTotpSecret: data.securityConfig.totpSecret || prev.newTotpSecret,
+              twoFactorEnabled: Boolean(data.securityConfig.twoFactorEnabled),
             }));
           }
           if (data.securityConfig.emergencyEmail) {
@@ -385,7 +410,7 @@ export default function MasterAdminPage() {
     }
   }, [currentBusiness]);
 
-  // Handle Standard Banking Login
+  // Handle Standard Banking Login (Server Verified - No Backdoors)
   const handleBankingLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
@@ -400,51 +425,42 @@ export default function MasterAdminPage() {
     const keyClean = masterKeyInput.trim();
     const tokenClean = totpTokenInput.trim();
 
-    // Check Master Key locally first
-    const localSavedKey = typeof window !== 'undefined' ? localStorage.getItem('prestigia_master_custom_key') : null;
-    let isMasterKeyValid =
-      keyClean === MASTER_KEY_DEFAULT ||
-      keyClean === MASTER_KEY_FALLBACK ||
-      (localSavedKey !== null && keyClean === localSavedKey);
-
-    // If not matched locally, verify against backend
-    if (!isMasterKeyValid && keyClean.length > 0) {
-      try {
-        const verifyRes = await fetch('/api/master', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'verify_master_credentials',
-            masterKey: keyClean,
-          }),
-        });
-        const verifyData = await verifyRes.json();
-        if (verifyData.isValid) {
-          isMasterKeyValid = true;
-        }
-      } catch (err) {
-        // Network fallback
-      }
+    if (!keyClean) {
+      setAuthError('Por favor ingresa tu Llave Maestra.');
+      return;
     }
 
-    // Check TOTP token (6 digits or '999999' / '123456' / '000000' or any 6-digit in dev)
-    const isTotpValid = tokenClean.length === 6;
+    try {
+      const verifyRes = await fetch('/api/master', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'verify_master_credentials',
+          masterKey: keyClean,
+          totpToken: tokenClean,
+        }),
+      });
+      const verifyData = await verifyRes.json();
 
-    if (isMasterKeyValid && isTotpValid) {
-      setIsAuthenticated(true);
-      setFailedAttempts(0);
-      setLockoutUntil(null);
-      lastActivityRef.current = Date.now();
-    } else {
-      const newAttempts = failedAttempts + 1;
-      setFailedAttempts(newAttempts);
-      if (newAttempts >= MAX_FAILED_ATTEMPTS) {
-        const lockoutTime = Date.now() + LOCKOUT_DURATION_MS;
-        setLockoutUntil(lockoutTime);
-        setAuthError('ALERTA DE SEGURIDAD: 3 intentos fallidos consecutivos. Consola Master congelada preventivamente por 15 minutos.');
+      if (verifyData.isValid) {
+        setIsAuthenticated(true);
+        setFailedAttempts(0);
+        setLockoutUntil(null);
+        lastActivityRef.current = Date.now();
+        localStorage.setItem('prestigia_master_custom_key', keyClean);
       } else {
-        setAuthError(`Credencial o Token TOTP incorrecto. Intento ${newAttempts} de ${MAX_FAILED_ATTEMPTS}.`);
+        const newAttempts = failedAttempts + 1;
+        setFailedAttempts(newAttempts);
+        if (newAttempts >= MAX_FAILED_ATTEMPTS) {
+          const lockoutTime = Date.now() + LOCKOUT_DURATION_MS;
+          setLockoutUntil(lockoutTime);
+          setAuthError('ALERTA DE SEGURIDAD: 3 intentos fallidos consecutivos. Consola Master congelada preventivamente por 15 minutos.');
+        } else {
+          setAuthError(verifyData.error || `Credencial incorrecta. Intento ${newAttempts} de ${MAX_FAILED_ATTEMPTS}.`);
+        }
       }
+    } catch (err) {
+      setAuthError('Error de conexión con el servidor bancario.');
     }
   };
 
@@ -483,6 +499,7 @@ export default function MasterAdminPage() {
           newEmergencyPhone: securityForm.newEmergencyPhone,
           newEmergencyEmail: securityForm.newEmergencyEmail,
           newTotpSecret: securityForm.newTotpSecret,
+          twoFactorEnabled: securityForm.twoFactorEnabled,
         }),
       });
       const data = await res.json();
@@ -490,6 +507,7 @@ export default function MasterAdminPage() {
         if (securityForm.newMasterKey) {
           localStorage.setItem('prestigia_master_custom_key', securityForm.newMasterKey.trim());
         }
+        setIsTwoFactorActiveOnServer(Boolean(securityForm.twoFactorEnabled));
         setShowSecurityConfigModal(false);
         setSecurityForm((prev) => ({
           ...prev,
@@ -497,7 +515,7 @@ export default function MasterAdminPage() {
           newMasterKey: '',
           confirmNewMasterKey: '',
         }));
-        setNotification({ type: 'success', message: '¡Credenciales bancarias maestras actualizadas y encriptadas con éxito!' });
+        setNotification({ type: 'success', message: '¡Credenciales bancarias maestras y nivel de blindaje actualizados con éxito!' });
         setTimeout(() => setNotification(null), 4000);
         fetchMasterData();
       } else {
@@ -528,7 +546,6 @@ export default function MasterAdminPage() {
       if (data.success) {
         setEmergencyOtpSent(true);
         setEmergencyCountdown(300);
-        setEmergencyDemoHint(data.demoHint || null);
       } else {
         setAuthError(data.error || 'Error solicitando clave dinámica.');
       }
@@ -1233,60 +1250,41 @@ export default function MasterAdminPage() {
                   </button>
                 </div>
                 <p className="text-[10px] text-slate-400 mt-1 flex items-center justify-between">
-                  <span>Clave de alta entropía (o PIN provisional: 1234)</span>
+                  <span>Clave criptográfica de alta entropía</span>
                   <span className="text-amber-400/80 font-mono">256-BIT ENCRYPTION</span>
                 </p>
               </div>
 
-              {/* Factor 2: Dynamic 2FA TOTP Token */}
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-2 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <Smartphone className="w-3.5 h-3.5 text-amber-400" />
-                    Token Dinámico Bancario (TOTP)
-                  </span>
-                  <span className="text-[10px] text-amber-400 font-mono flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    Cambia en {totpRemainingSec}s
-                  </span>
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    maxLength={6}
-                    value={totpTokenInput}
-                    onChange={(e) => setTotpTokenInput(e.target.value.replace(/[^0-9]/g, ''))}
-                    placeholder="123456"
-                    required
-                    disabled={Boolean(lockoutUntil && Date.now() < lockoutUntil)}
-                    className="w-full bg-[#141A26] border border-slate-700/80 focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 text-white placeholder-slate-500 text-center tracking-[0.4em] text-lg font-mono rounded-xl px-4 py-3 transition-all outline-none font-bold"
-                  />
-                  {totpTokenInput !== '123456' && (
-                    <button
-                      type="button"
-                      onClick={() => setTotpTokenInput('123456')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-bold tracking-normal transition-all"
-                    >
-                      Autocompletar
-                    </button>
-                  )}
+              {/* Factor 2: Dynamic 2FA TOTP Token (Only rendered if 2FA is active on server) */}
+              {isTwoFactorActiveOnServer && (
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-2 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Smartphone className="w-3.5 h-3.5 text-amber-400" />
+                      Token Dinámico Bancario (Google Authenticator TOTP)
+                    </span>
+                    <span className="text-[10px] text-amber-400 font-mono flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      RFC-6238
+                    </span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={totpTokenInput}
+                      onChange={(e) => setTotpTokenInput(e.target.value.replace(/[^0-9]/g, ''))}
+                      placeholder="••••••"
+                      required
+                      disabled={Boolean(lockoutUntil && Date.now() < lockoutUntil)}
+                      className="w-full bg-[#141A26] border border-slate-700/80 focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 text-white placeholder-slate-600 text-center tracking-[0.4em] text-lg font-mono rounded-xl px-4 py-3 transition-all outline-none font-bold"
+                    />
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1.5 text-center">
+                    Introduce el código temporal de 6 dígitos de tu aplicación autenticadora.
+                  </p>
                 </div>
-                <div className="mt-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between text-[11px]">
-                  <span className="text-slate-300">
-                    💡 <strong>Token de prueba:</strong> <span className="font-mono text-amber-300 font-bold">123456</span>
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setTotpTokenInput('123456')}
-                    className="text-amber-400 hover:text-amber-300 underline font-semibold text-[11px] cursor-pointer"
-                  >
-                    Usar 123456
-                  </button>
-                </div>
-                <p className="text-[10px] text-slate-400 mt-1 text-center">
-                  En producción real se vincula a tu celular (Google Authenticator) o te llega a tu WhatsApp con el botón SOS de abajo.
-                </p>
-              </div>
+              )}
 
               {/* Submit Button */}
               <button
@@ -1357,25 +1355,9 @@ export default function MasterAdminPage() {
                     Código Dinámico de Un Solo Uso
                   </p>
                   <p className="mt-1 text-[11px] text-slate-300">
-                    Generado y despachado exclusivamente a tu WhatsApp: <span className="text-white font-mono font-semibold">+57 3•• ••• ••10</span> y correo <span className="text-white font-mono font-semibold">b••••@prestigia.app</span>.
+                    Generado y despachado de forma segura a tus canales de rescate autorizados (WhatsApp y correo de seguridad).
                   </p>
                 </div>
-
-                {emergencyDemoHint && (
-                  <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] text-emerald-400 uppercase font-semibold">Simulación de Despacho WhatsApp</p>
-                      <p className="font-mono text-base font-bold tracking-widest text-white mt-0.5">{emergencyDemoHint}</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setEmergencyOtpInput(emergencyDemoHint)}
-                      className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-medium cursor-pointer"
-                    >
-                      Autocompletar
-                    </button>
-                  </div>
-                )}
 
                 <form onSubmit={handleVerifyEmergencyOtp} className="space-y-4">
                   <div>
@@ -4383,28 +4365,103 @@ export default function MasterAdminPage() {
                 </div>
               </div>
 
-              {/* Step 4: TOTP Secret */}
-              <div className="pt-3 border-t border-slate-800">
-                <label className="block text-slate-400 mb-1 flex items-center justify-between">
-                  <span>Clave Secreta TOTP (Google Authenticator / Authy):</span>
-                  <span className="text-[10px] text-amber-400 font-mono">RFC-6238 COMPLIANT</span>
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={securityForm.newTotpSecret}
-                    onChange={(e) => setSecurityForm({ ...securityForm, newTotpSecret: e.target.value })}
-                    className="flex-1 bg-[#141A26] border border-slate-700 text-slate-300 rounded-xl px-3.5 py-2 outline-none font-mono text-xs"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleCopy(securityForm.newTotpSecret, 'totp-secret')}
-                    className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs cursor-pointer flex items-center gap-1"
-                  >
-                    {copiedText === 'totp-secret' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedText === 'totp-secret' ? 'Copiado' : 'Copiar'}</span>
-                  </button>
+              {/* Step 4: Security Mode (Modo A vs Modo B) & TOTP */}
+              <div className="pt-3 border-t border-slate-800 space-y-3">
+                <div>
+                  <label className="text-slate-200 font-bold flex items-center justify-between mb-2">
+                    <span className="flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                      4. Política de Acceso y Nivel de Blindaje
+                    </span>
+                    <span className="text-[10px] text-amber-400 font-mono">AUTENTICACIÓN</span>
+                  </label>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Modo A */}
+                    <div
+                      onClick={() => setSecurityForm({ ...securityForm, twoFactorEnabled: false })}
+                      className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
+                        !securityForm.twoFactorEnabled
+                          ? 'bg-amber-500/10 border-amber-500/50 text-white shadow-lg shadow-amber-500/10'
+                          : 'bg-[#141A26] border-slate-800 text-slate-400 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="font-bold text-xs flex items-center gap-1.5 text-amber-300">
+                          <Key className="w-3.5 h-3.5" />
+                          Modo A: Llave Maestra + SOS
+                        </span>
+                        {!securityForm.twoFactorEnabled && (
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 ring-4 ring-emerald-400/20" />
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed">
+                        Ingreso directo con tu Llave Maestra. Si la olvidas, puedes solicitar un código de un solo uso despachado a tu WhatsApp registrado.
+                      </p>
+                      <span className="inline-block mt-2 text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
+                        ✓ Recomendado para Operación Ágil
+                      </span>
+                    </div>
+
+                    {/* Modo B */}
+                    <div
+                      onClick={() => setSecurityForm({ ...securityForm, twoFactorEnabled: true })}
+                      className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
+                        securityForm.twoFactorEnabled
+                          ? 'bg-blue-500/10 border-blue-500/50 text-white shadow-lg shadow-blue-500/10'
+                          : 'bg-[#141A26] border-slate-800 text-slate-400 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="font-bold text-xs flex items-center gap-1.5 text-blue-300">
+                          <Smartphone className="w-3.5 h-3.5" />
+                          Modo B: Blindaje 2FA (TOTP)
+                        </span>
+                        {securityForm.twoFactorEnabled && (
+                          <span className="w-2 h-2 rounded-full bg-blue-400 ring-4 ring-blue-400/20" />
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed">
+                        Exige en cada acceso tu Llave Maestra más el token dinámico de 6 dígitos de tu app Google Authenticator o Authy.
+                      </p>
+                      <span className="inline-block mt-2 text-[10px] font-semibold text-blue-400 uppercase tracking-wider">
+                        🛡️ Máxima Seguridad Bancaria
+                      </span>
+                    </div>
+                  </div>
                 </div>
+
+                {/* TOTP Secret (Only configuration if Modo B is active) */}
+                {securityForm.twoFactorEnabled && (
+                  <div className="p-3.5 rounded-2xl bg-blue-950/20 border border-blue-500/30 space-y-2 animate-in fade-in duration-200">
+                    <label className="block text-slate-300 text-xs font-semibold flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <Smartphone className="w-3.5 h-3.5 text-blue-400" />
+                        Clave Secreta TOTP para Google Authenticator / Authy:
+                      </span>
+                      <span className="text-[10px] text-blue-400 font-mono">RFC-6238 COMPLIANT</span>
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={securityForm.newTotpSecret}
+                        onChange={(e) => setSecurityForm({ ...securityForm, newTotpSecret: e.target.value })}
+                        className="flex-1 bg-[#141A26] border border-blue-500/40 text-blue-200 rounded-xl px-3.5 py-2 outline-none font-mono text-xs font-bold tracking-wider"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(securityForm.newTotpSecret, 'totp-secret')}
+                        className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-all"
+                      >
+                        {copiedText === 'totp-secret' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copiedText === 'totp-secret' ? 'Copiado' : 'Copiar Clave'}</span>
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-slate-400 leading-normal">
+                      Copia esta clave secreta e ingrésala manualmente en tu aplicación autenticadora (cuenta &quot;Prestigia Master&quot; con clave basada en tiempo).
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Submit Buttons */}

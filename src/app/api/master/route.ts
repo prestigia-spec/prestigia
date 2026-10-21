@@ -14,6 +14,7 @@ import {
   getAllCommercialLeads,
 } from '@/lib/db';
 import { Business, MasterAddOns, DayOneBaseline } from '@/lib/types';
+import { verifyTOTP, getTOTPAuthUrl } from '@/lib/totp';
 
 // In-memory Ephemeral Emergency OTP Store (Single use, 5-minute expiry)
 interface EmergencyOtpRecord {
@@ -181,6 +182,8 @@ export async function GET(request: NextRequest) {
       securityConfig: {
         emergencyPhone: securitySettings.emergencyPhone,
         emergencyEmail: securitySettings.emergencyEmail,
+        twoFactorEnabled: Boolean(securitySettings.twoFactorEnabled),
+        totpSecret: securitySettings.totpSecret || 'JBSWY3DPEHPK3PXP',
         updatedAt: securitySettings.updatedAt,
         maskedPhone: securitySettings.emergencyPhone.replace(/(\+\d{2}\s?\d{3})\d{4}(\d{3})/, '$1 •••• $2'),
         maskedEmail: securitySettings.emergencyEmail.replace(/(.{2})(.*)(@.*)/, '$1••••$3'),
@@ -204,23 +207,69 @@ export async function POST(request: NextRequest) {
     const { action } = body;
     const currentSec = await getMasterSecuritySettings();
 
-    // 0. Verify Master Credentials
-    if (action === 'verify_master_credentials') {
-      const { masterKey } = body;
-      const cleanKey = (masterKey || '').trim();
-      const isValid = cleanKey === currentSec.masterKey || cleanKey === '1234' || cleanKey === 'PRESTIGIA-MASTER-2026';
+    // -1. Public Gateway Security Status (used by login screen before auth)
+    if (action === 'get_gateway_status') {
       return NextResponse.json({
-        success: isValid,
-        isValid,
-        message: isValid ? 'Credencial maestra válida' : 'Credencial incorrecta',
+        success: true,
+        twoFactorEnabled: Boolean(currentSec.twoFactorEnabled),
+        maskedPhone: currentSec.emergencyPhone.replace(/(\+\d{2}\s?\d{3})\d{4}(\d{3})/, '$1 •••• $2'),
+        maskedEmail: currentSec.emergencyEmail.replace(/(.{2})(.*)(@.*)/, '$1••••$3'),
+      });
+    }
+
+    // 0. Verify Master Credentials (Strict Authentication)
+    if (action === 'verify_master_credentials') {
+      const { masterKey, totpToken } = body;
+      const cleanKey = (masterKey || '').trim();
+
+      // Check Master Key strictly against server storage (NO demo keys)
+      const isKeyValid = cleanKey === currentSec.masterKey;
+      if (!isKeyValid) {
+        return NextResponse.json({
+          success: false,
+          isValid: false,
+          error: 'Llave Maestra incorrecta. Acceso denegado.',
+        }, { status: 401 });
+      }
+
+      // Check 2FA if enabled in settings
+      if (currentSec.twoFactorEnabled) {
+        const cleanToken = (totpToken || '').trim();
+        if (!cleanToken || cleanToken.length !== 6) {
+          return NextResponse.json({
+            success: false,
+            isValid: false,
+            twoFactorRequired: true,
+            error: 'Doble Factor Requerido: Introduce el código de 6 dígitos de Google Authenticator.',
+          }, { status: 401 });
+        }
+
+        const isTotpValid = verifyTOTP(cleanToken, currentSec.totpSecret || 'JBSWY3DPEHPK3PXP');
+        if (!isTotpValid) {
+          return NextResponse.json({
+            success: false,
+            isValid: false,
+            twoFactorRequired: true,
+            error: 'Token TOTP incorrecto o expirado. Verifica la app Google Authenticator de tu celular.',
+          }, { status: 401 });
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        isValid: true,
+        twoFactorRequired: Boolean(currentSec.twoFactorEnabled),
+        message: 'Sesión Master autorizada exitosamente.',
       });
     }
 
     // 0.1 Update Master Security Credentials
     if (action === 'update_master_security') {
-      const { currentMasterKey, newMasterKey, newEmergencyPhone, newEmergencyEmail, newTotpSecret } = body;
+      const { currentMasterKey, newMasterKey, newEmergencyPhone, newEmergencyEmail, newTotpSecret, twoFactorEnabled } = body;
       const cleanCurrent = (currentMasterKey || '').trim();
-      if (cleanCurrent !== currentSec.masterKey && cleanCurrent !== '1234' && cleanCurrent !== 'PRESTIGIA-MASTER-2026') {
+
+      // Strictly check current master key (NO backdoor)
+      if (cleanCurrent !== currentSec.masterKey) {
         return NextResponse.json({ error: 'La Llave Maestra actual es incorrecta. No se autoriza el cambio de credenciales.' }, { status: 403 });
       }
 
@@ -242,7 +291,8 @@ export async function POST(request: NextRequest) {
         masterKey: newMasterKey ? newMasterKey.trim() : currentSec.masterKey,
         emergencyPhone: newEmergencyPhone ? newEmergencyPhone.trim() : currentSec.emergencyPhone,
         emergencyEmail: newEmergencyEmail ? newEmergencyEmail.trim() : currentSec.emergencyEmail,
-        totpSecret: newTotpSecret ? newTotpSecret.trim() : currentSec.totpSecret,
+        totpSecret: newTotpSecret ? newTotpSecret.trim().toUpperCase() : (currentSec.totpSecret || 'JBSWY3DPEHPK3PXP'),
+        twoFactorEnabled: twoFactorEnabled !== undefined ? Boolean(twoFactorEnabled) : currentSec.twoFactorEnabled,
       });
 
       return NextResponse.json({
@@ -251,6 +301,8 @@ export async function POST(request: NextRequest) {
         securityConfig: {
           emergencyPhone: updated.emergencyPhone,
           emergencyEmail: updated.emergencyEmail,
+          twoFactorEnabled: Boolean(updated.twoFactorEnabled),
+          totpSecret: updated.totpSecret,
           updatedAt: updated.updatedAt,
           maskedPhone: updated.emergencyPhone.replace(/(\+\d{2}\s?\d{3})\d{4}(\d{3})/, '$1 •••• $2'),
           maskedEmail: updated.emergencyEmail.replace(/(.{2})(.*)(@.*)/, '$1••••$3'),
@@ -260,8 +312,8 @@ export async function POST(request: NextRequest) {
 
     // 1. Dispatch Emergency OTP (Out-of-band to WhatsApp and Email)
     if (action === 'request_emergency_otp') {
-      const targetPhone = body.phone || currentSec.emergencyPhone || '+57 300 892 4110';
-      const targetEmail = body.email || currentSec.emergencyEmail || 'brayan@prestigia.app';
+      const targetPhone = body.phone || currentSec.emergencyPhone || '+57 317 260 6093';
+      const targetEmail = body.email || currentSec.emergencyEmail || 'info@prestigia.app';
 
       // Generate high-entropy 6-digit OTP
       const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -279,12 +331,10 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: 'Clave Dinámica de Emergencia generada y despachada con éxito.',
+        message: 'Clave Dinámica de Emergencia generada y despachada con éxito a tu WhatsApp.',
         maskedPhone: targetPhone.replace(/(\+\d{2}\s?\d{3})\d{4}(\d{3})/, '$1 •••• $2'),
         maskedEmail: targetEmail.replace(/(.{2})(.*)(@.*)/, '$1••••$3'),
         expiresInSeconds: 300,
-        // In dev environment we provide demoHint for immediate testing:
-        demoHint: generatedOtp,
       });
     }
 

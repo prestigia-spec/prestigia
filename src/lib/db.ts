@@ -35,6 +35,7 @@ export interface MasterSecurityConfig {
   emergencyPhone: string;
   emergencyEmail: string;
   totpSecret?: string;
+  twoFactorEnabled?: boolean;
   updatedAt: string;
 }
 
@@ -498,11 +499,19 @@ export async function getMasterSecuritySettings(): Promise<MasterSecurityConfig>
   if (!db.masterSecurity) {
     db.masterSecurity = {
       masterKey: 'PRESTIGIA-MASTER-2026',
-      emergencyPhone: '+57 300 892 4110',
-      emergencyEmail: 'brayan@prestigia.app',
-      totpSecret: 'PRESTIGIA-TOTP-SECRET-HQ',
+      emergencyPhone: '+57 317 260 6093',
+      emergencyEmail: 'info@prestigia.app',
+      totpSecret: 'JBSWY3DPEHPK3PXP',
+      twoFactorEnabled: false,
       updatedAt: new Date().toISOString(),
     };
+    writeDbFile(db);
+  }
+  if (db.masterSecurity.twoFactorEnabled === undefined) {
+    db.masterSecurity.twoFactorEnabled = false;
+  }
+  if (!db.masterSecurity.totpSecret || db.masterSecurity.totpSecret.includes('PRESTIGIA-TOTP')) {
+    db.masterSecurity.totpSecret = 'JBSWY3DPEHPK3PXP';
     writeDbFile(db);
   }
   return db.masterSecurity;
