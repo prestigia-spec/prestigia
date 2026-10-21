@@ -119,6 +119,11 @@ export default function MasterAdminPage() {
   });
   const [securityFormLoading, setSecurityFormLoading] = useState(false);
   const [securityFormError, setSecurityFormError] = useState<string | null>(null);
+  const [isVaultUnlocked, setIsVaultUnlocked] = useState(false);
+  const [vaultChallengeKey, setVaultChallengeKey] = useState('');
+  const [vaultVerifying, setVaultVerifying] = useState(false);
+  const [vaultError, setVaultError] = useState<string | null>(null);
+  const [showVaultKey, setShowVaultKey] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -504,6 +509,52 @@ export default function MasterAdminPage() {
     }
   };
 
+  // Close and lock security vault
+  const handleCloseSecurityConfigModal = () => {
+    setShowSecurityConfigModal(false);
+    setIsVaultUnlocked(false);
+    setVaultChallengeKey('');
+    setVaultError(null);
+    setSecurityFormError(null);
+  };
+
+  // Challenge-response unlock for Master Security Vault
+  const handleUnlockVault = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setVaultError(null);
+    setVaultVerifying(true);
+
+    const cleanKey = vaultChallengeKey.trim();
+    if (!cleanKey) {
+      setVaultError('Por favor ingresa tu Llave Maestra actual.');
+      setVaultVerifying(false);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/master', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'verify_master_credentials',
+          masterKey: cleanKey,
+        }),
+      });
+      const data = await res.json();
+      if (data.isValid) {
+        setIsVaultUnlocked(true);
+        setSecurityForm((prev) => ({ ...prev, currentMasterKey: cleanKey }));
+        setVaultError(null);
+      } else {
+        setVaultError(data.error || 'Llave Maestra incorrecta. Acceso a la bóveda denegado.');
+      }
+    } catch (err) {
+      setVaultError('Error de conexión con el servidor bancario.');
+    } finally {
+      setVaultVerifying(false);
+    }
+  };
+
   // Save Master Security Credentials
   const handleSaveSecuritySettings = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -563,6 +614,8 @@ export default function MasterAdminPage() {
         setEmergencyPhone(updatedConfig.emergencyPhone);
         setIsTwoFactorActiveOnServer(Boolean(securityForm.twoFactorEnabled));
         setShowSecurityConfigModal(false);
+        setIsVaultUnlocked(false);
+        setVaultChallengeKey('');
         setSecurityForm((prev) => ({
           ...prev,
           currentMasterKey: '',
@@ -1521,6 +1574,9 @@ export default function MasterAdminPage() {
             type="button"
             onClick={() => {
               setSecurityFormError(null);
+              setIsVaultUnlocked(false);
+              setVaultChallengeKey('');
+              setVaultError(null);
               setShowSecurityConfigModal(true);
             }}
             title="Cambiar Llave Maestra y WhatsApp de Emergencia"
@@ -4195,351 +4251,427 @@ export default function MasterAdminPage() {
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/40">
-                  <Key className="w-5 h-5" />
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center border transition-all ${
+                  isVaultUnlocked
+                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 shadow-lg shadow-emerald-500/10'
+                    : 'bg-amber-500/20 text-amber-400 border-amber-500/40'
+                }`}>
+                  {isVaultUnlocked ? <ShieldCheck className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-white flex items-center gap-2">
-                    Seguridad & Credenciales Master
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-mono border border-emerald-500/30">
-                      256-BIT
+                    {isVaultUnlocked ? 'Bóveda Criptográfica Master' : 'Bóveda Criptográfica Ciega'}
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono border ${
+                      isVaultUnlocked
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 font-bold'
+                        : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                    }`}>
+                      {isVaultUnlocked ? 'DESBLOQUEADA' : 'ZERO-TRUST BLOQUEADO'}
                     </span>
                   </h3>
-                  <p className="text-xs text-slate-400">Modifica tu Llave Maestra y tus canales de rescate bancario</p>
+                  <p className="text-xs text-slate-400">
+                    {isVaultUnlocked
+                      ? 'Gestión autorizada de credenciales y canales confidenciales'
+                      : 'Datos sensibles ocultos. Introduce tu Llave Maestra para descifrar la bóveda.'}
+                  </p>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => setShowSecurityConfigModal(false)}
+                onClick={handleCloseSecurityConfigModal}
                 className="text-slate-400 hover:text-white p-1 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Error Message */}
-            {securityFormError && (
-              <div className="mt-4 p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/50 text-rose-300 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
-                <span>{securityFormError}</span>
-              </div>
-            )}
+            {/* FASE 1: BÓVEDA BLOQUEADA (CHALLENGE-RESPONSE GATE) */}
+            {!isVaultUnlocked ? (
+              <div className="mt-5 space-y-4 text-xs">
+                <div className="p-4 sm:p-5 rounded-2xl bg-[#141A26] border border-amber-500/30 space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-amber-300 text-xs flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-amber-400" />
+                      Autorización Obligatoria de Bóveda
+                    </span>
+                    <span className="text-[10px] text-amber-400 font-mono">CONFIDENCIALIDAD PRIVADA</span>
+                  </div>
+                  <p className="text-slate-300 text-xs leading-relaxed">
+                    Por protocolo de máxima seguridad bancaria, tu WhatsApp de rescate, correo oficial y configuraciones de 2FA están totalmente ocultos contra miradas no autorizadas.
+                  </p>
 
-            <form onSubmit={handleSaveSecuritySettings} className="mt-5 space-y-4 text-xs">
-              {/* Step 1: Current Master Key (Re-auth verification) */}
-              <div className="p-3.5 rounded-2xl bg-[#141A26] border border-amber-500/30">
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-slate-200 font-bold flex items-center gap-1.5 text-amber-400">
-                    <Lock className="w-3.5 h-3.5" />
-                    1. Llave Maestra Actual (Autorización Obligatoria) *
-                  </label>
+                  <form onSubmit={handleUnlockVault} className="space-y-4 pt-1">
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-slate-200 text-xs font-semibold">Introduce tu Llave Maestra Actual:</label>
+                        <button
+                          type="button"
+                          onClick={() => setShowVaultKey(!showVaultKey)}
+                          className="text-[11px] text-slate-400 hover:text-slate-200 flex items-center gap-1 cursor-pointer"
+                        >
+                          {showVaultKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                          <span>{showVaultKey ? 'Ocultar' : 'Ver'}</span>
+                        </button>
+                      </div>
+                      <input
+                        type={showVaultKey ? 'text' : 'password'}
+                        required
+                        autoFocus
+                        value={vaultChallengeKey}
+                        onChange={(e) => setVaultChallengeKey(e.target.value)}
+                        placeholder="••••••••••••••••"
+                        className="w-full bg-[#0D111A] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 font-mono text-sm tracking-wider"
+                      />
+                    </div>
+
+                    {vaultError && (
+                      <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+                        <span>{vaultError}</span>
+                      </div>
+                    )}
+
+                    <div className="pt-2 flex items-center justify-end gap-3">
+                      <button
+                        type="button"
+                        onClick={handleCloseSecurityConfigModal}
+                        className="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs cursor-pointer"
+                      >
+                        Cerrar
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={vaultVerifying || !vaultChallengeKey.trim()}
+                        className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-bold rounded-xl text-xs cursor-pointer shadow-lg shadow-amber-500/25 flex items-center gap-2 disabled:opacity-50"
+                      >
+                        <Unlock className="w-3.5 h-3.5" />
+                        {vaultVerifying ? 'Verificando Criptográficamente...' : 'Desbloquear y Descifrar Bóveda'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                <div className="flex items-center justify-center gap-4 text-[11px] text-slate-500">
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    Cifrado Zero-Trust Activo
+                  </span>
+                  <span>•</span>
+                  <span>Blindaje contra Visualización Indebida</span>
+                </div>
+              </div>
+            ) : (
+              /* FASE 2: BÓVEDA DESBLOQUEADA Y EDITABLE */
+              <div className="mt-5 space-y-4 text-xs animate-in fade-in duration-200">
+                {/* Desbloqueo Exitoso Banner */}
+                <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 text-emerald-300">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="font-semibold">Bóveda descifrada con éxito. Puedes modificar tus credenciales.</span>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="text-[11px] text-slate-400 hover:text-slate-200 flex items-center gap-1 cursor-pointer"
+                    onClick={() => {
+                      setIsVaultUnlocked(false);
+                      setVaultChallengeKey('');
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-medium cursor-pointer flex items-center gap-1"
                   >
-                    {showCurrentPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                    <span>{showCurrentPassword ? 'Ocultar' : 'Ver'}</span>
+                    <Lock className="w-3 h-3 text-amber-400" />
+                    <span>Bloquear</span>
                   </button>
                 </div>
-                <div className="relative">
-                  <input
-                    type={showCurrentPassword ? 'text' : 'password'}
-                    required
-                    value={securityForm.currentMasterKey}
-                    onChange={(e) => setSecurityForm({ ...securityForm, currentMasterKey: e.target.value })}
-                    placeholder="Escribe tu Llave Maestra actual para autorizar cambios"
-                    className="w-full bg-[#0D111A] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 font-mono"
-                  />
-                </div>
-                <p className="text-[10px] text-slate-400 mt-1 flex items-center justify-between">
-                  <span>Por seguridad bancaria, confirma tu clave actual para autorizar cualquier cambio.</span>
-                  <span className="text-emerald-400 font-semibold font-mono flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" />
-                    Cifrado Bancario Activo
-                  </span>
-                </p>
-              </div>
 
-              {/* Step 2: New Master Key */}
-              <div className="space-y-3 pt-2">
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-slate-200 font-bold flex items-center gap-1.5">
-                      <Key className="w-3.5 h-3.5 text-blue-400" />
-                      2. Nueva Llave Criptográfica Maestra (Opcional)
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="text-[11px] text-slate-400 hover:text-slate-200 flex items-center gap-1 cursor-pointer"
-                    >
-                      {showNewPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                      <span>{showNewPassword ? 'Ocultar' : 'Ver'}</span>
-                    </button>
+                {/* Error Message */}
+                {securityFormError && (
+                  <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/50 text-rose-300 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+                    <span>{securityFormError}</span>
                   </div>
-                  <input
-                    type={showNewPassword ? 'text' : 'password'}
-                    value={securityForm.newMasterKey}
-                    onChange={(e) => setSecurityForm({ ...securityForm, newMasterKey: e.target.value })}
-                    placeholder="Deja en blanco si deseas mantener la misma"
-                    className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 font-mono"
-                  />
-                  {securityForm.newMasterKey && (() => {
-                    const k = securityForm.newMasterKey;
-                    const letters = (k.match(/[a-zA-Z]/g) || []).length;
-                    const uppercase = (k.match(/[A-Z]/g) || []).length;
-                    const numbers = (k.match(/[0-9]/g) || []).length;
-                    const symbols = (k.match(/[^a-zA-Z0-9\s]/g) || []).length;
-                    const hasLetters = letters >= 4;
-                    const hasUppercase = uppercase >= 1;
-                    const hasNumbers = numbers >= 2;
-                    const hasSymbols = symbols >= 1;
-                    const isAllMet = hasLetters && hasUppercase && hasNumbers && hasSymbols;
+                )}
 
-                    return (
-                      <div className="mt-2 p-3 rounded-2xl bg-[#0D111A] border border-slate-800 text-[11px] space-y-2">
-                        <div className="flex items-center justify-between font-semibold">
-                          <span className="text-slate-300">Reglas Bancarias Obligatorias:</span>
-                          <span className={isAllMet ? 'text-emerald-400 font-bold' : 'text-amber-400 font-semibold'}>
-                            {isAllMet ? '✓ Estándar Bancario Cumplido' : '⚠️ Requisitos Pendientes'}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[10px]">
-                          <span className={`p-1.5 rounded-lg border flex items-center gap-1.5 ${
-                            hasLetters ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 font-semibold' : 'bg-slate-900 border-slate-800 text-slate-400'
-                          }`}>
-                            {hasLetters ? <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> : <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />}
-                            Min. 4 Letras ({letters}/4)
-                          </span>
-                          <span className={`p-1.5 rounded-lg border flex items-center gap-1.5 ${
-                            hasUppercase ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 font-semibold' : 'bg-slate-900 border-slate-800 text-slate-400'
-                          }`}>
-                            {hasUppercase ? <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> : <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />}
-                            Min. 1 Mayúscula ({uppercase}/1)
-                          </span>
-                          <span className={`p-1.5 rounded-lg border flex items-center gap-1.5 ${
-                            hasNumbers ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 font-semibold' : 'bg-slate-900 border-slate-800 text-slate-400'
-                          }`}>
-                            {hasNumbers ? <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> : <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />}
-                            Min. 2 Números ({numbers}/2)
-                          </span>
-                          <span className={`p-1.5 rounded-lg border flex items-center gap-1.5 ${
-                            hasSymbols ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 font-semibold' : 'bg-slate-900 border-slate-800 text-slate-400'
-                          }`}>
-                            {hasSymbols ? <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> : <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />}
-                            Min. 1 Signo ({symbols}/1)
-                          </span>
-                        </div>
+                <form onSubmit={handleSaveSecuritySettings} className="space-y-4">
+                  {/* Step 1: New Master Key */}
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-slate-200 font-bold flex items-center gap-1.5">
+                          <Key className="w-3.5 h-3.5 text-amber-400" />
+                          1. Nueva Llave Criptográfica Maestra (Opcional)
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="text-[11px] text-slate-400 hover:text-slate-200 flex items-center gap-1 cursor-pointer"
+                        >
+                          {showNewPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                          <span>{showNewPassword ? 'Ocultar' : 'Ver'}</span>
+                        </button>
                       </div>
-                    );
-                  })()}
-                </div>
+                      <input
+                        type={showNewPassword ? 'text' : 'password'}
+                        value={securityForm.newMasterKey}
+                        onChange={(e) => setSecurityForm({ ...securityForm, newMasterKey: e.target.value })}
+                        placeholder="Deja en blanco si deseas mantener la misma"
+                        className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 font-mono"
+                      />
+                      {securityForm.newMasterKey && (() => {
+                        const k = securityForm.newMasterKey;
+                        const letters = (k.match(/[a-zA-Z]/g) || []).length;
+                        const uppercase = (k.match(/[A-Z]/g) || []).length;
+                        const numbers = (k.match(/[0-9]/g) || []).length;
+                        const symbols = (k.match(/[^a-zA-Z0-9\s]/g) || []).length;
+                        const hasLetters = letters >= 4;
+                        const hasUppercase = uppercase >= 1;
+                        const hasNumbers = numbers >= 2;
+                        const hasSymbols = symbols >= 1;
+                        const isAllMet = hasLetters && hasUppercase && hasNumbers && hasSymbols;
 
-                {securityForm.newMasterKey && (
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="text-slate-300 font-medium">Confirmar Nueva Llave Maestra *</label>
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="text-[11px] text-slate-400 hover:text-slate-200 flex items-center gap-1 cursor-pointer"
-                      >
-                        {showConfirmPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                        <span>{showConfirmPassword ? 'Ocultar' : 'Ver'}</span>
-                      </button>
+                        return (
+                          <div className="mt-2 p-3 rounded-2xl bg-[#0D111A] border border-slate-800 text-[11px] space-y-2">
+                            <div className="flex items-center justify-between font-semibold">
+                              <span className="text-slate-300">Reglas Bancarias Obligatorias:</span>
+                              <span className={isAllMet ? 'text-emerald-400 font-bold' : 'text-amber-400 font-semibold'}>
+                                {isAllMet ? '✓ Estándar Bancario Cumplido' : '⚠️ Requisitos Pendientes'}
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[10px]">
+                              <span className={`p-1.5 rounded-lg border flex items-center gap-1.5 ${
+                                hasLetters ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 font-semibold' : 'bg-slate-900 border-slate-800 text-slate-400'
+                              }`}>
+                                {hasLetters ? <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> : <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />}
+                                Min. 4 Letras ({letters}/4)
+                              </span>
+                              <span className={`p-1.5 rounded-lg border flex items-center gap-1.5 ${
+                                hasUppercase ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 font-semibold' : 'bg-slate-900 border-slate-800 text-slate-400'
+                              }`}>
+                                {hasUppercase ? <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> : <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />}
+                                Min. 1 Mayúscula ({uppercase}/1)
+                              </span>
+                              <span className={`p-1.5 rounded-lg border flex items-center gap-1.5 ${
+                                hasNumbers ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 font-semibold' : 'bg-slate-900 border-slate-800 text-slate-400'
+                              }`}>
+                                {hasNumbers ? <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> : <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />}
+                                Min. 2 Números ({numbers}/2)
+                              </span>
+                              <span className={`p-1.5 rounded-lg border flex items-center gap-1.5 ${
+                                hasSymbols ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 font-semibold' : 'bg-slate-900 border-slate-800 text-slate-400'
+                              }`}>
+                                {hasSymbols ? <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> : <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />}
+                                Min. 1 Signo ({symbols}/1)
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
-                    <input
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      required={Boolean(securityForm.newMasterKey)}
-                      value={securityForm.confirmNewMasterKey}
-                      onChange={(e) => setSecurityForm({ ...securityForm, confirmNewMasterKey: e.target.value })}
-                      placeholder="Repite exactamente la nueva Llave Maestra"
-                      className={`w-full bg-[#141A26] border text-white rounded-xl px-3.5 py-2.5 outline-none font-mono ${
-                        securityForm.confirmNewMasterKey
-                          ? securityForm.confirmNewMasterKey === securityForm.newMasterKey
-                            ? 'border-emerald-500 focus:border-emerald-400'
-                            : 'border-rose-500 focus:border-rose-400'
-                          : 'border-slate-700 focus:border-amber-400'
-                      }`}
-                    />
-                    {securityForm.confirmNewMasterKey && (
-                      <p className={`text-[10px] mt-1 font-semibold flex items-center gap-1 ${
-                        securityForm.confirmNewMasterKey === securityForm.newMasterKey
-                          ? 'text-emerald-400'
-                          : 'text-rose-400'
-                      }`}>
-                        {securityForm.confirmNewMasterKey === securityForm.newMasterKey ? (
-                          <>
-                            <Check className="w-3 h-3" />
-                            ✓ Las claves coinciden perfectamente
-                          </>
-                        ) : (
-                          <>
-                            <AlertCircle className="w-3 h-3" />
-                            ⚠️ La confirmación no coincide con la nueva clave
-                          </>
+
+                    {securityForm.newMasterKey && (
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="text-slate-300 font-medium">Confirmar Nueva Llave Maestra *</label>
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="text-[11px] text-slate-400 hover:text-slate-200 flex items-center gap-1 cursor-pointer"
+                          >
+                            {showConfirmPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            <span>{showConfirmPassword ? 'Ocultar' : 'Ver'}</span>
+                          </button>
+                        </div>
+                        <input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          required={Boolean(securityForm.newMasterKey)}
+                          value={securityForm.confirmNewMasterKey}
+                          onChange={(e) => setSecurityForm({ ...securityForm, confirmNewMasterKey: e.target.value })}
+                          placeholder="Repite exactamente la nueva Llave Maestra"
+                          className={`w-full bg-[#141A26] border text-white rounded-xl px-3.5 py-2.5 outline-none font-mono ${
+                            securityForm.confirmNewMasterKey
+                              ? securityForm.confirmNewMasterKey === securityForm.newMasterKey
+                                ? 'border-emerald-500 focus:border-emerald-400'
+                                : 'border-rose-500 focus:border-rose-400'
+                              : 'border-slate-700 focus:border-amber-400'
+                          }`}
+                        />
+                        {securityForm.confirmNewMasterKey && (
+                          <p className={`text-[10px] mt-1 font-semibold flex items-center gap-1 ${
+                            securityForm.confirmNewMasterKey === securityForm.newMasterKey
+                              ? 'text-emerald-400'
+                              : 'text-rose-400'
+                          }`}>
+                            {securityForm.confirmNewMasterKey === securityForm.newMasterKey ? (
+                              <>
+                                <Check className="w-3 h-3" />
+                                ✓ Las claves coinciden perfectamente
+                              </>
+                            ) : (
+                              <>
+                                <AlertCircle className="w-3 h-3" />
+                                ⚠️ La confirmación no coincide con la nueva clave
+                              </>
+                            )}
+                          </p>
                         )}
-                      </p>
+                      </div>
                     )}
                   </div>
-                )}
-              </div>
 
-              {/* Step 3: Emergency Channels */}
-              <div className="pt-3 border-t border-slate-800 space-y-3">
-                <p className="text-slate-200 font-bold flex items-center gap-1.5">
-                  <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
-                  3. Canales de Rescate para Clave Dinámica de Emergencia
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-slate-400 mb-1">WhatsApp Personal de Rescate *</label>
-                    <input
-                      type="text"
-                      required
-                      value={securityForm.newEmergencyPhone}
-                      onChange={(e) => setSecurityForm({ ...securityForm, newEmergencyPhone: e.target.value })}
-                      placeholder="+57 300 123 4567"
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2 outline-none font-mono focus:border-amber-400"
-                    />
-                    <p className="text-[10px] text-slate-400 mt-1">Aquí recibirás los códigos OTP efímeros de 5 min.</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-400 mb-1">Correo Electrónico de Notificación *</label>
-                    <input
-                      type="email"
-                      required
-                      value={securityForm.newEmergencyEmail}
-                      onChange={(e) => setSecurityForm({ ...securityForm, newEmergencyEmail: e.target.value })}
-                      placeholder="brayan@prestigia.app"
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2 outline-none focus:border-amber-400"
-                    />
-                    <p className="text-[10px] text-slate-400 mt-1">Copia de auditoría para eventos críticos.</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Step 4: Security Mode (Modo A vs Modo B) & TOTP */}
-              <div className="pt-3 border-t border-slate-800 space-y-3">
-                <div>
-                  <label className="text-slate-200 font-bold flex items-center justify-between mb-2">
-                    <span className="flex items-center gap-1.5">
-                      <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                      4. Política de Acceso y Nivel de Blindaje
-                    </span>
-                    <span className="text-[10px] text-amber-400 font-mono">AUTENTICACIÓN</span>
-                  </label>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Modo A */}
-                    <div
-                      onClick={() => setSecurityForm({ ...securityForm, twoFactorEnabled: false })}
-                      className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
-                        !securityForm.twoFactorEnabled
-                          ? 'bg-amber-500/10 border-amber-500/50 text-white shadow-lg shadow-amber-500/10'
-                          : 'bg-[#141A26] border-slate-800 text-slate-400 hover:border-slate-700'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="font-bold text-xs flex items-center gap-1.5 text-amber-300">
-                          <Key className="w-3.5 h-3.5" />
-                          Modo A: Llave Maestra + SOS
-                        </span>
-                        {!securityForm.twoFactorEnabled && (
-                          <span className="w-2 h-2 rounded-full bg-emerald-400 ring-4 ring-emerald-400/20" />
-                        )}
-                      </div>
-                      <p className="text-[11px] text-slate-300 leading-relaxed">
-                        Ingreso directo con tu Llave Maestra. Si la olvidas, puedes solicitar un código de un solo uso despachado a tu WhatsApp registrado.
-                      </p>
-                      <span className="inline-block mt-2 text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
-                        ✓ Recomendado para Operación Ágil
-                      </span>
-                    </div>
-
-                    {/* Modo B */}
-                    <div
-                      onClick={() => setSecurityForm({ ...securityForm, twoFactorEnabled: true })}
-                      className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
-                        securityForm.twoFactorEnabled
-                          ? 'bg-blue-500/10 border-blue-500/50 text-white shadow-lg shadow-blue-500/10'
-                          : 'bg-[#141A26] border-slate-800 text-slate-400 hover:border-slate-700'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="font-bold text-xs flex items-center gap-1.5 text-blue-300">
-                          <Smartphone className="w-3.5 h-3.5" />
-                          Modo B: Blindaje 2FA (TOTP)
-                        </span>
-                        {securityForm.twoFactorEnabled && (
-                          <span className="w-2 h-2 rounded-full bg-blue-400 ring-4 ring-blue-400/20" />
-                        )}
-                      </div>
-                      <p className="text-[11px] text-slate-300 leading-relaxed">
-                        Exige en cada acceso tu Llave Maestra más el token dinámico de 6 dígitos de tu app Google Authenticator o Authy.
-                      </p>
-                      <span className="inline-block mt-2 text-[10px] font-semibold text-blue-400 uppercase tracking-wider">
-                        🛡️ Máxima Seguridad Bancaria
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* TOTP Secret (Only configuration if Modo B is active) */}
-                {securityForm.twoFactorEnabled && (
-                  <div className="p-3.5 rounded-2xl bg-blue-950/20 border border-blue-500/30 space-y-2 animate-in fade-in duration-200">
-                    <label className="block text-slate-300 text-xs font-semibold flex items-center justify-between">
-                      <span className="flex items-center gap-1.5">
-                        <Smartphone className="w-3.5 h-3.5 text-blue-400" />
-                        Clave Secreta TOTP para Google Authenticator / Authy:
-                      </span>
-                      <span className="text-[10px] text-blue-400 font-mono">RFC-6238 COMPLIANT</span>
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={securityForm.newTotpSecret}
-                        onChange={(e) => setSecurityForm({ ...securityForm, newTotpSecret: e.target.value })}
-                        className="flex-1 bg-[#141A26] border border-blue-500/40 text-blue-200 rounded-xl px-3.5 py-2 outline-none font-mono text-xs font-bold tracking-wider"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(securityForm.newTotpSecret, 'totp-secret')}
-                        className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-all"
-                      >
-                        {copiedText === 'totp-secret' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                        <span>{copiedText === 'totp-secret' ? 'Copiado' : 'Copiar Clave'}</span>
-                      </button>
-                    </div>
-                    <p className="text-[10px] text-slate-400 leading-normal">
-                      Copia esta clave secreta e ingrésala manualmente en tu aplicación autenticadora (cuenta &quot;Prestigia Master&quot; con clave basada en tiempo).
+                  {/* Step 2: Emergency Channels */}
+                  <div className="pt-3 border-t border-slate-800 space-y-3">
+                    <p className="text-slate-200 font-bold flex items-center gap-1.5">
+                      <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+                      2. Canales de Rescate para Clave Dinámica de Emergencia
                     </p>
-                  </div>
-                )}
-              </div>
 
-              {/* Submit Buttons */}
-              <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setShowSecurityConfigModal(false)}
-                  className="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white cursor-pointer"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={securityFormLoading}
-                  className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-bold rounded-xl cursor-pointer shadow-lg shadow-amber-500/25 flex items-center gap-2 disabled:opacity-50"
-                >
-                  <Lock className="w-4 h-4" />
-                  {securityFormLoading ? 'Encriptando y Guardando...' : 'Guardar y Encriptar Nuevas Credenciales'}
-                </button>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-slate-400 mb-1">WhatsApp Personal de Rescate *</label>
+                        <input
+                          type="text"
+                          required
+                          value={securityForm.newEmergencyPhone}
+                          onChange={(e) => setSecurityForm({ ...securityForm, newEmergencyPhone: e.target.value })}
+                          placeholder="+57 300 123 4567"
+                          className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2 outline-none font-mono focus:border-amber-400"
+                        />
+                        <p className="text-[10px] text-slate-400 mt-1">Aquí recibirás los códigos OTP efímeros de 5 min.</p>
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-400 mb-1">Correo Electrónico de Notificación *</label>
+                        <input
+                          type="email"
+                          required
+                          value={securityForm.newEmergencyEmail}
+                          onChange={(e) => setSecurityForm({ ...securityForm, newEmergencyEmail: e.target.value })}
+                          placeholder="luisma0603@gmail.com"
+                          className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2 outline-none focus:border-amber-400"
+                        />
+                        <p className="text-[10px] text-slate-400 mt-1">Copia de auditoría para eventos críticos.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 3: Security Mode (Modo A vs Modo B) & TOTP */}
+                  <div className="pt-3 border-t border-slate-800 space-y-3">
+                    <div>
+                      <label className="text-slate-200 font-bold flex items-center justify-between mb-2">
+                        <span className="flex items-center gap-1.5">
+                          <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                          3. Política de Acceso y Nivel de Blindaje
+                        </span>
+                        <span className="text-[10px] text-amber-400 font-mono">AUTENTICACIÓN</span>
+                      </label>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {/* Modo A */}
+                        <div
+                          onClick={() => setSecurityForm({ ...securityForm, twoFactorEnabled: false })}
+                          className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
+                            !securityForm.twoFactorEnabled
+                              ? 'bg-amber-500/10 border-amber-500/50 text-white shadow-lg shadow-amber-500/10'
+                              : 'bg-[#141A26] border-slate-800 text-slate-400 hover:border-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="font-bold text-xs flex items-center gap-1.5 text-amber-300">
+                              <Key className="w-3.5 h-3.5" />
+                              Modo A: Llave Maestra + SOS
+                            </span>
+                            {!securityForm.twoFactorEnabled && (
+                              <span className="w-2 h-2 rounded-full bg-emerald-400 ring-4 ring-emerald-400/20" />
+                            )}
+                          </div>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">
+                            Ingreso directo con tu Llave Maestra. Si la olvidas, puedes solicitar un código de un solo uso despachado a tu WhatsApp registrado.
+                          </p>
+                          <span className="inline-block mt-2 text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
+                            ✓ Recomendado para Operación Ágil
+                          </span>
+                        </div>
+
+                        {/* Modo B */}
+                        <div
+                          onClick={() => setSecurityForm({ ...securityForm, twoFactorEnabled: true })}
+                          className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
+                            securityForm.twoFactorEnabled
+                              ? 'bg-blue-500/10 border-blue-500/50 text-white shadow-lg shadow-blue-500/10'
+                              : 'bg-[#141A26] border-slate-800 text-slate-400 hover:border-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="font-bold text-xs flex items-center gap-1.5 text-blue-300">
+                              <Smartphone className="w-3.5 h-3.5" />
+                              Modo B: Blindaje 2FA (TOTP)
+                            </span>
+                            {securityForm.twoFactorEnabled && (
+                              <span className="w-2 h-2 rounded-full bg-blue-400 ring-4 ring-blue-400/20" />
+                            )}
+                          </div>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">
+                            Exige en cada acceso tu Llave Maestra más el token dinámico de 6 dígitos de tu app Google Authenticator o Authy.
+                          </p>
+                          <span className="inline-block mt-2 text-[10px] font-semibold text-blue-400 uppercase tracking-wider">
+                            🛡️ Máxima Seguridad Bancaria
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* TOTP Secret (Only configuration if Modo B is active) */}
+                    {securityForm.twoFactorEnabled && (
+                      <div className="p-3.5 rounded-2xl bg-blue-950/20 border border-blue-500/30 space-y-2 animate-in fade-in duration-200">
+                        <label className="block text-slate-300 text-xs font-semibold flex items-center justify-between">
+                          <span className="flex items-center gap-1.5">
+                            <Smartphone className="w-3.5 h-3.5 text-blue-400" />
+                            Clave Secreta TOTP para Google Authenticator / Authy:
+                          </span>
+                          <span className="text-[10px] text-blue-400 font-mono">RFC-6238 COMPLIANT</span>
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={securityForm.newTotpSecret}
+                            onChange={(e) => setSecurityForm({ ...securityForm, newTotpSecret: e.target.value })}
+                            className="flex-1 bg-[#141A26] border border-blue-500/40 text-blue-200 rounded-xl px-3.5 py-2 outline-none font-mono text-xs font-bold tracking-wider"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(securityForm.newTotpSecret, 'totp-secret')}
+                            className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-all"
+                          >
+                            {copiedText === 'totp-secret' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                            <span>{copiedText === 'totp-secret' ? 'Copiado' : 'Copiar Clave'}</span>
+                          </button>
+                        </div>
+                        <p className="text-[10px] text-slate-400 leading-normal">
+                          Copia esta clave secreta e ingrésala manualmente en tu aplicación autenticadora (cuenta &quot;Prestigia Master&quot; con clave basada en tiempo).
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Submit Buttons */}
+                  <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-800">
+                    <button
+                      type="button"
+                      onClick={handleCloseSecurityConfigModal}
+                      className="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={securityFormLoading}
+                      className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-bold rounded-xl cursor-pointer shadow-lg shadow-amber-500/25 flex items-center gap-2 disabled:opacity-50"
+                    >
+                      <Lock className="w-4 h-4" />
+                      {securityFormLoading ? 'Encriptando y Guardando...' : 'Guardar y Encriptar Nuevas Credenciales'}
+                    </button>
+                  </div>
+                </form>
               </div>
-            </form>
+            )}
           </div>
         </div>
       )}
