@@ -1316,15 +1316,25 @@ export default function MasterAdminPage() {
             </p>
           </div>
 
-          {/* Security Alert Box */}
+          {/* Security Alert / Info Box */}
           {authError && (
-            <div className="mb-6 p-4 rounded-2xl bg-rose-950/40 border border-rose-500/50 text-rose-200 text-xs flex items-start gap-3 shadow-lg shadow-rose-950/50 animate-shake">
-              <ShieldAlert className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-semibold text-rose-300">Error de Validación de Seguridad</p>
-                <p className="mt-0.5 text-rose-200/90 leading-relaxed">{authError}</p>
+            authError.includes('voluntariamente') ? (
+              <div className="mb-6 p-4 rounded-2xl bg-slate-900/90 border border-emerald-500/40 text-slate-300 text-xs flex items-start gap-3 shadow-xl shadow-black/60">
+                <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-emerald-300">Consola Master Bloqueada con Éxito</p>
+                  <p className="mt-0.5 text-slate-300 leading-relaxed">Has cerrado tu sesión de forma segura. Introduce tu Llave Maestra y token 2FA para volver a ingresar.</p>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="mb-6 p-4 rounded-2xl bg-rose-950/40 border border-rose-500/50 text-rose-200 text-xs flex items-start gap-3 shadow-lg shadow-rose-950/50 animate-shake">
+                <ShieldAlert className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-rose-300">Error de Validación de Seguridad</p>
+                  <p className="mt-0.5 text-rose-200/90 leading-relaxed">{authError}</p>
+                </div>
+              </div>
+            )
           )}
 
           {/* Banking Form Card */}
