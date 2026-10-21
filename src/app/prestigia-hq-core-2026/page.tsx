@@ -92,6 +92,7 @@ export default function MasterAdminPage() {
   const [masterKeyInput, setMasterKeyInput] = useState('');
   const [totpTokenInput, setTotpTokenInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showTotpToken, setShowTotpToken] = useState(false);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -103,6 +104,7 @@ export default function MasterAdminPage() {
   const [emergencyEmail, setEmergencyEmail] = useState('info@prestigia.app');
   const [emergencyOtpSent, setEmergencyOtpSent] = useState(false);
   const [emergencyOtpInput, setEmergencyOtpInput] = useState('');
+  const [showEmergencyOtp, setShowEmergencyOtp] = useState(false);
   const [emergencyCountdown, setEmergencyCountdown] = useState(300);
   const [emergencyLoading, setEmergencyLoading] = useState(false);
 
@@ -127,6 +129,7 @@ export default function MasterAdminPage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showTotpSecret, setShowTotpSecret] = useState(false);
   const [securityConfig, setSecurityConfig] = useState<{
     emergencyPhone: string;
     emergencyEmail: string;
@@ -1390,15 +1393,22 @@ export default function MasterAdminPage() {
                   </label>
                   <div className="relative">
                     <input
-                      type="text"
+                      type={showTotpToken ? 'text' : 'password'}
                       maxLength={6}
                       value={totpTokenInput}
                       onChange={(e) => setTotpTokenInput(e.target.value.replace(/[^0-9]/g, ''))}
                       placeholder="••••••"
                       required
                       disabled={Boolean(lockoutUntil && Date.now() < lockoutUntil)}
-                      className="w-full bg-[#141A26] border border-slate-700/80 focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 text-white placeholder-slate-600 text-center tracking-[0.4em] text-lg font-mono rounded-xl px-4 py-3 transition-all outline-none font-bold"
+                      className="w-full bg-[#141A26] border border-slate-700/80 focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 text-white placeholder-slate-600 text-center tracking-[0.4em] text-lg font-mono rounded-xl px-4 py-3 pr-11 transition-all outline-none font-bold"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowTotpToken(!showTotpToken)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                    >
+                      {showTotpToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                   <p className="text-[10px] text-slate-400 mt-1.5 text-center">
                     Introduce el código temporal de 6 dígitos de tu aplicación autenticadora.
@@ -1487,16 +1497,25 @@ export default function MasterAdminPage() {
                         Vigencia: {Math.floor(emergencyCountdown / 60)}:{(emergencyCountdown % 60).toString().padStart(2, '0')}
                       </span>
                     </div>
-                    <input
-                      type="text"
-                      maxLength={6}
-                      value={emergencyOtpInput}
-                      onChange={(e) => setEmergencyOtpInput(e.target.value.replace(/[^0-9]/g, ''))}
-                      placeholder="000000"
-                      required
-                      autoFocus
-                      className="w-full bg-[#141A26] border border-amber-500/50 focus:border-amber-400 text-white text-center font-mono text-2xl tracking-[0.3em] font-bold rounded-xl py-3 outline-none"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showEmergencyOtp ? 'text' : 'password'}
+                        maxLength={6}
+                        value={emergencyOtpInput}
+                        onChange={(e) => setEmergencyOtpInput(e.target.value.replace(/[^0-9]/g, ''))}
+                        placeholder="••••••"
+                        required
+                        autoFocus
+                        className="w-full bg-[#141A26] border border-amber-500/50 focus:border-amber-400 text-white text-center font-mono text-2xl tracking-[0.3em] font-bold rounded-xl py-3 pr-11 outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowEmergencyOtp(!showEmergencyOtp)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                      >
+                        {showEmergencyOtp ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
 
                   <button
@@ -4639,16 +4658,25 @@ export default function MasterAdminPage() {
                           <span className="text-[10px] text-blue-400 font-mono">RFC-6238 COMPLIANT</span>
                         </label>
                         <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            value={securityForm.newTotpSecret}
-                            onChange={(e) => setSecurityForm({ ...securityForm, newTotpSecret: e.target.value })}
-                            className="flex-1 bg-[#141A26] border border-blue-500/40 text-blue-200 rounded-xl px-3.5 py-2 outline-none font-mono text-xs font-bold tracking-wider"
-                          />
+                          <div className="relative flex-1">
+                            <input
+                              type={showTotpSecret ? 'text' : 'password'}
+                              value={securityForm.newTotpSecret}
+                              onChange={(e) => setSecurityForm({ ...securityForm, newTotpSecret: e.target.value })}
+                              className="w-full bg-[#141A26] border border-blue-500/40 text-blue-200 rounded-xl px-3.5 py-2 pr-10 outline-none font-mono text-xs font-bold tracking-wider"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowTotpSecret(!showTotpSecret)}
+                              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                            >
+                              {showTotpSecret ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
                           <button
                             type="button"
                             onClick={() => handleCopy(securityForm.newTotpSecret, 'totp-secret')}
-                            className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-all"
+                            className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-all shrink-0"
                           >
                             {copiedText === 'totp-secret' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                             <span>{copiedText === 'totp-secret' ? 'Copiado' : 'Copiar Clave'}</span>
