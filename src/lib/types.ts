@@ -395,7 +395,7 @@ export const PRESTIGIA_NICHES: PrestigiaNiche[] = [
     shortLabel: 'Salud & Médica',
     icon: '🩺',
     color: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30',
-    keywords: ['salud', 'médic', 'medic', 'dental', 'odontolog', 'clínica', 'clinica', 'doctor', 'estética médica', 'estetica medica', 'fisioterapia', 'laboratorio'],
+    keywords: ['salud', 'médic', 'medic', 'dental', 'odontolog', 'doctor', 'hospital', 'ips', 'eps', 'fisioterapia', 'laboratorio clínico', 'laboratorio clinico', 'pediatría', 'pediatria'],
   },
   {
     id: 'auto',
@@ -435,7 +435,7 @@ export const PRESTIGIA_NICHES: PrestigiaNiche[] = [
     shortLabel: 'Mascotas & Veterinaria',
     icon: '🐾',
     color: 'bg-teal-500/10 text-teal-300 border-teal-500/30',
-    keywords: ['mascota', 'veterinaria', 'veterinario', 'pet', 'perro', 'gato', 'canina', 'guardería canina', 'grooming'],
+    keywords: ['mascota', 'veterinaria', 'veterinario', 'pet', 'perro', 'gato', 'canina', 'guardería canina', 'grooming', 'clínica veterinaria', 'clinica veterinaria', 'spa canino'],
   },
   {
     id: 'retail',

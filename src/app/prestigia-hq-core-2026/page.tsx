@@ -1258,13 +1258,26 @@ export default function MasterAdminPage() {
 
   // Helper for Niche & Industry badge classification
   const getNicheBadge = (category: string) => {
-    const cat = (category || '').toLowerCase();
+    const cat = (category || '').toLowerCase().trim();
+    // 1. Direct exact match with official niche label or ID
+    const exact = PRESTIGIA_NICHES.find(
+      (n) => n.id === cat || n.label.toLowerCase() === cat || (n.shortLabel && n.shortLabel.toLowerCase() === cat)
+    );
+    if (exact) {
+      return { id: exact.id, label: exact.shortLabel || exact.label, icon: exact.icon, color: exact.color };
+    }
+    // 2. Explicit veterinary / pet isolation (never confuse with human health)
+    if (cat.includes('veterin') || cat.includes('mascota') || cat.includes('pet ') || cat.startsWith('pet') || cat.endsWith('pet') || cat.includes('canin') || cat.includes('felin')) {
+      const petNiche = PRESTIGIA_NICHES.find((n) => n.id === 'mascotas')!;
+      return { id: petNiche.id, label: petNiche.shortLabel || petNiche.label, icon: petNiche.icon, color: petNiche.color };
+    }
+    // 3. Fallback keyword scan across all niches
     for (const niche of PRESTIGIA_NICHES) {
       if (niche.keywords.some((k) => cat.includes(k))) {
-        return { label: niche.shortLabel || niche.label, icon: niche.icon, color: niche.color };
+        return { id: niche.id, label: niche.shortLabel || niche.label, icon: niche.icon, color: niche.color };
       }
     }
-    return { label: category || 'Comercial & Retail', icon: '🏢', color: 'bg-slate-500/10 text-slate-300 border-slate-500/30' };
+    return { id: 'other', label: category || 'Comercial & Retail', icon: '🏢', color: 'bg-slate-500/10 text-slate-300 border-slate-500/30' };
   };
 
   // Filtered Businesses for Directory Tab
@@ -1275,14 +1288,8 @@ export default function MasterAdminPage() {
 
       // 2. Nicho / Category filter
       if (selectedCategoryFilter !== 'all') {
-        const cat = (biz.category || '').toLowerCase();
-        const niche = PRESTIGIA_NICHES.find((n) => n.id === selectedCategoryFilter);
-        if (niche) {
-          const matches = niche.keywords.some((k) => cat.includes(k));
-          if (!matches) return false;
-        } else {
-          if (!cat.includes(selectedCategoryFilter.toLowerCase())) return false;
-        }
+        const badge = getNicheBadge(biz.category);
+        if (badge.id !== selectedCategoryFilter) return false;
       }
 
       // 3. Search term filter
