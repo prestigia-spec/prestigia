@@ -41,6 +41,13 @@ export interface MasterSecurityConfig {
   emergencyEmail: string;
   totpSecret?: string;
   twoFactorEnabled?: boolean;
+  activeOtp?: {
+    code: string;
+    expiresAt: number;
+    phone: string;
+    email: string;
+    consumed: boolean;
+  };
   updatedAt: string;
 }
 

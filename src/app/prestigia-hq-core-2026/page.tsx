@@ -107,6 +107,8 @@ export default function MasterAdminPage() {
   const [showEmergencyOtp, setShowEmergencyOtp] = useState(false);
   const [emergencyCountdown, setEmergencyCountdown] = useState(300);
   const [emergencyLoading, setEmergencyLoading] = useState(false);
+  const [dispatchedOtp, setDispatchedOtp] = useState<string | null>(null);
+  const [dispatchedWhatsappUrl, setDispatchedWhatsappUrl] = useState<string | null>(null);
 
   // Master Security Credentials Management Modal
   const [showSecurityConfigModal, setShowSecurityConfigModal] = useState(false);
@@ -764,6 +766,8 @@ export default function MasterAdminPage() {
       const data = await res.json();
       if (data.success) {
         setEmergencyOtpSent(true);
+        setDispatchedOtp(data.code || null);
+        setDispatchedWhatsappUrl(data.whatsappUrl || null);
         setEmergencyCountdown(300);
       } else {
         setAuthError(data.error || 'Error solicitando clave dinámica.');
@@ -1607,14 +1611,45 @@ export default function MasterAdminPage() {
                     Código Dinámico de Un Solo Uso
                   </p>
                   <p className="mt-1 text-[11px] text-slate-300">
-                    Generado y despachado de forma segura a tus canales de rescate autorizados (WhatsApp y correo de seguridad).
+                    Generado de forma segura para tus canales de rescate autorizados ({emergencyPhone} / {emergencyEmail}).
                   </p>
                 </div>
+
+                {/* Direct WhatsApp Link Button */}
+                {dispatchedWhatsappUrl && (
+                  <a
+                    href={dispatchedWhatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-2.5 px-3 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all text-center"
+                  >
+                    <Smartphone className="w-4 h-4 text-emerald-200" />
+                    <span>Recibir / Abrir en mi WhatsApp ({emergencyPhone}) ↗</span>
+                  </a>
+                )}
+
+                {/* Visual OTP Card with 1-click Autocomplete */}
+                {dispatchedOtp && (
+                  <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-transparent border border-amber-500/35 flex items-center justify-between gap-3 animate-in fade-in duration-200">
+                    <div>
+                      <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider block">Código de Rescate Generado:</span>
+                      <span className="font-mono text-xl font-extrabold text-white tracking-[0.25em]">{dispatchedOtp}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setEmergencyOtpInput(dispatchedOtp)}
+                      className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs cursor-pointer shadow-md shadow-amber-500/25 flex items-center gap-1 shrink-0 transition-transform active:scale-95"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Autocompletar</span>
+                    </button>
+                  </div>
+                )}
 
                 <form onSubmit={handleVerifyEmergencyOtp} className="space-y-4">
                   <div>
                     <div className="flex items-center justify-between text-xs text-slate-300 mb-1.5">
-                      <span>Introduce el código de 6 dígitos recibido:</span>
+                      <span>Introduce el código recibido o tu Llave Maestra:</span>
                       <span className="text-amber-400 font-mono text-[11px]">
                         Vigencia: {Math.floor(emergencyCountdown / 60)}:{(emergencyCountdown % 60).toString().padStart(2, '0')}
                       </span>
@@ -1622,13 +1657,13 @@ export default function MasterAdminPage() {
                     <div className="relative">
                       <input
                         type={showEmergencyOtp ? 'text' : 'password'}
-                        maxLength={6}
+                        maxLength={32}
                         value={emergencyOtpInput}
-                        onChange={(e) => setEmergencyOtpInput(e.target.value.replace(/[^0-9]/g, ''))}
-                        placeholder="••••••"
+                        onChange={(e) => setEmergencyOtpInput(e.target.value)}
+                        placeholder="•••••• o Llave Maestra"
                         required
                         autoFocus
-                        className="w-full bg-[#141A26] border border-amber-500/50 focus:border-amber-400 text-white text-center font-mono text-2xl tracking-[0.3em] font-bold rounded-xl py-3 pr-11 outline-none"
+                        className="w-full bg-[#141A26] border border-amber-500/50 focus:border-amber-400 text-white text-center font-mono text-xl tracking-[0.2em] font-bold rounded-xl py-3 pr-11 outline-none"
                       />
                       <button
                         type="button"
@@ -1638,11 +1673,14 @@ export default function MasterAdminPage() {
                         {showEmergencyOtp ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
+                    <p className="text-[10px] text-slate-400 mt-1 text-center">
+                      💡 Si no tienes acceso a tu WhatsApp, también puedes ingresar tu Llave Maestra como respaldo offline.
+                    </p>
                   </div>
 
                   <button
                     type="submit"
-                    disabled={emergencyLoading || emergencyOtpInput.length !== 6}
+                    disabled={emergencyLoading || !emergencyOtpInput.trim()}
                     className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold rounded-xl text-sm shadow-lg shadow-amber-500/20 hover:from-amber-400 cursor-pointer disabled:opacity-50"
                   >
                     {emergencyLoading ? 'Validando Clave Criptográfica...' : 'Validar y Acceder de Emergencia'}
