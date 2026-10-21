@@ -252,12 +252,8 @@ export default function MasterAdminPage() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          // If local doesn't have an override, apply server values
-          const savedConfig = localStorage.getItem('prestigia_master_security_config');
-          if (!savedConfig) {
-            setIsTwoFactorActiveOnServer(Boolean(data.twoFactorEnabled));
-            if (data.maskedPhone) setEmergencyPhone(data.maskedPhone);
-          }
+          setIsTwoFactorActiveOnServer(Boolean(data.twoFactorEnabled));
+          if (data.maskedPhone) setEmergencyPhone(data.maskedPhone);
         }
       })
       .catch(() => {});
@@ -650,6 +646,12 @@ export default function MasterAdminPage() {
           }
         } catch (e) {}
       } else {
+        if (verifyData.twoFactorRequired) {
+          setIsTwoFactorActiveOnServer(true);
+          setAuthError('Doble Factor Requerido: Introduce el código de 6 dígitos de Google Authenticator.');
+          return;
+        }
+
         const newAttempts = failedAttempts + 1;
         setFailedAttempts(newAttempts);
         if (newAttempts >= MAX_FAILED_ATTEMPTS) {

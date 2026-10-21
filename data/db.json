@@ -2626,8 +2626,8 @@
     "emergencyPhone": "+57 317 260 6093",
     "emergencyEmail": "luisma0603@gmail.com",
     "totpSecret": "JBSWY3DPEHPK3PXP",
-    "twoFactorEnabled": true,
-    "updatedAt": "2026-10-20T22:00:00.000Z"
+    "twoFactorEnabled": false,
+    "updatedAt": "2026-10-21T10:18:00.000Z"
   },
   "leads": [
     {
