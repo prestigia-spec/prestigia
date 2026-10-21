@@ -1618,7 +1618,7 @@ export default function MasterAdminPage() {
                     Protocolo de Rescate Fuera de Banda
                   </p>
                   <p className="mt-1 text-[11px] text-slate-300">
-                    {emergencyPhone ? `Se ha despachado una clave temporal a tus canales privados autorizados (${maskSafePhone(emergencyPhone)} / ${maskSafeEmail(emergencyEmail)}). Ningún código se revela en este terminal público.` : 'Introduce tu Llave Maestra o clave temporal para rescate de emergencia.'}
+                    Se ha despachado una clave temporal a tus canales privados autorizados. Ningún código se revela en este terminal público.
                   </p>
                 </div>
 
