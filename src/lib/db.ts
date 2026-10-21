@@ -24,6 +24,20 @@ const SEED_DB_FILE = path.join(process.cwd(), 'data', 'db.json');
 // In-process memory singleton cache to ensure immediate consistency
 let memoryDb: DatabaseSchema | null = null;
 
+export interface EmailDispatchRecord {
+  id: string;
+  templateId: 'welcome_credentials' | 'reactivation_winback' | 'monthly_report' | 'official_announcement' | 'billing_renewal' | 'custom';
+  templateName: string;
+  subject: string;
+  recipientEmail: string;
+  recipientName: string;
+  businessName: string;
+  status: 'sent' | 'queued' | 'failed';
+  provider: string;
+  sentAt: string;
+  error?: string;
+}
+
 interface DatabaseSchema {
   businesses: Business[];
   feedbacks: Feedback[];
@@ -33,6 +47,7 @@ interface DatabaseSchema {
   masterSecurity?: MasterSecurityConfig;
   leads?: CommercialLead[];
   trafficVisits?: TrafficVisit[];
+  emailDispatches?: EmailDispatchRecord[];
 }
 
 export interface MasterSecurityConfig {
@@ -623,6 +638,29 @@ export async function updateCommercialLeadStatus(
   lead.status = status;
   writeDbFile(db);
   return true;
+}
+
+export async function getAllEmailDispatches(): Promise<EmailDispatchRecord[]> {
+  const db = ensureDbFile();
+  return db.emailDispatches || [];
+}
+
+export async function saveEmailDispatch(
+  record: Omit<EmailDispatchRecord, 'id' | 'sentAt'>
+): Promise<EmailDispatchRecord> {
+  const db = ensureDbFile();
+  if (!db.emailDispatches) db.emailDispatches = [];
+  const newRecord: EmailDispatchRecord = {
+    ...record,
+    id: `disp-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    sentAt: new Date().toISOString(),
+  };
+  db.emailDispatches.unshift(newRecord);
+  if (db.emailDispatches.length > 200) {
+    db.emailDispatches = db.emailDispatches.slice(0, 200);
+  }
+  writeDbFile(db);
+  return newRecord;
 }
 
 

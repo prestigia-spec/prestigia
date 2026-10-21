@@ -70,6 +70,14 @@ import {
 } from 'lucide-react';
 import { PrestigiaIcon } from '@/components/PrestigiaIcon';
 import { Business, BusinessPlan, Branch, MasterAddOns, DayOneBaseline, PRESTIGIA_NICHES, CommercialLead, TrafficVisit } from '@/lib/types';
+import { EmailDispatchRecord } from '@/lib/db';
+import {
+  buildWelcomeCredentialsHtml,
+  buildReactivationWinbackHtml,
+  buildMonthlyReportHtml,
+  buildAnnouncementHtml,
+  buildBillingRenewalHtml,
+} from '@/lib/notifications';
 
 // Banking Master Credentials & Thresholds
 const MASTER_KEY_DEFAULT = 'PRESTIGIA-MASTER-2026';
@@ -265,7 +273,7 @@ export default function MasterAdminPage() {
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('la-burguesia');
 
   // Navigation & View State
-  const [activeTab, setActiveTab] = useState<'directorio' | 'conmutador' | 'bigdata' | 'casos' | 'alertas' | 'mrr' | 'trafico'>('directorio');
+  const [activeTab, setActiveTab] = useState<'directorio' | 'conmutador' | 'bigdata' | 'casos' | 'alertas' | 'mrr' | 'trafico' | 'comunicaciones'>('directorio');
   const [privacyMode, setPrivacyMode] = useState(false); // Masks financial numbers & phones
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlanFilter, setSelectedPlanFilter] = useState<string>('all');
@@ -273,6 +281,22 @@ export default function MasterAdminPage() {
   const [directoryViewMode, setDirectoryViewMode] = useState<'list' | 'cards'>('list');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Corporate VIP Communications & Mailer State (Tab 8)
+  const [emailDispatches, setEmailDispatches] = useState<EmailDispatchRecord[]>([]);
+  const [mailerTemplate, setMailerTemplate] = useState<
+    'welcome_credentials' | 'reactivation_winback' | 'monthly_report' | 'official_announcement' | 'billing_renewal' | 'custom'
+  >('welcome_credentials');
+  const [mailerAudience, setMailerAudience] = useState<
+    'single' | 'active_all' | 'inactive_all' | 'plan_elite_empresarial' | 'leads_prospects'
+  >('single');
+  const [mailerBusinessId, setMailerBusinessId] = useState<string>('');
+  const [mailerSubject, setMailerSubject] = useState<string>('');
+  const [mailerCustomBody, setMailerCustomBody] = useState<string>('');
+  const [mailerDiscountPercent, setMailerDiscountPercent] = useState<number>(25);
+  const [mailerSending, setMailerSending] = useState(false);
+  const [mailerResult, setMailerResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
 
   // Traffic & Commercial Leads State (Tab 7)
   const [trafficVisits, setTrafficVisits] = useState<TrafficVisit[]>([]);
@@ -499,10 +523,12 @@ export default function MasterAdminPage() {
 
         setTrafficVisits(data.trafficVisits || []);
         setCommercialLeads(data.leads || []);
+        setEmailDispatches(data.emailDispatches || []);
 
         // Set default selected business if available
-        if (data.businesses?.length > 0 && !selectedBusinessId) {
-          setSelectedBusinessId(data.businesses[0].id);
+        if (data.businesses?.length > 0) {
+          if (!selectedBusinessId) setSelectedBusinessId(data.businesses[0].id);
+          if (!mailerBusinessId) setMailerBusinessId(data.businesses[0].id);
         }
       }
     } catch (err) {
@@ -803,6 +829,52 @@ export default function MasterAdminPage() {
       });
     } finally {
       setTestNotificationLoading(false);
+    }
+  };
+
+  // Dispatch Corporate VIP Mailer Campaign
+  const handleSendCorporateCampaign = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMailerSending(true);
+    setMailerResult(null);
+
+    try {
+      const res = await fetch('/api/master', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'send_corporate_email',
+          audience: mailerAudience,
+          targetBusinessId: mailerBusinessId,
+          templateId: mailerTemplate,
+          customSubject: mailerSubject.trim() || undefined,
+          customBody: mailerCustomBody.trim() || undefined,
+          discountPercent: mailerDiscountPercent,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setMailerResult({
+          success: true,
+          message: data.message || `Campaña despachada con éxito a ${data.totalRecipients} destinatarios.`,
+        });
+        if (data.dispatches) {
+          setEmailDispatches(data.dispatches);
+        }
+      } else {
+        setMailerResult({
+          success: false,
+          message: data.error || 'Error procesando el envío de la campaña.',
+        });
+      }
+    } catch (err) {
+      setMailerResult({
+        success: false,
+        message: 'Error de conexión con el servidor bancario de despacho.',
+      });
+    } finally {
+      setMailerSending(false);
     }
   };
 
@@ -1941,6 +2013,24 @@ export default function MasterAdminPage() {
             {commercialLeads.filter((l) => l.status === 'new').length > 0 && (
               <span className="px-1.5 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-bold text-[10px]">
                 {commercialLeads.filter((l) => l.status === 'new').length} nuevos
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('comunicaciones')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+              activeTab === 'comunicaciones'
+                ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+            }`}
+          >
+            <Mail className="w-4 h-4" />
+            8. Comunicaciones VIP & Mailer
+            {emailDispatches.length > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full bg-amber-950/80 text-amber-300 text-[10px] font-mono border border-amber-500/30">
+                {emailDispatches.length} envíos
               </span>
             )}
           </button>
@@ -4103,6 +4193,490 @@ export default function MasterAdminPage() {
                   </div>
                 );
               })()}
+            </div>
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* TAB 8: CENTRO DE COMUNICACIONES VIP & MAILER OFICIAL */}
+        {/* ============================================================== */}
+        {activeTab === 'comunicaciones' && (
+          <div className="space-y-6">
+            {/* Top Header Card */}
+            <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-6 shadow-xl flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                      Centro de Comunicaciones VIP & Mailer Oficial
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-mono">
+                        {securityConfig.hasResendConfigured ? '✓ Resend Live API' : 'Modo Registro Interno'}
+                      </span>
+                    </h2>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Despacho corporativo de bienvenidas con credenciales, campañas de reactivación de inactivas, reportes mensuales y avisos oficiales.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Metrics Badges */}
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="px-3.5 py-2 rounded-2xl bg-[#141A26] border border-slate-800 text-xs">
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Empresas Activas</span>
+                  <span className="font-mono font-bold text-white text-sm">
+                    {businesses.filter((b) => b.status === 'active').length}
+                  </span>
+                </div>
+                <div className="px-3.5 py-2 rounded-2xl bg-[#141A26] border border-amber-500/30 text-xs">
+                  <span className="text-amber-400 block text-[10px] uppercase font-bold">Inactivas (Winback)</span>
+                  <span className="font-mono font-bold text-amber-300 text-sm">
+                    {businesses.filter((b) => b.status === 'suspended').length}
+                  </span>
+                </div>
+                <div className="px-3.5 py-2 rounded-2xl bg-[#141A26] border border-slate-800 text-xs">
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Total Despachos</span>
+                  <span className="font-mono font-bold text-emerald-400 text-sm">
+                    {emailDispatches.length}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Dual Grid: Editor & Live Preview */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left Column: Form & Configuration (5 cols) */}
+              <div className="lg:col-span-5 bg-[#0E121B] border border-slate-800 rounded-3xl p-6 shadow-xl space-y-5">
+                <div>
+                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                    1. Selecciona la Plantilla Ejecutiva
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">Formatos estandarizados con diseño bancario Prestigia Gold</p>
+                </div>
+
+                {/* Templates Selector Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setMailerTemplate('welcome_credentials')}
+                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                      mailerTemplate === 'welcome_credentials'
+                        ? 'bg-amber-500/15 border-amber-500/60 shadow-lg shadow-amber-500/10'
+                        : 'bg-[#141A26] border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-base">🎓</span>
+                      <span className="text-xs font-bold text-white">Bienvenida & Credenciales</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 leading-tight">Entrega de ID, clave inicial y link al portal</p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMailerTemplate('reactivation_winback')}
+                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                      mailerTemplate === 'reactivation_winback'
+                        ? 'bg-rose-500/15 border-rose-500/60 shadow-lg shadow-rose-500/10'
+                        : 'bg-[#141A26] border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-base">🎁</span>
+                      <span className="text-xs font-bold text-rose-300">Reactivación & Winback</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 leading-tight">Oferta especial para empresas inactivas</p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMailerTemplate('monthly_report')}
+                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                      mailerTemplate === 'monthly_report'
+                        ? 'bg-blue-500/15 border-blue-500/60 shadow-lg shadow-blue-500/10'
+                        : 'bg-[#141A26] border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-base">📊</span>
+                      <span className="text-xs font-bold text-blue-300">Reporte Mensual</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 leading-tight">Estrellas Google, NPS y quejas contenidas</p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMailerTemplate('official_announcement')}
+                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                      mailerTemplate === 'official_announcement'
+                        ? 'bg-purple-500/15 border-purple-500/60 shadow-lg shadow-purple-500/10'
+                        : 'bg-[#141A26] border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-base">📢</span>
+                      <span className="text-xs font-bold text-purple-300">Comunicado Oficial</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 leading-tight">Nuevas funciones o avisos institucionales</p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMailerTemplate('billing_renewal')}
+                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                      mailerTemplate === 'billing_renewal'
+                        ? 'bg-emerald-500/15 border-emerald-500/60 shadow-lg shadow-emerald-500/10'
+                        : 'bg-[#141A26] border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-base">💳</span>
+                      <span className="text-xs font-bold text-emerald-300">Aviso de Renovación</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 leading-tight">Facturación de ciclo y pago en línea</p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMailerTemplate('custom')}
+                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                      mailerTemplate === 'custom'
+                        ? 'bg-amber-500/15 border-amber-500/60 shadow-lg shadow-amber-500/10'
+                        : 'bg-[#141A26] border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-base">✍️</span>
+                      <span className="text-xs font-bold text-amber-300">Mensaje Libre</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 leading-tight">Asunto y cuerpo totalmente personalizados</p>
+                  </button>
+                </div>
+
+                {/* Form Controls */}
+                <form onSubmit={handleSendCorporateCampaign} className="space-y-4 pt-2">
+                  {/* Step 2: Audience Selector */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-200 flex items-center justify-between">
+                      <span>2. Segmento de Destinatarios</span>
+                      <span className="text-[10px] text-amber-400 font-mono">AUDIENCIA</span>
+                    </label>
+                    <select
+                      value={mailerAudience}
+                      onChange={(e) => setMailerAudience(e.target.value as any)}
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 text-xs outline-none focus:border-amber-400 cursor-pointer"
+                    >
+                      <option value="single">🎯 Una Empresa Específica</option>
+                      <option value="active_all">
+                        🟢 Todas las Empresas Activas ({businesses.filter((b) => b.status === 'active').length})
+                      </option>
+                      <option value="inactive_all">
+                        🔴 Empresas Inactivas / Suspendidas - Campaña Winback ({businesses.filter((b) => b.status === 'suspended').length})
+                      </option>
+                      <option value="plan_elite_empresarial">
+                        👑 Segmento VIP: Solo Planes Élite y Empresarial ({businesses.filter((b) => b.plan === 'elite' || b.plan === 'empresarial').length})
+                      </option>
+                      <option value="leads_prospects">
+                        🚀 Prospectos Web Registrados ({commercialLeads.length})
+                      </option>
+                    </select>
+                  </div>
+
+                  {/* If Single: Target Business Dropdown */}
+                  {mailerAudience === 'single' && (
+                    <div className="space-y-1.5 animate-in fade-in duration-150">
+                      <label className="text-xs font-medium text-slate-300">Seleccionar Empresa Afiliada:</label>
+                      <select
+                        value={mailerBusinessId}
+                        onChange={(e) => setMailerBusinessId(e.target.value)}
+                        className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 text-xs outline-none focus:border-amber-400 cursor-pointer"
+                      >
+                        {businesses.map((b) => (
+                          <option key={b.id} value={b.id}>
+                            {b.name} — {b.ownerName} ({b.ownerEmail || 'Sin correo'}) [{b.plan.toUpperCase()}]
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* If Winback: Discount percent */}
+                  {mailerTemplate === 'reactivation_winback' && (
+                    <div className="space-y-1.5 p-3 rounded-2xl bg-rose-950/20 border border-rose-500/30 animate-in fade-in duration-150">
+                      <div className="flex items-center justify-between text-xs">
+                        <label className="font-bold text-rose-300">Porcentaje de Descuento de Retorno:</label>
+                        <span className="font-mono font-bold text-white text-sm">{mailerDiscountPercent}% OFF</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="10"
+                        max="50"
+                        step="5"
+                        value={mailerDiscountPercent}
+                        onChange={(e) => setMailerDiscountPercent(Number(e.target.value))}
+                        className="w-full accent-rose-500 cursor-pointer"
+                      />
+                    </div>
+                  )}
+
+                  {/* Asunto Personalizado (Opcional) */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-slate-300">Asunto del Correo (Opcional):</label>
+                    <input
+                      type="text"
+                      value={mailerSubject}
+                      onChange={(e) => setMailerSubject(e.target.value)}
+                      placeholder="Deja en blanco para usar el asunto bancario predeterminado"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2 text-xs outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  {/* Mensaje Adicional / Nota Personalizada */}
+                  {(mailerTemplate === 'official_announcement' || mailerTemplate === 'custom' || mailerTemplate === 'reactivation_winback') && (
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-slate-300">
+                        {mailerTemplate === 'reactivation_winback' ? 'Detalle de la Oferta / Beneficios de Retorno:' : 'Cuerpo del Comunicado:'}
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={mailerCustomBody}
+                        onChange={(e) => setMailerCustomBody(e.target.value)}
+                        placeholder={
+                          mailerTemplate === 'reactivation_winback'
+                            ? 'Ej: 30 días de Add-ons VIP (Live Wallboard & Sentiment 360) sin costo adicional.'
+                            : 'Escribe el mensaje institucional aquí...'
+                        }
+                        className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl p-3 text-xs outline-none focus:border-amber-400 resize-none"
+                      />
+                    </div>
+                  )}
+
+                  {/* Status Banner */}
+                  {mailerResult && (
+                    <div
+                      className={`p-3 rounded-2xl text-xs flex items-center gap-2.5 ${
+                        mailerResult.success
+                          ? 'bg-emerald-950/40 border border-emerald-500/40 text-emerald-300'
+                          : 'bg-rose-950/40 border border-rose-500/40 text-rose-300'
+                      }`}
+                    >
+                      {mailerResult.success ? (
+                        <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                      ) : (
+                        <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+                      )}
+                      <span>{mailerResult.message}</span>
+                    </div>
+                  )}
+
+                  {/* Send Button */}
+                  <button
+                    type="submit"
+                    disabled={mailerSending}
+                    className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-bold rounded-2xl text-xs shadow-xl shadow-amber-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>{mailerSending ? 'Despachando Campaña Corporativa...' : 'Despachar Campaña Corporativa ↗'}</span>
+                  </button>
+                </form>
+              </div>
+
+              {/* Right Column: Live Interactive Preview (7 cols) */}
+              <div className="lg:col-span-7 bg-[#0E121B] border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div>
+                    <h3 className="text-base font-bold text-white flex items-center gap-2">
+                      <Eye className="w-4 h-4 text-blue-400" />
+                      Vista Previa en Vivo (Live Preview)
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Así recibirá el cliente este correo en su bandeja de entrada
+                    </p>
+                  </div>
+
+                  <div className="flex items-center bg-[#141A26] border border-slate-800 rounded-xl p-1 gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewDevice('desktop')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
+                        previewDevice === 'desktop' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <Monitor className="w-3.5 h-3.5" />
+                      <span>Desktop</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewDevice('mobile')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
+                        previewDevice === 'mobile' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <Smartphone className="w-3.5 h-3.5" />
+                      <span>Móvil</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Sandboxed Email Container */}
+                <div className="bg-[#07090E] p-4 rounded-2xl border border-slate-800 flex justify-center overflow-x-auto min-h-[520px]">
+                  <div
+                    className={`transition-all duration-300 w-full overflow-hidden ${
+                      previewDevice === 'mobile' ? 'max-w-sm rounded-3xl border border-slate-700 shadow-2xl' : 'max-w-xl'
+                    }`}
+                  >
+                    {(() => {
+                      const currentBiz =
+                        businesses.find((b) => b.id === mailerBusinessId) ||
+                        businesses[0] || {
+                          name: 'Tu Empresa VIP',
+                          ownerName: 'Estimado Titular',
+                          plan: 'elite',
+                          id: 'empresa-demo',
+                          password: 'admin',
+                          ownerEmail: 'cliente@empresa.com',
+                        };
+
+                      let previewHtml = '';
+                      if (mailerTemplate === 'welcome_credentials') {
+                        previewHtml = buildWelcomeCredentialsHtml({
+                          businessName: currentBiz.name,
+                          ownerName: currentBiz.ownerName || 'Director de Marca',
+                          plan: currentBiz.plan || 'pro',
+                          businessId: currentBiz.id,
+                          password: currentBiz.password || 'admin',
+                          portalUrl: 'https://prestigia.app/portal',
+                        });
+                      } else if (mailerTemplate === 'reactivation_winback') {
+                        previewHtml = buildReactivationWinbackHtml({
+                          businessName: currentBiz.name,
+                          ownerName: currentBiz.ownerName || 'Director de Marca',
+                          discountPercent: mailerDiscountPercent,
+                          offerDetails: mailerCustomBody || '30 días de Add-ons VIP (Live Wallboard & Sentiment 360) sin costo adicional.',
+                          portalUrl: 'https://prestigia.app/portal',
+                        });
+                      } else if (mailerTemplate === 'monthly_report') {
+                        previewHtml = buildMonthlyReportHtml({
+                          businessName: currentBiz.name,
+                          ownerName: currentBiz.ownerName || 'Director de Marca',
+                          currentRating: 4.8,
+                          ratingGain: 1.1,
+                          reviewsCount: 142,
+                          containedNegativeCount: 28,
+                          portalUrl: 'https://prestigia.app/portal',
+                        });
+                      } else if (mailerTemplate === 'billing_renewal') {
+                        previewHtml = buildBillingRenewalHtml({
+                          businessName: currentBiz.name,
+                          ownerName: currentBiz.ownerName || 'Director de Marca',
+                          plan: currentBiz.plan || 'pro',
+                          amountCOP: currentBiz.plan === 'elite' ? 650000 : currentBiz.plan === 'empresarial' ? 1200000 : 380000,
+                          dueDate: 'Fin de mes en curso',
+                          paymentUrl: 'https://prestigia.app/portal/facturacion',
+                        });
+                      } else {
+                        previewHtml = buildAnnouncementHtml({
+                          title: mailerSubject || 'Comunicado Oficial de Prestigia',
+                          message: mailerCustomBody || 'Estimado cliente, te compartimos una actualización importante sobre el servicio de Prestigia.',
+                          actionUrl: 'https://prestigia.app/portal',
+                          actionText: 'CONOCER MÁS EN MI PORTAL ↗',
+                        });
+                      }
+
+                      return (
+                        <div
+                          className="w-full text-xs"
+                          dangerouslySetInnerHTML={{ __html: previewHtml }}
+                        />
+                      );
+                    })()}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Section: Historical Dispatch Audit Log */}
+            <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Inbox className="w-5 h-5 text-amber-400" />
+                    Bitácora de Despachos & Historial de Envíos ({emailDispatches.length})
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Trazabilidad de cada correo institucional enviado a clientes, estados de entrega y proveedor utilizado.
+                  </p>
+                </div>
+              </div>
+
+              {emailDispatches.length === 0 ? (
+                <div className="text-center py-10 text-slate-500 text-xs">
+                  <Mail className="w-10 h-10 mx-auto text-slate-600 mb-2 opacity-50" />
+                  <p>Aún no se han despachado campañas de correo desde esta consola.</p>
+                  <p className="text-[10px] text-slate-400 mt-1">Usa el editor superior para enviar tu primera bienvenida o comunicado.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs text-slate-300">
+                    <thead className="bg-[#141A26] text-slate-400 font-semibold border-b border-slate-800">
+                      <tr>
+                        <th className="py-3 px-4 rounded-l-xl">Fecha & Hora</th>
+                        <th className="py-3 px-4">Plantilla</th>
+                        <th className="py-3 px-4">Destinatario</th>
+                        <th className="py-3 px-4">Empresa</th>
+                        <th className="py-3 px-4">Asunto</th>
+                        <th className="py-3 px-4 rounded-r-xl text-right">Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60">
+                      {emailDispatches.slice(0, 50).map((disp) => (
+                        <tr key={disp.id} className="hover:bg-[#141A26]/80 transition-colors">
+                          <td className="py-3 px-4 whitespace-nowrap text-slate-400 font-mono text-[11px]">
+                            {new Date(disp.sentAt).toLocaleString('es-CO', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            <span className="px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-[10px] font-semibold">
+                              {disp.templateName}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            <p className="font-semibold text-white">{disp.recipientName}</p>
+                            <p className="text-[10px] text-slate-400 font-mono">{disp.recipientEmail}</p>
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap font-medium text-amber-400">
+                            {disp.businessName}
+                          </td>
+                          <td className="py-3 px-4 truncate max-w-xs text-slate-300">
+                            {disp.subject}
+                          </td>
+                          <td className="py-3 px-4 text-right whitespace-nowrap">
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                disp.status === 'sent'
+                                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                  : disp.status === 'queued'
+                                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                  : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                              }`}
+                            >
+                              {disp.status === 'sent' ? `✓ Enviado (${disp.provider})` : disp.status === 'queued' ? 'En cola de auditoría' : 'Fallido'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         )}

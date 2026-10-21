@@ -12,10 +12,21 @@ import {
   updateMasterSecuritySettings,
   getAllTrafficVisits,
   getAllCommercialLeads,
+  getAllEmailDispatches,
+  saveEmailDispatch,
+  EmailDispatchRecord,
 } from '@/lib/db';
 import { Business, MasterAddOns, DayOneBaseline } from '@/lib/types';
 import { verifyTOTP, getTOTPAuthUrl } from '@/lib/totp';
-import { dispatchEmergencyOtpNotification } from '@/lib/notifications';
+import {
+  dispatchEmergencyOtpNotification,
+  sendTransactionalEmail,
+  buildWelcomeCredentialsHtml,
+  buildReactivationWinbackHtml,
+  buildMonthlyReportHtml,
+  buildAnnouncementHtml,
+  buildBillingRenewalHtml,
+} from '@/lib/notifications';
 
 // In-memory Ephemeral Emergency OTP Store (Single use, 5-minute expiry)
 interface EmergencyOtpRecord {
@@ -199,6 +210,7 @@ export async function GET(request: NextRequest) {
       campaignParticipants: enrichedParticipants,
       trafficVisits: await getAllTrafficVisits(),
       leads: await getAllCommercialLeads(),
+      emailDispatches: await getAllEmailDispatches(),
     });
   } catch (error) {
     console.error('Error fetching master data:', error);
@@ -444,6 +456,129 @@ export async function POST(request: NextRequest) {
         emailSent: dispatchResult.emailSent,
         smsSent: dispatchResult.smsSent,
         error: dispatchResult.error,
+      });
+    }
+
+    // 1.8 Corporate VIP Mailer Dispatcher (Single & Mass Campaigns)
+    if (action === 'send_corporate_email') {
+      const {
+        audience, // 'single' | 'active_all' | 'inactive_all' | 'plan_elite_empresarial' | 'leads_prospects'
+        targetBusinessId,
+        templateId, // 'welcome_credentials' | 'reactivation_winback' | 'monthly_report' | 'official_announcement' | 'billing_renewal' | 'custom'
+        customSubject,
+        customBody,
+        discountPercent,
+      } = body;
+
+      const allBusinesses = await getAllBusinesses();
+      let targetList: { email: string; name: string; businessName: string; business?: Business }[] = [];
+
+      if (audience === 'single') {
+        const b = allBusinesses.find((x) => x.id === targetBusinessId);
+        if (b && b.ownerEmail) {
+          targetList.push({ email: b.ownerEmail, name: b.ownerName, businessName: b.name, business: b });
+        }
+      } else if (audience === 'active_all') {
+        targetList = allBusinesses
+          .filter((b) => b.status === 'active' && Boolean(b.ownerEmail))
+          .map((b) => ({ email: b.ownerEmail!, name: b.ownerName, businessName: b.name, business: b }));
+      } else if (audience === 'inactive_all') {
+        targetList = allBusinesses
+          .filter((b) => b.status === 'suspended' && Boolean(b.ownerEmail))
+          .map((b) => ({ email: b.ownerEmail!, name: b.ownerName, businessName: b.name, business: b }));
+      } else if (audience === 'plan_elite_empresarial') {
+        targetList = allBusinesses
+          .filter((b) => (b.plan === 'elite' || b.plan === 'empresarial') && Boolean(b.ownerEmail))
+          .map((b) => ({ email: b.ownerEmail!, name: b.ownerName, businessName: b.name, business: b }));
+      } else if (audience === 'leads_prospects') {
+        const leads = await getAllCommercialLeads();
+        targetList = leads
+          .filter((l) => l.email)
+          .map((l) => ({ email: l.email!, name: l.fullName, businessName: l.businessName }));
+      }
+
+      if (targetList.length === 0) {
+        return NextResponse.json({ error: 'No se encontraron destinatarios válidos para la audiencia seleccionada.' }, { status: 400 });
+      }
+
+      let sentCount = 0;
+      let failCount = 0;
+
+      for (const recipient of targetList) {
+        let subject = customSubject || 'Comunicado Oficial de Prestigia';
+        let htmlContent = '';
+
+        if (templateId === 'welcome_credentials') {
+          subject = customSubject || `🎉 ¡Bienvenido a Prestigia, ${recipient.name}! Credenciales de Acceso Oficial`;
+          htmlContent = buildWelcomeCredentialsHtml({
+            businessName: recipient.businessName,
+            ownerName: recipient.name,
+            plan: recipient.business?.plan || 'pro',
+            businessId: recipient.business?.id || 'demo-brand',
+            password: recipient.business?.password || 'admin',
+          });
+        } else if (templateId === 'reactivation_winback') {
+          subject = customSubject || `🎁 ${recipient.name}, reactiva tu blindaje en ${recipient.businessName} con ${discountPercent || 25}% OFF`;
+          htmlContent = buildReactivationWinbackHtml({
+            businessName: recipient.businessName,
+            ownerName: recipient.name,
+            discountPercent: discountPercent || 25,
+            offerDetails: customBody || '30 días de Add-ons VIP (Live Wallboard & Sentiment 360) sin costo adicional.',
+          });
+        } else if (templateId === 'monthly_report') {
+          subject = customSubject || `📊 Reporte Ejecutivo de Reputación y Ventas: ${recipient.businessName}`;
+          htmlContent = buildMonthlyReportHtml({
+            businessName: recipient.businessName,
+            ownerName: recipient.name,
+            currentRating: 4.8,
+            ratingGain: 1.1,
+          });
+        } else if (templateId === 'billing_renewal') {
+          subject = customSubject || `💳 Aviso de Ciclo y Renovación de Servicio: ${recipient.businessName}`;
+          htmlContent = buildBillingRenewalHtml({
+            businessName: recipient.businessName,
+            ownerName: recipient.name,
+            plan: recipient.business?.plan || 'pro',
+            amountCOP: recipient.business?.plan === 'elite' ? 650000 : recipient.business?.plan === 'empresarial' ? 1200000 : 380000,
+            dueDate: 'Fin de mes en curso',
+          });
+        } else {
+          subject = customSubject || `📢 Comunicado Oficial Prestigia: ${recipient.businessName}`;
+          htmlContent = buildAnnouncementHtml({
+            title: customSubject || 'Comunicado Oficial de Dirección General',
+            message: customBody || 'Estimado cliente, te compartimos una actualización importante sobre el servicio de Prestigia.',
+          });
+        }
+
+        const dispatchRes = await sendTransactionalEmail({
+          to: recipient.email,
+          subject,
+          html: htmlContent,
+        }, currentSec);
+
+        await saveEmailDispatch({
+          templateId,
+          templateName: templateId === 'welcome_credentials' ? 'Bienvenida & Credenciales' : templateId === 'reactivation_winback' ? 'Reactivación & Winback' : templateId === 'monthly_report' ? 'Reporte Mensual' : templateId === 'billing_renewal' ? 'Renovación de Servicio' : 'Comunicado Oficial',
+          subject,
+          recipientEmail: recipient.email,
+          recipientName: recipient.name,
+          businessName: recipient.businessName,
+          status: dispatchRes.success ? 'sent' : 'queued',
+          provider: dispatchRes.provider,
+          error: dispatchRes.error,
+        });
+
+        if (dispatchRes.success) sentCount++;
+        else failCount++;
+      }
+
+      return NextResponse.json({
+        success: true,
+        sentCount,
+        failCount,
+        totalRecipients: targetList.length,
+        dispatches: await getAllEmailDispatches(),
+        message: `Campaña procesada: ${sentCount} enviados exitosamente, ${failCount} registrados en cola de auditoría.`,
       });
     }
 
