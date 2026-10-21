@@ -2229,7 +2229,6 @@ export default function MasterAdminPage() {
                                   <p className="font-bold text-white group-hover:text-amber-400 transition-colors truncate text-xs">
                                     {biz.name}
                                   </p>
-                                  <p className="text-[10px] text-slate-400 truncate">{biz.category}</p>
                                 </div>
                               </div>
                             </td>
@@ -2416,11 +2415,10 @@ export default function MasterAdminPage() {
                           </button>
                         </div>
 
-                        {/* Brand Name & Category */}
+                        {/* Brand Name */}
                         <h3 className="text-base font-bold text-white group-hover:text-amber-400 transition-colors">
                           {biz.name}
                         </h3>
-                        <p className="text-xs text-slate-400 mt-0.5">{biz.category}</p>
 
                         {/* Metadata Pills */}
                         <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-800/80 text-[11px]">
