@@ -1304,6 +1304,27 @@ export default function MasterAdminPage() {
     });
   }, [businesses, selectedPlanFilter, selectedCategoryFilter, searchTerm]);
 
+  // Dynamic counts for Plan & Niche filters
+  const planCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: businesses.length, independiente: 0, pro: 0, elite: 0, empresarial: 0 };
+    businesses.forEach((b) => {
+      if (counts[b.plan] !== undefined) counts[b.plan]++;
+    });
+    return counts;
+  }, [businesses]);
+
+  const nicheCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: businesses.length };
+    PRESTIGIA_NICHES.forEach((n) => { counts[n.id] = 0; });
+    businesses.forEach((b) => {
+      const badge = getNicheBadge(b.category);
+      if (counts[badge.id] !== undefined) {
+        counts[badge.id]++;
+      }
+    });
+    return counts;
+  }, [businesses]);
+
   // Unified Global Data Lake (Habeas Data & Lead Matrix: 80 Clientes Reales)
   const unifiedDataLakeRecords = useMemo(() => {
     const list: Array<{
@@ -2081,11 +2102,11 @@ export default function MasterAdminPage() {
                   onChange={(e) => setSelectedPlanFilter(e.target.value)}
                   className="bg-[#121622] border border-slate-700/80 text-slate-200 text-xs rounded-xl px-3 py-2.5 outline-none cursor-pointer"
                 >
-                  <option value="all">Todos los Planes (4)</option>
-                  <option value="independiente">Plan Independiente</option>
-                  <option value="pro">Plan Pro</option>
-                  <option value="elite">Plan Élite</option>
-                  <option value="empresarial">Plan Empresarial</option>
+                  <option value="all">Todos los Planes ({planCounts.all})</option>
+                  <option value="independiente">Plan Independiente ({planCounts.independiente || 0})</option>
+                  <option value="pro">Plan Pro ({planCounts.pro || 0})</option>
+                  <option value="elite">Plan Élite ({planCounts.elite || 0})</option>
+                  <option value="empresarial">Plan Empresarial ({planCounts.empresarial || 0})</option>
                 </select>
 
                 {/* Filter by Niche / Industry Classification */}
@@ -2094,10 +2115,10 @@ export default function MasterAdminPage() {
                   onChange={(e) => setSelectedCategoryFilter(e.target.value)}
                   className="bg-[#121622] border border-slate-700/80 text-slate-200 text-xs rounded-xl px-3 py-2.5 outline-none cursor-pointer"
                 >
-                  <option value="all">Todos los Nichos ({PRESTIGIA_NICHES.length})</option>
+                  <option value="all">Todos los Nichos ({nicheCounts.all})</option>
                   {PRESTIGIA_NICHES.map((niche) => (
                     <option key={niche.id} value={niche.id}>
-                      {niche.icon} {niche.label}
+                      {niche.icon} {niche.label} ({nicheCounts[niche.id] || 0})
                     </option>
                   ))}
                 </select>
