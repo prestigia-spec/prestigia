@@ -225,9 +225,30 @@ export async function POST(request: NextRequest) {
         .replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]/g, '-')
         .toUpperCase();
 
-    // 0. Verify Master Credentials (Strict Authentication)
+    // 0.05 Verify Vault Unlock (Intra-Session Re-Authentication / Sudo Mode for Bóveda Ciega)
+    if (action === 'verify_vault_unlock') {
+      const { masterKey } = body;
+      const cleanKey = normalizeKey(masterKey);
+      const expectedKey = normalizeKey(currentSec.masterKey || 'PRESTIGIA-MASTER-2026');
+
+      if (cleanKey !== expectedKey) {
+        return NextResponse.json({
+          success: false,
+          isValid: false,
+          error: 'Llave Maestra incorrecta. Desbloqueo de bóveda denegado.',
+        }, { status: 401 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        isValid: true,
+        message: 'Bóveda Ciega descifrada exitosamente.',
+      });
+    }
+
+    // 0. Verify Master Credentials (Strict Gateway Authentication)
     if (action === 'verify_master_credentials') {
-      const { masterKey, totpToken, requireTwoFactor } = body;
+      const { masterKey, totpToken, requireTwoFactor, isVaultUnlock } = body;
       const cleanKey = normalizeKey(masterKey);
       const expectedKey = normalizeKey(currentSec.masterKey || 'PRESTIGIA-MASTER-2026');
 
@@ -239,6 +260,15 @@ export async function POST(request: NextRequest) {
           isValid: false,
           error: 'Llave Maestra incorrecta. Acceso denegado.',
         }, { status: 401 });
+      }
+
+      // If called specifically for intra-session vault unlock, master key verification is sufficient
+      if (isVaultUnlock) {
+        return NextResponse.json({
+          success: true,
+          isValid: true,
+          message: 'Bóveda Ciega descifrada exitosamente.',
+        });
       }
 
       // Check 2FA if enabled in settings OR if client is in 2FA mode OR if totpToken was sent

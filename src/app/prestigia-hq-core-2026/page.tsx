@@ -540,7 +540,7 @@ export default function MasterAdminPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'verify_master_credentials',
+          action: 'verify_vault_unlock',
           masterKey: cleanKey,
         }),
       });
@@ -550,7 +550,7 @@ export default function MasterAdminPage() {
         setSecurityForm((prev) => ({ ...prev, currentMasterKey: cleanKey }));
         setVaultError(null);
       } else {
-        setVaultError(data.error || 'Llave Maestra incorrecta. Acceso a la bóveda denegado.');
+        setVaultError(data.error || 'Llave Maestra incorrecta. Desbloqueo de bóveda denegado.');
       }
     } catch (err) {
       setVaultError('Error de conexión con el servidor bancario.');
