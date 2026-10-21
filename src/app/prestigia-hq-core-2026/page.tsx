@@ -147,6 +147,19 @@ export default function MasterAdminPage() {
 
   // Query public gateway security status on load and hydrate local security preferences
   useEffect(() => {
+    // Check if coming from a voluntary or inactivity lock
+    if (typeof window !== 'undefined') {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const lockedParam = params.get('locked');
+        if (lockedParam === 'voluntary') {
+          setAuthError('Sesión bloqueada voluntariamente por el Administrador Master.');
+        } else if (lockedParam === 'timeout') {
+          setAuthError('Sesión bloqueada por inactividad prolongada (Seguridad Bancaria Prestigia).');
+        }
+      } catch (e) {}
+    }
+
     try {
       const savedConfig = localStorage.getItem('prestigia_master_security_config');
       if (savedConfig) {
@@ -311,8 +324,8 @@ export default function MasterAdminPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Voluntary or Inactivity Lock (Purges credentials and resets unmask state for Zero-Leakage)
-  const handleLockConsole = (message?: string) => {
+  // Voluntary or Inactivity Lock (Purges credentials and executes hard navigation for Zero-Leakage)
+  const handleLockConsole = (reason: 'voluntary' | 'timeout' = 'voluntary') => {
     setIsAuthenticated(false);
     setMasterKeyInput('');
     setTotpTokenInput('');
@@ -330,8 +343,13 @@ export default function MasterAdminPage() {
       newMasterKey: '',
       confirmNewMasterKey: '',
     }));
-    if (message) {
-      setAuthError(message);
+
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.clear();
+      } catch (e) {}
+      // Hard navigation to completely wipe React DOM memory and flush any cached form state
+      window.location.href = `/prestigia-hq-core-2026?locked=${reason}&t=${Date.now()}`;
     }
   };
 
@@ -348,7 +366,7 @@ export default function MasterAdminPage() {
 
     const checkInterval = setInterval(() => {
       if (Date.now() - lastActivityRef.current > SESSION_INACTIVITY_MS) {
-        handleLockConsole('Sesión bloqueada por inactividad prolongada (Seguridad Bancaria Prestigia).');
+        handleLockConsole('timeout');
       }
     }, 15000);
 
@@ -1664,7 +1682,7 @@ export default function MasterAdminPage() {
           {/* Lock Session Emergency */}
           <button
             type="button"
-            onClick={() => handleLockConsole('Sesión bloqueada voluntariamente por el Administrador Master.')}
+            onClick={() => handleLockConsole('voluntary')}
             className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <Lock className="w-3.5 h-3.5 text-rose-400" />
