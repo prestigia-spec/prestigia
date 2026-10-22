@@ -1554,18 +1554,18 @@ export default function PortalPage() {
 
   useEffect(() => {
     if (session?.business) {
-      const isIndep = effectivePlan === 'independiente';
-      setProfileName(isIndep ? 'Dr. Carlos Mendoza' : (session.business.name || ''));
-      setProfileCategory(isIndep ? (lang === 'en' ? 'Specialized Medical Practice' : 'Consulta Médica Especializada / Salud') : (session.business.category || ''));
-      setProfileTaxId(isIndep ? 'CC. 1.098.452.120' : (session.business.taxId || '901.458.723-1'));
-      setProfileCountry(isIndep ? (lang === 'en' ? 'Colombia (RUT / Tax ID)' : 'Colombia (RUT / DIAN)') : (session.business.country || (lang === 'en' ? 'United States (EIN)' : 'Colombia (NIT)')));
-      setProfileOwnerName(isIndep ? 'Dr. Carlos Mendoza' : (session.business.ownerName || ''));
-      setProfileOwnerPhone(isIndep ? '+57 300 987 6543' : (session.business.ownerPhone || ''));
-      setProfileLogoUrl(isIndep ? '' : (session.business.branding?.logoUrl || ''));
-      setProfilePrimaryColor(isIndep ? '#10B981' : (session.business.branding?.primaryColor || '#6366F1'));
-      setProfileAccentColor(isIndep ? '#059669' : (session.business.branding?.accentColor || '#4F46E5'));
+      const isMendozaMock = effectivePlan === 'independiente' && session.business.id === 'carlos-mendoza';
+      setProfileName(isMendozaMock ? 'Dr. Carlos Mendoza' : (session.business.name || ''));
+      setProfileCategory(isMendozaMock ? (lang === 'en' ? 'Specialized Medical Practice' : 'Consulta Médica Especializada / Salud') : (session.business.category || ''));
+      setProfileTaxId(isMendozaMock ? 'CC. 1.098.452.120' : (session.business.taxId || '901.458.723-1'));
+      setProfileCountry(isMendozaMock ? (lang === 'en' ? 'Colombia (RUT / Tax ID)' : 'Colombia (RUT / DIAN)') : (session.business.country || (lang === 'en' ? 'United States (EIN)' : 'Colombia (NIT)')));
+      setProfileOwnerName(isMendozaMock ? 'Dr. Carlos Mendoza' : (session.business.ownerName || ''));
+      setProfileOwnerPhone(isMendozaMock ? '+57 300 987 6543' : (session.business.ownerPhone || ''));
+      setProfileLogoUrl(isMendozaMock ? '' : (session.business.branding?.logoUrl || ''));
+      setProfilePrimaryColor(isMendozaMock ? '#10B981' : (session.business.branding?.primaryColor || '#6366F1'));
+      setProfileAccentColor(isMendozaMock ? '#059669' : (session.business.branding?.accentColor || '#4F46E5'));
 
-      if (isIndep) {
+      if (isMendozaMock) {
         setProfileBranches([
           {
             id: 'carlos-mendoza-consultorio',
@@ -6080,10 +6080,11 @@ export default function PortalPage() {
     setIsGeneratingTableTent(true);
     try {
       const isDark = style === 'mobile';
-      const bName = effectivePlan === 'independiente' ? 'Dr. Carlos Mendoza' : (session.business.name || 'Prestigia VIP');
-      const brName = effectivePlan === 'independiente' ? (lang === 'en' ? 'Private Medical Practice' : 'Consultorio Privado') : formatBranchName(currentBranchForQr.name, lang);
-      const brandColor = effectivePlan === 'independiente' ? '#10B981' : (brandIdentity.primaryColor || '#6366F1');
-      const brandLogoUrl = effectivePlan === 'independiente'
+      const isMendoza = session.business.id === 'carlos-mendoza';
+      const bName = session.business.name || 'Prestigia VIP';
+      const brName = isMendoza ? (lang === 'en' ? 'Private Medical Practice' : 'Consultorio Privado') : formatBranchName(currentBranchForQr.name, lang);
+      const brandColor = isMendoza ? '#10B981' : (brandIdentity.primaryColor || '#6366F1');
+      const brandLogoUrl = isMendoza
         ? 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80'
         : (brandIdentity.logoUrl || (session.business as any)?.logoUrl || '');
 
@@ -9018,19 +9019,18 @@ export default function PortalPage() {
                   : `${session.business.name}`
               }
             >
-              {effectivePlan === 'independiente' ? (
-                /* FOTO Y AVATAR DEL PROFESIONAL INDEPENDIENTE */
-                <div className="w-10 h-10 rounded-xl overflow-hidden border border-emerald-500/50 bg-slate-900 shadow-md ring-2 ring-emerald-500/30 shrink-0 group-hover:border-emerald-400 transition">
-                  <img
-                    src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80"
-                    alt="Dr. Carlos Mendoza"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ) : session.business.branding?.logoUrl ? (
+              {session.business.branding?.logoUrl ? (
                 <div className="w-10 h-10 rounded-xl overflow-hidden border border-slate-700/80 bg-slate-900 shadow-md ring-1 ring-white/10 shrink-0 group-hover:border-amber-400/60 transition">
                   <img
                     src={session.business.branding.logoUrl}
+                    alt={session.business.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : session.business.id === 'carlos-mendoza' ? (
+                <div className="w-10 h-10 rounded-xl overflow-hidden border border-emerald-500/50 bg-slate-900 shadow-md ring-2 ring-emerald-500/30 shrink-0 group-hover:border-emerald-400 transition">
+                  <img
+                    src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80"
                     alt={session.business.name}
                     className="w-full h-full object-cover"
                   />
@@ -9046,7 +9046,7 @@ export default function PortalPage() {
                   <span className={`font-extrabold text-sm sm:text-base transition ${
                     theme === 'light' ? 'text-slate-900 group-hover:text-amber-600' : 'text-white group-hover:text-amber-300'
                   }`}>
-                    {effectivePlan === 'independiente' ? 'Dr. Carlos Mendoza' : session.business.name}
+                    {session.business.name}
                   </span>
                   <span
                     className={`text-[10px] uppercase tracking-wider font-black px-2 py-0.5 rounded border ${
@@ -9071,10 +9071,10 @@ export default function PortalPage() {
                   <a
                     href={`https://wa.me/573001234567?text=${encodeURIComponent(
                       lang === 'en'
-                        ? `Hello Prestigia, I am the owner of ${effectivePlan === 'independiente' ? 'Dr. Carlos Mendoza' : session.business.name} (${
+                        ? `Hello Prestigia, I am the owner of ${session.business.name} (${
                             effectivePlan === 'elite' ? '👑 Elite Plan' : effectivePlan === 'pro' ? '⭐ Pro Plan' : 'Independent Plan'
                           }) and I would like to request priority VIP technical assistance.`
-                        : `Hola Prestigia, soy ${effectivePlan === 'independiente' ? 'Dr. Carlos Mendoza' : session.business.name} (${
+                        : `Hola Prestigia, soy ${session.business.name} (${
                             effectivePlan === 'elite' ? '👑 Plan Élite' : effectivePlan === 'pro' ? '⭐ Plan Pro' : 'Plan Independiente'
                           }) y deseo solicitar asistencia técnica de mi paquete mensual.`
                     )}`}
@@ -9099,13 +9099,9 @@ export default function PortalPage() {
                   </a>
                 </div>
                 <div className={`text-[11px] flex items-center gap-1.5 ${theme === 'light' ? 'text-slate-600' : 'text-slate-400'}`}>
-                  {effectivePlan === 'independiente' ? (
-                    <span className="text-emerald-400 flex items-center gap-1 font-bold">
-                      <span>🩺 {lang === 'en' ? 'Medical Specialist / Private Practice' : 'Médico Especialista / Consultorio Particular'}</span>
-                    </span>
-                  ) : effectiveRole === 'owner' ? (
+                  {effectiveRole === 'owner' ? (
                     <span className="text-amber-500 dark:text-amber-400 flex items-center gap-1 font-semibold">
-                      {t.navbar.ownerView}
+                      {session.business.category ? `🏢 ${session.business.category}` : t.navbar.ownerView}
                     </span>
                   ) : (
                     <span className="text-cyan-600 dark:text-cyan-400 flex items-center gap-1 font-semibold">
@@ -9127,7 +9123,7 @@ export default function PortalPage() {
                 }`}>
                   <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span className="text-xs font-bold">
-                    📍 {lang === 'en' ? 'Main Private Practice (Bogotá)' : 'Consultorio Privado Principal (Bogotá)'}
+                    📍 {session.branches?.[0]?.name || session.business.name} ({session.branches?.[0]?.city || 'Principal'})
                   </span>
                 </div>
               ) : effectivePlan === 'elite' || effectivePlan === 'empresarial' ? (
@@ -11370,7 +11366,7 @@ export default function PortalPage() {
                       </span>
                     </div>
                     <h3 className={`text-base font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
-                      {effectivePlan === 'independiente' ? 'Dr. Carlos Mendoza' : formatBranchName(currentBranchForQr.name, lang)}
+                      {effectivePlan === 'independiente' ? session.business.name : formatBranchName(currentBranchForQr.name, lang)}
                     </h3>
                     {effectivePlan === 'independiente' && (
                       <p className={`text-[11px] font-semibold ${theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>
@@ -11495,7 +11491,7 @@ export default function PortalPage() {
                               <div className="w-24 h-24 sm:w-26 sm:h-26 p-1.5 rounded-2xl bg-white border-2 shadow-md flex items-center justify-center relative z-10 my-auto" style={{ borderColor: brandColor }}>
                                 <img
                                   src={qrPrintDataUrl || activeQrDisplayUrl}
-                                  alt={`QR Prestigia - ${effectivePlan === 'independiente' ? 'Dr. Carlos Mendoza' : currentBranchForQr.name}`}
+                                  alt={`QR Prestigia - ${currentBranchForQr.name || session.business.name}`}
                                   className="w-full h-full object-contain rounded-lg"
                                 />
                               </div>
@@ -11601,7 +11597,7 @@ export default function PortalPage() {
                                 <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto p-2 rounded-2xl bg-white border-2 shadow-md flex items-center justify-center" style={{ borderColor: brandColor }}>
                                   <img
                                     src={qrPrintDataUrl || activeQrDisplayUrl}
-                                    alt={`QR Prestigia - ${effectivePlan === 'independiente' ? 'Dr. Carlos Mendoza' : currentBranchForQr.name}`}
+                                    alt={`QR Prestigia - ${currentBranchForQr.name || session.business.name}`}
                                     className="w-full h-full object-contain rounded-lg"
                                   />
                                 </div>
@@ -11713,7 +11709,7 @@ export default function PortalPage() {
                             <div className="w-48 h-48 sm:w-52 sm:h-52 mx-auto p-3 rounded-2xl bg-white border-2 shadow-lg flex items-center justify-center" style={{ borderColor: brandColor }}>
                               <img
                                 src={qrPrintDataUrl || activeQrDisplayUrl}
-                                alt={`QR Prestigia - ${effectivePlan === 'independiente' ? 'Dr. Carlos Mendoza' : currentBranchForQr.name}`}
+                                alt={`QR Prestigia - ${currentBranchForQr.name || session.business.name}`}
                                 className="w-full h-full object-contain rounded-xl"
                               />
                             </div>
@@ -24274,7 +24270,7 @@ export default function PortalPage() {
                         </span>
                       </div>
                       <span className="text-[10px] text-slate-400 dark:text-slate-500">
-                        Sesión: {effectivePlan === 'independiente' ? 'Dr. Carlos Mendoza' : (profileOwnerName || 'Titular')}
+                        Sesión: {profileOwnerName || session.business.ownerName || 'Titular'}
                       </span>
                     </div>
                   )}
