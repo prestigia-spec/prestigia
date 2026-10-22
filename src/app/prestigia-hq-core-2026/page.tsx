@@ -5608,11 +5608,11 @@ export default function MasterAdminPage() {
       {/* ============================================================== */}
       {viewPlaceModalBusiness && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0D111A] border border-blue-500/50 w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#0D111A] border border-blue-500/50 w-full max-w-3xl rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#141A26] border border-blue-500/40 flex items-center justify-center overflow-hidden shrink-0 shadow-md">
+            <div className="flex items-center justify-between pb-5 border-b border-slate-800">
+              <div className="flex items-center gap-3.5">
+                <div className="w-14 h-14 rounded-2xl bg-[#141A26] border border-blue-500/40 flex items-center justify-center overflow-hidden shrink-0 shadow-md">
                   {viewPlaceModalBusiness.branding?.logoUrl ? (
                     <img
                       src={viewPlaceModalBusiness.branding.logoUrl}
@@ -5620,38 +5620,38 @@ export default function MasterAdminPage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-blue-400 font-bold text-lg">{viewPlaceModalBusiness.name.charAt(0)}</span>
+                    <span className="text-blue-400 font-extrabold text-xl">{viewPlaceModalBusiness.name.charAt(0)}</span>
                   )}
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-white">{viewPlaceModalBusiness.name}</h3>
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <h3 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">{viewPlaceModalBusiness.name}</h3>
                     {(() => {
                       const nb = getNicheBadge(viewPlaceModalBusiness.category);
                       return (
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border flex items-center gap-1 ${nb.color}`}>
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${nb.color}`}>
                           <span>{nb.icon}</span>
                           <span>{nb.label}</span>
                         </span>
                       );
                     })()}
                   </div>
-                  <p className="text-xs text-slate-400">
-                    Ficha Oficial de Google Maps • ID: <span className="font-mono text-amber-300">{viewPlaceModalBusiness.id}</span>
+                  <p className="text-xs sm:text-sm text-slate-300 mt-1 font-medium">
+                    Ficha Oficial de Google Maps • ID: <span className="font-mono text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">{viewPlaceModalBusiness.id}</span>
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setViewPlaceModalBusiness(null)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg cursor-pointer"
+                className="text-slate-400 hover:text-white p-2 bg-slate-800/60 hover:bg-slate-800 rounded-xl transition cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Content Body */}
-            <div className="mt-5 space-y-4 text-xs">
+            <div className="mt-5 space-y-4">
               {(() => {
                 const primaryBranch = viewPlaceModalBusiness.branches?.[0];
                 const placeId = primaryBranch?.googlePlaceId || viewPlaceModalBusiness.id;
@@ -5665,60 +5665,60 @@ export default function MasterAdminPage() {
                 return (
                   <div className="space-y-4">
                     {/* Official Google Maps Card */}
-                    <div className="p-4 rounded-2xl bg-gradient-to-br from-[#141A26] to-[#0E121B] border border-blue-500/30">
+                    <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#141A26] to-[#0E121B] border border-blue-500/30">
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold">
-                            <Globe className="w-5 h-5" />
+                          <div className="w-12 h-12 rounded-2xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold shrink-0">
+                            <Globe className="w-6 h-6" />
                           </div>
                           <div>
-                            <p className="text-xs font-bold text-white flex items-center gap-2">
+                            <p className="text-sm sm:text-base font-extrabold text-white flex items-center gap-2">
                               Ficha Google Business Profile
-                              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-semibold border border-emerald-500/30">
+                              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/40">
                                 Certificada en Red
                               </span>
                             </p>
-                            <p className="text-[11px] text-slate-300 mt-0.5 flex items-center gap-1">
-                              <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <p className="text-xs sm:text-sm font-semibold text-slate-200 mt-1 flex items-center gap-1.5">
+                              <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
                               <span>{primaryBranch?.address || `${primaryBranch?.locality}, ${primaryBranch?.city}`}</span>
                             </p>
                           </div>
                         </div>
 
-                        <div className="text-left sm:text-right bg-[#0D111A] px-3.5 py-2 rounded-xl border border-slate-800">
-                          <div className="flex items-center gap-1 font-mono font-bold text-amber-400 text-sm">
+                        <div className="text-left sm:text-right bg-[#0D111A] px-4 py-2.5 rounded-xl border border-slate-800 shrink-0">
+                          <div className="flex items-center gap-1.5 font-mono font-extrabold text-amber-400 text-base sm:text-lg">
                             <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
                             <span>{currentRating}★</span>
-                            <span className="text-slate-400 text-xs font-normal">Google Maps</span>
+                            <span className="text-slate-300 text-xs font-bold">Google Maps</span>
                           </div>
-                          <p className="text-[10px] text-slate-400">
+                          <p className="text-xs text-slate-300 font-bold mt-0.5">
                             Día 1: {baselineRating}★ (+{Number((currentRating - baselineRating).toFixed(1))}★ Neto)
                           </p>
                         </div>
                       </div>
 
                       {/* Technical Identifiers */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-800 text-[11px]">
-                        <div className="bg-[#0D111A] px-3 py-2 rounded-xl border border-slate-800 flex items-center justify-between">
-                          <span className="text-slate-400">Place ID:</span>
-                          <span className="font-mono text-amber-300 truncate ml-2 font-semibold">{placeId}</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-4 pt-3.5 border-t border-slate-800">
+                        <div className="bg-[#0D111A] px-4 py-2.5 rounded-xl border border-slate-800 flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-300">Place ID:</span>
+                          <span className="font-mono text-amber-300 text-xs sm:text-sm font-extrabold truncate ml-2">{placeId}</span>
                         </div>
-                        <div className="bg-[#0D111A] px-3 py-2 rounded-xl border border-slate-800 flex items-center justify-between">
-                          <span className="text-slate-400">Sincronización API:</span>
-                          <span className="text-emerald-400 font-semibold flex items-center gap-1">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
+                        <div className="bg-[#0D111A] px-4 py-2.5 rounded-xl border border-slate-800 flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-300">Sincronización API:</span>
+                          <span className="text-emerald-400 text-xs sm:text-sm font-extrabold flex items-center gap-1.5">
+                            <CheckCircle2 className="w-4 h-4" />
                             Activa & Blindada
                           </span>
                         </div>
                       </div>
 
                       {/* Direct External Action Buttons */}
-                      <div className="mt-4 pt-3 border-t border-slate-800/80 flex flex-wrap items-center gap-2.5">
+                      <div className="mt-4 pt-3.5 border-t border-slate-800/80 flex flex-wrap items-center gap-3">
                         <a
                           href={googleMapsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-blue-600/20 transition-all text-center"
+                          className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-blue-600/25 transition-all text-center"
                         >
                           <ExternalLink className="w-4 h-4" />
                           <span>Abrir Ficha Oficial en Google Maps ↗</span>
@@ -5728,7 +5728,7 @@ export default function MasterAdminPage() {
                           href={reviewUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 py-2.5 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-amber-500/20 transition-all text-center"
+                          className="flex-1 py-3 px-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-amber-500/25 transition-all text-center"
                         >
                           <Star className="w-4 h-4 fill-slate-950" />
                           <span>Probar Enlace de Reseña Google ↗</span>
@@ -5737,19 +5737,21 @@ export default function MasterAdminPage() {
                     </div>
 
                     {/* Branches List */}
-                    <div className="p-4 rounded-2xl bg-[#141A26] border border-slate-800">
-                      <p className="font-bold text-white text-xs mb-2.5 flex items-center gap-1.5">
-                        <Store className="w-3.5 h-3.5 text-blue-400" />
+                    <div className="p-4 sm:p-5 rounded-2xl bg-[#141A26] border border-slate-800">
+                      <p className="font-extrabold text-white text-xs sm:text-sm mb-3 flex items-center gap-2">
+                        <Store className="w-4 h-4 text-blue-400" />
                         Sedes Físicas Registradas ({viewPlaceModalBusiness.branches?.length || 1})
                       </p>
-                      <div className="space-y-2">
+                      <div className="space-y-2.5">
                         {viewPlaceModalBusiness.branches?.map((branch, bIdx) => (
-                          <div key={branch.id || bIdx} className="bg-[#0E121B] p-3 rounded-xl border border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                          <div key={branch.id || bIdx} className="bg-[#0E121B] p-3.5 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
                             <div>
-                              <p className="font-semibold text-white">{branch.name}</p>
-                              <p className="text-[11px] text-slate-400">{branch.address || 'Sin dirección registrada'} • {branch.locality}, {branch.city}</p>
-                              <p className="text-[10px] text-slate-500 font-mono mt-0.5">
-                                WhatsApp Alertas: {branch.managerPhone} ({branch.managerName || 'Encargado Principal'})
+                              <p className="text-sm font-extrabold text-white">{branch.name}</p>
+                              <p className="text-xs sm:text-sm font-medium text-slate-200 mt-0.5">{branch.address || 'Sin dirección registrada'} • {branch.locality}, {branch.city}</p>
+                              <p className="text-xs font-semibold text-slate-300 mt-1.5 flex items-center gap-1.5 flex-wrap">
+                                <span className="text-emerald-400 font-extrabold">WhatsApp Alertas:</span>
+                                <span className="font-mono text-amber-300 font-bold bg-[#141A26] px-1.5 py-0.5 rounded border border-slate-700">{branch.managerPhone}</span>
+                                <span className="text-slate-400 font-medium">({branch.managerName || 'Encargado Principal'})</span>
                               </p>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
@@ -5757,9 +5759,9 @@ export default function MasterAdminPage() {
                                 href={branch.googleReviewUrl || googleMapsUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="px-2.5 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[10px] font-semibold flex items-center gap-1 cursor-pointer"
+                                className="px-3 py-1.5 rounded-xl bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/40 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition"
                               >
-                                <ExternalLink className="w-3 h-3" />
+                                <ExternalLink className="w-3.5 h-3.5" />
                                 <span>Google Maps</span>
                               </a>
                             </div>
@@ -5769,24 +5771,27 @@ export default function MasterAdminPage() {
                     </div>
 
                     {/* Business Contract & Owner Details */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                      <div className="p-3.5 rounded-2xl bg-[#141A26] border border-slate-800">
-                        <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Titular & Contacto</p>
-                        <p className="font-bold text-white text-sm">{viewPlaceModalBusiness.ownerName}</p>
-                        <p className="text-slate-300 font-mono text-[11px] mt-0.5">{maskPhone(viewPlaceModalBusiness.ownerPhone)}</p>
-                        <p className="text-slate-400 text-[11px] truncate mt-0.5">{viewPlaceModalBusiness.ownerEmail}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      <div className="p-4 rounded-2xl bg-[#141A26] border border-slate-800">
+                        <p className="text-slate-300 text-xs uppercase font-extrabold tracking-wider mb-1.5">Titular & Contacto</p>
+                        <p className="font-extrabold text-white text-base">{viewPlaceModalBusiness.ownerName}</p>
+                        <p className="text-amber-300 font-mono font-bold text-xs sm:text-sm mt-1">{maskPhone(viewPlaceModalBusiness.ownerPhone)}</p>
+                        <p className="text-slate-200 text-xs sm:text-sm font-semibold truncate mt-1">{viewPlaceModalBusiness.ownerEmail}</p>
                       </div>
 
-                      <div className="p-3.5 rounded-2xl bg-[#141A26] border border-slate-800">
-                        <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Plan & Facturación</p>
-                        <p className="font-bold text-amber-300 text-sm capitalize">Plan {viewPlaceModalBusiness.plan}</p>
-                        <p className="text-slate-300 text-[11px] mt-0.5">NIT / Doc: {viewPlaceModalBusiness.taxId}</p>
-                        <p className="text-slate-400 text-[11px] mt-0.5">Vigencia: Activa con Prestigia Master</p>
+                      <div className="p-4 rounded-2xl bg-[#141A26] border border-slate-800">
+                        <p className="text-slate-300 text-xs uppercase font-extrabold tracking-wider mb-1.5">Plan & Facturación</p>
+                        <p className="font-extrabold text-amber-300 text-base capitalize">Plan {viewPlaceModalBusiness.plan}</p>
+                        <p className="text-slate-200 text-xs sm:text-sm font-bold mt-1">NIT / Doc: <span className="text-white font-mono">{viewPlaceModalBusiness.taxId}</span></p>
+                        <p className="text-emerald-400 text-xs font-bold mt-1 flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          Vigencia: Activa con Prestigia Master
+                        </p>
                       </div>
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="pt-3 border-t border-slate-800 flex justify-between items-center gap-3">
+                    <div className="pt-4 border-t border-slate-800 flex justify-between items-center gap-3">
                       <button
                         type="button"
                         onClick={() => {
@@ -5794,16 +5799,16 @@ export default function MasterAdminPage() {
                           setViewPlaceModalBusiness(null);
                           handleImpersonate(target);
                         }}
-                        className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 text-slate-950 font-bold text-xs rounded-xl flex items-center gap-1.5 cursor-pointer shadow-lg shadow-emerald-500/20"
+                        className="px-5 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 text-slate-950 font-extrabold text-xs sm:text-sm rounded-xl flex items-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/25 transition active:scale-[0.99]"
                       >
-                        <Eye className="w-3.5 h-3.5" />
+                        <Eye className="w-4 h-4" />
                         <span>Entrar al Portal del Cliente</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => setViewPlaceModalBusiness(null)}
-                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs rounded-xl cursor-pointer"
+                        className="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs sm:text-sm rounded-xl cursor-pointer transition"
                       >
                         Cerrar Ficha
                       </button>
