@@ -271,6 +271,7 @@ export default function MasterAdminPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlanFilter, setSelectedPlanFilter] = useState<string>('all');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<'all' | 'active' | 'suspended'>('all');
   const [directoryViewMode, setDirectoryViewMode] = useState<'list' | 'cards'>('list');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -1322,6 +1323,10 @@ export default function MasterAdminPage() {
   // Filtered Businesses for Directory Tab
   const filteredBusinesses = useMemo(() => {
     return businesses.filter((biz) => {
+      // 0. Status filter
+      if (selectedStatusFilter === 'active' && biz.status === 'suspended') return false;
+      if (selectedStatusFilter === 'suspended' && biz.status !== 'suspended') return false;
+
       // 1. Plan filter
       if (selectedPlanFilter !== 'all' && biz.plan !== selectedPlanFilter) return false;
 
@@ -1341,9 +1346,18 @@ export default function MasterAdminPage() {
         biz.branches?.some((b) => b.city.toLowerCase().includes(term) || b.locality.toLowerCase().includes(term))
       );
     });
-  }, [businesses, selectedPlanFilter, selectedCategoryFilter, searchTerm]);
+  }, [businesses, selectedStatusFilter, selectedPlanFilter, selectedCategoryFilter, searchTerm]);
 
-  // Dynamic counts for Plan & Niche filters
+  // Dynamic counts for Status, Plan & Niche filters
+  const statusCounts = useMemo(() => {
+    const counts = { all: businesses.length, active: 0, suspended: 0 };
+    businesses.forEach((b) => {
+      if (b.status === 'suspended') counts.suspended++;
+      else counts.active++;
+    });
+    return counts;
+  }, [businesses]);
+
   const planCounts = useMemo(() => {
     const counts: Record<string, number> = { all: businesses.length, independiente: 0, pro: 0, elite: 0, empresarial: 0 };
     businesses.forEach((b) => {
@@ -2185,6 +2199,23 @@ export default function MasterAdminPage() {
                   ))}
                 </select>
 
+                {/* Filter by Operational Status (Activo / Suspendido) */}
+                <select
+                  value={selectedStatusFilter}
+                  onChange={(e) => setSelectedStatusFilter(e.target.value as any)}
+                  className={`border text-xs rounded-xl px-3 py-2.5 outline-none cursor-pointer font-medium transition-all ${
+                    selectedStatusFilter === 'active'
+                      ? 'bg-emerald-950/50 border-emerald-500/50 text-emerald-300 font-bold'
+                      : selectedStatusFilter === 'suspended'
+                      ? 'bg-rose-950/50 border-rose-500/50 text-rose-300 font-bold'
+                      : 'bg-[#121622] border-slate-700/80 text-slate-200'
+                  }`}
+                >
+                  <option value="all">Todos los Estados ({statusCounts.all})</option>
+                  <option value="active">● Solo Activos ({statusCounts.active})</option>
+                  <option value="suspended">● Solo Suspendidos ({statusCounts.suspended})</option>
+                </select>
+
                 {/* View Switcher: List (Default) vs Cards */}
                 <div className="flex items-center bg-[#121622] border border-slate-700/80 rounded-xl p-1 gap-1">
                   <button
@@ -2261,13 +2292,15 @@ export default function MasterAdminPage() {
                 <Building2 className="w-12 h-12 text-slate-600 mx-auto mb-3" />
                 <h3 className="text-base font-bold text-white">No se encontraron marcas</h3>
                 <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-                  No hay ningún cliente que coincida con "{searchTerm}" en el filtro seleccionado.
+                  No hay ningún cliente que coincida con los filtros seleccionados.
                 </p>
                 <button
                   type="button"
                   onClick={() => {
                     setSearchTerm('');
                     setSelectedPlanFilter('all');
+                    setSelectedCategoryFilter('all');
+                    setSelectedStatusFilter('all');
                   }}
                   className="mt-4 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-semibold cursor-pointer"
                 >
