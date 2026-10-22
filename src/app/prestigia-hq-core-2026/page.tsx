@@ -323,6 +323,7 @@ export default function MasterAdminPage() {
     country: 'Colombia (NIT)',
     city: 'Bogotá',
     locality: 'Chapinero',
+    address: '',
     plan: 'pro' as BusinessPlan,
     ownerName: '',
     ownerPhone: '+57',
@@ -1066,13 +1067,37 @@ export default function MasterAdminPage() {
         const rating = typeof d.rating === 'number' ? Number(d.rating.toFixed(1)) : 4.0;
         const reviews = typeof d.reviewsCount === 'number' ? d.reviewsCount : 0;
 
+        let detectedCity = '';
+        let detectedLocality = '';
+        const detectedAddress = d.address || '';
+
+        if (detectedAddress) {
+          const parts = detectedAddress.split(',').map((p: string) => p.trim());
+          if (parts.length >= 3) {
+            // e.g. "Cl. 93 #13-45, Chapinero, Bogotá, Cundinamarca"
+            detectedCity = parts[parts.length - 2];
+            detectedLocality = parts[parts.length - 3];
+          } else if (parts.length === 2) {
+            detectedCity = parts[1];
+            detectedLocality = parts[0];
+          }
+        }
+
+        const cleanName = (d.name && d.name !== 'Ficha de Google Maps') ? d.name : '';
+
         setOnboardForm((prev) => {
-          const newName = prev.name || d.name || '';
-          const newId = prev.id || (newName ? newName.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-') : '');
+          const newName = cleanName || prev.name || rawQuery;
+          const newId = prev.id && prev.id !== '' && prev.name === newName
+            ? prev.id
+            : newName.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+
           return {
             ...prev,
             name: newName,
             id: newId,
+            address: detectedAddress || prev.address || '',
+            city: detectedCity || prev.city || 'Bogotá',
+            locality: detectedLocality || prev.locality || 'Principal',
             initialRating: rating,
             initialReviewCount: reviews,
             googleMapsUrl: d.googleMapsUrl || prev.googleMapsUrl,
@@ -1082,17 +1107,17 @@ export default function MasterAdminPage() {
         });
 
         setDetectedGoogleProfile({
-          name: d.name || rawQuery,
+          name: cleanName || rawQuery,
           rating,
           reviewsCount: reviews,
-          address: d.address || `${onboardForm.locality}, ${onboardForm.city}`,
+          address: detectedAddress || `${onboardForm.locality}, ${onboardForm.city}`,
           placeId: d.placeId,
-          googleMapsUrl: d.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.name || rawQuery)}`,
+          googleMapsUrl: d.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanName || rawQuery)}`,
           googleReviewUrl: d.googleReviewUrl || (d.placeId ? `https://search.google.com/local/writereview?placeid=${d.placeId}` : ''),
         });
 
         setIsGoogleSynced(true);
-        setGoogleDetectSuccess(`¡Ficha Google Maps conectada con éxito! Calificación detectada: ${rating}★ (${reviews} reseñas oficiales). Sincronizado automáticamente como Línea Base Día 1.`);
+        setGoogleDetectSuccess(`¡Ficha Google Maps leída con éxito! Línea Base Día 1 fijada automáticamente: ${rating}★ con ${reviews} reseñas.`);
       } else {
         setGoogleDetectError(json.error || 'No se encontró la ficha en Google Maps. Puedes ajustar los valores manualmente.');
       }
@@ -2437,6 +2462,28 @@ export default function MasterAdminPage() {
                   setGoogleDetectError(null);
                   setGoogleDetectSuccess(null);
                   setIsGoogleSynced(false);
+                  setDetectedGoogleProfile(null);
+                  setOnboardForm({
+                    id: '',
+                    name: '',
+                    category: PRESTIGIA_NICHES[0].label,
+                    country: 'Colombia (NIT)',
+                    city: 'Bogotá',
+                    locality: 'Chapinero',
+                    address: '',
+                    plan: 'pro' as BusinessPlan,
+                    ownerName: '',
+                    ownerPhone: '+57',
+                    ownerEmail: '',
+                    taxId: '',
+                    googleMapsUrl: '',
+                    googlePlaceId: '',
+                    googleReviewUrl: '',
+                    averageTicketCOP: 45000,
+                    initialRating: 3.8,
+                    initialReviewCount: 25,
+                    clientQuote: '',
+                  });
                   setShowOnboardModal(true);
                 }}
                 className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer transition-all shrink-0"
@@ -5040,144 +5087,41 @@ export default function MasterAdminPage() {
               </button>
             </div>
 
-            <form onSubmit={handleCreateBusiness} className="mt-5 space-y-4 text-xs">
-              {/* Row 1: Brand Info */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-slate-300 font-medium mb-1">Nombre Comercial de la Marca *</label>
-                  <input
-                    type="text"
-                    required
-                    value={onboardForm.name}
-                    onChange={(e) => {
-                      const name = e.target.value;
-                      const slug = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
-                      setOnboardForm({ ...onboardForm, name, id: slug });
-                    }}
-                    placeholder="Ej: La Taquería del Sol"
-                    className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 font-medium mb-1">Identificador Slug (URL & QR) *</label>
-                  <input
-                    type="text"
-                    required
-                    value={onboardForm.id}
-                    onChange={(e) => setOnboardForm({ ...onboardForm, id: e.target.value })}
-                    placeholder="la-taqueria-del-sol"
-                    className="w-full bg-[#141A26] border border-slate-700 text-amber-400 font-mono rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
-                  />
-                </div>
-              </div>
-
-              {/* Row 2: Niche & Location */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-slate-300 font-medium mb-1">Nicho / Industria *</label>
-                  <select
-                    required
-                    value={onboardForm.category}
-                    onChange={(e) => setOnboardForm({ ...onboardForm, category: e.target.value })}
-                    className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 cursor-pointer"
-                  >
-                    {PRESTIGIA_NICHES.map((niche) => (
-                      <option key={niche.id} value={niche.label}>
-                        {niche.icon} {niche.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-slate-300 font-medium mb-1">Ciudad *</label>
-                  <input
-                    type="text"
-                    required
-                    value={onboardForm.city}
-                    onChange={(e) => setOnboardForm({ ...onboardForm, city: e.target.value })}
-                    placeholder="Bogotá"
-                    className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 font-medium mb-1">Localidad / Zona *</label>
-                  <input
-                    type="text"
-                    required
-                    value={onboardForm.locality}
-                    onChange={(e) => setOnboardForm({ ...onboardForm, locality: e.target.value })}
-                    placeholder="Zona Rosa / Usaquén"
-                    className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
-                  />
-                </div>
-              </div>
-
-              {/* Row 3: Owner & Plan */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-slate-300 font-medium mb-1">Nombre del Dueño *</label>
-                  <input
-                    type="text"
-                    required
-                    value={onboardForm.ownerName}
-                    onChange={(e) => setOnboardForm({ ...onboardForm, ownerName: e.target.value })}
-                    placeholder="Mario Casas"
-                    className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 font-medium mb-1">WhatsApp para Alertas *</label>
-                  <input
-                    type="text"
-                    required
-                    value={onboardForm.ownerPhone}
-                    onChange={(e) => setOnboardForm({ ...onboardForm, ownerPhone: e.target.value })}
-                    placeholder="+57 300 123 4567"
-                    className="w-full bg-[#141A26] border border-slate-700 text-white font-mono rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 font-medium mb-1">Plan Inicial Contratado *</label>
-                  <select
-                    value={onboardForm.plan}
-                    onChange={(e) => setOnboardForm({ ...onboardForm, plan: e.target.value as BusinessPlan })}
-                    className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 capitalize"
-                  >
-                    <option value="independiente">Plan Independiente ($49k)</option>
-                    <option value="pro">Plan Pro ($120k)</option>
-                    <option value="elite">Plan Élite ($290k)</option>
-                    <option value="empresarial">Plan Empresarial ($690k)</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Google Business Profile / Maps Auto-Detection Module */}
-              <div className="p-4 rounded-2xl bg-[#141A26] border border-blue-500/30">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-2">
+            <form onSubmit={handleCreateBusiness} className="mt-5 space-y-5 text-xs">
+              {/* ========================================================= */}
+              {/* PASO 1: CONEXIÓN & DETECCIÓN INSTANTÁNEA DE GOOGLE MAPS   */}
+              {/* ========================================================= */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#141A26] to-[#0E121B] border border-blue-500/40 shadow-xl shadow-blue-500/5">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 mb-2.5">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400 font-bold shrink-0">
-                      <Globe className="w-4 h-4" />
+                    <div className="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400 font-bold shrink-0">
+                      <Globe className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="font-bold text-white text-xs flex items-center gap-2">
-                        Conexión Oficial con Google Maps
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-extrabold text-[10px] tracking-wider uppercase border border-blue-500/30">
+                          Paso 1 • Recomendado
+                        </span>
+                        <h4 className="font-extrabold text-white text-sm">
+                          Detección Automática de Google Maps
+                        </h4>
                         {isGoogleSynced && (
                           <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/40 flex items-center gap-1">
                             <Check className="w-3 h-3" />
                             Detectado en Vivo
                           </span>
                         )}
-                      </p>
-                      <p className="text-[11px] text-slate-400">
-                        Pega el enlace de Google Maps o busca por nombre: Prestigia detecta automáticamente la calificación y las reseñas oficiales en tiempo real.
+                      </div>
+                      <p className="text-[11px] text-slate-300 mt-0.5">
+                        Pega el enlace de Google Maps de la marca o de la sede (ej: <code className="text-amber-300 font-mono">https://maps.app.goo.gl/...</code>). Prestigia extraerá en vivo la calificación (★), total de reseñas y dirección física para fijar la <strong className="text-white">Línea Base Día 1</strong> automáticamente.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex gap-2 mt-2">
+                <div className="flex flex-col sm:flex-row gap-2 mt-3">
                   <div className="relative flex-1">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       value={googleQueryInput}
@@ -5188,30 +5132,30 @@ export default function MasterAdminPage() {
                           handleDetectGooglePlace();
                         }
                       }}
-                      placeholder="Ej: https://maps.app.goo.gl/... o Nombre del Negocio + Ciudad"
-                      className="w-full bg-[#0E121B] border border-slate-700 focus:border-blue-400 text-white rounded-xl pl-9 pr-3 py-2 text-xs outline-none"
+                      placeholder="Pega el enlace de Google Maps (ej: https://maps.app.goo.gl/...) o nombre comercial"
+                      className="w-full bg-[#0E121B] border border-slate-700 focus:border-blue-400 text-white rounded-xl pl-10 pr-3.5 py-2.5 text-xs outline-none shadow-inner"
                     />
                   </div>
                   <button
                     type="button"
                     disabled={googleDetectLoading}
                     onClick={() => handleDetectGooglePlace()}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 cursor-pointer shadow-lg shadow-blue-600/20 transition-all shrink-0"
+                    className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-blue-600/25 transition-all shrink-0"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${googleDetectLoading ? 'animate-spin' : ''}`} />
-                    <span>{googleDetectLoading ? 'Detectando...' : 'Detectar con Google'}</span>
+                    <span>{googleDetectLoading ? 'Detectando en Google...' : '⚡ Detectar Ficha en Google'}</span>
                   </button>
                 </div>
 
                 {googleDetectSuccess && (
-                  <div className="mt-2.5 p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-[11px] flex items-center gap-2">
+                  <div className="mt-3 p-3 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-emerald-200 text-xs flex items-center gap-2.5 animate-in fade-in">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>{googleDetectSuccess}</span>
+                    <span className="font-medium">{googleDetectSuccess}</span>
                   </div>
                 )}
 
                 {googleDetectError && (
-                  <div className="mt-2.5 p-2.5 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 text-[11px] flex items-center gap-2">
+                  <div className="mt-3 p-3 rounded-xl bg-rose-950/50 border border-rose-500/40 text-rose-200 text-xs flex items-center gap-2.5 animate-in fade-in">
                     <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
                     <span>{googleDetectError}</span>
                   </div>
@@ -5219,38 +5163,46 @@ export default function MasterAdminPage() {
 
                 {/* Rich Google Business Profile Preview Card */}
                 {detectedGoogleProfile && (
-                  <div className="mt-3 p-3.5 rounded-xl bg-[#0E121B] border border-blue-500/40 text-xs space-y-2.5 animate-in fade-in zoom-in-95 duration-150">
-                    <div className="flex items-start justify-between gap-3">
+                  <div className="mt-3.5 p-4 rounded-xl bg-[#0E121B] border border-blue-500/40 text-xs space-y-3 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                       <div>
-                        <span className="text-[10px] uppercase font-bold text-blue-400 tracking-wider flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                          Ficha Oficial Detectada en Google Maps
+                        <span className="text-[10px] uppercase font-bold text-blue-400 tracking-wider flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                          Ficha Oficial Verificada en Google Maps
                         </span>
-                        <h4 className="font-bold text-white text-sm mt-0.5">{detectedGoogleProfile.name}</h4>
+                        <h4 className="font-extrabold text-white text-sm sm:text-base mt-0.5">{detectedGoogleProfile.name}</h4>
                         {detectedGoogleProfile.address && (
-                          <p className="text-[11px] text-slate-300 flex items-center gap-1.5 mt-1">
+                          <p className="text-xs text-slate-300 flex items-center gap-1.5 mt-1">
                             <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                             <span>{detectedGoogleProfile.address}</span>
                           </p>
                         )}
                       </div>
-                      <div className="text-right shrink-0 bg-[#141A26] px-3 py-1.5 rounded-xl border border-slate-800">
-                        <div className="flex items-center gap-1 justify-end font-mono font-bold text-amber-400 text-sm">
+                      <div className="text-left sm:text-right bg-[#141A26] px-4 py-2 rounded-xl border border-slate-800 shrink-0">
+                        <div className="flex items-center gap-1.5 justify-start sm:justify-end font-mono font-extrabold text-amber-400 text-base">
                           <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
                           <span>{detectedGoogleProfile.rating}★</span>
                         </div>
-                        <p className="text-[10px] text-slate-400">
+                        <p className="text-[11px] text-slate-300 font-semibold mt-0.5">
                           {detectedGoogleProfile.reviewsCount} opiniones oficiales
                         </p>
                       </div>
                     </div>
 
                     {detectedGoogleProfile.placeId && (
-                      <div className="flex items-center justify-between text-[10px] text-slate-400 bg-[#141A26] px-2.5 py-1.5 rounded-lg border border-slate-800">
-                        <span className="font-mono truncate">Place ID: <strong className="text-amber-300">{detectedGoogleProfile.placeId}</strong></span>
-                        <span className="text-emerald-400 font-semibold shrink-0 ml-2">API Certificada</span>
+                      <div className="flex items-center justify-between text-[11px] text-slate-400 bg-[#141A26] px-3 py-1.5 rounded-lg border border-slate-800">
+                        <span className="font-mono truncate">Google Place ID: <strong className="text-amber-300">{detectedGoogleProfile.placeId}</strong></span>
+                        <span className="text-emerald-400 font-bold shrink-0 ml-2">✓ API Prestigia Enlazada</span>
                       </div>
                     )}
+
+                    {/* Línea Base Confirmation Callout */}
+                    <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] flex items-center gap-2">
+                      <Star className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>
+                        <strong>Línea Base Día 1 fijada automáticamente:</strong> Inicia con {detectedGoogleProfile.rating}★ y {detectedGoogleProfile.reviewsCount} reseñas. Todos los campos inferiores han sido autocompletados.
+                      </span>
+                    </div>
 
                     {/* Direct Links to view Google Maps listing */}
                     <div className="pt-2 border-t border-slate-800/80 flex flex-wrap items-center gap-2">
@@ -5272,7 +5224,7 @@ export default function MasterAdminPage() {
                           className="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold text-[11px] flex items-center gap-1.5 transition-colors cursor-pointer"
                         >
                           <Star className="w-3.5 h-3.5 text-amber-400" />
-                          <span>Probar Enlace de Reseña ↗</span>
+                          <span>Probar Enlace Directo de Reseña ↗</span>
                         </a>
                       )}
                     </div>
@@ -5280,26 +5232,186 @@ export default function MasterAdminPage() {
                 )}
               </div>
 
-              {/* Section: Day-1 Baseline Parameters */}
-              <div className="pt-2 border-t border-slate-800">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-amber-400 font-bold flex items-center gap-1.5 text-xs">
-                    <Star className="w-3.5 h-3.5" />
-                    Línea Base Histórica (Día 1 para el Caso de Éxito):
-                  </p>
+              {/* ========================================================= */}
+              {/* PASO 2: DATOS COMERCIALES DE LA MARCA & SEDE PRINCIPAL   */}
+              {/* ========================================================= */}
+              <div className="space-y-4 pt-2">
+                <div className="flex items-center gap-2 pb-1 border-b border-slate-800">
+                  <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-extrabold text-[10px] tracking-wider uppercase border border-slate-700">
+                    Paso 2
+                  </span>
+                  <h4 className="font-extrabold text-white text-xs sm:text-sm">
+                    Datos Comerciales de la Marca & Sede Principal
+                  </h4>
+                </div>
+
+                {/* Row 1: Brand Info */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1">
+                      Nombre Comercial de la Marca *
+                      {isGoogleSynced && <span className="ml-2 text-[10px] text-emerald-400 font-bold">✓ Google Detectado</span>}
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={onboardForm.name}
+                      onChange={(e) => {
+                        const name = e.target.value;
+                        const slug = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+                        setOnboardForm({ ...onboardForm, name, id: slug });
+                      }}
+                      placeholder="Ej: La Taquería del Sol"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1">Identificador Slug (URL & QR) *</label>
+                    <input
+                      type="text"
+                      required
+                      value={onboardForm.id}
+                      onChange={(e) => setOnboardForm({ ...onboardForm, id: e.target.value })}
+                      placeholder="la-taqueria-del-sol"
+                      className="w-full bg-[#141A26] border border-slate-700 text-amber-400 font-mono rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 2: Niche & Physical Address */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1">Nicho / Industria *</label>
+                    <select
+                      required
+                      value={onboardForm.category}
+                      onChange={(e) => setOnboardForm({ ...onboardForm, category: e.target.value })}
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 cursor-pointer"
+                    >
+                      {PRESTIGIA_NICHES.map((niche) => (
+                        <option key={niche.id} value={niche.label}>
+                          {niche.icon} {niche.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1">
+                      Dirección Física de la Sede Principal
+                      {isGoogleSynced && <span className="ml-2 text-[10px] text-emerald-400 font-bold">✓ Google Detectado</span>}
+                    </label>
+                    <input
+                      type="text"
+                      value={onboardForm.address}
+                      onChange={(e) => setOnboardForm({ ...onboardForm, address: e.target.value })}
+                      placeholder="Ej: Cra. 13 #82-28, Chapinero"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 3: City & Locality */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1">Ciudad *</label>
+                    <input
+                      type="text"
+                      required
+                      value={onboardForm.city}
+                      onChange={(e) => setOnboardForm({ ...onboardForm, city: e.target.value })}
+                      placeholder="Bogotá"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1">Localidad / Zona *</label>
+                    <input
+                      type="text"
+                      required
+                      value={onboardForm.locality}
+                      onChange={(e) => setOnboardForm({ ...onboardForm, locality: e.target.value })}
+                      placeholder="Zona Rosa / Usaquén"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1">Plan Inicial Contratado *</label>
+                    <select
+                      value={onboardForm.plan}
+                      onChange={(e) => setOnboardForm({ ...onboardForm, plan: e.target.value as BusinessPlan })}
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 capitalize cursor-pointer"
+                    >
+                      <option value="independiente">Plan Independiente ($49k)</option>
+                      <option value="pro">Plan Pro ($120k)</option>
+                      <option value="elite">Plan Élite ($290k)</option>
+                      <option value="empresarial">Plan Empresarial ($690k)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Row 4: Owner & WhatsApp */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1">Nombre del Dueño o Encargado *</label>
+                    <input
+                      type="text"
+                      required
+                      value={onboardForm.ownerName}
+                      onChange={(e) => setOnboardForm({ ...onboardForm, ownerName: e.target.value })}
+                      placeholder="Mario Casas"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1">WhatsApp para Alertas Directas *</label>
+                    <input
+                      type="text"
+                      required
+                      value={onboardForm.ownerPhone}
+                      onChange={(e) => setOnboardForm({ ...onboardForm, ownerPhone: e.target.value })}
+                      placeholder="+57 300 123 4567"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white font-mono rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* ========================================================= */}
+              {/* PASO 3: VERIFICACIÓN DE LÍNEA BASE HISTÓRICA (DÍA 1)       */}
+              {/* ========================================================= */}
+              <div className="pt-3 border-t border-slate-800 space-y-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-extrabold text-[10px] tracking-wider uppercase border border-amber-500/30">
+                      Paso 3
+                    </span>
+                    <p className="text-amber-400 font-extrabold flex items-center gap-1.5 text-xs sm:text-sm">
+                      <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                      Línea Base Histórica Inicial (Día 1 para Caso de Éxito):
+                    </p>
+                  </div>
                   {isGoogleSynced && (
-                    <span className="text-[10px] text-emerald-400 font-medium flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
-                      <Check className="w-3 h-3" />
-                      Auto-detectado de Google Maps
+                    <span className="text-[11px] text-emerald-400 font-bold flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full">
+                      <Check className="w-3.5 h-3.5" />
+                      Leído de Google Maps en tiempo real
                     </span>
                   )}
                 </div>
+                <p className="text-[11px] text-slate-400">
+                  Estos números representan el estado con el que la empresa ingresa a Prestigia. Sirven como prueba documental inmutable para calcular el incremento de estrellas, reseñas ganadas y ROI.
+                </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-slate-400 mb-1 flex items-center justify-between">
-                      <span>Rating Google Inicial (1.0 - 5.0)</span>
-                      {isGoogleSynced && <span className="text-[10px] text-emerald-400 font-bold font-mono">Google Live</span>}
+                  <div className={`p-3 rounded-2xl bg-[#141A26] border transition-all ${
+                    isGoogleSynced ? 'border-emerald-500/50 shadow-md shadow-emerald-500/10' : 'border-slate-800'
+                  }`}>
+                    <label className="block text-slate-300 font-semibold mb-1 flex items-center justify-between">
+                      <span>Rating Google Día 1</span>
+                      {isGoogleSynced && (
+                        <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold">
+                          ✓ {onboardForm.initialRating}★ Live
+                        </span>
+                      )}
                     </label>
                     <input
                       type="number"
@@ -5308,50 +5420,62 @@ export default function MasterAdminPage() {
                       max="5.0"
                       value={onboardForm.initialRating}
                       onChange={(e) => setOnboardForm({ ...onboardForm, initialRating: parseFloat(e.target.value) })}
-                      className={`w-full bg-[#141A26] border text-white rounded-xl px-3 py-2 outline-none font-mono ${
-                        isGoogleSynced ? 'border-emerald-500/60 text-emerald-300 font-bold' : 'border-slate-700'
+                      className={`w-full bg-[#0E121B] border rounded-xl px-3 py-2 outline-none font-mono text-sm ${
+                        isGoogleSynced ? 'border-emerald-500/60 text-emerald-300 font-bold' : 'border-slate-700 text-white'
                       }`}
                     />
+                    <p className="text-[10px] text-slate-400 mt-1">Escala de 1.0 a 5.0★</p>
                   </div>
-                  <div>
-                    <label className="block text-slate-400 mb-1 flex items-center justify-between">
-                      <span>Reseñas Google Iniciales</span>
-                      {isGoogleSynced && <span className="text-[10px] text-emerald-400 font-bold font-mono">Google Live</span>}
+
+                  <div className={`p-3 rounded-2xl bg-[#141A26] border transition-all ${
+                    isGoogleSynced ? 'border-emerald-500/50 shadow-md shadow-emerald-500/10' : 'border-slate-800'
+                  }`}>
+                    <label className="block text-slate-300 font-semibold mb-1 flex items-center justify-between">
+                      <span>Reseñas Google Día 1</span>
+                      {isGoogleSynced && (
+                        <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold">
+                          ✓ {onboardForm.initialReviewCount} Live
+                        </span>
+                      )}
                     </label>
                     <input
                       type="number"
                       min="0"
                       value={onboardForm.initialReviewCount}
                       onChange={(e) => setOnboardForm({ ...onboardForm, initialReviewCount: parseInt(e.target.value) || 0 })}
-                      className={`w-full bg-[#141A26] border text-white rounded-xl px-3 py-2 outline-none font-mono ${
-                        isGoogleSynced ? 'border-emerald-500/60 text-emerald-300 font-bold' : 'border-slate-700'
+                      className={`w-full bg-[#0E121B] border rounded-xl px-3 py-2 outline-none font-mono text-sm ${
+                        isGoogleSynced ? 'border-emerald-500/60 text-emerald-300 font-bold' : 'border-slate-700 text-white'
                       }`}
                     />
+                    <p className="text-[10px] text-slate-400 mt-1">Total acumulado inicial</p>
                   </div>
-                  <div>
-                    <label className="block text-slate-400 mb-1">Ticket Promedio (COP $)</label>
+
+                  <div className="p-3 rounded-2xl bg-[#141A26] border border-slate-800">
+                    <label className="block text-slate-300 font-semibold mb-1">Ticket Promedio (COP $)</label>
                     <input
                       type="number"
                       step="1000"
                       value={onboardForm.averageTicketCOP}
                       onChange={(e) => setOnboardForm({ ...onboardForm, averageTicketCOP: parseInt(e.target.value) || 0 })}
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3 py-2 outline-none font-mono"
+                      className="w-full bg-[#0E121B] border border-slate-700 text-white rounded-xl px-3 py-2 outline-none font-mono text-sm"
                     />
+                    <p className="text-[10px] text-slate-400 mt-1">Valor promedio de compra</p>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 flex justify-end gap-3">
+              {/* Action Buttons */}
+              <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowOnboardModal(false)}
-                  className="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white"
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-bold rounded-xl cursor-pointer shadow-lg shadow-amber-500/20"
+                  className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-extrabold rounded-xl cursor-pointer shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Dar de Alta Marca en Prestigia
                 </button>

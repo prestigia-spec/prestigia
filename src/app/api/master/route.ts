@@ -704,6 +704,7 @@ export async function POST(request: NextRequest) {
         country,
         city,
         locality,
+        address,
         plan,
         ownerName,
         ownerPhone,
@@ -744,7 +745,7 @@ export async function POST(request: NextRequest) {
           {
             id: `${id}-principal`,
             name: 'Sede Principal',
-            address: `${locality || 'Zona Centro'}, ${city || 'Bogotá'}`,
+            address: address || `${locality || 'Zona Centro'}, ${city || 'Bogotá'}`,
             city: city || 'Bogotá',
             locality: locality || 'Principal',
             googleReviewUrl: googleReviewUrl || `https://search.google.com/local/writereview?placeid=${googlePlaceId || id}`,
