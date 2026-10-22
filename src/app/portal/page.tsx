@@ -8965,7 +8965,7 @@ export default function PortalPage() {
             onClick={() => {
               window.close();
               setTimeout(() => {
-                window.location.href = '/master';
+                window.location.href = '/prestigia-hq-core-2026';
               }, 200);
             }}
             className="px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-extrabold uppercase tracking-wider transition shadow cursor-pointer flex items-center gap-1.5"
