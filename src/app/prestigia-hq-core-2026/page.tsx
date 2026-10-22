@@ -22,6 +22,7 @@ import {
   TrendingDown,
   Clock,
   Calendar,
+  Database,
   Sparkles,
   Search,
   Filter,
@@ -1948,10 +1949,11 @@ export default function MasterAdminPage() {
           <button
             type="button"
             onClick={fetchMasterData}
-            title="Refrescar datos en vivo de la base de datos"
-            className="p-2 rounded-xl bg-[#141A26] border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white transition-colors cursor-pointer"
+            title="Actualizar datos en vivo de la base de datos (reseñas, negocios y métricas)"
+            className="px-2.5 py-1.5 rounded-xl bg-[#141A26] hover:bg-[#1a2232] border border-amber-500/30 text-amber-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
           >
-            <RefreshCw className={`w-4 h-4 ${loadingData ? 'animate-spin text-amber-400' : ''}`} />
+            <Database className={`w-3.5 h-3.5 text-amber-400 ${loadingData ? 'animate-pulse' : ''}`} />
+            <span className="hidden md:inline">Actualizar Datos</span>
           </button>
 
           {/* Hard Cache Purge Button */}
@@ -1968,10 +1970,10 @@ export default function MasterAdminPage() {
                 window.location.reload();
               }
             }}
-            title="Purgar Caché del Navegador y Forzar Descarga de la Última Versión"
+            title="Purgar Caché del Navegador y Forzar Descarga de la Última Versión del Sistema"
             className="px-2.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
           >
-            <RefreshCw className="w-3.5 h-3.5 text-blue-400" />
+            <Sparkles className="w-3.5 h-3.5 text-blue-400" />
             <span className="hidden md:inline">Purgar Caché</span>
           </button>
 
