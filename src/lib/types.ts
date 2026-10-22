@@ -173,14 +173,18 @@ export interface ReactivationContact {
 export interface Business {
   id: string; // Brand slug or ID (e.g. "la-burguesia")
   name: string; // Commercial brand name (e.g. "La Burguesía Artesanal")
-  ownerName: string;
-  ownerPhone: string; // Owner WhatsApp
+  legalName?: string; // Razón Social registrada (ej: "Inversiones Gastronómicas Gómez & Cía S.A.S.")
+  taxId?: string; // NIT, CIF, RFC, RUT, EIN or Tax ID according to country
+  address?: string; // Dirección principal / fiscal de la empresa
+  ownerName: string; // Representante Legal o titular que firmó el contrato
+  ownerPhone: string; // Owner WhatsApp / Teléfono del firmante
+  contractSignerName?: string; // Quien firmó el contrato (opcional, fallback a ownerName)
+  contractSignerPhone?: string; // Teléfono del firmante (opcional, fallback a ownerPhone)
   plan: BusinessPlan; // 'basic' | 'pro' | 'elite'
   status: BusinessStatus; // 'active' | 'suspended' (master status)
   trialEndsAt: string; // ISO date string
   password?: string; // For /portal owner login
   category: string; // e.g. "Hamburguesería & Gastrobar"
-  taxId?: string; // NIT, CIF, RFC, RUT, EIN or Tax ID according to country
   country?: string; // Country code or name, e.g. 'CO', 'MX', 'ES', 'US'
   ownerEmail?: string; // Official tax & billing notification email
   supportTicketsQuota?: number; // Monthly support ticket allowance (e.g. 4 for elite, 2 for pro, 1 for basic)

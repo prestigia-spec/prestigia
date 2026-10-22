@@ -700,6 +700,7 @@ export async function POST(request: NextRequest) {
       const {
         id,
         name,
+        legalName,
         category,
         country,
         city,
@@ -731,11 +732,15 @@ export async function POST(request: NextRequest) {
       const newBusiness: Business = {
         id: id.toLowerCase().trim().replace(/[^a-z0-9-]/g, '-'),
         name,
+        legalName: legalName || name,
         category: category || 'Comercio General',
         country: country || 'Colombia (NIT)',
         taxId: taxId || '900.000.000-1',
+        address: address || undefined,
         ownerName,
         ownerPhone,
+        contractSignerName: ownerName,
+        contractSignerPhone: ownerPhone,
         ownerEmail: ownerEmail || `${id}@prestigia.app`,
         plan: plan || 'pro',
         status: 'active',

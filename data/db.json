@@ -249,7 +249,11 @@
         "extraBranches": 0,
         "extraManagers": 0,
         "deviceAudit": true
-      }
+      },
+      "legalName": "Inversiones Gastronómicas Gómez & Cía S.A.S.",
+      "address": "Calle 67 # 9-20, Chapinero, Bogotá",
+      "contractSignerName": "Carlos Gómez",
+      "contractSignerPhone": "+573001234567"
     },
     {
       "id": "carlos-mendoza",
@@ -336,7 +340,11 @@
         "giveawayCrm": false,
         "deviceAudit": false,
         "customNotes": "Consultorio independiente individual."
-      }
+      },
+      "legalName": "Mendoza Medicina Especializada S.A.S.",
+      "address": "Carrera 16 # 82-20, Consultorio 504, Bogotá",
+      "contractSignerName": "Dr. Carlos Mendoza",
+      "contractSignerPhone": "+573104567890"
     },
     {
       "id": "auto-elite-bogota",
@@ -422,7 +430,11 @@
             }
           ]
         }
-      ]
+      ],
+      "legalName": "Ingeniería Automotriz AutoElite Colombia S.A.S.",
+      "address": "Calle 134 # 45-18, Prado Veraniego, Bogotá",
+      "contractSignerName": "Mauricio Varela",
+      "contractSignerPhone": "+573154443322"
     },
     {
       "id": "hoteles-soberana",
@@ -532,7 +544,11 @@
             }
           ]
         }
-      ]
+      ],
+      "legalName": "Operadora Hotelera & Spa Soberana de Colombia S.A.S.",
+      "address": "Carrera 7 # 116-50, Usaquén, Bogotá",
+      "contractSignerName": "Dra. Beatriz Arango",
+      "contractSignerPhone": "+573167778899"
     },
     {
       "id": "imperio-barber",
@@ -593,7 +609,11 @@
           "status": "active",
           "websiteUrl": "https://imperiobarber.prestigia.com"
         }
-      ]
+      ],
+      "legalName": "Estilo & Cuidado Masculino Imperio S.A.S.",
+      "address": "Calle 85 # 14-22, Zona Rosa, Bogotá",
+      "contractSignerName": "Fabián Castillo",
+      "contractSignerPhone": "+573201112233"
     },
     {
       "id": "titan-fit",
@@ -654,7 +674,11 @@
           "status": "active",
           "websiteUrl": "https://titanfit.prestigia.com"
         }
-      ]
+      ],
+      "legalName": "Titan Fitness Centers & Wellness S.A.S.",
+      "address": "Carrera 15 # 93-40, Chicó, Bogotá",
+      "contractSignerName": "Camila Osorio",
+      "contractSignerPhone": "+573189990011"
     },
     {
       "id": "veterinaria-san-roque",
@@ -715,7 +739,11 @@
           "status": "active",
           "websiteUrl": "https://sanroquevet.prestigia.com"
         }
-      ]
+      ],
+      "legalName": "Servicios Médicos Veterinarios San Roque S.A.S.",
+      "address": "Carrera 19 # 104-32, Usaquén, Bogotá",
+      "contractSignerName": "Dra. Natalia Duque",
+      "contractSignerPhone": "+573145556677"
     },
     {
       "id": "boutique-monaco",
@@ -776,7 +804,11 @@
           "status": "active",
           "websiteUrl": "https://monacoboutique.prestigia.com"
         }
-      ]
+      ],
+      "legalName": "Mónaco Alta Costura & Retail de Colombia S.A.S.",
+      "address": "Calle 82 # 11-37, El Retiro, Bogotá",
+      "contractSignerName": "Guillermo Restrepo",
+      "contractSignerPhone": "+573172223344"
     }
   ],
   "feedbacks": [
