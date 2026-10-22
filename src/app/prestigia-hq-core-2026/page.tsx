@@ -302,6 +302,8 @@ export default function MasterAdminPage() {
   // Onboarding Wizard Modal State
   const [showOnboardModal, setShowOnboardModal] = useState(false);
   const [viewPlaceModalBusiness, setViewPlaceModalBusiness] = useState<Business | null>(null);
+  const [killSwitchConfirmTarget, setKillSwitchConfirmTarget] = useState<Business | null>(null);
+  const [killSwitchLoading, setKillSwitchLoading] = useState(false);
   const [detectedGoogleProfile, setDetectedGoogleProfile] = useState<{
     name: string;
     rating: number;
@@ -1178,14 +1180,14 @@ export default function MasterAdminPage() {
     window.open(url, '_blank');
   };
 
-  // Quick Kill Switch / Toggle Business Status (Live Sync)
-  const handleToggleBusinessStatus = async (biz: Business) => {
-    const newStatus = biz.status === 'suspended' ? 'active' : 'suspended';
-    const confirmMsg = newStatus === 'suspended'
-      ? `🚨 ¿Seguro que deseas SUSPENDER a "${biz.name}"?\n\nConsecuencias inmediatas:\n• Bloqueo total de su portal corporativo.\n• Desactivación de su canal público QR.\n• Se refleja en vivo en menos de 10 segundos.`
-      : `✅ ¿Deseas REACTIVAR la cuenta de "${biz.name}"?\n\nSe restablecerá el acceso al portal y a la captura de opiniones de inmediato.`;
+  // Quick Kill Switch / Toggle Business Status (Opens Custom Security Modal)
+  const handleToggleBusinessStatus = (biz: Business) => {
+    setKillSwitchConfirmTarget(biz);
+  };
 
-    if (!window.confirm(confirmMsg)) return;
+  const executeToggleBusinessStatus = async (biz: Business) => {
+    const newStatus = biz.status === 'suspended' ? 'active' : 'suspended';
+    setKillSwitchLoading(true);
 
     try {
       const res = await fetch('/api/master', {
@@ -1202,11 +1204,14 @@ export default function MasterAdminPage() {
         setNotification({ type: 'success', message: data.message });
         setTimeout(() => setNotification(null), 4000);
         fetchMasterData();
+        setKillSwitchConfirmTarget(null);
       } else {
         alert(data.error || 'Error al cambiar estado');
       }
     } catch {
       alert('Error de conexión al cambiar estado');
+    } finally {
+      setKillSwitchLoading(false);
     }
   };
 
@@ -5792,6 +5797,113 @@ export default function MasterAdminPage() {
                 </form>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* MODAL: KILL SWITCH STATUS CONFIRMATION (BANKING GRADE)          */}
+      {/* ============================================================== */}
+      {killSwitchConfirmTarget && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#0F1420] border border-slate-700/80 w-full max-w-md rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                  killSwitchConfirmTarget.status === 'suspended'
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                }`}>
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-extrabold text-white flex items-center gap-1.5">
+                    <span>PRESTIGIA BANK GUARD</span>
+                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase ${
+                      killSwitchConfirmTarget.status === 'suspended'
+                        ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+                        : 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
+                    }`}>
+                      {killSwitchConfirmTarget.status === 'suspended' ? 'Reactivación' : 'Kill Switch'}
+                    </span>
+                  </h3>
+                  <p className="text-[10px] text-slate-400">Control de Seguridad y Estado de Red</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setKillSwitchConfirmTarget(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="mt-4 space-y-4">
+              <div className="bg-[#141A26] p-4 rounded-2xl border border-slate-800">
+                <p className="text-xs text-slate-400 uppercase font-bold">Establecimiento Objetivo</p>
+                <p className="text-base font-extrabold text-white mt-0.5">{killSwitchConfirmTarget.name}</p>
+                <p className="text-xs text-slate-300 mt-1">
+                  Titular: <strong>{killSwitchConfirmTarget.ownerName}</strong> • {killSwitchConfirmTarget.branches?.length || 1} {killSwitchConfirmTarget.branches?.length === 1 ? 'Sede' : 'Sedes'}
+                </p>
+              </div>
+
+              {killSwitchConfirmTarget.status === 'suspended' ? (
+                <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-200 text-xs space-y-1.5">
+                  <p className="font-bold flex items-center gap-1.5 text-emerald-400">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Protocolo de Reactivación Inmediata
+                  </p>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Se restablecerá el acceso total al portal del cliente y se reactivará la captura de opiniones y reseñas en todas sus sedes registradas.
+                  </p>
+                </div>
+              ) : (
+                <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-200 text-xs space-y-1.5">
+                  <p className="font-bold flex items-center gap-1.5 text-rose-400">
+                    <AlertTriangle className="w-4 h-4" />
+                    Consecuencias de la Suspensión Inmediata
+                  </p>
+                  <ul className="text-[11px] text-slate-300 space-y-1 list-disc list-inside">
+                    <li>Bloqueo total de acceso al portal corporativo.</li>
+                    <li>Desactivación del canal QR y captura de clientes en sala.</li>
+                    <li>Sincronización de bloqueo en red en tiempo real.</li>
+                  </ul>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setKillSwitchConfirmTarget(null)}
+                  disabled={killSwitchLoading}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => executeToggleBusinessStatus(killSwitchConfirmTarget)}
+                  disabled={killSwitchLoading}
+                  className={`flex-1 py-2.5 px-4 rounded-xl text-white text-xs font-extrabold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-lg ${
+                    killSwitchConfirmTarget.status === 'suspended'
+                      ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/30'
+                      : 'bg-rose-600 hover:bg-rose-500 shadow-rose-600/30'
+                  }`}
+                >
+                  {killSwitchLoading ? (
+                    <span>Procesando...</span>
+                  ) : killSwitchConfirmTarget.status === 'suspended' ? (
+                    <span>Confirmar Reactivación</span>
+                  ) : (
+                    <span>Confirmar Suspensión</span>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
