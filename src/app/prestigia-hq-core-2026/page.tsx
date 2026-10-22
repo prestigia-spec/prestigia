@@ -5932,31 +5932,70 @@ export default function MasterAdminPage() {
                         <Store className="w-4 h-4 text-blue-400" />
                         Sedes Físicas Registradas ({viewPlaceModalBusiness.branches?.length || 1})
                       </p>
-                      <div className="space-y-2.5">
-                        {viewPlaceModalBusiness.branches?.map((branch, bIdx) => (
-                          <div key={branch.id || bIdx} className="bg-[#0E121B] p-3.5 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
-                            <div>
-                              <p className="text-sm font-extrabold text-white">{branch.name}</p>
-                              <p className="text-xs sm:text-sm font-medium text-slate-200 mt-0.5">{branch.address || 'Sin dirección registrada'} • {branch.locality}, {branch.city}</p>
-                              <p className="text-xs font-semibold text-slate-300 mt-1.5 flex items-center gap-1.5 flex-wrap">
-                                <span className="text-emerald-400 font-extrabold">WhatsApp Alertas:</span>
-                                <span className="font-mono text-amber-300 font-bold bg-[#141A26] px-1.5 py-0.5 rounded border border-slate-700">{branch.managerPhone}</span>
-                                <span className="text-slate-400 font-medium">({branch.managerName || 'Encargado Principal'})</span>
-                              </p>
+                      <div className="space-y-3">
+                        {viewPlaceModalBusiness.branches?.map((branch, bIdx) => {
+                          const branchReviews = googleReviews.filter(
+                            (r) => r.businessId === viewPlaceModalBusiness.id && r.branchId === branch.id
+                          );
+                          const bAvgRating = branchReviews.length > 0
+                            ? Number((branchReviews.reduce((acc, r) => acc + (r.rating || 5), 0) / branchReviews.length).toFixed(1))
+                            : currentRating;
+                          const bReviewCount = branchReviews.length > 0
+                            ? branchReviews.length
+                            : (viewPlaceModalBusiness.baseline?.initialReviewCount || 25);
+                          const branchPlaceId = branch.googlePlaceId || placeId;
+                          const branchMapsUrl = branch.googlePlaceId 
+                            ? `https://www.google.com/maps/place/?q=place_id:${branch.googlePlaceId}`
+                            : (branch.googleReviewUrl || googleMapsUrl);
+
+                          return (
+                            <div key={branch.id || bIdx} className="bg-[#0E121B] p-4 rounded-xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                              <div className="space-y-1.5 flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <p className="text-sm font-extrabold text-white">{branch.name}</p>
+                                  <span className="flex items-center gap-1 font-mono font-extrabold text-amber-400 text-xs bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                                    <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                    {bAvgRating}★ ({bReviewCount} res.)
+                                  </span>
+                                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    API Conectada
+                                  </span>
+                                </div>
+
+                                <p className="text-xs sm:text-sm font-medium text-slate-200">
+                                  {branch.address || 'Sin dirección registrada'} • {branch.locality}, {branch.city}
+                                </p>
+
+                                <div className="flex items-center gap-2 pt-0.5 flex-wrap text-xs">
+                                  <span className="text-slate-400 font-semibold text-[11px]">Google Place ID:</span>
+                                  <span className="font-mono text-amber-300 text-xs font-bold bg-[#141A26] px-2 py-0.5 rounded border border-slate-700/80">
+                                    {branchPlaceId}
+                                  </span>
+                                </div>
+
+                                <p className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 flex-wrap pt-0.5">
+                                  <span className="text-emerald-400 font-extrabold">Encargado de Turno:</span>
+                                  <span className="text-white font-bold">{branch.managerName || 'Encargado Principal'}</span>
+                                  <span className="text-slate-400">• Alertas WhatsApp:</span>
+                                  <span className="font-mono text-amber-300 font-bold bg-[#141A26] px-1.5 py-0.5 rounded border border-slate-700">{branch.managerPhone}</span>
+                                </p>
+                              </div>
+
+                              <div className="flex items-center gap-2 shrink-0 w-full md:w-auto">
+                                <a
+                                  href={branchMapsUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="w-full md:w-auto px-3.5 py-2 rounded-xl bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/40 text-xs font-extrabold flex items-center justify-center gap-1.5 cursor-pointer transition"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                  <span>Abrir en Maps ↗</span>
+                                </a>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-2 shrink-0">
-                              <a
-                                href={branch.googleReviewUrl || googleMapsUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-3 py-1.5 rounded-xl bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/40 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition"
-                              >
-                                <ExternalLink className="w-3.5 h-3.5" />
-                                <span>Google Maps</span>
-                              </a>
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
 

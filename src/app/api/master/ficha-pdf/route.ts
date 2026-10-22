@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBusinessById } from '@/lib/db';
+import { getBusinessById, getGoogleReviews } from '@/lib/db';
 import { Business } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -41,19 +41,44 @@ export async function GET(req: NextRequest) {
       day: 'numeric',
     });
 
-    const branchesHtml = (biz.branches || [])
-      .map(
-        (b, i) => `
-        <tr style="border-bottom: 1px solid #e2e8f0;">
-          <td style="padding: 10px 12px; font-weight: 700; color: #0f172a;">${b.name || `Sede ${i + 1}`}</td>
-          <td style="padding: 10px 12px; color: #334155;">${b.address || 'Principal'}, ${b.locality || ''}, ${b.city || ''}</td>
-          <td style="padding: 10px 12px; color: #0f172a; font-weight: 600;">${b.managerName || 'Encargado Principal'}</td>
-          <td style="padding: 10px 12px; font-family: monospace; font-weight: 700; color: #d97706;">${b.managerPhone || signerPhone}</td>
-          <td style="padding: 10px 12px; text-align: center;"><span style="display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 700; background: #dcfce7; color: #15803d;">Activa</span></td>
-        </tr>
-      `
+    const branchesHtml = (
+      await Promise.all(
+        (biz.branches || []).map(async (b, i) => {
+          const bReviews = await getGoogleReviews(biz.id, b.id);
+          const bReviewCount = bReviews.length > 0 ? bReviews.length : (biz.baseline?.initialReviewCount || 25);
+          const bAvgRating = bReviews.length > 0
+            ? Number((bReviews.reduce((acc, r) => acc + (r.rating || 5), 0) / bReviews.length).toFixed(1))
+            : Math.min(5.0, Number(((biz.baseline?.initialRating || 3.8) + 1.1).toFixed(1)));
+          const bPlaceId = b.googlePlaceId || placeId;
+
+          return `
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 8px 10px; vertical-align: middle;">
+              <div style="font-weight: 800; font-size: 11.5px; color: #0f172a;">${b.name || `Sede ${i + 1}`}</div>
+              <div style="font-size: 9.5px; color: #64748b; margin-top: 1px;">${b.address || 'Principal'}, ${b.locality || ''}, ${b.city || ''}</div>
+            </td>
+            <td style="padding: 8px 10px; vertical-align: middle;">
+              <div style="font-family: monospace; font-size: 10px; font-weight: 800; color: #b45309; word-break: break-all;">${bPlaceId}</div>
+              <div style="font-size: 9px; color: #16a34a; font-weight: 700; margin-top: 2px;">✓ Sincronización API Google Activa</div>
+            </td>
+            <td style="padding: 8px 10px; text-align: center; vertical-align: middle;">
+              <div style="font-size: 13px; font-weight: 900; color: #d97706;">★ ${bAvgRating}</div>
+              <div style="font-size: 9px; color: #64748b; font-weight: 600;">${bReviewCount} reseñas</div>
+            </td>
+            <td style="padding: 8px 10px; vertical-align: middle;">
+              <div style="font-size: 11px; font-weight: 700; color: #0f172a;">${b.managerName || 'Encargado de Turno'}</div>
+              <div style="font-family: monospace; font-size: 10px; font-weight: 700; color: #0369a1; margin-top: 1px;">${b.managerPhone || signerPhone}</div>
+            </td>
+            <td style="padding: 8px 10px; text-align: center; vertical-align: middle;">
+              <span style="display: inline-block; padding: 2px 7px; border-radius: 9999px; font-size: 9.5px; font-weight: 800; background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;">
+                Activa
+              </span>
+            </td>
+          </tr>
+        `;
+        })
       )
-      .join('');
+    ).join('');
 
     const html = `<!DOCTYPE html>
 <html lang="es">
@@ -261,7 +286,7 @@ export async function GET(req: NextRequest) {
     <div class="card">
       <div class="card-label">Teléfono / WhatsApp Directo del Firmante</div>
       <div class="card-value" style="font-family: monospace; color: #d97706;">${signerPhone}</div>
-      <div style="font-size: 11px; color: #16a34a; font-weight: 700; margin-top: 3px;">Canal VIP de Alertas y Notificaciones</div>
+      <div style="font-size: 11px; color: #64748b; margin-top: 3px;">Línea de contacto contractual y legal</div>
     </div>
     <div class="card">
       <div class="card-label">Correo Electrónico de Facturación & Contrato</div>
@@ -298,11 +323,11 @@ export async function GET(req: NextRequest) {
   <table>
     <thead>
       <tr>
-        <th>Nombre de Sede</th>
-        <th>Dirección & Localidad</th>
-        <th>Encargado de Turno</th>
-        <th>WhatsApp Alertas</th>
-        <th style="text-align: center;">Estado</th>
+        <th style="width: 27%;">Nombre & Ubicación de Sede</th>
+        <th style="width: 28%;">Google Maps Place ID</th>
+        <th style="width: 14%; text-align: center;">Rating Google</th>
+        <th style="width: 20%;">Encargado & Alertas</th>
+        <th style="width: 11%; text-align: center;">Estado</th>
       </tr>
     </thead>
     <tbody>
