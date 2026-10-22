@@ -1874,7 +1874,7 @@ export default function MasterAdminPage() {
   return (
     <div className="min-h-screen bg-[#07090E] text-slate-100 flex flex-col font-sans selection:bg-amber-500/20 selection:text-amber-300 w-full overflow-x-hidden">
       {/* Top Banking Command Bar */}
-      <header className="sticky top-0 z-40 bg-[#0C101A]/95 backdrop-blur-xl border-b border-slate-800/80 px-3 sm:px-6 py-2.5 flex items-center justify-between gap-3 shadow-xl shadow-black/40 w-full">
+      <header className="sticky top-0 z-40 bg-[#0C101A]/95 backdrop-blur-xl border-b border-slate-800/80 px-3 sm:px-4 lg:px-5 py-2.5 flex items-center justify-between gap-2 shadow-xl shadow-black/40 w-full">
         {/* Left Crest & Identification */}
         <div className="flex items-center gap-2.5 shrink-0">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-950/40 border border-amber-500/40 flex items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
@@ -1892,33 +1892,33 @@ export default function MasterAdminPage() {
         </div>
 
         {/* Global Stats Micro-badges */}
-        <div className="hidden xl:flex items-center gap-2 text-[11px]">
-          <div className="px-2.5 py-1 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-1.5 whitespace-nowrap">
+        <div className="hidden xl:flex items-center gap-1.5 text-[11px]">
+          <div className="px-2 py-1 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-1.5 whitespace-nowrap">
             <Building2 className="w-3.5 h-3.5 text-blue-400" />
             <span>Marcas: <strong className="text-white">{businesses.length}</strong></span>
           </div>
-          <div className="px-2.5 py-1 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-1.5 whitespace-nowrap">
+          <div className="px-2 py-1 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-1.5 whitespace-nowrap">
             <Store className="w-3.5 h-3.5 text-emerald-400" />
             <span>Sedes: <strong className="text-white">{stats?.totalBranches || 0}</strong></span>
           </div>
-          <div className="px-2.5 py-1 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-1.5 whitespace-nowrap">
+          <div className="hidden 2xl:flex px-2 py-1 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 items-center gap-1.5 whitespace-nowrap">
             <Users className="w-3.5 h-3.5 text-purple-400" />
-            <span>Data Lake: <strong className="text-white">{campaignParticipants.length + feedbacks.length} clientes</strong></span>
+            <span>Data Lake: <strong className="text-white">{campaignParticipants.length + feedbacks.length}</strong></span>
           </div>
-          <div className="px-2.5 py-1 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-1.5 whitespace-nowrap">
+          <div className="px-2 py-1 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-1.5 whitespace-nowrap">
             <DollarSign className="w-3.5 h-3.5 text-amber-400" />
-            <span>MRR Total: <strong className="text-amber-300">{formatMoneyCOP(stats?.mrr?.totalCOP || 1469000)}</strong></span>
+            <span>MRR: <strong className="text-amber-300">{formatMoneyCOP(stats?.mrr?.totalCOP || 1469000)}</strong></span>
           </div>
         </div>
 
         {/* Right Security & Control Buttons */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Privacy Masking Toggle */}
           <button
             type="button"
             onClick={() => setPrivacyMode(!privacyMode)}
             title="Modo Privacidad Bancaria (Ocultar cifras sensibles en pantalla)"
-            className={`px-3 py-1.5 rounded-xl border text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+            className={`px-2.5 py-1.5 rounded-xl border text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
               privacyMode
                 ? 'bg-amber-500/20 border-amber-500/50 text-amber-300'
                 : 'bg-[#141A26] border-slate-700 text-slate-300 hover:text-white'
@@ -1939,10 +1939,10 @@ export default function MasterAdminPage() {
               setShowSecurityConfigModal(true);
             }}
             title="Cambiar Llave Maestra y WhatsApp de Emergencia"
-            className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
           >
             <Key className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden sm:inline">Seguridad & Llaves</span>
+            <span className="hidden sm:inline">Seguridad</span>
           </button>
 
           {/* Refresh Data */}
@@ -1950,10 +1950,10 @@ export default function MasterAdminPage() {
             type="button"
             onClick={fetchMasterData}
             title="Actualizar datos en vivo de la base de datos (reseñas, negocios y métricas)"
-            className="px-2.5 py-1.5 rounded-xl bg-[#141A26] hover:bg-[#1a2232] border border-amber-500/30 text-amber-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="px-2.5 py-1.5 rounded-xl bg-[#141A26] hover:bg-[#1a2232] border border-amber-500/30 text-amber-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
           >
             <Database className={`w-3.5 h-3.5 text-amber-400 ${loadingData ? 'animate-pulse' : ''}`} />
-            <span className="hidden md:inline">Actualizar Datos</span>
+            <span className="hidden md:inline">Actualizar</span>
           </button>
 
           {/* Hard Cache Purge Button */}
@@ -1971,7 +1971,7 @@ export default function MasterAdminPage() {
               }
             }}
             title="Purgar Caché del Navegador y Forzar Descarga de la Última Versión del Sistema"
-            className="px-2.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="px-2.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
           >
             <Sparkles className="w-3.5 h-3.5 text-blue-400" />
             <span className="hidden md:inline">Purgar Caché</span>
@@ -1981,10 +1981,11 @@ export default function MasterAdminPage() {
           <button
             type="button"
             onClick={() => handleLockConsole('voluntary')}
-            className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+            title="Bloquear Consola de Dirección General"
+            className="px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap shrink-0"
           >
             <Lock className="w-3.5 h-3.5 text-rose-400" />
-            <span className="hidden sm:inline">Bloquear Consola</span>
+            <span>Bloquear</span>
           </button>
         </div>
       </header>
