@@ -5964,12 +5964,12 @@ export default function MasterAdminPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       {/* Card 1: Datos de la Empresa & Fiscales */}
                       <div className="p-4 sm:p-5 rounded-2xl bg-[#141A26] border border-slate-800 space-y-2.5">
-                        <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
-                          <p className="text-amber-400 text-xs uppercase font-extrabold tracking-wider flex items-center gap-1.5">
+                        <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+                          <p className="text-amber-400 text-xs uppercase font-extrabold tracking-wider flex items-center gap-1.5 min-w-0">
                             <span>🏛️</span>
-                            <span>Datos de la Empresa & Fiscales</span>
+                            <span className="truncate">Datos de la Empresa & Fiscales</span>
                           </p>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 whitespace-nowrap shrink-0">
                             Persona Jurídica
                           </span>
                         </div>
@@ -5997,12 +5997,12 @@ export default function MasterAdminPage() {
 
                       {/* Card 2: Representación Legal & Contrato */}
                       <div className="p-4 sm:p-5 rounded-2xl bg-[#141A26] border border-slate-800 space-y-2.5">
-                        <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
-                          <p className="text-blue-400 text-xs uppercase font-extrabold tracking-wider flex items-center gap-1.5">
+                        <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+                          <p className="text-blue-400 text-xs uppercase font-extrabold tracking-wider flex items-center gap-1.5 min-w-0">
                             <span>✍️</span>
-                            <span>Representante Legal & Contrato</span>
+                            <span className="truncate">Representante Legal & Contrato</span>
                           </p>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/30">
+                          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/30 whitespace-nowrap shrink-0">
                             Firmante Oficial
                           </span>
                         </div>
