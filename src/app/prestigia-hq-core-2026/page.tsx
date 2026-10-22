@@ -1173,6 +1173,13 @@ export default function MasterAdminPage() {
   const handleDownloadFichaPDF = (biz: Business) => {
     if (typeof window === 'undefined') return;
 
+    // Sanitize business name for Windows / OS file naming (no forbidden chars \ / : * ? " < > |)
+    const cleanBizName = (biz.name || 'Negocio')
+      .replace(/[\\/:*?"<>|]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const documentTitle = `Ficha de ${cleanBizName}`;
+
     const primaryBranch = biz.branches?.[0];
     const placeId = primaryBranch?.googlePlaceId || biz.id;
     const baselineRating = biz.baseline?.initialRating || 3.8;
@@ -1210,7 +1217,7 @@ export default function MasterAdminPage() {
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Ficha Técnica Oficial - ${biz.name} | Prestigia</title>
+  <title>${documentTitle}</title>
   <style>
     @page { size: letter; margin: 15mm; }
     body {
@@ -1330,10 +1337,10 @@ export default function MasterAdminPage() {
   <div class="no-print" style="background: #0f172a; color: white; padding: 12px 18px; margin-bottom: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
     <div style="display: flex; align-items: center; gap: 10px;">
       <span style="font-size: 18px;">📄</span>
-      <span><strong>Ficha Técnica Lista:</strong> Para descargar en PDF, selecciona <em>"Guardar como PDF"</em> en la ventana de impresión.</span>
+      <span><strong>Ficha Técnica Lista:</strong> Al guardar, el archivo se nombrará automáticamente <em>"${documentTitle}.pdf"</em>.</span>
     </div>
-    <button onclick="window.print()" style="background: #f59e0b; color: #000; font-weight: 800; border: none; padding: 10px 22px; border-radius: 8px; cursor: pointer; font-size: 13px;">
-      🖨️ Guardar como PDF / Imprimir
+    <button onclick="document.title='${documentTitle}'; window.print()" style="background: #f59e0b; color: #000; font-weight: 800; border: none; padding: 10px 22px; border-radius: 8px; cursor: pointer; font-size: 13px;">
+      🖨️ Guardar como PDF
     </button>
   </div>
 
@@ -1430,8 +1437,11 @@ export default function MasterAdminPage() {
   </div>
 
   <script>
+    document.title = ${JSON.stringify(documentTitle)};
     window.onload = function() {
+      document.title = ${JSON.stringify(documentTitle)};
       setTimeout(function() {
+        document.title = ${JSON.stringify(documentTitle)};
         window.print();
       }, 500);
     };
@@ -1443,6 +1453,7 @@ export default function MasterAdminPage() {
     printWindow.document.open();
     printWindow.document.write(htmlContent);
     printWindow.document.close();
+    printWindow.document.title = documentTitle;
   };
 
   // Quick Kill Switch / Toggle Business Status (Live Sync)
