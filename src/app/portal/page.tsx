@@ -3498,12 +3498,12 @@ export default function PortalPage() {
   // Current actor identity for resolution tracking & accountability
   const currentActorName =
     effectivePlan === 'independiente'
-      ? (lang === 'en' ? 'Dr. Carlos Mendoza (Specialist)' : 'Dr. Carlos Mendoza (Especialista)')
+      ? (session?.business.ownerName ? `${session.business.ownerName} (${lang === 'en' ? 'Owner / Specialist' : 'Titular / Especialista'})` : (lang === 'en' ? 'Owner / Specialist' : 'Titular / Especialista'))
       : session?.role === 'owner'
-      ? `${session.business.ownerName || 'Carlos Gómez'} ${lang === 'en' ? '(General Owner)' : '(Dueño General)'}`
+      ? `${session.business.ownerName || 'Titular General'} ${lang === 'en' ? '(General Owner)' : '(Dueño General)'}`
       : session?.activeManager
       ? `${session.activeManager.name} (${session.activeManager.role})`
-      : `${session?.activeBranch?.managerName || 'Andrés Ramírez'} (${session?.activeBranch?.managerRole || (lang === 'en' ? 'Manager ' + formatBranchName(session?.activeBranch?.name || 'Location', lang) : 'Encargado ' + (session?.activeBranch?.name || 'Sede'))})`;
+      : `${session?.activeBranch?.managerName || 'Encargado'} (${session?.activeBranch?.managerRole || (lang === 'en' ? 'Manager ' + formatBranchName(session?.activeBranch?.name || 'Location', lang) : 'Encargado ' + (session?.activeBranch?.name || 'Sede'))})`;
   const currentActorRole = effectivePlan === 'independiente' ? 'owner' : session?.role;
 
   // Helper to categorize complaint reasons for behavioural auditing
@@ -4120,8 +4120,8 @@ export default function PortalPage() {
       const defaultMsg =
         effectivePlan === 'independiente'
           ? (lang === 'en'
-              ? `Hello ${item.customerName}, this is Dr. Carlos Mendoza. I received your feedback regarding: "${localizedReason}". I sincerely apologize and would like to assist you directly. How can I resolve this with you today?`
-              : `Hola ${item.customerName}, te saluda el Dr. Carlos Mendoza. Recibí con atención tu comentario respecto a: "${item.complaintReason}". Te ofrezco una sincera disculpa y quiero atenderte directamente. ¿Cómo podemos solucionarlo hoy mismo?`)
+              ? `Hello ${item.customerName}, this is ${session?.business.ownerName || session?.business.name || 'our team'}. I received your feedback regarding: "${localizedReason}". I sincerely apologize and would like to assist you directly. How can I resolve this with you today?`
+              : `Hola ${item.customerName}, te saluda ${session?.business.ownerName || session?.business.name || 'nuestro equipo'}. Recibí con atención tu comentario respecto a: "${item.complaintReason}". Te ofrezco una sincera disculpa y quiero atenderte directamente. ¿Cómo podemos solucionarlo hoy mismo?`)
           : (lang === 'en'
               ? `Hello ${item.customerName}, this is management from ${session?.business.name || 'our team'}. We received your feedback regarding: "${localizedReason}". We sincerely apologize and want to make things right immediately. How can we resolve this with you today?`
               : `Hola ${item.customerName}, te saluda la gerencia de ${session?.business.name || 'nuestro equipo'}. Vimos con mucha atención tu comentario respecto a: "${item.complaintReason}". Queremos pedirte sinceras disculpas y compensarte de inmediato. ¿Cómo podemos resolverlo contigo hoy?`);
@@ -5961,25 +5961,8 @@ export default function PortalPage() {
   }, [hourlyBehaviorData]);
 
   // Selected Branch Object for QR generator
-  const independentPracticeBranch: Branch = useMemo(() => ({
-    id: 'consultorio-dr-carlos-mendoza',
-    name: 'Consultorio Privado Principal (Bogotá)',
-    address: 'Calle 93 # 14-20, Consultorio 502',
-    city: 'Bogotá',
-    locality: 'Chicó Norte',
-    managerPhone: '+573114567890',
-    status: 'active',
-    googlePlaceId: 'ChIJ_dr_carlos_mendoza_bogota',
-    googleReviewUrl: 'https://maps.google.com',
-    googleBusinessStatus: 'connected',
-    googleManagedBy: 'prestigia_central',
-    websiteUrl: 'https://drcarlosmendoza.com',
-  }), []);
-
   const currentBranchForQr =
-    effectivePlan === 'independiente'
-      ? independentPracticeBranch
-      : session?.role === 'branch_manager'
+    session?.role === 'branch_manager'
       ? session.activeBranch
       : selectedQrBranchId
       ? session?.branches.find((b) => b.id === selectedQrBranchId) || session?.branches[0]
@@ -5989,10 +5972,10 @@ export default function PortalPage() {
 
   // QR URL
   const qrTargetUrl =
-    effectivePlan === 'independiente'
-      ? (typeof window !== 'undefined' ? `${window.location.origin}/r/dr-carlos-mendoza` : 'http://localhost:3000/r/dr-carlos-mendoza')
-      : currentBranchForQr
+    currentBranchForQr
       ? (typeof window !== 'undefined' ? `${window.location.origin}/r/${currentBranchForQr.id}` : `http://localhost:3000/r/${currentBranchForQr.id}`)
+      : session?.business?.id
+      ? (typeof window !== 'undefined' ? `${window.location.origin}/r/${session.business.id}` : `http://localhost:3000/r/${session.business.id}`)
       : 'http://localhost:3000';
 
   // Selected Branch Object for Reactivation Campaign (Supports Global / Multisede & Specific Branches)
@@ -6594,7 +6577,7 @@ export default function PortalPage() {
       const formatLabel = format === 'sticker' ? 'Sticker_Circular' : format === 'card' ? 'Tarjeta_VIP' : 'Hablador_Stand_A6';
       const a = document.createElement('a');
       a.href = tableTentDataUrl;
-      const downloadEntityId = effectivePlan === 'independiente' ? 'DrCarlosMendoza' : `${session.business.id}_${currentBranchForQr.id}`;
+      const downloadEntityId = `${session.business.id}_${currentBranchForQr?.id || 'main'}`;
       a.download = `SmartQR_Prestigia_${formatLabel}_${downloadEntityId}_${style === 'print' ? 'Imprenta' : 'Digital'}.png`;
       document.body.appendChild(a);
       a.click();
@@ -11058,7 +11041,7 @@ export default function PortalPage() {
                                 handleResolveFeedback(
                                   item.id,
                                   undefined,
-                                  lang === 'en' ? 'Dr. Carlos Mendoza (Specialist)' : 'Dr. Carlos Mendoza (Especialista)'
+                                  session?.business.ownerName ? `${session.business.ownerName} (${lang === 'en' ? 'Specialist' : 'Especialista'})` : (lang === 'en' ? 'Specialist' : 'Especialista')
                                 );
                               } else if (effectiveRole === 'owner') {
                                 setSelectedResolverManager(
@@ -11408,16 +11391,14 @@ export default function PortalPage() {
                 {/* REALISTIC DYNAMIC MATERIAL MOCKUP (Stand, Sticker, Tarjeta) */}
                 <div className="flex flex-col items-center justify-center py-2 space-y-3">
                   {(() => {
-                    const ind = getIndustryLabels(effectivePlan === 'independiente' ? 'salud medicina consultorio' : session.business.category, lang);
-                    const brandColor = effectivePlan === 'independiente' ? '#10B981' : (brandIdentity.primaryColor || '#6366F1');
-                    const brandLogo = effectivePlan === 'independiente'
-                      ? 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80'
-                      : (brandIdentity.logoUrl || (session.business as any)?.logoUrl || '');
-                    const businessDisplayName = effectivePlan === 'independiente' ? 'DR. CARLOS MENDOZA' : (session.business.name || 'P').toUpperCase();
-                    const branchDisplayName = effectivePlan === 'independiente'
-                      ? (lang === 'en' ? 'CONSULTORIO PARTICULAR' : 'CONSULTORIO PARTICULAR')
-                      : formatBranchName(currentBranchForQr.name, lang).toUpperCase();
-                    const bInitial = effectivePlan === 'independiente' ? 'DR' : (session.business.name || 'P').charAt(0).toUpperCase();
+                    const ind = getIndustryLabels(session.business.category || (effectivePlan === 'independiente' ? 'servicios independientes' : 'comercio'), lang);
+                    const brandColor = brandIdentity.primaryColor || (session.business.branding as any)?.primaryColor || '#6366F1';
+                    const brandLogo = brandIdentity.logoUrl || (session.business as any)?.logoUrl || (session.business.branding as any)?.logoUrl || '';
+                    const businessDisplayName = (session.business.name || 'Prestigia').toUpperCase();
+                    const branchDisplayName = currentBranchForQr
+                      ? formatBranchName(currentBranchForQr.name, lang).toUpperCase()
+                      : (session.business.name || 'SEDE PRINCIPAL').toUpperCase();
+                    const bInitial = (session.business.name || 'P').charAt(0).toUpperCase();
 
                     if (qrPhysicalFormat === 'sticker') {
                       // ==========================================
@@ -11778,7 +11759,7 @@ export default function PortalPage() {
                   <div className="flex flex-wrap items-center justify-center gap-2">
                     <a
                       href={activeQrDisplayUrl}
-                      download={`SmartQR_Prestigia_${effectivePlan === 'independiente' ? 'DrCarlosMendoza' : currentBranchForQr.id}_${qrSize === 'print' ? 'Blanco' : 'Color'}.png`}
+                      download={`SmartQR_Prestigia_${currentBranchForQr?.id || session.business.id}_${qrSize === 'print' ? 'Blanco' : 'Color'}.png`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition active:scale-95 cursor-pointer ${
@@ -11941,7 +11922,7 @@ export default function PortalPage() {
                     }`}>{effectivePlan === 'independiente' ? (lang === 'en' ? 'Consultation QR Active' : 'QR de Consultorio Activo') : t.qr.statusTitle}</div>
                     <div className="text-[11px] text-emerald-500 font-semibold">
                       {effectivePlan === 'independiente'
-                        ? (lang === 'en' ? '✓ Routing to Dr. Carlos Mendoza Funnel' : '✓ Enrutamiento Activo a Dr. Carlos Mendoza')
+                        ? (lang === 'en' ? `✓ Routing to ${session.business.name} Funnel` : `✓ Enrutamiento Activo a ${session.business.name}`)
                         : t.qr.statusActive}
                     </div>
                   </div>
@@ -21463,12 +21444,12 @@ export default function PortalPage() {
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] text-slate-600 dark:text-slate-400 font-mono font-bold flex items-center gap-1">
                             <Lock className="w-2.5 h-2.5" />
-                            <span>{t.profile.clientIdLabel} <strong className="text-indigo-600 dark:text-indigo-400">{effectivePlan === 'independiente' ? 'carlos-mendoza' : session.business.id}</strong></span>
+                            <span>{t.profile.clientIdLabel} <strong className="text-indigo-600 dark:text-indigo-400">{session.business.id}</strong></span>
                           </span>
                           <button
                             type="button"
                             onClick={() => {
-                              navigator.clipboard.writeText(effectivePlan === 'independiente' ? 'carlos-mendoza' : session.business.id);
+                              navigator.clipboard.writeText(session.business.id);
                               setCopiedClientId(true);
                               setTimeout(() => setCopiedClientId(false), 2000);
                             }}
@@ -21635,7 +21616,7 @@ export default function PortalPage() {
                       <input
                         type="text"
                         readOnly
-                        value={effectivePlan === 'independiente' ? 'contacto@drcarlosmendoza.com' : (session.business.ownerEmail || `facturacion@${session.business.id}.com`)}
+                        value={session.business.ownerEmail || `facturacion@${session.business.id}.com`}
                         className={`w-full px-3.5 py-2 rounded-xl border text-xs font-bold font-mono cursor-not-allowed ${
                           theme === 'light'
                             ? 'bg-slate-100 border-slate-300 text-slate-950'
@@ -21661,11 +21642,11 @@ export default function PortalPage() {
                       type="button"
                       onClick={() => {
                         const phone = '573001234567';
-                        const curBizId = effectivePlan === 'independiente' ? 'carlos-mendoza' : session?.business.id;
+                        const curBizId = session?.business.id;
                         const message = encodeURIComponent(
                           lang === 'en'
                             ? `Hello Prestigia Support, I am ${profileOwnerName || 'Owner'} from "${profileName}" (ID: ${curBizId}, Tax ID: ${profileTaxId}). I request to officially update our practice information:`
-                            : `Hola Soporte Prestigia, soy ${profileOwnerName || 'Titular'} de "${profileName}" (ID: ${curBizId}, NIT/ID Fiscal: ${profileTaxId}). Solicito actualizar la información de mi consultorio:`
+                            : `Hola Soporte Prestigia, soy ${profileOwnerName || 'Titular'} de "${profileName}" (ID: ${curBizId}, NIT/ID Fiscal: ${profileTaxId}). Solicito actualizar la información de mi negocio:`
                         );
                         window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
                       }}
@@ -22832,9 +22813,7 @@ export default function PortalPage() {
                               const message = encodeURIComponent(
                                 lang === 'en'
                                   ? `Hello Prestigia Support, I am ${profileOwnerName || 'Owner'} from "${profileName}". I request to update the physical location or manager of branch: ${currentBranch?.name} (ID: ${currentBranch?.id}):`
-                                  : (effectivePlan === 'independiente'
-                                      ? `Hola Soporte Prestigia, soy el Dr. Carlos Mendoza. Solicito actualizar los datos físicos de mi consultorio privado: ${currentBranch?.name} (ID: ${currentBranch?.id}):`
-                                      : `Hola Soporte Prestigia, soy ${profileOwnerName || 'Titular'} de "${profileName}". Solicito actualizar los datos físicos o encargado de la sede: ${currentBranch?.name} (ID: ${currentBranch?.id}):`)
+                                  : `Hola Soporte Prestigia, soy ${profileOwnerName || 'Titular'} de "${profileName}". Solicito actualizar los datos físicos o encargado de la sede: ${currentBranch?.name} (ID: ${currentBranch?.id}):`
                               );
                               window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
                             }}
@@ -23281,7 +23260,7 @@ export default function PortalPage() {
                             <input
                               type="text"
                               readOnly
-                              value={profileBranches[activeBranchEditIdx].managerName || (effectivePlan === 'independiente' ? 'Dr. Carlos Mendoza' : 'Andrés Ramírez')}
+                              value={profileBranches[activeBranchEditIdx].managerName || session.business.ownerName || (lang === 'en' ? 'General Manager' : 'Encargado Principal')}
                               className={`w-full h-[38px] px-3 py-2 rounded-xl border text-xs font-bold cursor-not-allowed ${
                                 theme === 'light'
                                   ? 'bg-slate-100 border-slate-300 text-slate-950'
