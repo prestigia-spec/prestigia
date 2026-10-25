@@ -211,7 +211,10 @@ export default function RatingCapturePage() {
           return;
         }
 
-        const res = await fetch(`/api/businesses/${businessId}`);
+        const res = await fetch(`/api/businesses/${businessId}?t=${Date.now()}`, {
+          cache: 'no-store',
+          headers: { 'Pragma': 'no-cache' },
+        });
         const data = await res.json();
 
         if (!res.ok) {

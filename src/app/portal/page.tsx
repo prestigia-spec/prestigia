@@ -998,14 +998,18 @@ export default function PortalPage() {
             const imp = JSON.parse(masterImpersonation);
             localStorage.removeItem('prestigia_master_impersonation');
             if (imp && imp.businessId) {
-              const res = await fetch(`/api/businesses/${imp.businessId}`);
+              const res = await fetch(`/api/businesses/${imp.businessId}?t=${Date.now()}`, {
+                cache: 'no-store',
+                headers: { 'Pragma': 'no-cache' },
+              });
               if (res.ok) {
                 const data = await res.json();
-                const biz = data.rawBusiness || {
+                const biz = {
+                  ...(data.rawBusiness || {}),
                   id: data.businessId,
                   name: data.businessName,
                   category: data.category,
-                  status: data.status,
+                  status: data.status, // Authoritative status (active or suspended)
                   plan: data.plan,
                   masterAddOns: data.masterAddOns,
                   baseline: data.baseline,
@@ -1078,14 +1082,17 @@ export default function PortalPage() {
             }
 
             // Sincronización inmediata con Master (Planes, Add-ons, Suspensión)
-            fetch(`/api/businesses/${parsed.business.id}`)
+            fetch(`/api/businesses/${parsed.business.id}?t=${Date.now()}`, {
+              cache: 'no-store',
+              headers: { 'Pragma': 'no-cache' },
+            })
               .then((r) => r.json())
               .then((fresh) => {
                 if (fresh && (fresh.rawBusiness || fresh.businessId)) {
-                  const updatedBiz = fresh.rawBusiness || {
-                    ...parsed.business,
+                  const updatedBiz = {
+                    ...(fresh.rawBusiness || parsed.business),
+                    status: fresh.status || parsed.business.status, // Authoritative status
                     plan: fresh.plan || parsed.business.plan,
-                    status: fresh.status || parsed.business.status,
                     masterAddOns: fresh.masterAddOns !== undefined ? fresh.masterAddOns : parsed.business.masterAddOns,
                     branches: fresh.branches || parsed.business.branches,
                     branding: fresh.branding || parsed.business.branding,

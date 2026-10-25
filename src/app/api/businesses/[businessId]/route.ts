@@ -67,7 +67,16 @@ export async function GET(
       branches: business.branches || [],
       campaign: (await getCampaign(business.id, branch.id)) || null,
       branding: business.branding || null,
-      rawBusiness: business,
+      rawBusiness: {
+        ...business,
+        status: effectiveStatus,
+      },
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        Pragma: 'no-cache',
+        Expires: '0',
+      },
     });
   } catch (error) {
     console.error('Error fetching business/branch:', error);
