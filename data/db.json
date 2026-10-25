@@ -621,7 +621,7 @@
       "ownerName": "Camila Osorio",
       "ownerPhone": "+573145566778",
       "plan": "independiente",
-      "status": "active",
+      "status": "suspended",
       "trialEndsAt": "2026-12-31T23:59:59.000Z",
       "password": "admin",
       "category": "Fitness, Gimnasios & Deportes",
@@ -671,7 +671,7 @@
           "locality": "Poblado",
           "googleReviewUrl": "https://search.google.com/local/writereview?placeid=ChIJtitanfit",
           "managerPhone": "+573145566778",
-          "status": "active",
+          "status": "suspended",
           "websiteUrl": "https://titanfit.prestigia.com"
         }
       ],

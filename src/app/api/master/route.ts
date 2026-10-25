@@ -211,6 +211,12 @@ export async function GET(request: NextRequest) {
       trafficVisits: await getAllTrafficVisits(),
       leads: await getAllCommercialLeads(),
       emailDispatches: await getAllEmailDispatches(),
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        Pragma: 'no-cache',
+        Expires: '0',
+      },
     });
   } catch (error) {
     console.error('Error fetching master data:', error);

@@ -8721,7 +8721,9 @@ export default function PortalPage() {
   // =========================================================================
   // VIEW: CUENTA SUSPENDIDA POR ADMINISTRACIÓN CENTRAL MASTER
   // =========================================================================
-  if (session.business.status === 'suspended') {
+  const isMasterAuditAccess = Boolean((session as any)?.isMasterImpersonation);
+
+  if (session.business.status === 'suspended' && !isMasterAuditAccess) {
     return (
       <main className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 bg-[#070A12] text-white select-none">
         <div className="w-full max-w-lg p-6 sm:p-8 rounded-3xl bg-[#0D1424] border border-red-500/30 shadow-2xl shadow-red-500/10 text-center space-y-6">
@@ -8940,16 +8942,40 @@ export default function PortalPage() {
         </div>
       </aside>
 
-      {/* 👑 Impersonation Banner (When admin accessed from Master Console) */}
+      {/* 👑 Impersonation & Master Audit Banner */}
       {Boolean((session as any)?.isMasterImpersonation) && (
-        <div className="w-full bg-gradient-to-r from-purple-950 via-indigo-900 to-purple-950 border-b border-purple-500/50 py-2 px-4 text-center text-xs font-bold text-purple-200 flex flex-wrap items-center justify-center gap-3 shadow-lg z-40">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
-            <span>👑 ACCESO DIRECTO DESDE CONSOLA CENTRAL MASTER • IMPERSONANDO:</span>
-            <span className="text-white underline font-black">{session.business.name}</span>
-            <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] uppercase font-mono">
-              Plan: {session.business.plan}
-            </span>
+        <div
+          className={`w-full py-2.5 px-4 text-center text-xs font-bold flex flex-wrap items-center justify-between gap-3 shadow-xl z-50 transition-all ${
+            session.business.status === 'suspended'
+              ? 'bg-gradient-to-r from-red-950 via-rose-950 to-red-950 border-b-2 border-red-500 text-red-100'
+              : 'bg-gradient-to-r from-purple-950 via-indigo-900 to-purple-950 border-b border-purple-500/50 text-purple-200'
+          }`}
+        >
+          <div className="flex flex-wrap items-center gap-2 mx-auto">
+            {session.business.status === 'suspended' ? (
+              <>
+                <span className="w-2.5 h-2.5 rounded-full bg-red-400 animate-ping inline-block" />
+                <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-black tracking-widest uppercase shadow">
+                  ⛔ CUENTA O NEGOCIO SUSPENDIDO (KILL SWITCH ACTIVO)
+                </span>
+                <span className="text-red-200">
+                  • Acceso Privilegiado de Auditoría Master (El cliente y sus QRs están 100% bloqueados)
+                </span>
+                <span className="text-white underline font-black ml-1">{session.business.name}</span>
+                <span className="px-2 py-0.5 rounded bg-red-900/60 text-red-200 text-[10px] uppercase font-mono border border-red-500/40">
+                  Plan: {session.business.plan}
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping inline-block" />
+                <span>👑 ACCESO DIRECTO DESDE CONSOLA CENTRAL MASTER • IMPERSONANDO:</span>
+                <span className="text-white underline font-black">{session.business.name}</span>
+                <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] uppercase font-mono">
+                  Plan: {session.business.plan}
+                </span>
+              </>
+            )}
           </div>
           <button
             type="button"
@@ -8959,7 +8985,11 @@ export default function PortalPage() {
                 window.location.href = '/prestigia-hq-core-2026';
               }, 200);
             }}
-            className="px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-extrabold uppercase tracking-wider transition shadow cursor-pointer flex items-center gap-1.5"
+            className={`px-3 py-1 rounded-lg text-white text-[11px] font-extrabold uppercase tracking-wider transition shadow cursor-pointer flex items-center gap-1.5 shrink-0 ml-auto ${
+              session.business.status === 'suspended'
+                ? 'bg-red-600 hover:bg-red-500 ring-1 ring-red-400'
+                : 'bg-purple-600 hover:bg-purple-500'
+            }`}
           >
             <span>← Volver a Master</span>
           </button>

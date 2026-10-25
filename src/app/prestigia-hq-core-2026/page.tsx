@@ -473,7 +473,10 @@ export default function MasterAdminPage() {
   const fetchMasterData = async () => {
     setLoadingData(true);
     try {
-      const res = await fetch('/api/master');
+      const res = await fetch(`/api/master?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Pragma': 'no-cache' },
+      });
       const data = await res.json();
       if (data.success) {
         setBusinesses(data.businesses || []);
