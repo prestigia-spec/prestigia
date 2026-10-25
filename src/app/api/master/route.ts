@@ -232,11 +232,15 @@ export async function POST(request: NextRequest) {
 
     // -1. Public Gateway Security Status (used by login screen before auth)
     if (action === 'get_gateway_status') {
+      const storageKeys = Object.keys(process.env).filter(k => 
+        k.includes('KV') || k.includes('REDIS') || k.includes('POSTGRES') || k.includes('DATABASE') || k.includes('BLOB') || k.includes('STORAGE') || k.includes('SUPABASE') || k.includes('FIREBASE') || k.includes('VERCEL_')
+      );
       return NextResponse.json({
         success: true,
         twoFactorEnabled: Boolean(currentSec.twoFactorEnabled),
         maskedPhone: currentSec.emergencyPhone.replace(/(\+\d{2}\s?\d{3})\d{4}(\d{3})/, '$1 •••• $2'),
         maskedEmail: currentSec.emergencyEmail.replace(/(.{2})(.*)(@.*)/, '$1••••$3'),
+        storageKeys,
       });
     }
 
