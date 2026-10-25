@@ -1688,13 +1688,13 @@ export default function MasterAdminPage() {
 
         <div className="w-full max-w-md relative z-10">
           {/* Header & Crest */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-b from-amber-500/20 to-amber-950/40 border border-amber-500/40 shadow-2xl shadow-amber-500/10 mb-4 p-3 ring-1 ring-amber-400/20">
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className="flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-b from-amber-500/20 to-amber-950/40 border border-amber-500/40 shadow-2xl shadow-amber-500/10 mb-4 p-3 ring-1 ring-amber-400/20">
               <PrestigiaIcon className="w-12 h-12 text-amber-400 drop-shadow-md" />
             </div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold tracking-wider uppercase mb-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold tracking-wider uppercase mb-3">
               <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-              Consola Master Central Prestigia
+              <span>Consola Master Central Prestigia</span>
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-white">Autenticación de Grado Bancario</h1>
             <p className="text-xs text-slate-400 mt-1">
