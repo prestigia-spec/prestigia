@@ -800,8 +800,11 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Acción no reconocida en el Master Admin' }, { status: 400 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error handling master POST:', error);
-    return NextResponse.json({ error: 'Error interno en operación Master' }, { status: 500 });
+    return NextResponse.json({
+      error: 'Error interno en operación Master: ' + (error?.message || String(error)),
+      stack: error?.stack,
+    }, { status: 500 });
   }
 }
