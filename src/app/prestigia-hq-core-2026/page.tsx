@@ -479,7 +479,36 @@ export default function MasterAdminPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setBusinesses(data.businesses || []);
+        let effBusinesses: Business[] = data.businesses || [];
+        try {
+          const savedOverrides = localStorage.getItem('prestigia_master_status_overrides');
+          if (savedOverrides) {
+            const overrides = JSON.parse(savedOverrides);
+            effBusinesses = effBusinesses.map((b) => {
+              if (overrides[b.id] && overrides[b.id] !== b.status) {
+                // Cold start discrepancy detected: background re-sync to serverless container
+                fetch('/api/master', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    action: 'toggle_business_status',
+                    businessId: b.id,
+                    status: overrides[b.id],
+                  }),
+                }).catch(() => {});
+
+                return {
+                  ...b,
+                  status: overrides[b.id],
+                  branches: (b.branches || []).map((br) => ({ ...br, status: overrides[b.id] })),
+                };
+              }
+              return b;
+            });
+          }
+        } catch (e) {}
+
+        setBusinesses(effBusinesses);
         setFeedbacks(data.feedbacks || []);
         setGoogleReviews(data.googleReviews || []);
         setCampaignParticipants(data.campaignParticipants || []);
@@ -1205,6 +1234,28 @@ export default function MasterAdminPage() {
       });
       const data = await res.json();
       if (data.success) {
+        try {
+          const overrides = JSON.parse(localStorage.getItem('prestigia_master_status_overrides') || '{}');
+          overrides[biz.id] = newStatus;
+          localStorage.setItem('prestigia_master_status_overrides', JSON.stringify(overrides));
+        } catch {}
+
+        setBusinesses((prev) =>
+          prev.map((b) =>
+            b.id === biz.id
+              ? {
+                  ...b,
+                  status: newStatus,
+                  branches: (b.branches || []).map((br) => ({ ...br, status: newStatus })),
+                }
+              : b
+          )
+        );
+
+        if (selectedBusinessId === biz.id) {
+          setAddonState((prev) => ({ ...prev, status: newStatus }));
+        }
+
         setNotification({ type: 'success', message: data.message });
         setTimeout(() => setNotification(null), 4000);
         fetchMasterData();
@@ -2703,7 +2754,12 @@ export default function MasterAdminPage() {
               <div className="flex items-center gap-2 bg-[#141A26] p-1.5 rounded-2xl border border-slate-800">
                 <button
                   type="button"
-                  onClick={() => setAddonState({ ...addonState, status: 'active' })}
+                  onClick={() => {
+                    if (currentBusiness && currentBusiness.status === 'suspended') {
+                      handleToggleBusinessStatus(currentBusiness);
+                    }
+                  }}
+                  title={currentBusiness.status === 'suspended' ? 'Clic para reactivar el negocio (Bank Guard)' : 'La cuenta ya se encuentra activa'}
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
                     addonState.status === 'active'
                       ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
@@ -2715,7 +2771,12 @@ export default function MasterAdminPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setAddonState({ ...addonState, status: 'suspended' })}
+                  onClick={() => {
+                    if (currentBusiness && currentBusiness.status !== 'suspended') {
+                      handleToggleBusinessStatus(currentBusiness);
+                    }
+                  }}
+                  title={currentBusiness.status !== 'suspended' ? 'Clic para suspender inmediatamente (Bank Guard)' : 'La cuenta ya se encuentra suspendida'}
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
                     addonState.status === 'suspended'
                       ? 'bg-red-500 text-white shadow-md shadow-red-500/20'

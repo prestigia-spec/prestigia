@@ -72,6 +72,34 @@ export interface MasterSecurityConfig {
   updatedAt: string;
 }
 
+const KV_REST_API_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+
+async function syncWithRemoteKv(): Promise<void> {
+  if (!KV_REST_API_URL || !KV_REST_API_TOKEN) return;
+  try {
+    const res = await fetch(`${KV_REST_API_URL}/get/prestigia_db`, {
+      headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` },
+      cache: 'no-store',
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.result) {
+        const parsed = typeof data.result === 'string' ? JSON.parse(data.result) : data.result;
+        if (parsed && Array.isArray(parsed.businesses)) {
+          memoryDb = parsed;
+          try {
+            if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+            fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), 'utf-8');
+          } catch {}
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[DB] KV fetch warning:', err);
+  }
+}
+
 function ensureDbFile(): DatabaseSchema {
   if (memoryDb) {
     return memoryDb;
@@ -126,6 +154,18 @@ function writeDbFile(data: DatabaseSchema): void {
   } catch (err: any) {
     console.warn('[DB] writeDbFile warning:', err?.message);
   }
+
+  // Background broadcast to remote KV if configured
+  if (KV_REST_API_URL && KV_REST_API_TOKEN) {
+    fetch(`${KV_REST_API_URL}/set/prestigia_db`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${KV_REST_API_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(JSON.stringify(data)),
+    }).catch((err) => console.warn('[DB] KV sync write warning:', err));
+  }
 }
 
 /**
@@ -134,6 +174,7 @@ function writeDbFile(data: DatabaseSchema): void {
 export async function getBranchOrBusiness(
   idOrSlug: string
 ): Promise<{ business: Business; branch: Branch } | null> {
+  await syncWithRemoteKv();
   const db = ensureDbFile();
   const target = idOrSlug.toLowerCase().trim();
 
@@ -161,6 +202,7 @@ export async function getBranchOrBusiness(
 }
 
 export async function getBusinessById(id: string): Promise<Business | null> {
+  await syncWithRemoteKv();
   const db = ensureDbFile();
   const business = db.businesses.find(
     (b) => b.id.toLowerCase() === id.toLowerCase().trim()
@@ -169,6 +211,7 @@ export async function getBusinessById(id: string): Promise<Business | null> {
 }
 
 export async function getAllBusinesses(): Promise<Business[]> {
+  await syncWithRemoteKv();
   const db = ensureDbFile();
   return db.businesses;
 }
