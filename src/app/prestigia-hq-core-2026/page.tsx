@@ -1485,16 +1485,15 @@ export default function MasterAdminPage() {
     const list = businesses.filter((biz) => {
       const isArchived = Boolean((biz as any).isArchived);
 
-      // 0. Status filter: los archivados quedan fuera de la lista general ("all") para no hacer bulto
-      if (selectedStatusFilter === 'all') {
-        if (isArchived) return false;
-      } else if (selectedStatusFilter === 'active') {
+      // 0. Status filter
+      if (selectedStatusFilter === 'active') {
         if (biz.status === 'suspended' || isArchived) return false;
       } else if (selectedStatusFilter === 'suspended') {
         if (biz.status !== 'suspended' || isArchived) return false;
       } else if (selectedStatusFilter === 'archived') {
         if (!isArchived) return false;
       }
+      // Cuando selectedStatusFilter === 'all' se muestran todos los estados
 
       // 1. Plan filter
       if (selectedPlanFilter !== 'all' && biz.plan !== selectedPlanFilter) return false;
@@ -1547,47 +1546,32 @@ export default function MasterAdminPage() {
     });
 
     return {
-      all: active + suspended, // Lista general limpia (no incluye archivados para no hacer bulto)
+      all: businesses.length, // Total contando los 3 estados (activos + suspendidos + archivados)
       active,
       suspended,
       archived,
-      totalWithArchived: businesses.length,
     };
   }, [businesses]);
 
   const planCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: 0, independiente: 0, pro: 0, elite: 0, empresarial: 0 };
+    const counts: Record<string, number> = { all: businesses.length, independiente: 0, pro: 0, elite: 0, empresarial: 0 };
     businesses.forEach((b) => {
-      const isArchived = Boolean((b as any).isArchived);
-      if (selectedStatusFilter === 'archived') {
-        if (!isArchived) return;
-      } else {
-        if (isArchived) return;
-      }
-      counts.all++;
       if (counts[b.plan] !== undefined) counts[b.plan]++;
     });
     return counts;
-  }, [businesses, selectedStatusFilter]);
+  }, [businesses]);
 
   const nicheCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: 0 };
+    const counts: Record<string, number> = { all: businesses.length };
     PRESTIGIA_NICHES.forEach((n) => { counts[n.id] = 0; });
     businesses.forEach((b) => {
-      const isArchived = Boolean((b as any).isArchived);
-      if (selectedStatusFilter === 'archived') {
-        if (!isArchived) return;
-      } else {
-        if (isArchived) return;
-      }
-      counts.all++;
       const badge = getNicheBadge(b.category);
       if (counts[badge.id] !== undefined) {
         counts[badge.id]++;
       }
     });
     return counts;
-  }, [businesses, selectedStatusFilter]);
+  }, [businesses]);
 
   // Unified Global Data Lake (Habeas Data & Lead Matrix: 80 Clientes Reales)
   const unifiedDataLakeRecords = useMemo(() => {
