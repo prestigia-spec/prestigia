@@ -931,6 +931,7 @@ export default function MasterAdminPage() {
   const [googleDetectError, setGoogleDetectError] = useState<string | null>(null);
   const [isGoogleSynced, setIsGoogleSynced] = useState(false);
 
+  const [customCountryMode, setCustomCountryMode] = useState(false);
   const [customCityMode, setCustomCityMode] = useState(false);
   const [onboardForm, setOnboardForm] = useState({
     id: '',
@@ -3052,6 +3053,7 @@ export default function MasterAdminPage() {
                   setGoogleDetectSuccess(null);
                   setIsGoogleSynced(false);
                   setDetectedGoogleProfile(null);
+                  setCustomCountryMode(false);
                   setCustomCityMode(false);
                   setOnboardForm({
                     id: '',
@@ -5951,98 +5953,142 @@ export default function MasterAdminPage() {
                   </span>
                 </div>
 
-                {/* Fila 1: Ubicación Geográfica (País y Ciudad Dependiente) */}
+                {/* Fila 1: Ubicación Geográfica (País y Ciudad Dependiente, con Modo Manual Libre) */}
                 {(() => {
                   const countryObj = PRESTIGIA_COUNTRIES.find((c) => c.id === onboardForm.country);
                   const americaCountries = PRESTIGIA_COUNTRIES.filter((c) => c.region === 'América');
                   const europaCountries = PRESTIGIA_COUNTRIES.filter((c) => c.region === 'Europa');
                   const otherCountries = PRESTIGIA_COUNTRIES.filter((c) => c.region === 'Internacional');
+                  const isCountryFilled = Boolean(onboardForm.country && onboardForm.country.trim());
 
                   return (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3.5 rounded-2xl bg-[#0F141F] border border-blue-500/20 shadow-md">
                       {/* Columna 1: País de Operación */}
                       <div>
-                        <label className="block text-slate-200 font-semibold mb-1 flex items-center justify-between">
-                          <span className="flex items-center gap-1.5">
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-slate-200 font-semibold flex items-center gap-1.5">
                             <Globe className="w-3.5 h-3.5 text-blue-400" />
                             1° País de Operación *
-                          </span>
-                          {countryObj ? (
-                            <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
-                              {countryObj.flag} Prefijo: {countryObj.prefix}
-                            </span>
-                          ) : (
-                            <span className="text-[10px] text-amber-400 font-bold">Selecciona primero</span>
-                          )}
-                        </label>
-                        <select
-                          required
-                          value={onboardForm.country}
-                          onChange={(e) => {
-                            const newCountryId = e.target.value;
-                            const newCountry = PRESTIGIA_COUNTRIES.find((c) => c.id === newCountryId);
-                            setCustomCityMode(false);
-                            if (newCountry) {
-                              setOnboardForm((prev) => {
-                                let newPhone = prev.ownerPhone;
-                                const knownPrefixes = PRESTIGIA_COUNTRIES.map((c) => c.prefix);
-                                const matchedPrefix = knownPrefixes.find((pfx) => pfx && newPhone.startsWith(pfx));
-                                if (matchedPrefix || !newPhone || newPhone.trim() === '') {
-                                  newPhone = newCountry.prefix + ' ';
-                                }
-                                return {
-                                  ...prev,
-                                  country: newCountryId,
-                                  ownerPhone: newPhone,
-                                  city: newCountry.defaultCity || newCountry.cities[0] || '',
-                                };
-                              });
-                            } else {
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const next = !customCountryMode;
+                              setCustomCountryMode(next);
+                              if (next) {
+                                setCustomCityMode(true);
+                              }
+                            }}
+                            className="text-[10px] text-amber-400 hover:text-amber-300 underline font-medium cursor-pointer"
+                          >
+                            {customCountryMode ? '📋 Elegir de la lista' : '✍️ Escribir país a mano'}
+                          </button>
+                        </div>
+
+                        {customCountryMode ? (
+                          <input
+                            type="text"
+                            required
+                            autoFocus
+                            value={onboardForm.country}
+                            onChange={(e) => {
+                              const val = e.target.value;
                               setOnboardForm((prev) => ({
                                 ...prev,
-                                country: '',
-                                city: '',
+                                country: val,
                               }));
-                            }
-                          }}
-                          className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 cursor-pointer font-medium text-xs"
-                        >
-                          <option value="">-- Elige el País de Operación --</option>
-                          <optgroup label={`🌎 América (${americaCountries.length} países)`}>
-                            {americaCountries.map((c) => (
-                              <option key={c.id} value={c.id}>
-                                {c.label} ({c.taxLabel.split(' ')[0]} • {c.prefix})
-                              </option>
-                            ))}
-                          </optgroup>
-                          <optgroup label={`🌍 Europa (${europaCountries.length} países)`}>
-                            {europaCountries.map((c) => (
-                              <option key={c.id} value={c.id}>
-                                {c.label} ({c.taxLabel.split(' ')[0]} • {c.prefix})
-                              </option>
-                            ))}
-                          </optgroup>
-                          <optgroup label="🌐 Internacional">
-                            {otherCountries.map((c) => (
-                              <option key={c.id} value={c.id}>
-                                {c.label} ({c.prefix})
-                              </option>
-                            ))}
-                          </optgroup>
-                        </select>
+                            }}
+                            placeholder="Escribe el nombre del país (ej: Australia, Japón, etc.)"
+                            className="w-full bg-[#141A26] border border-amber-500/60 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 text-xs font-medium"
+                          />
+                        ) : (
+                          <select
+                            required
+                            value={onboardForm.country}
+                            onChange={(e) => {
+                              const newCountryId = e.target.value;
+                              if (newCountryId === '__custom_country__') {
+                                setCustomCountryMode(true);
+                                setCustomCityMode(true);
+                                setOnboardForm((prev) => ({
+                                  ...prev,
+                                  country: '',
+                                  city: '',
+                                }));
+                                return;
+                              }
+                              const newCountry = PRESTIGIA_COUNTRIES.find((c) => c.id === newCountryId);
+                              setCustomCityMode(false);
+                              if (newCountry) {
+                                setOnboardForm((prev) => {
+                                  let newPhone = prev.ownerPhone;
+                                  const knownPrefixes = PRESTIGIA_COUNTRIES.map((c) => c.prefix);
+                                  const matchedPrefix = knownPrefixes.find((pfx) => pfx && newPhone.startsWith(pfx));
+                                  if (matchedPrefix || !newPhone || newPhone.trim() === '') {
+                                    newPhone = newCountry.prefix + ' ';
+                                  }
+                                  return {
+                                    ...prev,
+                                    country: newCountryId,
+                                    ownerPhone: newPhone,
+                                    city: newCountry.defaultCity || newCountry.cities[0] || '',
+                                  };
+                                });
+                              } else {
+                                setOnboardForm((prev) => ({
+                                  ...prev,
+                                  country: '',
+                                  city: '',
+                                }));
+                              }
+                            }}
+                            className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 cursor-pointer font-medium text-xs"
+                          >
+                            <option value="">-- Elige el País de Operación --</option>
+                            <optgroup label={`🌎 América (${americaCountries.length} países)`}>
+                              {americaCountries.map((c) => (
+                                <option key={c.id} value={c.id}>
+                                  {c.label} ({c.taxLabel.split(' ')[0]} • {c.prefix})
+                                </option>
+                              ))}
+                            </optgroup>
+                            <optgroup label={`🌍 Europa (${europaCountries.length} países)`}>
+                              {europaCountries.map((c) => (
+                                <option key={c.id} value={c.id}>
+                                  {c.label} ({c.taxLabel.split(' ')[0]} • {c.prefix})
+                                </option>
+                              ))}
+                            </optgroup>
+                            <optgroup label="🌐 Internacional">
+                              {otherCountries.map((c) => (
+                                <option key={c.id} value={c.id}>
+                                  {c.label} ({c.prefix})
+                                </option>
+                              ))}
+                            </optgroup>
+                            <option value="__custom_country__">✍️ Otro país no listado (Escribir a mano)...</option>
+                          </select>
+                        )}
+
                         <p className="text-[10px] text-slate-400 mt-1">
-                          Al seleccionar el país se activará la casilla de ciudades y el prefijo de contacto.
+                          {customCountryMode ? (
+                            <span className="text-amber-400/90 font-medium">✍️ Modo manual: Puedes escribir cualquier país del mundo.</span>
+                          ) : countryObj ? (
+                            <span className="text-emerald-400 font-medium">✓ {countryObj.flag} Prefijo: {countryObj.prefix} • {countryObj.taxLabel.split(' ')[0]}</span>
+                          ) : (
+                            'Al seleccionar o escribir el país se activará la casilla de ciudad.'
+                          )}
                         </p>
                       </div>
 
-                      {/* Columna 2: Ciudad de Operación (Bloqueada hasta elegir país) */}
+                      {/* Columna 2: Ciudad de Operación (Bloqueada hasta definir país) */}
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <label className="text-slate-200 font-semibold flex items-center gap-1.5">
                             <MapPin className="w-3.5 h-3.5 text-amber-400" />
                             2° Ciudad de Operación *
                           </label>
-                          {countryObj && (
+                          {countryObj && !customCountryMode && (
                             <button
                               type="button"
                               onClick={() => {
@@ -6058,19 +6104,19 @@ export default function MasterAdminPage() {
                           )}
                         </div>
 
-                        {!countryObj ? (
+                        {!isCountryFilled ? (
                           <div className="w-full bg-[#0B0F17] border border-dashed border-slate-800 text-slate-500 rounded-xl px-3.5 py-2.5 text-xs flex items-center gap-2 cursor-not-allowed select-none opacity-70">
                             <Lock className="w-3.5 h-3.5 text-amber-500/70 shrink-0" />
-                            <span className="font-medium">🔒 Bloqueado: Selecciona primero el país a la izquierda</span>
+                            <span className="font-medium">🔒 Bloqueado: Selecciona o escribe primero el país a la izquierda</span>
                           </div>
-                        ) : customCityMode ? (
+                        ) : customCountryMode || !countryObj || customCityMode ? (
                           <input
                             type="text"
                             required
-                            autoFocus
+                            autoFocus={customCountryMode || customCityMode}
                             value={onboardForm.city}
                             onChange={(e) => setOnboardForm({ ...onboardForm, city: e.target.value })}
-                            placeholder={`Escribe cualquier municipio de ${countryObj.label.split(' ')[0]}`}
+                            placeholder={countryObj ? `Escribe cualquier municipio de ${countryObj.label.split(' ')[0]}` : `Escribe la ciudad de ${onboardForm.country || 'la sede'}`}
                             className="w-full bg-[#141A26] border border-amber-500/60 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 text-xs font-medium"
                           />
                         ) : (
@@ -6098,11 +6144,15 @@ export default function MasterAdminPage() {
                         )}
 
                         <p className="text-[10px] text-slate-400 mt-1">
-                          {!countryObj
-                            ? 'Este campo se desbloqueará en cuanto elijas el país.'
-                            : customCityMode
-                            ? `✍️ Escribe libremente cualquier ciudad o municipio de ${countryObj.label.split(' ')[0]}.`
-                            : `✓ ${countryObj.cities.length} ciudades principales disponibles para selección directa.`}
+                          {!isCountryFilled ? (
+                            'Este campo se desbloqueará en cuanto elijas o escribas el país.'
+                          ) : customCountryMode || !countryObj ? (
+                            <span className="text-emerald-400">✓ País activo: <strong>{onboardForm.country}</strong>. Escribe la ciudad libremente.</span>
+                          ) : customCityMode ? (
+                            `✍️ Escribe libremente cualquier ciudad o municipio de ${countryObj.label.split(' ')[0]}.`
+                          ) : (
+                            `✓ ${countryObj.cities.length} ciudades principales disponibles para selección directa.`
+                          )}
                         </p>
                       </div>
                     </div>
