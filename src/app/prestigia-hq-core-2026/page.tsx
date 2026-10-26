@@ -95,12 +95,589 @@ const PLAN_BADGES: Record<string, { label: string; color: string; border: string
   empresarial: { label: 'Empresarial', color: 'bg-purple-500/10 text-purple-400', border: 'border-purple-500/30' },
 };
 
-const PRESTIGIA_COUNTRIES = [
-  { id: 'Colombia (NIT)', label: 'Colombia 🇨🇴', flag: '🇨🇴', prefix: '+57', taxLabel: 'NIT / Cédula Tributaria', taxPlaceholder: '901.458.723-1', defaultCity: 'Bogotá' },
-  { id: 'Chile (RUT)', label: 'Chile 🇨🇱', flag: '🇨🇱', prefix: '+56', taxLabel: 'RUT Comercial', taxPlaceholder: '76.432.198-5', defaultCity: 'Santiago' },
-  { id: 'México (RFC)', label: 'México 🇲🇽', flag: '🇲🇽', prefix: '+52', taxLabel: 'RFC Fiscal', taxPlaceholder: 'OPG180415XYZ', defaultCity: 'Ciudad de México' },
-  { id: 'España (CIF/NIF)', label: 'España 🇪🇸', flag: '🇪🇸', prefix: '+34', taxLabel: 'NIF / CIF Tributario', taxPlaceholder: 'B-12345678', defaultCity: 'Madrid' },
-  { id: 'Estados Unidos (EIN)', label: 'Estados Unidos 🇺🇸', flag: '🇺🇸', prefix: '+1', taxLabel: 'EIN / Tax ID', taxPlaceholder: '12-3456789', defaultCity: 'Miami' },
+const PRESTIGIA_COUNTRIES: {
+  id: string;
+  label: string;
+  region: 'América' | 'Europa' | 'Internacional';
+  flag: string;
+  prefix: string;
+  taxLabel: string;
+  taxPlaceholder: string;
+  defaultCity: string;
+  cities: string[];
+}[] = [
+  // 🌎 AMÉRICA (20 países)
+  {
+    id: 'Colombia (NIT)',
+    label: 'Colombia 🇨🇴',
+    region: 'América',
+    flag: '🇨🇴',
+    prefix: '+57',
+    taxLabel: 'NIT / Cédula Tributaria',
+    taxPlaceholder: '901.458.723-1',
+    defaultCity: 'Bogotá',
+    cities: [
+      'Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga',
+      'Pereira', 'Santa Marta', 'Manizales', 'Cúcuta', 'Ibagué', 'Pasto',
+      'Villavicencio', 'Montería', 'Valledupar', 'Armenia', 'Popayán', 'Neiva',
+      'Sincelejo', 'Tunja', 'Rionegro', 'Envigado', 'Chía', 'Floridablanca'
+    ],
+  },
+  {
+    id: 'México (RFC)',
+    label: 'México 🇲🇽',
+    region: 'América',
+    flag: '🇲🇽',
+    prefix: '+52',
+    taxLabel: 'RFC Fiscal',
+    taxPlaceholder: 'OPG180415XYZ',
+    defaultCity: 'Ciudad de México',
+    cities: [
+      'Ciudad de México', 'Guadalajara', 'Monterrey', 'Puebla', 'Tijuana', 'Querétaro',
+      'Mérida', 'Cancún', 'León', 'Toluca', 'Ciudad Juárez', 'San Luis Potosí',
+      'Hermosillo', 'Aguascalientes', 'Veracruz', 'Morelia', 'Cuernavaca', 'Chihuahua',
+      'Zapopan', 'San Pedro Garza García', 'Playa del Carmen'
+    ],
+  },
+  {
+    id: 'Estados Unidos (EIN)',
+    label: 'Estados Unidos 🇺🇸',
+    region: 'América',
+    flag: '🇺🇸',
+    prefix: '+1',
+    taxLabel: 'EIN / Tax ID',
+    taxPlaceholder: '12-3456789',
+    defaultCity: 'Miami',
+    cities: [
+      'Miami', 'Nueva York', 'Los Ángeles', 'Houston', 'Chicago', 'Dallas',
+      'Orlando', 'San Antonio', 'Austin', 'Phoenix', 'San Diego', 'Las Vegas',
+      'San Francisco', 'Atlanta', 'Seattle', 'Boston', 'Denver', 'Washington D.C.',
+      'Tampa', 'Fort Lauderdale'
+    ],
+  },
+  {
+    id: 'Canadá (BN)',
+    label: 'Canadá 🇨🇦',
+    region: 'América',
+    flag: '🇨🇦',
+    prefix: '+1',
+    taxLabel: 'Business Number (BN)',
+    taxPlaceholder: '123456789 RT0001',
+    defaultCity: 'Toronto',
+    cities: [
+      'Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Edmonton', 'Ottawa',
+      'Quebec', 'Winnipeg', 'Halifax', 'Victoria', 'Mississauga'
+    ],
+  },
+  {
+    id: 'Argentina (CUIT)',
+    label: 'Argentina 🇦🇷',
+    region: 'América',
+    flag: '🇦🇷',
+    prefix: '+54',
+    taxLabel: 'CUIT Fiscal',
+    taxPlaceholder: '30-71234567-8',
+    defaultCity: 'Buenos Aires',
+    cities: [
+      'Buenos Aires', 'Córdoba', 'Rosario', 'Mendoza', 'La Plata', 'Mar del Plata',
+      'San Miguel de Tucumán', 'Salta', 'Santa Fe', 'Neuquén', 'Bariloche', 'San Juan'
+    ],
+  },
+  {
+    id: 'Chile (RUT)',
+    label: 'Chile 🇨🇱',
+    region: 'América',
+    flag: '🇨🇱',
+    prefix: '+56',
+    taxLabel: 'RUT Comercial',
+    taxPlaceholder: '76.432.198-5',
+    defaultCity: 'Santiago',
+    cities: [
+      'Santiago', 'Valparaíso', 'Concepción', 'Viña del Mar', 'Antofagasta', 'Temuco',
+      'La Serena', 'Rancagua', 'Iquique', 'Puerto Montt', 'Chillán', 'Arica', 'Talca'
+    ],
+  },
+  {
+    id: 'Brasil (CNPJ)',
+    label: 'Brasil 🇧🇷',
+    region: 'América',
+    flag: '🇧🇷',
+    prefix: '+55',
+    taxLabel: 'CNPJ / CPF',
+    taxPlaceholder: '12.345.678/0001-90',
+    defaultCity: 'São Paulo',
+    cities: [
+      'São Paulo', 'Rio de Janeiro', 'Brasília', 'Salvador', 'Fortaleza',
+      'Belo Horizonte', 'Curitiba', 'Recife', 'Porto Alegre', 'Manaus', 'Florianópolis'
+    ],
+  },
+  {
+    id: 'Perú (RUC)',
+    label: 'Perú 🇵🇪',
+    region: 'América',
+    flag: '🇵🇪',
+    prefix: '+51',
+    taxLabel: 'RUC Comercial',
+    taxPlaceholder: '20512345678',
+    defaultCity: 'Lima',
+    cities: [
+      'Lima', 'Arequipa', 'Trujillo', 'Chiclayo', 'Cusco', 'Piura',
+      'Huancayo', 'Iquitos', 'Tacna', 'Pucallpa', 'Chimbote', 'Ica'
+    ],
+  },
+  {
+    id: 'Ecuador (RUC)',
+    label: 'Ecuador 🇪🇨',
+    region: 'América',
+    flag: '🇪🇨',
+    prefix: '+593',
+    taxLabel: 'RUC Fiscal',
+    taxPlaceholder: '1791234567001',
+    defaultCity: 'Quito',
+    cities: [
+      'Quito', 'Guayaquil', 'Cuenca', 'Santo Domingo', 'Machala',
+      'Manta', 'Portoviejo', 'Ambato', 'Loja', 'Riobamba', 'Esmeraldas'
+    ],
+  },
+  {
+    id: 'Panamá (RUC)',
+    label: 'Panamá 🇵🇦',
+    region: 'América',
+    flag: '🇵🇦',
+    prefix: '+507',
+    taxLabel: 'RUC / DV',
+    taxPlaceholder: '155612345-2-2021',
+    defaultCity: 'Ciudad de Panamá',
+    cities: [
+      'Ciudad de Panamá', 'San Miguelito', 'David', 'Colón', 'La Chorrera',
+      'Santiago de Veraguas', 'Penonomé', 'Chitré', 'Boquete'
+    ],
+  },
+  {
+    id: 'Costa Rica (Cédula Jurídica)',
+    label: 'Costa Rica 🇨🇷',
+    region: 'América',
+    flag: '🇨🇷',
+    prefix: '+506',
+    taxLabel: 'Cédula Jurídica / Física',
+    taxPlaceholder: '3-101-123456',
+    defaultCity: 'San José',
+    cities: [
+      'San José', 'Alajuela', 'Cartago', 'Heredia', 'Puntarenas',
+      'Liberia', 'Limón', 'Escazú', 'Santa Ana'
+    ],
+  },
+  {
+    id: 'República Dominicana (RNC)',
+    label: 'República Dominicana 🇩🇴',
+    region: 'América',
+    flag: '🇩🇴',
+    prefix: '+1-809',
+    taxLabel: 'RNC / Cédula',
+    taxPlaceholder: '1-31-12345-6',
+    defaultCity: 'Santo Domingo',
+    cities: [
+      'Santo Domingo', 'Santiago de los Caballeros', 'Punta Cana', 'La Romana',
+      'San Cristóbal', 'Puerto Plata', 'San Pedro de Macorís', 'Higüey'
+    ],
+  },
+  {
+    id: 'Guatemala (NIT)',
+    label: 'Guatemala 🇬🇹',
+    region: 'América',
+    flag: '🇬🇹',
+    prefix: '+502',
+    taxLabel: 'NIT Fiscal',
+    taxPlaceholder: '1234567-8',
+    defaultCity: 'Ciudad de Guatemala',
+    cities: [
+      'Ciudad de Guatemala', 'Mixco', 'Villa Nueva', 'Quetzaltenango',
+      'Antigua Guatemala', 'Escuintla', 'Chinautla'
+    ],
+  },
+  {
+    id: 'El Salvador (NIT)',
+    label: 'El Salvador 🇸🇻',
+    region: 'América',
+    flag: '🇸🇻',
+    prefix: '+503',
+    taxLabel: 'NIT / NRC',
+    taxPlaceholder: '0614-123456-101-0',
+    defaultCity: 'San Salvador',
+    cities: [
+      'San Salvador', 'Santa Ana', 'San Miguel', 'Soyapango',
+      'Ilopango', 'Antiguo Cuscatlán', 'Santa Tecla'
+    ],
+  },
+  {
+    id: 'Honduras (RTN)',
+    label: 'Honduras 🇭🇳',
+    region: 'América',
+    flag: '🇭🇳',
+    prefix: '+504',
+    taxLabel: 'RTN Tributario',
+    taxPlaceholder: '08011990123456',
+    defaultCity: 'Tegucigalpa',
+    cities: [
+      'Tegucigalpa', 'San Pedro Sula', 'Choloma', 'La Ceiba',
+      'El Progreso', 'Comayagua', 'Roatán'
+    ],
+  },
+  {
+    id: 'Nicaragua (RUC)',
+    label: 'Nicaragua 🇳🇮',
+    region: 'América',
+    flag: '🇳🇮',
+    prefix: '+505',
+    taxLabel: 'RUC Comercial',
+    taxPlaceholder: 'J0310000123456',
+    defaultCity: 'Managua',
+    cities: [
+      'Managua', 'León', 'Masaya', 'Matagalpa',
+      'Chinandega', 'Granada', 'Estelí'
+    ],
+  },
+  {
+    id: 'Bolivia (NIT)',
+    label: 'Bolivia 🇧🇴',
+    region: 'América',
+    flag: '🇧🇴',
+    prefix: '+591',
+    taxLabel: 'NIT Tributario',
+    taxPlaceholder: '1023456789',
+    defaultCity: 'Santa Cruz de la Sierra',
+    cities: [
+      'Santa Cruz de la Sierra', 'La Paz', 'Cochabamba',
+      'Sucre', 'Tarija', 'Oruro', 'Potosí'
+    ],
+  },
+  {
+    id: 'Paraguay (RUC)',
+    label: 'Paraguay 🇵🇾',
+    region: 'América',
+    flag: '🇵🇾',
+    prefix: '+595',
+    taxLabel: 'RUC Fiscal',
+    taxPlaceholder: '80012345-6',
+    defaultCity: 'Asunción',
+    cities: [
+      'Asunción', 'Ciudad del Este', 'San Lorenzo',
+      'Luque', 'Encarnación', 'Capiatá'
+    ],
+  },
+  {
+    id: 'Uruguay (RUT)',
+    label: 'Uruguay 🇺🇾',
+    region: 'América',
+    flag: '🇺🇾',
+    prefix: '+598',
+    taxLabel: 'RUT Comercial',
+    taxPlaceholder: '21.123456.0018',
+    defaultCity: 'Montevideo',
+    cities: [
+      'Montevideo', 'Punta del Este', 'Ciudad de la Costa',
+      'Salto', 'Paysandú', 'Maldonado'
+    ],
+  },
+  {
+    id: 'Puerto Rico (EIN)',
+    label: 'Puerto Rico 🇵🇷',
+    region: 'América',
+    flag: '🇵🇷',
+    prefix: '+1-787',
+    taxLabel: 'EIN / Reg. Comerciante',
+    taxPlaceholder: '12-3456789',
+    defaultCity: 'San Juan',
+    cities: [
+      'San Juan', 'Bayamón', 'Ponce', 'Carolina',
+      'Caguas', 'Mayagüez', 'Guaynabo', 'Dorado'
+    ],
+  },
+
+  // 🌍 EUROPA (20 países)
+  {
+    id: 'España (CIF/NIF)',
+    label: 'España 🇪🇸',
+    region: 'Europa',
+    flag: '🇪🇸',
+    prefix: '+34',
+    taxLabel: 'NIF / CIF Tributario',
+    taxPlaceholder: 'B-12345678',
+    defaultCity: 'Madrid',
+    cities: [
+      'Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Zaragoza', 'Málaga',
+      'Murcia', 'Palma de Mallorca', 'Las Palmas de Gran Canaria', 'Bilbao',
+      'Alicante', 'Córdoba', 'Valladolid', 'Vigo', 'Granada', 'San Sebastián'
+    ],
+  },
+  {
+    id: 'Reino Unido (VAT)',
+    label: 'Reino Unido 🇬🇧',
+    region: 'Europa',
+    flag: '🇬🇧',
+    prefix: '+44',
+    taxLabel: 'UTR / VAT Number',
+    taxPlaceholder: 'GB123456789',
+    defaultCity: 'Londres',
+    cities: [
+      'Londres', 'Mánchester', 'Birmingham', 'Edimburgo', 'Glasgow',
+      'Liverpool', 'Bristol', 'Leeds', 'Sheffield', 'Belfast', 'Newcastle'
+    ],
+  },
+  {
+    id: 'Francia (SIRET)',
+    label: 'Francia 🇫🇷',
+    region: 'Europa',
+    flag: '🇫🇷',
+    prefix: '+33',
+    taxLabel: 'SIRET / SIREN',
+    taxPlaceholder: '123 456 789 00012',
+    defaultCity: 'París',
+    cities: [
+      'París', 'Marsella', 'Lyon', 'Toulouse', 'Niza', 'Nantes',
+      'Estrasburgo', 'Montpellier', 'Burdeos', 'Lille', 'Rennes'
+    ],
+  },
+  {
+    id: 'Italia (P.IVA)',
+    label: 'Italia 🇮🇹',
+    region: 'Europa',
+    flag: '🇮🇹',
+    prefix: '+39',
+    taxLabel: 'Partita IVA / Codice Fiscale',
+    taxPlaceholder: 'IT12345678901',
+    defaultCity: 'Roma',
+    cities: [
+      'Roma', 'Milán', 'Nápoles', 'Turín', 'Palermo', 'Génova',
+      'Bolonia', 'Florencia', 'Bari', 'Venecia', 'Verona'
+    ],
+  },
+  {
+    id: 'Alemania (USt-IdNr)',
+    label: 'Alemania 🇩🇪',
+    region: 'Europa',
+    flag: '🇩🇪',
+    prefix: '+49',
+    taxLabel: 'Steuernummer / USt-IdNr',
+    taxPlaceholder: 'DE123456789',
+    defaultCity: 'Berlín',
+    cities: [
+      'Berlín', 'Múnich', 'Fráncfort', 'Hamburgo', 'Colonia',
+      'Stuttgart', 'Düsseldorf', 'Leipzig', 'Dortmund', 'Dresde'
+    ],
+  },
+  {
+    id: 'Portugal (NIF)',
+    label: 'Portugal 🇵🇹',
+    region: 'Europa',
+    flag: '🇵🇹',
+    prefix: '+351',
+    taxLabel: 'NIF / NIPC',
+    taxPlaceholder: '501234567',
+    defaultCity: 'Lisboa',
+    cities: [
+      'Lisboa', 'Oporto', 'Vila Nova de Gaia', 'Amadora', 'Braga',
+      'Coímbra', 'Funchal', 'Faro', 'Setúbal', 'Cascais'
+    ],
+  },
+  {
+    id: 'Países Bajos (BTW)',
+    label: 'Países Bajos 🇳🇱',
+    region: 'Europa',
+    flag: '🇳🇱',
+    prefix: '+31',
+    taxLabel: 'KVK / BTW-nummer',
+    taxPlaceholder: 'NL123456789B01',
+    defaultCity: 'Ámsterdam',
+    cities: [
+      'Ámsterdam', 'Róterdam', 'La Haya', 'Utrecht',
+      'Eindhoven', 'Groninga', 'Tilburgo', 'Breda'
+    ],
+  },
+  {
+    id: 'Suiza (UID)',
+    label: 'Suiza 🇨🇭',
+    region: 'Europa',
+    flag: '🇨🇭',
+    prefix: '+41',
+    taxLabel: 'UID / IDE',
+    taxPlaceholder: 'CHE-123.456.789',
+    defaultCity: 'Zúrich',
+    cities: [
+      'Zúrich', 'Ginebra', 'Basilea', 'Lausana',
+      'Berna', 'Lucerna', 'Lugano', 'San Galo'
+    ],
+  },
+  {
+    id: 'Bélgica (BCE)',
+    label: 'Bélgica 🇧🇪',
+    region: 'Europa',
+    flag: '🇧🇪',
+    prefix: '+32',
+    taxLabel: "Numéro d'entreprise (BCE)",
+    taxPlaceholder: 'BE 0123.456.789',
+    defaultCity: 'Bruselas',
+    cities: [
+      'Bruselas', 'Amberes', 'Gante', 'Charleroi',
+      'Lieja', 'Brujas', 'Namur', 'Lovaina'
+    ],
+  },
+  {
+    id: 'Austria (UID)',
+    label: 'Austria 🇦🇹',
+    region: 'Europa',
+    flag: '🇦🇹',
+    prefix: '+43',
+    taxLabel: 'UID-Nummer',
+    taxPlaceholder: 'ATU12345678',
+    defaultCity: 'Viena',
+    cities: [
+      'Viena', 'Graz', 'Linz', 'Salzburgo', 'Innsbruck', 'Klagenfurt'
+    ],
+  },
+  {
+    id: 'Irlanda (TRN)',
+    label: 'Irlanda 🇮🇪',
+    region: 'Europa',
+    flag: '🇮🇪',
+    prefix: '+353',
+    taxLabel: 'Tax Reference (TRN)',
+    taxPlaceholder: '1234567T',
+    defaultCity: 'Dublín',
+    cities: [
+      'Dublín', 'Cork', 'Galway', 'Limerick', 'Waterford'
+    ],
+  },
+  {
+    id: 'Suecia (Org.nr)',
+    label: 'Suecia 🇸🇪',
+    region: 'Europa',
+    flag: '🇸🇪',
+    prefix: '+46',
+    taxLabel: 'Organisationsnummer',
+    taxPlaceholder: '556123-4567',
+    defaultCity: 'Estocolmo',
+    cities: [
+      'Estocolmo', 'Gotemburgo', 'Malmö', 'Uppsala', 'Linköping'
+    ],
+  },
+  {
+    id: 'Noruega (Org.nr)',
+    label: 'Noruega 🇳🇴',
+    region: 'Europa',
+    flag: '🇳🇴',
+    prefix: '+47',
+    taxLabel: 'Organisasjonsnummer',
+    taxPlaceholder: '912 345 678 MVA',
+    defaultCity: 'Oslo',
+    cities: [
+      'Oslo', 'Bergen', 'Trondheim', 'Stavanger', 'Drammen', 'Tromsø'
+    ],
+  },
+  {
+    id: 'Dinamarca (CVR)',
+    label: 'Dinamarca 🇩🇰',
+    region: 'Europa',
+    flag: '🇩🇰',
+    prefix: '+45',
+    taxLabel: 'CVR-nummer',
+    taxPlaceholder: 'DK12345678',
+    defaultCity: 'Copenhague',
+    cities: [
+      'Copenhague', 'Aarhus', 'Odense', 'Aalborg', 'Esbjerg'
+    ],
+  },
+  {
+    id: 'Polonia (NIP)',
+    label: 'Polonia 🇵🇱',
+    region: 'Europa',
+    flag: '🇵🇱',
+    prefix: '+48',
+    taxLabel: 'NIP Fiscal',
+    taxPlaceholder: '123-456-78-90',
+    defaultCity: 'Varsovia',
+    cities: [
+      'Varsovia', 'Cracovia', 'Łódź', 'Breslavia (Wrocław)', 'Poznań', 'Gdansk'
+    ],
+  },
+  {
+    id: 'Grecia (AFM)',
+    label: 'Grecia 🇬🇷',
+    region: 'Europa',
+    flag: '🇬🇷',
+    prefix: '+30',
+    taxLabel: 'AFM / ΑΦΜ',
+    taxPlaceholder: 'EL123456789',
+    defaultCity: 'Atenas',
+    cities: [
+      'Atenas', 'Salónica', 'Patras', 'Heraclión', 'Larisa', 'Volos'
+    ],
+  },
+  {
+    id: 'República Checa (DIČ)',
+    label: 'República Checa 🇨🇿',
+    region: 'Europa',
+    flag: '🇨🇿',
+    prefix: '+420',
+    taxLabel: 'DIČ / IČO',
+    taxPlaceholder: 'CZ12345678',
+    defaultCity: 'Praga',
+    cities: [
+      'Praga', 'Brno', 'Ostrava', 'Pilsen (Plzeň)', 'Liberec'
+    ],
+  },
+  {
+    id: 'Rumania (CIF)',
+    label: 'Rumania 🇷🇴',
+    region: 'Europa',
+    flag: '🇷🇴',
+    prefix: '+40',
+    taxLabel: 'CIF / CUI',
+    taxPlaceholder: 'RO12345678',
+    defaultCity: 'Bucarest',
+    cities: [
+      'Bucarest', 'Cluj-Napoca', 'Timișoara', 'Iași', 'Constanța', 'Brașov'
+    ],
+  },
+  {
+    id: 'Hungría (Adószám)',
+    label: 'Hungría 🇭🇺',
+    region: 'Europa',
+    flag: '🇭🇺',
+    prefix: '+36',
+    taxLabel: 'Adószám',
+    taxPlaceholder: '12345678-2-41',
+    defaultCity: 'Budapest',
+    cities: [
+      'Budapest', 'Debrecen', 'Szeged', 'Miskolc', 'Pécs'
+    ],
+  },
+  {
+    id: 'Finlandia (Y-tunnus)',
+    label: 'Finlandia 🇫🇮',
+    region: 'Europa',
+    flag: '🇫🇮',
+    prefix: '+358',
+    taxLabel: 'Y-tunnus (ALV)',
+    taxPlaceholder: '1234567-8',
+    defaultCity: 'Helsinki',
+    cities: [
+      'Helsinki', 'Espoo', 'Tampere', 'Vantaa', 'Oulu', 'Turku'
+    ],
+  },
+
+  // 🌐 INTERNACIONAL
+  {
+    id: 'Otro País (Internacional)',
+    label: 'Otro País (Internacional) 🌐',
+    region: 'Internacional',
+    flag: '🌐',
+    prefix: '+',
+    taxLabel: 'Tax ID / ID Fiscal',
+    taxPlaceholder: 'TAX-ID-12345',
+    defaultCity: 'Ciudad Principal',
+    cities: ['Ciudad Principal', 'Sede Central'],
+  },
 ];
 
 // Zero-Trust Masking Helpers for Confidential Contact Channels
@@ -337,18 +914,19 @@ export default function MasterAdminPage() {
   const [googleDetectError, setGoogleDetectError] = useState<string | null>(null);
   const [isGoogleSynced, setIsGoogleSynced] = useState(false);
 
+  const [customCityMode, setCustomCityMode] = useState(false);
   const [onboardForm, setOnboardForm] = useState({
     id: '',
     name: '',
     legalName: '',
     category: PRESTIGIA_NICHES[0].label,
-    country: 'Colombia (NIT)',
-    city: 'Bogotá',
-    locality: 'Chapinero',
+    country: '',
+    city: '',
+    locality: '',
     address: '',
     plan: 'pro' as BusinessPlan,
     ownerName: '',
-    ownerPhone: '+57',
+    ownerPhone: '',
     ownerEmail: '',
     logoUrl: '',
     taxId: '',
@@ -1151,14 +1729,28 @@ export default function MasterAdminPage() {
           const finalName = prev.name.trim() ? prev.name : detectedNameClean;
           const finalId = prev.id.trim() ? prev.id : finalName.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
           const finalAddress = prev.address.trim() ? prev.address : (detectedAddress || '');
-          const finalCity = (prev.city.trim() && prev.city !== 'Bogotá') ? prev.city : (detectedCity || prev.city || 'Bogotá');
-          const finalLocality = (prev.locality.trim() && prev.locality !== 'Chapinero' && prev.locality !== 'Principal') ? prev.locality : (detectedLocality || prev.locality || 'Principal');
+
+          let detectedCountry = prev.country;
+          if (!detectedCountry && detectedAddress) {
+            const matchedCountry = PRESTIGIA_COUNTRIES.find((c) =>
+              detectedAddress.toLowerCase().includes(c.label.split(' ')[0].toLowerCase()) ||
+              c.cities.some((ct) => detectedAddress.toLowerCase().includes(ct.toLowerCase()))
+            );
+            if (matchedCountry) {
+              detectedCountry = matchedCountry.id;
+            }
+          }
+
+          const finalCountry = prev.country ? prev.country : detectedCountry;
+          const finalCity = prev.city.trim() ? prev.city : (detectedCity || '');
+          const finalLocality = prev.locality.trim() ? prev.locality : (detectedLocality || '');
 
           return {
             ...prev,
             name: finalName,
             id: finalId,
             address: finalAddress,
+            country: finalCountry,
             city: finalCity,
             locality: finalLocality,
             initialRating: rating,
@@ -2443,18 +3035,19 @@ export default function MasterAdminPage() {
                   setGoogleDetectSuccess(null);
                   setIsGoogleSynced(false);
                   setDetectedGoogleProfile(null);
+                  setCustomCityMode(false);
                   setOnboardForm({
                     id: '',
                     name: '',
                     legalName: '',
                     category: PRESTIGIA_NICHES[0].label,
-                    country: 'Colombia (NIT)',
-                    city: 'Bogotá',
-                    locality: 'Chapinero',
+                    country: '',
+                    city: '',
+                    locality: '',
                     address: '',
                     plan: 'pro' as BusinessPlan,
                     ownerName: '',
-                    ownerPhone: '+57',
+                    ownerPhone: '',
                     ownerEmail: '',
                     logoUrl: '',
                     taxId: '',
@@ -5341,42 +5934,179 @@ export default function MasterAdminPage() {
                   </span>
                 </div>
 
-                {/* Fila 1: País de Operación & Nicho / Industria */}
+                {/* Fila 1: Ubicación Geográfica (País y Ciudad Dependiente) */}
+                {(() => {
+                  const countryObj = PRESTIGIA_COUNTRIES.find((c) => c.id === onboardForm.country);
+                  const americaCountries = PRESTIGIA_COUNTRIES.filter((c) => c.region === 'América');
+                  const europaCountries = PRESTIGIA_COUNTRIES.filter((c) => c.region === 'Europa');
+                  const otherCountries = PRESTIGIA_COUNTRIES.filter((c) => c.region === 'Internacional');
+
+                  return (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3.5 rounded-2xl bg-[#0F141F] border border-blue-500/20 shadow-md">
+                      {/* Columna 1: País de Operación */}
+                      <div>
+                        <label className="block text-slate-200 font-semibold mb-1 flex items-center justify-between">
+                          <span className="flex items-center gap-1.5">
+                            <Globe className="w-3.5 h-3.5 text-blue-400" />
+                            1° País de Operación *
+                          </span>
+                          {countryObj ? (
+                            <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                              {countryObj.flag} Prefijo: {countryObj.prefix}
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-amber-400 font-bold">Selecciona primero</span>
+                          )}
+                        </label>
+                        <select
+                          required
+                          value={onboardForm.country}
+                          onChange={(e) => {
+                            const newCountryId = e.target.value;
+                            const newCountry = PRESTIGIA_COUNTRIES.find((c) => c.id === newCountryId);
+                            setCustomCityMode(false);
+                            if (newCountry) {
+                              setOnboardForm((prev) => {
+                                let newPhone = prev.ownerPhone;
+                                const knownPrefixes = PRESTIGIA_COUNTRIES.map((c) => c.prefix);
+                                const matchedPrefix = knownPrefixes.find((pfx) => pfx && newPhone.startsWith(pfx));
+                                if (matchedPrefix || !newPhone || newPhone.trim() === '') {
+                                  newPhone = newCountry.prefix + ' ';
+                                }
+                                return {
+                                  ...prev,
+                                  country: newCountryId,
+                                  ownerPhone: newPhone,
+                                  city: newCountry.defaultCity || newCountry.cities[0] || '',
+                                };
+                              });
+                            } else {
+                              setOnboardForm((prev) => ({
+                                ...prev,
+                                country: '',
+                                city: '',
+                              }));
+                            }
+                          }}
+                          className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 cursor-pointer font-medium text-xs"
+                        >
+                          <option value="">-- Elige el País de Operación --</option>
+                          <optgroup label="🌎 América (20 países)">
+                            {americaCountries.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.label} ({c.taxLabel.split(' ')[0]} • {c.prefix})
+                              </option>
+                            ))}
+                          </optgroup>
+                          <optgroup label="🌍 Europa (20 países)">
+                            {europaCountries.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.label} ({c.taxLabel.split(' ')[0]} • {c.prefix})
+                              </option>
+                            ))}
+                          </optgroup>
+                          <optgroup label="🌐 Internacional">
+                            {otherCountries.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.label} ({c.prefix})
+                              </option>
+                            ))}
+                          </optgroup>
+                        </select>
+                        <p className="text-[10px] text-slate-400 mt-1">
+                          Al seleccionar el país se activará la casilla de ciudades y el prefijo de contacto.
+                        </p>
+                      </div>
+
+                      {/* Columna 2: Ciudad de Operación (Bloqueada hasta elegir país) */}
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-slate-200 font-semibold flex items-center gap-1.5">
+                            <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                            2° Ciudad de Operación *
+                          </label>
+                          {countryObj && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCustomCityMode(!customCityMode);
+                                if (!customCityMode && !onboardForm.city) {
+                                  setOnboardForm({ ...onboardForm, city: '' });
+                                }
+                              }}
+                              className="text-[10px] text-amber-400 hover:text-amber-300 underline font-medium cursor-pointer"
+                            >
+                              {customCityMode ? '📋 Elegir de la lista' : '✍️ Escribir otra ciudad'}
+                            </button>
+                          )}
+                        </div>
+
+                        {!countryObj ? (
+                          <div className="w-full bg-[#0B0F17] border border-dashed border-slate-800 text-slate-500 rounded-xl px-3.5 py-2.5 text-xs flex items-center gap-2 cursor-not-allowed select-none opacity-70">
+                            <Lock className="w-3.5 h-3.5 text-amber-500/70 shrink-0" />
+                            <span className="font-medium">🔒 Bloqueado: Selecciona primero el país a la izquierda</span>
+                          </div>
+                        ) : customCityMode ? (
+                          <input
+                            type="text"
+                            required
+                            autoFocus
+                            value={onboardForm.city}
+                            onChange={(e) => setOnboardForm({ ...onboardForm, city: e.target.value })}
+                            placeholder={`Escribe cualquier municipio de ${countryObj.label.split(' ')[0]}`}
+                            className="w-full bg-[#141A26] border border-amber-500/60 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 text-xs font-medium"
+                          />
+                        ) : (
+                          <select
+                            required
+                            value={onboardForm.city}
+                            onChange={(e) => {
+                              if (e.target.value === '__custom__') {
+                                setCustomCityMode(true);
+                                setOnboardForm({ ...onboardForm, city: '' });
+                              } else {
+                                setOnboardForm({ ...onboardForm, city: e.target.value });
+                              }
+                            }}
+                            className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 cursor-pointer font-medium text-xs"
+                          >
+                            <option value="">-- Elige una ciudad de {countryObj.label.split(' ')[0]} --</option>
+                            {countryObj.cities.map((city) => (
+                              <option key={city} value={city}>
+                                📍 {city}
+                              </option>
+                            ))}
+                            <option value="__custom__">✍️ Otra ciudad no listada (Escribir a mano)...</option>
+                          </select>
+                        )}
+
+                        <p className="text-[10px] text-slate-400 mt-1">
+                          {!countryObj
+                            ? 'Este campo se desbloqueará en cuanto elijas el país.'
+                            : customCityMode
+                            ? `✍️ Escribe libremente cualquier ciudad o municipio de ${countryObj.label.split(' ')[0]}.`
+                            : `✓ ${countryObj.cities.length} ciudades principales disponibles para selección directa.`}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Fila 2: Localidad / Zona / Barrio & Nicho / Industria */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1 flex items-center justify-between">
-                      <span>País de Operación *</span>
-                      <span className="text-[10px] text-amber-400 font-bold">Moneda & Prefijo</span>
+                    <label className="block text-slate-300 font-medium mb-1">
+                      Localidad / Barrio / Zona *
                     </label>
-                    <select
+                    <input
+                      type="text"
                       required
-                      value={onboardForm.country}
-                      onChange={(e) => {
-                        const newCountryId = e.target.value;
-                        const countryObj = PRESTIGIA_COUNTRIES.find((c) => c.id === newCountryId) || PRESTIGIA_COUNTRIES[0];
-                        setOnboardForm((prev) => {
-                          let newPhone = prev.ownerPhone;
-                          const knownPrefixes = PRESTIGIA_COUNTRIES.map((c) => c.prefix);
-                          const matchedPrefix = knownPrefixes.find((pfx) => newPhone.startsWith(pfx));
-                          if (matchedPrefix || !newPhone || newPhone.trim() === '') {
-                            newPhone = countryObj.prefix + ' ';
-                          }
-                          return {
-                            ...prev,
-                            country: newCountryId,
-                            ownerPhone: newPhone,
-                            city: prev.city === 'Bogotá' || !prev.city ? countryObj.defaultCity : prev.city,
-                          };
-                        });
-                      }}
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 cursor-pointer font-medium"
-                    >
-                      {PRESTIGIA_COUNTRIES.map((country) => (
-                        <option key={country.id} value={country.id}>
-                          {country.label} ({country.taxLabel} • {country.prefix})
-                        </option>
-                      ))}
-                    </select>
+                      value={onboardForm.locality}
+                      onChange={(e) => setOnboardForm({ ...onboardForm, locality: e.target.value })}
+                      placeholder="Ej: Chapinero / Polanco / Palermo / Providencia"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 text-xs"
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1">Sector o barrio específico de la sede principal.</p>
                   </div>
 
                   <div>
@@ -5385,7 +6115,7 @@ export default function MasterAdminPage() {
                       required
                       value={onboardForm.category}
                       onChange={(e) => setOnboardForm({ ...onboardForm, category: e.target.value })}
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 cursor-pointer font-medium"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 cursor-pointer font-medium text-xs"
                     >
                       {PRESTIGIA_NICHES.map((niche) => (
                         <option key={niche.id} value={niche.label}>
@@ -5393,10 +6123,11 @@ export default function MasterAdminPage() {
                         </option>
                       ))}
                     </select>
+                    <p className="text-[10px] text-slate-400 mt-1">Sector comercial para segmentación de analítica.</p>
                   </div>
                 </div>
 
-                {/* Fila 2: Nombre Comercial de la Marca & Identificador Slug */}
+                {/* Fila 3: Nombre Comercial de la Marca & Identificador Slug */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-slate-300 font-medium mb-1 flex items-center justify-between">
@@ -5418,7 +6149,7 @@ export default function MasterAdminPage() {
                         });
                       }}
                       placeholder="Ej: La Taquería del Sol"
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 font-medium"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 font-medium text-xs"
                     />
                     <p className="text-[10px] text-slate-400 mt-1">Escribe el nombre comercial oficial que verán tus clientes.</p>
                   </div>
@@ -5430,7 +6161,7 @@ export default function MasterAdminPage() {
                       value={onboardForm.id}
                       onChange={(e) => setOnboardForm({ ...onboardForm, id: e.target.value })}
                       placeholder="la-taqueria-del-sol"
-                      className="w-full bg-[#141A26] border border-slate-700 text-amber-400 font-mono rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                      className="w-full bg-[#141A26] border border-slate-700 text-amber-400 font-mono rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 text-xs"
                     />
                     <p className="text-[10px] text-slate-400 mt-1">
                       Enlace público QR: <span className="font-mono text-slate-300">prestigia.app/r/{onboardForm.id || 'slug'}</span>
@@ -5438,12 +6169,12 @@ export default function MasterAdminPage() {
                   </div>
                 </div>
 
-                {/* Fila 3: Logotipo de la Marca & Razón Social Registrada */}
+                {/* Fila 4: Logotipo de la Marca & Razón Social Registrada */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-slate-300 font-medium mb-1 flex items-center justify-between">
-                      <span>Logotipo de la Marca (Opcional)</span>
-                      <span className="text-[10px] text-slate-400">URL de imagen</span>
+                      <span>Logotipo de la Marca (URL de Imagen)</span>
+                      <span className="text-[10px] text-amber-400">Previsualizador en Vivo</span>
                     </label>
                     <div className="flex items-center gap-2.5">
                       <div className="w-10 h-10 rounded-xl bg-[#0E121B] border border-slate-700 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
@@ -5480,13 +6211,13 @@ export default function MasterAdminPage() {
                       value={onboardForm.legalName}
                       onChange={(e) => setOnboardForm({ ...onboardForm, legalName: e.target.value })}
                       placeholder="Ej: Operadora Gastronómica del Sol S.A.S."
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 text-xs"
                     />
                     <p className="text-[10px] text-slate-400 mt-1">Si es igual a la marca o persona natural, puedes dejarlo igual.</p>
                   </div>
                 </div>
 
-                {/* Fila 4: Identificación Tributaria (NIT/RUT/RFC/NIF) & Dirección Física */}
+                {/* Fila 5: Identificación Tributaria (NIT/RUT/RFC/NIF) & Dirección Física */}
                 {(() => {
                   const countryObj = PRESTIGIA_COUNTRIES.find((c) => c.id === onboardForm.country) || PRESTIGIA_COUNTRIES[0];
                   return (
@@ -5502,7 +6233,7 @@ export default function MasterAdminPage() {
                           value={onboardForm.taxId}
                           onChange={(e) => setOnboardForm({ ...onboardForm, taxId: e.target.value })}
                           placeholder={`Ej: ${countryObj.taxPlaceholder}`}
-                          className="w-full bg-[#141A26] border border-slate-700 text-amber-300 font-mono rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                          className="w-full bg-[#141A26] border border-slate-700 text-amber-300 font-mono rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 text-xs"
                         />
                         <p className="text-[10px] text-slate-400 mt-1">Número de identificación tributaria para facturación.</p>
                       </div>
@@ -5517,7 +6248,7 @@ export default function MasterAdminPage() {
                           value={onboardForm.address}
                           onChange={(e) => setOnboardForm({ ...onboardForm, address: e.target.value })}
                           placeholder="Ej: Cra. 13 #82-28, Chapinero"
-                          className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                          className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 text-xs"
                         />
                         <p className="text-[10px] text-slate-400 mt-1">Escribe la dirección física real o afina la de Google.</p>
                       </div>
@@ -5525,47 +6256,23 @@ export default function MasterAdminPage() {
                   );
                 })()}
 
-                {/* Fila 5: Ciudad, Localidad / Zona & Plan Contratado */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-slate-300 font-medium mb-1">Ciudad *</label>
-                    <input
-                      type="text"
-                      required
-                      value={onboardForm.city}
-                      onChange={(e) => setOnboardForm({ ...onboardForm, city: e.target.value })}
-                      placeholder="Bogotá"
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-300 font-medium mb-1">Localidad / Zona *</label>
-                    <input
-                      type="text"
-                      required
-                      value={onboardForm.locality}
-                      onChange={(e) => setOnboardForm({ ...onboardForm, locality: e.target.value })}
-                      placeholder="Zona Rosa / Usaquén"
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
-                    />
-                  </div>
+                {/* Fila 6: Plan Inicial Contratado & Representante Legal */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-slate-300 font-medium mb-1">Plan Inicial Contratado *</label>
                     <select
                       value={onboardForm.plan}
                       onChange={(e) => setOnboardForm({ ...onboardForm, plan: e.target.value as BusinessPlan })}
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 capitalize cursor-pointer font-medium"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 capitalize cursor-pointer font-medium text-xs"
                     >
                       <option value="independiente">Plan Independiente ($49k)</option>
                       <option value="pro">Plan Pro ($120k)</option>
                       <option value="elite">Plan Élite ($290k)</option>
                       <option value="empresarial">Plan Empresarial ($690k)</option>
                     </select>
+                    <p className="text-[10px] text-slate-400 mt-1">Nivel de servicio y capacidad de sedes asignado.</p>
                   </div>
-                </div>
 
-                {/* Fila 6: Titular / Firmante, WhatsApp & Correo Electrónico (3 Columnas) */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-slate-300 font-medium mb-1">
                       Representante Legal / Titular *
@@ -5576,11 +6283,14 @@ export default function MasterAdminPage() {
                       value={onboardForm.ownerName}
                       onChange={(e) => setOnboardForm({ ...onboardForm, ownerName: e.target.value })}
                       placeholder="Mario Casas"
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 text-xs"
                     />
-                    <p className="text-[10px] text-slate-400 mt-1">Nombre del dueño o gerente.</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Nombre del dueño, director o gerente titular.</p>
                   </div>
+                </div>
 
+                {/* Fila 7: WhatsApp para Alertas Directas & Correo Electrónico */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-slate-300 font-medium mb-1">
                       WhatsApp para Alertas Directas *
@@ -5591,9 +6301,9 @@ export default function MasterAdminPage() {
                       value={onboardForm.ownerPhone}
                       onChange={(e) => setOnboardForm({ ...onboardForm, ownerPhone: e.target.value })}
                       placeholder="+57 300 123 4567"
-                      className="w-full bg-[#141A26] border border-slate-700 text-white font-mono rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white font-mono rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 text-xs"
                     />
-                    <p className="text-[10px] text-slate-400 mt-1">Para alertas de insatisfacción en vivo.</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Con prefijo del país para alertas de insatisfacción en vivo.</p>
                   </div>
 
                   <div>
@@ -5606,9 +6316,9 @@ export default function MasterAdminPage() {
                       value={onboardForm.ownerEmail}
                       onChange={(e) => setOnboardForm({ ...onboardForm, ownerEmail: e.target.value })}
                       placeholder="gerencia@taqueria.com"
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 text-xs"
                     />
-                    <p className="text-[10px] text-slate-400 mt-1">Para envío de credenciales del portal.</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Para recepción de credenciales del portal y reportes.</p>
                   </div>
                 </div>
               </div>
