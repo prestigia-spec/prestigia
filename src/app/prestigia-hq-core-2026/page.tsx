@@ -58,6 +58,7 @@ import {
   Shield,
   Layers,
   BarChart3,
+  Archive,
   HelpCircle,
   LayoutGrid,
   List,
@@ -305,6 +306,14 @@ export default function MasterAdminPage() {
   const [viewPlaceModalBusiness, setViewPlaceModalBusiness] = useState<Business | null>(null);
   const [killSwitchConfirmTarget, setKillSwitchConfirmTarget] = useState<Business | null>(null);
   const [killSwitchLoading, setKillSwitchLoading] = useState(false);
+
+  // Decommissioning Protocol State (Protocolo de Baja Oficial: Archivo Histórico o Purga Total)
+  const [decommissionTarget, setDecommissionTarget] = useState<Business | null>(null);
+  const [decommissionMode, setDecommissionMode] = useState<'archive' | 'purge'>('archive');
+  const [decommissionKey, setDecommissionKey] = useState('');
+  const [decommissionReason, setDecommissionReason] = useState('');
+  const [decommissionLoading, setDecommissionLoading] = useState(false);
+  const [decommissionError, setDecommissionError] = useState<string | null>(null);
   const [detectedGoogleProfile, setDetectedGoogleProfile] = useState<{
     name: string;
     rating: number;
@@ -1273,6 +1282,97 @@ export default function MasterAdminPage() {
       alert('Error de conexión al cambiar estado');
     } finally {
       setKillSwitchLoading(false);
+    }
+  };
+
+  // Open Decommissioning Modal (Protocolo de Baja Oficial)
+  const handleOpenDecommissionModal = (biz: Business, mode: 'archive' | 'purge' = 'archive') => {
+    setDecommissionTarget(biz);
+    setDecommissionMode(mode);
+    setDecommissionKey('');
+    setDecommissionReason(
+      mode === 'archive'
+        ? 'Terminación formal de contrato comercial y traslado a custodia histórica.'
+        : 'Purga técnica definitiva solicitada por el administrador.'
+    );
+    setDecommissionError(null);
+  };
+
+  // Execute Decommissioning with Bank Guard validation
+  const handleExecuteDecommission = async () => {
+    if (!decommissionTarget) return;
+    if (!decommissionKey.trim()) {
+      setDecommissionError('Por favor introduce la Llave Maestra para autorizar esta operación.');
+      return;
+    }
+
+    setDecommissionLoading(true);
+    setDecommissionError(null);
+
+    try {
+      const action = decommissionMode === 'archive' ? 'archive_business' : 'delete_business';
+      const payload: any = {
+        action,
+        businessId: decommissionTarget.id,
+        masterKey: decommissionKey.trim(),
+      };
+      if (decommissionMode === 'archive') {
+        payload.reason = decommissionReason.trim();
+      }
+
+      const res = await fetch('/api/master', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        if (decommissionMode === 'archive') {
+          try {
+            const overrides = JSON.parse(localStorage.getItem('prestigia_master_status_overrides') || '{}');
+            overrides[decommissionTarget.id] = 'suspended';
+            localStorage.setItem('prestigia_master_status_overrides', JSON.stringify(overrides));
+          } catch {}
+
+          setBusinesses((prev) =>
+            prev.map((b) =>
+              b.id === decommissionTarget.id
+                ? {
+                    ...b,
+                    status: 'suspended',
+                    isArchived: true,
+                    archivedAt: new Date().toISOString(),
+                    archiveReason: decommissionReason.trim(),
+                  } as any
+                : b
+            )
+          );
+        } else {
+          try {
+            const overrides = JSON.parse(localStorage.getItem('prestigia_master_status_overrides') || '{}');
+            delete overrides[decommissionTarget.id];
+            localStorage.setItem('prestigia_master_status_overrides', JSON.stringify(overrides));
+          } catch {}
+
+          setBusinesses((prev) => prev.filter((b) => b.id !== decommissionTarget.id));
+          if (selectedBusinessId === decommissionTarget.id) {
+            const remaining = businesses.filter((b) => b.id !== decommissionTarget.id);
+            if (remaining.length > 0) setSelectedBusinessId(remaining[0].id);
+          }
+        }
+
+        setNotification({ type: 'success', message: data.message });
+        setTimeout(() => setNotification(null), 5000);
+        setDecommissionTarget(null);
+        fetchMasterData();
+      } else {
+        setDecommissionError(data.error || 'Error al procesar la baja oficial');
+      }
+    } catch {
+      setDecommissionError('Error de conexión con el servidor Prestigia.');
+    } finally {
+      setDecommissionLoading(false);
     }
   };
 
@@ -2459,7 +2559,12 @@ export default function MasterAdminPage() {
                                 title={biz.status === 'suspended' ? 'Clic para reactivar el negocio' : 'Clic para suspender el negocio (Kill Switch)'}
                                 className="cursor-pointer"
                               >
-                                {biz.status === 'suspended' ? (
+                                {((biz as any).isArchived) ? (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-[10px] font-semibold">
+                                    <Archive className="w-2.5 h-2.5 text-amber-400" />
+                                    Archivado
+                                  </span>
+                                ) : biz.status === 'suspended' ? (
                                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-semibold hover:bg-red-500/20 transition">
                                     <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
                                     Suspendido
@@ -2515,6 +2620,14 @@ export default function MasterAdminPage() {
                                   className="p-1 rounded-lg bg-[#141A26] hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors cursor-pointer"
                                 >
                                   <Award className="w-3 h-3 text-emerald-400" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenDecommissionModal(biz, (biz as any).isArchived ? 'purge' : 'archive')}
+                                  title="Protocolo de Baja Oficial: Archivo Histórico o Purga Definitiva (Bank Guard)"
+                                  className="p-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/30 transition-colors cursor-pointer"
+                                >
+                                  <Trash2 className="w-3 h-3" />
                                 </button>
                               </div>
                             </td>
@@ -2689,6 +2802,15 @@ export default function MasterAdminPage() {
                         >
                           <Award className="w-4 h-4 text-emerald-400" />
                         </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleOpenDecommissionModal(biz, (biz as any).isArchived ? 'purge' : 'archive')}
+                          title="Protocolo de Baja Oficial: Archivo Histórico o Purga Definitiva (Bank Guard)"
+                          className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/30 text-xs transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
                   );
@@ -2781,6 +2903,52 @@ export default function MasterAdminPage() {
                 </button>
               </div>
             </div>
+
+            {/* Protocolo de Baja Oficial y Desvinculación */}
+            {currentBusiness && (
+              <div className="bg-[#0E121B] border border-rose-900/40 rounded-3xl p-5 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <ShieldAlert className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-extrabold text-white flex items-center gap-2">
+                      <span>Protocolo de Baja Oficial y Desvinculación</span>
+                      {(currentBusiness as any)?.isArchived ? (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-amber-500/30 uppercase">
+                          Archivado Histórico
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 uppercase">
+                          Grado Bancario
+                        </span>
+                      )}
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
+                      Desvinculación formal de <strong>{currentBusiness.name}</strong>: Opción A (Archivo Histórico de auditoría) u Opción B (Purga total e irreversible de base de datos).
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenDecommissionModal(currentBusiness, 'archive')}
+                    className="px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Archive className="w-3.5 h-3.5" />
+                    <span>Archivo Histórico</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenDecommissionModal(currentBusiness, 'purge')}
+                    className="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/40 text-xs font-extrabold transition flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Purga Total</span>
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Plan Switcher Grid */}
             <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-6 shadow-xl space-y-6">
@@ -5993,6 +6161,197 @@ export default function MasterAdminPage() {
                   )}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* MODAL: PROTOCOLO DE BAJA OFICIAL (ARCHIVO HISTÓRICO O PURGA)   */}
+      {/* ============================================================== */}
+      {decommissionTarget && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#0F1420] border border-rose-500/40 w-full max-w-lg rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  decommissionMode === 'archive'
+                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                    : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                }`}>
+                  {decommissionMode === 'archive' ? <Archive className="w-5 h-5" /> : <Trash2 className="w-5 h-5" />}
+                </div>
+                <div>
+                  <h3 className="text-sm font-extrabold text-white flex items-center gap-1.5">
+                    <span>PRESTIGIA BANK GUARD</span>
+                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase ${
+                      decommissionMode === 'archive'
+                        ? 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
+                        : 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
+                    }`}>
+                      {decommissionMode === 'archive' ? 'Archivo Histórico' : 'Purga Irreversible'}
+                    </span>
+                  </h3>
+                  <p className="text-[10px] text-slate-400">Protocolo de Desvinculación y Baja Oficial</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDecommissionTarget(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Target Business Info */}
+            <div className="mt-4 bg-[#141A26] p-4 rounded-2xl border border-slate-800 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Marca Seleccionada</p>
+                <p className="text-base font-extrabold text-white mt-0.5">{decommissionTarget.name}</p>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  ID: <span className="font-mono text-amber-300">{decommissionTarget.id}</span> • Titular: <strong>{decommissionTarget.ownerName}</strong>
+                </p>
+              </div>
+              <div className="text-right">
+                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                  Plan {decommissionTarget.plan}
+                </span>
+                <p className="text-[10px] text-slate-400 mt-1">
+                  {decommissionTarget.branches?.length || 1} {decommissionTarget.branches?.length === 1 ? 'Sede' : 'Sedes'}
+                </p>
+              </div>
+            </div>
+
+            {/* Mode Switcher Tabs */}
+            <div className="mt-4 grid grid-cols-2 gap-2 p-1 bg-[#141A26] rounded-2xl border border-slate-800">
+              <button
+                type="button"
+                onClick={() => {
+                  setDecommissionMode('archive');
+                  setDecommissionReason('Terminación formal de contrato comercial y traslado a custodia histórica.');
+                  setDecommissionError(null);
+                }}
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                  decommissionMode === 'archive'
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Archive className="w-3.5 h-3.5" />
+                <span>Opción A: Archivo Histórico</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setDecommissionMode('purge');
+                  setDecommissionError(null);
+                }}
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                  decommissionMode === 'purge'
+                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Opción B: Purga Total</span>
+              </button>
+            </div>
+
+            {/* Mode Explanation */}
+            <div className="mt-4">
+              {decommissionMode === 'archive' ? (
+                <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-xs space-y-2">
+                  <p className="font-bold flex items-center gap-1.5 text-amber-300">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Custodia Legal y Desvinculación Segura (Recomendado)
+                  </p>
+                  <ul className="text-[11px] text-slate-300 space-y-1 list-disc list-inside leading-relaxed">
+                    <li>La marca queda suspendida definitivamente y con sello de <strong>Archivada</strong>.</li>
+                    <li>Portales y canales QR quedan totalmente inoperativos para el cliente y el público.</li>
+                    <li>Todo el historial de métricas, auditoría y reseñas se conserva inmutable en base de datos para respaldo legal o eventual reactivación.</li>
+                  </ul>
+                  <div className="pt-2">
+                    <label className="text-[10px] uppercase font-bold text-slate-300 block mb-1">
+                      Motivo Oficial de la Desvinculación / Custodia
+                    </label>
+                    <input
+                      type="text"
+                      value={decommissionReason}
+                      onChange={(e) => setDecommissionReason(e.target.value)}
+                      placeholder="Ej: Terminación por vencimiento de contrato comercial..."
+                      className="w-full bg-[#090D14] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="p-3.5 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-200 text-xs space-y-2">
+                  <p className="font-bold flex items-center gap-1.5 text-rose-400">
+                    <AlertTriangle className="w-4 h-4" />
+                    ⚠️ Purga Definitiva e Irreversible de la Base de Datos
+                  </p>
+                  <ul className="text-[11px] text-slate-300 space-y-1 list-disc list-inside leading-relaxed">
+                    <li>Se eliminará todo el registro de <strong>{decommissionTarget.name}</strong> de la base de datos de Prestigia.</li>
+                    <li>Sus sedes, credenciales de acceso y configuraciones de plan serán destruidas.</li>
+                    <li>Esta acción es permanente y no podrá deshacerse ni recuperarse.</li>
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Master Key Security Challenge */}
+            <div className="mt-4 p-3.5 bg-[#090D14] rounded-2xl border border-slate-800 space-y-2">
+              <label className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+                <Key className="w-3.5 h-3.5 text-amber-400" />
+                <span>Autorización con Llave Maestra</span>
+              </label>
+              <input
+                type="password"
+                value={decommissionKey}
+                onChange={(e) => {
+                  setDecommissionKey(e.target.value);
+                  if (decommissionError) setDecommissionError(null);
+                }}
+                placeholder="Ingresa tu Llave Maestra Prestigia"
+                className="w-full bg-[#141A26] border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-rose-400 font-mono tracking-wider"
+              />
+              {decommissionError && (
+                <p className="text-xs text-rose-400 font-medium flex items-center gap-1 mt-1">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{decommissionError}</span>
+                </p>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3 pt-4">
+              <button
+                type="button"
+                onClick={() => setDecommissionTarget(null)}
+                disabled={decommissionLoading}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleExecuteDecommission}
+                disabled={decommissionLoading}
+                className={`flex-1 py-2.5 px-4 rounded-xl text-white text-xs font-extrabold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-lg ${
+                  decommissionMode === 'archive'
+                    ? 'bg-amber-600 hover:bg-amber-500 shadow-amber-600/30'
+                    : 'bg-rose-700 hover:bg-rose-600 shadow-rose-700/40 animate-pulse'
+                }`}
+              >
+                {decommissionLoading ? (
+                  <span>Procesando...</span>
+                ) : decommissionMode === 'archive' ? (
+                  <span>Confirmar Archivo Histórico</span>
+                ) : (
+                  <span>Confirmar Purga Total</span>
+                )}
+              </button>
             </div>
           </div>
         </div>

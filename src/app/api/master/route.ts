@@ -15,6 +15,8 @@ import {
   getAllEmailDispatches,
   saveEmailDispatch,
   EmailDispatchRecord,
+  deleteBusiness,
+  archiveBusiness,
 } from '@/lib/db';
 import { Business, MasterAddOns, DayOneBaseline } from '@/lib/types';
 import { verifyTOTP, getTOTPAuthUrl } from '@/lib/totp';
@@ -732,6 +734,61 @@ export async function POST(request: NextRequest) {
         success: true,
         message: `Estado de ${existing.name} cambiado a '${status === 'active' ? 'Activo' : 'Suspendido'}' exitosamente.`,
         business: existing,
+      });
+    }
+
+    // 3.2 Protocolo de Baja Oficial: Archivo Histórico
+    if (action === 'archive_business') {
+      const { businessId, masterKey, reason } = body;
+      if (!businessId || !masterKey) {
+        return NextResponse.json({ error: 'businessId y Llave Maestra son requeridos' }, { status: 400 });
+      }
+
+      const cleanKey = normalizeKey(masterKey);
+      const expectedKey = normalizeKey(currentSec.masterKey || 'PRESTIGIA-MASTER-2026');
+      if (cleanKey !== expectedKey) {
+        return NextResponse.json({ error: 'Llave Maestra incorrecta. Autorización denegada.' }, { status: 401 });
+      }
+
+      const existing = await getBusinessById(businessId);
+      if (!existing) {
+        return NextResponse.json({ error: 'Negocio no encontrado' }, { status: 404 });
+      }
+
+      const archived = await archiveBusiness(businessId, reason);
+      return NextResponse.json({
+        success: true,
+        message: `La marca '${existing.name}' ha sido desvinculada y trasladada al archivo histórico de Prestigia.`,
+        business: archived,
+      });
+    }
+
+    // 3.3 Protocolo de Baja Oficial: Purga Total e Irreversible
+    if (action === 'delete_business') {
+      const { businessId, masterKey } = body;
+      if (!businessId || !masterKey) {
+        return NextResponse.json({ error: 'businessId y Llave Maestra son requeridos' }, { status: 400 });
+      }
+
+      const cleanKey = normalizeKey(masterKey);
+      const expectedKey = normalizeKey(currentSec.masterKey || 'PRESTIGIA-MASTER-2026');
+      if (cleanKey !== expectedKey) {
+        return NextResponse.json({ error: 'Llave Maestra incorrecta. Autorización de purga denegada.' }, { status: 401 });
+      }
+
+      const existing = await getBusinessById(businessId);
+      if (!existing) {
+        return NextResponse.json({ error: 'Negocio no encontrado' }, { status: 404 });
+      }
+
+      const deleted = await deleteBusiness(businessId);
+      if (!deleted) {
+        return NextResponse.json({ error: 'Error al purgar la marca de la base de datos' }, { status: 500 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: `La marca '${existing.name}' (${businessId}) ha sido purgada y eliminada definitivamente de la base de datos.`,
       });
     }
 

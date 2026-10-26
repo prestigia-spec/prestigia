@@ -239,6 +239,38 @@ export async function updateBusinessStatus(
   }
 }
 
+export async function deleteBusiness(id: string): Promise<boolean> {
+  const db = ensureDbFile();
+  const targetId = id.toLowerCase().trim();
+  const index = db.businesses.findIndex((b) => b.id.toLowerCase() === targetId);
+  if (index === -1) return false;
+
+  db.businesses.splice(index, 1);
+  writeDbFile(db);
+  return true;
+}
+
+export async function archiveBusiness(id: string, reason?: string): Promise<Business | null> {
+  const db = ensureDbFile();
+  const targetId = id.toLowerCase().trim();
+  const business = db.businesses.find((b) => b.id.toLowerCase() === targetId);
+  if (!business) return null;
+
+  business.status = 'suspended';
+  (business as any).isArchived = true;
+  (business as any).archivedAt = new Date().toISOString();
+  if (reason) (business as any).archiveReason = reason;
+
+  if (Array.isArray(business.branches)) {
+    business.branches.forEach((br) => {
+      br.status = 'suspended';
+    });
+  }
+
+  writeDbFile(db);
+  return business;
+}
+
 export async function createFeedback(
   data: Omit<Feedback, 'id' | 'createdAt' | 'status'> & { staffAttended?: string; status?: FeedbackStatus }
 ): Promise<Feedback> {
