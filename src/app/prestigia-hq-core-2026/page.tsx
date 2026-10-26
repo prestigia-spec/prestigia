@@ -70,6 +70,7 @@ import {
   Inbox,
   UserCheck,
   Upload,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { PrestigiaIcon } from '@/components/PrestigiaIcon';
 import { Business, BusinessPlan, Branch, MasterAddOns, DayOneBaseline, PRESTIGIA_NICHES, CommercialLead, TrafficVisit } from '@/lib/types';
@@ -6324,29 +6325,14 @@ export default function MasterAdminPage() {
                       className="hidden"
                     />
 
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-slate-300 font-medium flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                        Logotipo de la Marca
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => logoFileInputRef.current?.click()}
-                        className="text-[10px] text-amber-300 hover:text-white font-bold flex items-center gap-1 cursor-pointer bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-500/40 px-2.5 py-1 rounded-lg hover:border-amber-400 transition-all shadow-sm"
-                      >
-                        <Upload className="w-3 h-3 text-amber-400" />
-                        <span>Subir desde mi equipo</span>
-                      </button>
-                    </div>
+                    <label className="block text-slate-300 font-medium mb-1.5 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      Logotipo de la Marca
+                    </label>
 
-                    <div className="flex items-center gap-2.5">
-                      {/* Avatar Preview Box (Clickable to trigger upload) */}
-                      <button
-                        type="button"
-                        onClick={() => logoFileInputRef.current?.click()}
-                        title="Haz clic para subir imagen local desde tu computadora o teléfono"
-                        className="w-11 h-11 rounded-xl bg-[#0E121B] border border-slate-700 hover:border-amber-400 flex items-center justify-center overflow-hidden shrink-0 shadow-inner group transition-all cursor-pointer relative"
-                      >
+                    <div className="flex items-center gap-2">
+                      {/* Avatar Preview Box */}
+                      <div className="w-10 h-10 rounded-xl bg-[#0E121B] border border-slate-700 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
                         {onboardForm.logoUrl ? (
                           <img
                             src={onboardForm.logoUrl}
@@ -6357,11 +6343,9 @@ export default function MasterAdminPage() {
                             }}
                           />
                         ) : (
-                          <div className="flex flex-col items-center justify-center text-slate-500 group-hover:text-amber-400">
-                            <Upload className="w-4 h-4" />
-                          </div>
+                          <ImageIcon className="w-4 h-4 text-slate-500" />
                         )}
-                      </button>
+                      </div>
 
                       {/* URL or Local File Text Input */}
                       <div className="flex-1 relative">
@@ -6372,8 +6356,8 @@ export default function MasterAdminPage() {
                             setLocalLogoName(null);
                             setOnboardForm({ ...onboardForm, logoUrl: e.target.value });
                           }}
-                          placeholder="Pega un enlace (URL) o sube un archivo local arriba"
-                          className="w-full bg-[#141A26] border border-slate-700 text-white text-xs rounded-xl pl-3.5 pr-16 py-2.5 outline-none focus:border-amber-400 font-mono"
+                          placeholder="Pega enlace de imagen (URL)..."
+                          className="w-full bg-[#141A26] border border-slate-700 text-white text-xs rounded-xl pl-3 pr-14 py-2.5 outline-none focus:border-amber-400 font-mono"
                         />
 
                         {onboardForm.logoUrl && (
@@ -6390,20 +6374,24 @@ export default function MasterAdminPage() {
                           </button>
                         )}
                       </div>
+
+                      {/* UN SOLO BOTÓN para subir archivo local */}
+                      <button
+                        type="button"
+                        onClick={() => logoFileInputRef.current?.click()}
+                        className="px-3 py-2.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 hover:border-amber-400 text-amber-300 font-semibold text-xs rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                      >
+                        <Upload className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Subir archivo</span>
+                      </button>
                     </div>
 
-                    <p className="text-[10px] text-slate-400 mt-1 flex items-center justify-between">
+                    <p className="text-[10px] text-slate-400 mt-1">
                       {onboardForm.logoUrl.startsWith('data:') ? (
                         <span className="text-emerald-400 font-medium">✓ Imagen local optimizada y lista para guardar.</span>
                       ) : (
-                        <span>Admite PNG, JPG, SVG, WebP o enlace web (URL).</span>
+                        <span>Admite PNG, JPG, SVG o WebP (máx. 5MB) o enlace URL.</span>
                       )}
-                      <span
-                        className="text-amber-400/90 cursor-pointer hover:underline font-medium"
-                        onClick={() => logoFileInputRef.current?.click()}
-                      >
-                        Examinar archivos...
-                      </span>
                     </p>
                   </div>
 
