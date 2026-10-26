@@ -5190,7 +5190,7 @@ export default function MasterAdminPage() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-extrabold text-[10px] tracking-wider uppercase border border-blue-500/30">
+                        <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-extrabold text-[10px] tracking-wider uppercase border border-blue-500/30 whitespace-nowrap shrink-0 inline-flex items-center">
                           Paso 1 • Recomendado
                         </span>
                         <h4 className="font-extrabold text-white text-sm">
@@ -5329,7 +5329,7 @@ export default function MasterAdminPage() {
               <div className="space-y-4 pt-2">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-1 border-b border-slate-800 gap-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-extrabold text-[10px] tracking-wider uppercase border border-slate-700">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-extrabold text-[10px] tracking-wider uppercase border border-slate-700 whitespace-nowrap shrink-0 inline-flex items-center">
                       Paso 2
                     </span>
                     <h4 className="font-extrabold text-white text-xs sm:text-sm">
@@ -5619,7 +5619,7 @@ export default function MasterAdminPage() {
               <div className="pt-3 border-t border-slate-800 space-y-3">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-extrabold text-[10px] tracking-wider uppercase border border-amber-500/30">
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-extrabold text-[10px] tracking-wider uppercase border border-amber-500/30 whitespace-nowrap shrink-0 inline-flex items-center">
                       Paso 3
                     </span>
                     <p className="text-amber-400 font-extrabold flex items-center gap-1.5 text-xs sm:text-sm">
