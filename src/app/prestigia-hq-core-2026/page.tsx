@@ -124,6 +124,23 @@ const PRESTIGIA_COUNTRIES: {
     ],
   },
   {
+    id: 'Venezuela (RIF)',
+    label: 'Venezuela 🇻🇪',
+    region: 'América',
+    flag: '🇻🇪',
+    prefix: '+58',
+    taxLabel: 'RIF Tributario',
+    taxPlaceholder: 'J-12345678-9',
+    defaultCity: 'Caracas',
+    cities: [
+      'Caracas', 'Maracaibo', 'Valencia', 'Barquisimeto', 'Maracay',
+      'Ciudad Guayana (Puerto Ordaz)', 'San Cristóbal', 'Barcelona',
+      'Puerto La Cruz', 'Maturín', 'Mérida', 'Ciudad Bolívar',
+      'Porlamar (Margarita)', 'Punto Fijo', 'Los Teques', 'Barinas',
+      'Cumaná', 'Cabimas', 'Coro', 'Guatire / Guarenas', 'Lechería'
+    ],
+  },
+  {
     id: 'México (RFC)',
     label: 'México 🇲🇽',
     region: 'América',
@@ -5991,14 +6008,14 @@ export default function MasterAdminPage() {
                           className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 cursor-pointer font-medium text-xs"
                         >
                           <option value="">-- Elige el País de Operación --</option>
-                          <optgroup label="🌎 América (20 países)">
+                          <optgroup label={`🌎 América (${americaCountries.length} países)`}>
                             {americaCountries.map((c) => (
                               <option key={c.id} value={c.id}>
                                 {c.label} ({c.taxLabel.split(' ')[0]} • {c.prefix})
                               </option>
                             ))}
                           </optgroup>
-                          <optgroup label="🌍 Europa (20 países)">
+                          <optgroup label={`🌍 Europa (${europaCountries.length} países)`}>
                             {europaCountries.map((c) => (
                               <option key={c.id} value={c.id}>
                                 {c.label} ({c.taxLabel.split(' ')[0]} • {c.prefix})
