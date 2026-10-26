@@ -5887,6 +5887,15 @@ export default function MasterAdminPage() {
                       type="text"
                       value={googleQueryInput}
                       onChange={(e) => setGoogleQueryInput(e.target.value)}
+                      onPaste={(e) => {
+                        const pasted = e.clipboardData.getData('text');
+                        if (pasted && (pasted.includes('goo.gl') || pasted.includes('google.com/maps') || pasted.includes('maps.app'))) {
+                          setGoogleQueryInput(pasted);
+                          setTimeout(() => {
+                            handleDetectGooglePlace(pasted.trim());
+                          }, 120);
+                        }
+                      }}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
