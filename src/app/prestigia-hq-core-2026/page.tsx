@@ -5956,9 +5956,18 @@ export default function MasterAdminPage() {
                 {/* Fila 1: Ubicación Geográfica (País y Ciudad Dependiente, con Modo Manual Libre) */}
                 {(() => {
                   const countryObj = PRESTIGIA_COUNTRIES.find((c) => c.id === onboardForm.country);
-                  const americaCountries = PRESTIGIA_COUNTRIES.filter((c) => c.region === 'América');
-                  const europaCountries = PRESTIGIA_COUNTRIES.filter((c) => c.region === 'Europa');
-                  const otherCountries = PRESTIGIA_COUNTRIES.filter((c) => c.region === 'Internacional');
+                  const americaCountries = PRESTIGIA_COUNTRIES
+                    .filter((c) => c.region === 'América')
+                    .sort((a, b) => a.label.localeCompare(b.label, 'es'));
+                  const europaCountries = PRESTIGIA_COUNTRIES
+                    .filter((c) => c.region === 'Europa')
+                    .sort((a, b) => a.label.localeCompare(b.label, 'es'));
+                  const otherCountries = PRESTIGIA_COUNTRIES
+                    .filter((c) => c.region === 'Internacional')
+                    .sort((a, b) => a.label.localeCompare(b.label, 'es'));
+                  const sortedCities = countryObj
+                    ? [...countryObj.cities].sort((a, b) => a.localeCompare(b, 'es'))
+                    : [];
                   const isCountryFilled = Boolean(onboardForm.country && onboardForm.country.trim());
 
                   return (
@@ -6134,7 +6143,7 @@ export default function MasterAdminPage() {
                             className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 cursor-pointer font-medium text-xs"
                           >
                             <option value="">-- Elige una ciudad de {countryObj.label.split(' ')[0]} --</option>
-                            {countryObj.cities.map((city) => (
+                            {sortedCities.map((city) => (
                               <option key={city} value={city}>
                                 📍 {city}
                               </option>
@@ -6151,7 +6160,7 @@ export default function MasterAdminPage() {
                           ) : customCityMode ? (
                             `✍️ Escribe libremente cualquier ciudad o municipio de ${countryObj.label.split(' ')[0]}.`
                           ) : (
-                            `✓ ${countryObj.cities.length} ciudades principales disponibles para selección directa.`
+                            `✓ ${sortedCities.length} ciudades principales disponibles en orden alfabético (A-Z).`
                           )}
                         </p>
                       </div>
