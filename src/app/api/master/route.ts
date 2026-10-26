@@ -27,6 +27,16 @@ import {
   buildAnnouncementHtml,
   buildBillingRenewalHtml,
 } from '@/lib/notifications';
+import { getClientIp } from '@/lib/security';
+
+// In-memory Master Login Attempt Tracker (Strict 3-strike IP lockout)
+interface MasterIpAttempt {
+  attempts: number;
+  lockedUntil: number;
+}
+const MASTER_IP_LOCKS: Map<string, MasterIpAttempt> = new Map();
+const MASTER_MAX_ATTEMPTS = 3;
+const MASTER_LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
 
 // In-memory Ephemeral Emergency OTP Store (Single use, 5-minute expiry)
 interface EmergencyOtpRecord {
@@ -273,8 +283,22 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 0. Verify Master Credentials (Strict Gateway Authentication)
+    // 0. Verify Master Credentials (Strict Gateway Authentication with Server IP Lockout)
     if (action === 'verify_master_credentials') {
+      const ip = getClientIp(request);
+      const now = Date.now();
+      const lock = MASTER_IP_LOCKS.get(ip);
+
+      if (lock && lock.lockedUntil && now < lock.lockedUntil) {
+        const remMin = Math.ceil((lock.lockedUntil - now) / 60000);
+        return NextResponse.json({
+          success: false,
+          isValid: false,
+          isLocked: true,
+          error: `🚨 BLOQUEO BANCARIO PRESTIGIA: Se registraron 3 intentos fallidos consecutivos desde esta dirección IP. Acceso congelado preventivamente por ${remMin} minuto(s). Si eres el titular legítimo, utiliza el Rescate Criptográfico por WhatsApp.`,
+        }, { status: 423 });
+      }
+
       const { masterKey, totpToken, requireTwoFactor, isVaultUnlock } = body;
       const cleanKey = normalizeKey(masterKey);
       const expectedKey = normalizeKey(currentSec.masterKey || 'PRESTIGIA-MASTER-2026');
@@ -282,12 +306,37 @@ export async function POST(request: NextRequest) {
       // Check Master Key strictly against server storage (NO demo keys)
       const isKeyValid = cleanKey === expectedKey;
       if (!isKeyValid) {
-        return NextResponse.json({
-          success: false,
-          isValid: false,
-          error: 'Llave Maestra incorrecta. Acceso denegado.',
-        }, { status: 401 });
+        const prevAttempts = (lock && now > lock.lockedUntil) ? 0 : (lock?.attempts || 0);
+        const currentAttempts = prevAttempts + 1;
+
+        if (currentAttempts >= MASTER_MAX_ATTEMPTS) {
+          MASTER_IP_LOCKS.set(ip, {
+            attempts: currentAttempts,
+            lockedUntil: now + MASTER_LOCKOUT_MS,
+          });
+          return NextResponse.json({
+            success: false,
+            isValid: false,
+            isLocked: true,
+            error: '🚨 ACCESO BLOQUEADO POR SEGURIDAD: 3 intentos fallidos consecutivos. Tu dirección IP ha sido congelada durante 15 minutos para proteger la Consola Central.',
+          }, { status: 423 });
+        } else {
+          MASTER_IP_LOCKS.set(ip, {
+            attempts: currentAttempts,
+            lockedUntil: 0,
+          });
+          const remaining = MASTER_MAX_ATTEMPTS - currentAttempts;
+          return NextResponse.json({
+            success: false,
+            isValid: false,
+            remainingAttempts: remaining,
+            error: `Llave Maestra incorrecta. Te queda(n) ${remaining} intento(s) antes del bloqueo bancario por IP.`,
+          }, { status: 401 });
+        }
       }
+
+      // Valid key: reset IP failure tracking
+      MASTER_IP_LOCKS.delete(ip);
 
       // If called specifically for intra-session vault unlock, master key verification is sufficient
       if (isVaultUnlock) {

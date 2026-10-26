@@ -685,14 +685,20 @@ export default function MasterAdminPage() {
           return;
         }
 
-        const newAttempts = failedAttempts + 1;
-        setFailedAttempts(newAttempts);
-        if (newAttempts >= MAX_FAILED_ATTEMPTS) {
+        if (verifyData.isLocked) {
           const lockoutTime = Date.now() + LOCKOUT_DURATION_MS;
           setLockoutUntil(lockoutTime);
-          setAuthError('ALERTA DE SEGURIDAD: 3 intentos fallidos consecutivos. Consola Master congelada preventivamente por 15 minutos.');
+          setAuthError(verifyData.error || 'ALERTA DE SEGURIDAD: 3 intentos fallidos consecutivos. Tu IP ha sido congelada por 15 minutos.');
         } else {
-          setAuthError(verifyData.error || `Credencial incorrecta. Intento ${newAttempts} de ${MAX_FAILED_ATTEMPTS}.`);
+          const newAttempts = failedAttempts + 1;
+          setFailedAttempts(newAttempts);
+          if (newAttempts >= MAX_FAILED_ATTEMPTS) {
+            const lockoutTime = Date.now() + LOCKOUT_DURATION_MS;
+            setLockoutUntil(lockoutTime);
+            setAuthError('ALERTA DE SEGURIDAD: 3 intentos fallidos consecutivos. Consola Master congelada preventivamente por 15 minutos.');
+          } else {
+            setAuthError(verifyData.error || `Credencial incorrecta. Intento ${newAttempts} de ${MAX_FAILED_ATTEMPTS}.`);
+          }
         }
       }
     } catch (err) {
@@ -1824,19 +1830,6 @@ export default function MasterAdminPage() {
               >
                 <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
                 ¿Emergencia? Rescate Criptográfico de la Consola Master
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  localStorage.removeItem('prestigia_master_security_config');
-                  localStorage.removeItem('prestigia_master_custom_key');
-                  sessionStorage.clear();
-                  window.location.reload();
-                }}
-                className="text-[11px] text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
-              >
-                🔄 Limpiar datos locales y restablecer sesión
               </button>
             </div>
           </div>
