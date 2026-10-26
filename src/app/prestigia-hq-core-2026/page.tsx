@@ -2752,8 +2752,10 @@ export default function MasterAdminPage() {
   // -------------------------------------------------------------
   return (
     <div className="min-h-screen bg-[#07090E] text-slate-100 flex flex-col font-sans selection:bg-amber-500/20 selection:text-amber-300 w-full overflow-x-hidden">
-      {/* Top Banking Command Bar */}
-      <header className="sticky top-0 z-40 bg-[#0C101A]/95 backdrop-blur-xl border-b border-slate-800/80 px-3 sm:px-4 lg:px-5 py-2.5 flex items-center justify-between gap-2 shadow-xl shadow-black/40 w-full">
+      {/* Sticky Command Deck (Top Header + Tabs Navigation Bar) */}
+      <div className="sticky top-0 z-40 w-full bg-[#0C101A]/95 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl shadow-black/60">
+        {/* Top Banking Command Bar */}
+        <header className="px-3 sm:px-4 lg:px-5 py-2.5 flex items-center justify-between gap-2 border-b border-slate-800/70 w-full">
         {/* Left Crest & Identification */}
         <div className="flex items-center gap-2.5 shrink-0">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-950/40 border border-amber-500/40 flex items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
@@ -2869,28 +2871,8 @@ export default function MasterAdminPage() {
         </div>
       </header>
 
-      {/* Global Toast Notification */}
-      {notification && (
-        <div className="fixed top-20 right-6 z-50 animate-in fade-in slide-in-from-top-4 duration-200">
-          <div
-            className={`px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-xs font-semibold border ${
-              notification.type === 'success'
-                ? 'bg-emerald-950/90 border-emerald-500 text-emerald-200'
-                : 'bg-rose-950/90 border-rose-500 text-rose-200'
-            }`}
-          >
-            {notification.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-            ) : (
-              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-            )}
-            <span>{notification.message}</span>
-          </div>
-        </div>
-      )}
-
       {/* Main Tabs Navigation Bar */}
-      <nav className="bg-[#0A0D15] border-b border-slate-800/80 px-3 sm:px-6 py-1.5 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700 w-full">
+      <nav className="bg-[#0A0D15]/95 px-3 sm:px-6 py-1.5 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700 w-full">
         <div className="flex items-center gap-1.5 min-w-max">
           <button
             type="button"
@@ -3010,9 +2992,30 @@ export default function MasterAdminPage() {
           </button>
         </div>
       </nav>
+    </div>
 
-      {/* Main Work Area */}
-      <main className="flex-1 px-3 sm:px-6 py-5 w-full max-w-[1600px] mx-auto">
+    {/* Global Toast Notification */}
+    {notification && (
+      <div className="fixed top-24 right-6 z-50 animate-in fade-in slide-in-from-top-4 duration-200">
+        <div
+          className={`px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-xs font-semibold border ${
+            notification.type === 'success'
+              ? 'bg-emerald-950/90 border-emerald-500 text-emerald-200'
+              : 'bg-rose-950/90 border-rose-500 text-rose-200'
+          }`}
+        >
+          {notification.type === 'success' ? (
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          ) : (
+            <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+          )}
+          <span>{notification.message}</span>
+        </div>
+      </div>
+    )}
+
+    {/* Main Work Area */}
+    <main className="flex-1 px-3 sm:px-6 py-5 w-full max-w-[1600px] mx-auto">
         {/* ============================================================== */}
         {/* TAB 1: DIRECTORIO GLOBAL DE MARCAS & ONBOARDING WIZARD */}
         {/* ============================================================== */}
