@@ -272,7 +272,7 @@ export default function MasterAdminPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlanFilter, setSelectedPlanFilter] = useState<string>('all');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState<'all' | 'active' | 'suspended'>('all');
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<'all' | 'active' | 'suspended' | 'archived'>('all');
   const [directoryViewMode, setDirectoryViewMode] = useState<'list' | 'cards'>('list');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -1482,10 +1482,19 @@ export default function MasterAdminPage() {
 
   // Filtered Businesses for Directory Tab
   const filteredBusinesses = useMemo(() => {
-    return businesses.filter((biz) => {
-      // 0. Status filter
-      if (selectedStatusFilter === 'active' && biz.status === 'suspended') return false;
-      if (selectedStatusFilter === 'suspended' && biz.status !== 'suspended') return false;
+    const list = businesses.filter((biz) => {
+      const isArchived = Boolean((biz as any).isArchived);
+
+      // 0. Status filter: los archivados quedan fuera de la lista general ("all") para no hacer bulto
+      if (selectedStatusFilter === 'all') {
+        if (isArchived) return false;
+      } else if (selectedStatusFilter === 'active') {
+        if (biz.status === 'suspended' || isArchived) return false;
+      } else if (selectedStatusFilter === 'suspended') {
+        if (biz.status !== 'suspended' || isArchived) return false;
+      } else if (selectedStatusFilter === 'archived') {
+        if (!isArchived) return false;
+      }
 
       // 1. Plan filter
       if (selectedPlanFilter !== 'all' && biz.plan !== selectedPlanFilter) return false;
@@ -1506,37 +1515,79 @@ export default function MasterAdminPage() {
         biz.branches?.some((b) => b.city.toLowerCase().includes(term) || b.locality.toLowerCase().includes(term))
       );
     });
+
+    // Orden de prioridad estricto: 1° Activos, 2° Inactivos (Suspendidos), 3° Archivados
+    return list.sort((a, b) => {
+      const getPriority = (item: Business) => {
+        if ((item as any).isArchived) return 3;
+        if (item.status === 'suspended') return 2;
+        return 1; // Activo
+      };
+      const pA = getPriority(a);
+      const pB = getPriority(b);
+      if (pA !== pB) return pA - pB;
+      return a.name.localeCompare(b.name, 'es', { sensitivity: 'base' });
+    });
   }, [businesses, selectedStatusFilter, selectedPlanFilter, selectedCategoryFilter, searchTerm]);
 
   // Dynamic counts for Status, Plan & Niche filters
   const statusCounts = useMemo(() => {
-    const counts = { all: businesses.length, active: 0, suspended: 0 };
+    let active = 0;
+    let suspended = 0;
+    let archived = 0;
+
     businesses.forEach((b) => {
-      if (b.status === 'suspended') counts.suspended++;
-      else counts.active++;
+      if ((b as any).isArchived) {
+        archived++;
+      } else if (b.status === 'suspended') {
+        suspended++;
+      } else {
+        active++;
+      }
     });
-    return counts;
+
+    return {
+      all: active + suspended, // Lista general limpia (no incluye archivados para no hacer bulto)
+      active,
+      suspended,
+      archived,
+      totalWithArchived: businesses.length,
+    };
   }, [businesses]);
 
   const planCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: businesses.length, independiente: 0, pro: 0, elite: 0, empresarial: 0 };
+    const counts: Record<string, number> = { all: 0, independiente: 0, pro: 0, elite: 0, empresarial: 0 };
     businesses.forEach((b) => {
+      const isArchived = Boolean((b as any).isArchived);
+      if (selectedStatusFilter === 'archived') {
+        if (!isArchived) return;
+      } else {
+        if (isArchived) return;
+      }
+      counts.all++;
       if (counts[b.plan] !== undefined) counts[b.plan]++;
     });
     return counts;
-  }, [businesses]);
+  }, [businesses, selectedStatusFilter]);
 
   const nicheCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: businesses.length };
+    const counts: Record<string, number> = { all: 0 };
     PRESTIGIA_NICHES.forEach((n) => { counts[n.id] = 0; });
     businesses.forEach((b) => {
+      const isArchived = Boolean((b as any).isArchived);
+      if (selectedStatusFilter === 'archived') {
+        if (!isArchived) return;
+      } else {
+        if (isArchived) return;
+      }
+      counts.all++;
       const badge = getNicheBadge(b.category);
       if (counts[badge.id] !== undefined) {
         counts[badge.id]++;
       }
     });
     return counts;
-  }, [businesses]);
+  }, [businesses, selectedStatusFilter]);
 
   // Unified Global Data Lake (Habeas Data & Lead Matrix: 80 Clientes Reales)
   const unifiedDataLakeRecords = useMemo(() => {
@@ -2346,21 +2397,16 @@ export default function MasterAdminPage() {
                   ))}
                 </select>
 
-                {/* Filter by Operational Status (Activo / Suspendido) */}
+                {/* Filter by Operational Status (Activo / Suspendido / Archivado) */}
                 <select
                   value={selectedStatusFilter}
                   onChange={(e) => setSelectedStatusFilter(e.target.value as any)}
-                  className={`border text-xs rounded-xl px-3 py-2.5 outline-none cursor-pointer font-medium transition-all ${
-                    selectedStatusFilter === 'active'
-                      ? 'bg-emerald-950/50 border-emerald-500/50 text-emerald-300 font-bold'
-                      : selectedStatusFilter === 'suspended'
-                      ? 'bg-rose-950/50 border-rose-500/50 text-rose-300 font-bold'
-                      : 'bg-[#121622] border-slate-700/80 text-slate-200'
-                  }`}
+                  className="bg-[#121622] border border-slate-700/80 text-slate-200 text-xs rounded-xl px-3 py-2.5 outline-none cursor-pointer font-medium transition-all hover:border-slate-600 focus:border-amber-400"
                 >
-                  <option value="all">Todos los Estados ({statusCounts.all})</option>
-                  <option value="active">● Solo Activos ({statusCounts.active})</option>
-                  <option value="suspended">● Solo Suspendidos ({statusCounts.suspended})</option>
+                  <option value="all" className="bg-[#0F1420] text-slate-200">Todos los Estados ({statusCounts.all})</option>
+                  <option value="active" className="bg-[#0F1420] text-slate-200">Solo Activos ({statusCounts.active})</option>
+                  <option value="suspended" className="bg-[#0F1420] text-slate-200">Solo Suspendidos ({statusCounts.suspended})</option>
+                  <option value="archived" className="bg-[#0F1420] text-slate-200">Solo Archivados ({statusCounts.archived})</option>
                 </select>
 
                 {/* View Switcher: List (Default) vs Cards */}
@@ -2555,8 +2601,20 @@ export default function MasterAdminPage() {
                             <td className="py-2.5 px-2 whitespace-nowrap text-center">
                               <button
                                 type="button"
-                                onClick={() => handleToggleBusinessStatus(biz)}
-                                title={biz.status === 'suspended' ? 'Clic para reactivar el negocio' : 'Clic para suspender el negocio (Kill Switch)'}
+                                onClick={() => {
+                                  if ((biz as any).isArchived) {
+                                    handleOpenDecommissionModal(biz, 'archive');
+                                  } else {
+                                    handleToggleBusinessStatus(biz);
+                                  }
+                                }}
+                                title={
+                                  (biz as any).isArchived
+                                    ? 'Marca en Custodia Histórica (Clic para gestionar o purgar)'
+                                    : biz.status === 'suspended'
+                                    ? 'Clic para reactivar el negocio'
+                                    : 'Clic para suspender el negocio (Kill Switch)'
+                                }
                                 className="cursor-pointer"
                               >
                                 {((biz as any).isArchived) ? (
@@ -2683,11 +2741,28 @@ export default function MasterAdminPage() {
                           </div>
                           <button
                             type="button"
-                            onClick={() => handleToggleBusinessStatus(biz)}
-                            title={biz.status === 'suspended' ? 'Clic para reactivar el negocio' : 'Clic para suspender el negocio (Kill Switch)'}
+                            onClick={() => {
+                              if ((biz as any).isArchived) {
+                                handleOpenDecommissionModal(biz, 'archive');
+                              } else {
+                                handleToggleBusinessStatus(biz);
+                              }
+                            }}
+                            title={
+                              (biz as any).isArchived
+                                ? 'Marca en Custodia Histórica (Clic para gestionar o purgar)'
+                                : biz.status === 'suspended'
+                                ? 'Clic para reactivar el negocio'
+                                : 'Clic para suspender el negocio (Kill Switch)'
+                            }
                             className="cursor-pointer"
                           >
-                            {biz.status === 'suspended' ? (
+                            {((biz as any).isArchived) ? (
+                              <span className="inline-flex items-center gap-1.5 text-[11px] text-slate-300 font-semibold px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700">
+                                <Archive className="w-3 h-3 text-amber-400" />
+                                Archivado
+                              </span>
+                            ) : biz.status === 'suspended' ? (
                               <span className="inline-flex items-center gap-1.5 text-[11px] text-red-400 font-semibold px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 transition">
                                 <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
                                 Suspendido
