@@ -69,6 +69,7 @@ import {
   Send,
   Inbox,
   UserCheck,
+  Upload,
 } from 'lucide-react';
 import { PrestigiaIcon } from '@/components/PrestigiaIcon';
 import { Business, BusinessPlan, Branch, MasterAddOns, DayOneBaseline, PRESTIGIA_NICHES, CommercialLead, TrafficVisit } from '@/lib/types';
@@ -933,6 +934,8 @@ export default function MasterAdminPage() {
 
   const [customCountryMode, setCustomCountryMode] = useState(false);
   const [customCityMode, setCustomCityMode] = useState(false);
+  const logoFileInputRef = useRef<HTMLInputElement | null>(null);
+  const [localLogoName, setLocalLogoName] = useState<string | null>(null);
   const [onboardForm, setOnboardForm] = useState({
     id: '',
     name: '',
@@ -1799,6 +1802,59 @@ export default function MasterAdminPage() {
     } finally {
       setGoogleDetectLoading(false);
     }
+  };
+
+  // Handle local logo file upload with automatic web optimization
+  const handleLogoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor selecciona un archivo de imagen válido (PNG, JPG, SVG o WebP).');
+      return;
+    }
+
+    setLocalLogoName(file.name);
+
+    const reader = new FileReader();
+    reader.onload = (readerEvent) => {
+      const result = readerEvent.target?.result as string;
+      if (!result) return;
+
+      if (file.type === 'image/svg+xml') {
+        setOnboardForm((prev) => ({ ...prev, logoUrl: result }));
+        return;
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 512;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const optimizedDataUrl = canvas.toDataURL('image/webp', 0.88);
+          setOnboardForm((prev) => ({ ...prev, logoUrl: optimizedDataUrl }));
+        } else {
+          setOnboardForm((prev) => ({ ...prev, logoUrl: result }));
+        }
+      };
+      img.src = result;
+    };
+    reader.readAsDataURL(file);
   };
 
   // Handle Onboard Create Business
@@ -3055,6 +3111,8 @@ export default function MasterAdminPage() {
                   setDetectedGoogleProfile(null);
                   setCustomCountryMode(false);
                   setCustomCityMode(false);
+                  setLocalLogoName(null);
+                  if (logoFileInputRef.current) logoFileInputRef.current.value = '';
                   setOnboardForm({
                     id: '',
                     name: '',
@@ -6245,37 +6303,99 @@ export default function MasterAdminPage() {
                   </div>
                 </div>
 
-                {/* Fila 4: Logotipo de la Marca & Razón Social Registrada */}
+                {/* Fila 4: Logotipo de la Marca (Subida Local o URL) & Razón Social Registrada */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1 flex items-center justify-between">
-                      <span>Logotipo de la Marca (URL de Imagen)</span>
-                      <span className="text-[10px] text-amber-400">Previsualizador en Vivo</span>
-                    </label>
+                    {/* Hidden Native File Input */}
+                    <input
+                      type="file"
+                      ref={logoFileInputRef}
+                      accept="image/*"
+                      onChange={handleLogoFileUpload}
+                      className="hidden"
+                    />
+
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-slate-300 font-medium flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                        Logotipo de la Marca
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => logoFileInputRef.current?.click()}
+                        className="text-[10px] text-amber-300 hover:text-white font-bold flex items-center gap-1 cursor-pointer bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-500/40 px-2.5 py-1 rounded-lg hover:border-amber-400 transition-all shadow-sm"
+                      >
+                        <Upload className="w-3 h-3 text-amber-400" />
+                        <span>Subir desde mi equipo</span>
+                      </button>
+                    </div>
+
                     <div className="flex items-center gap-2.5">
-                      <div className="w-10 h-10 rounded-xl bg-[#0E121B] border border-slate-700 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                      {/* Avatar Preview Box (Clickable to trigger upload) */}
+                      <button
+                        type="button"
+                        onClick={() => logoFileInputRef.current?.click()}
+                        title="Haz clic para subir imagen local desde tu computadora o teléfono"
+                        className="w-11 h-11 rounded-xl bg-[#0E121B] border border-slate-700 hover:border-amber-400 flex items-center justify-center overflow-hidden shrink-0 shadow-inner group transition-all cursor-pointer relative"
+                      >
                         {onboardForm.logoUrl ? (
                           <img
                             src={onboardForm.logoUrl}
                             alt="Logo preview"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain p-1"
                             onError={(e) => {
                               (e.target as HTMLImageElement).style.display = 'none';
                             }}
                           />
                         ) : (
-                          <Sparkles className="w-4 h-4 text-amber-400" />
+                          <div className="flex flex-col items-center justify-center text-slate-500 group-hover:text-amber-400">
+                            <Upload className="w-4 h-4" />
+                          </div>
+                        )}
+                      </button>
+
+                      {/* URL or Local File Text Input */}
+                      <div className="flex-1 relative">
+                        <input
+                          type="text"
+                          value={onboardForm.logoUrl.startsWith('data:') ? `[Archivo Local] ${localLogoName || 'logo.png'}` : onboardForm.logoUrl}
+                          onChange={(e) => {
+                            setLocalLogoName(null);
+                            setOnboardForm({ ...onboardForm, logoUrl: e.target.value });
+                          }}
+                          placeholder="Pega un enlace (URL) o sube un archivo local arriba"
+                          className="w-full bg-[#141A26] border border-slate-700 text-white text-xs rounded-xl pl-3.5 pr-16 py-2.5 outline-none focus:border-amber-400 font-mono"
+                        />
+
+                        {onboardForm.logoUrl && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setLocalLogoName(null);
+                              setOnboardForm({ ...onboardForm, logoUrl: '' });
+                              if (logoFileInputRef.current) logoFileInputRef.current.value = '';
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 hover:text-red-400 bg-slate-800/80 hover:bg-red-500/20 px-2 py-0.5 rounded cursor-pointer transition-colors"
+                          >
+                            Quitar
+                          </button>
                         )}
                       </div>
-                      <input
-                        type="url"
-                        value={onboardForm.logoUrl}
-                        onChange={(e) => setOnboardForm({ ...onboardForm, logoUrl: e.target.value })}
-                        placeholder="https://ejemplo.com/logo.png"
-                        className="flex-1 bg-[#141A26] border border-slate-700 text-white text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
-                      />
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-1">Pega el link de la imagen de tu logo (o déjalo vacío para avatar inicial).</p>
+
+                    <p className="text-[10px] text-slate-400 mt-1 flex items-center justify-between">
+                      {onboardForm.logoUrl.startsWith('data:') ? (
+                        <span className="text-emerald-400 font-medium">✓ Imagen local optimizada y lista para guardar.</span>
+                      ) : (
+                        <span>Admite PNG, JPG, SVG, WebP o enlace web (URL).</span>
+                      )}
+                      <span
+                        className="text-amber-400/90 cursor-pointer hover:underline font-medium"
+                        onClick={() => logoFileInputRef.current?.click()}
+                      >
+                        Examinar archivos...
+                      </span>
+                    </p>
                   </div>
 
                   <div>
