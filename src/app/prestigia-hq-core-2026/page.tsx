@@ -955,8 +955,8 @@ export default function MasterAdminPage() {
     googlePlaceId: '',
     googleReviewUrl: '',
     averageTicketCOP: 45000,
-    initialRating: 3.8,
-    initialReviewCount: 30,
+    initialRating: 0,
+    initialReviewCount: 0,
     clientQuote: '',
   });
 
@@ -3132,8 +3132,8 @@ export default function MasterAdminPage() {
                     googlePlaceId: '',
                     googleReviewUrl: '',
                     averageTicketCOP: 45000,
-                    initialRating: 3.8,
-                    initialReviewCount: 25,
+                    initialRating: 0,
+                    initialReviewCount: 0,
                     clientQuote: '',
                   });
                   setShowOnboardModal(true);
@@ -6520,7 +6520,7 @@ export default function MasterAdminPage() {
               </div>
 
               {/* ========================================================= */}
-              {/* PASO 3: VERIFICACIÓN DE LÍNEA BASE HISTÓRICA (DÍA 1)       */}
+              {/* PASO 3: LÍNEA BASE HISTÓRICA INICIAL (DÍA 1)              */}
               {/* ========================================================= */}
               <div className="pt-3 border-t border-slate-800 space-y-3">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
@@ -6533,26 +6533,46 @@ export default function MasterAdminPage() {
                       Línea Base Histórica Inicial (Día 1 para Caso de Éxito):
                     </p>
                   </div>
-                  {isGoogleSynced && (
-                    <span className="text-[11px] text-emerald-400 font-bold flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full">
+                  {isGoogleSynced ? (
+                    <span className="text-[11px] text-emerald-400 font-bold flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full animate-in fade-in">
                       <Check className="w-3.5 h-3.5" />
-                      Leído de Google Maps en tiempo real
+                      ✓ Autocompletado en vivo desde Google Maps
+                    </span>
+                  ) : (
+                    <span className="text-[11px] text-amber-400/90 font-medium flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-full">
+                      ⚡ Automático: Se llena al detectar Google en Paso 1
                     </span>
                   )}
                 </div>
                 <p className="text-[11px] text-slate-400">
-                  Estos números representan el estado con el que la empresa ingresa a Prestigia. Sirven como prueba documental inmutable para calcular el incremento de estrellas, reseñas ganadas y ROI.
+                  {isGoogleSynced ? (
+                    <span className="text-emerald-300 font-medium">
+                      ✓ Calificación y reseñas extraídas en vivo desde la ficha pública de Google Maps. Servirán como prueba documental inmutable para calcular el incremento de estrellas y reseñas ganadas con Prestigia.
+                    </span>
+                  ) : (
+                    <span>
+                      Al presionar <strong>⚡ Detectar Ficha en Google</strong> en el Paso 1 arriba, la calificación (★) y total de reseñas se leerán y colocarán aquí automáticamente sin que tengas que escribirlos.
+                    </span>
+                  )}
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className={`p-3 rounded-2xl bg-[#141A26] border transition-all ${
-                    isGoogleSynced ? 'border-emerald-500/50 shadow-md shadow-emerald-500/10' : 'border-slate-800'
+                  {/* Rating Google Día 1 */}
+                  <div className={`p-3.5 rounded-2xl bg-[#141A26] border transition-all ${
+                    isGoogleSynced ? 'border-emerald-500/60 bg-emerald-950/20 shadow-lg shadow-emerald-500/10' : 'border-slate-800'
                   }`}>
-                    <label className="block text-slate-300 font-semibold mb-1 flex items-center justify-between">
-                      <span>Rating Google Día 1</span>
-                      {isGoogleSynced && (
+                    <label className="block text-slate-300 font-semibold mb-1.5 flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        <Star className={`w-3.5 h-3.5 ${isGoogleSynced ? 'text-amber-400 fill-amber-400' : 'text-slate-500'}`} />
+                        Rating Google Día 1
+                      </span>
+                      {isGoogleSynced ? (
                         <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold">
                           ✓ {onboardForm.initialRating}★ Live
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-amber-400 font-mono">
+                          Auto (Paso 1)
                         </span>
                       )}
                     </label>
@@ -6561,48 +6581,73 @@ export default function MasterAdminPage() {
                       step="0.1"
                       min="1.0"
                       max="5.0"
-                      value={onboardForm.initialRating}
-                      onChange={(e) => setOnboardForm({ ...onboardForm, initialRating: parseFloat(e.target.value) })}
-                      className={`w-full bg-[#0E121B] border rounded-xl px-3 py-2 outline-none font-mono text-sm ${
-                        isGoogleSynced ? 'border-emerald-500/60 text-emerald-300 font-bold' : 'border-slate-700 text-white'
+                      value={onboardForm.initialRating > 0 ? onboardForm.initialRating : ''}
+                      onChange={(e) => setOnboardForm({ ...onboardForm, initialRating: parseFloat(e.target.value) || 0 })}
+                      placeholder="⚡ Automático al detectar Google..."
+                      className={`w-full bg-[#0E121B] border rounded-xl px-3.5 py-2.5 outline-none font-mono text-sm ${
+                        isGoogleSynced
+                          ? 'border-emerald-500/60 text-emerald-300 font-bold'
+                          : 'border-slate-700 text-white placeholder-slate-600'
                       }`}
                     />
-                    <p className="text-[10px] text-slate-400 mt-1">Escala de 1.0 a 5.0★</p>
+                    <p className="text-[10px] text-slate-400 mt-1 flex items-center justify-between">
+                      <span>Escala de 1.0 a 5.0★</span>
+                      {isGoogleSynced && <span className="text-emerald-400 font-bold">✓ Extraído de Google Maps</span>}
+                    </p>
                   </div>
 
-                  <div className={`p-3 rounded-2xl bg-[#141A26] border transition-all ${
-                    isGoogleSynced ? 'border-emerald-500/50 shadow-md shadow-emerald-500/10' : 'border-slate-800'
+                  {/* Reseñas Google Día 1 */}
+                  <div className={`p-3.5 rounded-2xl bg-[#141A26] border transition-all ${
+                    isGoogleSynced ? 'border-emerald-500/60 bg-emerald-950/20 shadow-lg shadow-emerald-500/10' : 'border-slate-800'
                   }`}>
-                    <label className="block text-slate-300 font-semibold mb-1 flex items-center justify-between">
-                      <span>Reseñas Google Día 1</span>
-                      {isGoogleSynced && (
+                    <label className="block text-slate-300 font-semibold mb-1.5 flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        <MessageCircle className={`w-3.5 h-3.5 ${isGoogleSynced ? 'text-blue-400' : 'text-slate-500'}`} />
+                        Reseñas Google Día 1
+                      </span>
+                      {isGoogleSynced ? (
                         <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold">
                           ✓ {onboardForm.initialReviewCount} Live
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-amber-400 font-mono">
+                          Auto (Paso 1)
                         </span>
                       )}
                     </label>
                     <input
                       type="number"
                       min="0"
-                      value={onboardForm.initialReviewCount}
+                      value={onboardForm.initialReviewCount > 0 ? onboardForm.initialReviewCount : ''}
                       onChange={(e) => setOnboardForm({ ...onboardForm, initialReviewCount: parseInt(e.target.value) || 0 })}
-                      className={`w-full bg-[#0E121B] border rounded-xl px-3 py-2 outline-none font-mono text-sm ${
-                        isGoogleSynced ? 'border-emerald-500/60 text-emerald-300 font-bold' : 'border-slate-700 text-white'
+                      placeholder="⚡ Automático al detectar Google..."
+                      className={`w-full bg-[#0E121B] border rounded-xl px-3.5 py-2.5 outline-none font-mono text-sm ${
+                        isGoogleSynced
+                          ? 'border-emerald-500/60 text-emerald-300 font-bold'
+                          : 'border-slate-700 text-white placeholder-slate-600'
                       }`}
                     />
-                    <p className="text-[10px] text-slate-400 mt-1">Total acumulado inicial</p>
+                    <p className="text-[10px] text-slate-400 mt-1 flex items-center justify-between">
+                      <span>Total acumulado inicial</span>
+                      {isGoogleSynced && <span className="text-emerald-400 font-bold">✓ Extraído de Google Maps</span>}
+                    </p>
                   </div>
 
-                  <div className="p-3 rounded-2xl bg-[#141A26] border border-slate-800">
-                    <label className="block text-slate-300 font-semibold mb-1">Ticket Promedio (COP $)</label>
+                  {/* Ticket Promedio */}
+                  <div className="p-3.5 rounded-2xl bg-[#141A26] border border-slate-800">
+                    <label className="block text-slate-300 font-semibold mb-1.5 flex items-center gap-1">
+                      <DollarSign className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Ticket Promedio de Compra</span>
+                    </label>
                     <input
                       type="number"
                       step="1000"
-                      value={onboardForm.averageTicketCOP}
+                      value={onboardForm.averageTicketCOP || ''}
                       onChange={(e) => setOnboardForm({ ...onboardForm, averageTicketCOP: parseInt(e.target.value) || 0 })}
-                      className="w-full bg-[#0E121B] border border-slate-700 text-white rounded-xl px-3 py-2 outline-none font-mono text-sm"
+                      placeholder="Ej: 45000"
+                      className="w-full bg-[#0E121B] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none font-mono text-sm"
                     />
-                    <p className="text-[10px] text-slate-400 mt-1">Valor promedio de compra</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Valor promedio de compra del comensal o cliente.</p>
                   </div>
                 </div>
               </div>
