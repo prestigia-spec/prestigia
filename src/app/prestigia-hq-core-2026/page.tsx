@@ -2751,9 +2751,9 @@ export default function MasterAdminPage() {
   // VIEW: AUTHENTICATED MASTER CONSOLE
   // -------------------------------------------------------------
   return (
-    <div className="min-h-screen bg-[#07090E] text-slate-100 flex flex-col font-sans selection:bg-amber-500/20 selection:text-amber-300 w-full overflow-x-hidden">
-      {/* Sticky Command Deck (Top Header + Tabs Navigation Bar) */}
-      <div className="sticky top-0 z-40 w-full bg-[#0C101A]/95 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl shadow-black/60">
+    <div className="min-h-screen bg-[#07090E] text-slate-100 flex flex-col font-sans selection:bg-amber-500/20 selection:text-amber-300 w-full">
+      {/* Fixed Command Deck (Top Header + Tabs Navigation Bar) */}
+      <div className="fixed top-0 left-0 right-0 z-40 w-full bg-[#0C101A]/95 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl shadow-black/60">
         {/* Top Banking Command Bar */}
         <header className="px-3 sm:px-4 lg:px-5 py-2.5 flex items-center justify-between gap-2 border-b border-slate-800/70 w-full">
         {/* Left Crest & Identification */}
@@ -2994,9 +2994,12 @@ export default function MasterAdminPage() {
       </nav>
     </div>
 
+    {/* Layout Spacer to guarantee no content is hidden underneath the fixed command deck */}
+    <div className="h-[108px] shrink-0 w-full pointer-events-none" aria-hidden="true" />
+
     {/* Global Toast Notification */}
     {notification && (
-      <div className="fixed top-24 right-6 z-50 animate-in fade-in slide-in-from-top-4 duration-200">
+      <div className="fixed top-28 right-6 z-50 animate-in fade-in slide-in-from-top-4 duration-200">
         <div
           className={`px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-xs font-semibold border ${
             notification.type === 'success'
