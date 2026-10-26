@@ -95,6 +95,14 @@ const PLAN_BADGES: Record<string, { label: string; color: string; border: string
   empresarial: { label: 'Empresarial', color: 'bg-purple-500/10 text-purple-400', border: 'border-purple-500/30' },
 };
 
+const PRESTIGIA_COUNTRIES = [
+  { id: 'Colombia (NIT)', label: 'Colombia 🇨🇴', flag: '🇨🇴', prefix: '+57', taxLabel: 'NIT / Cédula Tributaria', taxPlaceholder: '901.458.723-1', defaultCity: 'Bogotá' },
+  { id: 'Chile (RUT)', label: 'Chile 🇨🇱', flag: '🇨🇱', prefix: '+56', taxLabel: 'RUT Comercial', taxPlaceholder: '76.432.198-5', defaultCity: 'Santiago' },
+  { id: 'México (RFC)', label: 'México 🇲🇽', flag: '🇲🇽', prefix: '+52', taxLabel: 'RFC Fiscal', taxPlaceholder: 'OPG180415XYZ', defaultCity: 'Ciudad de México' },
+  { id: 'España (CIF/NIF)', label: 'España 🇪🇸', flag: '🇪🇸', prefix: '+34', taxLabel: 'NIF / CIF Tributario', taxPlaceholder: 'B-12345678', defaultCity: 'Madrid' },
+  { id: 'Estados Unidos (EIN)', label: 'Estados Unidos 🇺🇸', flag: '🇺🇸', prefix: '+1', taxLabel: 'EIN / Tax ID', taxPlaceholder: '12-3456789', defaultCity: 'Miami' },
+];
+
 // Zero-Trust Masking Helpers for Confidential Contact Channels
 const maskSafePhone = (phone: string) => {
   if (!phone) return '+57 ••• ••• ••XX';
@@ -342,6 +350,7 @@ export default function MasterAdminPage() {
     ownerName: '',
     ownerPhone: '+57',
     ownerEmail: '',
+    logoUrl: '',
     taxId: '',
     googleMapsUrl: '',
     googlePlaceId: '',
@@ -1138,18 +1147,20 @@ export default function MasterAdminPage() {
         const cleanName = (d.name && d.name !== 'Ficha de Google Maps') ? d.name : '';
 
         setOnboardForm((prev) => {
-          const newName = cleanName || prev.name || rawQuery;
-          const newId = prev.id && prev.id !== '' && prev.name === newName
-            ? prev.id
-            : newName.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+          const detectedNameClean = cleanName || rawQuery;
+          const finalName = prev.name.trim() ? prev.name : detectedNameClean;
+          const finalId = prev.id.trim() ? prev.id : finalName.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+          const finalAddress = prev.address.trim() ? prev.address : (detectedAddress || '');
+          const finalCity = (prev.city.trim() && prev.city !== 'Bogotá') ? prev.city : (detectedCity || prev.city || 'Bogotá');
+          const finalLocality = (prev.locality.trim() && prev.locality !== 'Chapinero' && prev.locality !== 'Principal') ? prev.locality : (detectedLocality || prev.locality || 'Principal');
 
           return {
             ...prev,
-            name: newName,
-            id: newId,
-            address: detectedAddress || prev.address || '',
-            city: detectedCity || prev.city || 'Bogotá',
-            locality: detectedLocality || prev.locality || 'Principal',
+            name: finalName,
+            id: finalId,
+            address: finalAddress,
+            city: finalCity,
+            locality: finalLocality,
             initialRating: rating,
             initialReviewCount: reviews,
             googleMapsUrl: d.googleMapsUrl || prev.googleMapsUrl,
@@ -2445,6 +2456,7 @@ export default function MasterAdminPage() {
                     ownerName: '',
                     ownerPhone: '+57',
                     ownerEmail: '',
+                    logoUrl: '',
                     taxId: '',
                     googleMapsUrl: '',
                     googlePlaceId: '',
@@ -5315,21 +5327,81 @@ export default function MasterAdminPage() {
               {/* PASO 2: DATOS COMERCIALES DE LA MARCA & SEDE PRINCIPAL   */}
               {/* ========================================================= */}
               <div className="space-y-4 pt-2">
-                <div className="flex items-center gap-2 pb-1 border-b border-slate-800">
-                  <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-extrabold text-[10px] tracking-wider uppercase border border-slate-700">
-                    Paso 2
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-1 border-b border-slate-800 gap-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-extrabold text-[10px] tracking-wider uppercase border border-slate-700">
+                      Paso 2
+                    </span>
+                    <h4 className="font-extrabold text-white text-xs sm:text-sm">
+                      Datos Comerciales de la Marca & Sede Principal
+                    </h4>
+                  </div>
+                  <span className="text-[10px] text-amber-400 font-medium">
+                    ✍️ Puedes escribir tus datos o afinar los sugeridos por Google
                   </span>
-                  <h4 className="font-extrabold text-white text-xs sm:text-sm">
-                    Datos Comerciales de la Marca & Sede Principal
-                  </h4>
                 </div>
 
-                {/* Row 1: Brand Info */}
+                {/* Fila 1: País de Operación & Nicho / Industria */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1">
-                      Nombre Comercial de la Marca *
-                      {isGoogleSynced && <span className="ml-2 text-[10px] text-emerald-400 font-bold">✓ Google Detectado</span>}
+                    <label className="block text-slate-300 font-medium mb-1 flex items-center justify-between">
+                      <span>País de Operación *</span>
+                      <span className="text-[10px] text-amber-400 font-bold">Moneda & Prefijo</span>
+                    </label>
+                    <select
+                      required
+                      value={onboardForm.country}
+                      onChange={(e) => {
+                        const newCountryId = e.target.value;
+                        const countryObj = PRESTIGIA_COUNTRIES.find((c) => c.id === newCountryId) || PRESTIGIA_COUNTRIES[0];
+                        setOnboardForm((prev) => {
+                          let newPhone = prev.ownerPhone;
+                          const knownPrefixes = PRESTIGIA_COUNTRIES.map((c) => c.prefix);
+                          const matchedPrefix = knownPrefixes.find((pfx) => newPhone.startsWith(pfx));
+                          if (matchedPrefix || !newPhone || newPhone.trim() === '') {
+                            newPhone = countryObj.prefix + ' ';
+                          }
+                          return {
+                            ...prev,
+                            country: newCountryId,
+                            ownerPhone: newPhone,
+                            city: prev.city === 'Bogotá' || !prev.city ? countryObj.defaultCity : prev.city,
+                          };
+                        });
+                      }}
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 cursor-pointer font-medium"
+                    >
+                      {PRESTIGIA_COUNTRIES.map((country) => (
+                        <option key={country.id} value={country.id}>
+                          {country.label} ({country.taxLabel} • {country.prefix})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1">Nicho / Industria *</label>
+                    <select
+                      required
+                      value={onboardForm.category}
+                      onChange={(e) => setOnboardForm({ ...onboardForm, category: e.target.value })}
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 cursor-pointer font-medium"
+                    >
+                      {PRESTIGIA_NICHES.map((niche) => (
+                        <option key={niche.id} value={niche.label}>
+                          {niche.icon} {niche.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Fila 2: Nombre Comercial de la Marca & Identificador Slug */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1 flex items-center justify-between">
+                      <span>Nombre Comercial de la Marca *</span>
+                      {isGoogleSynced && <span className="text-[10px] text-emerald-400 font-bold">✓ Sugerido Google</span>}
                     </label>
                     <input
                       type="text"
@@ -5348,6 +5420,7 @@ export default function MasterAdminPage() {
                       placeholder="Ej: La Taquería del Sol"
                       className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 font-medium"
                     />
+                    <p className="text-[10px] text-slate-400 mt-1">Escribe el nombre comercial oficial que verán tus clientes.</p>
                   </div>
                   <div>
                     <label className="block text-slate-300 font-medium mb-1">Identificador Slug (URL & QR) *</label>
@@ -5359,11 +5432,45 @@ export default function MasterAdminPage() {
                       placeholder="la-taqueria-del-sol"
                       className="w-full bg-[#141A26] border border-slate-700 text-amber-400 font-mono rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
                     />
+                    <p className="text-[10px] text-slate-400 mt-1">
+                      Enlace público QR: <span className="font-mono text-slate-300">prestigia.app/r/{onboardForm.id || 'slug'}</span>
+                    </p>
                   </div>
                 </div>
 
-                {/* Row 2: Razón Social & NIT */}
+                {/* Fila 3: Logotipo de la Marca & Razón Social Registrada */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1 flex items-center justify-between">
+                      <span>Logotipo de la Marca (Opcional)</span>
+                      <span className="text-[10px] text-slate-400">URL de imagen</span>
+                    </label>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 rounded-xl bg-[#0E121B] border border-slate-700 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                        {onboardForm.logoUrl ? (
+                          <img
+                            src={onboardForm.logoUrl}
+                            alt="Logo preview"
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <Sparkles className="w-4 h-4 text-amber-400" />
+                        )}
+                      </div>
+                      <input
+                        type="url"
+                        value={onboardForm.logoUrl}
+                        onChange={(e) => setOnboardForm({ ...onboardForm, logoUrl: e.target.value })}
+                        placeholder="https://ejemplo.com/logo.png"
+                        className="flex-1 bg-[#141A26] border border-slate-700 text-white text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-1">Pega el link de la imagen de tu logo (o déjalo vacío para avatar inicial).</p>
+                  </div>
+
                   <div>
                     <label className="block text-slate-300 font-medium mb-1">
                       Razón Social Registrada (Persona Jurídica o Legal)
@@ -5377,55 +5484,48 @@ export default function MasterAdminPage() {
                     />
                     <p className="text-[10px] text-slate-400 mt-1">Si es igual a la marca o persona natural, puedes dejarlo igual.</p>
                   </div>
-                  <div>
-                    <label className="block text-slate-300 font-medium mb-1">
-                      NIT / Identificación Tributaria *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={onboardForm.taxId}
-                      onChange={(e) => setOnboardForm({ ...onboardForm, taxId: e.target.value })}
-                      placeholder="Ej: 901.458.723-1"
-                      className="w-full bg-[#141A26] border border-slate-700 text-amber-300 font-mono rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
-                    />
-                    <p className="text-[10px] text-slate-400 mt-1">Número de identificación tributaria para facturación.</p>
-                  </div>
                 </div>
 
-                {/* Row 3: Niche & Physical Address */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-slate-300 font-medium mb-1">Nicho / Industria *</label>
-                    <select
-                      required
-                      value={onboardForm.category}
-                      onChange={(e) => setOnboardForm({ ...onboardForm, category: e.target.value })}
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 cursor-pointer"
-                    >
-                      {PRESTIGIA_NICHES.map((niche) => (
-                        <option key={niche.id} value={niche.label}>
-                          {niche.icon} {niche.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-slate-300 font-medium mb-1">
-                      Dirección Física de la Sede Principal
-                      {isGoogleSynced && <span className="ml-2 text-[10px] text-emerald-400 font-bold">✓ Google Detectado</span>}
-                    </label>
-                    <input
-                      type="text"
-                      value={onboardForm.address}
-                      onChange={(e) => setOnboardForm({ ...onboardForm, address: e.target.value })}
-                      placeholder="Ej: Cra. 13 #82-28, Chapinero"
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
-                    />
-                  </div>
-                </div>
+                {/* Fila 4: Identificación Tributaria (NIT/RUT/RFC/NIF) & Dirección Física */}
+                {(() => {
+                  const countryObj = PRESTIGIA_COUNTRIES.find((c) => c.id === onboardForm.country) || PRESTIGIA_COUNTRIES[0];
+                  return (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-slate-300 font-medium mb-1 flex items-center justify-between">
+                          <span>{countryObj.taxLabel} *</span>
+                          <span className="text-[10px] font-mono text-amber-400">{countryObj.flag} {countryObj.id.split(' ')[0]}</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={onboardForm.taxId}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, taxId: e.target.value })}
+                          placeholder={`Ej: ${countryObj.taxPlaceholder}`}
+                          className="w-full bg-[#141A26] border border-slate-700 text-amber-300 font-mono rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                        />
+                        <p className="text-[10px] text-slate-400 mt-1">Número de identificación tributaria para facturación.</p>
+                      </div>
 
-                {/* Row 4: City, Locality & Plan */}
+                      <div>
+                        <label className="block text-slate-300 font-medium mb-1 flex items-center justify-between">
+                          <span>Dirección Física de la Sede Principal</span>
+                          {isGoogleSynced && <span className="text-[10px] text-emerald-400 font-bold">✓ Sugerido Google</span>}
+                        </label>
+                        <input
+                          type="text"
+                          value={onboardForm.address}
+                          onChange={(e) => setOnboardForm({ ...onboardForm, address: e.target.value })}
+                          placeholder="Ej: Cra. 13 #82-28, Chapinero"
+                          className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                        />
+                        <p className="text-[10px] text-slate-400 mt-1">Escribe la dirección física real o afina la de Google.</p>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Fila 5: Ciudad, Localidad / Zona & Plan Contratado */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-slate-300 font-medium mb-1">Ciudad *</label>
@@ -5454,7 +5554,7 @@ export default function MasterAdminPage() {
                     <select
                       value={onboardForm.plan}
                       onChange={(e) => setOnboardForm({ ...onboardForm, plan: e.target.value as BusinessPlan })}
-                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 capitalize cursor-pointer"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 capitalize cursor-pointer font-medium"
                     >
                       <option value="independiente">Plan Independiente ($49k)</option>
                       <option value="pro">Plan Pro ($120k)</option>
@@ -5464,10 +5564,12 @@ export default function MasterAdminPage() {
                   </div>
                 </div>
 
-                {/* Row 5: Contract Signer & WhatsApp */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Fila 6: Titular / Firmante, WhatsApp & Correo Electrónico (3 Columnas) */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1">Representante Legal / Quien Firmó el Contrato *</label>
+                    <label className="block text-slate-300 font-medium mb-1">
+                      Representante Legal / Titular *
+                    </label>
                     <input
                       type="text"
                       required
@@ -5476,9 +5578,13 @@ export default function MasterAdminPage() {
                       placeholder="Mario Casas"
                       className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
                     />
+                    <p className="text-[10px] text-slate-400 mt-1">Nombre del dueño o gerente.</p>
                   </div>
+
                   <div>
-                    <label className="block text-slate-300 font-medium mb-1">WhatsApp para Alertas Directas *</label>
+                    <label className="block text-slate-300 font-medium mb-1">
+                      WhatsApp para Alertas Directas *
+                    </label>
                     <input
                       type="text"
                       required
@@ -5487,6 +5593,22 @@ export default function MasterAdminPage() {
                       placeholder="+57 300 123 4567"
                       className="w-full bg-[#141A26] border border-slate-700 text-white font-mono rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
                     />
+                    <p className="text-[10px] text-slate-400 mt-1">Para alertas de insatisfacción en vivo.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1">
+                      Correo Electrónico del Titular *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={onboardForm.ownerEmail}
+                      onChange={(e) => setOnboardForm({ ...onboardForm, ownerEmail: e.target.value })}
+                      placeholder="gerencia@taqueria.com"
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400"
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1">Para envío de credenciales del portal.</p>
                   </div>
                 </div>
               </div>

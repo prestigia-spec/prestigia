@@ -826,6 +826,7 @@ export async function POST(request: NextRequest) {
         ownerName,
         ownerPhone,
         ownerEmail,
+        logoUrl,
         taxId,
         averageTicketCOP,
         initialRating,
@@ -857,11 +858,15 @@ export async function POST(request: NextRequest) {
         ownerPhone,
         contractSignerName: ownerName,
         contractSignerPhone: ownerPhone,
-        ownerEmail: ownerEmail || `${id}@prestigia.app`,
+        ownerEmail: (ownerEmail && ownerEmail.trim()) ? ownerEmail.trim() : `${id}@prestigia.app`,
         plan: plan || 'pro',
         status: 'active',
         password: 'admin',
         trialEndsAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+        branding: (logoUrl && typeof logoUrl === 'string' && logoUrl.trim()) ? {
+          logoUrl: logoUrl.trim(),
+          primaryColor: '#F59E0B',
+        } : undefined,
         branches: [
           {
             id: `${id}-principal`,
