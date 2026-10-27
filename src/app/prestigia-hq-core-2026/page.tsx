@@ -3225,23 +3225,25 @@ export default function MasterAdminPage() {
     return Array.from(set).sort();
   }, [unifiedDataLakeRecords]);
 
-  // Cities belonging ONLY to the selected Country (Cascading)
+  // Cities belonging ONLY to the selected Country (Cascading estricto: solo al elegir país)
   const availableDataCities = useMemo(() => {
+    if (dataFilterCountry === 'all') return [];
     const set = new Set<string>();
     unifiedDataLakeRecords.forEach((r) => {
-      if (dataFilterCountry === 'all' || r.country === dataFilterCountry) {
-        if (r.city) set.add(r.city.trim());
+      if (r.country === dataFilterCountry && r.city) {
+        set.add(r.city.trim());
       }
     });
     return Array.from(set).sort();
   }, [unifiedDataLakeRecords, dataFilterCountry]);
 
-  // Localities belonging ONLY to the selected City and Country (Cascading)
+  // Localities belonging ONLY to the selected City and Country (Cascading estricto: solo al elegir ciudad)
   const availableDataLocalities = useMemo(() => {
+    if (dataFilterCountry === 'all' || dataFilterCity === 'all') return [];
     const set = new Set<string>();
     unifiedDataLakeRecords.forEach((r) => {
-      const matchCountry = dataFilterCountry === 'all' || r.country === dataFilterCountry;
-      const matchCity = dataFilterCity === 'all' || r.city.trim().toLowerCase() === dataFilterCity.trim().toLowerCase();
+      const matchCountry = r.country === dataFilterCountry;
+      const matchCity = r.city.trim().toLowerCase() === dataFilterCity.trim().toLowerCase();
       if (matchCountry && matchCity && r.locality && r.locality !== 'Principal') {
         set.add(r.locality.trim());
       }
@@ -6143,34 +6145,36 @@ export default function MasterAdminPage() {
                   </select>
                 </div>
 
-                {/* Ciudad Filter */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-slate-400 font-medium">Ciudad:</span>
-                  <select
-                    value={dataFilterCity}
-                    onChange={(e) => {
-                      setDataFilterCity(e.target.value);
-                      setDataFilterLocality('all');
-                    }}
-                    className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
-                  >
-                    <option value="all">Todas las Ciudades ({availableDataCities.length})</option>
-                    {availableDataCities.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
+                {/* Ciudad Filter - Solo aparece tras seleccionar un País específico */}
+                {dataFilterCountry !== 'all' && availableDataCities.length > 0 && (
+                  <div className="flex items-center gap-1.5 animate-fade-in">
+                    <span className="text-slate-400 font-medium">Ciudad:</span>
+                    <select
+                      value={dataFilterCity}
+                      onChange={(e) => {
+                        setDataFilterCity(e.target.value);
+                        setDataFilterLocality('all');
+                      }}
+                      className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
+                    >
+                      <option value="all">Todas las Ciudades de {dataFilterCountry} ({availableDataCities.length})</option>
+                      {availableDataCities.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
-                {/* Localidad / Zona Filter */}
-                {availableDataLocalities.length > 0 && (
-                  <div className="flex items-center gap-1.5">
+                {/* Localidad / Zona Filter - Solo aparece tras seleccionar una Ciudad específica */}
+                {dataFilterCountry !== 'all' && dataFilterCity !== 'all' && availableDataLocalities.length > 0 && (
+                  <div className="flex items-center gap-1.5 animate-fade-in">
                     <span className="text-slate-400 font-medium">Zona / Localidad:</span>
                     <select
                       value={dataFilterLocality}
                       onChange={(e) => setDataFilterLocality(e.target.value)}
                       className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
                     >
-                      <option value="all">Todas las Zonas ({availableDataLocalities.length})</option>
+                      <option value="all">Todas las Zonas de {dataFilterCity} ({availableDataLocalities.length})</option>
                       {availableDataLocalities.map((loc) => (
                         <option key={loc} value={loc}>{loc}</option>
                       ))}
@@ -6196,9 +6200,9 @@ export default function MasterAdminPage() {
                   </select>
                 </div>
 
-                {/* Sede Física Filter (Cascading) */}
-                {availableDataBranches.length > 0 && (
-                  <div className="flex items-center gap-1.5">
+                {/* Sede Física Filter - Solo aparece tras seleccionar un Negocio específico */}
+                {dataFilterBusiness !== 'all' && availableDataBranches.length > 0 && (
+                  <div className="flex items-center gap-1.5 animate-fade-in">
                     <span className="text-slate-400 font-medium">Sede:</span>
                     <select
                       value={dataFilterBranch}
