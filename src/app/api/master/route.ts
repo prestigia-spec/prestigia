@@ -18,7 +18,7 @@ import {
   deleteBusiness,
   archiveBusiness,
 } from '@/lib/db';
-import { Business, MasterAddOns, DayOneBaseline } from '@/lib/types';
+import { Business, MasterAddOns, DayOneBaseline, Branch } from '@/lib/types';
 import { verifyTOTP, getTOTPAuthUrl } from '@/lib/totp';
 import {
   dispatchEmergencyOtpNotification,
@@ -808,6 +808,86 @@ export async function POST(request: NextRequest) {
         success: true,
         message: `Línea base histórica de ${updated.name} actualizada correctamente.`,
         business: updated,
+      });
+    }
+
+    // Save or Update Branch (Sede)
+    if (action === 'save_branch') {
+      const { businessId, branch } = body;
+      if (!businessId || !branch || !branch.name) {
+        return NextResponse.json({ error: 'Faltan datos obligatorios de la sede' }, { status: 400 });
+      }
+
+      const biz = await getBusinessById(businessId);
+      if (!biz) {
+        return NextResponse.json({ error: 'Marca no encontrada' }, { status: 404 });
+      }
+
+      const branchSlug = branch.id
+        ? branch.id
+        : `${biz.id}-${branch.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-')}`;
+
+      const finalBranch: Branch = {
+        ...branch,
+        id: branchSlug,
+        name: branch.name.trim(),
+        city: branch.city || biz.baseline?.city || 'Bogotá',
+        locality: branch.locality || 'Principal',
+        address: branch.address || '',
+        managerName: branch.managerName || biz.ownerName,
+        managerPhone: branch.managerPhone || biz.ownerPhone,
+        managerPassword: branch.managerPassword || '1234',
+        googleReviewUrl: branch.googleReviewUrl || (branch.googlePlaceId ? `https://search.google.com/local/writereview?placeid=${branch.googlePlaceId}` : biz.branches?.[0]?.googleReviewUrl || ''),
+        googlePlaceId: branch.googlePlaceId || undefined,
+        status: branch.status || 'active',
+        websiteUrl: branch.websiteUrl || `https://${biz.id}.prestigia.com`,
+      };
+
+      const existingBranches = biz.branches || [];
+      const branchIndex = existingBranches.findIndex((b) => b.id === finalBranch.id);
+
+      let updatedBranches: Branch[];
+      if (branchIndex >= 0) {
+        updatedBranches = [...existingBranches];
+        updatedBranches[branchIndex] = { ...existingBranches[branchIndex], ...finalBranch };
+      } else {
+        updatedBranches = [...existingBranches, finalBranch];
+      }
+
+      biz.branches = updatedBranches;
+      await saveBusiness(biz);
+
+      return NextResponse.json({
+        success: true,
+        message: `Sede '${finalBranch.name}' guardada correctamente en ${biz.name}.`,
+        business: biz,
+        branch: finalBranch,
+      });
+    }
+
+    // Delete Branch
+    if (action === 'delete_branch') {
+      const { businessId, branchId } = body;
+      if (!businessId || !branchId) {
+        return NextResponse.json({ error: 'Faltan identificadores para eliminar la sede' }, { status: 400 });
+      }
+
+      const biz = await getBusinessById(businessId);
+      if (!biz) {
+        return NextResponse.json({ error: 'Marca no encontrada' }, { status: 404 });
+      }
+
+      if ((biz.branches || []).length <= 1) {
+        return NextResponse.json({ error: 'No es posible eliminar la única sede principal de la marca.' }, { status: 400 });
+      }
+
+      biz.branches = (biz.branches || []).filter((b) => b.id !== branchId);
+      await saveBusiness(biz);
+
+      return NextResponse.json({
+        success: true,
+        message: 'Sede desvinculada y eliminada correctamente.',
+        business: biz,
       });
     }
 

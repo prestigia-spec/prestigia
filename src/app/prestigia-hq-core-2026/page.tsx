@@ -71,9 +71,10 @@ import {
   UserCheck,
   Upload,
   Image as ImageIcon,
+  Edit3,
 } from 'lucide-react';
 import { PrestigiaIcon } from '@/components/PrestigiaIcon';
-import { Business, BusinessPlan, Branch, MasterAddOns, DayOneBaseline, PRESTIGIA_NICHES, CommercialLead, TrafficVisit } from '@/lib/types';
+import { Business, BusinessPlan, Branch, BusinessStatus, MasterAddOns, DayOneBaseline, PRESTIGIA_NICHES, CommercialLead, TrafficVisit } from '@/lib/types';
 import { EmailDispatchRecord } from '@/lib/db';
 import {
   buildWelcomeCredentialsHtml,
@@ -933,6 +934,42 @@ export default function MasterAdminPage() {
   const [googleDetectError, setGoogleDetectError] = useState<string | null>(null);
   const [isGoogleSynced, setIsGoogleSynced] = useState(false);
 
+  // Branch (Sedes Físicas) Management State
+  const [showBranchModal, setShowBranchModal] = useState(false);
+  const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
+  const [branchFormData, setBranchFormData] = useState<{
+    id: string;
+    name: string;
+    address: string;
+    city: string;
+    locality: string;
+    managerName: string;
+    managerPhone: string;
+    managerPassword: string;
+    googlePlaceId: string;
+    googleReviewUrl: string;
+    googleMapsUrl: string;
+    status: BusinessStatus;
+  }>({
+    id: '',
+    name: '',
+    address: '',
+    city: '',
+    locality: '',
+    managerName: '',
+    managerPhone: '',
+    managerPassword: '1234',
+    googlePlaceId: '',
+    googleReviewUrl: '',
+    googleMapsUrl: '',
+    status: 'active',
+  });
+  const [branchGoogleQuery, setBranchGoogleQuery] = useState('');
+  const [branchGoogleLoading, setBranchGoogleLoading] = useState(false);
+  const [branchGoogleSuccess, setBranchGoogleSuccess] = useState<string | null>(null);
+  const [branchGoogleError, setBranchGoogleError] = useState<string | null>(null);
+  const [branchSavingLoading, setBranchSavingLoading] = useState(false);
+
   const [customCountryMode, setCustomCountryMode] = useState(false);
   const [customCityMode, setCustomCityMode] = useState(false);
   const logoFileInputRef = useRef<HTMLInputElement | null>(null);
@@ -1700,6 +1737,163 @@ export default function MasterAdminPage() {
       }
     } catch (err) {
       setNotification({ type: 'error', message: 'Error guardando testimonio' });
+    }
+  };
+
+  // Open Add/Edit Branch Modal
+  const handleOpenBranchModal = (branchToEdit?: Branch) => {
+    if (branchToEdit) {
+      setEditingBranch(branchToEdit);
+      setBranchFormData({
+        id: branchToEdit.id || '',
+        name: branchToEdit.name || '',
+        address: branchToEdit.address || '',
+        city: branchToEdit.city || currentBusiness?.baseline?.city || 'Bogotá',
+        locality: branchToEdit.locality || 'Principal',
+        managerName: branchToEdit.managerName || currentBusiness?.ownerName || '',
+        managerPhone: branchToEdit.managerPhone || currentBusiness?.ownerPhone || '',
+        managerPassword: branchToEdit.managerPassword || '1234',
+        googlePlaceId: branchToEdit.googlePlaceId || '',
+        googleReviewUrl: branchToEdit.googleReviewUrl || '',
+        googleMapsUrl: branchToEdit.googlePlaceId ? `https://www.google.com/maps/place/?q=place_id:${branchToEdit.googlePlaceId}` : (branchToEdit.googleReviewUrl || ''),
+        status: branchToEdit.status || 'active',
+      });
+      setBranchGoogleQuery(branchToEdit.googlePlaceId || branchToEdit.name || '');
+    } else {
+      const nextIdx = (currentBusiness?.branches?.length || 0) + 1;
+      setEditingBranch(null);
+      setBranchFormData({
+        id: '',
+        name: `Sede ${nextIdx}`,
+        address: '',
+        city: currentBusiness?.baseline?.city || currentBusiness?.branches?.[0]?.city || 'Bogotá',
+        locality: 'Norte',
+        managerName: '',
+        managerPhone: currentBusiness?.ownerPhone || '',
+        managerPassword: '1234',
+        googlePlaceId: '',
+        googleReviewUrl: '',
+        googleMapsUrl: '',
+        status: 'active',
+      });
+      setBranchGoogleQuery('');
+    }
+    setBranchGoogleSuccess(null);
+    setBranchGoogleError(null);
+    setShowBranchModal(true);
+  };
+
+  // Google Maps RPC Detection for specific branch
+  const handleDetectBranchGoogle = async (inputQuery?: string) => {
+    const query = (inputQuery || branchGoogleQuery || branchFormData.name).trim();
+    if (!query) {
+      setBranchGoogleError('Ingresa el enlace de Google Maps o nombre de esta sede.');
+      return;
+    }
+    setBranchGoogleLoading(true);
+    setBranchGoogleError(null);
+    setBranchGoogleSuccess(null);
+    try {
+      const res = await fetch('/api/auditor/google-lookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: query }),
+      });
+      const json = await res.json();
+      if (json.success && json.data) {
+        const d = json.data;
+        let detectedCity = '';
+        let detectedLocality = '';
+        if (d.address) {
+          const parts = d.address.split(',').map((p: string) => p.trim());
+          if (parts.length >= 3) {
+            detectedCity = parts[parts.length - 2];
+            detectedLocality = parts[parts.length - 3];
+          } else if (parts.length === 2) {
+            detectedCity = parts[1];
+            detectedLocality = parts[0];
+          }
+        }
+        setBranchFormData((prev) => ({
+          ...prev,
+          name: (d.name && d.name !== 'Ficha de Google Maps') ? d.name : prev.name,
+          address: d.address || prev.address,
+          city: detectedCity || prev.city,
+          locality: detectedLocality || prev.locality,
+          googlePlaceId: d.placeId || prev.googlePlaceId,
+          googleReviewUrl: d.googleReviewUrl || prev.googleReviewUrl,
+          googleMapsUrl: d.googleMapsUrl || prev.googleMapsUrl,
+        }));
+        setBranchGoogleSuccess(`¡Ficha de sede detectada! ${d.name} (${d.rating}★ - ${d.reviewsCount} reseñas)`);
+      } else {
+        setBranchGoogleError(json.error || 'No se encontró la ficha de Google. Puedes completar los datos manualmente.');
+      }
+    } catch {
+      setBranchGoogleError('Error al consultar el servicio de Google Maps.');
+    } finally {
+      setBranchGoogleLoading(false);
+    }
+  };
+
+  // Save Branch Handler
+  const handleSaveBranch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentBusiness) return;
+    if (!branchFormData.name.trim()) {
+      alert('El nombre de la sede es obligatorio.');
+      return;
+    }
+    setBranchSavingLoading(true);
+    try {
+      const res = await fetch('/api/master', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_branch',
+          businessId: currentBusiness.id,
+          branch: branchFormData,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShowBranchModal(false);
+        setNotification({ type: 'success', message: data.message });
+        setTimeout(() => setNotification(null), 4000);
+        fetchMasterData();
+      } else {
+        alert(data.error || 'Error al guardar la sede');
+      }
+    } catch {
+      alert('Error de red al conectar con el servidor');
+    } finally {
+      setBranchSavingLoading(false);
+    }
+  };
+
+  // Delete Branch Handler
+  const handleDeleteBranch = async (branchId: string, branchName: string) => {
+    if (!currentBusiness) return;
+    if (!confirm(`¿Estás seguro de eliminar la sede '${branchName}'? Esta acción desvinculará su código QR y alertas.`)) return;
+    try {
+      const res = await fetch('/api/master', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete_branch',
+          businessId: currentBusiness.id,
+          branchId,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNotification({ type: 'success', message: data.message });
+        setTimeout(() => setNotification(null), 4000);
+        fetchMasterData();
+      } else {
+        alert(data.error || 'Error al eliminar la sede');
+      }
+    } catch {
+      alert('Error de conexión');
     }
   };
 
@@ -4025,6 +4219,176 @@ export default function MasterAdminPage() {
                     Aplicar Cambios en Vivo para {currentBusiness.name}
                   </button>
                 </div>
+              </div>
+            </div>
+
+            {/* 3. GESTOR INTEGRAL DE SEDES FÍSICAS DE LA MARCA */}
+            <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-6 shadow-xl space-y-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-extrabold text-[10px] tracking-wider uppercase border border-blue-500/20">
+                      Multi-Sede Master
+                    </span>
+                    <span className="text-xs text-slate-400 font-mono">
+                      {(currentBusiness.branches || []).length} sede(s) registrada(s)
+                    </span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-white mt-1 flex items-center gap-2">
+                    <Store className="w-5 h-5 text-amber-400" />
+                    <span>3. Sedes Físicas & Encargados de {currentBusiness.name}</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Gobierna individualmente cada local: dirección, encargado de turno, WhatsApp de alertas inmediatas, ficha de Google y PIN de sala.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleOpenBranchModal()}
+                  className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-extrabold text-xs rounded-xl flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer transition-all shrink-0"
+                >
+                  <Plus className="w-4 h-4 stroke-[2.5]" />
+                  <span>Dar de Alta Nueva Sede</span>
+                </button>
+              </div>
+
+              {/* Lista de Sedes Físicas */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {(currentBusiness.branches || []).map((branch, bIdx) => {
+                  const isPrimary = bIdx === 0 || branch.id.includes('principal');
+                  const branchPlaceId = branch.googlePlaceId;
+                  const branchMapsUrl = branchPlaceId
+                    ? `https://www.google.com/maps/place/?q=place_id:${branchPlaceId}`
+                    : (branch.googleReviewUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(branch.name + ' ' + branch.city)}`);
+                  const qrEvaluationUrl = `https://prestigia.app/evaluar/${branch.id}`;
+
+                  return (
+                    <div
+                      key={branch.id || bIdx}
+                      className="p-5 rounded-2xl bg-[#141A26] border border-slate-800 hover:border-slate-700 transition-all space-y-4 flex flex-col justify-between"
+                    >
+                      {/* Top Header of Card */}
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-sm font-extrabold text-white flex items-center gap-1.5">
+                                <Store className="w-4 h-4 text-amber-400 shrink-0" />
+                                <span>{branch.name}</span>
+                              </h4>
+                              {isPrimary ? (
+                                <span className="text-[10px] bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded-full border border-amber-500/30">
+                                  Sede Principal
+                                </span>
+                              ) : (
+                                <span className="text-[10px] bg-blue-500/20 text-blue-300 font-bold px-2 py-0.5 rounded-full border border-blue-500/30">
+                                  Sede Satélite #{bIdx + 1}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-slate-300 mt-1 flex items-center gap-1.5">
+                              <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                              <span>{branch.address || 'Sin dirección física registrada'} • <strong className="text-white">{branch.locality}, {branch.city}</strong></span>
+                            </p>
+                          </div>
+
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${
+                            branch.status === 'suspended'
+                              ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                              : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                          }`}>
+                            {branch.status === 'suspended' ? 'En Mantenimiento' : 'Activa en Red'}
+                          </span>
+                        </div>
+
+                        {/* Ficha Google & QR Info */}
+                        <div className="p-3 rounded-xl bg-[#0E121B] border border-slate-800/80 space-y-2 text-xs">
+                          {/* Google Maps Listing */}
+                          <div className="flex items-center justify-between flex-wrap gap-2">
+                            <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                              Ficha Google Maps:
+                            </span>
+                            {branchPlaceId ? (
+                              <a
+                                href={branchMapsUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[11px] text-blue-400 hover:text-blue-300 font-mono font-semibold flex items-center gap-1 hover:underline cursor-pointer"
+                              >
+                                <span>Place ID: {branchPlaceId.substring(0, 14)}...</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            ) : (
+                              <span className="text-[11px] text-slate-500 font-mono">Sin Place ID individual</span>
+                            )}
+                          </div>
+
+                          {/* Encargado & Alertas WhatsApp */}
+                          <div className="flex items-center justify-between flex-wrap gap-2 pt-1.5 border-t border-slate-800/60">
+                            <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                              <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                              Encargado Turno:
+                            </span>
+                            <span className="text-[11px] text-white font-medium">
+                              <strong>{branch.managerName || currentBusiness.ownerName}</strong> ({branch.managerPhone})
+                            </span>
+                          </div>
+
+                          {/* PIN Acceso en Sala */}
+                          <div className="flex items-center justify-between flex-wrap gap-2 pt-1.5 border-t border-slate-800/60">
+                            <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                              <Key className="w-3.5 h-3.5 text-purple-400" />
+                              PIN Acceso Sala:
+                            </span>
+                            <span className="text-[11px] font-mono text-purple-300 font-bold bg-[#141A26] px-2 py-0.5 rounded border border-purple-500/30">
+                              {branch.managerPassword || '1234'}
+                            </span>
+                          </div>
+
+                          {/* QR Public URL */}
+                          <div className="flex items-center justify-between flex-wrap gap-2 pt-1.5 border-t border-slate-800/60">
+                            <span className="text-[11px] text-slate-400 font-mono truncate max-w-[180px]">
+                              Slug QR: <strong className="text-amber-300">{branch.id}</strong>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(qrEvaluationUrl, `branch-qr-${branch.id}`)}
+                              className="text-[10px] text-amber-400 hover:text-white flex items-center gap-1 cursor-pointer font-bold bg-amber-500/10 hover:bg-amber-500/20 px-2 py-0.5 rounded transition-colors"
+                            >
+                              <Copy className="w-3 h-3" />
+                              <span>{copiedText === `branch-qr-${branch.id}` ? '¡Copiado!' : 'Copiar URL QR'}</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Card Action Buttons */}
+                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenBranchModal(branch)}
+                          className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                          <Edit3 className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Editar Sede</span>
+                        </button>
+
+                        {!isPrimary && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteBranch(branch.id, branch.name)}
+                            className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Eliminar</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -7821,6 +8185,257 @@ export default function MasterAdminPage() {
                 );
               })()}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Administrador de Sede Física & Encargado */}
+      {showBranchModal && currentBusiness && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-fade-in">
+          <div className="relative w-full max-w-2xl bg-[#0C101A] border border-amber-500/30 rounded-3xl shadow-2xl p-5 sm:p-7 text-white my-8 max-h-[92vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                  <Store className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+                    <span>{editingBranch ? 'Configurar Sede Física' : 'Registrar Nueva Sede Física'}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                      Super Master
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Marca: <span className="text-amber-300 font-bold">{currentBusiness.name}</span> • Asignación de encargados, PIN de sala y ficha Google
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowBranchModal(false)}
+                className="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveBranch} className="space-y-5 pt-4">
+              {/* Step 1: Auto-detección con Google Maps */}
+              <div className="p-4 rounded-2xl bg-[#141A26] border border-amber-500/20 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <label className="text-xs uppercase font-extrabold text-amber-300 tracking-wider flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Detección Automática de Ficha Google Maps (Opcional)</span>
+                  </label>
+                  <span className="text-[10px] font-semibold text-slate-400">Pegar enlace o Place ID</span>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={branchGoogleQuery}
+                      onChange={(e) => setBranchGoogleQuery(e.target.value)}
+                      onPaste={(e) => {
+                        const pasted = e.clipboardData.getData('text');
+                        if (pasted && (pasted.includes('google.com') || pasted.includes('goo.gl') || pasted.startsWith('ChIJ'))) {
+                          setTimeout(() => {
+                            setBranchGoogleQuery(pasted);
+                            handleDetectBranchGoogle(pasted);
+                          }, 100);
+                        }
+                      }}
+                      placeholder="Pega link de Google Maps, Place ID o nombre de la sucursal..."
+                      className="w-full bg-[#0C101A] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDetectBranchGoogle()}
+                    disabled={branchGoogleLoading || !branchGoogleQuery.trim()}
+                    className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition shrink-0 cursor-pointer"
+                  >
+                    {branchGoogleLoading ? (
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Search className="w-3.5 h-3.5" />
+                    )}
+                    <span>Detectar Ficha</span>
+                  </button>
+                </div>
+                {branchGoogleSuccess && (
+                  <p className="text-xs text-emerald-400 flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-lg">
+                    <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                    <span>{branchGoogleSuccess}</span>
+                  </p>
+                )}
+                {branchGoogleError && (
+                  <p className="text-xs text-amber-300 flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-lg">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{branchGoogleError}</span>
+                  </p>
+                )}
+              </div>
+
+              {/* Step 2: Información Básica de la Sede */}
+              <div className="space-y-3">
+                <p className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Datos de Identificación y Ubicación</span>
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">Nombre Comercial de la Sede *</label>
+                    <input
+                      type="text"
+                      required
+                      value={branchFormData.name}
+                      onChange={(e) => setBranchFormData({ ...branchFormData, name: e.target.value })}
+                      placeholder="Ej: Sede Chicó Norte, Sede Poblado..."
+                      className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">Estado Operativo de Sede</label>
+                    <select
+                      value={branchFormData.status}
+                      onChange={(e) => setBranchFormData({ ...branchFormData, status: e.target.value as BusinessStatus })}
+                      className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none transition"
+                    >
+                      <option value="active">Activa Operando</option>
+                      <option value="suspended">Suspendida Temporalmente</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">Ciudad</label>
+                    <input
+                      type="text"
+                      value={branchFormData.city}
+                      onChange={(e) => setBranchFormData({ ...branchFormData, city: e.target.value })}
+                      placeholder="Ej: Bogotá, Medellín, Cali..."
+                      className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">Localidad / Zona / Barrio</label>
+                    <input
+                      type="text"
+                      value={branchFormData.locality}
+                      onChange={(e) => setBranchFormData({ ...branchFormData, locality: e.target.value })}
+                      placeholder="Ej: Chapinero, Usaquén, El Poblado..."
+                      className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">Dirección Física Exacta</label>
+                    <input
+                      type="text"
+                      value={branchFormData.address}
+                      onChange={(e) => setBranchFormData({ ...branchFormData, address: e.target.value })}
+                      placeholder="Ej: Carrera 15 # 93-45 Local 2"
+                      className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 3: Encargado de Sede & Alertas */}
+              <div className="space-y-3 pt-2 border-t border-slate-800">
+                <p className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Encargado de Turno & Enrutamiento de Quejas</span>
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">Nombre Encargado / Gerente</label>
+                    <input
+                      type="text"
+                      value={branchFormData.managerName}
+                      onChange={(e) => setBranchFormData({ ...branchFormData, managerName: e.target.value })}
+                      placeholder="Ej: Carlos Ramírez"
+                      className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">WhatsApp de Alertas (1-3★)</label>
+                    <input
+                      type="text"
+                      value={branchFormData.managerPhone}
+                      onChange={(e) => setBranchFormData({ ...branchFormData, managerPhone: e.target.value })}
+                      placeholder="Ej: 3101234567"
+                      className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">PIN Acceso Terminal / Sala</label>
+                    <input
+                      type="text"
+                      maxLength={8}
+                      value={branchFormData.managerPassword}
+                      onChange={(e) => setBranchFormData({ ...branchFormData, managerPassword: e.target.value })}
+                      placeholder="Ej: 1234"
+                      className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-amber-300 font-mono placeholder-slate-500 outline-none transition"
+                    />
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-400">
+                  ⚡ Las quejas de 1 a 3 estrellas ocurridas en este punto físico se enrutan de inmediato al WhatsApp de este encargado para resolver la inconformidad en sala antes de que el cliente se retire.
+                </p>
+              </div>
+
+              {/* Step 4: Parámetros Técnicos de Google Maps */}
+              <div className="space-y-3 pt-2 border-t border-slate-800">
+                <p className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Ficha Técnica Google Maps & Place ID</span>
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">Google Place ID</label>
+                    <input
+                      type="text"
+                      value={branchFormData.googlePlaceId}
+                      onChange={(e) => setBranchFormData({ ...branchFormData, googlePlaceId: e.target.value })}
+                      placeholder="Ej: ChIJN1t_tDeuEmsRUsoyG83frY4"
+                      className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-amber-300 font-mono placeholder-slate-500 outline-none transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">Link Directo de Reseñas Google</label>
+                    <input
+                      type="url"
+                      value={branchFormData.googleReviewUrl}
+                      onChange={(e) => setBranchFormData({ ...branchFormData, googleReviewUrl: e.target.value })}
+                      placeholder="Ej: https://g.page/r/..."
+                      className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="pt-4 border-t border-slate-800 flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowBranchModal(false)}
+                  className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={branchSavingLoading}
+                  className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 disabled:opacity-50 text-slate-950 font-extrabold text-xs rounded-xl flex items-center gap-2 shadow-lg shadow-amber-500/25 transition cursor-pointer"
+                >
+                  {branchSavingLoading ? (
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Check className="w-4 h-4" />
+                  )}
+                  <span>{editingBranch ? 'Actualizar Sede' : 'Guardar y Activar Sede'}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
