@@ -1897,6 +1897,39 @@ export default function MasterAdminPage() {
     }
   };
 
+  // Toggle Branch Status Handler (1-click from badge)
+  const handleToggleBranchStatus = async (branch: Branch) => {
+    if (!currentBusiness) return;
+    const newStatus: BusinessStatus = branch.status === 'suspended' ? 'active' : 'suspended';
+    try {
+      const res = await fetch('/api/master', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_branch',
+          businessId: currentBusiness.id,
+          branch: {
+            ...branch,
+            status: newStatus,
+          },
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNotification({
+          type: 'success',
+          message: `Sede '${branch.name}' marcada como ${newStatus === 'active' ? 'Activa en Red' : 'En Mantenimiento'}.`,
+        });
+        setTimeout(() => setNotification(null), 3500);
+        fetchMasterData();
+      } else {
+        alert(data.error || 'Error al cambiar estado de la sede');
+      }
+    } catch {
+      alert('Error de conexión al actualizar estado de la sede');
+    }
+  };
+
   // Auto-detect and sync with Google Maps / Google Business Profile
   const handleDetectGooglePlace = async (queryParam?: string) => {
     const rawQuery = (queryParam || googleQueryInput || onboardForm.name || '').trim();
@@ -4293,13 +4326,19 @@ export default function MasterAdminPage() {
                             </p>
                           </div>
 
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${
-                            branch.status === 'suspended'
-                              ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                              : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                          }`}>
-                            {branch.status === 'suspended' ? 'En Mantenimiento' : 'Activa en Red'}
-                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleBranchStatus(branch)}
+                            title={branch.status === 'suspended' ? 'Clic para reactivar esta sede a "Activa en Red"' : 'Clic para pausar esta sede a "En Mantenimiento"'}
+                            className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border shrink-0 transition-all cursor-pointer hover:scale-105 active:scale-95 flex items-center gap-1 ${
+                              branch.status === 'suspended'
+                                ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border-rose-500/30'
+                                : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                            }`}
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full ${branch.status === 'suspended' ? 'bg-rose-400' : 'bg-emerald-400 animate-pulse'}`} />
+                            <span>{branch.status === 'suspended' ? 'En Mantenimiento' : 'Activa en Red'}</span>
+                          </button>
                         </div>
 
                         {/* Ficha Google & QR Info */}
