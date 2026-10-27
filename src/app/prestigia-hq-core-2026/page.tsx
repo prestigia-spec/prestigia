@@ -6301,10 +6301,15 @@ export default function MasterAdminPage() {
                     {displayedDataLake.map((participant, idx) => {
                       const isPromoter = participant.rating >= 4;
                       const cleanPhone = participant.customerPhone.replace(/[^0-9+]/g, '');
-                      const waMsg = isPromoter
-                        ? encodeURIComponent(`Hola ${participant.customerName}, te saludamos de ${participant.businessName} (${participant.branchName}). Queremos agradecerte de corazón por tu calificación de ${participant.rating} estrellas en tu reciente visita. ¡Eres parte de nuestra comunidad VIP y nos encantaría tenerte de vuelta pronto!`)
-                        : encodeURIComponent(`Hola ${participant.customerName}, te saluda la gerencia de ${participant.businessName} (${participant.branchName}). Revisamos con atención tu calificación de ${participant.rating} estrellas y tus observaciones. Nos importa muchísimo tu experiencia y queremos ofrecerte una solución inmediata. ¿Podrías contarnos cómo podemos atenderte mejor hoy?`);
-                      const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}?text=${waMsg}` : null;
+                      // Mensaje comercial B2B oficial de Prestigia: agradece participación en la marca y ofrece la plataforma con enlace a landing
+                      const waProspectingMsg = encodeURIComponent(
+                        `Hola ${participant.customerName}, te saluda el equipo directivo de Prestigia.\n\n` +
+                        `¡Muchas gracias por haber participado e interactuado a través de nuestra plataforma en ${participant.businessName} (${participant.branchName})!\n\n` +
+                        `Notamos tu interacción y nos encantaría mostrarte cómo Prestigia ayuda a dueños de negocios, marcas y profesionales a blindar su reputación en Google Maps, multiplicar sus reseñas de 5 estrellas y fidelizar a sus comensales y clientes en sala.\n\n` +
+                        `🚀 Conoce nuestra tecnología y solicita una demostración gratuita de Prestigia para tu negocio aquí:\nhttps://prestigia.app\n\n` +
+                        `¿Tienes una marca, empresa o consultorio? Con gusto te compartimos una auditoría de reputación sin costo.`
+                      );
+                      const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}?text=${waProspectingMsg}` : null;
                       const countryFlag = participant.country === 'Chile' ? '🇨🇱' : '🇨🇴';
 
                       return (
@@ -6324,10 +6329,10 @@ export default function MasterAdminPage() {
                                   href={waLink}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  title={isPromoter ? 'Enviar agradecimiento VIP por WhatsApp' : 'Contactar de inmediato para resolver inconformidad'}
-                                  className="text-[10px] text-emerald-400 hover:text-emerald-300 font-semibold underline flex items-center gap-1"
+                                  title="Abrir chat en WhatsApp para agradecer participación y ofrecer los servicios de Prestigia para sus propios negocios con enlace a https://prestigia.app"
+                                  className="text-[10px] text-purple-300 hover:text-white bg-purple-500/15 hover:bg-purple-500/25 px-2 py-0.5 rounded-md border border-purple-500/30 font-semibold flex items-center gap-1 transition"
                                 >
-                                  <span>WhatsApp</span>
+                                  <span>Ofrecer Prestigia B2B</span>
                                   <span>↗</span>
                                 </a>
                               )}
