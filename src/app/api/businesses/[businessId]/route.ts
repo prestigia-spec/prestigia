@@ -161,14 +161,18 @@ export async function PUT(
               });
             }
           }
-          const maxStaff = b.staffQuota || 15;
+          const baseStaff = existing.plan === 'independiente' ? 0 : existing.plan === 'pro' ? 5 : existing.plan === 'elite' ? 15 : 30;
+          const totalStaffQuota = baseStaff + (existing.masterAddOns?.extraStaffQuota || 0);
+          const maxStaff = b.staffQuota || totalStaffQuota || 25;
           if (unique.size >= maxStaff) break;
         }
         cleanedStaff = Array.from(unique.values());
       }
 
       // Sanitizar y limitar encargados según cupo contratado en Master
-      const maxManagers = b.managersQuota || 3;
+      const baseManagers = existing.plan === 'independiente' ? 0 : existing.plan === 'pro' ? 1 : existing.plan === 'elite' ? 3 : 10;
+      const totalManagersQuota = existing.masterAddOns?.extraManagers ? existing.masterAddOns.extraManagers : baseManagers;
+      const maxManagers = b.managersQuota || totalManagersQuota || 5;
       let cleanedManagers = b.managers || [];
       if (Array.isArray(incoming.managers)) {
         cleanedManagers = incoming.managers.slice(0, maxManagers);
@@ -211,6 +215,21 @@ export async function PUT(
       branding: body.branding !== undefined ? body.branding : existing.branding,
       branches: mergedBranches,
     };
+
+    // Synchronize overall masterAddOns counters so Master HQ reflects immediately
+    const totalManagersCount = (mergedBranches || []).reduce((acc, b) => {
+      return acc + (b.managers && b.managers.length > 0 ? b.managers.length : (b.managerName ? 1 : 0));
+    }, 0);
+    const totalStaffCount = (mergedBranches || []).reduce((acc, b) => {
+      return acc + (b.staffMembers?.length || 0);
+    }, 0);
+
+    if (updatedBusiness.masterAddOns) {
+      updatedBusiness.masterAddOns.extraManagers = Math.max(updatedBusiness.masterAddOns.extraManagers || 0, totalManagersCount);
+      if (totalStaffCount > 15) {
+        updatedBusiness.masterAddOns.extraStaffQuota = Math.max(updatedBusiness.masterAddOns.extraStaffQuota || 0, totalStaffCount - 15);
+      }
+    }
 
     await saveBusiness(updatedBusiness);
     return NextResponse.json({ success: true, business: updatedBusiness });

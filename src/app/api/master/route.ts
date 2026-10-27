@@ -911,6 +911,74 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Save/Update Branch Team (Managers & Staff) directly from Master HQ
+    if (action === 'save_branch_team') {
+      const { businessId, branchId, managers, staffMembers } = body;
+      if (!businessId || !branchId) {
+        return NextResponse.json({ error: 'Faltan identificadores de negocio y sede' }, { status: 400 });
+      }
+
+      const biz = await getBusinessById(businessId);
+      if (!biz) {
+        return NextResponse.json({ error: 'Marca no encontrada' }, { status: 404 });
+      }
+
+      const branchIdx = (biz.branches || []).findIndex((b) => b.id === branchId);
+      if (branchIdx === -1) {
+        return NextResponse.json({ error: 'Sede no encontrada' }, { status: 404 });
+      }
+
+      const targetBranch = biz.branches[branchIdx];
+
+      if (Array.isArray(managers)) {
+        targetBranch.managers = managers;
+        if (managers.length > 0) {
+          targetBranch.managerName = managers[0].name;
+          targetBranch.managerPhone = managers[0].phone;
+          if (managers[0].password) targetBranch.managerPassword = managers[0].password;
+          if (managers[0].role) targetBranch.managerRole = managers[0].role;
+        }
+      }
+
+      if (Array.isArray(staffMembers)) {
+        targetBranch.staffMembers = staffMembers;
+      }
+
+      // Synchronize overall masterAddOns counters
+      const totalManagersCount = (biz.branches || []).reduce((acc, b) => {
+        return acc + (b.managers && b.managers.length > 0 ? b.managers.length : (b.managerName ? 1 : 0));
+      }, 0);
+      const totalStaffCount = (biz.branches || []).reduce((acc, b) => {
+        return acc + (b.staffMembers?.length || 0);
+      }, 0);
+
+      if (!biz.masterAddOns) {
+        biz.masterAddOns = {
+          extraBranches: Math.max(0, biz.branches.length - 1),
+          extraManagers: totalManagersCount,
+          extraStaffQuota: Math.max(0, totalStaffCount - 15),
+          sentiment360: { enabled: false, mode: 'trial' },
+          liveWallboard: { enabled: false, mode: 'trial' },
+          giveawayCrm: false,
+          deviceAudit: false,
+        };
+      } else {
+        biz.masterAddOns.extraManagers = Math.max(biz.masterAddOns.extraManagers || 0, totalManagersCount);
+        if (totalStaffCount > 15) {
+          biz.masterAddOns.extraStaffQuota = Math.max(biz.masterAddOns.extraStaffQuota || 0, totalStaffCount - 15);
+        }
+      }
+
+      await saveBusiness(biz);
+
+      return NextResponse.json({
+        success: true,
+        message: `Equipo de '${targetBranch.name}' actualizado y sincronizado en vivo con la app del negocio.`,
+        business: biz,
+        branch: targetBranch,
+      });
+    }
+
     // 5. Onboard New Business (Alta de Marca con Asistente)
     if (action === 'create_business') {
       const {

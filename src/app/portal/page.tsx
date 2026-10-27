@@ -8337,9 +8337,8 @@ export default function PortalPage() {
 
     const currentBranch = profileBranches[activeBranchEditIdx];
     const currentStaff = currentBranch?.staffMembers ? [...currentBranch.staffMembers] : [];
-    const maxStaffQuota = (effectivePlan === 'pro' || effectivePlan === 'elite')
-      ? (currentBranch?.staffQuota || 10)
-      : (currentBranch?.staffQuota || 25);
+    const baseStaffPlan = effectivePlan === 'independiente' ? 0 : effectivePlan === 'pro' ? 5 : effectivePlan === 'elite' ? 15 : 30;
+    const maxStaffQuota = currentBranch?.staffQuota || (baseStaffPlan + (session?.business?.masterAddOns?.extraStaffQuota || 0));
 
     if (currentStaff.length >= maxStaffQuota) {
       if (effectivePlan === 'pro') {
@@ -8424,7 +8423,8 @@ export default function PortalPage() {
 
     const currentBranch = profileBranches[activeBranchEditIdx];
     const currentManagers = currentBranch?.managers ? [...currentBranch.managers] : [];
-    const maxManagersQuota = currentBranch?.managersQuota || (effectivePlan === 'elite' ? 1 : 3);
+    const baseManagersPlan = effectivePlan === 'independiente' ? 0 : effectivePlan === 'pro' ? 1 : effectivePlan === 'elite' ? 3 : 10;
+    const maxManagersQuota = currentBranch?.managersQuota || (session?.business?.masterAddOns?.extraManagers ? session.business.masterAddOns.extraManagers : baseManagersPlan);
 
     if (currentManagers.length >= maxManagersQuota) {
       if (effectivePlan === 'elite') {

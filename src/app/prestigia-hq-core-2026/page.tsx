@@ -74,7 +74,7 @@ import {
   Edit3,
 } from 'lucide-react';
 import { PrestigiaIcon } from '@/components/PrestigiaIcon';
-import { Business, BusinessPlan, Branch, BusinessStatus, MasterAddOns, DayOneBaseline, PRESTIGIA_NICHES, CommercialLead, TrafficVisit } from '@/lib/types';
+import { Business, BusinessPlan, Branch, BranchManager, StaffMember, BusinessStatus, MasterAddOns, DayOneBaseline, PRESTIGIA_NICHES, CommercialLead, TrafficVisit } from '@/lib/types';
 import { EmailDispatchRecord } from '@/lib/db';
 import {
   buildWelcomeCredentialsHtml,
@@ -969,6 +969,23 @@ export default function MasterAdminPage() {
   const [branchGoogleSuccess, setBranchGoogleSuccess] = useState<string | null>(null);
   const [branchGoogleError, setBranchGoogleError] = useState<string | null>(null);
   const [branchSavingLoading, setBranchSavingLoading] = useState(false);
+
+  // Team Management State for Specific Branch (Super Master HQ)
+  const [selectedTeamBranch, setSelectedTeamBranch] = useState<Branch | null>(null);
+  const [teamManagers, setTeamManagers] = useState<BranchManager[]>([]);
+  const [teamStaff, setTeamStaff] = useState<(StaffMember | string)[]>([]);
+  const [teamModalTab, setTeamModalTab] = useState<'managers' | 'staff'>('managers');
+  const [isSavingTeam, setIsSavingTeam] = useState(false);
+
+  // New Manager Form inputs
+  const [newTeamMgrName, setNewTeamMgrName] = useState('');
+  const [newTeamMgrRole, setNewTeamMgrRole] = useState('Capitán de Sala & VIP');
+  const [newTeamMgrPhone, setNewTeamMgrPhone] = useState('');
+  const [newTeamMgrPassword, setNewTeamMgrPassword] = useState('1234');
+
+  // New Staff Form inputs
+  const [newTeamStaffName, setNewTeamStaffName] = useState('');
+  const [newTeamStaffRole, setNewTeamStaffRole] = useState('Atención / Servicio');
 
   const [customCountryMode, setCustomCountryMode] = useState(false);
   const [customCityMode, setCustomCityMode] = useState(false);
@@ -1957,6 +1974,108 @@ export default function MasterAdminPage() {
       }
     } catch {
       alert('Error de conexión al actualizar estado de la sede');
+    }
+  };
+
+  // Open Branch Team Management Modal
+  const handleOpenTeamModal = (branch: Branch) => {
+    setSelectedTeamBranch(branch);
+    let initialMgrs: BranchManager[] = [];
+    if (branch.managers && branch.managers.length > 0) {
+      initialMgrs = [...branch.managers];
+    } else if (branch.managerName) {
+      initialMgrs = [{
+        id: `mgr-${branch.id}-primary`,
+        name: branch.managerName,
+        role: branch.managerRole || 'Administrador de Sede',
+        phone: branch.managerPhone || currentBusiness?.ownerPhone || '',
+        password: branch.managerPassword || '1234',
+        active: true,
+      }];
+    }
+    setTeamManagers(initialMgrs);
+    setTeamStaff(branch.staffMembers ? [...branch.staffMembers] : []);
+    setTeamModalTab('managers');
+    setNewTeamMgrName('');
+    setNewTeamMgrPhone('');
+    setNewTeamMgrPassword('1234');
+    setNewTeamStaffName('');
+    setNewTeamStaffRole('Atención / Servicio');
+  };
+
+  const handleAddTeamManager = () => {
+    if (!newTeamMgrName.trim()) {
+      alert('Ingresa el nombre del encargado.');
+      return;
+    }
+    const newMgr: BranchManager = {
+      id: `mgr-${Date.now()}`,
+      name: newTeamMgrName.trim(),
+      role: newTeamMgrRole.trim() || 'Encargado de Turno',
+      phone: newTeamMgrPhone.trim() || currentBusiness?.ownerPhone || '',
+      password: newTeamMgrPassword.trim() || '1234',
+      active: true,
+    };
+    setTeamManagers(prev => [...prev, newMgr]);
+    setNewTeamMgrName('');
+    setNewTeamMgrPhone('');
+    setNewTeamMgrPassword('1234');
+  };
+
+  const handleRemoveTeamManager = (idx: number) => {
+    setTeamManagers(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleAddTeamStaff = () => {
+    if (!newTeamStaffName.trim()) {
+      alert('Ingresa el nombre del colaborador.');
+      return;
+    }
+    const today = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+    const newCollab: StaffMember = {
+      name: newTeamStaffName.trim(),
+      role: newTeamStaffRole.trim() || 'Atención / Servicio',
+      joinedAt: today,
+    };
+    setTeamStaff(prev => [...prev, newCollab]);
+    setNewTeamStaffName('');
+  };
+
+  const handleRemoveTeamStaff = (idx: number) => {
+    setTeamStaff(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleSaveBranchTeam = async () => {
+    if (!currentBusiness || !selectedTeamBranch) return;
+    setIsSavingTeam(true);
+    try {
+      const res = await fetch('/api/master', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_branch_team',
+          businessId: currentBusiness.id,
+          branchId: selectedTeamBranch.id,
+          managers: teamManagers,
+          staffMembers: teamStaff,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNotification({
+          type: 'success',
+          message: data.message || `Equipo de '${selectedTeamBranch.name}' sincronizado con la app del negocio.`,
+        });
+        setTimeout(() => setNotification(null), 4000);
+        setSelectedTeamBranch(null);
+        fetchMasterData();
+      } else {
+        alert(data.error || 'Error al guardar el equipo de la sede.');
+      }
+    } catch {
+      alert('Error de conexión con el servidor.');
+    } finally {
+      setIsSavingTeam(false);
     }
   };
 
@@ -4497,26 +4616,49 @@ export default function MasterAdminPage() {
                       </div>
 
                       {/* Card Action Buttons */}
-                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
-                        <button
-                          type="button"
-                          onClick={() => handleOpenBranchModal(branch)}
-                          className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                        >
-                          <Edit3 className="w-3.5 h-3.5 text-amber-400" />
-                          <span>Editar Sede</span>
-                        </button>
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-2.5 border-t border-slate-800">
+                        {/* Team summary pill */}
+                        <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                          <span className="flex items-center gap-1 font-semibold text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
+                            <Users className="w-3 h-3 text-purple-400" />
+                            {branch.managers && branch.managers.length > 0 ? branch.managers.length : (branch.managerName ? 1 : 0)} Encargado(s)
+                          </span>
+                          <span className="flex items-center gap-1 font-semibold text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                            {branch.staffMembers?.length || 0} Colaborador(es)
+                          </span>
+                        </div>
 
-                        {!isPrimary && (
+                        <div className="flex items-center gap-2 flex-wrap">
                           <button
                             type="button"
-                            onClick={() => handleDeleteBranch(branch.id, branch.name)}
-                            className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                            onClick={() => handleOpenTeamModal(branch)}
+                            className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500/20 to-purple-500/20 hover:from-indigo-500/30 hover:to-purple-500/30 text-indigo-300 border border-indigo-500/30 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
+                            title="Gestionar encargados y colaboradores de esta sede en vivo"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            <span>Eliminar</span>
+                            <Users className="w-3.5 h-3.5 text-indigo-400" />
+                            <span>Gestionar Equipo</span>
                           </button>
-                        )}
+
+                          <button
+                            type="button"
+                            onClick={() => handleOpenBranchModal(branch)}
+                            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                          >
+                            <Edit3 className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Editar Sede</span>
+                          </button>
+
+                          {!isPrimary && (
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteBranch(branch.id, branch.name)}
+                              className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Eliminar</span>
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -8568,6 +8710,316 @@ export default function MasterAdminPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Gestión de Equipo & Encargados de la Sede (Super Master HQ) */}
+      {selectedTeamBranch && currentBusiness && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-fade-in">
+          <div className="relative w-full max-w-3xl bg-[#0C101A] border border-indigo-500/30 rounded-3xl shadow-2xl p-5 sm:p-7 text-white my-8 max-h-[92vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-600/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+                    <span>Equipo & Personal de {selectedTeamBranch.name}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                      Sincronización en Vivo
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Marca: <strong className="text-amber-300">{currentBusiness.name}</strong> • Modifica encargados y colaboradores con impacto bidireccional en la app del cliente.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedTeamBranch(null)}
+                className="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Quota Banner */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-4">
+              <div className="p-3 rounded-2xl bg-[#141A26] border border-purple-500/20 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Cupo de Encargados (Supervisores)</span>
+                  <p className="text-sm font-extrabold text-purple-300 mt-0.5">
+                    {teamManagers.length} en sede • <span className="text-white font-normal text-xs">{addonState.extraManagers} autorizados en Master</span>
+                  </p>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                  Acceso PIN
+                </span>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-[#141A26] border border-emerald-500/20 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Cupo de Colaboradores (Plantilla)</span>
+                  <p className="text-sm font-extrabold text-emerald-300 mt-0.5">
+                    {teamStaff.length} en sede • <span className="text-white font-normal text-xs">{15 + addonState.extraStaffQuota} autorizados en Master</span>
+                  </p>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
+                  Auditados
+                </span>
+              </div>
+            </div>
+
+            {/* Tabs Selector */}
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-2 mb-4">
+              <button
+                type="button"
+                onClick={() => setTeamModalTab('managers')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                  teamModalTab === 'managers'
+                    ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                }`}
+              >
+                <Users className="w-4 h-4 text-purple-400" />
+                <span>1. Encargados de Turno ({teamManagers.length})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setTeamModalTab('staff')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                  teamModalTab === 'staff'
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                }`}
+              >
+                <Award className="w-4 h-4 text-emerald-400" />
+                <span>2. Trabajadores & Colaboradores ({teamStaff.length})</span>
+              </button>
+            </div>
+
+            {/* Content Tab 1: Encargados de Turno */}
+            {teamModalTab === 'managers' && (
+              <div className="space-y-4">
+                {/* Form Agregar Encargado */}
+                <div className="p-4 rounded-2xl bg-[#141A26] border border-purple-500/20 space-y-3">
+                  <p className="text-xs uppercase font-extrabold text-purple-300 tracking-wider flex items-center gap-1.5">
+                    <Plus className="w-3.5 h-3.5 text-purple-400" />
+                    <span>Dar de Alta Encargado de Sede</span>
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                    <div>
+                      <label className="text-[10px] text-slate-400 block mb-1">Nombre Completo *</label>
+                      <input
+                        type="text"
+                        value={newTeamMgrName}
+                        onChange={(e) => setNewTeamMgrName(e.target.value)}
+                        placeholder="Ej: Andrés Ramírez"
+                        className="w-full bg-[#0C101A] border border-slate-700 focus:border-purple-400 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-slate-400 block mb-1">Cargo / Puesto *</label>
+                      <input
+                        type="text"
+                        value={newTeamMgrRole}
+                        onChange={(e) => setNewTeamMgrRole(e.target.value)}
+                        placeholder="Ej: Capitán de Sala & VIP"
+                        className="w-full bg-[#0C101A] border border-slate-700 focus:border-purple-400 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-slate-400 block mb-1">WhatsApp (Alertas 1-3★) *</label>
+                      <input
+                        type="text"
+                        value={newTeamMgrPhone}
+                        onChange={(e) => setNewTeamMgrPhone(e.target.value)}
+                        placeholder="Ej: +573001112233"
+                        className="w-full bg-[#0C101A] border border-slate-700 focus:border-purple-400 rounded-xl px-3 py-2 text-xs text-amber-300 font-mono placeholder-slate-500 outline-none transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-slate-400 block mb-1">PIN Acceso Sala</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          maxLength={6}
+                          value={newTeamMgrPassword}
+                          onChange={(e) => setNewTeamMgrPassword(e.target.value)}
+                          placeholder="1234"
+                          className="w-full bg-[#0C101A] border border-slate-700 focus:border-purple-400 rounded-xl px-3 py-2 text-xs text-purple-300 font-mono placeholder-slate-500 outline-none transition"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddTeamManager}
+                          className="px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition cursor-pointer shrink-0"
+                          title="Añadir a la lista"
+                        >
+                          + Añadir
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lista de Encargados */}
+                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                  {teamManagers.length === 0 ? (
+                    <div className="p-6 text-center rounded-2xl bg-[#141A26] border border-dashed border-slate-800 text-slate-400 text-xs">
+                      No hay encargados registrados para esta sede. Puedes añadir el primero con el formulario superior.
+                    </div>
+                  ) : (
+                    teamManagers.map((mgr, idx) => (
+                      <div
+                        key={mgr.id || idx}
+                        className="p-3 rounded-2xl bg-[#141A26] border border-slate-800 flex items-center justify-between gap-3 hover:border-slate-700 transition"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-8 h-8 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-300 font-bold text-xs shrink-0">
+                            {idx + 1}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-extrabold text-white truncate flex items-center gap-2">
+                              <span>{mgr.name}</span>
+                              <span className="text-[10px] font-semibold px-2 py-0.2 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                                {mgr.role}
+                              </span>
+                            </p>
+                            <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-3">
+                              <span className="font-mono text-amber-300">📱 {mgr.phone}</span>
+                              <span className="font-mono text-purple-300">🔑 PIN: {mgr.password || '1234'}</span>
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTeamManager(idx)}
+                          className="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center transition cursor-pointer shrink-0"
+                          title="Eliminar encargado"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Content Tab 2: Trabajadores & Colaboradores */}
+            {teamModalTab === 'staff' && (
+              <div className="space-y-4">
+                {/* Form Agregar Colaborador */}
+                <div className="p-4 rounded-2xl bg-[#141A26] border border-emerald-500/20 space-y-3">
+                  <p className="text-xs uppercase font-extrabold text-emerald-300 tracking-wider flex items-center gap-1.5">
+                    <Plus className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Dar de Alta Trabajador / Colaborador</span>
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    <div className="sm:col-span-2">
+                      <label className="text-[10px] text-slate-400 block mb-1">Nombre Completo del Colaborador *</label>
+                      <input
+                        type="text"
+                        value={newTeamStaffName}
+                        onChange={(e) => setNewTeamStaffName(e.target.value)}
+                        placeholder="Ej: Camilo Restrepo, Valentina Gómez, Sebastián Cruz..."
+                        className="w-full bg-[#0C101A] border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-slate-400 block mb-1">Cargo / Puesto *</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={newTeamStaffRole}
+                          onChange={(e) => setNewTeamStaffRole(e.target.value)}
+                          placeholder="Ej: Mesero, Cocina, Caja"
+                          className="w-full bg-[#0C101A] border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none transition"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddTeamStaff}
+                          className="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs rounded-xl transition cursor-pointer shrink-0"
+                          title="Añadir colaborador"
+                        >
+                          + Añadir
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lista de Colaboradores */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[300px] overflow-y-auto pr-1">
+                  {teamStaff.length === 0 ? (
+                    <div className="sm:col-span-2 p-6 text-center rounded-2xl bg-[#141A26] border border-dashed border-slate-800 text-slate-400 text-xs">
+                      No hay colaboradores registrados para esta sede. Puedes añadir meseros y personal con el formulario superior.
+                    </div>
+                  ) : (
+                    teamStaff.map((st, idx) => {
+                      const name = typeof st === 'object' && st !== null ? (st.name || '') : String(st || '');
+                      const role = typeof st === 'object' && st !== null ? (st.role || 'Atención / Servicio') : 'Colaborador';
+                      const joined = typeof st === 'object' && st !== null ? (st.joinedAt || 'Activo') : 'Activo';
+
+                      return (
+                        <div
+                          key={idx}
+                          className="p-3 rounded-2xl bg-[#141A26] border border-slate-800 flex items-center justify-between gap-3 hover:border-slate-700 transition"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-300 font-bold text-[11px] shrink-0">
+                              {idx + 1}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-white truncate">{name}</p>
+                              <p className="text-[10px] text-slate-400">
+                                <span className="text-emerald-300 font-medium">{role}</span> • Ingreso: {joined}
+                              </p>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveTeamStaff(idx)}
+                            className="w-6 h-6 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center transition cursor-pointer shrink-0"
+                            title="Eliminar colaborador"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Footer Actions */}
+            <div className="pt-4 border-t border-slate-800 flex items-center justify-between gap-3 mt-4">
+              <button
+                type="button"
+                onClick={() => setSelectedTeamBranch(null)}
+                className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition cursor-pointer"
+              >
+                Cerrar
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveBranchTeam}
+                disabled={isSavingTeam}
+                className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 via-indigo-600 to-purple-600 hover:from-emerald-400 text-white font-extrabold text-xs rounded-xl flex items-center gap-2 shadow-lg shadow-indigo-500/25 transition cursor-pointer disabled:opacity-50"
+              >
+                {isSavingTeam ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Check className="w-4 h-4" />
+                )}
+                <span>Guardar y Sincronizar en Vivo con App del Negocio</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
