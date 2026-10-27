@@ -63,6 +63,7 @@ export interface Branch {
   googleBusinessStatus?: 'connected' | 'pending' | 'disconnected'; // Google API sync state
   googleManagedBy?: 'prestigia_central' | 'client_self_service'; // Operational management model
   googleAuditedAt?: string; // Master audit & certification timestamp
+  baseline?: DayOneBaseline; // Optional branch-specific Day 1 historical baseline calibration
   googleAuditNotes?: string; // Technical audit notes from Master
   googleSelfServiceEnabled?: boolean; // Master switch allowing client self-service Google connection
 }
@@ -218,6 +219,7 @@ export interface DayOneBaseline {
   founderName?: string;
   calibratedAt?: string; // Fecha y hora ISO de cuando se hizo la calibración
   isCalibrated?: boolean; // True si ya fue calibrado manualmente
+  customMonthlyFeeCOP?: number; // Tarifa / inversión mensual acordada a la medida (sin plan fijo)
 }
 
 export interface MasterAddOns {

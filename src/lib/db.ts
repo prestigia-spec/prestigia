@@ -606,12 +606,20 @@ export async function updateBusinessMasterPlanAndAddons(
 
 export async function updateBusinessBaseline(
   businessId: string,
-  baseline: import('./types').DayOneBaseline
+  baseline: import('./types').DayOneBaseline,
+  branchId?: string
 ): Promise<Business | null> {
   const db = ensureDbFile();
   const business = db.businesses.find((b) => b.id === businessId);
   if (!business) return null;
-  business.baseline = baseline;
+  if (branchId && branchId !== 'all') {
+    const branch = business.branches?.find((br) => br.id === branchId);
+    if (branch) {
+      branch.baseline = baseline;
+    }
+  } else {
+    business.baseline = baseline;
+  }
   writeDbFile(db);
   return business;
 }

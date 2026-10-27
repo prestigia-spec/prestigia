@@ -794,12 +794,12 @@ export async function POST(request: NextRequest) {
 
     // 4. Update Day-1 Historical Baseline
     if (action === 'update_baseline') {
-      const { businessId, baseline } = body;
+      const { businessId, baseline, branchId } = body;
       if (!businessId || !baseline) {
         return NextResponse.json({ error: 'Faltan datos de la línea base histórica' }, { status: 400 });
       }
 
-      const updated = await updateBusinessBaseline(businessId, baseline);
+      const updated = await updateBusinessBaseline(businessId, baseline, branchId);
       if (!updated) {
         return NextResponse.json({ error: 'Negocio no encontrado' }, { status: 404 });
       }

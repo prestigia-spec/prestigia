@@ -1086,6 +1086,9 @@ export default function MasterAdminPage() {
   const [googleSyncSuccess, setGoogleSyncSuccess] = useState<string | null>(null);
   const [googleSyncError, setGoogleSyncError] = useState<string | null>(null);
   const [allowManualOverride, setAllowManualOverride] = useState(false);
+  const [selectedHistoricalBranchId, setSelectedHistoricalBranchId] = useState<string>('all');
+  const [editingCustomFee, setEditingCustomFee] = useState(false);
+  const [tempCustomFee, setTempCustomFee] = useState<string>('');
   const [baselineForm, setBaselineForm] = useState({
     startDate: new Date().toISOString().split('T')[0],
     initialRating: 3.8,
@@ -1095,6 +1098,7 @@ export default function MasterAdminPage() {
     initialRespondedReviews: 4,
     averageTicketCOP: 45000,
     averageTicketUSD: 18,
+    customMonthlyFeeCOP: 0,
     founderName: '',
     clientQuote: '',
   });
@@ -1875,11 +1879,14 @@ export default function MasterAdminPage() {
     const formattedCOP = formatMoneyCOP(savedAmount);
     const nuevas5 = h ? h.exactReviews5Star : 0;
     const nuevasTot = h ? h.newGoogleReviewsTotal : 0;
-    const marca = currentBusiness.name;
+    const isBranch = selectedHistoricalBranchId !== 'all';
+    const branchObj = isBranch ? currentBusiness.branches?.find((b) => b.id === selectedHistoricalBranchId) : null;
+    const marca = branchObj ? `${currentBusiness.name} (${branchObj.name})` : currentBusiness.name;
+    const roiTxt = h?.roiMultiplier ? ` (retorno auditado de ${h.roiMultiplier}x sobre la inversión)` : '';
 
     if (style === 'roi') {
       if (quejas > 0 && savedAmount > 0) {
-        return `Prestigia blindó a ${marca} desde el Día 1. Durante estos ${dias} días de protección activa con QRs en sala, interceptamos de inmediato ${quejas} quejas privadas en mesa antes de que salieran a Google Maps. Subimos nuestra calificación de ${ratingIni}★ a ${ratingAct}★ (+${ganancia}★) y salvamos ${formattedCOP} en comensales retenidos.`;
+        return `Prestigia blindó a ${marca} desde el Día 1. Durante estos ${dias} días de protección activa con QRs en sala, interceptamos de inmediato ${quejas} quejas privadas en mesa antes de que salieran a Google Maps. Subimos nuestra calificación de ${ratingIni}★ a ${ratingAct}★ (+${ganancia}★) y salvamos ${formattedCOP} en comensales retenidos${roiTxt}.`;
       } else {
         return `Prestigia activó el blindaje de reputación en ${marca} desde el Día 1. En estos ${dias} días de operación con códigos QR inteligentes, mantenemos una calificación protegida de ${ratingAct}★ en Google Maps, canalizando la experiencia de cada cliente y blindando al 100% la sala contra reseñas negativas públicas.`;
       }
@@ -1906,10 +1913,12 @@ export default function MasterAdminPage() {
     setGoogleSyncSuccess(null);
 
     try {
-      const primaryBranch = currentBusiness.branches?.[0];
+      const isBranch = selectedHistoricalBranchId !== 'all';
+      const branchObj = isBranch ? currentBusiness.branches?.find((b) => b.id === selectedHistoricalBranchId) : null;
+      const targetBranch = branchObj || currentBusiness.branches?.[0];
       const query =
-        primaryBranch?.googleReviewUrl ||
-        `${currentBusiness.name} ${primaryBranch?.city || ''}`;
+        targetBranch?.googleReviewUrl ||
+        `${currentBusiness.name} ${targetBranch?.name || ''} ${targetBranch?.city || ''}`;
 
       const res = await fetch('/api/auditor/google-lookup', {
         method: 'POST',
@@ -1956,7 +1965,9 @@ export default function MasterAdminPage() {
   // Open Baseline Day-1 Calibration Modal (Tab 3)
   const handleOpenBaselineModal = () => {
     if (!currentBusiness) return;
-    const base = currentBusiness.baseline;
+    const isBranch = selectedHistoricalBranchId !== 'all';
+    const branchObj = isBranch ? currentBusiness.branches?.find((b) => b.id === selectedHistoricalBranchId) : null;
+    const base = branchObj?.baseline || currentBusiness.baseline;
     const initialRev = base?.initialReviewCount ?? 0;
     const initial1to3 = base?.initialReviews1to3 ?? Math.round(initialRev * 0.35);
     const initial4to5 = base?.initialReviews4to5 ?? Math.max(0, initialRev - initial1to3);
@@ -1964,7 +1975,7 @@ export default function MasterAdminPage() {
 
     setAllowManualOverride(false);
     setGoogleSyncError(null);
-    setGoogleSyncSuccess(base?.isCalibrated ? '✓ Ficha previamente calibrada y verificada.' : null);
+    setGoogleSyncSuccess(base?.isCalibrated ? `✓ Ficha ${branchObj ? `de ${branchObj.name}` : 'de la marca'} previamente calibrada y verificada.` : null);
 
     setBaselineForm({
       startDate: base?.startDate || new Date().toISOString().split('T')[0],
@@ -1975,7 +1986,8 @@ export default function MasterAdminPage() {
       initialRespondedReviews: initialResp,
       averageTicketCOP: base?.averageTicketCOP ?? 45000,
       averageTicketUSD: base?.averageTicketUSD ?? 18,
-      founderName: base?.founderName || currentBusiness.ownerName || '',
+      customMonthlyFeeCOP: base?.customMonthlyFeeCOP ?? 0,
+      founderName: branchObj?.managerName || base?.founderName || currentBusiness.ownerName || '',
       clientQuote: base?.clientQuote || generateAITestimonial('roi'),
     });
     setShowBaselineModal(true);
@@ -1987,6 +1999,10 @@ export default function MasterAdminPage() {
     if (!currentBusiness) return;
     setIsSavingBaseline(true);
     try {
+      const isBranch = selectedHistoricalBranchId !== 'all';
+      const branchObj = isBranch ? currentBusiness.branches?.find((b) => b.id === selectedHistoricalBranchId) : null;
+      const base = branchObj?.baseline || currentBusiness.baseline;
+
       const updatedBaseline: DayOneBaseline = {
         startDate: baselineForm.startDate,
         initialRating: Number(baselineForm.initialRating) || 3.8,
@@ -1994,14 +2010,15 @@ export default function MasterAdminPage() {
         initialReviews1to3: Number(baselineForm.initialReviews1to3) || 0,
         initialReviews4to5: Number(baselineForm.initialReviews4to5) || 0,
         initialRespondedReviews: Number(baselineForm.initialRespondedReviews) || 0,
-        initialMonthlyComplaints: currentBusiness.baseline?.initialMonthlyComplaints || 15,
+        initialMonthlyComplaints: base?.initialMonthlyComplaints || 15,
         averageTicketCOP: Number(baselineForm.averageTicketCOP) || 45000,
         averageTicketUSD: Number(baselineForm.averageTicketUSD) || 18,
+        customMonthlyFeeCOP: Number(baselineForm.customMonthlyFeeCOP) || 0,
         nicheCategory: currentBusiness.category || 'Gastronomía y Retail',
-        city: currentBusiness.branches?.[0]?.city || 'Bogotá',
-        locality: currentBusiness.branches?.[0]?.locality || 'Principal',
+        city: branchObj?.city || currentBusiness.branches?.[0]?.city || 'Bogotá',
+        locality: branchObj?.locality || currentBusiness.branches?.[0]?.locality || 'Principal',
         country: currentBusiness.country || 'Colombia',
-        founderName: baselineForm.founderName || currentBusiness.ownerName || 'Propietario',
+        founderName: baselineForm.founderName || branchObj?.managerName || currentBusiness.ownerName || 'Propietario',
         clientQuote: baselineForm.clientQuote,
         calibratedAt: new Date().toISOString(),
         isCalibrated: true,
@@ -2013,6 +2030,7 @@ export default function MasterAdminPage() {
         body: JSON.stringify({
           action: 'update_baseline',
           businessId: currentBusiness.id,
+          branchId: selectedHistoricalBranchId,
           baseline: updatedBaseline,
         }),
       });
@@ -2020,13 +2038,22 @@ export default function MasterAdminPage() {
       const data = await res.json();
       if (data.success) {
         setBusinesses((prev) =>
-          prev.map((b) => (b.id === currentBusiness.id ? { ...b, baseline: updatedBaseline } : b))
+          prev.map((b) => {
+            if (b.id !== currentBusiness.id) return b;
+            if (isBranch) {
+              return {
+                ...b,
+                branches: b.branches?.map((br) => (br.id === selectedHistoricalBranchId ? { ...br, baseline: updatedBaseline } : br)),
+              };
+            }
+            return { ...b, baseline: updatedBaseline };
+          })
         );
         setCustomTestimonialQuote(baselineForm.clientQuote);
         setShowBaselineModal(false);
         setNotification({
           type: 'success',
-          message: `¡Línea Base Día 1 de ${currentBusiness.name} calibrada y fijada con éxito!`,
+          message: `¡Línea Base Día 1 de ${branchObj ? branchObj.name : currentBusiness.name} calibrada y fijada con éxito!`,
         });
         setTimeout(() => setNotification(null), 4000);
       } else {
@@ -2804,11 +2831,16 @@ export default function MasterAdminPage() {
     }
   };
 
-  // Historical Day-1 Performance Computations for currentBusiness
+  // Historical Day-1 Performance Computations for currentBusiness (Consolidated or Branch-Specific)
   const historicalMetrics = useMemo(() => {
     if (!currentBusiness) return null;
 
-    const base = currentBusiness.baseline;
+    const isBranch = selectedHistoricalBranchId !== 'all';
+    const currentHistoricalBranch = isBranch
+      ? currentBusiness.branches?.find((b) => b.id === selectedHistoricalBranchId) || null
+      : null;
+
+    const base = currentHistoricalBranch?.baseline || currentBusiness.baseline;
     const isCalibrated = Boolean(base?.isCalibrated);
     const startDate = base?.startDate || (currentBusiness.createdAt ? currentBusiness.createdAt.split('T')[0] : '2026-03-01');
 
@@ -2826,11 +2858,12 @@ export default function MasterAdminPage() {
       initialMonthlyComplaints: 0,
       averageTicketCOP: 45000,
       averageTicketUSD: 18,
+      customMonthlyFeeCOP: 0,
       nicheCategory: currentBusiness.category || 'Gastrobar / Restaurante',
-      city: currentBusiness.branches?.[0]?.city || 'Bogotá',
-      locality: currentBusiness.branches?.[0]?.locality || 'Principal',
+      city: currentHistoricalBranch?.city || currentBusiness.branches?.[0]?.city || 'Bogotá',
+      locality: currentHistoricalBranch?.locality || currentBusiness.branches?.[0]?.locality || 'Principal',
       country: currentBusiness.country || 'Colombia',
-      founderName: currentBusiness.ownerName || 'Propietario',
+      founderName: currentHistoricalBranch?.managerName || currentBusiness.ownerName || 'Propietario',
       clientQuote: 'Prestigia blindó nuestra reputación y convirtió clientes inconformes en promotores fieles de 5 estrellas.',
       isCalibrated: false,
     };
@@ -2842,22 +2875,23 @@ export default function MasterAdminPage() {
     const initialRespondedReviews = baseline.initialRespondedReviews ?? Math.round(initialRevCount * 0.15);
     const initialResponseRate = initialRevCount > 0 ? Math.round((initialRespondedReviews / initialRevCount) * 100) : 0;
 
-    // Filter strictly by startTimestamp:
-    // Only reviews & feedbacks registered on or after Prestigia activation count towards Prestigia improvement!
+    // Filter strictly by startTimestamp and selected branch (if branch-specific):
     const startTimestamp = new Date(startDate).getTime();
 
     // Relevant feedbacks (intercepted private complaints in room/WhatsApp)
     const bizFeedbacks = feedbacks.filter((f) => {
       if (f.businessId !== currentBusiness.id) return false;
+      if (isBranch && f.branchId !== selectedHistoricalBranchId) return false;
       if (!f.createdAt) return false;
       return new Date(f.createdAt).getTime() >= startTimestamp;
     });
     const privateComplaintsIntercepted = bizFeedbacks.filter((f) => Number(f.rating) <= 3).length;
     const resolvedPrivateCount = bizFeedbacks.filter((f) => Number(f.rating) <= 3 && f.status === 'resolved').length;
 
-    // Relevant Google Reviews for this business (Exact Breakdown)
+    // Relevant Google Reviews for this business / branch (Exact Breakdown)
     const bizReviews = googleReviews.filter((r) => {
       if (r.businessId !== currentBusiness.id) return false;
+      if (isBranch && r.branchId !== selectedHistoricalBranchId) return false;
       if (!r.createdAt) return false;
       return new Date(r.createdAt).getTime() >= startTimestamp;
     });
@@ -2891,11 +2925,22 @@ export default function MasterAdminPage() {
       ? privateComplaintsIntercepted * baseline.averageTicketUSD
       : Math.round(preservedRevenueCOP / 4000);
 
+    // Multiplicador de Retorno de Inversión (ROI)
+    // Sin precios fijos de planes: calculamos según la tarifa acordada negociada por cliente (customMonthlyFeeCOP)
+    const monthlyFeeCOP = baseline.customMonthlyFeeCOP || 0;
+    const monthsOperating = Math.max(1, Math.round(daysOperating / 30));
+    const totalInvestmentCOP = monthlyFeeCOP > 0 ? monthlyFeeCOP * monthsOperating : 0;
+    const roiMultiplier = totalInvestmentCOP > 0 && preservedRevenueCOP > 0
+      ? Number((preservedRevenueCOP / totalInvestmentCOP).toFixed(1))
+      : null;
+
     // Resolution Speed (<10s compliance)
     const resolutionSpeedPercent = 98.6;
 
     // Staff stars
-    const staffMembers = currentBusiness.branches?.flatMap((b) => b.staffMembers || []) || [];
+    const staffMembers = currentHistoricalBranch
+      ? (currentHistoricalBranch.staffMembers || [])
+      : (currentBusiness.branches?.flatMap((b) => b.staffMembers || []) || []);
     const topStaff = staffMembers[0] ? (typeof staffMembers[0] === 'string' ? staffMembers[0] : staffMembers[0].name) : 'Camilo Restrepo';
 
     return {
@@ -2903,6 +2948,13 @@ export default function MasterAdminPage() {
       isCalibrated,
       daysOperating,
       startDate,
+      isBranch,
+      currentHistoricalBranch,
+      selectedHistoricalBranchId,
+      monthlyFeeCOP,
+      monthsOperating,
+      totalInvestmentCOP,
+      roiMultiplier,
       initialReviews1to3,
       initialReviews4to5,
       initialRespondedReviews,
@@ -2926,7 +2978,7 @@ export default function MasterAdminPage() {
       resolutionSpeedPercent,
       topStaff,
     };
-  }, [currentBusiness, feedbacks, googleReviews]);
+  }, [currentBusiness, selectedHistoricalBranchId, feedbacks, googleReviews]);
 
   // Format currency helper respecting Privacy Mode
   const formatMoneyCOP = (amount: number) => {
@@ -5189,14 +5241,33 @@ export default function MasterAdminPage() {
 
               {/* Selector, Calibrate & Print / Export buttons */}
               <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                {/* Selector de Negocio */}
                 <select
                   value={selectedBusinessId}
-                  onChange={(e) => setSelectedBusinessId(e.target.value)}
-                  className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer"
+                  onChange={(e) => {
+                    setSelectedBusinessId(e.target.value);
+                    setSelectedHistoricalBranchId('all');
+                  }}
+                  className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-xl px-3.5 py-2.5 outline-none font-semibold cursor-pointer"
                 >
                   {businesses.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Selector de Sede Específica / Consolidado */}
+                <select
+                  value={selectedHistoricalBranchId}
+                  onChange={(e) => setSelectedHistoricalBranchId(e.target.value)}
+                  className="bg-[#141A26] border border-amber-500/40 text-amber-300 text-xs rounded-xl px-3.5 py-2.5 outline-none font-semibold cursor-pointer"
+                  title="Filtrar reporte por sede o ver consolidado de toda la marca"
+                >
+                  <option value="all">🏢 Consolidado ({currentBusiness.branches?.length || 0} Sedes)</option>
+                  {currentBusiness.branches?.map((br) => (
+                    <option key={br.id} value={br.id}>
+                      📍 {br.name} ({br.locality || br.city})
                     </option>
                   ))}
                 </select>
@@ -5209,7 +5280,11 @@ export default function MasterAdminPage() {
                   title="Calibrar fecha de inicio real de QRs, calificación inicial y reseñas previas"
                 >
                   <Sliders className="w-4 h-4 text-slate-950" />
-                  <span>{historicalMetrics.isCalibrated ? 'Recalibrar Línea Base Día 1' : 'Calibrar Línea Base Día 1'}</span>
+                  <span>
+                    {historicalMetrics.isCalibrated
+                      ? (historicalMetrics.isBranch ? `Recalibrar ${historicalMetrics.currentHistoricalBranch?.name}` : 'Recalibrar Línea Base')
+                      : (historicalMetrics.isBranch ? `Calibrar ${historicalMetrics.currentHistoricalBranch?.name}` : 'Calibrar Línea Base Día 1')}
+                  </span>
                 </button>
 
                 <button
@@ -5224,9 +5299,13 @@ export default function MasterAdminPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    const text = `🏆 CASO DE ÉXITO AUDITADO: ${currentBusiness.name}\n` +
+                    const scopeTitle = historicalMetrics.isBranch && historicalMetrics.currentHistoricalBranch
+                      ? `${currentBusiness.name} - ${historicalMetrics.currentHistoricalBranch.name}`
+                      : `${currentBusiness.name} (Consolidado ${currentBusiness.branches?.length || 1} Sedes)`;
+                    const text = `🏆 CASO DE ÉXITO AUDITADO: ${scopeTitle}\n` +
                       `📍 Ubicación: ${historicalMetrics.baseline.city} (${historicalMetrics.baseline.nicheCategory})\n` +
-                      `⏱️ Tiempo con Prestigia: ${historicalMetrics.daysOperating} días de protección activa (Desde ${historicalMetrics.startDate})\n\n` +
+                      `⏱️ Tiempo con Prestigia: ${historicalMetrics.daysOperating} días de protección activa (Desde ${historicalMetrics.startDate})\n` +
+                      `🚀 Multiplicador de Retorno (ROI): ${historicalMetrics.roiMultiplier !== null ? `${historicalMetrics.roiMultiplier}x de Retorno sobre Inversión` : `${historicalMetrics.privateComplaintsIntercepted}x mesas retenidas en sala`}\n\n` +
                       `📊 EVOLUCIÓN HISTÓRICA EN GOOGLE MAPS:\n` +
                       `• Calificación: ${historicalMetrics.baseline.initialRating}★ ➔ ${historicalMetrics.currentRating}★ (+${historicalMetrics.ratingGain}★)\n` +
                       `• Reseñas Totales: ${historicalMetrics.baseline.initialReviewCount} ➔ ${historicalMetrics.totalAllReviews} (${historicalMetrics.newGoogleReviewsTotal > 0 ? `+${historicalMetrics.newGoogleReviewsTotal} nuevas ganadas` : '0 nuevas ganadas'})\n` +
@@ -5236,7 +5315,7 @@ export default function MasterAdminPage() {
                       `🛡️ CONTENCIÓN Y RETENCIÓN EN SALA:\n` +
                       `• Quejas Privadas Salvadas en Sala: ${historicalMetrics.privateComplaintsIntercepted} crisis resueltas en <10 seg antes de salir a Google Maps\n` +
                       `• Facturación Salvada de Fuga: ${formatMoneyCOP(historicalMetrics.preservedRevenueCOP)} / ${formatMoneyUSD(historicalMetrics.preservedRevenueUSD)} (${historicalMetrics.privateComplaintsIntercepted} mesas × ${formatMoneyCOP(historicalMetrics.baseline.averageTicketCOP)})\n\n` +
-                      `🗣️ TESTIMONIO DEL DUEÑO (${historicalMetrics.baseline.founderName}):\n` +
+                      `🗣️ TESTIMONIO DEL RESPONSABLE (${historicalMetrics.baseline.founderName}):\n` +
                       `"${customTestimonialQuote || historicalMetrics.baseline.clientQuote}"\n\n` +
                       `👉 Descubre cómo blindar tu reputación en: prestigia.app`;
                     handleCopy(text, 'whatsapp-summary');
@@ -5257,8 +5336,15 @@ export default function MasterAdminPage() {
                     <ShieldCheck className="w-4 h-4 text-emerald-400" />
                     Protección Activa Día {historicalMetrics.daysOperating}
                   </span>
+                  <span className="px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-amber-300 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    {historicalMetrics.isBranch && historicalMetrics.currentHistoricalBranch ? (
+                      <>📍 {historicalMetrics.currentHistoricalBranch.name}</>
+                    ) : (
+                      <>🏢 Consolidado ({currentBusiness.branches?.length || 1} Sedes)</>
+                    )}
+                  </span>
                   <span className="text-xs text-slate-400">
-                    Activación de QRs en sala: <strong className="text-slate-200 font-mono">{historicalMetrics.startDate}</strong>
+                    Activación de QRs: <strong className="text-slate-200 font-mono">{historicalMetrics.startDate}</strong>
                   </span>
                   {historicalMetrics.baseline.calibratedAt && (
                     <span className="text-[11px] text-slate-500">
@@ -5273,11 +5359,100 @@ export default function MasterAdminPage() {
                   </span>
                 </h3>
                 <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-                  Desde el inicio de la operación con códigos QR en sala, el sistema ha blindado activamente la reputación de <strong className="text-white">{currentBusiness.name}</strong>, canalizando clientes insatisfechos en privado hacia WhatsApp en menos de 10 segundos e impulsando únicamente reseñas de 5 estrellas en su perfil público de Google Maps.
+                  Desde el inicio de la operación con códigos QR en sala, el sistema ha blindado activamente la reputación de{' '}
+                  <strong className="text-white">
+                    {historicalMetrics.isBranch && historicalMetrics.currentHistoricalBranch
+                      ? `${currentBusiness.name} — ${historicalMetrics.currentHistoricalBranch.name}`
+                      : currentBusiness.name}
+                  </strong>
+                  , canalizando clientes insatisfechos en privado hacia WhatsApp en menos de 10 segundos e impulsando únicamente reseñas de 5 estrellas en su perfil público de Google Maps.
                 </p>
+
+                {/* Inline Negotiated Fee Editor (Sin Planes Fijos) */}
+                <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
+                  <span className="text-slate-400 font-medium">Inversión mensual pactada:</span>
+                  {editingCustomFee ? (
+                    <div className="inline-flex items-center gap-1.5 bg-[#141A26] border border-amber-500/40 rounded-xl px-2.5 py-1">
+                      <span className="text-amber-400 font-mono">$</span>
+                      <input
+                        type="number"
+                        placeholder="Ej: 450000"
+                        value={tempCustomFee}
+                        onChange={(e) => setTempCustomFee(e.target.value)}
+                        className="w-28 bg-transparent text-white font-mono text-xs outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const fee = Number(tempCustomFee) || 0;
+                          const isBranch = selectedHistoricalBranchId !== 'all';
+                          const branchObj = isBranch ? currentBusiness.branches?.find((b) => b.id === selectedHistoricalBranchId) : null;
+                          const base = branchObj?.baseline || currentBusiness.baseline || historicalMetrics.baseline;
+                          const updatedBaseline = { ...base, customMonthlyFeeCOP: fee };
+                          
+                          await fetch('/api/master', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              action: 'update_baseline',
+                              businessId: currentBusiness.id,
+                              branchId: selectedHistoricalBranchId,
+                              baseline: updatedBaseline,
+                            }),
+                          });
+
+                          setBusinesses((prev) =>
+                            prev.map((b) => {
+                              if (b.id !== currentBusiness.id) return b;
+                              if (isBranch) {
+                                return {
+                                  ...b,
+                                  branches: b.branches?.map((br) => (br.id === selectedHistoricalBranchId ? { ...br, baseline: updatedBaseline } : br)),
+                                };
+                              }
+                              return { ...b, baseline: updatedBaseline };
+                            })
+                          );
+                          setEditingCustomFee(false);
+                          setNotification({ type: 'success', message: '¡Tarifa de inversión pactada actualizada con éxito!' });
+                          setTimeout(() => setNotification(null), 3000);
+                        }}
+                        className="px-2 py-0.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[10px] cursor-pointer"
+                      >
+                        Guardar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingCustomFee(false)}
+                        className="text-slate-400 hover:text-white text-[10px] cursor-pointer px-1"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTempCustomFee(String(historicalMetrics.monthlyFeeCOP || ''));
+                        setEditingCustomFee(true);
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-slate-800/90 hover:bg-slate-700 border border-slate-700 hover:border-amber-500/50 text-slate-300 font-mono text-[11px] flex items-center gap-1.5 transition cursor-pointer"
+                      title="Haz clic para ingresar la tarifa personalizada acordada con este cliente y calcular el multiplicador de ROI"
+                    >
+                      <DollarSign className="w-3 h-3 text-emerald-400" />
+                      <span>
+                        {historicalMetrics.monthlyFeeCOP > 0
+                          ? `${formatMoneyCOP(historicalMetrics.monthlyFeeCOP)} / mes (Pactado)`
+                          : 'Fijar tarifa acordada para Multiplicador ROI'}
+                      </span>
+                      <Edit3 className="w-2.5 h-2.5 text-amber-400" />
+                    </button>
+                  )}
+                </div>
               </div>
 
-              <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 w-full lg:w-auto justify-between lg:justify-end">
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 shrink-0 w-full lg:w-auto justify-between lg:justify-end">
+                {/* Badge 1: Nuevas 5★ */}
                 <div className="text-center px-4 py-3 rounded-2xl bg-[#141A26] border border-slate-800 flex-1 lg:flex-initial">
                   <span className="text-[10px] text-slate-400 uppercase font-bold block">Nuevas 5★ Maps</span>
                   <strong className="text-amber-300 font-mono text-xl font-extrabold block">
@@ -5287,15 +5462,46 @@ export default function MasterAdminPage() {
                     {historicalMetrics.exactReviews4Star > 0 ? `(+${historicalMetrics.exactReviews4Star} de 4★)` : (historicalMetrics.exactReviews5Star > 0 ? 'Impulsadas al QR' : 'Monitoreo activo')}
                   </span>
                 </div>
+
+                {/* Badge 2: Quejas Salvadas */}
                 <div className="text-center px-4 py-3 rounded-2xl bg-[#141A26] border border-slate-800 flex-1 lg:flex-initial">
                   <span className="text-[10px] text-slate-400 uppercase font-bold block">Quejas Salvadas</span>
                   <strong className="text-blue-400 font-mono text-xl font-extrabold block">{historicalMetrics.privateComplaintsIntercepted}</strong>
                   <span className="text-[9px] text-blue-300 font-semibold">En mesa (&lt;10s)</span>
                 </div>
+
+                {/* Badge 3: Dinero Retenido */}
                 <div className="text-center px-4 py-3 rounded-2xl bg-[#141A26] border border-slate-800 flex-1 lg:flex-initial">
                   <span className="text-[10px] text-slate-400 uppercase font-bold block">Dinero Retenido</span>
                   <strong className="text-emerald-400 font-mono text-base sm:text-lg font-extrabold block">{formatMoneyCOP(historicalMetrics.preservedRevenueCOP)}</strong>
                   <span className="text-[9px] text-slate-400 font-mono">{formatMoneyUSD(historicalMetrics.preservedRevenueUSD)}</span>
+                </div>
+
+                {/* Badge 4: Multiplicador ROI */}
+                <div className="text-center px-4 py-3 rounded-2xl bg-gradient-to-b from-amber-500/10 to-[#141A26] border border-amber-500/40 flex-1 lg:flex-initial shadow-lg shadow-amber-500/10">
+                  <span className="text-[10px] text-amber-400 uppercase font-bold block flex items-center justify-center gap-1">
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    Multiplicador ROI
+                  </span>
+                  {historicalMetrics.roiMultiplier !== null ? (
+                    <>
+                      <strong className="text-amber-300 font-mono text-xl font-black block">
+                        {historicalMetrics.roiMultiplier}x
+                      </strong>
+                      <span className="text-[9px] text-emerald-400 font-semibold block">
+                        Retorno de Inversión
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <strong className="text-amber-300 font-mono text-base font-extrabold block">
+                        {historicalMetrics.privateComplaintsIntercepted}x Mesas
+                      </strong>
+                      <span className="text-[9px] text-slate-400 font-semibold block">
+                        Cuentas recuperadas
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -5430,13 +5636,26 @@ export default function MasterAdminPage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-bold text-white tracking-tight">{currentBusiness.name}</h3>
+                      <h3 className="text-lg font-bold text-white tracking-tight">
+                        {currentBusiness.name}
+                        {historicalMetrics.isBranch && historicalMetrics.currentHistoricalBranch && (
+                          <span className="text-amber-400 font-bold ml-1.5">— {historicalMetrics.currentHistoricalBranch.name}</span>
+                        )}
+                      </h3>
                       <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/40">
-                        Caso de Éxito Certificado
+                        {historicalMetrics.isBranch ? 'Reporte Oficial por Sede' : `Consolidado (${currentBusiness.branches?.length || 1} Sedes)`}
                       </span>
                     </div>
                     <p className="text-xs text-slate-400">
-                      {historicalMetrics.baseline.nicheCategory} • {historicalMetrics.baseline.city}, {historicalMetrics.baseline.country}
+                      {historicalMetrics.isBranch && historicalMetrics.currentHistoricalBranch ? (
+                        <>
+                          {historicalMetrics.currentHistoricalBranch.address || ''} • {historicalMetrics.currentHistoricalBranch.locality || historicalMetrics.currentHistoricalBranch.city}, {historicalMetrics.baseline.country} • Responsable: {historicalMetrics.currentHistoricalBranch.managerName || currentBusiness.ownerName}
+                        </>
+                      ) : (
+                        <>
+                          {historicalMetrics.baseline.nicheCategory} • {historicalMetrics.baseline.city}, {historicalMetrics.baseline.country} • Titular General: {currentBusiness.ownerName}
+                        </>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -5586,6 +5805,27 @@ export default function MasterAdminPage() {
                         </td>
                         <td className="py-3 px-4 text-emerald-300 font-semibold font-mono">
                           Monto exacto: {historicalMetrics.privateComplaintsIntercepted} mesas × {formatMoneyCOP(historicalMetrics.baseline.averageTicketCOP)} ({formatMoneyUSD(historicalMetrics.preservedRevenueUSD)})
+                        </td>
+                      </tr>
+
+                      {/* Fila: Multiplicador de Retorno de Inversión (ROI) */}
+                      <tr className="hover:bg-slate-800/20 transition-colors bg-amber-500/[0.04]">
+                        <td className="py-3 px-4 font-semibold text-amber-300 flex items-center gap-2">
+                          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Multiplicador de Retorno (ROI)</span>
+                        </td>
+                        <td className="py-3 px-4 font-mono text-rose-300">
+                          0x (Sin blindaje, fuga total)
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-amber-300 text-sm">
+                          {historicalMetrics.roiMultiplier !== null
+                            ? `${historicalMetrics.roiMultiplier}x Retorno Directo`
+                            : `${historicalMetrics.privateComplaintsIntercepted}x Mesas Salvadas`}
+                        </td>
+                        <td className="py-3 px-4 text-amber-300 font-semibold font-mono">
+                          {historicalMetrics.roiMultiplier !== null
+                            ? `Por cada $1 invertido en blindaje, la marca retuvo $${historicalMetrics.roiMultiplier} en caja`
+                            : `Retención patrimonial: ${historicalMetrics.privateComplaintsIntercepted} cuentas devueltas al balance`}
                         </td>
                       </tr>
 
@@ -9637,6 +9877,31 @@ export default function MasterAdminPage() {
                       className="w-full bg-[#0C101A] border border-slate-700 text-white text-xs rounded-xl px-4 py-2.5 outline-none focus:border-amber-400 font-mono"
                     />
                   </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-800">
+                  <label className="text-[11px] font-semibold text-amber-300 flex items-center justify-between mb-1">
+                    <span className="flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      Inversión Mensual Pactada con el Cliente (COP)
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-normal">Para Multiplicador ROI exacto (Sin planes fijos)</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-xs">$</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="10000"
+                      placeholder="Ej: 450000 (Opcional, según acuerdo con el cliente)"
+                      value={baselineForm.customMonthlyFeeCOP || ''}
+                      onChange={(e) => setBaselineForm({ ...baselineForm, customMonthlyFeeCOP: Number(e.target.value) || 0 })}
+                      className="w-full bg-[#0C101A] border border-amber-500/30 text-white text-xs rounded-xl pl-8 pr-4 py-2.5 outline-none focus:border-amber-400 font-mono"
+                    />
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    Como no existen planes de precio fijo, ingresa la tarifa que se acordó contractualmente con este cliente para que el dossier calcule automáticamente cuántas veces recuperó su inversión.
+                  </p>
                 </div>
               </div>
 
