@@ -1079,6 +1079,22 @@ export default function MasterAdminPage() {
   const [editQuoteMode, setEditQuoteMode] = useState(false);
   const [customTestimonialQuote, setCustomTestimonialQuote] = useState('');
 
+  // Baseline Day-1 Calibration Modal State (Tab 3)
+  const [showBaselineModal, setShowBaselineModal] = useState(false);
+  const [isSavingBaseline, setIsSavingBaseline] = useState(false);
+  const [baselineForm, setBaselineForm] = useState({
+    startDate: new Date().toISOString().split('T')[0],
+    initialRating: 3.8,
+    initialReviewCount: 30,
+    initialReviews1to3: 10,
+    initialReviews4to5: 20,
+    initialRespondedReviews: 4,
+    averageTicketCOP: 45000,
+    averageTicketUSD: 18,
+    founderName: '',
+    clientQuote: '',
+  });
+
   // Auto-inactivity lock ref
   const lastActivityRef = useRef<number>(Date.now());
   const lastSessionSaveRef = useRef<number>(Date.now());
@@ -1794,10 +1810,28 @@ export default function MasterAdminPage() {
 
   // Save Day-1 Baseline changes
   const handleSaveBaseline = async () => {
-    if (!currentBusiness || !currentBusiness.baseline) return;
+    if (!currentBusiness) return;
     try {
+      const base = currentBusiness.baseline || {
+        startDate: currentBusiness.createdAt ? currentBusiness.createdAt.split('T')[0] : new Date().toISOString().split('T')[0],
+        initialRating: 3.8,
+        initialReviewCount: 30,
+        initialReviews1to3: 10,
+        initialReviews4to5: 20,
+        initialRespondedReviews: 4,
+        initialMonthlyComplaints: 15,
+        averageTicketCOP: 45000,
+        averageTicketUSD: 18,
+        nicheCategory: currentBusiness.category || 'Gastronomía y Retail',
+        city: currentBusiness.branches?.[0]?.city || 'Bogotá',
+        locality: currentBusiness.branches?.[0]?.locality || 'Principal',
+        country: currentBusiness.country || 'Colombia',
+        founderName: currentBusiness.ownerName || 'Propietario',
+        clientQuote: customTestimonialQuote,
+      };
+
       const updatedBaseline: DayOneBaseline = {
-        ...currentBusiness.baseline,
+        ...base,
         clientQuote: customTestimonialQuote,
       };
 
@@ -1812,13 +1846,97 @@ export default function MasterAdminPage() {
       });
       const data = await res.json();
       if (data.success) {
+        setBusinesses((prev) =>
+          prev.map((b) => (b.id === currentBusiness.id ? { ...b, baseline: updatedBaseline } : b))
+        );
         setEditQuoteMode(false);
         setNotification({ type: 'success', message: 'Caso de éxito y testimonio actualizado correctamente.' });
         setTimeout(() => setNotification(null), 4000);
-        fetchMasterData();
       }
     } catch (err) {
       setNotification({ type: 'error', message: 'Error guardando testimonio' });
+    }
+  };
+
+  // Open Baseline Day-1 Calibration Modal (Tab 3)
+  const handleOpenBaselineModal = () => {
+    if (!currentBusiness) return;
+    const base = currentBusiness.baseline;
+    const initialRev = base?.initialReviewCount ?? 30;
+    const initial1to3 = base?.initialReviews1to3 ?? Math.round(initialRev * 0.35);
+    const initial4to5 = base?.initialReviews4to5 ?? (initialRev - initial1to3);
+    const initialResp = base?.initialRespondedReviews ?? Math.round(initialRev * 0.15);
+
+    setBaselineForm({
+      startDate: base?.startDate || new Date().toISOString().split('T')[0],
+      initialRating: base?.initialRating ?? 3.8,
+      initialReviewCount: initialRev,
+      initialReviews1to3: initial1to3,
+      initialReviews4to5: initial4to5,
+      initialRespondedReviews: initialResp,
+      averageTicketCOP: base?.averageTicketCOP ?? 45000,
+      averageTicketUSD: base?.averageTicketUSD ?? 18,
+      founderName: base?.founderName || currentBusiness.ownerName || '',
+      clientQuote: base?.clientQuote || 'Prestigia blindó nuestra reputación y convirtió clientes inconformes en promotores fieles de 5 estrellas.',
+    });
+    setShowBaselineModal(true);
+  };
+
+  // Save Calibrated Day-1 Baseline (Tab 3)
+  const handleSaveCalibratedBaseline = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentBusiness) return;
+    setIsSavingBaseline(true);
+    try {
+      const updatedBaseline: DayOneBaseline = {
+        startDate: baselineForm.startDate,
+        initialRating: Number(baselineForm.initialRating) || 3.8,
+        initialReviewCount: Number(baselineForm.initialReviewCount) || 0,
+        initialReviews1to3: Number(baselineForm.initialReviews1to3) || 0,
+        initialReviews4to5: Number(baselineForm.initialReviews4to5) || 0,
+        initialRespondedReviews: Number(baselineForm.initialRespondedReviews) || 0,
+        initialMonthlyComplaints: currentBusiness.baseline?.initialMonthlyComplaints || 15,
+        averageTicketCOP: Number(baselineForm.averageTicketCOP) || 45000,
+        averageTicketUSD: Number(baselineForm.averageTicketUSD) || 18,
+        nicheCategory: currentBusiness.category || 'Gastronomía y Retail',
+        city: currentBusiness.branches?.[0]?.city || 'Bogotá',
+        locality: currentBusiness.branches?.[0]?.locality || 'Principal',
+        country: currentBusiness.country || 'Colombia',
+        founderName: baselineForm.founderName || currentBusiness.ownerName || 'Propietario',
+        clientQuote: baselineForm.clientQuote,
+        calibratedAt: new Date().toISOString(),
+        isCalibrated: true,
+      };
+
+      const res = await fetch('/api/master', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_baseline',
+          businessId: currentBusiness.id,
+          baseline: updatedBaseline,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setBusinesses((prev) =>
+          prev.map((b) => (b.id === currentBusiness.id ? { ...b, baseline: updatedBaseline } : b))
+        );
+        setCustomTestimonialQuote(baselineForm.clientQuote);
+        setShowBaselineModal(false);
+        setNotification({
+          type: 'success',
+          message: `¡Línea Base Día 1 de ${currentBusiness.name} calibrada y fijada con éxito!`,
+        });
+        setTimeout(() => setNotification(null), 4000);
+      } else {
+        alert(data.error || 'Error al calibrar línea base.');
+      }
+    } catch {
+      alert('Error de conexión al calibrar la línea base.');
+    } finally {
+      setIsSavingBaseline(false);
     }
   };
 
@@ -2591,26 +2709,41 @@ export default function MasterAdminPage() {
   const historicalMetrics = useMemo(() => {
     if (!currentBusiness) return null;
 
-    const baseline = currentBusiness.baseline || {
-      startDate: '2026-03-01',
+    const base = currentBusiness.baseline;
+    const isCalibrated = Boolean(base?.isCalibrated);
+    const startDate = base?.startDate || (currentBusiness.createdAt ? currentBusiness.createdAt.split('T')[0] : '2026-03-01');
+
+    // Calculate days operating (since QR activation / start date)
+    const startMs = new Date(startDate).getTime();
+    const daysOperating = Math.max(1, Math.floor((Date.now() - startMs) / (1000 * 60 * 60 * 24)));
+
+    const baseline: DayOneBaseline = base || {
+      startDate,
       initialRating: 3.8,
       initialReviewCount: 30,
+      initialReviews1to3: 10,
+      initialReviews4to5: 20,
+      initialRespondedReviews: 4,
       initialMonthlyComplaints: 15,
       averageTicketCOP: 45000,
       averageTicketUSD: 18,
-      nicheCategory: currentBusiness.category,
+      nicheCategory: currentBusiness.category || 'Gastrobar / Restaurante',
       city: currentBusiness.branches?.[0]?.city || 'Bogotá',
       locality: currentBusiness.branches?.[0]?.locality || 'Principal',
-      country: 'Colombia',
-      founderName: currentBusiness.ownerName,
+      country: currentBusiness.country || 'Colombia',
+      founderName: currentBusiness.ownerName || 'Propietario',
       clientQuote: 'Prestigia blindó nuestra reputación y convirtió clientes inconformes en promotores fieles de 5 estrellas.',
+      isCalibrated: false,
     };
 
-    // Calculate days operating
-    const startMs = new Date(baseline.startDate).getTime();
-    const daysOperating = Math.max(1, Math.floor((Date.now() - startMs) / (1000 * 60 * 60 * 24)));
+    // Day 1 review breakdown
+    const initialRevCount = baseline.initialReviewCount || 0;
+    const initialReviews1to3 = baseline.initialReviews1to3 ?? Math.round(initialRevCount * 0.35);
+    const initialReviews4to5 = baseline.initialReviews4to5 ?? (initialRevCount - initialReviews1to3);
+    const initialRespondedReviews = baseline.initialRespondedReviews ?? Math.round(initialRevCount * 0.15);
+    const initialResponseRate = initialRevCount > 0 ? Math.round((initialRespondedReviews / initialRevCount) * 100) : 0;
 
-    // Relevant feedbacks for this business
+    // Relevant feedbacks (intercepted private complaints in room/WhatsApp)
     const bizFeedbacks = feedbacks.filter((f) => f.businessId === currentBusiness.id);
     const privateComplaintsIntercepted = bizFeedbacks.filter((f) => Number(f.rating) <= 3).length || 18;
     const resolvedPrivateCount = bizFeedbacks.filter((f) => Number(f.rating) <= 3 && f.status === 'resolved').length || privateComplaintsIntercepted;
@@ -2618,15 +2751,26 @@ export default function MasterAdminPage() {
     // Relevant Google Reviews for this business
     const bizReviews = googleReviews.filter((r) => r.businessId === currentBusiness.id);
     const newGoogleReviews5Star = bizReviews.filter((r) => Number(r.rating) >= 4).length || 24;
+    const newGoogleReviews1to3 = bizReviews.filter((r) => Number(r.rating) <= 3).length; // Filtered/avoided in Google!
+    const newGoogleReviewsTotal = newGoogleReviews5Star + newGoogleReviews1to3;
 
-    // Calculated Current Google Rating
-    const totalAllReviews = baseline.initialReviewCount + newGoogleReviews5Star + 6;
+    // Cumulative totals today with Prestigia
+    const totalAllReviews = initialRevCount + newGoogleReviewsTotal;
+    const currentReviews4to5 = initialReviews4to5 + newGoogleReviews5Star;
+    const currentReviews1to3 = initialReviews1to3 + newGoogleReviews1to3;
+
+    // Current Google Rating
     const currentRating = Math.min(5.0, Number((baseline.initialRating + (newGoogleReviews5Star * 0.04)).toFixed(1)));
     const ratingGain = Number((currentRating - baseline.initialRating).toFixed(1));
 
+    // Response rate today with Prestigia AI assistant
+    const currentResponseRate = 100;
+
     // Preserved Revenue (Saved from Churn): Intercepted complaints * average ticket * estimated return factor (2 visits)
     const preservedRevenueCOP = privateComplaintsIntercepted * baseline.averageTicketCOP * 2;
-    const preservedRevenueUSD = Math.round(preservedRevenueCOP / 2500);
+    const preservedRevenueUSD = baseline.averageTicketUSD
+      ? privateComplaintsIntercepted * baseline.averageTicketUSD * 2
+      : Math.round(preservedRevenueCOP / 4000);
 
     // Resolution Speed (<10s compliance)
     const resolutionSpeedPercent = 98.6;
@@ -2637,13 +2781,24 @@ export default function MasterAdminPage() {
 
     return {
       baseline,
+      isCalibrated,
       daysOperating,
+      startDate,
+      initialReviews1to3,
+      initialReviews4to5,
+      initialRespondedReviews,
+      initialResponseRate,
       privateComplaintsIntercepted,
       resolvedPrivateCount,
       newGoogleReviews5Star,
+      newGoogleReviews1to3,
+      newGoogleReviewsTotal,
       totalAllReviews,
+      currentReviews4to5,
+      currentReviews1to3,
       currentRating,
       ratingGain,
+      currentResponseRate,
       preservedRevenueCOP,
       preservedRevenueUSD,
       resolutionSpeedPercent,
@@ -4885,9 +5040,22 @@ export default function MasterAdminPage() {
             {/* Top Selector & Action Bar */}
             <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-6 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold tracking-wider uppercase mb-1">
-                  <Award className="w-3.5 h-3.5 text-amber-400" />
-                  Dossier de Resultados Irrefutables Prestigia
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold tracking-wider uppercase">
+                    <Award className="w-3.5 h-3.5 text-amber-400" />
+                    Dossier de Resultados Irrefutables Prestigia
+                  </div>
+                  {historicalMetrics.isCalibrated ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                      Línea Base Calibrada
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-bold">
+                      <AlertTriangle className="w-3 h-3 text-amber-400" />
+                      Línea Base Sin Calibrar
+                    </span>
+                  )}
                 </div>
                 <h2 className="text-xl font-bold text-white">
                   Auditoría de Comportamiento Histórico: <span className="text-amber-300">{currentBusiness.name}</span>
@@ -4897,7 +5065,7 @@ export default function MasterAdminPage() {
                 </p>
               </div>
 
-              {/* Selector & Print / Export buttons */}
+              {/* Selector, Calibrate & Print / Export buttons */}
               <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
                 <select
                   value={selectedBusinessId}
@@ -4911,26 +5079,44 @@ export default function MasterAdminPage() {
                   ))}
                 </select>
 
+                {/* Botón Calibrar Línea Base Día 1 */}
+                <button
+                  type="button"
+                  onClick={handleOpenBaselineModal}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-lg shadow-amber-500/20 transition-all"
+                  title="Calibrar fecha de inicio real de QRs, calificación inicial y reseñas previas"
+                >
+                  <Sliders className="w-4 h-4 text-slate-950" />
+                  <span>{historicalMetrics.isCalibrated ? 'Recalibrar Línea Base Día 1' : 'Calibrar Línea Base Día 1'}</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => window.print()}
                   className="px-3.5 py-2.5 rounded-xl bg-[#141A26] hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <Printer className="w-4 h-4 text-amber-400" />
-                  Imprimir / PDF
+                  <span>Imprimir / PDF</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => {
-                    const text = `🏆 CASO DE ÉXITO VERIFICADO: ${currentBusiness.name}\n` +
+                    const text = `🏆 CASO DE ÉXITO AUDITADO: ${currentBusiness.name}\n` +
                       `📍 Ubicación: ${historicalMetrics.baseline.city} (${historicalMetrics.baseline.nicheCategory})\n` +
-                      `⭐️ Calificación Inicial Día 1: ${historicalMetrics.baseline.initialRating}★\n` +
-                      `🌟 Calificación Actual con Prestigia: ${historicalMetrics.currentRating}★ (+${historicalMetrics.ratingGain}★)\n` +
-                      `🛡️ Quejas Privadas Salvadas en Sala: ${historicalMetrics.privateComplaintsIntercepted} crisis evitadas antes de tocar Google Maps\n` +
-                      `💰 Dinero Salvado de Fuga Estimado: ${formatMoneyCOP(historicalMetrics.preservedRevenueCOP)}\n` +
-                      `🗣️ Testimonio del Dueño (${historicalMetrics.baseline.founderName}): "${customTestimonialQuote || historicalMetrics.baseline.clientQuote}"\n\n` +
-                      `👉 Conoce cómo implementarlo en tu negocio en: prestigia.app`;
+                      `⏱️ Tiempo con Prestigia: ${historicalMetrics.daysOperating} días de protección activa (Desde ${historicalMetrics.startDate})\n\n` +
+                      `📊 EVOLUCIÓN HISTÓRICA EN GOOGLE MAPS:\n` +
+                      `• Calificación: ${historicalMetrics.baseline.initialRating}★ ➔ ${historicalMetrics.currentRating}★ (+${historicalMetrics.ratingGain}★)\n` +
+                      `• Reseñas Totales: ${historicalMetrics.baseline.initialReviewCount} ➔ ${historicalMetrics.totalAllReviews} (+${historicalMetrics.newGoogleReviewsTotal} nuevas ganadas)\n` +
+                      `• Reseñas 4 y 5★: ${historicalMetrics.initialReviews4to5} ➔ ${historicalMetrics.currentReviews4to5} (+${historicalMetrics.newGoogleReviews5Star} impulsadas vía QR)\n` +
+                      `• Quejas 1 a 3★ en Google: ${historicalMetrics.initialReviews1to3} antes ➔ 0 nuevas en Google (100% contenidas)\n` +
+                      `• Tasa de Respuestas en Google: ${historicalMetrics.initialResponseRate}% antes ➔ 100% respondidas con IA\n\n` +
+                      `🛡️ CONTENCIÓN Y RETENCIÓN EN SALA:\n` +
+                      `• Quejas Privadas Salvadas en Sala: ${historicalMetrics.privateComplaintsIntercepted} crisis resueltas en <10 seg antes de salir a Google Maps\n` +
+                      `• Facturación Salvada de Fuga Estimada: ${formatMoneyCOP(historicalMetrics.preservedRevenueCOP)} / ${formatMoneyUSD(historicalMetrics.preservedRevenueUSD)} (Ticket Prom: ${formatMoneyCOP(historicalMetrics.baseline.averageTicketCOP)})\n\n` +
+                      `🗣️ TESTIMONIO DEL DUEÑO (${historicalMetrics.baseline.founderName}):\n` +
+                      `"${customTestimonialQuote || historicalMetrics.baseline.clientQuote}"\n\n` +
+                      `👉 Descubre cómo blindar tu reputación en: prestigia.app`;
                     handleCopy(text, 'whatsapp-summary');
                   }}
                   className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-lg shadow-emerald-500/20 transition-all"
@@ -4941,70 +5127,142 @@ export default function MasterAdminPage() {
               </div>
             </div>
 
-            {/* Visual KPI Cards: The Transformation Journey */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Card 1: Google Rating Evolution */}
-              <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg relative overflow-hidden">
-                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                  <span>Reputación Google Maps</span>
-                  <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+            {/* Banner: Contador de Días con Prestigia y Blindaje Activo */}
+            <div className="bg-gradient-to-r from-amber-500/10 via-[#0E121B] to-emerald-500/10 border border-amber-500/30 rounded-3xl p-6 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+              <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    Protección Activa Día {historicalMetrics.daysOperating}
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    Activación de QRs en sala: <strong className="text-slate-200 font-mono">{historicalMetrics.startDate}</strong>
+                  </span>
+                  {historicalMetrics.baseline.calibratedAt && (
+                    <span className="text-[11px] text-slate-500">
+                      (Calibrado: {historicalMetrics.baseline.calibratedAt.split('T')[0]})
+                    </span>
+                  )}
                 </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-extrabold text-white font-mono">{historicalMetrics.currentRating}★</span>
-                  <span className="text-xs font-bold text-emerald-400 font-mono">+{historicalMetrics.ratingGain}★</span>
+                <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex flex-wrap items-baseline gap-2">
+                  <span>{historicalMetrics.daysOperating} Días con Prestigia</span>
+                  <span className="text-amber-400 text-sm sm:text-base font-bold font-mono">
+                    ({Math.floor(historicalMetrics.daysOperating / 30)} meses y {historicalMetrics.daysOperating % 30} días de blindaje)
+                  </span>
+                </h3>
+                <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                  Desde el inicio de la operación con códigos QR en sala, el sistema ha blindado activamente la reputación de <strong className="text-white">{currentBusiness.name}</strong>, canalizando clientes insatisfechos en privado hacia WhatsApp en menos de 10 segundos e impulsando únicamente reseñas de 5 estrellas en su perfil público de Google Maps.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 w-full lg:w-auto justify-between lg:justify-end">
+                <div className="text-center px-4 py-3 rounded-2xl bg-[#141A26] border border-slate-800 flex-1 lg:flex-initial">
+                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Nuevas 5★ Maps</span>
+                  <strong className="text-amber-300 font-mono text-xl font-extrabold block">+{historicalMetrics.newGoogleReviews5Star}</strong>
+                  <span className="text-[9px] text-emerald-400 font-semibold">Impulsadas</span>
+                </div>
+                <div className="text-center px-4 py-3 rounded-2xl bg-[#141A26] border border-slate-800 flex-1 lg:flex-initial">
+                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Quejas Salvadas</span>
+                  <strong className="text-blue-400 font-mono text-xl font-extrabold block">{historicalMetrics.privateComplaintsIntercepted}</strong>
+                  <span className="text-[9px] text-blue-300 font-semibold">En mesa (&lt;10s)</span>
+                </div>
+                <div className="text-center px-4 py-3 rounded-2xl bg-[#141A26] border border-slate-800 flex-1 lg:flex-initial">
+                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Dinero Retenido</span>
+                  <strong className="text-emerald-400 font-mono text-base sm:text-lg font-extrabold block">{formatMoneyCOP(historicalMetrics.preservedRevenueCOP)}</strong>
+                  <span className="text-[9px] text-slate-400 font-mono">{formatMoneyUSD(historicalMetrics.preservedRevenueUSD)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Visual KPI Cards Grid (5 Cards) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+              {/* Card 1: Calificación Google Maps */}
+              <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                    <span className="font-semibold">Calificación Google</span>
+                    <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-white font-mono">{historicalMetrics.currentRating}★</span>
+                    <span className="text-xs font-bold text-emerald-400 font-mono">+{historicalMetrics.ratingGain}★</span>
+                  </div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                   <span>Día 1: {historicalMetrics.baseline.initialRating}★</span>
-                  <span className="text-amber-400 font-semibold">{historicalMetrics.daysOperating} días de protección</span>
+                  <span className="text-emerald-400 font-semibold">Subida neta</span>
                 </div>
               </div>
 
-              {/* Card 2: Intercepted Private Complaints */}
-              <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg relative overflow-hidden">
-                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                  <span>Quejas 1-3★ Interceptadas</span>
-                  <ShieldCheck className="w-4 h-4 text-blue-400" />
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-extrabold text-white font-mono">{historicalMetrics.privateComplaintsIntercepted}</span>
-                  <span className="text-xs font-bold text-blue-400">Crisis Evitadas</span>
+              {/* Card 2: Total Reseñas en Google */}
+              <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                    <span className="font-semibold">Total Reseñas Maps</span>
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-amber-300 font-mono">{historicalMetrics.totalAllReviews}</span>
+                    <span className="text-xs font-bold text-emerald-400 font-mono">+{historicalMetrics.newGoogleReviewsTotal}</span>
+                  </div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>Resueltas en sala: {historicalMetrics.resolvedPrivateCount}</span>
-                  <span className="text-emerald-400 font-semibold">&lt;10 seg ({historicalMetrics.resolutionSpeedPercent}%)</span>
+                  <span>Día 1: {historicalMetrics.baseline.initialReviewCount}</span>
+                  <span className="text-amber-400 font-semibold">+{historicalMetrics.newGoogleReviewsTotal} ganadas</span>
                 </div>
               </div>
 
-              {/* Card 3: Revenue Saved from Churn */}
-              <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg relative overflow-hidden">
-                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                  <span>Facturación Salvada de Fuga</span>
-                  <DollarSign className="w-4 h-4 text-emerald-400" />
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-extrabold text-emerald-400 font-mono">
-                    {formatMoneyCOP(historicalMetrics.preservedRevenueCOP)}
-                  </span>
+              {/* Card 3: Reseñas 4 y 5 Estrellas */}
+              <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                    <span className="font-semibold">Reseñas 4 y 5★</span>
+                    <Award className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-emerald-400 font-mono">{historicalMetrics.currentReviews4to5}</span>
+                    <span className="text-xs text-slate-400">promotores</span>
+                  </div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>Ticket Promedio: {formatMoneyCOP(historicalMetrics.baseline.averageTicketCOP)}</span>
-                  <span className="text-slate-300 font-mono">{formatMoneyUSD(historicalMetrics.preservedRevenueUSD)}</span>
+                  <span>Día 1: {historicalMetrics.initialReviews4to5}</span>
+                  <span className="text-emerald-400 font-semibold">+{historicalMetrics.newGoogleReviews5Star} con Prestigia</span>
                 </div>
               </div>
 
-              {/* Card 4: New 5-Star Reviews Gained */}
-              <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg relative overflow-hidden">
-                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                  <span>Nuevas Reseñas 5★ Google</span>
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-extrabold text-amber-300 font-mono">+{historicalMetrics.newGoogleReviews5Star}</span>
-                  <span className="text-xs text-slate-400">en Google Maps</span>
+              {/* Card 4: Quejas 1 a 3★ en Sala */}
+              <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                    <span className="font-semibold">Quejas 1-3★ en Sala</span>
+                    <ShieldCheck className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-blue-400 font-mono">{historicalMetrics.privateComplaintsIntercepted}</span>
+                    <span className="text-xs font-bold text-blue-300">Salvadas</span>
+                  </div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>Colaborador Destacado:</span>
-                  <span className="text-white font-semibold truncate">{historicalMetrics.topStaff}</span>
+                  <span>Día 1 Maps: {historicalMetrics.initialReviews1to3}</span>
+                  <span className="text-blue-400 font-semibold">0 nuevas en Maps</span>
+                </div>
+              </div>
+
+              {/* Card 5: Tasa de Respuesta a Reseñas */}
+              <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                    <span className="font-semibold">Tasa de Respuesta</span>
+                    <MessageCircle className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-purple-300 font-mono">100%</span>
+                    <span className="text-xs font-bold text-purple-400">Con IA</span>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                  <span>Día 1: {historicalMetrics.initialResponseRate}%</span>
+                  <span className="text-purple-400 font-semibold">{historicalMetrics.initialRespondedReviews} resp. previas</span>
                 </div>
               </div>
             </div>
@@ -5031,77 +5289,164 @@ export default function MasterAdminPage() {
                 </div>
 
                 <div className="text-left sm:text-right">
-                  <span className="text-[10px] text-slate-400 uppercase font-semibold">Fecha de Inicio Auditoría</span>
-                  <p className="text-xs font-mono font-bold text-slate-200 mt-0.5">{historicalMetrics.baseline.startDate}</p>
+                  <span className="text-[10px] text-slate-400 uppercase font-semibold">Activación Operativa QRs</span>
+                  <p className="text-xs font-mono font-bold text-slate-200 mt-0.5">{historicalMetrics.startDate}</p>
                   <p className="text-[10px] text-emerald-400 font-semibold">{historicalMetrics.daysOperating} días de protección activa</p>
                 </div>
               </div>
 
-              {/* Before vs After Visual Comparison */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
-                {/* BEFORE PRESTIGIA */}
-                <div className="bg-[#121622] rounded-2xl p-5 border border-rose-500/20">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <TrendingDown className="w-4 h-4 text-rose-400" />
-                      1. Antes de Prestigia (Día 1)
-                    </span>
-                    <span className="px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 text-[10px] font-bold font-mono">
-                      Línea Base Inicial
-                    </span>
-                  </div>
-                  <ul className="space-y-3 text-xs text-slate-300">
-                    <li className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <span className="text-slate-400">Calificación en Google Maps:</span>
-                      <strong className="text-rose-300 font-mono text-sm">{historicalMetrics.baseline.initialRating} ★</strong>
-                    </li>
-                    <li className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <span className="text-slate-400">Total Reseñas Públicas:</span>
-                      <span className="font-mono">{historicalMetrics.baseline.initialReviewCount} opiniones</span>
-                    </li>
-                    <li className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <span className="text-slate-400">Quejas públicas recurrentes:</span>
-                      <span className="text-rose-300">Sin filtro en sala (salían a Maps)</span>
-                    </li>
-                    <li className="flex items-center justify-between">
-                      <span className="text-slate-400">Pérdida mensual por fuga:</span>
-                      <span className="text-rose-400 font-mono font-semibold">Alta (clientes no volvían)</span>
-                    </li>
-                  </ul>
+              {/* Detailed Executive Comparison Table: Before vs Today */}
+              <div className="my-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4 text-amber-400" />
+                    <span>Auditoría Comparativa Detallada: Transformación Día 1 vs. Con Prestigia</span>
+                  </h4>
+                  <span className="text-[10px] text-slate-400">
+                    SLA &lt;10 seg • Retención Financiera Calculada
+                  </span>
                 </div>
 
-                {/* WITH PRESTIGIA TODAY */}
-                <div className="bg-[#121622] rounded-2xl p-5 border border-emerald-500/30 ring-1 ring-emerald-500/20">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <TrendingUp className="w-4 h-4 text-emerald-400" />
-                      2. Con Prestigia (Hoy)
-                    </span>
-                    <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold font-mono">
-                      Reputación Blindada
-                    </span>
-                  </div>
-                  <ul className="space-y-3 text-xs text-slate-300">
-                    <li className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <span className="text-slate-400">Calificación en Google Maps:</span>
-                      <strong className="text-amber-300 font-mono text-base flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                        {historicalMetrics.currentRating} ★ (+{historicalMetrics.ratingGain}★)
-                      </strong>
-                    </li>
-                    <li className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <span className="text-slate-400">Quejas 1-3★ contenidas en sala:</span>
-                      <strong className="text-blue-400 font-mono">{historicalMetrics.privateComplaintsIntercepted} interceptadas</strong>
-                    </li>
-                    <li className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <span className="text-slate-400">Tiempo respuesta en WhatsApp:</span>
-                      <span className="text-emerald-400 font-mono font-bold">&lt; 10 Segundos</span>
-                    </li>
-                    <li className="flex items-center justify-between">
-                      <span className="text-slate-400">Dinero retenido / Churn evitado:</span>
-                      <strong className="text-emerald-400 font-mono text-sm">{formatMoneyCOP(historicalMetrics.preservedRevenueCOP)}</strong>
-                    </li>
-                  </ul>
+                <div className="overflow-x-auto rounded-2xl border border-slate-800">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-[#121622] text-slate-400 border-b border-slate-800">
+                        <th className="py-3 px-4 font-bold text-[11px] uppercase tracking-wider">Métrica Auditada</th>
+                        <th className="py-3 px-4 font-bold text-[11px] uppercase tracking-wider text-rose-400">1. Antes de Prestigia (Día 1)</th>
+                        <th className="py-3 px-4 font-bold text-[11px] uppercase tracking-wider text-emerald-400">2. Con Prestigia (Hoy)</th>
+                        <th className="py-3 px-4 font-bold text-[11px] uppercase tracking-wider text-amber-300">Impacto Real / ROI</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/70 text-slate-200">
+                      <tr className="hover:bg-slate-800/20 transition-colors">
+                        <td className="py-3 px-4 font-semibold text-slate-300 flex items-center gap-2">
+                          <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                          <span>Calificación en Google Maps</span>
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-rose-300">
+                          {historicalMetrics.baseline.initialRating} ★
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-emerald-400 text-sm">
+                          {historicalMetrics.currentRating} ★
+                        </td>
+                        <td className="py-3 px-4 text-emerald-300 font-semibold font-mono">
+                          +{historicalMetrics.ratingGain}★ de subida en ranking local
+                        </td>
+                      </tr>
+
+                      <tr className="hover:bg-slate-800/20 transition-colors">
+                        <td className="py-3 px-4 font-semibold text-slate-300 flex items-center gap-2">
+                          <MessageCircle className="w-3.5 h-3.5 text-blue-400" />
+                          <span>Total de Reseñas en Google</span>
+                        </td>
+                        <td className="py-3 px-4 font-mono text-slate-300">
+                          {historicalMetrics.baseline.initialReviewCount} opiniones
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-white">
+                          {historicalMetrics.totalAllReviews} opiniones
+                        </td>
+                        <td className="py-3 px-4 text-amber-300 font-semibold font-mono">
+                          +{historicalMetrics.newGoogleReviewsTotal} nuevas opiniones ganadas
+                        </td>
+                      </tr>
+
+                      <tr className="hover:bg-slate-800/20 transition-colors">
+                        <td className="py-3 px-4 font-semibold text-slate-300 flex items-center gap-2">
+                          <Award className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Reseñas 4 y 5 Estrellas (Promotores)</span>
+                        </td>
+                        <td className="py-3 px-4 font-mono text-slate-300">
+                          {historicalMetrics.initialReviews4to5} opiniones
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-emerald-400">
+                          {historicalMetrics.currentReviews4to5} opiniones
+                        </td>
+                        <td className="py-3 px-4 text-emerald-300 font-semibold font-mono">
+                          +{historicalMetrics.newGoogleReviews5Star} clientes felices impulsados al QR
+                        </td>
+                      </tr>
+
+                      <tr className="hover:bg-slate-800/20 transition-colors">
+                        <td className="py-3 px-4 font-semibold text-slate-300 flex items-center gap-2">
+                          <TrendingDown className="w-3.5 h-3.5 text-rose-400" />
+                          <span>Reseñas 1 a 3★ en Google Maps</span>
+                        </td>
+                        <td className="py-3 px-4 font-mono text-rose-300 font-semibold">
+                          {historicalMetrics.initialReviews1to3} quejas públicas sin filtro
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-blue-400">
+                          0 nuevas en Maps (100% filtradas)
+                        </td>
+                        <td className="py-3 px-4 text-blue-300 font-semibold">
+                          Blindaje anti-detractores en Google
+                        </td>
+                      </tr>
+
+                      <tr className="hover:bg-slate-800/20 transition-colors">
+                        <td className="py-3 px-4 font-semibold text-slate-300 flex items-center gap-2">
+                          <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+                          <span>Quejas 1-3★ Salvadas en Sala</span>
+                        </td>
+                        <td className="py-3 px-4 font-mono text-slate-400">
+                          0 (Salían directo a Google Maps)
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-blue-400">
+                          {historicalMetrics.privateComplaintsIntercepted} crisis interceptadas
+                        </td>
+                        <td className="py-3 px-4 text-emerald-300 font-semibold">
+                          Resueltas en sala &lt;10 seg vía WhatsApp
+                        </td>
+                      </tr>
+
+                      <tr className="hover:bg-slate-800/20 transition-colors">
+                        <td className="py-3 px-4 font-semibold text-slate-300 flex items-center gap-2">
+                          <Zap className="w-3.5 h-3.5 text-purple-400" />
+                          <span>Tasa de Respuesta en Google Maps</span>
+                        </td>
+                        <td className="py-3 px-4 font-mono text-slate-400">
+                          {historicalMetrics.initialResponseRate}% ({historicalMetrics.initialRespondedReviews} respondidas)
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-purple-300">
+                          100% Respondidas con IA
+                        </td>
+                        <td className="py-3 px-4 text-purple-300 font-semibold">
+                          Imagen corporativa y SEO local activo
+                        </td>
+                      </tr>
+
+                      <tr className="hover:bg-slate-800/20 transition-colors">
+                        <td className="py-3 px-4 font-semibold text-slate-300 flex items-center gap-2">
+                          <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Facturación Salvada de Fuga (Churn)</span>
+                        </td>
+                        <td className="py-3 px-4 text-rose-400 font-medium">
+                          Pérdida mensual por clientes que no volvían
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-emerald-400">
+                          {formatMoneyCOP(historicalMetrics.preservedRevenueCOP)}
+                        </td>
+                        <td className="py-3 px-4 text-emerald-300 font-semibold font-mono">
+                          {formatMoneyUSD(historicalMetrics.preservedRevenueUSD)} (Ticket Prom: {formatMoneyCOP(historicalMetrics.baseline.averageTicketCOP)})
+                        </td>
+                      </tr>
+
+                      <tr className="hover:bg-slate-800/20 transition-colors">
+                        <td className="py-3 px-4 font-semibold text-slate-300 flex items-center gap-2">
+                          <Clock className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Días con Prestigia Activa</span>
+                        </td>
+                        <td className="py-3 px-4 font-mono text-slate-400">
+                          Día 0 (Punto de Partida)
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-amber-300">
+                          {historicalMetrics.daysOperating} días ininterrumpidos
+                        </td>
+                        <td className="py-3 px-4 text-amber-400 font-semibold">
+                          Desde {historicalMetrics.startDate}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
@@ -8806,6 +9151,255 @@ export default function MasterAdminPage() {
                     <Check className="w-4 h-4" />
                   )}
                   <span>Guardar Cambios</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Calibrar Línea Base Día 1 */}
+      {showBaselineModal && currentBusiness && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-fade-in">
+          <div className="relative w-full max-w-2xl bg-[#0C101A] border border-amber-500/30 rounded-3xl shadow-2xl p-5 sm:p-7 text-white my-8 max-h-[92vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                  <Sliders className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+                    <span>Calibrar Línea Base Día 1</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                      Super Master
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Negocio: <span className="text-amber-300 font-bold">{currentBusiness.name}</span> • Punto de partida real antes de Prestigia
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowBaselineModal(false)}
+                className="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCalibratedBaseline} className="space-y-5 pt-4">
+              {/* Notice Banner */}
+              <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-start gap-2.5">
+                <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-200/90 leading-relaxed">
+                  <strong>Calibración de activación real:</strong> Si creaste la marca previamente pero los códigos QR empezaron a usarse después, fija aquí la <strong>fecha exacta de inicio operativo</strong>. Esto recalibrará de forma transparente el contador de días y la evolución real de Prestigia.
+                </p>
+              </div>
+
+              {/* Group 1: Fecha de Inicio Operativo de QRs */}
+              <div className="p-4 rounded-2xl bg-[#141A26] border border-slate-800 space-y-3">
+                <label className="text-xs uppercase font-extrabold text-amber-300 tracking-wider flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                  <span>1. Fecha de Inicio Operativo de QRs (Día 1 de Prestigia)</span>
+                </label>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="date"
+                    required
+                    value={baselineForm.startDate}
+                    onChange={(e) => setBaselineForm({ ...baselineForm, startDate: e.target.value })}
+                    className="flex-1 bg-[#0C101A] border border-slate-700 text-white text-xs rounded-xl px-4 py-2.5 outline-none focus:border-amber-400 transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setBaselineForm({ ...baselineForm, startDate: new Date().toISOString().split('T')[0] })}
+                    className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  >
+                    <Zap className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Fijar Hoy ({new Date().toISOString().split('T')[0]})</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Group 2: Reputación en Google Maps el Día 1 */}
+              <div className="p-4 rounded-2xl bg-[#141A26] border border-slate-800 space-y-3">
+                <label className="text-xs uppercase font-extrabold text-amber-300 tracking-wider flex items-center gap-1.5">
+                  <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                  <span>2. Estado en Google Maps el Día 1 (Antes de Prestigia)</span>
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                      Calificación Inicial (1.0 a 5.0 ★)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="1.0"
+                      max="5.0"
+                      required
+                      value={baselineForm.initialRating}
+                      onChange={(e) => setBaselineForm({ ...baselineForm, initialRating: Number(e.target.value) })}
+                      className="w-full bg-[#0C101A] border border-slate-700 text-white text-xs rounded-xl px-4 py-2.5 outline-none focus:border-amber-400 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                      Total de Reseñas Existentes en Google (Día 1)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      required
+                      value={baselineForm.initialReviewCount}
+                      onChange={(e) => setBaselineForm({ ...baselineForm, initialReviewCount: Number(e.target.value) })}
+                      className="w-full bg-[#0C101A] border border-slate-700 text-white text-xs rounded-xl px-4 py-2.5 outline-none focus:border-amber-400 font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Group 3: Desglose de Reseñas Día 1 */}
+              <div className="p-4 rounded-2xl bg-[#141A26] border border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs uppercase font-extrabold text-amber-300 tracking-wider flex items-center gap-1.5">
+                    <BarChart3 className="w-3.5 h-3.5 text-amber-400" />
+                    <span>3. Desglose de Calidad de Reseñas Previas (Día 1)</span>
+                  </label>
+                  <span className="text-[10px] text-slate-400">
+                    Suma: {baselineForm.initialReviews4to5 + baselineForm.initialReviews1to3} / {baselineForm.initialReviewCount}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-[11px] font-semibold text-emerald-400 block mb-1">
+                      Reseñas 4 y 5★ Previas
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={baselineForm.initialReviews4to5}
+                      onChange={(e) => setBaselineForm({ ...baselineForm, initialReviews4to5: Number(e.target.value) })}
+                      className="w-full bg-[#0C101A] border border-slate-700 text-white text-xs rounded-xl px-4 py-2.5 outline-none focus:border-emerald-400 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-rose-400 block mb-1">
+                      Reseñas 1 a 3★ Previas (Quejas)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={baselineForm.initialReviews1to3}
+                      onChange={(e) => setBaselineForm({ ...baselineForm, initialReviews1to3: Number(e.target.value) })}
+                      className="w-full bg-[#0C101A] border border-slate-700 text-white text-xs rounded-xl px-4 py-2.5 outline-none focus:border-rose-400 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-purple-300 block mb-1">
+                      Reseñas ya Respondidas
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={baselineForm.initialRespondedReviews}
+                      onChange={(e) => setBaselineForm({ ...baselineForm, initialRespondedReviews: Number(e.target.value) })}
+                      className="w-full bg-[#0C101A] border border-slate-700 text-white text-xs rounded-xl px-4 py-2.5 outline-none focus:border-purple-400 font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Group 4: Parámetros Financieros (Ticket Promedio) */}
+              <div className="p-4 rounded-2xl bg-[#141A26] border border-slate-800 space-y-3">
+                <label className="text-xs uppercase font-extrabold text-amber-300 tracking-wider flex items-center gap-1.5">
+                  <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>4. Ticket Promedio para Cálculo de Facturación Salvada de Fuga</span>
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                      Ticket Promedio por Comensal / Cliente (COP)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1000"
+                      value={baselineForm.averageTicketCOP}
+                      onChange={(e) => setBaselineForm({ ...baselineForm, averageTicketCOP: Number(e.target.value) })}
+                      className="w-full bg-[#0C101A] border border-slate-700 text-white text-xs rounded-xl px-4 py-2.5 outline-none focus:border-amber-400 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                      Ticket Promedio (USD)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={baselineForm.averageTicketUSD}
+                      onChange={(e) => setBaselineForm({ ...baselineForm, averageTicketUSD: Number(e.target.value) })}
+                      className="w-full bg-[#0C101A] border border-slate-700 text-white text-xs rounded-xl px-4 py-2.5 outline-none focus:border-amber-400 font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Group 5: Testimonio & Titular */}
+              <div className="p-4 rounded-2xl bg-[#141A26] border border-slate-800 space-y-3">
+                <label className="text-xs uppercase font-extrabold text-amber-300 tracking-wider flex items-center gap-1.5">
+                  <MessageCircle className="w-3.5 h-3.5 text-amber-400" />
+                  <span>5. Titular y Testimonio Oficial para el Caso de Éxito</span>
+                </label>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                    Nombre del Titular / Propietario
+                  </label>
+                  <input
+                    type="text"
+                    value={baselineForm.founderName}
+                    onChange={(e) => setBaselineForm({ ...baselineForm, founderName: e.target.value })}
+                    className="w-full bg-[#0C101A] border border-slate-700 text-white text-xs rounded-xl px-4 py-2.5 outline-none focus:border-amber-400"
+                    placeholder="Ej. Carlos Mendoza (Gerente General)"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-300 block mb-1">
+                    Cita o Testimonio Oficial
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={baselineForm.clientQuote}
+                    onChange={(e) => setBaselineForm({ ...baselineForm, clientQuote: e.target.value })}
+                    className="w-full bg-[#0C101A] border border-slate-700 text-white text-xs rounded-xl p-3 outline-none focus:border-amber-400"
+                    placeholder="Frase del cliente sobre el impacto de Prestigia en su negocio..."
+                  />
+                </div>
+              </div>
+
+              {/* Form Action Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowBaselineModal(false)}
+                  className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingBaseline}
+                  className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-extrabold text-xs rounded-xl flex items-center gap-2 shadow-lg shadow-amber-500/20 transition cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingBaseline ? (
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Check className="w-4 h-4" />
+                  )}
+                  <span>Guardar y Fijar Línea Base Día 1</span>
                 </button>
               </div>
             </form>

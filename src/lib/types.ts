@@ -184,6 +184,7 @@ export interface Business {
   plan: BusinessPlan; // 'basic' | 'pro' | 'elite'
   status: BusinessStatus; // 'active' | 'suspended' (master status)
   trialEndsAt: string; // ISO date string
+  createdAt?: string; // ISO creation timestamp
   password?: string; // For /portal owner login
   category: string; // e.g. "Hamburguesería & Gastrobar"
   country?: string; // Country code or name, e.g. 'CO', 'MX', 'ES', 'US'
@@ -203,6 +204,9 @@ export interface DayOneBaseline {
   startDate: string; // e.g. "2026-03-15"
   initialRating: number; // e.g. 3.7
   initialReviewCount: number; // e.g. 38
+  initialReviews1to3?: number; // Reseñas 1-3★ previas en Google Maps el Día 1
+  initialReviews4to5?: number; // Reseñas 4-5★ previas en Google Maps el Día 1
+  initialRespondedReviews?: number; // Reseñas que estaban respondidas antes de Prestigia
   initialMonthlyComplaints: number; // e.g. 15
   averageTicketCOP: number; // e.g. 45000
   averageTicketUSD: number; // e.g. 18
@@ -212,6 +216,8 @@ export interface DayOneBaseline {
   country: string;
   clientQuote?: string; // Real or AI-suggested quote
   founderName?: string;
+  calibratedAt?: string; // Fecha y hora ISO de cuando se hizo la calibración
+  isCalibrated?: boolean; // True si ya fue calibrado manualmente
 }
 
 export interface MasterAddOns {
