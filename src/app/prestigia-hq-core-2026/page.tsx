@@ -950,6 +950,8 @@ export default function MasterAdminPage() {
     googleReviewUrl: string;
     googleMapsUrl: string;
     status: BusinessStatus;
+    agreedMonthlyFeeCOP: number;
+    agreedMonthlyFeeUSD: number;
   }>({
     id: '',
     name: '',
@@ -963,6 +965,8 @@ export default function MasterAdminPage() {
     googleReviewUrl: '',
     googleMapsUrl: '',
     status: 'active',
+    agreedMonthlyFeeCOP: 0,
+    agreedMonthlyFeeUSD: 0,
   });
   const [branchGoogleQuery, setBranchGoogleQuery] = useState('');
   const [branchGoogleLoading, setBranchGoogleLoading] = useState(false);
@@ -1002,6 +1006,9 @@ export default function MasterAdminPage() {
     taxId: '',
     password: '',
     ownerEmail: '',
+    agreedMonthlyFeeCOP: 0,
+    agreedMonthlyFeeUSD: 0,
+    billingCycle: 'monthly' as 'monthly' | 'quarterly' | 'semiannual' | 'annual',
   });
 
   const [customCountryMode, setCustomCountryMode] = useState(false);
@@ -1030,6 +1037,9 @@ export default function MasterAdminPage() {
     initialRating: 0,
     initialReviewCount: 0,
     clientQuote: '',
+    agreedMonthlyFeeCOP: 0,
+    agreedMonthlyFeeUSD: 0,
+    billingCycle: 'monthly' as 'monthly' | 'quarterly' | 'semiannual' | 'annual',
   });
 
   // Conmutador Add-Ons Local State
@@ -2083,6 +2093,8 @@ export default function MasterAdminPage() {
         googleReviewUrl: branchToEdit.googleReviewUrl || '',
         googleMapsUrl: branchToEdit.googlePlaceId ? `https://www.google.com/maps/place/?q=place_id:${branchToEdit.googlePlaceId}` : (branchToEdit.googleReviewUrl || ''),
         status: branchToEdit.status || 'active',
+        agreedMonthlyFeeCOP: branchToEdit.agreedMonthlyFeeCOP || 0,
+        agreedMonthlyFeeUSD: branchToEdit.agreedMonthlyFeeUSD || 0,
       });
       setBranchGoogleQuery(branchToEdit.googlePlaceId || branchToEdit.name || '');
     } else {
@@ -2109,6 +2121,8 @@ export default function MasterAdminPage() {
         googleReviewUrl: '',
         googleMapsUrl: '',
         status: 'active',
+        agreedMonthlyFeeCOP: 0,
+        agreedMonthlyFeeUSD: 0,
       });
       setBranchGoogleQuery('');
     }
@@ -2638,6 +2652,9 @@ export default function MasterAdminPage() {
       taxId: currentBusiness.taxId || '',
       password: currentBusiness.password || 'admin',
       ownerEmail: currentBusiness.ownerEmail || '',
+      agreedMonthlyFeeCOP: currentBusiness.agreedMonthlyFeeCOP || 0,
+      agreedMonthlyFeeUSD: currentBusiness.agreedMonthlyFeeUSD || 0,
+      billingCycle: currentBusiness.billingCycle || 'monthly',
     });
     setShowOwnerEditModal(true);
   };
@@ -2926,8 +2943,10 @@ export default function MasterAdminPage() {
       : Math.round(preservedRevenueCOP / 4000);
 
     // Multiplicador de Retorno de Inversión (ROI)
-    // Sin precios fijos de planes: calculamos según la tarifa acordada negociada por cliente (customMonthlyFeeCOP)
-    const monthlyFeeCOP = baseline.customMonthlyFeeCOP || 0;
+    // Sin precios fijos de planes: calculamos según la tarifa acordada negociada por cliente / sede
+    const monthlyFeeCOP = isBranch && currentHistoricalBranch
+      ? (currentHistoricalBranch.agreedMonthlyFeeCOP || currentHistoricalBranch.baseline?.customMonthlyFeeCOP || baseline.customMonthlyFeeCOP || (currentBusiness.agreedMonthlyFeeCOP ? Math.round(currentBusiness.agreedMonthlyFeeCOP / Math.max(1, currentBusiness.branches?.length || 1)) : 0))
+      : (currentBusiness.agreedMonthlyFeeCOP || currentBusiness.branches?.reduce((acc, b) => acc + (b.agreedMonthlyFeeCOP || 0), 0) || baseline.customMonthlyFeeCOP || 0);
     const monthsOperating = Math.max(1, Math.round(daysOperating / 30));
     const totalInvestmentCOP = monthlyFeeCOP > 0 ? monthlyFeeCOP * monthsOperating : 0;
     const roiMultiplier = totalInvestmentCOP > 0 && preservedRevenueCOP > 0
@@ -4004,6 +4023,9 @@ export default function MasterAdminPage() {
                     initialRating: 0,
                     initialReviewCount: 0,
                     clientQuote: '',
+                    agreedMonthlyFeeCOP: 0,
+                    agreedMonthlyFeeUSD: 0,
+                    billingCycle: 'monthly',
                   });
                   setShowOnboardModal(true);
                 }}
@@ -4982,7 +5004,7 @@ export default function MasterAdminPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
                   <div className="bg-[#0C101A] p-3 rounded-xl border border-slate-800">
                     <span className="text-slate-400 text-[10px] uppercase font-bold block">Representante Legal (Dueño)</span>
                     <span className="font-extrabold text-white text-sm block mt-0.5 truncate">{currentBusiness.ownerName}</span>
@@ -5008,6 +5030,20 @@ export default function MasterAdminPage() {
                     <span className="font-bold text-amber-300 text-xs block mt-0.5 capitalize">Plan {currentBusiness.plan}</span>
                     <span className="text-slate-400 text-[11px] block mt-0.5">
                       {currentBusiness.plan === 'elite' ? '3 Sedes Físicas incluidas' : currentBusiness.plan === 'empresarial' ? 'Sedes ilimitadas' : '1 Sede física incluida'}
+                    </span>
+                  </div>
+
+                  <div className="bg-[#0C101A] p-3 rounded-xl border border-emerald-500/30">
+                    <span className="text-emerald-400 text-[10px] uppercase font-bold block flex items-center justify-between">
+                      <span>Tarifa Pactada Contrato</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">Sin precios fijos</span>
+                    </span>
+                    <span className="font-extrabold text-emerald-400 text-sm block mt-0.5 font-mono">
+                      {currentBusiness.agreedMonthlyFeeCOP ? formatMoneyCOP(currentBusiness.agreedMonthlyFeeCOP) : '$0 COP'}
+                      <span className="text-[11px] text-slate-400 font-normal"> / mes</span>
+                    </span>
+                    <span className="text-slate-400 text-[11px] block mt-0.5 capitalize">
+                      Ciclo: {currentBusiness.billingCycle || 'mensual'} • {currentBusiness.agreedMonthlyFeeUSD ? formatMoneyUSD(currentBusiness.agreedMonthlyFeeUSD) : 'USD eq'}
                     </span>
                   </div>
                 </div>
@@ -5051,6 +5087,13 @@ export default function MasterAdminPage() {
                               <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                               <span>{branch.address || 'Sin dirección física registrada'} • <strong className="text-white">{branch.locality}, {branch.city}</strong></span>
                             </p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 flex items-center gap-1">
+                                <span>💵 Tarifa Pactada Sede:</span>
+                                <strong className="text-white font-bold">{branch.agreedMonthlyFeeCOP ? formatMoneyCOP(branch.agreedMonthlyFeeCOP) : '$0 COP'}</strong>
+                                <span className="text-slate-400">/mes</span>
+                              </span>
+                            </div>
                           </div>
 
                           <button
@@ -8121,6 +8164,57 @@ export default function MasterAdminPage() {
                   </div>
                 </div>
 
+                {/* Fila 6.5: Tarifa Mensual Pactada & Ciclo de Facturación */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3.5 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-[#101722] to-emerald-500/10 border border-emerald-500/30">
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-emerald-300 font-bold text-xs">
+                        Tarifa Mensual Pactada (COP) *
+                      </label>
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
+                        Sin Planes Fijos
+                      </span>
+                    </div>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">$</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="10000"
+                        value={onboardForm.agreedMonthlyFeeCOP || ''}
+                        onChange={(e) => {
+                          const cop = parseInt(e.target.value) || 0;
+                          setOnboardForm({
+                            ...onboardForm,
+                            agreedMonthlyFeeCOP: cop,
+                            agreedMonthlyFeeUSD: cop > 0 ? Math.round(cop / 4000) : 0,
+                          });
+                        }}
+                        placeholder="Ej: 900000"
+                        className="w-full bg-[#141A26] border border-emerald-500/40 text-emerald-300 font-mono rounded-xl pl-8 pr-3.5 py-2.5 outline-none focus:border-emerald-400 text-xs font-bold"
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-1">Prestigia acuerda la tarifa según contrato (sin precios de planes fijos).</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-medium mb-1 text-xs">
+                      Ciclo de Facturación
+                    </label>
+                    <select
+                      value={onboardForm.billingCycle || 'monthly'}
+                      onChange={(e) => setOnboardForm({ ...onboardForm, billingCycle: e.target.value as any })}
+                      className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 text-xs font-medium cursor-pointer"
+                    >
+                      <option value="monthly">Facturación Mensual</option>
+                      <option value="quarterly">Facturación Trimestral</option>
+                      <option value="semiannual">Facturación Semestral</option>
+                      <option value="annual">Facturación Anual</option>
+                    </select>
+                    <p className="text-[10px] text-slate-400 mt-1">Equivalente ref: {onboardForm.agreedMonthlyFeeUSD ? `${onboardForm.agreedMonthlyFeeUSD} USD` : '$0 USD'}.</p>
+                  </div>
+                </div>
+
                 {/* Fila 7: WhatsApp para Alertas Directas & Correo Electrónico */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -9566,6 +9660,65 @@ export default function MasterAdminPage() {
                 </div>
               </div>
 
+              {/* Tarifa Pactada & Ciclo de Facturación */}
+              <div className="pt-3 border-t border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Tarifa Contratada Global de la Marca</span>
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
+                    Tarifa Pactada Personalizada
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">
+                      Tarifa Mensual Pactada (COP) *
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">$</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="10000"
+                        value={ownerEditForm.agreedMonthlyFeeCOP || ''}
+                        onChange={(e) => {
+                          const cop = parseInt(e.target.value) || 0;
+                          setOwnerEditForm({
+                            ...ownerEditForm,
+                            agreedMonthlyFeeCOP: cop,
+                            agreedMonthlyFeeUSD: cop > 0 ? Math.round(cop / 4000) : 0,
+                          });
+                        }}
+                        placeholder="Ej: 900000"
+                        className="w-full bg-[#141A26] border border-slate-700 focus:border-emerald-400 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-emerald-300 font-mono placeholder-slate-500 outline-none transition"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">
+                      Ciclo de Facturación Contratado
+                    </label>
+                    <select
+                      value={ownerEditForm.billingCycle || 'monthly'}
+                      onChange={(e) => setOwnerEditForm({ ...ownerEditForm, billingCycle: e.target.value as any })}
+                      className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none transition"
+                    >
+                      <option value="monthly">Facturación Mensual</option>
+                      <option value="quarterly">Facturación Trimestral</option>
+                      <option value="semiannual">Facturación Semestral</option>
+                      <option value="annual">Facturación Anual</option>
+                    </select>
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-400">
+                  Prestigia no impone precios rígidos de planes. La tarifa se acuerda caso por caso según sedes, volumen y servicios.
+                </p>
+              </div>
+
               <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3 mt-6">
                 <button
                   type="button"
@@ -10223,6 +10376,64 @@ export default function MasterAdminPage() {
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Step 5: Acuerdo Económico y Tarifa Mensual de esta Sede */}
+              <div className="space-y-3 pt-2 border-t border-slate-800">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Tarifa Mensual Contratada para esta Sede</span>
+                  </p>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
+                    Sin Planes Fijos • Negociación a Medida
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">
+                      Tarifa Mensual Pactada (COP) *
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">$</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="10000"
+                        value={branchFormData.agreedMonthlyFeeCOP || ''}
+                        onChange={(e) => {
+                          const cop = parseInt(e.target.value) || 0;
+                          setBranchFormData({
+                            ...branchFormData,
+                            agreedMonthlyFeeCOP: cop,
+                            agreedMonthlyFeeUSD: cop > 0 ? Math.round(cop / 4000) : 0,
+                          });
+                        }}
+                        placeholder="Ej: 450000"
+                        className="w-full bg-[#141A26] border border-slate-700 focus:border-emerald-400 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-emerald-300 font-mono placeholder-slate-500 outline-none transition"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">
+                      Equivalente Referencial (USD)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">US$</span>
+                      <input
+                        type="number"
+                        min="0"
+                        value={branchFormData.agreedMonthlyFeeUSD || ''}
+                        onChange={(e) => setBranchFormData({ ...branchFormData, agreedMonthlyFeeUSD: parseInt(e.target.value) || 0 })}
+                        placeholder="Ej: 110"
+                        className="w-full bg-[#141A26] border border-slate-700 focus:border-emerald-400 rounded-xl pl-11 pr-3.5 py-2.5 text-xs text-white font-mono placeholder-slate-500 outline-none transition"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-400">
+                  ⚡ Prestigia no impone precios fijos. Esta tarifa alimenta con exactitud el multiplicador de Retorno de Inversión (ROI) en el Dossier Histórico de esta sede y consolida el MRR corporativo.
+                </p>
               </div>
 
               {/* Modal Actions */}

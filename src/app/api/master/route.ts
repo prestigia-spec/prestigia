@@ -84,7 +84,16 @@ export async function GET(request: NextRequest) {
     let mrrAddOnsUSD = 0;
 
     businesses.forEach((biz) => {
-      const planCost = PLAN_PRICING[biz.plan] || PLAN_PRICING.pro;
+      // Tarifa mensual contratada real: si la marca o sus sedes tienen tarifa pactada, tiene prioridad absoluta
+      const branchesFeeCOP = (biz.branches || []).reduce((acc: number, b: any) => acc + (b.agreedMonthlyFeeCOP || 0), 0);
+      const branchesFeeUSD = (biz.branches || []).reduce((acc: number, b: any) => acc + (b.agreedMonthlyFeeUSD || 0), 0);
+      const agreedCOP = biz.agreedMonthlyFeeCOP || branchesFeeCOP;
+      const agreedUSD = biz.agreedMonthlyFeeUSD || branchesFeeUSD;
+
+      const planCost = agreedCOP > 0
+        ? { cop: agreedCOP, usd: agreedUSD > 0 ? agreedUSD : Math.round(agreedCOP / 4000) }
+        : (PLAN_PRICING[biz.plan] || PLAN_PRICING.pro);
+
       mrrPlansCOP += planCost.cop;
       mrrPlansUSD += planCost.usd;
 
@@ -813,7 +822,7 @@ export async function POST(request: NextRequest) {
 
     // Update Owner Details (from Tab 2 Cuenta Dueño card)
     if (action === 'update_owner_details') {
-      const { businessId, ownerName, ownerPhone, legalName, taxId, password, ownerEmail } = body;
+      const { businessId, ownerName, ownerPhone, legalName, taxId, password, ownerEmail, agreedMonthlyFeeCOP, agreedMonthlyFeeUSD, billingCycle } = body;
       if (!businessId) {
         return NextResponse.json({ error: 'Falta identificador de negocio' }, { status: 400 });
       }
@@ -828,6 +837,9 @@ export async function POST(request: NextRequest) {
       if (taxId !== undefined) biz.taxId = String(taxId).trim();
       if (password !== undefined) biz.password = String(password).trim();
       if (ownerEmail !== undefined) biz.ownerEmail = String(ownerEmail).trim();
+      if (agreedMonthlyFeeCOP !== undefined) biz.agreedMonthlyFeeCOP = Number(agreedMonthlyFeeCOP);
+      if (agreedMonthlyFeeUSD !== undefined) biz.agreedMonthlyFeeUSD = Number(agreedMonthlyFeeUSD);
+      if (billingCycle !== undefined) biz.billingCycle = billingCycle;
 
       await saveBusiness(biz);
       return NextResponse.json({
@@ -867,6 +879,8 @@ export async function POST(request: NextRequest) {
         googlePlaceId: branch.googlePlaceId || undefined,
         status: branch.status || 'active',
         websiteUrl: branch.websiteUrl || `https://${biz.id}.prestigia.com`,
+        agreedMonthlyFeeCOP: branch.agreedMonthlyFeeCOP !== undefined ? Number(branch.agreedMonthlyFeeCOP) : undefined,
+        agreedMonthlyFeeUSD: branch.agreedMonthlyFeeUSD !== undefined ? Number(branch.agreedMonthlyFeeUSD) : undefined,
       };
 
       const existingBranches = biz.branches || [];
@@ -1054,6 +1068,9 @@ export async function POST(request: NextRequest) {
         googleMapsUrl,
         googlePlaceId,
         googleReviewUrl,
+        agreedMonthlyFeeCOP,
+        agreedMonthlyFeeUSD,
+        billingCycle,
       } = body;
 
       if (!id || !name || !ownerName || !ownerPhone) {
@@ -1082,6 +1099,9 @@ export async function POST(request: NextRequest) {
         status: 'active',
         password: 'admin',
         trialEndsAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+        agreedMonthlyFeeCOP: agreedMonthlyFeeCOP ? Number(agreedMonthlyFeeCOP) : 0,
+        agreedMonthlyFeeUSD: agreedMonthlyFeeUSD ? Number(agreedMonthlyFeeUSD) : 0,
+        billingCycle: billingCycle || 'monthly',
         branding: (logoUrl && typeof logoUrl === 'string' && logoUrl.trim()) ? {
           logoUrl: logoUrl.trim(),
           primaryColor: '#F59E0B',
@@ -1117,6 +1137,7 @@ export async function POST(request: NextRequest) {
           country: country || 'Colombia',
           founderName: ownerName,
           clientQuote: clientQuote || 'Prestigia transformó la experiencia de nuestros clientes y blindó nuestra reputación desde el primer día.',
+          customMonthlyFeeCOP: agreedMonthlyFeeCOP ? Number(agreedMonthlyFeeCOP) : 0,
         },
         masterAddOns: {
           extraBranches: 0,

@@ -112,7 +112,9 @@
               "joinedAt": "11 Ago 2026"
             }
           ],
-          "menuUrl": ""
+          "menuUrl": "",
+          "agreedMonthlyFeeCOP": 450000,
+          "agreedMonthlyFeeUSD": 180
         },
         {
           "id": "la-burguesia-usaquen",
@@ -208,7 +210,9 @@
               "joinedAt": "05 Sep 2026"
             }
           ],
-          "menuUrl": ""
+          "menuUrl": "",
+          "agreedMonthlyFeeCOP": 450000,
+          "agreedMonthlyFeeUSD": 180
         }
       ],
       "campaign": {
@@ -237,7 +241,8 @@
         "founderName": "Carlos Gómez",
         "clientQuote": "Prestigia blindó a La Burguesía Artesanal desde el Día 1. Durante nuestra operación activa con QRs en sala, interceptamos de inmediato quejas privadas en mesa antes de que salieran a Google Maps, elevando nuestra calificación a 4.8★ en Google Maps y blindando la facturación del restaurante.",
         "calibratedAt": "2026-03-15T10:00:00.000Z",
-        "isCalibrated": true
+        "isCalibrated": true,
+        "customMonthlyFeeCOP": 900000
       },
       "masterAddOns": {
         "customNotes": "Cuenta VIP Élite con 2 sedes activas y monitoreo de turno.",
@@ -258,7 +263,10 @@
       "legalName": "Inversiones Gastronómicas Gómez & Cía S.A.S.",
       "address": "Calle 67 # 9-20, Chapinero, Bogotá",
       "contractSignerName": "Carlos Gómez",
-      "contractSignerPhone": "+573001234567"
+      "contractSignerPhone": "+573001234567",
+      "agreedMonthlyFeeCOP": 900000,
+      "agreedMonthlyFeeUSD": 360,
+      "billingCycle": "monthly"
     },
     {
       "id": "carlos-mendoza",

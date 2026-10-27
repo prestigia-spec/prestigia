@@ -66,6 +66,8 @@ export interface Branch {
   baseline?: DayOneBaseline; // Optional branch-specific Day 1 historical baseline calibration
   googleAuditNotes?: string; // Technical audit notes from Master
   googleSelfServiceEnabled?: boolean; // Master switch allowing client self-service Google connection
+  agreedMonthlyFeeCOP?: number; // Tarifa pactada mensual contratada para esta sede física en COP (sin planes fijos)
+  agreedMonthlyFeeUSD?: number; // Tarifa pactada mensual contratada para esta sede física en USD
 }
 
 export interface StaffMember {
@@ -199,6 +201,9 @@ export interface Business {
   baseline?: DayOneBaseline;
   masterAddOns?: MasterAddOns;
   customStaffRoles?: string[]; // Custom job titles/roles created by this business
+  agreedMonthlyFeeCOP?: number; // Tarifa mensual pactada contratada oficial de la marca en COP (sin planes fijos)
+  agreedMonthlyFeeUSD?: number; // Tarifa mensual pactada contratada oficial de la marca en USD
+  billingCycle?: 'monthly' | 'quarterly' | 'semiannual' | 'annual'; // Ciclo comercial pactado
 }
 
 export interface DayOneBaseline {
