@@ -2831,31 +2831,39 @@ export default function MasterAdminPage() {
 
     // Relevant feedbacks (intercepted private complaints in room/WhatsApp)
     const bizFeedbacks = feedbacks.filter((f) => f.businessId === currentBusiness.id);
-    const privateComplaintsIntercepted = bizFeedbacks.filter((f) => Number(f.rating) <= 3).length || 18;
-    const resolvedPrivateCount = bizFeedbacks.filter((f) => Number(f.rating) <= 3 && f.status === 'resolved').length || privateComplaintsIntercepted;
+    const privateComplaintsIntercepted = bizFeedbacks.filter((f) => Number(f.rating) <= 3).length;
+    const resolvedPrivateCount = bizFeedbacks.filter((f) => Number(f.rating) <= 3 && f.status === 'resolved').length;
 
-    // Relevant Google Reviews for this business
+    // Relevant Google Reviews for this business (Exact Breakdown)
     const bizReviews = googleReviews.filter((r) => r.businessId === currentBusiness.id);
-    const newGoogleReviews5Star = bizReviews.filter((r) => Number(r.rating) >= 4).length || 24;
-    const newGoogleReviews1to3 = bizReviews.filter((r) => Number(r.rating) <= 3).length; // Filtered/avoided in Google!
-    const newGoogleReviewsTotal = newGoogleReviews5Star + newGoogleReviews1to3;
+    const exactReviews5Star = bizReviews.filter((r) => Number(r.rating) === 5).length;
+    const exactReviews4Star = bizReviews.filter((r) => Number(r.rating) === 4).length;
+    const exactReviews1to3 = bizReviews.filter((r) => Number(r.rating) <= 3).length;
+    const newGoogleReviewsTotal = bizReviews.length;
+    const newGoogleReviews5Star = exactReviews5Star; // Strictly 5★ reviews!
+    const newPositiveReviewsTotal = exactReviews5Star + exactReviews4Star;
 
     // Cumulative totals today with Prestigia
     const totalAllReviews = initialRevCount + newGoogleReviewsTotal;
-    const currentReviews4to5 = initialReviews4to5 + newGoogleReviews5Star;
-    const currentReviews1to3 = initialReviews1to3 + newGoogleReviews1to3;
+    const currentReviews4to5 = initialReviews4to5 + newPositiveReviewsTotal;
+    const currentReviews1to3 = initialReviews1to3 + exactReviews1to3;
 
-    // Current Google Rating
-    const currentRating = Math.min(5.0, Number((baseline.initialRating + (newGoogleReviews5Star * 0.04)).toFixed(1)));
-    const ratingGain = Number((currentRating - baseline.initialRating).toFixed(1));
+    // Mathematical Arithmetic Mean for Google Rating (100% exact, no arbitrary factors)
+    const initialStarsSum = (baseline.initialRating || 3.8) * initialRevCount;
+    const newReviewsStarsSum = bizReviews.reduce((sum, r) => sum + (Number(r.rating) || 5), 0);
+    const totalStarsSum = initialStarsSum + newReviewsStarsSum;
+    const currentRating = totalAllReviews > 0
+      ? Math.min(5.0, Number((totalStarsSum / totalAllReviews).toFixed(1)))
+      : (baseline.initialRating || 3.8);
+    const ratingGain = Number(Math.max(0, currentRating - (baseline.initialRating || 3.8)).toFixed(1));
 
     // Response rate today with Prestigia AI assistant
     const currentResponseRate = 100;
 
-    // Preserved Revenue (Saved from Churn): Intercepted complaints * average ticket * estimated return factor (2 visits)
-    const preservedRevenueCOP = privateComplaintsIntercepted * baseline.averageTicketCOP * 2;
+    // Preserved Revenue (Saved from Churn): Exact calculation = Quejas interceptadas * Ticket Promedio exacto
+    const preservedRevenueCOP = privateComplaintsIntercepted * (baseline.averageTicketCOP || 45000);
     const preservedRevenueUSD = baseline.averageTicketUSD
-      ? privateComplaintsIntercepted * baseline.averageTicketUSD * 2
+      ? privateComplaintsIntercepted * baseline.averageTicketUSD
       : Math.round(preservedRevenueCOP / 4000);
 
     // Resolution Speed (<10s compliance)
@@ -2876,9 +2884,12 @@ export default function MasterAdminPage() {
       initialResponseRate,
       privateComplaintsIntercepted,
       resolvedPrivateCount,
+      exactReviews5Star,
+      exactReviews4Star,
       newGoogleReviews5Star,
-      newGoogleReviews1to3,
+      newGoogleReviews1to3: exactReviews1to3,
       newGoogleReviewsTotal,
+      newPositiveReviewsTotal,
       totalAllReviews,
       currentReviews4to5,
       currentReviews1to3,
@@ -5244,8 +5255,10 @@ export default function MasterAdminPage() {
               <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 w-full lg:w-auto justify-between lg:justify-end">
                 <div className="text-center px-4 py-3 rounded-2xl bg-[#141A26] border border-slate-800 flex-1 lg:flex-initial">
                   <span className="text-[10px] text-slate-400 uppercase font-bold block">Nuevas 5★ Maps</span>
-                  <strong className="text-amber-300 font-mono text-xl font-extrabold block">+{historicalMetrics.newGoogleReviews5Star}</strong>
-                  <span className="text-[9px] text-emerald-400 font-semibold">Impulsadas</span>
+                  <strong className="text-amber-300 font-mono text-xl font-extrabold block">+{historicalMetrics.exactReviews5Star}</strong>
+                  <span className="text-[9px] text-emerald-400 font-semibold block">
+                    {historicalMetrics.exactReviews4Star > 0 ? `(+${historicalMetrics.exactReviews4Star} de 4★)` : 'Impulsadas'}
+                  </span>
                 </div>
                 <div className="text-center px-4 py-3 rounded-2xl bg-[#141A26] border border-slate-800 flex-1 lg:flex-initial">
                   <span className="text-[10px] text-slate-400 uppercase font-bold block">Quejas Salvadas</span>
@@ -5260,8 +5273,8 @@ export default function MasterAdminPage() {
               </div>
             </div>
 
-            {/* Visual KPI Cards Grid (5 Cards) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+            {/* Visual KPI Cards Grid (6 Cards con Montos y Cantidades Exactas) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
               {/* Card 1: Calificación Google Maps */}
               <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between">
                 <div>
@@ -5276,7 +5289,7 @@ export default function MasterAdminPage() {
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                   <span>Día 1: {historicalMetrics.baseline.initialRating}★</span>
-                  <span className="text-emerald-400 font-semibold">Subida neta</span>
+                  <span className="text-emerald-400 font-semibold font-mono">Promedio Real</span>
                 </div>
               </div>
 
@@ -5294,33 +5307,33 @@ export default function MasterAdminPage() {
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                   <span>Día 1: {historicalMetrics.baseline.initialReviewCount}</span>
-                  <span className="text-amber-400 font-semibold">+{historicalMetrics.newGoogleReviewsTotal} ganadas</span>
+                  <span className="text-amber-400 font-semibold font-mono">+{historicalMetrics.newGoogleReviewsTotal} ganadas</span>
                 </div>
               </div>
 
-              {/* Card 3: Reseñas 4 y 5 Estrellas */}
+              {/* Card 3: Nuevas Reseñas 5★ Exactas */}
               <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                    <span className="font-semibold">Reseñas 4 y 5★</span>
-                    <Award className="w-4 h-4 text-emerald-400" />
+                    <span className="font-semibold">Nuevas Reseñas 5★</span>
+                    <Award className="w-4 h-4 text-amber-400" />
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-extrabold text-emerald-400 font-mono">{historicalMetrics.currentReviews4to5}</span>
-                    <span className="text-xs text-slate-400">promotores</span>
+                    <span className="text-3xl font-extrabold text-amber-300 font-mono">+{historicalMetrics.exactReviews5Star}</span>
+                    <span className="text-xs text-slate-400 font-bold font-mono">de 5★</span>
                   </div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>Día 1: {historicalMetrics.initialReviews4to5}</span>
-                  <span className="text-emerald-400 font-semibold">+{historicalMetrics.newGoogleReviews5Star} con Prestigia</span>
+                  <span>Total 4-5★: {historicalMetrics.currentReviews4to5}</span>
+                  <span className="text-emerald-400 font-semibold font-mono">+{historicalMetrics.exactReviews4Star} de 4★</span>
                 </div>
               </div>
 
-              {/* Card 4: Quejas 1 a 3★ en Sala */}
+              {/* Card 4: Quejas 1 a 3★ Salvadas en Sala */}
               <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                    <span className="font-semibold">Quejas 1-3★ en Sala</span>
+                    <span className="font-semibold">Quejas en Sala</span>
                     <ShieldCheck className="w-4 h-4 text-blue-400" />
                   </div>
                   <div className="flex items-baseline gap-2">
@@ -5330,11 +5343,28 @@ export default function MasterAdminPage() {
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                   <span>Día 1 Maps: {historicalMetrics.initialReviews1to3}</span>
-                  <span className="text-blue-400 font-semibold">0 nuevas en Maps</span>
+                  <span className="text-blue-400 font-semibold font-mono">{historicalMetrics.newGoogleReviews1to3} nuevas en Maps</span>
                 </div>
               </div>
 
-              {/* Card 5: Tasa de Respuesta a Reseñas */}
+              {/* Card 5: Facturación Retenida Exacta */}
+              <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                    <span className="font-semibold">Facturación Retenida</span>
+                    <DollarSign className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-extrabold text-emerald-400 font-mono">{formatMoneyCOP(historicalMetrics.preservedRevenueCOP)}</span>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                  <span>{historicalMetrics.privateComplaintsIntercepted} mesas × {formatMoneyCOP(historicalMetrics.baseline.averageTicketCOP)}</span>
+                  <span className="text-slate-400 font-mono">{formatMoneyUSD(historicalMetrics.preservedRevenueUSD)}</span>
+                </div>
+              </div>
+
+              {/* Card 6: Tasa de Respuesta a Reseñas */}
               <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
@@ -5343,12 +5373,12 @@ export default function MasterAdminPage() {
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-extrabold text-purple-300 font-mono">100%</span>
-                    <span className="text-xs font-bold text-purple-400">Con IA</span>
+                    <span className="text-xs font-bold text-purple-400 font-mono">Con IA</span>
                   </div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                   <span>Día 1: {historicalMetrics.initialResponseRate}%</span>
-                  <span className="text-purple-400 font-semibold">{historicalMetrics.initialRespondedReviews} resp. previas</span>
+                  <span className="text-purple-400 font-semibold font-mono">{historicalMetrics.initialRespondedReviews} resp. previas</span>
                 </div>
               </div>
             </div>
@@ -5448,7 +5478,7 @@ export default function MasterAdminPage() {
                           {historicalMetrics.currentReviews4to5} opiniones
                         </td>
                         <td className="py-3 px-4 text-emerald-300 font-semibold font-mono">
-                          +{historicalMetrics.newGoogleReviews5Star} clientes felices impulsados al QR
+                          +{historicalMetrics.exactReviews5Star} de 5★ • +{historicalMetrics.exactReviews4Star} de 4★ impulsadas al QR
                         </td>
                       </tr>
 
@@ -5461,7 +5491,7 @@ export default function MasterAdminPage() {
                           {historicalMetrics.initialReviews1to3} quejas públicas sin filtro
                         </td>
                         <td className="py-3 px-4 font-mono font-bold text-blue-400">
-                          0 nuevas en Maps (100% filtradas)
+                          {historicalMetrics.newGoogleReviews1to3} nuevas en Maps ({historicalMetrics.newGoogleReviews1to3 === 0 ? '100% filtradas' : 'Contenidas'})
                         </td>
                         <td className="py-3 px-4 text-blue-300 font-semibold">
                           Blindaje anti-detractores en Google
@@ -5512,7 +5542,7 @@ export default function MasterAdminPage() {
                           {formatMoneyCOP(historicalMetrics.preservedRevenueCOP)}
                         </td>
                         <td className="py-3 px-4 text-emerald-300 font-semibold font-mono">
-                          {formatMoneyUSD(historicalMetrics.preservedRevenueUSD)} (Ticket Prom: {formatMoneyCOP(historicalMetrics.baseline.averageTicketCOP)})
+                          Monto exacto: {historicalMetrics.privateComplaintsIntercepted} mesas × {formatMoneyCOP(historicalMetrics.baseline.averageTicketCOP)} ({formatMoneyUSD(historicalMetrics.preservedRevenueUSD)})
                         </td>
                       </tr>
 
