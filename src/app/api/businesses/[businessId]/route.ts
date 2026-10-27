@@ -188,6 +188,7 @@ export async function PUT(
         menuUrl: incoming.menuUrl !== undefined ? String(incoming.menuUrl).trim() : b.menuUrl,
         // Permitir actualizar colaboradores / empleados sanitizados (respetando quota)
         staffMembers: cleanedStaff,
+        customStaffRoles: Array.isArray(incoming.customStaffRoles) ? incoming.customStaffRoles : (b.customStaffRoles || []),
         // Permitir actualizar encargados de servicio (managers multi-cuentas respetando quota)
         managers: cleanedManagers,
         // Permitir actualizar horarios de atención y protocolo de contención de sede
@@ -213,6 +214,7 @@ export async function PUT(
     const updatedBusiness = {
       ...existing,
       branding: body.branding !== undefined ? body.branding : existing.branding,
+      customStaffRoles: Array.isArray(body.customStaffRoles) ? body.customStaffRoles : (existing.customStaffRoles || []),
       branches: mergedBranches,
     };
 

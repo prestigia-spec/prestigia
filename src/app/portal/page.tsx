@@ -1526,6 +1526,8 @@ export default function PortalPage() {
   const [activeBranchEditIdx, setActiveBranchEditIdx] = useState(0);
   const [newStaffInput, setNewStaffInput] = useState('');
   const [newStaffRole, setNewStaffRole] = useState('');
+  const [isCreatingPortalRole, setIsCreatingPortalRole] = useState(false);
+  const [newPortalRoleInput, setNewPortalRoleInput] = useState('');
   const [newManagerName, setNewManagerName] = useState('');
   const [newManagerRole, setNewManagerRole] = useState('');
   const [newManagerPhone, setNewManagerPhone] = useState('');
@@ -8318,6 +8320,55 @@ export default function PortalPage() {
     }
   };
 
+  const activeBranchStaffRoles = useMemo(() => {
+    const br = profileBranches[activeBranchEditIdx];
+    const roles = Array.from(
+      new Set([
+        ...(br?.customStaffRoles || []),
+        ...(session?.business?.customStaffRoles || []),
+        ...(br?.staffMembers || []).map((s: any) => typeof s === 'object' && s !== null ? s.role : '').filter(Boolean)
+      ])
+    ).filter((r: any) => r && r !== 'Atención / Servicio' && r !== 'Colaborador');
+    return roles as string[];
+  }, [profileBranches, activeBranchEditIdx, session]);
+
+  const handleSavePortalStaffRole = () => {
+    const roleClean = sanitizeStaffName(newPortalRoleInput);
+    if (!roleClean) {
+      alert(lang === 'en' ? 'Please enter role name (e.g. Waiter, Cook, Cashier).' : 'Ingresa el nombre del puesto (ej: Mesero, Parrillero, Cajero).');
+      return;
+    }
+    setProfileBranches((prev) => {
+      const copy = [...prev];
+      const target = copy[activeBranchEditIdx];
+      if (target) {
+        const roles = Array.from(new Set([...(target.customStaffRoles || []), roleClean]));
+        copy[activeBranchEditIdx] = { ...target, customStaffRoles: roles };
+      }
+      return copy;
+    });
+    setNewStaffRole(roleClean);
+    setNewPortalRoleInput('');
+    setIsCreatingPortalRole(false);
+    setIsStaffDirty(true);
+  };
+
+  const handleDeletePortalStaffRole = (roleToDelete: string) => {
+    setProfileBranches((prev) => {
+      const copy = [...prev];
+      const target = copy[activeBranchEditIdx];
+      if (target) {
+        const roles = (target.customStaffRoles || []).filter((r) => r !== roleToDelete);
+        copy[activeBranchEditIdx] = { ...target, customStaffRoles: roles };
+      }
+      return copy;
+    });
+    if (newStaffRole === roleToDelete) {
+      setNewStaffRole('');
+    }
+    setIsStaffDirty(true);
+  };
+
   const handleAddStaff = () => {
     const cleanName = sanitizeStaffName(newStaffInput);
     if (!cleanName) {
@@ -8325,12 +8376,16 @@ export default function PortalPage() {
       return;
     }
 
-    const cleanRole = sanitizeStaffName(newStaffRole);
+    const roleToUse = (isCreatingPortalRole && newPortalRoleInput.trim())
+      ? newPortalRoleInput.trim()
+      : (newStaffRole.trim() || newPortalRoleInput.trim());
+
+    const cleanRole = sanitizeStaffName(roleToUse);
     if (!cleanRole) {
       alert(
         lang === 'en'
-          ? 'Please specify the role or position for this team member (e.g. Branch Manager, Workshop Lead, Specialist, Collaborator).'
-          : 'Por favor ingresa el cargo o puesto para este integrante (ej: Gerente de Sede, Administrador, Jefe de Taller, Especialista, Colaborador).'
+          ? 'Please select or create a position for this team member (e.g. Waiter, Cook).'
+          : 'Por favor selecciona o crea un cargo o puesto para este integrante (ej: Mesero, Parrillero, Cajero).'
       );
       return;
     }
@@ -8395,13 +8450,18 @@ export default function PortalPage() {
       if (target) {
         const staff = target.staffMembers ? [...target.staffMembers] : [];
         staff.push(newCollaborator);
-        copy[activeBranchEditIdx] = { ...target, staffMembers: staff };
+        const customRoles = Array.from(new Set([...(target.customStaffRoles || []), cleanRole]));
+        copy[activeBranchEditIdx] = { ...target, staffMembers: staff, customStaffRoles: customRoles };
       }
       return copy;
     });
     setIsStaffDirty(true);
     setNewStaffInput('');
-    setNewStaffRole('');
+    if (isCreatingPortalRole) {
+      setIsCreatingPortalRole(false);
+      setNewPortalRoleInput('');
+      setNewStaffRole(cleanRole);
+    }
   };
 
   const handleRemoveStaff = (staffIndex: number) => {
@@ -24011,29 +24071,84 @@ export default function PortalPage() {
                               />
                             </div>
 
-                            {/* Cargo / Rol */}
+                            {/* Cargo / Rol (Lista desplegable o Creación Dinámica) */}
                             <div className="sm:col-span-4">
-                              <input
-                                type="text"
-                                value={newStaffRole}
-                                onChange={(e) => setNewStaffRole(e.target.value)}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    handleAddStaff();
-                                  }
-                                }}
-                                placeholder={lang === 'en' ? 'Role / Position (e.g. Manager, Lead, Specialist, Collaborator)...' : 'Cargo / Puesto (ej: Administrador, Gerente, Jefe, Especialista, Colaborador)...'}
-                                className={`w-full px-3 py-2 rounded-xl border text-xs focus:outline-none ${
-                                  theme === 'light'
-                                    ? 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-indigo-600'
-                                    : 'bg-slate-950 border-slate-700 text-white focus:border-indigo-500'
-                                }`}
-                              />
+                              <div className="flex items-center justify-between mb-1">
+                                <label className="text-[10px] text-slate-500 font-medium">
+                                  {lang === 'en' ? 'Position / Role *' : 'Cargo / Puesto *'}
+                                </label>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setIsCreatingPortalRole(!isCreatingPortalRole);
+                                    setNewPortalRoleInput('');
+                                  }}
+                                  className="text-[10px] text-indigo-500 hover:text-indigo-400 font-bold cursor-pointer"
+                                >
+                                  {isCreatingPortalRole && activeBranchStaffRoles.length > 0 ? (lang === 'en' ? '✕ View List' : '✕ Ver Lista') : (lang === 'en' ? '+ New Position' : '+ Nuevo Puesto')}
+                                </button>
+                              </div>
+
+                              {isCreatingPortalRole || activeBranchStaffRoles.length === 0 ? (
+                                <div className="flex gap-1">
+                                  <input
+                                    type="text"
+                                    value={newPortalRoleInput}
+                                    onChange={(e) => setNewPortalRoleInput(e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleSavePortalStaffRole();
+                                      }
+                                    }}
+                                    placeholder={lang === 'en' ? 'Position (e.g. Waiter)...' : 'Puesto (ej: Mesero)...'}
+                                    className={`w-full px-3 py-2 rounded-xl border text-xs focus:outline-none ${
+                                      theme === 'light'
+                                        ? 'bg-white border-indigo-400 text-slate-900 placeholder:text-slate-400'
+                                        : 'bg-slate-950 border-indigo-500 text-white'
+                                    }`}
+                                    autoFocus={isCreatingPortalRole}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={handleSavePortalStaffRole}
+                                    className="px-2.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition cursor-pointer shrink-0"
+                                  >
+                                    {lang === 'en' ? 'Save' : 'Guardar'}
+                                  </button>
+                                </div>
+                              ) : (
+                                <select
+                                  value={newStaffRole}
+                                  onChange={(e) => {
+                                    if (e.target.value === '__NEW__') {
+                                      setIsCreatingPortalRole(true);
+                                      setNewPortalRoleInput('');
+                                    } else {
+                                      setNewStaffRole(e.target.value);
+                                    }
+                                  }}
+                                  className={`w-full px-3 py-2 rounded-xl border text-xs focus:outline-none cursor-pointer ${
+                                    theme === 'light'
+                                      ? 'bg-white border-slate-300 text-slate-900 focus:border-indigo-600'
+                                      : 'bg-slate-950 border-slate-700 text-white focus:border-indigo-500'
+                                  }`}
+                                >
+                                  <option value="">{lang === 'en' ? '-- Select position --' : '-- Seleccionar puesto --'}</option>
+                                  {activeBranchStaffRoles.map((role) => (
+                                    <option key={role} value={role}>
+                                      {role}
+                                    </option>
+                                  ))}
+                                  <option value="__NEW__" className="text-indigo-500 font-bold">
+                                    {lang === 'en' ? '+ Create new position...' : '+ Crear nuevo puesto...'}
+                                  </option>
+                                </select>
+                              )}
                             </div>
 
                             {/* Botón Añadir */}
-                            <div className="sm:col-span-2">
+                            <div className="sm:col-span-2 flex flex-col justify-end">
                               <button
                                 type="button"
                                 onClick={handleAddStaff}
@@ -24045,34 +24160,30 @@ export default function PortalPage() {
                             </div>
                           </div>
 
-                          {/* Multi-Industry Quick Role Chips */}
-                          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                            <span className={`text-[10px] font-bold ${theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>
-                              {lang === 'en' ? 'Optional suggestions:' : 'Sugerencias rápidas:'}
-                            </span>
-                            {[
-                              lang === 'en' ? 'Branch Manager / Administrator' : 'Administrador / Gerente de Sede',
-                              lang === 'en' ? 'Operations Head / Lead' : 'Jefe de Operaciones / Encargado',
-                              lang === 'en' ? 'Specialist / Professional' : 'Especialista / Profesional',
-                              lang === 'en' ? 'Customer Care / Advisor' : 'Asesor de Atención / Ventas',
-                              lang === 'en' ? 'General Collaborator' : 'Colaborador General',
-                            ].map((roleChip) => (
-                              <button
-                                key={roleChip}
-                                type="button"
-                                onClick={() => setNewStaffRole(roleChip)}
-                                className={`text-[10px] px-2 py-0.5 rounded-lg border font-semibold transition active:scale-95 cursor-pointer ${
-                                  newStaffRole === roleChip
-                                    ? 'bg-indigo-600 text-white border-indigo-600'
-                                    : theme === 'light'
-                                    ? 'bg-white hover:bg-indigo-50 hover:text-indigo-700 border-slate-300 text-slate-700'
-                                    : 'bg-slate-900 hover:bg-indigo-950/40 hover:text-indigo-300 border-slate-800 text-slate-300'
-                                }`}
-                              >
-                                + {roleChip}
-                              </button>
-                            ))}
-                          </div>
+                          {/* Chips de Puestos Guardados en la Marca */}
+                          {activeBranchStaffRoles.length > 0 && (
+                            <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center flex-wrap gap-1.5">
+                              <span className="text-[10px] text-slate-500 font-medium mr-1">
+                                {lang === 'en' ? 'Saved positions in dropdown:' : 'Puestos en lista desplegable:'}
+                              </span>
+                              {activeBranchStaffRoles.map((role) => (
+                                <span
+                                  key={role}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-[10px] font-semibold"
+                                >
+                                  <span>{role}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeletePortalStaffRole(role)}
+                                    className="hover:text-rose-500 transition ml-0.5 cursor-pointer"
+                                    title={`Eliminar '${role}' de la lista`}
+                                  >
+                                    ✕
+                                  </button>
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
 
                         {/* List / Table of Collaborators */}

@@ -58,6 +58,7 @@ export interface Branch {
   timezone?: string; // e.g. "GMT-5 (Bogotá, Lima, Quito)"
   lastAuditUpdate?: string; // Enterprise audit trail timestamp
   staffMembers?: (string | StaffMember)[]; // Pro feature: list of staff/servers
+  customStaffRoles?: string[]; // Custom job titles/roles created by this business/branch
   googlePlaceId?: string; // Unique Google Maps Place ID for this physical branch
   googleBusinessStatus?: 'connected' | 'pending' | 'disconnected'; // Google API sync state
   googleManagedBy?: 'prestigia_central' | 'client_self_service'; // Operational management model
@@ -195,6 +196,7 @@ export interface Business {
   branding?: BrandIdentity;
   baseline?: DayOneBaseline;
   masterAddOns?: MasterAddOns;
+  customStaffRoles?: string[]; // Custom job titles/roles created by this business
 }
 
 export interface DayOneBaseline {

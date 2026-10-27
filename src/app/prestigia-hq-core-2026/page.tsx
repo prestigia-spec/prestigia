@@ -985,9 +985,12 @@ export default function MasterAdminPage() {
   const [newTeamMgrPhone, setNewTeamMgrPhone] = useState('');
   const [newTeamMgrPassword, setNewTeamMgrPassword] = useState('1234');
 
-  // New Staff Form inputs
+  // New Staff Form inputs & Dynamic Custom Roles
   const [newTeamStaffName, setNewTeamStaffName] = useState('');
-  const [newTeamStaffRole, setNewTeamStaffRole] = useState('Atención / Servicio');
+  const [newTeamStaffRole, setNewTeamStaffRole] = useState('');
+  const [teamStaffRoles, setTeamStaffRoles] = useState<string[]>([]);
+  const [isCreatingStaffRole, setIsCreatingStaffRole] = useState(false);
+  const [newStaffRoleInput, setNewStaffRoleInput] = useState('');
 
   const [customCountryMode, setCustomCountryMode] = useState(false);
   const [customCityMode, setCustomCityMode] = useState(false);
@@ -2014,7 +2017,46 @@ export default function MasterAdminPage() {
     setNewTeamMgrPhone('');
     setNewTeamMgrPassword('1234');
     setNewTeamStaffName('');
-    setNewTeamStaffRole('Atención / Servicio');
+    // Dynamically retrieve existing staff roles for this brand/branch (strictly no hardcoded values)
+    const existingRoles: string[] = Array.from(
+      new Set([
+        ...(branch.customStaffRoles || []),
+        ...(currentBusiness?.customStaffRoles || []),
+        ...(branch.staffMembers || []).map(s => typeof s === 'object' && s !== null ? s.role : '').filter(Boolean),
+      ])
+    ).filter(r => r && r !== 'Atención / Servicio' && r !== 'Colaborador');
+
+    setTeamStaffRoles(existingRoles);
+    setIsCreatingStaffRole(existingRoles.length === 0);
+    setNewStaffRoleInput('');
+    setNewTeamStaffRole(existingRoles.length > 0 ? existingRoles[0] : '');
+  };
+
+  const handleSaveNewStaffRole = () => {
+    const roleClean = newStaffRoleInput.trim();
+    if (!roleClean) {
+      alert('Ingresa el nombre del puesto (ej: Mesero, Parrillero, Cajero).');
+      return;
+    }
+    if (!teamStaffRoles.some(r => r.toLowerCase() === roleClean.toLowerCase())) {
+      const updated = [...teamStaffRoles, roleClean];
+      setTeamStaffRoles(updated);
+      setNewTeamStaffRole(roleClean);
+    } else {
+      setNewTeamStaffRole(roleClean);
+    }
+    setNewStaffRoleInput('');
+    setIsCreatingStaffRole(false);
+  };
+
+  const handleDeleteStaffRole = (roleToDelete: string) => {
+    const updated = teamStaffRoles.filter(r => r !== roleToDelete);
+    setTeamStaffRoles(updated);
+    if (newTeamStaffRole === roleToDelete) {
+      const nextRole = updated.length > 0 ? updated[0] : '';
+      setNewTeamStaffRole(nextRole);
+      if (updated.length === 0) setIsCreatingStaffRole(true);
+    }
   };
 
   const handleAddTeamManager = () => {
@@ -2045,14 +2087,30 @@ export default function MasterAdminPage() {
       alert('Ingresa el nombre del colaborador.');
       return;
     }
+    const roleAssigned = (isCreatingStaffRole && newStaffRoleInput.trim())
+      ? newStaffRoleInput.trim()
+      : (newTeamStaffRole.trim() || newStaffRoleInput.trim());
+
+    if (!roleAssigned) {
+      alert('Selecciona un puesto de la lista o escribe uno nuevo con [+ Nuevo Puesto].');
+      return;
+    }
     const today = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
     const newCollab: StaffMember = {
       name: newTeamStaffName.trim(),
-      role: newTeamStaffRole.trim() || 'Atención / Servicio',
+      role: roleAssigned,
       joinedAt: today,
     };
     setTeamStaff(prev => [...prev, newCollab]);
+    if (!teamStaffRoles.some(r => r.toLowerCase() === roleAssigned.toLowerCase())) {
+      setTeamStaffRoles(prev => [...prev, roleAssigned]);
+    }
     setNewTeamStaffName('');
+    if (isCreatingStaffRole) {
+      setIsCreatingStaffRole(false);
+      setNewStaffRoleInput('');
+      setNewTeamStaffRole(roleAssigned);
+    }
   };
 
   const handleRemoveTeamStaff = (idx: number) => {
@@ -2074,6 +2132,7 @@ export default function MasterAdminPage() {
           staffQuota: teamStaffQuota,
           managers: teamManagers,
           staffMembers: teamStaff,
+          customStaffRoles: teamStaffRoles,
         }),
       });
       const data = await res.json();
@@ -8869,38 +8928,128 @@ export default function MasterAdminPage() {
                     <Plus className="w-3.5 h-3.5 text-emerald-400" />
                     <span>Dar de Alta Trabajador / Colaborador</span>
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                    <div className="sm:col-span-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                    {/* Nombre del Colaborador */}
+                    <div className="sm:col-span-6">
                       <label className="text-[10px] text-slate-400 block mb-1">Nombre Completo del Colaborador *</label>
                       <input
                         type="text"
                         value={newTeamStaffName}
                         onChange={(e) => setNewTeamStaffName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddTeamStaff();
+                          }
+                        }}
                         placeholder="Ej: Camilo Restrepo, Valentina Gómez, Sebastián Cruz..."
                         className="w-full bg-[#0C101A] border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none transition"
                       />
                     </div>
-                    <div>
-                      <label className="text-[10px] text-slate-400 block mb-1">Cargo / Puesto *</label>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={newTeamStaffRole}
-                          onChange={(e) => setNewTeamStaffRole(e.target.value)}
-                          placeholder="Ej: Mesero, Cocina, Caja"
-                          className="w-full bg-[#0C101A] border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none transition"
-                        />
+
+                    {/* Cargo / Puesto (Lista Desplegable o Creación Dinámica) */}
+                    <div className="sm:col-span-4">
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] text-slate-400">Cargo / Puesto *</label>
                         <button
                           type="button"
-                          onClick={handleAddTeamStaff}
-                          className="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs rounded-xl transition cursor-pointer shrink-0"
-                          title="Añadir colaborador"
+                          onClick={() => {
+                            setIsCreatingStaffRole(!isCreatingStaffRole);
+                            setNewStaffRoleInput('');
+                          }}
+                          className="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 cursor-pointer"
                         >
-                          + Añadir
+                          {isCreatingStaffRole && teamStaffRoles.length > 0 ? '✕ Ver Lista' : '+ Nuevo Puesto'}
                         </button>
                       </div>
+
+                      {isCreatingStaffRole || teamStaffRoles.length === 0 ? (
+                        <div className="flex gap-1.5">
+                          <input
+                            type="text"
+                            value={newStaffRoleInput}
+                            onChange={(e) => setNewStaffRoleInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleSaveNewStaffRole();
+                              }
+                            }}
+                            placeholder="Escribe el puesto (ej: Mesero)..."
+                            className="w-full bg-[#0C101A] border border-emerald-500/40 focus:border-emerald-400 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none transition"
+                            autoFocus={isCreatingStaffRole}
+                          />
+                          <button
+                            type="button"
+                            onClick={handleSaveNewStaffRole}
+                            className="px-2.5 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl transition cursor-pointer shrink-0"
+                            title="Guardar puesto en la lista desplegable"
+                          >
+                            Guardar
+                          </button>
+                        </div>
+                      ) : (
+                        <select
+                          value={newTeamStaffRole}
+                          onChange={(e) => {
+                            if (e.target.value === '__NEW__') {
+                              setIsCreatingStaffRole(true);
+                              setNewStaffRoleInput('');
+                            } else {
+                              setNewTeamStaffRole(e.target.value);
+                            }
+                          }}
+                          className="w-full bg-[#0C101A] border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2 text-xs text-white outline-none transition cursor-pointer"
+                        >
+                          <option value="">-- Selecciona el puesto --</option>
+                          {teamStaffRoles.map((role) => (
+                            <option key={role} value={role}>
+                              {role}
+                            </option>
+                          ))}
+                          <option value="__NEW__" className="text-emerald-400 font-bold">
+                            + Crear nuevo puesto...
+                          </option>
+                        </select>
+                      )}
+                    </div>
+
+                    {/* Botón Añadir Colaborador */}
+                    <div className="sm:col-span-2 flex flex-col justify-end">
+                      <button
+                        type="button"
+                        onClick={handleAddTeamStaff}
+                        className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs rounded-xl transition cursor-pointer flex items-center justify-center gap-1 shadow-md shadow-emerald-600/20"
+                        title="Añadir colaborador a esta sede"
+                      >
+                        <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                        <span>Añadir</span>
+                      </button>
                     </div>
                   </div>
+
+                  {/* Chips de Puestos Guardados en la Marca */}
+                  {teamStaffRoles.length > 0 && (
+                    <div className="pt-2 border-t border-slate-800/60 flex items-center flex-wrap gap-1.5">
+                      <span className="text-[10px] text-slate-400 font-medium mr-1">Puestos en lista desplegable:</span>
+                      {teamStaffRoles.map((role) => (
+                        <span
+                          key={role}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px] font-semibold"
+                        >
+                          <span>{role}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteStaffRole(role)}
+                            className="hover:text-rose-400 transition ml-0.5 cursor-pointer"
+                            title={`Eliminar '${role}' de la lista desplegable`}
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Lista de Colaboradores */}
