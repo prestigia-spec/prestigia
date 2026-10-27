@@ -111,6 +111,7 @@ export interface CampaignParticipant {
   customerName: string;
   customerPhone: string;
   rating: number; // 1 to 5 (Calificación del cliente)
+  customerComment?: string; // Opinión o reseña real expresada por el cliente
   registeredAt: string;
   attendedBy?: string; // Collaborator / server who attended the customer
   isWinner?: boolean;

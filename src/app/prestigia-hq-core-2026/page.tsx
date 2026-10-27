@@ -3183,7 +3183,7 @@ export default function MasterAdminPage() {
         rating: Number(p.rating) || 5,
         source: '🎁 Ruleta / Sorteo QR',
         sourceType: 'sorteo',
-        complaintReason: (p as any).complaintReason || ((p as any).prizeWon ? `Premio ganado en ruleta de fidelización: ${(p as any).prizeWon}` : (Number(p.rating) >= 4 ? 'Experiencia 5★ excelente verificada en sala a través de dinámica interactiva QR.' : 'Calificación insatisfecha interceptada en ruleta interactiva antes de llegar a Google Maps.')),
+        complaintReason: (p as any).customerComment || (p as any).complaintReason || ((p as any).prizeWon ? `Premio ganado en ruleta de fidelización: ${(p as any).prizeWon}` : (Number(p.rating) >= 4 ? 'Excelente servicio y experiencia verificada en sala.' : 'Incidencia de servicio interceptada en sala.')),
         attendedBy: (p as any).attendedBy,
         registeredAt: p.registeredAt || '2026-10-01',
       });
@@ -6506,20 +6506,28 @@ export default function MasterAdminPage() {
                         <MessageCircle className="w-3.5 h-3.5 text-amber-400" />
                         <span>Mensaje / Opinión Registrada</span>
                       </span>
-                      {selectedDataLakeRecord.rating <= 3 && (
-                        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
-                          🛡️ Atajada de Google Maps
+                      {selectedDataLakeRecord.rating <= 3 ? (
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1">
+                          <span>🛡️ Atajada en Privado</span>
+                        </span>
+                      ) : (
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                          <span>🌟 Reseña 5★ Google Maps</span>
                         </span>
                       )}
                     </div>
 
-                    <div className="p-3 rounded-xl bg-[#0C101A] border border-slate-800 text-xs text-slate-200 leading-relaxed font-medium">
+                    <div className="p-3 rounded-xl bg-[#0C101A] border border-slate-800 text-xs text-slate-100 leading-relaxed font-medium">
                       "{selectedDataLakeRecord.complaintReason || 'Calificación registrada en sala a través del sistema interactivo QR Prestigia.'}"
                     </div>
 
-                    {selectedDataLakeRecord.rating <= 3 && (
+                    {selectedDataLakeRecord.rating <= 3 ? (
                       <p className="text-[10px] text-slate-400 leading-tight">
                         ⚡ Esta queja fue capturada en privado por el filtro inteligente de Prestigia antes de que el cliente pudiera publicarla negativamente en Google Maps, blindando la reputación de la marca.
+                      </p>
+                    ) : (
+                      <p className="text-[10px] text-emerald-400/80 leading-tight">
+                        ✓ Reseña oficial de 5 estrellas expresada por el comensal/cliente con fidelización verificada en sala.
                       </p>
                     )}
                   </div>
