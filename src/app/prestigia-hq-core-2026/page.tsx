@@ -1260,14 +1260,44 @@ export default function MasterAdminPage() {
     return businesses.find((b) => b.id === selectedBusinessId) || businesses[0] || null;
   }, [businesses, selectedBusinessId]);
 
+  // Computed Live Operational Stats for currentBusiness (Tab 2 Conmutador)
+  const currentBranchesCount = currentBusiness?.branches?.length || 1;
+  const currentExtraBranchesCount = Math.max(0, currentBranchesCount - 1);
+  const currentManagersList = useMemo(() => {
+    if (!currentBusiness?.branches) return [];
+    const list: string[] = [];
+    currentBusiness.branches.forEach((b) => {
+      if (b.managers && b.managers.length > 0) {
+        b.managers.forEach((m) => {
+          if (m.name && !list.includes(m.name)) list.push(m.name);
+        });
+      } else if (b.managerName && !list.includes(b.managerName)) {
+        list.push(b.managerName);
+      }
+    });
+    return list;
+  }, [currentBusiness]);
+
+  const currentStaffCount = useMemo(() => {
+    if (!currentBusiness?.branches) return 0;
+    return currentBusiness.branches.reduce((acc, b) => acc + (b.staffMembers?.length || 0), 0);
+  }, [currentBusiness]);
+
   useEffect(() => {
     if (currentBusiness) {
       const addons = currentBusiness.masterAddOns;
+      const actualBranches = currentBusiness.branches?.length || 1;
+      const actualExtra = Math.max(0, actualBranches - 1);
+      const effectiveExtraBranches = Math.max(addons?.extraBranches || 0, actualExtra);
+
+      const actualManagersCount = currentBusiness.branches?.filter(b => b.managerName || (b.managers && b.managers.length > 0)).length || 0;
+      const effectiveExtraManagers = Math.max(addons?.extraManagers || 0, actualManagersCount);
+
       setAddonState({
         plan: currentBusiness.plan,
         status: currentBusiness.status || 'active',
-        extraBranches: addons?.extraBranches || 0,
-        extraManagers: addons?.extraManagers || 0,
+        extraBranches: effectiveExtraBranches,
+        extraManagers: effectiveExtraManagers,
         extraStaffQuota: addons?.extraStaffQuota || 0,
         sentimentEnabled: addons?.sentiment360?.enabled ?? (currentBusiness.plan === 'elite' || currentBusiness.plan === 'empresarial'),
         sentimentMode: addons?.sentiment360?.mode || 'trial',
@@ -3988,14 +4018,35 @@ export default function MasterAdminPage() {
                           <Store className="w-3.5 h-3.5 text-blue-400" />
                           Sedes Físicas Extras
                         </span>
-                        <span className="text-[10px] text-blue-400 font-semibold bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded-full">Capacidad Multi-Sede</span>
+                        <span className="text-[10px] text-blue-400 font-semibold bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded-full">
+                          Capacidad Multi-Sede
+                        </span>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-1">
                         Habilita la operación de sedes físicas adicionales según el acuerdo pactado.
                       </p>
+
+                      {/* Live Reality Reflection */}
+                      <div className="mt-3 p-2.5 rounded-xl bg-[#0C101A] border border-blue-500/20 text-[11px] space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400">Sedes operando en vivo:</span>
+                          <span className="font-extrabold text-blue-300 font-mono">
+                            {currentBranchesCount} {currentBranchesCount === 1 ? 'Sede' : 'Sedes'} ({currentBranchesCount === 1 ? '1 Matriz' : `1 Matriz + ${currentExtraBranchesCount} Extra`})
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-400 truncate" title={currentBusiness.branches?.map(b => b.name).join(' • ') || 'Sede Principal'}>
+                          📍 {currentBusiness.branches?.map(b => b.name).join(' • ') || 'Sede Principal'}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-800/80">
-                      <span className="text-xs text-slate-300">Sedes adicionales:</span>
+
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/80">
+                      <div>
+                        <span className="text-xs text-slate-300 block font-semibold">Sedes adicionales:</span>
+                        <span className="text-[10px] text-slate-400">
+                          {addonState.extraBranches >= currentExtraBranchesCount ? '✅ Capacidad cubierta' : '⚠️ Cupo sugerido: +' + currentExtraBranchesCount}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
@@ -4026,14 +4077,35 @@ export default function MasterAdminPage() {
                           <Users className="w-3.5 h-3.5 text-purple-400" />
                           Encargados de Turno
                         </span>
-                        <span className="text-[10px] text-purple-400 font-semibold bg-purple-500/10 border border-purple-500/30 px-2 py-0.5 rounded-full">Supervisión con PIN</span>
+                        <span className="text-[10px] text-purple-400 font-semibold bg-purple-500/10 border border-purple-500/30 px-2 py-0.5 rounded-full">
+                          Supervisión con PIN
+                        </span>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-1">
                         Cuentas operativas para supervisores o administradores con acceso por PIN.
                       </p>
+
+                      {/* Live Reality Reflection */}
+                      <div className="mt-3 p-2.5 rounded-xl bg-[#0C101A] border border-purple-500/20 text-[11px] space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400">Encargados con PIN:</span>
+                          <span className="font-extrabold text-purple-300 font-mono">
+                            {currentManagersList.length} {currentManagersList.length === 1 ? 'Encargado' : 'Encargados'}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-400 truncate" title={currentManagersList.join(' • ') || 'Sin encargados asignados'}>
+                          👤 {currentManagersList.join(' • ') || 'Sin encargados asignados'}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-800/80">
-                      <span className="text-xs text-slate-300">Cuentas de encargado:</span>
+
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/80">
+                      <div>
+                        <span className="text-xs text-slate-300 block font-semibold">Cuentas de encargado:</span>
+                        <span className="text-[10px] text-slate-400">
+                          {addonState.extraManagers >= currentManagersList.length ? '✅ Supervisores habilitados' : '⚠️ Cupo sugerido: ' + currentManagersList.length}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
@@ -4064,14 +4136,35 @@ export default function MasterAdminPage() {
                           <Users className="w-3.5 h-3.5 text-emerald-400" />
                           Cupo Empleados (+5)
                         </span>
-                        <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">Equipo Auditado</span>
+                        <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                          Equipo Auditado
+                        </span>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-1">
                         Amplía la capacidad de colaboradores y meseros evaluados por los comensales.
                       </p>
+
+                      {/* Live Reality Reflection */}
+                      <div className="mt-3 p-2.5 rounded-xl bg-[#0C101A] border border-emerald-500/20 text-[11px] space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400">Empleados en equipo:</span>
+                          <span className="font-extrabold text-emerald-300 font-mono">
+                            {currentStaffCount} {currentStaffCount === 1 ? 'Colaborador' : 'Colaboradores'}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-400 truncate" title={currentBusiness.branches?.map(b => `${b.locality || b.name}: ${b.staffMembers?.length || 0}`).join(' • ') || 'Personal evaluado'}>
+                          👥 {currentBusiness.branches?.map(b => `${b.locality || b.name}: ${b.staffMembers?.length || 0}`).join(' • ') || 'Personal evaluado'}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-800/80">
-                      <span className="text-xs text-slate-300">Cupos adicionales:</span>
+
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/80">
+                      <div>
+                        <span className="text-xs text-slate-300 block font-semibold">Cupos adicionales (+5):</span>
+                        <span className="text-[10px] text-slate-400">
+                          {currentStaffCount > 0 ? `Capacidad base +${addonState.extraStaffQuota} extras` : 'Personal evaluado'}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-2">
                         <button
                           type="button"

@@ -855,6 +855,21 @@ export async function POST(request: NextRequest) {
       }
 
       biz.branches = updatedBranches;
+      if (!biz.masterAddOns) {
+        biz.masterAddOns = {
+          extraBranches: Math.max(0, updatedBranches.length - 1),
+          extraManagers: updatedBranches.filter(b => b.managerName || (b.managers && b.managers.length > 0)).length,
+          extraStaffQuota: 0,
+          sentiment360: { enabled: false, mode: 'trial' },
+          liveWallboard: { enabled: false, mode: 'trial' },
+          giveawayCrm: false,
+          deviceAudit: false,
+        };
+      } else {
+        biz.masterAddOns.extraBranches = Math.max(biz.masterAddOns.extraBranches || 0, Math.max(0, updatedBranches.length - 1));
+        const managersCount = updatedBranches.filter(b => b.managerName || (b.managers && b.managers.length > 0)).length;
+        biz.masterAddOns.extraManagers = Math.max(biz.masterAddOns.extraManagers || 0, managersCount);
+      }
       await saveBusiness(biz);
 
       return NextResponse.json({
@@ -882,6 +897,11 @@ export async function POST(request: NextRequest) {
       }
 
       biz.branches = (biz.branches || []).filter((b) => b.id !== branchId);
+      if (biz.masterAddOns) {
+        biz.masterAddOns.extraBranches = Math.max(0, (biz.branches || []).length - 1);
+        const managersCount = (biz.branches || []).filter(b => b.managerName || (b.managers && b.managers.length > 0)).length;
+        biz.masterAddOns.extraManagers = managersCount;
+      }
       await saveBusiness(biz);
 
       return NextResponse.json({

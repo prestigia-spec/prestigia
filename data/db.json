@@ -235,7 +235,7 @@
         "clientQuote": "Prestigia interceptó más de 120 quejas privadas en sala antes de que salieran a Google Maps. Subimos de 3.8★ a 4.9★ en 5 meses y salvamos más de  millones COP en clientes que se iban a fugar."
       },
       "masterAddOns": {
-        "customNotes": "Cuenta VIP �lite con 2 sedes activas y monitoreo de turno.",
+        "customNotes": "Cuenta VIP Élite con 2 sedes activas y monitoreo de turno.",
         "sentiment360": {
           "mode": "permanent",
           "enabled": true
@@ -245,9 +245,9 @@
           "enabled": true
         },
         "giveawayCrm": true,
-        "extraStaffQuota": 0,
-        "extraBranches": 0,
-        "extraManagers": 0,
+        "extraStaffQuota": 10,
+        "extraBranches": 1,
+        "extraManagers": 2,
         "deviceAudit": true
       },
       "legalName": "Inversiones Gastronómicas Gómez & Cía S.A.S.",
