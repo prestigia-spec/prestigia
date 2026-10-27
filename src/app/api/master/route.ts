@@ -913,7 +913,7 @@ export async function POST(request: NextRequest) {
 
     // Save/Update Branch Team (Managers & Staff) directly from Master HQ
     if (action === 'save_branch_team') {
-      const { businessId, branchId, managers, staffMembers } = body;
+      const { businessId, branchId, managers, staffMembers, managersQuota, staffQuota } = body;
       if (!businessId || !branchId) {
         return NextResponse.json({ error: 'Faltan identificadores de negocio y sede' }, { status: 400 });
       }
@@ -929,6 +929,14 @@ export async function POST(request: NextRequest) {
       }
 
       const targetBranch = biz.branches[branchIdx];
+
+      if (managersQuota !== undefined) {
+        targetBranch.managersQuota = Math.max(1, Number(managersQuota));
+      }
+
+      if (staffQuota !== undefined) {
+        targetBranch.staffQuota = Math.max(1, Number(staffQuota));
+      }
 
       if (Array.isArray(managers)) {
         targetBranch.managers = managers;

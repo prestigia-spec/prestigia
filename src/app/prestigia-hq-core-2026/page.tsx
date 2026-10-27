@@ -975,6 +975,8 @@ export default function MasterAdminPage() {
   const [teamManagers, setTeamManagers] = useState<BranchManager[]>([]);
   const [teamStaff, setTeamStaff] = useState<(StaffMember | string)[]>([]);
   const [teamModalTab, setTeamModalTab] = useState<'managers' | 'staff'>('managers');
+  const [teamManagersQuota, setTeamManagersQuota] = useState(2);
+  const [teamStaffQuota, setTeamStaffQuota] = useState(15);
   const [isSavingTeam, setIsSavingTeam] = useState(false);
 
   // New Manager Form inputs
@@ -1995,6 +1997,8 @@ export default function MasterAdminPage() {
     }
     setTeamManagers(initialMgrs);
     setTeamStaff(branch.staffMembers ? [...branch.staffMembers] : []);
+    setTeamManagersQuota(branch.managersQuota || Math.max(2, initialMgrs.length));
+    setTeamStaffQuota(branch.staffQuota || Math.max(10, (branch.staffMembers?.length || 5)));
     setTeamModalTab('managers');
     setNewTeamMgrName('');
     setNewTeamMgrPhone('');
@@ -2056,6 +2060,8 @@ export default function MasterAdminPage() {
           action: 'save_branch_team',
           businessId: currentBusiness.id,
           branchId: selectedTeamBranch.id,
+          managersQuota: teamManagersQuota,
+          staffQuota: teamStaffQuota,
           managers: teamManagers,
           staffMembers: teamStaff,
         }),
@@ -4180,124 +4186,6 @@ export default function MasterAdminPage() {
                         <button
                           type="button"
                           onClick={() => setAddonState({ ...addonState, extraBranches: addonState.extraBranches + 1 })}
-                          className="w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-sm cursor-pointer"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Encargados Extras / Habilitación en Pro */}
-                  <div className="bg-[#141A26] p-4 rounded-2xl border border-slate-800 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-purple-400" />
-                          Encargados de Turno
-                        </span>
-                        <span className="text-[10px] text-purple-400 font-semibold bg-purple-500/10 border border-purple-500/30 px-2 py-0.5 rounded-full">
-                          Supervisión con PIN
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 mt-1">
-                        Cuentas operativas para supervisores o administradores con acceso por PIN.
-                      </p>
-
-                      {/* Live Reality Reflection */}
-                      <div className="mt-3 p-2.5 rounded-xl bg-[#0C101A] border border-purple-500/20 text-[11px] space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-slate-400">Encargados con PIN:</span>
-                          <span className="font-extrabold text-purple-300 font-mono">
-                            {currentManagersList.length} {currentManagersList.length === 1 ? 'Encargado' : 'Encargados'}
-                          </span>
-                        </div>
-                        <p className="text-[10px] text-slate-400 truncate" title={currentManagersList.join(' • ') || 'Sin encargados asignados'}>
-                          👤 {currentManagersList.join(' • ') || 'Sin encargados asignados'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/80">
-                      <div>
-                        <span className="text-xs text-slate-300 block font-semibold">Cuentas de encargado:</span>
-                        <span className="text-[10px] text-slate-400">
-                          {addonState.extraManagers >= currentManagersList.length ? '✅ Supervisores habilitados' : '⚠️ Cupo sugerido: ' + currentManagersList.length}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setAddonState({ ...addonState, extraManagers: Math.max(0, addonState.extraManagers - 1) })}
-                          className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center font-bold text-sm cursor-pointer"
-                        >
-                          -
-                        </button>
-                        <span className="w-8 text-center font-bold font-mono text-white text-sm">
-                          {addonState.extraManagers}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setAddonState({ ...addonState, extraManagers: addonState.extraManagers + 1 })}
-                          className="w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-sm cursor-pointer"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Cupo Colaboradores en Bloques de 5 */}
-                  <div className="bg-[#141A26] p-4 rounded-2xl border border-slate-800 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-emerald-400" />
-                          Cupo Empleados (+5)
-                        </span>
-                        <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                          Equipo Auditado
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 mt-1">
-                        Amplía la capacidad de colaboradores y meseros evaluados por los comensales.
-                      </p>
-
-                      {/* Live Reality Reflection */}
-                      <div className="mt-3 p-2.5 rounded-xl bg-[#0C101A] border border-emerald-500/20 text-[11px] space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-slate-400">Empleados en equipo:</span>
-                          <span className="font-extrabold text-emerald-300 font-mono">
-                            {currentStaffCount} {currentStaffCount === 1 ? 'Colaborador' : 'Colaboradores'}
-                          </span>
-                        </div>
-                        <p className="text-[10px] text-slate-400 truncate" title={currentBusiness.branches?.map(b => `${b.locality || b.name}: ${b.staffMembers?.length || 0}`).join(' • ') || 'Personal evaluado'}>
-                          👥 {currentBusiness.branches?.map(b => `${b.locality || b.name}: ${b.staffMembers?.length || 0}`).join(' • ') || 'Personal evaluado'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/80">
-                      <div>
-                        <span className="text-xs text-slate-300 block font-semibold">Cupos adicionales (+5):</span>
-                        <span className="text-[10px] text-slate-400">
-                          {currentStaffCount > 0 ? `Capacidad base +${addonState.extraStaffQuota} extras` : 'Personal evaluado'}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setAddonState({ ...addonState, extraStaffQuota: Math.max(0, addonState.extraStaffQuota - 5) })}
-                          className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center font-bold text-sm cursor-pointer"
-                        >
-                          -
-                        </button>
-                        <span className="w-8 text-center font-bold font-mono text-white text-sm">
-                          +{addonState.extraStaffQuota}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setAddonState({ ...addonState, extraStaffQuota: addonState.extraStaffQuota + 5 })}
                           className="w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-sm cursor-pointer"
                         >
                           +
@@ -8745,30 +8633,62 @@ export default function MasterAdminPage() {
               </button>
             </div>
 
-            {/* Quota Banner */}
+            {/* Quota Controls for THIS specific branch */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-4">
-              <div className="p-3 rounded-2xl bg-[#141A26] border border-purple-500/20 flex items-center justify-between">
+              <div className="p-3.5 rounded-2xl bg-[#141A26] border border-purple-500/20 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Cupo de Encargados (Supervisores)</span>
-                  <p className="text-sm font-extrabold text-purple-300 mt-0.5">
-                    {teamManagers.length} en sede • <span className="text-white font-normal text-xs">{addonState.extraManagers} autorizados en Master</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Cupo Encargados (Esta Sede)</span>
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    <strong className="text-purple-300 text-sm">{teamManagers.length}</strong> registrados de <strong className="text-white text-sm">{teamManagersQuota}</strong> autorizados
                   </p>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/30">
-                  Acceso PIN
-                </span>
+                <div className="flex items-center gap-1.5 bg-[#0C101A] px-2 py-1 rounded-xl border border-slate-700">
+                  <button
+                    type="button"
+                    onClick={() => setTeamManagersQuota(Math.max(1, teamManagersQuota - 1))}
+                    className="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center font-bold text-xs cursor-pointer"
+                  >
+                    -
+                  </button>
+                  <span className="w-6 text-center font-bold font-mono text-purple-300 text-xs">
+                    {teamManagersQuota}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setTeamManagersQuota(teamManagersQuota + 1)}
+                    className="w-6 h-6 rounded-lg bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center font-bold text-xs cursor-pointer"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
 
-              <div className="p-3 rounded-2xl bg-[#141A26] border border-emerald-500/20 flex items-center justify-between">
+              <div className="p-3.5 rounded-2xl bg-[#141A26] border border-emerald-500/20 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Cupo de Colaboradores (Plantilla)</span>
-                  <p className="text-sm font-extrabold text-emerald-300 mt-0.5">
-                    {teamStaff.length} en sede • <span className="text-white font-normal text-xs">{15 + addonState.extraStaffQuota} autorizados en Master</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Cupo Colaboradores (Esta Sede)</span>
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    <strong className="text-emerald-300 text-sm">{teamStaff.length}</strong> registrados de <strong className="text-white text-sm">{teamStaffQuota}</strong> autorizados
                   </p>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
-                  Auditados
-                </span>
+                <div className="flex items-center gap-1.5 bg-[#0C101A] px-2 py-1 rounded-xl border border-slate-700">
+                  <button
+                    type="button"
+                    onClick={() => setTeamStaffQuota(Math.max(1, teamStaffQuota - 1))}
+                    className="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center font-bold text-xs cursor-pointer"
+                  >
+                    -
+                  </button>
+                  <span className="w-6 text-center font-bold font-mono text-emerald-300 text-xs">
+                    {teamStaffQuota}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setTeamStaffQuota(teamStaffQuota + 1)}
+                    className="w-6 h-6 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs cursor-pointer"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
 
