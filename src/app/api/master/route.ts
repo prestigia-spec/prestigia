@@ -851,6 +851,13 @@ export async function POST(request: NextRequest) {
         updatedBranches = [...existingBranches];
         updatedBranches[branchIndex] = { ...existingBranches[branchIndex], ...finalBranch };
       } else {
+        // Enforce quota: prevent creating a new branch if current count reaches or exceeds authorized capacity
+        const maxAllowedBranches = 1 + (biz.masterAddOns?.extraBranches || 0);
+        if (existingBranches.length >= maxAllowedBranches) {
+          return NextResponse.json({
+            error: `Capacidad de sedes completada (${existingBranches.length}/${maxAllowedBranches}). Debes ampliar el cupo en 'Sedes Físicas Extras' en el Conmutador de la marca antes de dar de alta una nueva sede.`,
+          }, { status: 400 });
+        }
         updatedBranches = [...existingBranches, finalBranch];
       }
 
