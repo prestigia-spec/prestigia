@@ -1866,22 +1866,35 @@ export default function MasterAdminPage() {
   const generateAITestimonial = (style: 'roi' | 'prestige' | 'growth' = 'roi') => {
     if (!currentBusiness) return '';
     const h = historicalMetrics;
-    const dias = h?.daysOperating || 30;
+    const dias = h ? h.daysOperating : 1;
     const ratingIni = Number(baselineForm.initialRating) || h?.baseline.initialRating || 3.8;
-    const ratingAct = h?.currentRating || 4.8;
-    const ganancia = Number((ratingAct - ratingIni).toFixed(1));
-    const quejas = h?.privateComplaintsIntercepted || 18;
-    const savedAmount = h?.preservedRevenueCOP || 1620000;
-    const formattedCOP = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(savedAmount);
-    const nuevas5 = h?.newGoogleReviews5Star || 24;
+    const ratingAct = h?.currentRating || ratingIni;
+    const ganancia = Number(Math.max(0, ratingAct - ratingIni).toFixed(1));
+    const quejas = h ? h.privateComplaintsIntercepted : 0;
+    const savedAmount = h ? h.preservedRevenueCOP : 0;
+    const formattedCOP = formatMoneyCOP(savedAmount);
+    const nuevas5 = h ? h.exactReviews5Star : 0;
+    const nuevasTot = h ? h.newGoogleReviewsTotal : 0;
     const marca = currentBusiness.name;
 
     if (style === 'roi') {
-      return `Prestigia blindó a ${marca} desde el Día 1. Durante estos ${dias} días de protección activa, interceptó ${quejas} quejas privadas en sala antes de que salieran a Google Maps. Subimos nuestra calificación de ${ratingIni}★ a ${ratingAct}★ (+${ganancia}★) y salvamos más de ${formattedCOP} en comensales que habríamos perdido definitivamente.`;
+      if (quejas > 0 && savedAmount > 0) {
+        return `Prestigia blindó a ${marca} desde el Día 1. Durante estos ${dias} días de protección activa con QRs en sala, interceptamos de inmediato ${quejas} quejas privadas en mesa antes de que salieran a Google Maps. Subimos nuestra calificación de ${ratingIni}★ a ${ratingAct}★ (+${ganancia}★) y salvamos ${formattedCOP} en comensales retenidos.`;
+      } else {
+        return `Prestigia activó el blindaje de reputación en ${marca} desde el Día 1. En estos ${dias} días de operación con códigos QR inteligentes, mantenemos una calificación protegida de ${ratingAct}★ en Google Maps, canalizando la experiencia de cada cliente y blindando al 100% la sala contra reseñas negativas públicas.`;
+      }
     } else if (style === 'prestige') {
-      return `La contención inmediata en mesa (<10 seg) cambió por completo la experiencia de nuestros clientes en ${marca}. Neutralizamos ${quejas} posibles malas reseñas públicas en Google Maps y sumamos +${nuevas5} opiniones de 5 estrellas, consolidando nuestra reputación en ${ratingAct}★. La tranquilidad de proteger la marca no tiene precio.`;
+      if (quejas > 0 || nuevas5 > 0) {
+        return `La contención inmediata en mesa (<10 seg) cambió por completo la experiencia de nuestros clientes en ${marca}. Contuvimos ${quejas} alertas privadas vía WhatsApp y sumamos ${nuevas5} reseñas reales de 5 estrellas en Google Maps, llevando nuestro perfil a ${ratingAct}★. La certeza de proteger el prestigio de la marca en tiempo real no tiene comparación.`;
+      } else {
+        return `El protocolo de contención VIP y fidelización en mesa de Prestigia mantiene blindada la experiencia en ${marca}. Con ${dias} días de protección activa, consolidamos un perfil protegido de ${ratingAct}★ en Google Maps y respuesta instantánea garantizada.`;
+      }
     } else {
-      return `Antes de Prestigia estábamos estancados en ${ratingIni}★ con quejas que salían directo a Google. Hoy, con ${dias} días de blindaje activo, alcanzamos ${ratingAct}★ en Google Maps (+${ganancia}★) y nuestros comensales felices nos posicionaron como el referente local gracias al flujo QR en sala.`;
+      if (ganancia > 0 || nuevasTot > 0) {
+        return `Antes de Prestigia la reputación de ${marca} estaba en ${ratingIni}★ con riesgo constante de quejas públicas. Hoy, tras ${dias} días de blindaje con QR en mesa, alcanzamos ${ratingAct}★ en Google Maps (+${ganancia}★ con ${nuevasTot} nuevas reseñas ganadas), convirtiéndonos en el referente gastronómico más confiable del sector.`;
+      } else {
+        return `Desde la calibración Día 1, Prestigia estableció el estándar de calidad para ${marca} en ${ratingIni}★. Con ${dias} días de monitoreo y QR activos, tenemos control absoluto sobre la satisfacción de cada mesa y el crecimiento orgánico de nuestra reputación.`;
+      }
     }
   };
 
@@ -1944,9 +1957,9 @@ export default function MasterAdminPage() {
   const handleOpenBaselineModal = () => {
     if (!currentBusiness) return;
     const base = currentBusiness.baseline;
-    const initialRev = base?.initialReviewCount ?? 30;
+    const initialRev = base?.initialReviewCount ?? 0;
     const initial1to3 = base?.initialReviews1to3 ?? Math.round(initialRev * 0.35);
-    const initial4to5 = base?.initialReviews4to5 ?? (initialRev - initial1to3);
+    const initial4to5 = base?.initialReviews4to5 ?? Math.max(0, initialRev - initial1to3);
     const initialResp = base?.initialRespondedReviews ?? Math.round(initialRev * 0.15);
 
     setAllowManualOverride(false);
@@ -2806,11 +2819,11 @@ export default function MasterAdminPage() {
     const baseline: DayOneBaseline = base || {
       startDate,
       initialRating: 3.8,
-      initialReviewCount: 30,
-      initialReviews1to3: 10,
-      initialReviews4to5: 20,
-      initialRespondedReviews: 4,
-      initialMonthlyComplaints: 15,
+      initialReviewCount: 0,
+      initialReviews1to3: 0,
+      initialReviews4to5: 0,
+      initialRespondedReviews: 0,
+      initialMonthlyComplaints: 0,
       averageTicketCOP: 45000,
       averageTicketUSD: 18,
       nicheCategory: currentBusiness.category || 'Gastrobar / Restaurante',
@@ -2825,17 +2838,29 @@ export default function MasterAdminPage() {
     // Day 1 review breakdown
     const initialRevCount = baseline.initialReviewCount || 0;
     const initialReviews1to3 = baseline.initialReviews1to3 ?? Math.round(initialRevCount * 0.35);
-    const initialReviews4to5 = baseline.initialReviews4to5 ?? (initialRevCount - initialReviews1to3);
+    const initialReviews4to5 = baseline.initialReviews4to5 ?? Math.max(0, initialRevCount - initialReviews1to3);
     const initialRespondedReviews = baseline.initialRespondedReviews ?? Math.round(initialRevCount * 0.15);
     const initialResponseRate = initialRevCount > 0 ? Math.round((initialRespondedReviews / initialRevCount) * 100) : 0;
 
+    // Filter strictly by startTimestamp:
+    // Only reviews & feedbacks registered on or after Prestigia activation count towards Prestigia improvement!
+    const startTimestamp = new Date(startDate).getTime();
+
     // Relevant feedbacks (intercepted private complaints in room/WhatsApp)
-    const bizFeedbacks = feedbacks.filter((f) => f.businessId === currentBusiness.id);
+    const bizFeedbacks = feedbacks.filter((f) => {
+      if (f.businessId !== currentBusiness.id) return false;
+      if (!f.createdAt) return false;
+      return new Date(f.createdAt).getTime() >= startTimestamp;
+    });
     const privateComplaintsIntercepted = bizFeedbacks.filter((f) => Number(f.rating) <= 3).length;
     const resolvedPrivateCount = bizFeedbacks.filter((f) => Number(f.rating) <= 3 && f.status === 'resolved').length;
 
     // Relevant Google Reviews for this business (Exact Breakdown)
-    const bizReviews = googleReviews.filter((r) => r.businessId === currentBusiness.id);
+    const bizReviews = googleReviews.filter((r) => {
+      if (r.businessId !== currentBusiness.id) return false;
+      if (!r.createdAt) return false;
+      return new Date(r.createdAt).getTime() >= startTimestamp;
+    });
     const exactReviews5Star = bizReviews.filter((r) => Number(r.rating) === 5).length;
     const exactReviews4Star = bizReviews.filter((r) => Number(r.rating) === 4).length;
     const exactReviews1to3 = bizReviews.filter((r) => Number(r.rating) <= 3).length;
@@ -5204,13 +5229,13 @@ export default function MasterAdminPage() {
                       `⏱️ Tiempo con Prestigia: ${historicalMetrics.daysOperating} días de protección activa (Desde ${historicalMetrics.startDate})\n\n` +
                       `📊 EVOLUCIÓN HISTÓRICA EN GOOGLE MAPS:\n` +
                       `• Calificación: ${historicalMetrics.baseline.initialRating}★ ➔ ${historicalMetrics.currentRating}★ (+${historicalMetrics.ratingGain}★)\n` +
-                      `• Reseñas Totales: ${historicalMetrics.baseline.initialReviewCount} ➔ ${historicalMetrics.totalAllReviews} (+${historicalMetrics.newGoogleReviewsTotal} nuevas ganadas)\n` +
-                      `• Reseñas 4 y 5★: ${historicalMetrics.initialReviews4to5} ➔ ${historicalMetrics.currentReviews4to5} (+${historicalMetrics.newGoogleReviews5Star} impulsadas vía QR)\n` +
-                      `• Quejas 1 a 3★ en Google: ${historicalMetrics.initialReviews1to3} antes ➔ 0 nuevas en Google (100% contenidas)\n` +
+                      `• Reseñas Totales: ${historicalMetrics.baseline.initialReviewCount} ➔ ${historicalMetrics.totalAllReviews} (${historicalMetrics.newGoogleReviewsTotal > 0 ? `+${historicalMetrics.newGoogleReviewsTotal} nuevas ganadas` : '0 nuevas ganadas'})\n` +
+                      `• Reseñas 4 y 5★: ${historicalMetrics.initialReviews4to5} ➔ ${historicalMetrics.currentReviews4to5} (${historicalMetrics.newPositiveReviewsTotal > 0 ? `+${historicalMetrics.exactReviews5Star} de 5★ y +${historicalMetrics.exactReviews4Star} de 4★ impulsadas vía QR` : '0 impulsadas vía QR'})\n` +
+                      `• Quejas 1 a 3★ en Google: ${historicalMetrics.initialReviews1to3} antes ➔ ${historicalMetrics.newGoogleReviews1to3} nuevas en Google (${historicalMetrics.newGoogleReviews1to3 === 0 ? '100% contenidas en sala' : 'Contenidas'})\n` +
                       `• Tasa de Respuestas en Google: ${historicalMetrics.initialResponseRate}% antes ➔ 100% respondidas con IA\n\n` +
                       `🛡️ CONTENCIÓN Y RETENCIÓN EN SALA:\n` +
                       `• Quejas Privadas Salvadas en Sala: ${historicalMetrics.privateComplaintsIntercepted} crisis resueltas en <10 seg antes de salir a Google Maps\n` +
-                      `• Facturación Salvada de Fuga Estimada: ${formatMoneyCOP(historicalMetrics.preservedRevenueCOP)} / ${formatMoneyUSD(historicalMetrics.preservedRevenueUSD)} (Ticket Prom: ${formatMoneyCOP(historicalMetrics.baseline.averageTicketCOP)})\n\n` +
+                      `• Facturación Salvada de Fuga: ${formatMoneyCOP(historicalMetrics.preservedRevenueCOP)} / ${formatMoneyUSD(historicalMetrics.preservedRevenueUSD)} (${historicalMetrics.privateComplaintsIntercepted} mesas × ${formatMoneyCOP(historicalMetrics.baseline.averageTicketCOP)})\n\n` +
                       `🗣️ TESTIMONIO DEL DUEÑO (${historicalMetrics.baseline.founderName}):\n` +
                       `"${customTestimonialQuote || historicalMetrics.baseline.clientQuote}"\n\n` +
                       `👉 Descubre cómo blindar tu reputación en: prestigia.app`;
@@ -5255,9 +5280,11 @@ export default function MasterAdminPage() {
               <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 w-full lg:w-auto justify-between lg:justify-end">
                 <div className="text-center px-4 py-3 rounded-2xl bg-[#141A26] border border-slate-800 flex-1 lg:flex-initial">
                   <span className="text-[10px] text-slate-400 uppercase font-bold block">Nuevas 5★ Maps</span>
-                  <strong className="text-amber-300 font-mono text-xl font-extrabold block">+{historicalMetrics.exactReviews5Star}</strong>
+                  <strong className="text-amber-300 font-mono text-xl font-extrabold block">
+                    {historicalMetrics.exactReviews5Star > 0 ? `+${historicalMetrics.exactReviews5Star}` : '0'}
+                  </strong>
                   <span className="text-[9px] text-emerald-400 font-semibold block">
-                    {historicalMetrics.exactReviews4Star > 0 ? `(+${historicalMetrics.exactReviews4Star} de 4★)` : 'Impulsadas'}
+                    {historicalMetrics.exactReviews4Star > 0 ? `(+${historicalMetrics.exactReviews4Star} de 4★)` : (historicalMetrics.exactReviews5Star > 0 ? 'Impulsadas al QR' : 'Monitoreo activo')}
                   </span>
                 </div>
                 <div className="text-center px-4 py-3 rounded-2xl bg-[#141A26] border border-slate-800 flex-1 lg:flex-initial">
@@ -5284,7 +5311,9 @@ export default function MasterAdminPage() {
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-extrabold text-white font-mono">{historicalMetrics.currentRating}★</span>
-                    <span className="text-xs font-bold text-emerald-400 font-mono">+{historicalMetrics.ratingGain}★</span>
+                    <span className="text-xs font-bold text-emerald-400 font-mono">
+                      {historicalMetrics.ratingGain > 0 ? `+${historicalMetrics.ratingGain}★` : 'Línea Base'}
+                    </span>
                   </div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
@@ -5302,12 +5331,16 @@ export default function MasterAdminPage() {
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-extrabold text-amber-300 font-mono">{historicalMetrics.totalAllReviews}</span>
-                    <span className="text-xs font-bold text-emerald-400 font-mono">+{historicalMetrics.newGoogleReviewsTotal}</span>
+                    <span className="text-xs font-bold text-emerald-400 font-mono">
+                      {historicalMetrics.newGoogleReviewsTotal > 0 ? `+${historicalMetrics.newGoogleReviewsTotal}` : '0 nuevas'}
+                    </span>
                   </div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                   <span>Día 1: {historicalMetrics.baseline.initialReviewCount}</span>
-                  <span className="text-amber-400 font-semibold font-mono">+{historicalMetrics.newGoogleReviewsTotal} ganadas</span>
+                  <span className="text-amber-400 font-semibold font-mono">
+                    {historicalMetrics.newGoogleReviewsTotal > 0 ? `+${historicalMetrics.newGoogleReviewsTotal} ganadas con Prestigia` : '0 ganadas (Monitoreo activo)'}
+                  </span>
                 </div>
               </div>
 
@@ -5319,13 +5352,17 @@ export default function MasterAdminPage() {
                     <Award className="w-4 h-4 text-amber-400" />
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-extrabold text-amber-300 font-mono">+{historicalMetrics.exactReviews5Star}</span>
+                    <span className="text-3xl font-extrabold text-amber-300 font-mono">
+                      {historicalMetrics.exactReviews5Star > 0 ? `+${historicalMetrics.exactReviews5Star}` : '0'}
+                    </span>
                     <span className="text-xs text-slate-400 font-bold font-mono">de 5★</span>
                   </div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                   <span>Total 4-5★: {historicalMetrics.currentReviews4to5}</span>
-                  <span className="text-emerald-400 font-semibold font-mono">+{historicalMetrics.exactReviews4Star} de 4★</span>
+                  <span className="text-emerald-400 font-semibold font-mono">
+                    {historicalMetrics.exactReviews4Star > 0 ? `+${historicalMetrics.exactReviews4Star} de 4★` : '0 de 4★'}
+                  </span>
                 </div>
               </div>
 
@@ -5462,7 +5499,9 @@ export default function MasterAdminPage() {
                           {historicalMetrics.totalAllReviews} opiniones
                         </td>
                         <td className="py-3 px-4 text-amber-300 font-semibold font-mono">
-                          +{historicalMetrics.newGoogleReviewsTotal} nuevas opiniones ganadas
+                          {historicalMetrics.newGoogleReviewsTotal > 0
+                            ? `+${historicalMetrics.newGoogleReviewsTotal} nuevas opiniones ganadas`
+                            : '0 opiniones ganadas (Inicio de monitoreo)'}
                         </td>
                       </tr>
 
@@ -5478,7 +5517,9 @@ export default function MasterAdminPage() {
                           {historicalMetrics.currentReviews4to5} opiniones
                         </td>
                         <td className="py-3 px-4 text-emerald-300 font-semibold font-mono">
-                          +{historicalMetrics.exactReviews5Star} de 5★ • +{historicalMetrics.exactReviews4Star} de 4★ impulsadas al QR
+                          {historicalMetrics.newPositiveReviewsTotal > 0
+                            ? `+${historicalMetrics.exactReviews5Star} de 5★ • +${historicalMetrics.exactReviews4Star} de 4★ impulsadas al QR`
+                            : '0 impulsadas vía QR (Monitoreo activo)'}
                         </td>
                       </tr>
 
@@ -5510,7 +5551,9 @@ export default function MasterAdminPage() {
                           {historicalMetrics.privateComplaintsIntercepted} crisis interceptadas
                         </td>
                         <td className="py-3 px-4 text-emerald-300 font-semibold">
-                          Resueltas en sala &lt;10 seg vía WhatsApp
+                          {historicalMetrics.privateComplaintsIntercepted > 0
+                            ? 'Resueltas en sala <10 seg vía WhatsApp'
+                            : 'Blindaje activo en mesas'}
                         </td>
                       </tr>
 

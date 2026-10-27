@@ -224,6 +224,9 @@
         "startDate": "2026-03-15",
         "initialRating": 3.8,
         "initialReviewCount": 42,
+        "initialReviews1to3": 15,
+        "initialReviews4to5": 27,
+        "initialRespondedReviews": 6,
         "initialMonthlyComplaints": 18,
         "averageTicketCOP": 52000,
         "averageTicketUSD": 22,
@@ -232,7 +235,9 @@
         "locality": "Chapinero & Usaquén",
         "country": "Colombia",
         "founderName": "Carlos Gómez",
-        "clientQuote": "Prestigia interceptó más de 120 quejas privadas en sala antes de que salieran a Google Maps. Subimos de 3.8★ a 4.9★ en 5 meses y salvamos más de  millones COP en clientes que se iban a fugar."
+        "clientQuote": "Prestigia blindó a La Burguesía Artesanal desde el Día 1. Durante nuestra operación activa con QRs en sala, interceptamos de inmediato quejas privadas en mesa antes de que salieran a Google Maps, elevando nuestra calificación a 4.8★ en Google Maps y blindando la facturación del restaurante.",
+        "calibratedAt": "2026-03-15T10:00:00.000Z",
+        "isCalibrated": true
       },
       "masterAddOns": {
         "customNotes": "Cuenta VIP Élite con 2 sedes activas y monitoreo de turno.",
