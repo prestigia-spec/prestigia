@@ -1282,11 +1282,26 @@ export default function MasterAdminPage() {
     return businesses.find((b) => b.id === selectedBusinessId) || businesses[0] || null;
   }, [businesses, selectedBusinessId]);
 
+  // Business Plan Base Branches Allowance:
+  // Independiente: 1 Punto Único (Solo Cuenta Dueño)
+  // Pro: 1 Cuenta Dueño + 1 Sede Física incluida
+  // Elite: 1 Cuenta Dueño + hasta 3 Sedes Físicas incluidas
+  // Empresarial: 1 Cuenta Dueño + Sedes Físicas Ilimitadas
+  const getBaseBranchesForPlan = (plan?: BusinessPlan): number => {
+    if (plan === 'independiente') return 1;
+    if (plan === 'pro') return 1;
+    if (plan === 'elite') return 3;
+    if (plan === 'empresarial') return 999;
+    return 1;
+  };
+
   // Computed Live Operational Stats for currentBusiness (Tab 2 Conmutador)
   const currentBranchesCount = currentBusiness?.branches ? currentBusiness.branches.length : (currentBusiness ? 1 : 0);
-  const currentExtraBranchesCount = Math.max(0, currentBranchesCount - 1);
-  const totalAuthorizedBranches = 1 + (addonState.extraBranches || 0);
-  const isBranchQuotaReached = currentBranchesCount >= totalAuthorizedBranches;
+  const activePlan = addonState.plan || currentBusiness?.plan || 'pro';
+  const basePlanBranches = getBaseBranchesForPlan(activePlan);
+  const currentExtraBranchesCount = basePlanBranches === 999 ? 0 : Math.max(0, currentBranchesCount - basePlanBranches);
+  const totalAuthorizedBranches = basePlanBranches === 999 ? 999 : (basePlanBranches + (addonState.extraBranches || 0));
+  const isBranchQuotaReached = basePlanBranches === 999 ? false : currentBranchesCount >= totalAuthorizedBranches;
   const currentManagersList = useMemo(() => {
     if (!currentBusiness?.branches) return [];
     const list: string[] = [];
@@ -1310,8 +1325,9 @@ export default function MasterAdminPage() {
   useEffect(() => {
     if (currentBusiness) {
       const addons = currentBusiness.masterAddOns;
+      const baseAllowed = getBaseBranchesForPlan(currentBusiness.plan);
       const actualBranches = currentBusiness.branches?.length || 1;
-      const actualExtra = Math.max(0, actualBranches - 1);
+      const actualExtra = baseAllowed === 999 ? 0 : Math.max(0, actualBranches - baseAllowed);
       const effectiveExtraBranches = Math.max(addons?.extraBranches || 0, actualExtra);
 
       const actualManagersCount = currentBusiness.branches?.filter(b => b.managerName || (b.managers && b.managers.length > 0)).length || 0;
@@ -1817,8 +1833,8 @@ export default function MasterAdminPage() {
       if (isBranchQuotaReached) {
         alert(
           `⚠️ CAPACIDAD DE SEDES COMPLETA (${currentBranchesCount}/${totalAuthorizedBranches})\n\n` +
-          `Esta marca tiene autorizadas ${totalAuthorizedBranches} sede(s) (${currentBranchesCount} actualmente registradas).\n\n` +
-          `Para dar de alta una nueva sede física, primero debes ampliar el cupo en 'Sedes Físicas Extras' en la Sección 2 (Add-Ons Modulares) haciendo clic en [+] y luego en 'Aplicar Cambios en Vivo'.`
+          `Esta marca en Plan ${activePlan.toUpperCase()} tiene autorizadas ${totalAuthorizedBranches} sede(s) física(s) (${basePlanBranches} del plan + ${addonState.extraBranches} extras), y actualmente tiene ${currentBranchesCount} operando.\n\n` +
+          `Para dar de alta una nueva sede física, primero debes ampliar el cupo en 'Sedes Físicas Extras' en la Sección 2 (Conmutador de Add-Ons) haciendo clic en [+] y guardando los cambios.`
         );
         return;
       }
@@ -4210,22 +4226,42 @@ export default function MasterAdminPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-white flex items-center gap-1.5">
                           <Store className="w-3.5 h-3.5 text-blue-400" />
-                          Sedes Físicas Extras
+                          Sedes Físicas Extras (Add-On)
                         </span>
                         <span className="text-[10px] text-blue-400 font-semibold bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded-full">
-                          Capacidad Multi-Sede
+                          {activePlan === 'elite' ? '3 Sedes en Plan Élite' : activePlan === 'empresarial' ? 'Sedes Ilimitadas' : activePlan === 'pro' ? '1 Sede en Plan Pro' : 'Punto Único'}
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-1">
-                        Habilita la operación de sedes físicas adicionales según el acuerdo pactado.
+                        {activePlan === 'elite'
+                          ? '1 Cuenta Dueño + hasta 3 sedes físicas incluidas en Plan Élite. Usa este conmutador si contrata a partir de la 4ta sede.'
+                          : activePlan === 'pro'
+                          ? '1 Cuenta Dueño + 1 sede física incluida en Plan Pro. Agrega sedes extras a partir de la 2da sede.'
+                          : activePlan === 'empresarial'
+                          ? '1 Cuenta Dueño + Sedes físicas ilimitadas incluidas en Plan Empresarial.'
+                          : '1 Cuenta Dueño (Punto Profesional Único / Consultorio sin sedes extras).'}
                       </p>
 
                       {/* Live Reality Reflection */}
-                      <div className="mt-3 p-2.5 rounded-xl bg-[#0C101A] border border-blue-500/20 text-[11px] space-y-1">
+                      <div className="mt-3 p-2.5 rounded-xl bg-[#0C101A] border border-blue-500/20 text-[11px] space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-400">Sedes operando en vivo:</span>
+                          <span className="text-slate-400">Cuenta Dueño General:</span>
+                          <span className="font-bold text-slate-200 truncate max-w-[160px]" title={`${currentBusiness.ownerName} (${currentBusiness.name})`}>
+                            👤 {currentBusiness.ownerName}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400">Sedes físicas activas:</span>
                           <span className="font-extrabold text-blue-300 font-mono">
-                            {currentBranchesCount} {currentBranchesCount === 1 ? 'Sede' : 'Sedes'} ({currentBranchesCount === 1 ? '1 Matriz' : `1 Matriz + ${currentExtraBranchesCount} Extra`})
+                            {currentBranchesCount} {currentBranchesCount === 1 ? 'Sede' : 'Sedes'} (
+                            {activePlan === 'elite'
+                              ? `${currentBranchesCount} de 3 del Plan Élite`
+                              : activePlan === 'empresarial'
+                              ? 'Ilimitadas'
+                              : activePlan === 'independiente'
+                              ? 'Punto Único'
+                              : `${currentBranchesCount} de ${totalAuthorizedBranches} autorizadas`}
+                            )
                           </span>
                         </div>
                         <p className="text-[10px] text-slate-400 truncate" title={currentBusiness.branches?.map(b => b.name).join(' • ') || 'Sede Principal'}>
@@ -4236,30 +4272,38 @@ export default function MasterAdminPage() {
 
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/80">
                       <div>
-                        <span className="text-xs text-slate-300 block font-semibold">Sedes adicionales:</span>
+                        <span className="text-xs text-slate-300 block font-semibold">
+                          {activePlan === 'elite' ? 'Sedes extra (+ sobre las 3):' : activePlan === 'pro' ? 'Sedes extra (+ sobre la 1):' : 'Sedes adicionales:'}
+                        </span>
                         <span className="text-[10px] text-slate-400">
-                          {addonState.extraBranches >= currentExtraBranchesCount ? '✅ Capacidad cubierta' : '⚠️ Cupo sugerido: +' + currentExtraBranchesCount}
+                          {activePlan === 'empresarial'
+                            ? '✅ Ilimitadas en Empresarial'
+                            : currentBranchesCount <= totalAuthorizedBranches
+                            ? `✅ Capacidad cubierta (${currentBranchesCount}/${totalAuthorizedBranches === 999 ? '∞' : totalAuthorizedBranches})`
+                            : `⚠️ Cupo sugerido: +${currentExtraBranchesCount}`}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setAddonState({ ...addonState, extraBranches: Math.max(0, addonState.extraBranches - 1) })}
-                          className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center font-bold text-sm cursor-pointer"
-                        >
-                          -
-                        </button>
-                        <span className="w-8 text-center font-bold font-mono text-white text-sm">
-                          {addonState.extraBranches}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setAddonState({ ...addonState, extraBranches: addonState.extraBranches + 1 })}
-                          className="w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-sm cursor-pointer"
-                        >
-                          +
-                        </button>
-                      </div>
+                      {activePlan !== 'empresarial' && activePlan !== 'independiente' && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setAddonState({ ...addonState, extraBranches: Math.max(0, addonState.extraBranches - 1) })}
+                            className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center font-bold text-sm cursor-pointer"
+                          >
+                            -
+                          </button>
+                          <span className="w-8 text-center font-bold font-mono text-white text-sm">
+                            {addonState.extraBranches}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setAddonState({ ...addonState, extraBranches: addonState.extraBranches + 1 })}
+                            className="w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-sm cursor-pointer"
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -4433,9 +4477,13 @@ export default function MasterAdminPage() {
                       Multi-Sede Master
                     </span>
                     <span className="text-xs text-slate-400 font-mono">
-                      {currentBranchesCount} de {totalAuthorizedBranches} sede(s) autorizada(s)
+                      {totalAuthorizedBranches === 999 ? `${currentBranchesCount} sedes (Ilimitadas en Empresarial)` : `${currentBranchesCount} de ${totalAuthorizedBranches} sede(s) autorizada(s)`}
                     </span>
-                    {isBranchQuotaReached ? (
+                    {totalAuthorizedBranches === 999 ? (
+                      <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 text-[10px] font-bold border border-cyan-500/30">
+                        Sedes Ilimitadas
+                      </span>
+                    ) : isBranchQuotaReached ? (
                       <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-bold border border-amber-500/30 flex items-center gap-1">
                         <Lock className="w-3 h-3" /> Capacidad Completa
                       </span>
@@ -4471,7 +4519,7 @@ export default function MasterAdminPage() {
                     className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-extrabold text-xs rounded-xl flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer transition-all shrink-0"
                   >
                     <Plus className="w-4 h-4 stroke-[2.5]" />
-                    <span>Dar de Alta Nueva Sede ({currentBranchesCount}/{totalAuthorizedBranches})</span>
+                    <span>Dar de Alta Nueva Sede ({totalAuthorizedBranches === 999 ? `${currentBranchesCount} en uso` : `${currentBranchesCount}/${totalAuthorizedBranches}`})</span>
                   </button>
                 )}
               </div>

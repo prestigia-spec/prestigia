@@ -246,7 +246,7 @@
         },
         "giveawayCrm": true,
         "extraStaffQuota": 10,
-        "extraBranches": 1,
+        "extraBranches": 0,
         "extraManagers": 2,
         "deviceAudit": true
       },

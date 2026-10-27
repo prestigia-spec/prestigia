@@ -847,24 +847,27 @@ export async function POST(request: NextRequest) {
       const branchIndex = existingBranches.findIndex((b) => b.id === finalBranch.id);
 
       let updatedBranches: Branch[];
+      const baseAllowed = biz.plan === 'elite' ? 3 : biz.plan === 'empresarial' ? 999 : 1;
+      const maxAllowedBranches = baseAllowed === 999 ? 999 : baseAllowed + (biz.masterAddOns?.extraBranches || 0);
+
       if (branchIndex >= 0) {
         updatedBranches = [...existingBranches];
         updatedBranches[branchIndex] = { ...existingBranches[branchIndex], ...finalBranch };
       } else {
         // Enforce quota: prevent creating a new branch if current count reaches or exceeds authorized capacity
-        const maxAllowedBranches = 1 + (biz.masterAddOns?.extraBranches || 0);
         if (existingBranches.length >= maxAllowedBranches) {
           return NextResponse.json({
-            error: `Capacidad de sedes completada (${existingBranches.length}/${maxAllowedBranches}). Debes ampliar el cupo en 'Sedes Físicas Extras' en el Conmutador de la marca antes de dar de alta una nueva sede.`,
+            error: `Capacidad de sedes completada (${existingBranches.length}/${maxAllowedBranches}). Tu Plan ${biz.plan.toUpperCase()} incluye ${baseAllowed === 999 ? 'sedes ilimitadas' : `${baseAllowed} sede(s) física(s)`}. Para dar de alta una sede adicional, debes ampliar el cupo en 'Sedes Físicas Extras' en el Conmutador de la marca.`,
           }, { status: 400 });
         }
         updatedBranches = [...existingBranches, finalBranch];
       }
 
       biz.branches = updatedBranches;
+      const neededExtra = baseAllowed === 999 ? 0 : Math.max(0, updatedBranches.length - baseAllowed);
       if (!biz.masterAddOns) {
         biz.masterAddOns = {
-          extraBranches: Math.max(0, updatedBranches.length - 1),
+          extraBranches: neededExtra,
           extraManagers: updatedBranches.filter(b => b.managerName || (b.managers && b.managers.length > 0)).length,
           extraStaffQuota: 0,
           sentiment360: { enabled: false, mode: 'trial' },
@@ -873,7 +876,7 @@ export async function POST(request: NextRequest) {
           deviceAudit: false,
         };
       } else {
-        biz.masterAddOns.extraBranches = Math.max(biz.masterAddOns.extraBranches || 0, Math.max(0, updatedBranches.length - 1));
+        biz.masterAddOns.extraBranches = Math.max(biz.masterAddOns.extraBranches || 0, neededExtra);
         const managersCount = updatedBranches.filter(b => b.managerName || (b.managers && b.managers.length > 0)).length;
         biz.masterAddOns.extraManagers = Math.max(biz.masterAddOns.extraManagers || 0, managersCount);
       }
@@ -905,7 +908,9 @@ export async function POST(request: NextRequest) {
 
       biz.branches = (biz.branches || []).filter((b) => b.id !== branchId);
       if (biz.masterAddOns) {
-        biz.masterAddOns.extraBranches = Math.max(0, (biz.branches || []).length - 1);
+        const baseAllowed = biz.plan === 'elite' ? 3 : biz.plan === 'empresarial' ? 999 : 1;
+        const neededExtra = baseAllowed === 999 ? 0 : Math.max(0, (biz.branches || []).length - baseAllowed);
+        biz.masterAddOns.extraBranches = neededExtra;
         const managersCount = (biz.branches || []).filter(b => b.managerName || (b.managers && b.managers.length > 0)).length;
         biz.masterAddOns.extraManagers = managersCount;
       }
