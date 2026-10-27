@@ -6028,7 +6028,7 @@ export default function MasterAdminPage() {
                     Big Data Lake Prestigia: <span className="text-purple-300">{unifiedDataLakeRecords.length} Contactos Reales Clasificados</span>
                   </h2>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Consolidado de comensales de Ruletas/Sorteos QR y opiniones en sala con teléfono, nombre y autorización de Habeas Data.
+                    Consolidado de clientes, pacientes y usuarios de todo tipo de empresas, comercios y profesionales independientes con teléfono, nombre y autorización de Habeas Data.
                   </p>
                 </div>
 
@@ -6301,13 +6301,13 @@ export default function MasterAdminPage() {
                     {displayedDataLake.map((participant, idx) => {
                       const isPromoter = participant.rating >= 4;
                       const cleanPhone = participant.customerPhone.replace(/[^0-9+]/g, '');
-                      // Mensaje comercial B2B oficial de Prestigia: agradece participación en la marca y ofrece la plataforma con enlace a landing
+                      // Mensaje comercial B2B oficial de Prestigia: agradece participación en la marca y ofrece la plataforma a todo tipo de empresas y profesionales independientes
                       const waProspectingMsg = encodeURIComponent(
                         `Hola ${participant.customerName}, te saluda el equipo directivo de Prestigia.\n\n` +
-                        `¡Muchas gracias por haber participado e interactuado a través de nuestra plataforma en ${participant.businessName} (${participant.branchName})!\n\n` +
-                        `Notamos tu interacción y nos encantaría mostrarte cómo Prestigia ayuda a dueños de negocios, marcas y profesionales a blindar su reputación en Google Maps, multiplicar sus reseñas de 5 estrellas y fidelizar a sus comensales y clientes en sala.\n\n` +
-                        `🚀 Conoce nuestra tecnología y solicita una demostración gratuita de Prestigia para tu negocio aquí:\nhttps://prestigia.app\n\n` +
-                        `¿Tienes una marca, empresa o consultorio? Con gusto te compartimos una auditoría de reputación sin costo.`
+                        `¡Muchas gracias por haber interactuado a través de nuestra plataforma en ${participant.businessName} (${participant.branchName})!\n\n` +
+                        `Notamos tu participación y nos encantaría mostrarte cómo Prestigia impulsa a todo tipo de empresas, negocios, comercios y profesionales independientes a blindar su reputación en Google Maps, multiplicar sus reseñas de 5 estrellas y fidelizar a sus clientes y pacientes.\n\n` +
+                        `🚀 Conoce nuestra tecnología y solicita una demostración gratuita para tu empresa o actividad profesional aquí:\nhttps://prestigia.app\n\n` +
+                        `¿Cuentas con un negocio, consultorio, empresa o servicio profesional independiente? Con gusto te compartimos una auditoría de reputación digital sin costo.`
                       );
                       const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}?text=${waProspectingMsg}` : null;
                       const countryFlag = participant.country === 'Chile' ? '🇨🇱' : '🇨🇴';
@@ -6329,7 +6329,7 @@ export default function MasterAdminPage() {
                                   href={waLink}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  title="Abrir chat en WhatsApp para agradecer participación y ofrecer los servicios de Prestigia para sus propios negocios con enlace a https://prestigia.app"
+                                  title="Abrir chat en WhatsApp para agradecer participación y ofrecer Prestigia para todo tipo de empresas, negocios y profesionales independientes"
                                   className="text-[10px] text-purple-300 hover:text-white bg-purple-500/15 hover:bg-purple-500/25 px-2 py-0.5 rounded-md border border-purple-500/30 font-semibold flex items-center gap-1 transition"
                                 >
                                   <span>Ofrecer Prestigia B2B</span>
