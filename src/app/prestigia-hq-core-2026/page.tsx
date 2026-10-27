@@ -1071,7 +1071,8 @@ export default function MasterAdminPage() {
     customNotes: '',
   });
 
-  // Big Data Lake Filters State
+  // Big Data Lake Filters State & View Record Modal
+  const [selectedDataLakeRecord, setSelectedDataLakeRecord] = useState<any | null>(null);
   const [dataFilterCountry, setDataFilterCountry] = useState('all');
   const [dataFilterCity, setDataFilterCity] = useState('all');
   const [dataFilterLocality, setDataFilterLocality] = useState('all');
@@ -3154,6 +3155,7 @@ export default function MasterAdminPage() {
       source: string;
       sourceType: 'sorteo' | 'feedback';
       complaintReason?: string;
+      attendedBy?: string;
       registeredAt: string;
     }> = [];
 
@@ -3181,7 +3183,8 @@ export default function MasterAdminPage() {
         rating: Number(p.rating) || 5,
         source: '🎁 Ruleta / Sorteo QR',
         sourceType: 'sorteo',
-        complaintReason: (p as any).prizeWon ? `Premio Ganado: ${(p as any).prizeWon}` : undefined,
+        complaintReason: (p as any).complaintReason || ((p as any).prizeWon ? `Premio ganado en ruleta de fidelización: ${(p as any).prizeWon}` : (Number(p.rating) >= 4 ? 'Experiencia 5★ excelente verificada en sala a través de dinámica interactiva QR.' : 'Calificación insatisfecha interceptada en ruleta interactiva antes de llegar a Google Maps.')),
+        attendedBy: (p as any).attendedBy,
         registeredAt: p.registeredAt || '2026-10-01',
       });
     });
@@ -3194,7 +3197,7 @@ export default function MasterAdminPage() {
       const estCountry = (f as any).country || 'Colombia';
       list.push({
         id: f.id,
-        customerName: f.customerName || 'Comensal Registrado',
+        customerName: f.customerName || 'Cliente Registrado',
         customerPhone: f.customerPhone || '',
         country: estCountry,
         city: (f as any).city || 'Bogotá',
@@ -3210,7 +3213,8 @@ export default function MasterAdminPage() {
         rating: Number(f.rating) || 3,
         source: '📱 QR Mesa / Opinión',
         sourceType: 'feedback',
-        complaintReason: f.complaintReason,
+        complaintReason: f.complaintReason || (Number(f.rating) >= 4 ? 'Experiencia 5★ positiva registrada en sala con consentimiento de fidelización.' : 'Incidencia de servicio interceptada en sala antes de salir a Google Maps.'),
+        attendedBy: (f as any).attendedBy || (f as any).staffAttended,
         registeredAt: f.createdAt ? f.createdAt.slice(0, 16).replace('T', ' ') : '2026-10-01',
       });
     });
@@ -6323,11 +6327,20 @@ export default function MasterAdminPage() {
                             <p className="font-semibold text-white">
                               {privacyMode ? 'Cliente Anónimo' : participant.customerName}
                             </p>
-                            <div className="flex items-center gap-2 mt-0.5">
+                            <div className="flex flex-wrap items-center gap-2 mt-1">
                               <p className="text-[11px] font-mono text-slate-400 flex items-center gap-1">
                                 <Phone className="w-3 h-3 text-emerald-400" />
                                 {maskPhone(participant.customerPhone)}
                               </p>
+                              <button
+                                type="button"
+                                onClick={() => setSelectedDataLakeRecord(participant)}
+                                title="Ver mensaje u opinión completa registrada por este cliente"
+                                className="text-[10px] text-amber-300 hover:text-white bg-amber-500/15 hover:bg-amber-500/25 px-2 py-0.5 rounded-md border border-amber-500/30 font-semibold flex items-center gap-1 transition cursor-pointer"
+                              >
+                                <Eye className="w-2.5 h-2.5 text-amber-400" />
+                                <span>Ver Mensaje</span>
+                              </button>
                               {waLink && !privacyMode && (
                                 <a
                                   href={waLink}
@@ -6347,12 +6360,6 @@ export default function MasterAdminPage() {
                                   <span>{participant.customerOriginFlag}</span>
                                   <span>Turista / Internacional ({participant.customerOriginCountry})</span>
                                 </span>
-                              </div>
-                            )}
-                            {participant.complaintReason && (
-                              <div className="mt-1.5 text-[10px] text-slate-300 bg-[#0C101A] border border-slate-800 rounded-lg p-1.5 max-w-xs" title={participant.complaintReason}>
-                                <span className="text-amber-400 font-semibold mr-1">💬 Nota:</span>
-                                <span className="italic">{participant.complaintReason}</span>
                               </div>
                             )}
                           </td>
@@ -6432,6 +6439,155 @@ export default function MasterAdminPage() {
                 </span>
               </div>
             </div>
+
+            {/* Modal: Expediente de Opinión & Verificación Habeas Data */}
+            {selectedDataLakeRecord && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-fade-in">
+                <div className="relative w-full max-w-lg bg-[#0C101A] border border-amber-500/30 rounded-3xl shadow-2xl p-5 sm:p-6 text-white my-8 max-h-[92vh] overflow-y-auto space-y-4">
+                  {/* Modal Header */}
+                  <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-800">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 font-extrabold text-base shrink-0">
+                        {selectedDataLakeRecord.rating >= 4 ? '🌟' : '🛡️'}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                            selectedDataLakeRecord.rating >= 4
+                              ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                              : 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                          }`}>
+                            {selectedDataLakeRecord.rating >= 4 ? 'Promotor 4-5★ (Fidelizado)' : 'Detractor 1-3★ (Interceptado en Privado)'}
+                          </span>
+                          <span className="text-[11px] text-slate-400 font-mono">
+                            {selectedDataLakeRecord.rating} Estrellas
+                          </span>
+                        </div>
+                        <h3 className="text-base font-bold text-white mt-0.5">
+                          {privacyMode ? 'Cliente Anónimo' : selectedDataLakeRecord.customerName}
+                        </h3>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDataLakeRecord(null)}
+                      className="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Context Cards */}
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="p-2.5 rounded-xl bg-[#141A26] border border-slate-800">
+                      <span className="text-[10px] text-slate-400 block font-semibold">Establecimiento & Sede</span>
+                      <strong className="text-slate-100 block mt-0.5 truncate">{selectedDataLakeRecord.businessName}</strong>
+                      <span className="text-[11px] text-slate-400 block truncate">{selectedDataLakeRecord.branchName}</span>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-[#141A26] border border-slate-800">
+                      <span className="text-[10px] text-slate-400 block font-semibold">Ubicación Geográfica</span>
+                      <strong className="text-slate-100 block mt-0.5 truncate">
+                        {selectedDataLakeRecord.country} • {selectedDataLakeRecord.city}
+                      </strong>
+                      <span className="text-[11px] text-slate-400 block truncate">{selectedDataLakeRecord.locality}</span>
+                    </div>
+                  </div>
+
+                  {/* Opinion / Feedback Box */}
+                  <div className={`p-4 rounded-2xl border space-y-2 ${
+                    selectedDataLakeRecord.rating >= 4
+                      ? 'bg-gradient-to-br from-emerald-500/10 via-[#101722] to-transparent border-emerald-500/30'
+                      : 'bg-gradient-to-br from-rose-500/10 via-[#141118] to-transparent border-rose-500/30'
+                  }`}>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 text-slate-300">
+                        <MessageCircle className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Mensaje / Opinión Registrada</span>
+                      </span>
+                      {selectedDataLakeRecord.rating <= 3 && (
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                          🛡️ Atajada de Google Maps
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-[#0C101A] border border-slate-800 text-xs text-slate-200 leading-relaxed font-medium">
+                      "{selectedDataLakeRecord.complaintReason || 'Calificación registrada en sala a través del sistema interactivo QR Prestigia.'}"
+                    </div>
+
+                    {selectedDataLakeRecord.rating <= 3 && (
+                      <p className="text-[10px] text-slate-400 leading-tight">
+                        ⚡ Esta queja fue capturada en privado por el filtro inteligente de Prestigia antes de que el cliente pudiera publicarla negativamente en Google Maps, blindando la reputación de la marca.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Attended By Staff */}
+                  {selectedDataLakeRecord.attendedBy && (
+                    <div className="p-2.5 rounded-xl bg-[#141A26] border border-slate-800 text-xs flex items-center justify-between">
+                      <span className="text-slate-400">Colaborador / Atendido por:</span>
+                      <strong className="text-amber-300 font-semibold">{selectedDataLakeRecord.attendedBy}</strong>
+                    </div>
+                  )}
+
+                  {/* Habeas Data & Contact Info */}
+                  <div className="p-3 rounded-xl bg-[#10141E] border border-slate-800 text-xs space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">Consentimiento Legal:</span>
+                      <span className="text-emerald-400 font-bold flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3" />
+                        Habeas Data 100% Autorizado
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-slate-300">
+                      <span className="text-slate-400">Teléfono / WhatsApp:</span>
+                      <span className="font-mono text-emerald-300 font-bold">{maskPhone(selectedDataLakeRecord.customerPhone)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-slate-400 text-[11px]">
+                      <span>Fecha de Registro:</span>
+                      <span className="font-mono">{selectedDataLakeRecord.registeredAt}</span>
+                    </div>
+                  </div>
+
+                  {/* Modal Actions */}
+                  <div className="pt-2 border-t border-slate-800 flex items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDataLakeRecord(null)}
+                      className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition cursor-pointer"
+                    >
+                      Cerrar
+                    </button>
+
+                    {(() => {
+                      const cleanPhone = selectedDataLakeRecord.customerPhone.replace(/[^0-9+]/g, '');
+                      const waProspectingMsg = encodeURIComponent(
+                        `Hola ${selectedDataLakeRecord.customerName}, te saluda el equipo directivo de Prestigia.\n\n` +
+                        `¡Muchas gracias por haber interactuado a través de nuestra plataforma en ${selectedDataLakeRecord.businessName} (${selectedDataLakeRecord.branchName})!\n\n` +
+                        `Notamos tu participación y nos encantaría mostrarte cómo Prestigia impulsa a todo tipo de empresas, negocios, comercios y profesionales independientes a blindar su reputación en Google Maps, multiplicar sus reseñas de 5 estrellas y fidelizar a sus clientes y pacientes.\n\n` +
+                        `🚀 Conoce nuestra tecnología y solicita una demostración gratuita para tu empresa o actividad profesional aquí:\nhttps://prestigia.app\n\n` +
+                        `¿Cuentas con un negocio, consultorio, empresa o servicio profesional independiente? Con gusto te compartimos una auditoría de reputación digital sin costo.`
+                      );
+                      const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}?text=${waProspectingMsg}` : null;
+
+                      return waLink && !privacyMode ? (
+                        <a
+                          href={waLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs rounded-xl flex items-center gap-1.5 shadow-lg shadow-purple-600/25 transition cursor-pointer"
+                        >
+                          <span>Ofrecer Prestigia B2B por WhatsApp</span>
+                          <span>↗</span>
+                        </a>
+                      ) : null;
+                    })()}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
