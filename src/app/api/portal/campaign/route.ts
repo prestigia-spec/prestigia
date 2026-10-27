@@ -136,8 +136,17 @@ export async function PUT(request: Request) {
         );
       }
 
+      const biz = await getBusinessById(participant.businessId);
+      const targetBranch = (biz?.branches || []).find((b: any) => b.id === participant.branchId) || biz?.branches?.[0];
+
       const saved = await addCampaignParticipant({
         ...participant,
+        businessName: participant.businessName || biz?.name || 'Negocio Registrado',
+        nicheCategory: participant.nicheCategory || biz?.category || 'Gastronomía & Servicios',
+        country: participant.country || (targetBranch as any)?.country || biz?.baseline?.country || 'Colombia',
+        city: participant.city || targetBranch?.city || biz?.baseline?.city || 'Bogotá',
+        locality: participant.locality || targetBranch?.locality || 'Principal',
+        branchName: participant.branchName || targetBranch?.name || 'Sede Principal',
         customerName: cleanName,
         customerPhone: cleanPhone,
         attendedBy: cleanAttendedBy,

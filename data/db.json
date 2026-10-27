@@ -843,7 +843,11 @@
       "resolvedAt": "2026-10-07T21:28:23.971Z",
       "resolvedBy": "Dr. Carlos Mendoza (Especialista)",
       "resolvedByRole": "owner",
-      "rescueMessage": "Hola Andrés Felipe Castro, te saluda el Dr. Carlos Mendoza. Recibí con atención tu comentario respecto a: \"Demora de más de 35 minutos en la entrega de las hamburguesas y las papas llegaron frías a la mesa.\". Te ofrezco una sincera disculpa y quiero atenderte directamente. ¿Cómo podemos solucionarlo hoy mismo?"
+      "rescueMessage": "Hola Andrés Felipe Castro, te saluda el Dr. Carlos Mendoza. Recibí con atención tu comentario respecto a: \"Demora de más de 35 minutos en la entrega de las hamburguesas y las papas llegaron frías a la mesa.\". Te ofrezco una sincera disculpa y quiero atenderte directamente. ¿Cómo podemos solucionarlo hoy mismo?",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_2",
@@ -863,7 +867,11 @@
       "resolvedAt": "2026-09-30T01:23:18.906Z",
       "resolvedBy": "Carlos Gómez (Dueño General)",
       "resolvedByRole": "owner",
-      "rescueMessage": "Hola María Paula Jaramillo, te saluda la gerencia de La Burguesía Artesanal. Vimos con mucha atención tu comentario respecto a: \"Pedimos cocteles de autor y el sabor estaba muy aguado, además tardaron 25 minutos en traer las bebidas.\". Queremos pedirte sinceras disculpas y compensarte de inmediato. ¿Cómo podemos resolverlo contigo hoy?"
+      "rescueMessage": "Hola María Paula Jaramillo, te saluda la gerencia de La Burguesía Artesanal. Vimos con mucha atención tu comentario respecto a: \"Pedimos cocteles de autor y el sabor estaba muy aguado, además tardaron 25 minutos en traer las bebidas.\". Queremos pedirte sinceras disculpas y compensarte de inmediato. ¿Cómo podemos resolverlo contigo hoy?",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_3",
@@ -879,7 +887,11 @@
       "status": "pending",
       "createdAt": "2026-09-28T20:21:00.000Z",
       "source": "📱 QR Mesa - Sede Chapinero",
-      "attendedBy": "Sebastián Torres"
+      "attendedBy": "Sebastián Torres",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_4",
@@ -895,7 +907,11 @@
       "status": "pending",
       "createdAt": "2026-09-27T21:24:00.000Z",
       "source": "📱 QR Mesa - Sede Chapinero",
-      "attendedBy": "Laura Méndez"
+      "attendedBy": "Laura Méndez",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_5",
@@ -911,7 +927,11 @@
       "status": "pending",
       "createdAt": "2026-09-26T22:27:00.000Z",
       "source": "📱 QR Mesa - Sede Chapinero",
-      "attendedBy": "Juliana Morales"
+      "attendedBy": "Juliana Morales",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_6",
@@ -927,7 +947,11 @@
       "status": "pending",
       "createdAt": "2026-09-25T23:30:00.000Z",
       "source": "📱 QR Mesa - Sede Chapinero",
-      "attendedBy": "Felipe Salazar"
+      "attendedBy": "Felipe Salazar",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_7",
@@ -943,7 +967,11 @@
       "status": "pending",
       "createdAt": "2026-09-25T00:33:00.000Z",
       "source": "📱 QR Mesa - Sede Chapinero",
-      "attendedBy": "Mariana Pineda"
+      "attendedBy": "Mariana Pineda",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_8",
@@ -959,7 +987,11 @@
       "status": "pending",
       "createdAt": "2026-09-24T01:36:00.000Z",
       "source": "📱 QR Mesa - Sede Chapinero",
-      "attendedBy": "Esteban Castro"
+      "attendedBy": "Esteban Castro",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_9",
@@ -979,7 +1011,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola Jorge Eduardo, Andrés Ramírez de La Burguesía Chapinero. Te pedimos disculpas sinceras. Te dejamos acreditada cortesía VIP para tu próxima visita.",
       "source": "📱 QR Mesa - Sede Chapinero",
-      "attendedBy": "Camilo Restrepo"
+      "attendedBy": "Camilo Restrepo",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_10",
@@ -999,7 +1035,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola Tatiana, lamentamos el retraso con la cuenta. Hemos agilizado los datáfonos inalámbricos.",
       "source": "📱 QR Mesa - Sede Chapinero",
-      "attendedBy": "Carlos Duque"
+      "attendedBy": "Carlos Duque",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_11",
@@ -1019,7 +1059,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola Santiago, Andrés Ramírez de Chapinero. Lamentamos la espera de tu reserva, te enviamos invitación VIP.",
       "source": "📱 QR Mesa - Sede Chapinero",
-      "attendedBy": "Valentina Ríos"
+      "attendedBy": "Valentina Ríos",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_12",
@@ -1039,7 +1083,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola Marcela, revisamos con el jefe de parrilla el estándar de la tocineta crocante.",
       "source": "📱 QR Mesa - Sede Chapinero",
-      "attendedBy": "Sebastián Torres"
+      "attendedBy": "Sebastián Torres",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_13",
@@ -1059,7 +1107,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola César, ya repusimos el stock premium de ginebras. Te invitamos a probarla.",
       "source": "📱 QR Mesa - Sede Chapinero",
-      "attendedBy": "Daniela Henao"
+      "attendedBy": "Daniela Henao",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_14",
@@ -1079,7 +1131,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola Gloria, reforzamos el protocolo de servicio en mesa con nuestro equipo.",
       "source": "📱 QR Mesa - Sede Chapinero",
-      "attendedBy": "Laura Méndez"
+      "attendedBy": "Laura Méndez",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_15",
@@ -1099,7 +1155,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola Mauricio, gracias por tu reporte. Te dejamos una orden de papas trufadas de cortesía.",
       "source": "📱 QR Mesa - Sede Chapinero",
-      "attendedBy": "Felipe Salazar"
+      "attendedBy": "Felipe Salazar",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Chapinero",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_16",
@@ -1119,7 +1179,11 @@
       "resolvedAt": "2026-09-30T01:23:06.603Z",
       "resolvedBy": "Carlos Gómez (Dueño General)",
       "resolvedByRole": "owner",
-      "rescueMessage": "Hola Viviana Lucía Santamaría, te saluda la gerencia de La Burguesía Artesanal. Vimos con mucha preocupación tu reporte respecto a: \"En la terraza hacía mucho frío porque los calentadores de gas estaban apagados y el mesero no los encendió.\". Queremos pedirte sinceras disculpas; ese no es nuestro estándar de calidad. Para compensar este mal momento, queremos invitarte a repetir tu experiencia completamente por cuenta de la casa. ¿Te gustaría coordinar tu visita para este fin de semana?"
+      "rescueMessage": "Hola Viviana Lucía Santamaría, te saluda la gerencia de La Burguesía Artesanal. Vimos con mucha preocupación tu reporte respecto a: \"En la terraza hacía mucho frío porque los calentadores de gas estaban apagados y el mesero no los encendió.\". Queremos pedirte sinceras disculpas; ese no es nuestro estándar de calidad. Para compensar este mal momento, queremos invitarte a repetir tu experiencia completamente por cuenta de la casa. ¿Te gustaría coordinar tu visita para este fin de semana?",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_17",
@@ -1135,7 +1199,11 @@
       "status": "pending",
       "createdAt": "2026-09-28T18:18:00.000Z",
       "source": "📱 QR Mesa - Sede Usaquén",
-      "attendedBy": "Alejandro Morales"
+      "attendedBy": "Alejandro Morales",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_18",
@@ -1151,7 +1219,11 @@
       "status": "pending",
       "createdAt": "2026-09-27T19:21:00.000Z",
       "source": "📱 QR Mesa - Sede Usaquén",
-      "attendedBy": "Marcela Gómez"
+      "attendedBy": "Marcela Gómez",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_19",
@@ -1167,7 +1239,11 @@
       "status": "pending",
       "createdAt": "2026-09-26T20:24:00.000Z",
       "source": "📱 QR Mesa - Sede Usaquén",
-      "attendedBy": "Camila Benítez"
+      "attendedBy": "Camila Benítez",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_20",
@@ -1183,7 +1259,11 @@
       "status": "pending",
       "createdAt": "2026-09-25T21:27:00.000Z",
       "source": "📱 QR Mesa - Sede Usaquén",
-      "attendedBy": "Carolina Ruiz"
+      "attendedBy": "Carolina Ruiz",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_21",
@@ -1199,7 +1279,11 @@
       "status": "pending",
       "createdAt": "2026-09-24T22:30:00.000Z",
       "source": "📱 QR Mesa - Sede Usaquén",
-      "attendedBy": "Santiago Ospina"
+      "attendedBy": "Santiago Ospina",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_22",
@@ -1215,7 +1299,11 @@
       "status": "pending",
       "createdAt": "2026-09-23T23:33:00.000Z",
       "source": "📱 QR Mesa - Sede Usaquén",
-      "attendedBy": "Natalia Vargas"
+      "attendedBy": "Natalia Vargas",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_23",
@@ -1235,7 +1323,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola Álvaro, Mateo Ríos de Usaquén. Sentimos el retraso en la entrada, te esperamos con prioridad.",
       "source": "📱 QR Mesa - Sede Usaquén",
-      "attendedBy": "Diego Montoya"
+      "attendedBy": "Diego Montoya",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_24",
@@ -1255,7 +1347,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola Liliana, hemos instalado toldo cubierto en la entrada de Usaquén y capacitado a recepción.",
       "source": "📱 QR Mesa - Sede Usaquén",
-      "attendedBy": "Sofía Cárdenas"
+      "attendedBy": "Sofía Cárdenas",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_25",
@@ -1275,7 +1371,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola Esteban, ajustamos la molienda de carne Certified Angus con el proveedor.",
       "source": "📱 QR Mesa - Sede Usaquén",
-      "attendedBy": "Alejandro Morales"
+      "attendedBy": "Alejandro Morales",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_26",
@@ -1295,7 +1395,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola Mónica, capacitamos a la sala en el comandeo digital de términos.",
       "source": "📱 QR Mesa - Sede Usaquén",
-      "attendedBy": "Andrés Herrera"
+      "attendedBy": "Andrés Herrera",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_27",
@@ -1315,7 +1419,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola Hernando, calibramos el chiller del barril de cerveza artesanal.",
       "source": "📱 QR Mesa - Sede Usaquén",
-      "attendedBy": "Marcela Gómez"
+      "attendedBy": "Marcela Gómez",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_28",
@@ -1335,7 +1443,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola Constanza, revisamos el protocolo de marcación de mesa previo a la entrega.",
       "source": "📱 QR Mesa - Sede Usaquén",
-      "attendedBy": "Camila Benítez"
+      "attendedBy": "Camila Benítez",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_29",
@@ -1355,7 +1467,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola Óscar, corregimos de inmediato el protocolo de limpieza profunda en mesas.",
       "source": "📱 QR Mesa - Sede Usaquén",
-      "attendedBy": "Sebastián Vargas"
+      "attendedBy": "Sebastián Vargas",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     },
     {
       "id": "fb_lb_1790689685813_30",
@@ -1375,7 +1491,11 @@
       "resolvedByRole": "branch_manager",
       "rescueMessage": "Hola Lorena, renovamos diariamente todos los batch de aderezos artesanales.",
       "source": "📱 QR Mesa - Sede Usaquén",
-      "attendedBy": "Santiago Ospina"
+      "attendedBy": "Santiago Ospina",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "locality": "Usaquén",
+      "category": "Hamburguesería & Gastrobar"
     }
   ],
   "googleReviews": [
@@ -1831,7 +1951,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_1",
@@ -1847,7 +1968,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_2",
@@ -1863,7 +1985,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_3",
@@ -1879,7 +2002,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_4",
@@ -1895,7 +2019,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_5",
@@ -1911,7 +2036,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_6",
@@ -1927,7 +2053,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_7",
@@ -1943,7 +2070,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_8",
@@ -1959,7 +2087,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_9",
@@ -1975,7 +2104,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_10",
@@ -1991,7 +2121,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_11",
@@ -2007,7 +2138,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_12",
@@ -2023,7 +2155,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_13",
@@ -2039,7 +2172,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_14",
@@ -2055,7 +2189,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_15",
@@ -2071,7 +2206,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_16",
@@ -2087,7 +2223,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_17",
@@ -2103,7 +2240,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_18",
@@ -2119,7 +2257,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_19",
@@ -2135,7 +2274,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Chapinero"
+      "locality": "Chapinero",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_20",
@@ -2151,7 +2291,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_21",
@@ -2167,7 +2308,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_22",
@@ -2183,7 +2325,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_23",
@@ -2199,7 +2342,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_24",
@@ -2215,7 +2359,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_25",
@@ -2231,7 +2376,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_26",
@@ -2247,7 +2393,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_27",
@@ -2263,7 +2410,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_28",
@@ -2279,7 +2427,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_29",
@@ -2295,7 +2444,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_30",
@@ -2311,7 +2461,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_31",
@@ -2327,7 +2478,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_32",
@@ -2343,7 +2495,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_33",
@@ -2359,7 +2512,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_34",
@@ -2375,7 +2529,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_35",
@@ -2391,7 +2546,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_36",
@@ -2407,7 +2563,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_37",
@@ -2423,7 +2580,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_lb_1790689685814_38",
@@ -2439,7 +2597,8 @@
       "businessName": "La Burguesía Artesanal",
       "nicheCategory": "Gastronomía & Gastrobar",
       "city": "Bogotá",
-      "locality": "Usaquén"
+      "locality": "Usaquén",
+      "country": "Colombia"
     },
     {
       "id": "part_cm_01",
@@ -2455,7 +2614,8 @@
       "rating": 5,
       "registeredAt": "2026-09-28T15:20:00.000Z",
       "isWinner": false,
-      "source": "📱 QR Recepción"
+      "source": "📱 QR Recepción",
+      "country": "Colombia"
     },
     {
       "id": "part_cm_02",
@@ -2471,7 +2631,8 @@
       "rating": 5,
       "registeredAt": "2026-09-26T11:45:00.000Z",
       "isWinner": false,
-      "source": "📱 QR Recepción"
+      "source": "📱 QR Recepción",
+      "country": "Colombia"
     },
     {
       "id": "part_cm_03",
@@ -2487,7 +2648,8 @@
       "rating": 5,
       "registeredAt": "2026-09-24T17:10:00.000Z",
       "isWinner": false,
-      "source": "📱 QR Recepción"
+      "source": "📱 QR Recepción",
+      "country": "Colombia"
     },
     {
       "id": "part_cm_04",
@@ -2503,7 +2665,8 @@
       "rating": 2,
       "registeredAt": "2026-09-22T09:30:00.000Z",
       "isWinner": false,
-      "source": "📱 QR Recepción"
+      "source": "📱 QR Recepción",
+      "country": "Colombia"
     },
     {
       "id": "part_ae_01",
@@ -2519,7 +2682,8 @@
       "rating": 5,
       "registeredAt": "2026-09-29T14:15:00.000Z",
       "isWinner": false,
-      "source": "📱 QR Sala de Espera"
+      "source": "📱 QR Sala de Espera",
+      "country": "Colombia"
     },
     {
       "id": "part_ae_02",
@@ -2535,7 +2699,8 @@
       "rating": 5,
       "registeredAt": "2026-09-27T16:40:00.000Z",
       "isWinner": false,
-      "source": "📱 QR Sala de Espera"
+      "source": "📱 QR Sala de Espera",
+      "country": "Colombia"
     },
     {
       "id": "part_ae_03",
@@ -2551,7 +2716,8 @@
       "rating": 3,
       "registeredAt": "2026-09-25T10:00:00.000Z",
       "isWinner": false,
-      "source": "📱 QR Sala de Espera"
+      "source": "📱 QR Sala de Espera",
+      "country": "Colombia"
     },
     {
       "id": "part_hs_01",
@@ -2567,7 +2733,8 @@
       "rating": 5,
       "registeredAt": "2026-09-29T21:00:00.000Z",
       "isWinner": false,
-      "source": "📱 QR Habitación & Spa"
+      "source": "📱 QR Habitación & Spa",
+      "country": "Colombia"
     },
     {
       "id": "part_hs_02",
@@ -2583,7 +2750,8 @@
       "rating": 5,
       "registeredAt": "2026-09-28T18:30:00.000Z",
       "isWinner": false,
-      "source": "📱 QR Habitación & Spa"
+      "source": "📱 QR Habitación & Spa",
+      "country": "Colombia"
     },
     {
       "id": "part_hs_03",
@@ -2599,7 +2767,8 @@
       "rating": 5,
       "registeredAt": "2026-09-26T12:00:00.000Z",
       "isWinner": false,
-      "source": "📱 QR Habitación & Spa"
+      "source": "📱 QR Habitación & Spa",
+      "country": "Colombia"
     },
     {
       "id": "part_hs_04",
@@ -2615,7 +2784,8 @@
       "rating": 2,
       "registeredAt": "2026-09-23T08:15:00.000Z",
       "isWinner": false,
-      "source": "📱 QR Habitación & Spa"
+      "source": "📱 QR Habitación & Spa",
+      "country": "Colombia"
     }
   ],
   "shiftIncidents": [

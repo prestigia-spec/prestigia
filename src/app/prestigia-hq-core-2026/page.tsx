@@ -1076,6 +1076,7 @@ export default function MasterAdminPage() {
   const [dataFilterCity, setDataFilterCity] = useState('all');
   const [dataFilterLocality, setDataFilterLocality] = useState('all');
   const [dataFilterBusiness, setDataFilterBusiness] = useState('all');
+  const [dataFilterBranch, setDataFilterBranch] = useState('all');
   const [dataFilterNiche, setDataFilterNiche] = useState('all');
   const [dataFilterRating, setDataFilterRating] = useState('all');
   const [dataPageLimit, setDataPageLimit] = useState<'30' | '50' | 'all'>('all');
@@ -3146,11 +3147,13 @@ export default function MasterAdminPage() {
       isTourist: boolean;
       businessId: string;
       businessName: string;
+      branchId: string;
       branchName: string;
       nicheCategory: string;
       rating: number;
       source: string;
       sourceType: 'sorteo' | 'feedback';
+      complaintReason?: string;
       registeredAt: string;
     }> = [];
 
@@ -3172,11 +3175,13 @@ export default function MasterAdminPage() {
         isTourist: Boolean((p as any).isTourist || (isChilePhone && estCountry === 'Colombia')),
         businessId: p.businessId,
         businessName: p.businessName || 'Negocio Registrado',
+        branchId: p.branchId || '',
         branchName: p.branchName || 'Sede Principal',
         nicheCategory: p.nicheCategory || 'Gastronomía & Servicios',
         rating: Number(p.rating) || 5,
         source: '🎁 Ruleta / Sorteo QR',
         sourceType: 'sorteo',
+        complaintReason: (p as any).prizeWon ? `Premio Ganado: ${(p as any).prizeWon}` : undefined,
         registeredAt: p.registeredAt || '2026-10-01',
       });
     });
@@ -3199,11 +3204,13 @@ export default function MasterAdminPage() {
         isTourist: Boolean((f as any).isTourist || (isChilePhone && estCountry === 'Colombia')),
         businessId: f.businessId,
         businessName: (f as any).businessName || f.businessId,
+        branchId: f.branchId || '',
         branchName: f.branchName || 'Sede Principal',
-        nicheCategory: (f as any).nicheCategory || 'Gastronomía & Servicios',
+        nicheCategory: (f as any).category || (f as any).nicheCategory || 'Gastronomía & Servicios',
         rating: Number(f.rating) || 3,
         source: '📱 QR Mesa / Opinión',
         sourceType: 'feedback',
+        complaintReason: f.complaintReason,
         registeredAt: f.createdAt ? f.createdAt.slice(0, 16).replace('T', ' ') : '2026-10-01',
       });
     });
@@ -3254,6 +3261,20 @@ export default function MasterAdminPage() {
     return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
   }, [unifiedDataLakeRecords, dataFilterCountry, dataFilterCity]);
 
+  // Sedes belonging to the selected Business (Cascading Sede Filter)
+  const availableDataBranches = useMemo(() => {
+    const map = new Map<string, string>();
+    unifiedDataLakeRecords.forEach((r) => {
+      const matchCountry = dataFilterCountry === 'all' || r.country === dataFilterCountry;
+      const matchCity = dataFilterCity === 'all' || r.city.trim().toLowerCase() === dataFilterCity.trim().toLowerCase();
+      const matchBiz = dataFilterBusiness === 'all' || r.businessId === dataFilterBusiness;
+      if (matchCountry && matchCity && matchBiz && r.branchId && r.branchName) {
+        map.set(r.branchId, r.branchName);
+      }
+    });
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  }, [unifiedDataLakeRecords, dataFilterCountry, dataFilterCity, dataFilterBusiness]);
+
   // Filtered Records for Big Data Lake Tab
   const filteredDataLake = useMemo(() => {
     return unifiedDataLakeRecords.filter((r) => {
@@ -3268,6 +3289,9 @@ export default function MasterAdminPage() {
 
       // 4. Business filter
       if (dataFilterBusiness !== 'all' && r.businessId !== dataFilterBusiness) return false;
+
+      // 4.1. Sede filter
+      if (dataFilterBranch !== 'all' && r.branchId !== dataFilterBranch) return false;
 
       // 5. Nicho filter
       if (dataFilterNiche !== 'all') {
@@ -3292,6 +3316,7 @@ export default function MasterAdminPage() {
           r.customerName.toLowerCase().includes(t) ||
           r.customerPhone.includes(t) ||
           r.businessName.toLowerCase().includes(t) ||
+          r.branchName.toLowerCase().includes(t) ||
           r.nicheCategory.toLowerCase().includes(t) ||
           r.city.toLowerCase().includes(t) ||
           r.locality.toLowerCase().includes(t) ||
@@ -3307,10 +3332,16 @@ export default function MasterAdminPage() {
     dataFilterCity,
     dataFilterLocality,
     dataFilterBusiness,
+    dataFilterBranch,
     dataFilterNiche,
     dataFilterRating,
     searchTerm,
   ]);
+
+  // Executive KPI metrics for Big Data Lake
+  const dataLakePromotersCount = useMemo(() => filteredDataLake.filter((r) => r.rating >= 4).length, [filteredDataLake]);
+  const dataLakeDetractorsCount = useMemo(() => filteredDataLake.filter((r) => r.rating < 4).length, [filteredDataLake]);
+  const dataLakeTouristsCount = useMemo(() => filteredDataLake.filter((r) => r.isTourist).length, [filteredDataLake]);
 
   // Displayed records according to pagination / limit
   const displayedDataLake = useMemo(() => {
@@ -6008,7 +6039,7 @@ export default function MasterAdminPage() {
                       const csvHeader = 'Nombre_Cliente,Telefono_WhatsApp,Pais,Ciudad,Localidad_Zona,Negocio_Registrado,Sede,Nicho_Industria,Calificacion,Segmento,Origen_Registro,Consentimiento_HabeasData,Fecha\n';
                       const csvRows = filteredDataLake.map((p) => {
                         const segment = p.rating >= 4 ? 'Promotor (4-5 Estrellas)' : 'Detractor Interceptado (1-3 Estrellas)';
-                        return `"${p.customerName}","${p.customerPhone}","${p.country}","${p.city}","${p.locality}","${p.businessName}","${p.branchName}","${p.nicheCategory}","${p.rating}★","${segment}","${p.source}","Autorizado 100% Habeas Data","${p.registeredAt}"`;
+                        return `"${p.customerName}","${p.customerPhone}","${p.country}","${p.city}","${p.locality}","${p.businessName}","${p.branchName}","${p.nicheCategory}","${p.rating}★","${segment}","${p.source}","Autorizado 100% Habeas Data (${p.country} - ${p.city})","${p.registeredAt}"`;
                       }).join('\n');
                       const blob = new Blob([csvHeader + csvRows], { type: 'text/csv;charset=utf-8;' });
                       const url = URL.createObjectURL(blob);
@@ -6023,6 +6054,70 @@ export default function MasterAdminPage() {
                     Exportar a Excel / CSV ({filteredDataLake.length})
                   </button>
                 </div>
+              </div>
+            </div>
+
+            {/* KPI Cards: Big Data Lake & Habeas Data Verified Matrix */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-[#0E121B] border border-purple-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-purple-500/10 to-transparent">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-400 font-medium">Habeas Data Verificado</span>
+                  <CheckCircle2 className="w-4 h-4 text-purple-400" />
+                </div>
+                <p className="text-2xl font-extrabold text-white font-mono mt-1">
+                  {filteredDataLake.length}
+                </p>
+                <p className="text-[10px] text-purple-300 mt-0.5">
+                  100% consentidos • Con País, Ciudad y Localidad
+                </p>
+              </div>
+
+              <div className="bg-[#0E121B] border border-emerald-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-emerald-500/10 to-transparent">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-400 font-medium">Promotores Fidelizados (4-5★)</span>
+                  <Star className="w-4 h-4 text-emerald-400 fill-emerald-400" />
+                </div>
+                <p className="text-2xl font-extrabold text-emerald-400 font-mono mt-1">
+                  {dataLakePromotersCount}
+                  <span className="text-xs text-slate-400 font-normal ml-2">
+                    ({filteredDataLake.length > 0 ? Math.round((dataLakePromotersCount / filteredDataLake.length) * 100) : 0}%)
+                  </span>
+                </p>
+                <p className="text-[10px] text-slate-400 mt-0.5">
+                  Listos para programas VIP y recompra
+                </p>
+              </div>
+
+              <div className="bg-[#0E121B] border border-rose-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-rose-500/10 to-transparent">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-400 font-medium">Detractores Interceptados (1-3★)</span>
+                  <ShieldAlert className="w-4 h-4 text-rose-400" />
+                </div>
+                <p className="text-2xl font-extrabold text-rose-400 font-mono mt-1">
+                  {dataLakeDetractorsCount}
+                  <span className="text-xs text-slate-400 font-normal ml-2">
+                    ({filteredDataLake.length > 0 ? Math.round((dataLakeDetractorsCount / filteredDataLake.length) * 100) : 0}%)
+                  </span>
+                </p>
+                <p className="text-[10px] text-slate-400 mt-0.5">
+                  Blindados en sala antes de salir a Google Maps
+                </p>
+              </div>
+
+              <div className="bg-[#0E121B] border border-blue-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-blue-500/10 to-transparent">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-400 font-medium">Turistas & Extranjeros</span>
+                  <Globe className="w-4 h-4 text-blue-400" />
+                </div>
+                <p className="text-2xl font-extrabold text-blue-300 font-mono mt-1">
+                  {dataLakeTouristsCount}
+                  <span className="text-xs text-slate-400 font-normal ml-2">
+                    ({filteredDataLake.length > 0 ? Math.round((dataLakeTouristsCount / filteredDataLake.length) * 100) : 0}%)
+                  </span>
+                </p>
+                <p className="text-[10px] text-slate-400 mt-0.5">
+                  Comensales internacionales captados en sala
+                </p>
               </div>
             </div>
 
@@ -6088,7 +6183,10 @@ export default function MasterAdminPage() {
                   <span className="text-slate-400 font-medium">Negocio:</span>
                   <select
                     value={dataFilterBusiness}
-                    onChange={(e) => setDataFilterBusiness(e.target.value)}
+                    onChange={(e) => {
+                      setDataFilterBusiness(e.target.value);
+                      setDataFilterBranch('all');
+                    }}
                     className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer max-w-[180px] truncate"
                   >
                     <option value="all">Todos los Negocios ({availableDataBusinesses.length})</option>
@@ -6097,6 +6195,23 @@ export default function MasterAdminPage() {
                     ))}
                   </select>
                 </div>
+
+                {/* Sede Física Filter (Cascading) */}
+                {availableDataBranches.length > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-slate-400 font-medium">Sede:</span>
+                    <select
+                      value={dataFilterBranch}
+                      onChange={(e) => setDataFilterBranch(e.target.value)}
+                      className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer max-w-[170px] truncate"
+                    >
+                      <option value="all">Todas las Sedes ({availableDataBranches.length})</option>
+                      {availableDataBranches.map((br) => (
+                        <option key={br.id} value={br.id}>{br.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 {/* Nicho Filter */}
                 <div className="flex items-center gap-1.5">
@@ -6148,7 +6263,7 @@ export default function MasterAdminPage() {
                 <span>
                   Mostrando <strong className="text-white">{displayedDataLake.length}</strong> de <strong className="text-white">{filteredDataLake.length}</strong> clientes filtrados (Total en Data Lake: <strong className="text-purple-300">{unifiedDataLakeRecords.length}</strong>)
                 </span>
-                {(dataFilterCountry !== 'all' || dataFilterCity !== 'all' || dataFilterBusiness !== 'all' || dataFilterNiche !== 'all' || dataFilterRating !== 'all') && (
+                {(dataFilterCountry !== 'all' || dataFilterCity !== 'all' || dataFilterLocality !== 'all' || dataFilterBusiness !== 'all' || dataFilterBranch !== 'all' || dataFilterNiche !== 'all' || dataFilterRating !== 'all') && (
                   <button
                     type="button"
                     onClick={() => {
@@ -6156,6 +6271,7 @@ export default function MasterAdminPage() {
                       setDataFilterCity('all');
                       setDataFilterLocality('all');
                       setDataFilterBusiness('all');
+                      setDataFilterBranch('all');
                       setDataFilterNiche('all');
                       setDataFilterRating('all');
                     }}
@@ -6185,7 +6301,10 @@ export default function MasterAdminPage() {
                     {displayedDataLake.map((participant, idx) => {
                       const isPromoter = participant.rating >= 4;
                       const cleanPhone = participant.customerPhone.replace(/[^0-9+]/g, '');
-                      const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}` : null;
+                      const waMsg = isPromoter
+                        ? encodeURIComponent(`Hola ${participant.customerName}, te saludamos de ${participant.businessName} (${participant.branchName}). Queremos agradecerte de corazón por tu calificación de ${participant.rating} estrellas en tu reciente visita. ¡Eres parte de nuestra comunidad VIP y nos encantaría tenerte de vuelta pronto!`)
+                        : encodeURIComponent(`Hola ${participant.customerName}, te saluda la gerencia de ${participant.businessName} (${participant.branchName}). Revisamos con atención tu calificación de ${participant.rating} estrellas y tus observaciones. Nos importa muchísimo tu experiencia y queremos ofrecerte una solución inmediata. ¿Podrías contarnos cómo podemos atenderte mejor hoy?`);
+                      const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}?text=${waMsg}` : null;
                       const countryFlag = participant.country === 'Chile' ? '🇨🇱' : '🇨🇴';
 
                       return (
@@ -6205,10 +6324,11 @@ export default function MasterAdminPage() {
                                   href={waLink}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  title="Abrir chat en WhatsApp"
-                                  className="text-[10px] text-emerald-400 hover:text-emerald-300 font-semibold underline"
+                                  title={isPromoter ? 'Enviar agradecimiento VIP por WhatsApp' : 'Contactar de inmediato para resolver inconformidad'}
+                                  className="text-[10px] text-emerald-400 hover:text-emerald-300 font-semibold underline flex items-center gap-1"
                                 >
-                                  WhatsApp ↗
+                                  <span>WhatsApp</span>
+                                  <span>↗</span>
                                 </a>
                               )}
                             </div>
@@ -6218,6 +6338,12 @@ export default function MasterAdminPage() {
                                   <span>{participant.customerOriginFlag}</span>
                                   <span>Turista / Internacional ({participant.customerOriginCountry})</span>
                                 </span>
+                              </div>
+                            )}
+                            {participant.complaintReason && (
+                              <div className="mt-1.5 text-[10px] text-slate-300 bg-[#0C101A] border border-slate-800 rounded-lg p-1.5 max-w-xs" title={participant.complaintReason}>
+                                <span className="text-amber-400 font-semibold mr-1">💬 Nota:</span>
+                                <span className="italic">{participant.complaintReason}</span>
                               </div>
                             )}
                           </td>
@@ -6269,13 +6395,16 @@ export default function MasterAdminPage() {
                             </span>
                           </td>
 
-                          {/* Source & Legal Habeas Data Consent */}
+                          {/* Source & Legal Habeas Data Consent with Geographic Anchoring */}
                           <td className="py-3 px-3.5 text-center whitespace-nowrap">
                             <p className="text-[10px] font-medium text-slate-400 mb-0.5">{participant.source}</p>
                             <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-semibold">
                               <CheckCircle2 className="w-3.5 h-3.5" />
                               Habeas Data OK
                             </span>
+                            <p className="text-[9px] text-slate-400 mt-0.5">
+                              {participant.country} • {participant.city} • {participant.locality}
+                            </p>
                           </td>
                         </tr>
                       );

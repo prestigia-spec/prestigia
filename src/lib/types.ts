@@ -102,9 +102,10 @@ export interface CampaignParticipant {
   id: string;
   businessId: string;
   businessName?: string; // Nombre oficial del negocio
-  nicheCategory?: string; // Nicho / Categoría de la industria
-  city?: string; // Ciudad donde se registró el cliente
+  country?: string; // País donde opera la sede
+  city?: string; // Ciudad donde opera la sede
   locality?: string; // Localidad o Zona geográfica
+  nicheCategory?: string; // Nicho / Categoría de la industria
   branchId: string;
   branchName: string;
   customerName: string;
@@ -277,6 +278,7 @@ export interface Feedback {
   rescueMessage?: string; // WhatsApp rescue message sent to customer
   // Inherited segmentation metadata:
   category: string;
+  country?: string;
   city: string;
   locality: string;
 }

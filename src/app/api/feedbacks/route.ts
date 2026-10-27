@@ -96,6 +96,9 @@ export async function POST(request: Request) {
     }
 
     const { business, branch } = resolved;
+    const feedbackCountry = (branch as any).country || business.baseline?.country || 'Colombia';
+    const feedbackCity = branch.city || business.baseline?.city || 'Bogotá';
+    const feedbackLocality = branch.locality || 'Principal';
 
     // Auto-inherit specific branch and brand metadata
     const feedback = await createFeedback({
@@ -110,8 +113,9 @@ export async function POST(request: Request) {
       attendedBy: cleanAttendedBy,
       clubConsent: Boolean(clubConsent),
       category: business.category || 'Comercio Local',
-      city: branch.city || 'No especificada',
-      locality: branch.locality || 'No especificada',
+      country: feedbackCountry,
+      city: feedbackCity,
+      locality: feedbackLocality,
     });
 
     // Registrar acción de IP exitosa para activar el bloqueo de 24 horas solo si fue queja
@@ -124,6 +128,11 @@ export async function POST(request: Request) {
       try {
         await addCampaignParticipant({
           businessId: business.id,
+          businessName: business.name,
+          nicheCategory: business.category || 'Gastronomía & Servicios',
+          country: feedbackCountry,
+          city: feedbackCity,
+          locality: feedbackLocality,
           branchId: branch.id,
           branchName: branch.name,
           customerName: cleanCustomerName,
