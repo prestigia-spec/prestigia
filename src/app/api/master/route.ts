@@ -811,6 +811,32 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Update Owner Details (from Tab 2 Cuenta Dueño card)
+    if (action === 'update_owner_details') {
+      const { businessId, ownerName, ownerPhone, legalName, taxId, password, ownerEmail } = body;
+      if (!businessId) {
+        return NextResponse.json({ error: 'Falta identificador de negocio' }, { status: 400 });
+      }
+      const biz = await getBusinessById(businessId);
+      if (!biz) {
+        return NextResponse.json({ error: 'Marca no encontrada' }, { status: 404 });
+      }
+
+      if (ownerName) biz.ownerName = String(ownerName).trim();
+      if (ownerPhone) biz.ownerPhone = String(ownerPhone).trim();
+      if (legalName !== undefined) biz.legalName = String(legalName).trim();
+      if (taxId !== undefined) biz.taxId = String(taxId).trim();
+      if (password !== undefined) biz.password = String(password).trim();
+      if (ownerEmail !== undefined) biz.ownerEmail = String(ownerEmail).trim();
+
+      await saveBusiness(biz);
+      return NextResponse.json({
+        success: true,
+        message: `Datos de la Cuenta Dueño de '${biz.name}' actualizados con éxito.`,
+        business: biz,
+      });
+    }
+
     // Save or Update Branch (Sede)
     if (action === 'save_branch') {
       const { businessId, branch } = body;

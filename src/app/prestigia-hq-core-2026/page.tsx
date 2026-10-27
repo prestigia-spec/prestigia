@@ -992,6 +992,18 @@ export default function MasterAdminPage() {
   const [isCreatingStaffRole, setIsCreatingStaffRole] = useState(false);
   const [newStaffRoleInput, setNewStaffRoleInput] = useState('');
 
+  // Quick Edit Owner Modal State (Tab 2)
+  const [showOwnerEditModal, setShowOwnerEditModal] = useState(false);
+  const [isSavingOwner, setIsSavingOwner] = useState(false);
+  const [ownerEditForm, setOwnerEditForm] = useState({
+    ownerName: '',
+    ownerPhone: '',
+    legalName: '',
+    taxId: '',
+    password: '',
+    ownerEmail: '',
+  });
+
   const [customCountryMode, setCustomCountryMode] = useState(false);
   const [customCityMode, setCustomCityMode] = useState(false);
   const logoFileInputRef = useRef<HTMLInputElement | null>(null);
@@ -2353,16 +2365,70 @@ export default function MasterAdminPage() {
     }
   };
 
-  // Impersonate into /portal
-  const handleImpersonate = (biz: Business) => {
+  // Impersonate into /portal (Global or filtered by Branch)
+  const handleImpersonate = (biz: Business, branchId?: string) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('prestigia_selected_business', biz.id);
+      if (branchId) {
+        localStorage.setItem('prestigia_selected_branch', branchId);
+      } else {
+        localStorage.removeItem('prestigia_selected_branch');
+      }
       localStorage.setItem('prestigia_master_impersonation', JSON.stringify({
         businessId: biz.id,
+        branchId: branchId || 'all',
         role: 'owner',
         timestamp: Date.now(),
       }));
-      window.open('/portal', '_blank');
+      window.open(branchId ? `/portal?branch=${encodeURIComponent(branchId)}` : '/portal', '_blank');
+    }
+  };
+
+  // Quick Edit Owner Modal Handlers (Tab 2)
+  const handleOpenOwnerEditModal = () => {
+    if (!currentBusiness) return;
+    setOwnerEditForm({
+      ownerName: currentBusiness.ownerName || '',
+      ownerPhone: currentBusiness.ownerPhone || '',
+      legalName: currentBusiness.legalName || currentBusiness.name || '',
+      taxId: currentBusiness.taxId || '',
+      password: currentBusiness.password || 'admin',
+      ownerEmail: currentBusiness.ownerEmail || '',
+    });
+    setShowOwnerEditModal(true);
+  };
+
+  const handleSaveOwnerDetails = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentBusiness) return;
+    if (!ownerEditForm.ownerName.trim()) {
+      alert('Ingresa el nombre del representante legal / titular.');
+      return;
+    }
+    setIsSavingOwner(true);
+    try {
+      const res = await fetch('/api/master', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_owner_details',
+          businessId: currentBusiness.id,
+          ...ownerEditForm,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNotification({ type: 'success', message: 'Datos de la Cuenta Dueño actualizados con éxito.' });
+        setTimeout(() => setNotification(null), 3500);
+        setShowOwnerEditModal(false);
+        setBusinesses(prev => prev.map(b => b.id === currentBusiness.id ? { ...b, ...ownerEditForm } : b));
+      } else {
+        alert(data.error || 'Error al actualizar datos del dueño.');
+      }
+    } catch {
+      alert('Error de conexión con el servidor.');
+    } finally {
+      setIsSavingOwner(false);
     }
   };
 
@@ -4549,6 +4615,15 @@ export default function MasterAdminPage() {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
+                      onClick={handleOpenOwnerEditModal}
+                      title="Editar datos del titular, NIT, Razón Social y contraseña del dueño"
+                      className="px-3 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                    >
+                      <Edit3 className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Editar Datos Dueño</span>
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => handleImpersonate(currentBusiness)}
                       title="Entrar al Portal del Dueño en modo simulación Master"
                       className="px-3.5 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
@@ -4748,6 +4823,29 @@ export default function MasterAdminPage() {
                           >
                             <Users className="w-3.5 h-3.5 text-indigo-400" />
                             <span>Gestionar Equipo</span>
+                          </button>
+
+                          {/* Direct Test Google Reviews 5★ */}
+                          <a
+                            href={branch.googleReviewUrl || branchMapsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                            title="Probar Ficha de Reseñas 5 Estrellas en Google Maps"
+                          >
+                            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                            <span>Probar Ficha 5★</span>
+                          </a>
+
+                          {/* Direct Impersonation for this Branch */}
+                          <button
+                            type="button"
+                            onClick={() => handleImpersonate(currentBusiness, branch.id)}
+                            className="px-2.5 py-1.5 rounded-lg bg-blue-600/15 hover:bg-blue-600/25 text-blue-300 border border-blue-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                            title={`Entrar al portal del cliente simulando a esta sede (${branch.name})`}
+                          >
+                            <Eye className="w-3 h-3 text-blue-400" />
+                            <span>Entrar en Sede</span>
                           </button>
 
                           <button
@@ -8570,6 +8668,147 @@ export default function MasterAdminPage() {
                 );
               })()}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Editar Datos de la Cuenta Dueño */}
+      {showOwnerEditModal && currentBusiness && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-fade-in">
+          <div className="relative w-full max-w-lg bg-[#0C101A] border border-amber-500/30 rounded-3xl shadow-2xl p-5 sm:p-7 text-white my-8 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 font-extrabold text-lg shrink-0">
+                  👑
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                    <span>Editar Cuenta Dueño</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 uppercase">
+                      Titular
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Modifica los datos corporativos y credenciales de acceso de {currentBusiness.name}.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowOwnerEditModal(false)}
+                className="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveOwnerDetails} className="space-y-4 pt-4">
+              <div>
+                <label className="text-[11px] font-semibold text-slate-400 block mb-1">
+                  Nombre del Titular / Representante Legal *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={ownerEditForm.ownerName}
+                  onChange={(e) => setOwnerEditForm({ ...ownerEditForm, ownerName: e.target.value })}
+                  placeholder="Ej: Carlos Gómez"
+                  className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-400 block mb-1">
+                    WhatsApp Oficial de Alertas *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={ownerEditForm.ownerPhone}
+                    onChange={(e) => setOwnerEditForm({ ...ownerEditForm, ownerPhone: e.target.value })}
+                    placeholder="Ej: +573001234567"
+                    className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-amber-300 font-mono placeholder-slate-500 outline-none transition"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-400 block mb-1">
+                    Contraseña del Portal Dueño *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={ownerEditForm.password}
+                    onChange={(e) => setOwnerEditForm({ ...ownerEditForm, password: e.target.value })}
+                    placeholder="Clave para prestigia.app/portal"
+                    className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-purple-300 font-mono placeholder-slate-500 outline-none transition"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[11px] font-semibold text-slate-400 block mb-1">
+                  Razón Social Registrada
+                </label>
+                <input
+                  type="text"
+                  value={ownerEditForm.legalName}
+                  onChange={(e) => setOwnerEditForm({ ...ownerEditForm, legalName: e.target.value })}
+                  placeholder="Ej: Inversiones Gastronómicas Gómez & Cía S.A.S."
+                  className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-400 block mb-1">
+                    NIT / Tax ID / CIF / RFC
+                  </label>
+                  <input
+                    type="text"
+                    value={ownerEditForm.taxId}
+                    onChange={(e) => setOwnerEditForm({ ...ownerEditForm, taxId: e.target.value })}
+                    placeholder="Ej: 901.458.723-1"
+                    className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-400 block mb-1">
+                    Correo Electrónico Oficial
+                  </label>
+                  <input
+                    type="email"
+                    value={ownerEditForm.ownerEmail}
+                    onChange={(e) => setOwnerEditForm({ ...ownerEditForm, ownerEmail: e.target.value })}
+                    placeholder="contacto@empresa.com"
+                    className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowOwnerEditModal(false)}
+                  className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingOwner}
+                  className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-extrabold text-xs rounded-xl flex items-center gap-2 shadow-lg shadow-amber-500/20 transition cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingOwner ? (
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Check className="w-4 h-4" />
+                  )}
+                  <span>Guardar Cambios</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

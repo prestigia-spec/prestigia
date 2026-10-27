@@ -1027,7 +1027,8 @@ export default function PortalPage() {
                 };
 
                 setSession(newSession);
-                setSelectedBranchId('all');
+                const targetBranch = (imp && imp.branchId && imp.branchId !== 'all') ? imp.branchId : 'all';
+                setSelectedBranchId(targetBranch);
                 try {
                   localStorage.setItem('prestigia_portal_session', JSON.stringify(newSession));
                 } catch {}
@@ -1078,7 +1079,13 @@ export default function PortalPage() {
             if (parsed.role === 'branch_manager' && parsed.activeBranch) {
               setSelectedBranchId(parsed.activeBranch.id);
             } else {
-              setSelectedBranchId('all');
+              const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+              const branchQuery = urlParams?.get('branch');
+              if (branchQuery && (parsed.business.branches || []).some((b: any) => b.id === branchQuery)) {
+                setSelectedBranchId(branchQuery);
+              } else {
+                setSelectedBranchId('all');
+              }
             }
 
             // Sincronización inmediata con Master (Planes, Add-ons, Suspensión)
