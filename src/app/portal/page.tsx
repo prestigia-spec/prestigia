@@ -25931,8 +25931,12 @@ export default function PortalPage() {
                       </div>
 
                       <div>
-                        <div className="text-lg font-black text-white">$120.000 COP <span className="text-xs font-normal text-slate-400">/ mes</span></div>
-                        <div className="text-[11px] text-slate-400">$49 USD / mes • Anual: $1.200.000 COP</div>
+                        <div className="text-base font-black text-white">
+                          {lang === 'en' ? 'Tailored Proposal & Trial' : 'Piloto de Prueba & Cuota Personalizada'}
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          {lang === 'en' ? 'Direct consultation with your assigned advisor' : 'Atención directa y activación con tu asesor comercial'}
+                        </div>
                       </div>
 
                       <ul className="space-y-1.5 text-[11px] text-slate-300 border-t border-slate-800 pt-2.5">
@@ -25962,8 +25966,8 @@ export default function PortalPage() {
                     <a
                       href={`https://wa.me/573009876543?text=${encodeURIComponent(
                         lang === 'en'
-                          ? `Hello Prestigia, I want to upgrade to Plan Pro ($120.000 COP / $49 USD) for "${profileName || 'My Business'}".`
-                          : `Hola Prestigia, quiero solicitar el Plan Pro ($120.000 COP / $49 USD) para "${profileName || 'Mi Negocio'}".`
+                          ? `Hello Prestigia, I want to request the Plan Pro evaluation for "${profileName || 'My Business'}".`
+                          : `Hola Prestigia, quiero solicitar la activación del Plan Pro para "${profileName || 'Mi Negocio'}".`
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -25980,7 +25984,7 @@ export default function PortalPage() {
                         <div className="flex items-center gap-1.5">
                           <span className="font-black text-amber-400 text-sm">PLAN ÉLITE</span>
                           <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                            {lang === 'en' ? '1 to 3 Locations' : '1 a 3 Sedes'}
+                            {lang === 'en' ? 'Multi-Location' : 'Multi-Sede'}
                           </span>
                         </div>
                         <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500 text-slate-950">
@@ -25989,23 +25993,11 @@ export default function PortalPage() {
                       </div>
 
                       <div>
-                        <div className="text-lg font-black text-white">
-                          <span className="text-xs font-bold text-amber-400 mr-1">{lang === 'en' ? 'From' : 'Desde'}</span>
-                          $250.000 COP <span className="text-xs font-normal text-slate-400">/ mes</span>
+                        <div className="text-base font-black text-white">
+                          {lang === 'en' ? 'Multi-Location Suite & VIP Pilot' : 'Piloto VIP Multi-Sede Personalizado'}
                         </div>
-                        <div className="mt-1.5 p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[10.5px] space-y-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-slate-300 font-medium">• {lang === 'en' ? '1 Location:' : '1 Sede:'}</span>
-                            <span className="font-bold text-white">$250.000 COP <span className="text-slate-400 font-normal">($99 USD)</span></span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-slate-300 font-medium">• {lang === 'en' ? '2 Locations:' : '2 Sedes:'}</span>
-                            <span className="font-bold text-white">$300.000 COP <span className="text-slate-400 font-normal">($119 USD)</span></span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-slate-300 font-medium">• {lang === 'en' ? '3 Locations:' : '3 Sedes:'}</span>
-                            <span className="font-bold text-white">$350.000 COP <span className="text-slate-400 font-normal">($139 USD)</span></span>
-                          </div>
+                        <div className="text-[11px] text-slate-400">
+                          {lang === 'en' ? 'Custom deployment based on your number of locations' : 'Acuerdo modular según tu número de sedes y volumen'}
                         </div>
                       </div>
 
@@ -26032,8 +26024,8 @@ export default function PortalPage() {
                     <a
                       href={`https://wa.me/573009876543?text=${encodeURIComponent(
                         lang === 'en'
-                          ? `Hello Prestigia, I want to upgrade to Plan Élite (from $250.000 COP / $99 USD) for "${profileName || 'My Business'}".`
-                          : `Hola Prestigia, quiero solicitar el Plan Élite (desde $250.000 COP / $99 USD) para "${profileName || 'Mi Negocio'}".`
+                          ? `Hello Prestigia, I want to request the Plan Élite evaluation for "${profileName || 'My Business'}".`
+                          : `Hola Prestigia, quiero solicitar la activación del Plan Élite para "${profileName || 'Mi Negocio'}".`
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -26078,7 +26070,7 @@ export default function PortalPage() {
                 <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span className="text-[11px]">
                   {effectivePlan === 'independiente'
-                    ? (lang === 'en' ? 'Current Plan: Independent ($49.000 COP / mo) • Seamless upgrade with 0 downtime' : 'Plan Actual: Independiente ($49.000 COP / mes) • Migración inmediata sin perder reseñas')
+                    ? (lang === 'en' ? 'Current Plan: Independent • Seamless upgrade with 0 downtime' : 'Plan Actual: Independiente • Migración inmediata sin perder historial ni reseñas')
                     : (lang === 'en' ? 'Seamless upgrade with 0 downtime' : 'Migración inmediata sin perder historial ni reseñas')}
                 </span>
               </div>

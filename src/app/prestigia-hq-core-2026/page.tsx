@@ -3730,10 +3730,10 @@ export default function MasterAdminPage() {
                       )}
                       <h4 className="text-sm font-bold text-white capitalize">{p}</h4>
                       <p className="text-[11px] text-slate-400 mt-1">
-                        {p === 'independiente' && '$49k COP / $19 USD • 1 Sede • Solo Profesional'}
-                        {p === 'pro' && '$120k COP / $49 USD • 1 Sede • Dueño Central'}
-                        {p === 'elite' && '$290k COP / $110 USD • Hasta 3 Sedes + Encargados'}
-                        {p === 'empresarial' && 'Corporativo • Holding • Sedes Ilimitadas'}
+                        {p === 'independiente' && '1 Sede • Operador Único • Captura Ágil de Reseñas'}
+                        {p === 'pro' && '1 Sede • Panel Central de Control • Radar Anti-Crisis en Vivo'}
+                        {p === 'elite' && 'Multi-Sede (Hasta 3 Sedes) • Encargados de Turno • IA 360° & Wallboard'}
+                        {p === 'empresarial' && 'Corporativo • Holding • Sedes & Supervisores Ilimitados'}
                       </p>
                     </div>
                   );
@@ -3748,7 +3748,7 @@ export default function MasterAdminPage() {
                     2. Add-Ons y Superpoderes Modulares (A la Carta)
                   </h3>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Genera ingresos adicionales activando funciones temporales (Trial Hooks de venta) o permanentes.
+                    Habilita capacidades operativas temporales (Pilotos de prueba / cortesía) o acuerdos permanentes según la negociación con el cliente.
                   </p>
                 </div>
 
@@ -3761,10 +3761,10 @@ export default function MasterAdminPage() {
                           <Store className="w-3.5 h-3.5 text-blue-400" />
                           Sedes Físicas Extras
                         </span>
-                        <span className="text-[10px] text-amber-400 font-mono font-semibold">+ $50k COP / $20 USD c/u</span>
+                        <span className="text-[10px] text-blue-400 font-semibold bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded-full">Capacidad Multi-Sede</span>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-1">
-                        Permite a la marca añadir sedes más allá de las incluidas en su plan base.
+                        Habilita la operación de sedes físicas adicionales según el acuerdo pactado.
                       </p>
                     </div>
                     <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-800/80">
@@ -3799,10 +3799,10 @@ export default function MasterAdminPage() {
                           <Users className="w-3.5 h-3.5 text-purple-400" />
                           Encargados de Turno
                         </span>
-                        <span className="text-[10px] text-amber-400 font-mono font-semibold">+ $25k COP / $10 USD</span>
+                        <span className="text-[10px] text-purple-400 font-semibold bg-purple-500/10 border border-purple-500/30 px-2 py-0.5 rounded-full">Supervisión con PIN</span>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-1">
-                        Habilita la cuenta de encargado en Plan Pro (si el dueño opera a distancia) o suma supervisores en Élite.
+                        Cuentas operativas para supervisores o administradores con acceso por PIN.
                       </p>
                     </div>
                     <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-800/80">
@@ -3837,10 +3837,10 @@ export default function MasterAdminPage() {
                           <Users className="w-3.5 h-3.5 text-emerald-400" />
                           Cupo Empleados (+5)
                         </span>
-                        <span className="text-[10px] text-amber-400 font-mono font-semibold">+ $20k COP / $8 USD</span>
+                        <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">Equipo Auditado</span>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-1">
-                        Amplía la capacidad de colaboradores auditados en sala por encima del límite estándar de 10.
+                        Amplía la capacidad de colaboradores y meseros evaluados por los comensales.
                       </p>
                     </div>
                     <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-800/80">
@@ -3993,18 +3993,25 @@ export default function MasterAdminPage() {
                   </div>
                 </div>
 
-                {/* Custom Notes */}
+                {/* Custom Notes & Commercial Agreements */}
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                    Notas Administrativas y Acuerdos Especiales (Uso Interno Master):
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-amber-400" />
+                      Acuerdo Comercial & Condiciones del Piloto (Uso Interno Master):
+                    </span>
+                    <span className="text-[10px] text-amber-400/90 font-mono">Confidencial</span>
                   </label>
                   <input
                     type="text"
                     value={addonState.customNotes}
                     onChange={(e) => setAddonState({ ...addonState, customNotes: e.target.value })}
-                    placeholder="Ej: Autorizada excepción de encargado sin costo por ser cliente fundador..."
+                    placeholder="Ej: Piloto de cortesía por 30 días con Wallboard activo. Negociación sujeta a volumen..."
                     className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 text-white text-xs rounded-xl px-4 py-2.5 outline-none"
                   />
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    Documenta aquí el tipo de prueba, duración de la cortesía o propuesta personalizada acordada con el cliente.
+                  </p>
                 </div>
 
                 {/* Action Save Bar */}
@@ -6464,10 +6471,10 @@ export default function MasterAdminPage() {
                       onChange={(e) => setOnboardForm({ ...onboardForm, plan: e.target.value as BusinessPlan })}
                       className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 outline-none focus:border-amber-400 capitalize cursor-pointer font-medium text-xs"
                     >
-                      <option value="independiente">Plan Independiente ($49k)</option>
-                      <option value="pro">Plan Pro ($120k)</option>
-                      <option value="elite">Plan Élite ($290k)</option>
-                      <option value="empresarial">Plan Empresarial ($690k)</option>
+                      <option value="independiente">Plan Independiente (1 Sede • Operador Único)</option>
+                      <option value="pro">Plan Pro (1 Sede • Panel Central)</option>
+                      <option value="elite">Plan Élite (Multi-Sede • Encargados)</option>
+                      <option value="empresarial">Plan Empresarial (Holding • Ilimitado)</option>
                     </select>
                     <p className="text-[10px] text-slate-400 mt-1">Nivel de servicio y capacidad de sedes asignado.</p>
                   </div>

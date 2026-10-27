@@ -168,32 +168,10 @@ export default function PropuestaUnificadaPage() {
           </div>
 
           <div className="flex items-center gap-2.5">
-            {/* Moneda Toggle */}
-            <div className="flex items-center rounded-xl bg-slate-900 border border-slate-800 p-1 text-xs font-bold">
-              <button
-                onClick={() => setCurrency('COP')}
-                className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${currency === 'COP' ? 'bg-amber-500 text-slate-950 shadow-md font-black' : 'text-slate-400 hover:text-white'}`}
-              >
-                COP 🇨🇴
-              </button>
-              <button
-                onClick={() => setCurrency('USD')}
-                className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${currency === 'USD' ? 'bg-amber-500 text-slate-950 shadow-md font-black' : 'text-slate-400 hover:text-white'}`}
-              >
-                USD 🌎
-              </button>
-              <button
-                onClick={() => setCurrency('EUR')}
-                className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${currency === 'EUR' ? 'bg-amber-500 text-slate-950 shadow-md font-black' : 'text-slate-400 hover:text-white'}`}
-              >
-                EUR 🇪🇸
-              </button>
-              <button
-                onClick={() => setCurrency('MXN')}
-                className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${currency === 'MXN' ? 'bg-amber-500 text-slate-950 shadow-md font-black' : 'text-slate-400 hover:text-white'}`}
-              >
-                MXN 🇲🇽
-              </button>
+            {/* Cobertura & Modalidad */}
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold text-slate-300">
+              <Globe className="w-3.5 h-3.5 text-amber-400" />
+              <span>Planes & Pilotos de Prueba a la Medida</span>
             </div>
 
             {/* Imprimir / Descargar en PDF */}
@@ -717,15 +695,15 @@ export default function PropuestaUnificadaPage() {
                 </div>
 
                 <div>
-                  <div className="text-3xl font-black text-white">
-                    {currency === 'COP' ? '$89.000 COP' : '$29 USD'}
-                    <span className="text-xs text-slate-400 font-normal"> / mes</span>
+                  <div className="text-2xl font-black text-white">
+                    Piloto de Prueba
+                    <span className="text-xs text-amber-400 font-bold block mt-0.5">Propuesta a la Medida</span>
                   </div>
-                  <div className="text-[11px] text-amber-400/90 font-medium pt-0.5">
-                    {currency === 'COP' ? '$890.000 COP / año (2 meses gratis)' : '$290 USD / año (2 months off)'}
+                  <div className="text-[11px] text-slate-400 pt-1">
+                    Evaluación sin riesgo inicial según tamaño de local
                   </div>
-                  <div className="mt-2 p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-[10px] text-slate-400">
-                    ⚙️ <strong>Setup Inicial:</strong> {currency === 'COP' ? '$350.000 COP' : '$99 USD'} (pago único)
+                  <div className="mt-2 p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-[10px] text-emerald-400 font-bold">
+                    ⚙️ <strong>Setup & Montaje:</strong> Bonificado en piloto de lanzamiento
                   </div>
                 </div>
 
@@ -776,7 +754,7 @@ export default function PropuestaUnificadaPage() {
                 className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs text-center flex items-center justify-center gap-2 transition active:scale-95 shadow-md cursor-pointer"
               >
                 <Lock className="w-3.5 h-3.5 text-slate-400" />
-                <span>Solicitar Básico con mi Asesor</span>
+                <span>Solicitar Piloto de Prueba</span>
               </button>
             </div>
 
@@ -795,15 +773,15 @@ export default function PropuestaUnificadaPage() {
                 </div>
 
                 <div>
-                  <div className="text-3xl font-black text-white">
-                    {currency === 'COP' ? '$179.000 COP' : '$49 USD'}
-                    <span className="text-xs text-slate-400 font-normal"> / mes</span>
+                  <div className="text-2xl font-black text-white">
+                    Piloto Pro Activo
+                    <span className="text-xs text-indigo-400 font-bold block mt-0.5">Propuesta a la Medida</span>
                   </div>
-                  <div className="text-[11px] text-indigo-300 font-medium pt-0.5">
-                    {currency === 'COP' ? '$1.790.000 COP / año (2 meses gratis)' : '$490 USD / año (2 months off)'}
+                  <div className="text-[11px] text-slate-400 pt-1">
+                    Acceso completo a IA y Radar Anti-Crisis en Vivo
                   </div>
                   <div className="mt-2 p-1.5 rounded-lg bg-emerald-950/50 border border-emerald-500/40 text-[10px] text-emerald-300 font-bold">
-                    🎁 <strong>Setup Inicial ({currency === 'COP' ? '$350K COP' : '$99 USD'}):</strong> ¡100% BONIFICADO en plan anual!
+                    🎁 <strong>Setup Inicial:</strong> 100% BONIFICADO en fase de prueba
                   </div>
                 </div>
 
@@ -854,7 +832,7 @@ export default function PropuestaUnificadaPage() {
                 className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs text-center flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-600/30 active:scale-95 cursor-pointer"
               >
                 <Lock className="w-3.5 h-3.5 text-amber-300" />
-                <span>Activar Plan Pro con mi Asesor</span>
+                <span>Activar Piloto Plan Pro</span>
               </button>
             </div>
 
@@ -873,27 +851,22 @@ export default function PropuestaUnificadaPage() {
                 </div>
 
                 <div>
-                  <div className="text-2xl sm:text-3xl font-black text-amber-400">
-                    <span className="text-xs font-semibold text-amber-300 mr-1.5">Desde</span>
-                    {currency === 'COP' ? '$250.000 COP' : '$99 USD'}
-                    <span className="text-xs text-slate-400 font-normal"> / mes</span>
+                  <div className="text-2xl font-black text-amber-400">
+                    Suite Multi-Sede VIP
+                    <span className="text-xs text-amber-300 font-bold block mt-0.5">Propuesta a la Medida</span>
                   </div>
                   <div className="mt-2 p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/30 text-[11px] space-y-1 font-medium">
                     <div className="flex items-center justify-between text-slate-300">
-                      <span>• 1 Sede física:</span>
-                      <strong className="text-white">{currency === 'COP' ? '$250.000 COP' : '$99 USD'} <span className="text-slate-400 font-normal">/ mes</span></strong>
+                      <span>• Hasta 3 Sedes físicas:</span>
+                      <strong className="text-white">Piloto Integral</strong>
                     </div>
                     <div className="flex items-center justify-between text-slate-300">
-                      <span>• 2 Sedes físicas:</span>
-                      <strong className="text-white">{currency === 'COP' ? '$300.000 COP' : '$119 USD'} <span className="text-slate-400 font-normal">/ mes</span></strong>
-                    </div>
-                    <div className="flex items-center justify-between text-slate-300">
-                      <span>• 3 Sedes físicas:</span>
-                      <strong className="text-white">{currency === 'COP' ? '$350.000 COP' : '$139 USD'} <span className="text-slate-400 font-normal">/ mes</span></strong>
+                      <span>• TV Wallboard para salón:</span>
+                      <strong className="text-emerald-400">Incluido</strong>
                     </div>
                   </div>
                   <div className="mt-2 p-1.5 rounded-lg bg-amber-950/50 border border-amber-500/40 text-[10px] text-amber-300 font-bold">
-                    🎁 <strong>Plan Anual:</strong> ¡Paga 10 meses y recibe 12 meses completos (Ahorras 2 meses)!
+                    👑 <strong>Acuerdo Franquicia:</strong> Tarifa preferencial según volumen de sedes
                   </div>
                 </div>
 
@@ -986,7 +959,7 @@ export default function PropuestaUnificadaPage() {
                 Un cliente recurrente que consume $45.000 COP acude 12 veces al año ($540.000 COP). Si una reseña destructiva de 1★ ahuyenta a solo 15 clientes nuevos al mes, tu negocio pierde <strong>$8.100.000 COP al año</strong>.
               </p>
               <div className="text-[11px] font-bold text-emerald-300 bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-500/30">
-                💰 Saldo: Contener 1 sola queja en privado paga más de 1 año completo del Plan Pro ($1.79M COP/año).
+                💰 Saldo: Contener 1 sola queja en privado paga con creces cualquier cuota mensual y protege la reputación para siempre.
               </div>
             </div>
 
@@ -1370,20 +1343,20 @@ export default function PropuestaUnificadaPage() {
             <div className="p-5 rounded-2xl bg-[#090E1A] border border-slate-800 space-y-2 print-card">
               <h4 className="font-bold text-white flex items-center gap-2">
                 <HelpCircle className="w-4 h-4 text-amber-400" />
-                <span>"El costo de inicio de $350.000 COP se me sale de presupuesto."</span>
+                <span>"¿Cómo se define el valor de mi plan y la prueba inicial?"</span>
               </h4>
               <p className="text-slate-300 leading-relaxed">
-                Diseñar una página web moderna y configurar Google Maps con una agencia externa cuesta más de $1.400.000 COP. Con Prestigia tienes un 50% de descuento ($350.000 COP) si alcanzas uno de los 5 cupos de tu nicho. Y mejor aún: <strong>si tomas el plan anual de Pro o Élite, ese montaje te queda 100% BONIFICADO ($0 COP).</strong>
+                Cada negocio tiene una escala y volumen de clientes diferente. Iniciamos con un <strong>Piloto de Evaluación sin riesgo</strong> para demostrar el impacto real en calificaciones e ingresos antes de fijar cualquier cuota personalizada. Además, la auditoría y montaje inicial quedan <strong>100% BONIFICADOS</strong> en la fase de prueba.
               </p>
             </div>
 
             <div className="p-5 rounded-2xl bg-[#090E1A] border border-slate-800 space-y-2 print-card">
               <h4 className="font-bold text-white flex items-center gap-2">
                 <HelpCircle className="w-4 h-4 text-amber-400" />
-                <span>"Tengo varias sedes y no quiero pagar por separado."</span>
+                <span>"Tengo varias sedes y no quiero contratos dispersos."</span>
               </h4>
               <p className="text-slate-300 leading-relaxed">
-                Para marcas y franquicias contamos con el <strong>Plan Élite</strong>: desde $250.000 COP al mes (1 Sede: $250.000 COP / 2 Sedes: $300.000 COP / 3 Sedes: $350.000 COP), con pantalla TV Wallboard para salón, sentimiento IA 360°, subcuentas para encargados con PIN y conmutador multi-sede centralizado.
+                Para marcas y franquicias contamos con la <strong>Suite Élite Multi-Sede</strong> y acuerdos corporativos unificados: pantalla TV Wallboard para salón, sentimiento IA 360°, subcuentas para encargados con PIN y conmutador centralizado con condiciones preferenciales según tu volumen de locales.
               </p>
             </div>
 
