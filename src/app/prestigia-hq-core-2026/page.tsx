@@ -4524,6 +4524,91 @@ export default function MasterAdminPage() {
                 )}
               </div>
 
+              {/* FICHA OFICIAL DE LA CUENTA DUEÑO (TITULAR GENERAL DE LA EMPRESA) */}
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-[#141A26] via-[#101520] to-[#141A26] border border-amber-500/30 shadow-lg space-y-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 font-extrabold text-sm shrink-0">
+                      👑
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 font-extrabold text-[10px] tracking-wider uppercase border border-amber-500/30">
+                          Cuenta Dueño General
+                        </span>
+                        <span className="text-[11px] text-slate-400 font-medium">
+                          Gobierna las {currentBranchesCount} sedes físicas de la marca
+                        </span>
+                      </div>
+                      <h4 className="text-base font-bold text-white mt-0.5">
+                        {currentBusiness.name}
+                      </h4>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleImpersonate(currentBusiness)}
+                      title="Entrar al Portal del Dueño en modo simulación Master"
+                      className="px-3.5 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-blue-400" />
+                      <span>Entrar al Portal Dueño</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const creds = `👑 CREDENCIALES CUENTA DUEÑO - PRESTIGIA\n\n` +
+                          `🏢 Marca: ${currentBusiness.name}\n` +
+                          `👤 Titular: ${currentBusiness.ownerName}\n` +
+                          `📱 WhatsApp: ${currentBusiness.ownerPhone}\n` +
+                          `🌐 Enlace Portal: https://prestigia.app/portal\n` +
+                          `🔑 Usuario: ${currentBusiness.id}\n` +
+                          `🔒 Clave: ${currentBusiness.password || 'admin'}`;
+                        navigator.clipboard.writeText(creds);
+                        alert('✅ Credenciales de la Cuenta Dueño copiadas al portapapeles.');
+                      }}
+                      className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                      title="Copiar credenciales de acceso del dueño"
+                    >
+                      <Copy className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Copiar Claves</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                  <div className="bg-[#0C101A] p-3 rounded-xl border border-slate-800">
+                    <span className="text-slate-400 text-[10px] uppercase font-bold block">Representante Legal (Dueño)</span>
+                    <span className="font-extrabold text-white text-sm block mt-0.5 truncate">{currentBusiness.ownerName}</span>
+                    <span className="text-amber-300 font-mono text-[11px] block mt-0.5">📱 {currentBusiness.ownerPhone}</span>
+                  </div>
+
+                  <div className="bg-[#0C101A] p-3 rounded-xl border border-slate-800">
+                    <span className="text-slate-400 text-[10px] uppercase font-bold block">Razón Social & NIT</span>
+                    <span className="font-semibold text-slate-200 text-xs block mt-0.5 truncate" title={currentBusiness.legalName || currentBusiness.name}>
+                      {currentBusiness.legalName || currentBusiness.name}
+                    </span>
+                    <span className="text-slate-400 font-mono text-[11px] block mt-0.5">NIT: {currentBusiness.taxId || 'No asignado'}</span>
+                  </div>
+
+                  <div className="bg-[#0C101A] p-3 rounded-xl border border-slate-800">
+                    <span className="text-slate-400 text-[10px] uppercase font-bold block">Acceso Portal del Dueño</span>
+                    <span className="font-mono text-cyan-300 text-xs block mt-0.5">👤 {currentBusiness.id}</span>
+                    <span className="font-mono text-purple-300 text-[11px] block mt-0.5">🔑 Clave: {currentBusiness.password || 'admin'}</span>
+                  </div>
+
+                  <div className="bg-[#0C101A] p-3 rounded-xl border border-slate-800">
+                    <span className="text-slate-400 text-[10px] uppercase font-bold block">Plan & Capacidad Sedes</span>
+                    <span className="font-bold text-amber-300 text-xs block mt-0.5 capitalize">Plan {currentBusiness.plan}</span>
+                    <span className="text-slate-400 text-[11px] block mt-0.5">
+                      {currentBusiness.plan === 'elite' ? '3 Sedes Físicas incluidas' : currentBusiness.plan === 'empresarial' ? 'Sedes ilimitadas' : '1 Sede física incluida'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               {/* Lista de Sedes Físicas */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {(currentBusiness.branches || []).map((branch, bIdx) => {
