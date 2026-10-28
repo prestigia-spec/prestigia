@@ -831,17 +831,18 @@ export default function PortalPage() {
     activeManager?: BranchManager;
   } | null>(null);
 
-  // Live Plan & Role Audit Simulation Bar State
+  // Live Plan & Role Audit Simulation Bar State (Hidden by default, only for Master)
+  const [showAuditSimulator, setShowAuditSimulator] = useState<boolean>(false);
   const [simulatedPlan, setSimulatedPlan] = useState<BusinessPlan | null>(null);
   const [simulatedRole, setSimulatedRole] = useState<UserRole | null>(null);
   const [proManagerUnlockedFromMaster, setProManagerUnlockedFromMaster] = useState<boolean>(false);
 
-  // Effective plan and role used throughout the dashboard (Plan Pro defaults to owner only unless master unlocks manager)
-  const effectivePlan: BusinessPlan = simulatedPlan || (session?.business?.plan as BusinessPlan) || 'pro';
+  // Effective plan and role used throughout the dashboard (Strictly uses real contracted plan unless Master toggles simulator)
+  const effectivePlan: BusinessPlan = (showAuditSimulator && simulatedPlan) || (session?.business?.plan as BusinessPlan) || 'pro';
   const effectiveRole: UserRole =
     (effectivePlan === 'independiente' || (effectivePlan === 'pro' && !proManagerUnlockedFromMaster))
       ? 'owner'
-      : (simulatedRole || (session?.role as UserRole) || 'owner');
+      : ((showAuditSimulator && simulatedRole) || (session?.role as UserRole) || 'owner');
 
   // Session persistence & Device tracking State
   const [sessionHydrated, setSessionHydrated] = useState<boolean>(false);
@@ -8857,7 +8858,8 @@ export default function PortalPage() {
   return (
     <main className={`min-h-screen w-full flex flex-col items-center transition-colors duration-200 ${theme === 'light' ? 'portal-light bg-slate-100 text-slate-900' : 'bg-[#070A12] text-white'}`}>
       
-      {/* 👑 LIVE PLAN & ROLE AUDIT SIMULATION BAR (STICKY AT VERY TOP) */}
+      {/* 👑 LIVE PLAN & ROLE AUDIT SIMULATION BAR (ONLY FOR MASTER WHEN TOGGLED ON) */}
+      {Boolean((session as any)?.isMasterImpersonation && showAuditSimulator) && (
       <aside aria-label="Modo Auditoría de Planes" className="w-full bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-950 border-b border-indigo-500/40 px-3 sm:px-6 py-2 text-white z-50 shadow-2xl">
         <div className="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-2.5 text-xs">
           {/* Label & Context */}
@@ -9008,6 +9010,7 @@ export default function PortalPage() {
           </div>
         </div>
       </aside>
+      )}
 
       {/* 👑 Impersonation & Master Audit Banner */}
       {Boolean((session as any)?.isMasterImpersonation) && (
@@ -9044,22 +9047,40 @@ export default function PortalPage() {
               </>
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              window.close();
-              setTimeout(() => {
+          <div className="flex items-center gap-2 ml-auto shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowAuditSimulator((prev) => !prev)}
+              className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-500/40 transition flex items-center gap-1 cursor-pointer"
+              title="Alternar simulador de planes en vivo"
+            >
+              <Zap className="w-3 h-3 text-amber-400" />
+              <span>{showAuditSimulator ? 'Ocultar Simulador' : 'Simular Otros Planes'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1 cursor-pointer"
+              title="Salir de la sesión y ver la pantalla de login del cliente"
+            >
+              <span>Salir a Login</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
                 window.location.href = '/prestigia-hq-core-2026';
-              }, 200);
-            }}
-            className={`px-3 py-1 rounded-lg text-white text-[11px] font-extrabold uppercase tracking-wider transition shadow cursor-pointer flex items-center gap-1.5 shrink-0 ml-auto ${
-              session.business.status === 'suspended'
-                ? 'bg-red-600 hover:bg-red-500 ring-1 ring-red-400'
-                : 'bg-purple-600 hover:bg-purple-500'
-            }`}
-          >
-            <span>← Volver a Master</span>
-          </button>
+              }}
+              className={`px-3 py-1 rounded-lg text-white text-[11px] font-extrabold uppercase tracking-wider transition shadow cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                session.business.status === 'suspended'
+                  ? 'bg-red-600 hover:bg-red-500 ring-1 ring-red-400'
+                  : 'bg-purple-600 hover:bg-purple-500'
+              }`}
+            >
+              <span>← Volver a Master</span>
+            </button>
+          </div>
         </div>
       )}
 
