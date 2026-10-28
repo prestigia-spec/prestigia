@@ -6974,12 +6974,12 @@ export default function MasterAdminPage() {
                 </div>
               </div>
 
-              {/* 6 Executive KPI Metric Cards */}
+              {/* 6 Executive KPI Metric Cards (Alineadas al Modelo B2B Negociado) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
                 {/* 1. MRR Total */}
                 <div className="bg-[#0E121B] border border-emerald-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-emerald-500/10 to-transparent">
                   <div className="flex items-center justify-between text-xs text-emerald-400 font-semibold">
-                    <span>MRR Total Consolidado</span>
+                    <span>MRR Total Cartera</span>
                     <DollarSign className="w-4 h-4 text-emerald-400" />
                   </div>
                   <p className="text-xl font-extrabold text-white font-mono mt-1">
@@ -6994,7 +6994,7 @@ export default function MasterAdminPage() {
                 {/* 2. ARR Run-Rate */}
                 <div className="bg-[#0E121B] border border-purple-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-purple-500/10 to-transparent">
                   <div className="flex items-center justify-between text-xs text-purple-400 font-semibold">
-                    <span>ARR Anual Proyectado</span>
+                    <span>ARR Anual Contratado</span>
                     <TrendingUp className="w-4 h-4 text-purple-400" />
                   </div>
                   <p className="text-xl font-extrabold text-white font-mono mt-1">
@@ -7006,37 +7006,7 @@ export default function MasterAdminPage() {
                   </p>
                 </div>
 
-                {/* 3. Add-Ons Modulares */}
-                <div className="bg-[#0E121B] border border-amber-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-amber-500/10 to-transparent">
-                  <div className="flex items-center justify-between text-xs text-amber-400 font-semibold">
-                    <span>Margen Add-Ons (&gt;90%)</span>
-                    <Sparkles className="w-4 h-4 text-amber-400" />
-                  </div>
-                  <p className="text-xl font-extrabold text-amber-300 font-mono mt-1">
-                    {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(addOnsUSD, 'USD') : formatCurrencyDisplay(addOnsCOP, 'COP'))}
-                    <span className="text-xs text-amber-400 font-sans ml-1 font-normal">/mes</span>
-                  </p>
-                  <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
-                    ≈ {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(addOnsCOP, 'COP') : formatCurrencyDisplay(addOnsUSD, 'USD'))}
-                  </p>
-                </div>
-
-                {/* 4. MRR Planes Base */}
-                <div className="bg-[#0E121B] border border-slate-800 rounded-2xl p-4 shadow-lg">
-                  <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
-                    <span>MRR Planes Base</span>
-                    <Building2 className="w-4 h-4 text-slate-400" />
-                  </div>
-                  <p className="text-xl font-extrabold text-white font-mono mt-1">
-                    {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(plansUSD, 'USD') : formatCurrencyDisplay(plansCOP, 'COP'))}
-                    <span className="text-xs text-slate-400 font-sans ml-1 font-normal">/mes</span>
-                  </p>
-                  <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
-                    ≈ {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(plansCOP, 'COP') : formatCurrencyDisplay(plansUSD, 'USD'))}
-                  </p>
-                </div>
-
-                {/* 5. ARPA Ticket Promedio */}
+                {/* 3. ARPA Ticket Promedio */}
                 <div className="bg-[#0E121B] border border-blue-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-blue-500/10 to-transparent">
                   <div className="flex items-center justify-between text-xs text-blue-400 font-semibold">
                     <span>Ticket Promedio (ARPA)</span>
@@ -7051,17 +7021,45 @@ export default function MasterAdminPage() {
                   </p>
                 </div>
 
-                {/* 6. Total Marcas Activas */}
+                {/* 4. Marcas Activas */}
                 <div className="bg-[#0E121B] border border-slate-800 rounded-2xl p-4 shadow-lg">
                   <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
-                    <span>Marcas Facturando</span>
+                    <span>Marcas Contratadas</span>
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   </div>
                   <p className="text-xl font-extrabold text-white font-mono mt-1">
-                    {activeCount} <span className="text-xs text-slate-400 font-sans font-normal">activas</span>
+                    {activeCount} <span className="text-xs text-slate-400 font-sans font-normal">empresas</span>
                   </p>
-                  <p className="text-[11px] text-emerald-400 font-semibold mt-0.5">
-                    100% de la red al día
+                  <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                    Clientes activos en cartera
+                  </p>
+                </div>
+
+                {/* 5. Sedes Operativas */}
+                <div className="bg-[#0E121B] border border-amber-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-amber-500/10 to-transparent">
+                  <div className="flex items-center justify-between text-xs text-amber-400 font-semibold">
+                    <span>Sedes en Operación</span>
+                    <Building2 className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <p className="text-xl font-extrabold text-amber-300 font-mono mt-1">
+                    {businesses.reduce((acc, b) => acc + (b.branches?.length || 1), 0)} <span className="text-xs text-amber-400 font-sans font-normal">sedes</span>
+                  </p>
+                  <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                    Puntos físicos blindados
+                  </p>
+                </div>
+
+                {/* 6. Cartera & Estado */}
+                <div className="bg-[#0E121B] border border-slate-800 rounded-2xl p-4 shadow-lg">
+                  <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+                    <span>Salud de Cartera</span>
+                    <Shield className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <p className="text-xl font-extrabold text-emerald-400 font-mono mt-1">
+                    100% <span className="text-xs text-emerald-300 font-sans font-normal">al día</span>
+                  </p>
+                  <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                    0 facturas en mora
                   </p>
                 </div>
               </div>
@@ -7181,11 +7179,11 @@ export default function MasterAdminPage() {
                     <thead className="bg-[#141A26] border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider font-semibold">
                       <tr>
                         <th className="py-3.5 px-4">Marca & Titular Comercial</th>
-                        <th className="py-3.5 px-3">País & Divisa</th>
-                        <th className="py-3.5 px-3">Plan & Sedes</th>
-                        <th className="py-3.5 px-3">Add-Ons Modulares</th>
-                        <th className="py-3.5 px-3">Tarifa Base</th>
-                        <th className="py-3.5 px-4 text-right">Facturación Mensual (MRR)</th>
+                        <th className="py-3.5 px-3">País & Moneda</th>
+                        <th className="py-3.5 px-3">Plan & Sedes Físicas</th>
+                        <th className="py-3.5 px-3">Módulos & Servicios Incluidos</th>
+                        <th className="py-3.5 px-4 text-right">Inversión Mensual Pactada (MRR)</th>
+                        <th className="py-3.5 px-4 text-right">Valor Anual Contrato (ARR)</th>
                         <th className="py-3.5 px-3.5 text-center">Acciones</th>
                       </tr>
                     </thead>
@@ -7198,16 +7196,19 @@ export default function MasterAdminPage() {
                         // Display formatted amount: either USD or Moneda Local
                         let primaryPrice = '';
                         let secondaryPrice = '';
+                        let arrDisplay = '';
 
                         if (mrrCurrencyMode === 'usd') {
                           primaryPrice = `${formatCurrencyDisplay(fin.totalUSD, 'USD')} USD`;
                           secondaryPrice = fin.currency.code === 'USD'
-                            ? `ARR: ${formatCurrencyDisplay(fin.arrUSD, 'USD')}/año`
+                            ? ''
                             : `≈ ${formatCurrencyDisplay(fin.totalLocal, fin.currency.code)}`;
+                          arrDisplay = `${formatCurrencyDisplay(fin.arrUSD, 'USD')} USD`;
                         } else {
                           // Moneda Local de la marca
                           primaryPrice = formatCurrencyDisplay(fin.totalLocal, fin.currency.code);
                           secondaryPrice = `≈ ${formatCurrencyDisplay(fin.totalUSD, 'USD')} USD`;
+                          arrDisplay = formatCurrencyDisplay(fin.totalLocal * 12, fin.currency.code);
                         }
 
                         return (
@@ -7231,7 +7232,6 @@ export default function MasterAdminPage() {
                             {/* Country & Currency */}
                             <td className="py-3.5 px-3 whitespace-nowrap">
                               <div className="flex items-center gap-1.5 font-medium text-slate-200">
-                                <span className="text-base">{fin.currency.flag}</span>
                                 <span>{biz.country?.replace(/\s*\(NIT\)/, '') || 'Colombia'}</span>
                               </div>
                               <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30 inline-block mt-0.5">
@@ -7253,11 +7253,11 @@ export default function MasterAdminPage() {
                                 Plan {biz.plan}
                               </span>
                               <p className="text-[11px] text-slate-400 font-mono mt-1">
-                                {biz.branches?.length || 1} {(biz.branches?.length || 1) === 1 ? 'Sede' : 'Sedes'}
+                                {biz.branches?.length || 1} {(biz.branches?.length || 1) === 1 ? 'Sede Física' : 'Sedes Físicas'}
                               </p>
                             </td>
 
-                            {/* Add-Ons */}
+                            {/* Modules Included in Bespoke Contract */}
                             <td className="py-3.5 px-3">
                               <div className="flex flex-wrap gap-1 max-w-xs">
                                 {addons?.extraBranches ? (
@@ -7281,37 +7281,33 @@ export default function MasterAdminPage() {
                                   </span>
                                 ) : null}
                                 {!addons?.extraBranches && !addons?.extraManagers && !addons?.sentiment360?.enabled && !addons?.liveWallboard?.enabled && (
-                                  <span className="text-[11px] text-slate-500 italic">Sin Add-Ons</span>
+                                  <span className="text-[11px] text-slate-400">Todo Incluido en Plan</span>
                                 )}
                               </div>
                             </td>
 
-                            {/* Base Fee */}
-                            <td className="py-3.5 px-3 whitespace-nowrap">
-                              <p className="font-mono font-bold text-white text-xs">
-                                {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(fin.baseUSD, 'USD') : formatCurrencyDisplay(fin.baseLocal, fin.currency.code))}
-                              </p>
-                              <p className="text-[10px] text-slate-400 font-mono mt-0.5">
-                                {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? `≈ ${formatCurrencyDisplay(fin.baseLocal, fin.currency.code)}` : `≈ ${formatCurrencyDisplay(fin.baseUSD, 'USD')}`)}
-                              </p>
-                              {fin.isCustomAgreed ? (
-                                <span className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-400 bg-amber-500/15 px-1.5 py-0.5 rounded border border-amber-500/30 mt-0.5">
-                                  ⭐ Pactada Comercial
-                                </span>
-                              ) : (
-                                <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">
-                                  Plan Estándar
-                                </span>
-                              )}
-                            </td>
-
-                            {/* Monthly Invoicing (MRR) */}
+                            {/* Monthly Agreed Retainer (MRR) */}
                             <td className="py-3.5 px-4 text-right whitespace-nowrap">
                               <p className="text-sm font-extrabold text-emerald-400 font-mono">
                                 {privacyMode ? '••••••••' : primaryPrice}
                               </p>
-                              <p className="text-[10px] text-slate-400 font-mono mt-0.5">
-                                {privacyMode ? '••••••••' : secondaryPrice}
+                              {secondaryPrice && (
+                                <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                                  {privacyMode ? '••••••••' : secondaryPrice}
+                                </p>
+                              )}
+                              <span className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-400 bg-amber-500/15 px-1.5 py-0.5 rounded border border-amber-500/30 mt-1">
+                                ⭐ Tarifa Pactada
+                              </span>
+                            </td>
+
+                            {/* Annual Contract Value (ARR) */}
+                            <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                              <p className="text-xs font-bold text-purple-300 font-mono">
+                                {privacyMode ? '••••••••' : arrDisplay}
+                              </p>
+                              <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                                Ciclo: {biz.billingCycle === 'annual' ? 'Anual' : biz.billingCycle === 'quarterly' ? 'Trimestral' : 'Mensual'}
                               </p>
                             </td>
 
@@ -7357,10 +7353,10 @@ export default function MasterAdminPage() {
                 {/* Table Footer */}
                 <div className="py-3.5 px-4 bg-[#121622] border-t border-slate-800 text-slate-400 text-xs flex flex-col sm:flex-row items-center justify-between gap-2">
                   <span>
-                    Consolidado de <strong className="text-white">{displayedBusinesses.length}</strong> marcas • Total MRR: <strong className="text-emerald-400 font-mono font-bold">{mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(totalUSD, 'USD') : formatCurrencyDisplay(totalCOP, 'COP')}</strong> (≈ {mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(totalCOP, 'COP') : formatCurrencyDisplay(totalUSD, 'USD')})
+                    Consolidado de <strong className="text-white">{displayedBusinesses.length}</strong> marcas • Total Cartera: <strong className="text-emerald-400 font-mono font-bold">{mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(totalUSD, 'USD') : formatCurrencyDisplay(totalCOP, 'COP')}</strong> (≈ {mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(totalCOP, 'COP') : formatCurrencyDisplay(totalUSD, 'USD')})
                   </span>
                   <span className="text-[11px] text-purple-400 font-medium">
-                    Prestigia B2B Billing System: Multi-Divisa (USD, COP, CLP, MXN, EUR)
+                    Prestigia B2B Enterprise: Facturación Recurrente por Contratos a Medida
                   </span>
                 </div>
               </div>
