@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const ip = getClientIp(request) || '127.0.0.1';
     const body = await request.json();
 
-    const { fullName, businessName, category, phone, email, city, branchCount, notes } = body;
+    const { fullName, businessName, category, phone, email, city, branchCount, notes, preferredTime, primaryGoal } = body;
 
     if (!fullName || !businessName || !phone) {
       return NextResponse.json(
@@ -40,6 +40,8 @@ export async function POST(request: NextRequest) {
       city: city ? sanitizeInput(city) : (headerCity ? decodeURIComponent(headerCity) : 'Bogotá'),
       branchCount: branchCount || '1',
       notes: notes ? sanitizeInput(notes) : undefined,
+      preferredTime: preferredTime ? sanitizeInput(preferredTime) : undefined,
+      primaryGoal: primaryGoal ? sanitizeInput(primaryGoal) : undefined,
       ip,
       country: headerCountry === 'CO' ? 'Colombia' : headerCountry,
       countryCode: headerCountry,

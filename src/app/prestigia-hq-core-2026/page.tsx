@@ -73,6 +73,7 @@ import {
   Upload,
   Image as ImageIcon,
   Edit3,
+  Rocket,
 } from 'lucide-react';
 import { PrestigiaIcon } from '@/components/PrestigiaIcon';
 import { Business, BusinessPlan, Branch, BranchManager, StaffMember, BusinessStatus, MasterAddOns, DayOneBaseline, PRESTIGIA_NICHES, CommercialLead, TrafficVisit } from '@/lib/types';
@@ -1334,8 +1335,61 @@ export default function MasterAdminPage() {
     } catch (err) {
       setNotification({ type: 'error', message: 'Error de conexión al actualizar prospecto.' });
     } finally {
-      setUpdatingLeadId(null);
+            setUpdatingLeadId(null);
     }
+  };
+
+  // Export Commercial Leads to CSV
+  const handleExportLeadsCSV = () => {
+    if (!commercialLeads || commercialLeads.length === 0) return;
+    const headers = ['ID', 'Fecha', 'Negocio', 'Contacto', 'WhatsApp', 'Email', 'Ciudad', 'Pais', 'Categoria', 'Sedes', 'Horario_Llamada', 'Meta_Principal', 'Estado', 'IP', 'Dispositivo', 'Notas'];
+    const rows = commercialLeads.map((l) => [
+      l.id,
+      new Date(l.createdAt).toISOString(),
+      '"' + (l.businessName || '').replace(/"/g, '""') + '"',
+      '"' + (l.fullName || '').replace(/"/g, '""') + '"',
+      '"' + (l.phone || '').replace(/"/g, '""') + '"',
+      '"' + (l.email || '').replace(/"/g, '""') + '"',
+      '"' + (l.city || '').replace(/"/g, '""') + '"',
+      '"' + (l.country || '').replace(/"/g, '""') + '"',
+      '"' + (l.category || '').replace(/"/g, '""') + '"',
+      l.branchCount || 1,
+      '"' + (l.preferredTime || '').replace(/"/g, '""') + '"',
+      '"' + (l.primaryGoal || '').replace(/"/g, '""') + '"',
+      l.status,
+      l.ip || '',
+      '"' + (l.device || '').replace(/"/g, '""') + '"',
+      '"' + (l.notes || '').replace(/"/g, '""') + '"',
+    ]);
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `prestigia_leads_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Pre-fill Onboard Modal from Commercial Lead
+  const handleOnboardFromLead = (lead: CommercialLead) => {
+    const cleanId = lead.businessName.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+    setOnboardForm((prev) => ({
+      ...prev,
+      id: cleanId,
+      name: lead.businessName,
+      legalName: lead.businessName,
+      category: lead.category || prev.category,
+      country: lead.country || 'Colombia',
+      city: lead.city || '',
+      ownerName: lead.fullName,
+      ownerPhone: lead.phone,
+      ownerEmail: lead.email || '',
+      clientQuote: lead.notes || (lead.primaryGoal ? `Meta comercial: ${lead.primaryGoal}` : ''),
+    }));
+    setShowOnboardModal(true);
   };
 
   useEffect(() => {
@@ -7920,6 +7974,16 @@ Quedamos atentos a la confirmación o recepción de tu soporte de pago para mant
                     <option value="won">🟢 Clientes Ganados</option>
                     <option value="dismissed">⚪ Descartados</option>
                   </select>
+
+                  <button
+                    onClick={handleExportLeadsCSV}
+                    disabled={commercialLeads.length === 0}
+                    className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    title="Exportar todos los prospectos a archivo CSV"
+                  >
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
+                    <span className="hidden sm:inline">Exportar</span> CSV
+                  </button>
                 </div>
               </div>
 
@@ -7951,9 +8015,12 @@ Quedamos atentos a la confirmación o recepción de tu soporte de pago para mant
                 return (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {filteredLeads.map((lead) => {
-                      const cleanPhoneDigits = lead.phone.replace(/[^0-9]/g, '');
+                      let cleanPhoneDigits = lead.phone.replace(/[^0-9]/g, '');
+                      if (cleanPhoneDigits.length === 10 && cleanPhoneDigits.startsWith('3')) {
+                        cleanPhoneDigits = '57' + cleanPhoneDigits;
+                      }
                       const waText = encodeURIComponent(
-                        `Hola ${lead.fullName}, te escribo desde la dirección de Prestigia respecto a la solicitud de auditoría de reputación para ${lead.businessName}. ¿En qué horario te queda bien que revisemos tu diagnóstico?`
+                        `Hola ${lead.fullName}, te habla Brayan de la dirección de Prestigia. Recibí tu solicitud para ${lead.businessName}. Vi que te interesa "${lead.primaryGoal || 'escalar tus ventas y blindar reputación'}" y prefieres coordinar en horario ${lead.preferredTime || 'laboral'}. ¿Cuándo te viene bien una llamada de 10 min para revisar tus números?`
                       );
                       const waUrl = `https://wa.me/${cleanPhoneDigits}?text=${waText}`;
 
@@ -8005,6 +8072,24 @@ Quedamos atentos a la confirmación o recepción de tu soporte de pago para mant
                               </div>
                             </div>
 
+                            {/* Preferred time & Goal Badges */}
+                            {(lead.preferredTime || lead.primaryGoal) && (
+                              <div className="flex flex-wrap gap-1.5 mt-3">
+                                {lead.preferredTime && (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] font-medium text-amber-300">
+                                    <Clock className="w-3 h-3 text-amber-400" />
+                                    Horario: {lead.preferredTime}
+                                  </span>
+                                )}
+                                {lead.primaryGoal && (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-medium text-emerald-300">
+                                    <Sparkles className="w-3 h-3 text-emerald-400" />
+                                    Meta: {lead.primaryGoal}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+
                             {/* Details Grid */}
                             <div className="grid grid-cols-2 gap-2 mt-3 text-xs text-slate-400 bg-[#0E121B] p-3 rounded-xl border border-slate-800/80">
                               <div className="flex items-center gap-1.5">
@@ -8035,11 +8120,20 @@ Quedamos atentos a la confirmación o recepción de tu soporte de pago para mant
                           </div>
 
                           {/* Quick WhatsApp Action Button */}
-                          <div className="pt-2 border-t border-slate-800/60 flex items-center justify-between gap-3">
-                            <span className="text-[11px] text-slate-500">
+                          <div className="pt-2 border-t border-slate-800/60 flex flex-wrap items-center justify-between gap-2">
+<span className="text-[11px] text-slate-500">
                               IP: {privacyMode ? '•••.•••.•••' : lead.ip || '127.0.0.1'} • {lead.device || 'Móvil'}
                             </span>
-                            <a
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleOnboardFromLead(lead)}
+                                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                                title="Crear marca directamente con estos datos"
+                              >
+                                <Rocket className="w-3.5 h-3.5 text-amber-400" />
+                                Crear Marca
+                              </button>
+<a
                               href={waUrl}
                               target="_blank"
                               rel="noopener noreferrer"
@@ -8048,6 +8142,7 @@ Quedamos atentos a la confirmación o recepción de tu soporte de pago para mant
                               <MessageCircle className="w-4 h-4" />
                               Contactar por WhatsApp
                             </a>
+                            </div>
                           </div>
                         </div>
                       );

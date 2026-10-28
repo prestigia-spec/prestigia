@@ -512,6 +512,8 @@ export interface CommercialLead {
   city: string;
   branchCount: string;
   notes?: string;
+  preferredTime?: string; // Horario preferido para la llamada estratégica (ej: Mañana, Tarde, Noche)
+  primaryGoal?: string; // Meta de crecimiento del negocio
   createdAt: string;
   status: 'new' | 'contacted' | 'negotiating' | 'won' | 'dismissed';
   ip?: string;
