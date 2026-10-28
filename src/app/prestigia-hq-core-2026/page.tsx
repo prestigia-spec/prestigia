@@ -6956,11 +6956,11 @@ export default function MasterAdminPage() {
                     <TrendingUp className="w-4 h-4 text-purple-400" />
                   </div>
                   <p className="text-xl font-extrabold text-white font-mono mt-1">
-                    {privacyMode ? '••••••••' : formatCurrencyDisplay(arrUSD, 'USD')}
+                    {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(arrUSD, 'USD') : formatCurrencyDisplay(arrCOP, 'COP'))}
                     <span className="text-xs text-purple-300 font-sans ml-1 font-normal">/año</span>
                   </p>
                   <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
-                    ≈ {privacyMode ? '••••••••' : formatCurrencyDisplay(arrCOP, 'COP')}
+                    ≈ {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(arrCOP, 'COP') : formatCurrencyDisplay(arrUSD, 'USD'))}
                   </p>
                 </div>
 
@@ -6971,11 +6971,11 @@ export default function MasterAdminPage() {
                     <Sparkles className="w-4 h-4 text-amber-400" />
                   </div>
                   <p className="text-xl font-extrabold text-amber-300 font-mono mt-1">
-                    {privacyMode ? '••••••••' : formatCurrencyDisplay(addOnsUSD, 'USD')}
+                    {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(addOnsUSD, 'USD') : formatCurrencyDisplay(addOnsCOP, 'COP'))}
                     <span className="text-xs text-amber-400 font-sans ml-1 font-normal">/mes</span>
                   </p>
                   <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
-                    ≈ {privacyMode ? '••••••••' : formatCurrencyDisplay(addOnsCOP, 'COP')}
+                    ≈ {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(addOnsCOP, 'COP') : formatCurrencyDisplay(addOnsUSD, 'USD'))}
                   </p>
                 </div>
 
@@ -6986,11 +6986,11 @@ export default function MasterAdminPage() {
                     <Building2 className="w-4 h-4 text-slate-400" />
                   </div>
                   <p className="text-xl font-extrabold text-white font-mono mt-1">
-                    {privacyMode ? '••••••••' : formatCurrencyDisplay(plansUSD, 'USD')}
+                    {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(plansUSD, 'USD') : formatCurrencyDisplay(plansCOP, 'COP'))}
                     <span className="text-xs text-slate-400 font-sans ml-1 font-normal">/mes</span>
                   </p>
                   <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
-                    ≈ {privacyMode ? '••••••••' : formatCurrencyDisplay(plansCOP, 'COP')}
+                    ≈ {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(plansCOP, 'COP') : formatCurrencyDisplay(plansUSD, 'USD'))}
                   </p>
                 </div>
 
@@ -7001,11 +7001,11 @@ export default function MasterAdminPage() {
                     <BarChart3 className="w-4 h-4 text-blue-400" />
                   </div>
                   <p className="text-xl font-extrabold text-white font-mono mt-1">
-                    {privacyMode ? '••••••••' : formatCurrencyDisplay(arpaUSD, 'USD')}
+                    {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(arpaUSD, 'USD') : formatCurrencyDisplay(arpaCOP, 'COP'))}
                     <span className="text-xs text-blue-300 font-sans ml-1 font-normal">/cuenta</span>
                   </p>
                   <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
-                    ≈ {privacyMode ? '••••••••' : formatCurrencyDisplay(arpaCOP, 'COP')}
+                    ≈ {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(arpaCOP, 'COP') : formatCurrencyDisplay(arpaUSD, 'USD'))}
                   </p>
                 </div>
 
@@ -7247,7 +7247,10 @@ export default function MasterAdminPage() {
                             {/* Base Fee */}
                             <td className="py-3.5 px-3 whitespace-nowrap">
                               <p className="font-mono font-bold text-white text-xs">
-                                {privacyMode ? '••••••••' : formatCurrencyDisplay(fin.baseUSD, 'USD')}
+                                {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(fin.baseUSD, 'USD') : formatCurrencyDisplay(fin.baseLocal, fin.currency.code))}
+                              </p>
+                              <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                                {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? `≈ ${formatCurrencyDisplay(fin.baseLocal, fin.currency.code)}` : `≈ ${formatCurrencyDisplay(fin.baseUSD, 'USD')}`)}
                               </p>
                               {fin.isCustomAgreed ? (
                                 <span className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-400 bg-amber-500/15 px-1.5 py-0.5 rounded border border-amber-500/30 mt-0.5">
@@ -7312,7 +7315,7 @@ export default function MasterAdminPage() {
                 {/* Table Footer */}
                 <div className="py-3.5 px-4 bg-[#121622] border-t border-slate-800 text-slate-400 text-xs flex flex-col sm:flex-row items-center justify-between gap-2">
                   <span>
-                    Consolidado de <strong className="text-white">{displayedBusinesses.length}</strong> marcas • Total MRR Global: <strong className="text-emerald-400 font-mono font-bold">{formatCurrencyDisplay(totalUSD, 'USD')}</strong> (≈ {formatCurrencyDisplay(totalCOP, 'COP')})
+                    Consolidado de <strong className="text-white">{displayedBusinesses.length}</strong> marcas • Total MRR: <strong className="text-emerald-400 font-mono font-bold">{mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(totalUSD, 'USD') : formatCurrencyDisplay(totalCOP, 'COP')}</strong> (≈ {mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(totalCOP, 'COP') : formatCurrencyDisplay(totalUSD, 'USD')})
                   </span>
                   <span className="text-[11px] text-purple-400 font-medium">
                     Prestigia B2B Billing System: Multi-Divisa (USD, COP, CLP, MXN, EUR)
