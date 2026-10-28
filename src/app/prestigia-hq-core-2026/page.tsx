@@ -7477,12 +7477,9 @@ Quedamos atentos a la confirmación o recepción de tu soporte de pago para mant
 
                                 <button
                                   type="button"
-                                  onClick={() => {
-                                    setSelectedBusinessId(biz.id);
-                                    setActiveTab('directorio');
-                                  }}
+                                  onClick={() => setViewPlaceModalBusiness(biz)}
                                   className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer"
-                                  title="Ver expediente en Directorio"
+                                  title={`Abrir Ficha Ejecutiva y Datos de ${biz.name}`}
                                 >
                                   <ExternalLink className="w-3 h-3 text-slate-400" />
                                   <span>Ficha</span>
