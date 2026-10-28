@@ -6073,6 +6073,10 @@ export default function MasterAdminPage() {
                   <p className="text-xs text-slate-400 mt-0.5">
                     Consolidado de clientes, pacientes y usuarios de todo tipo de empresas, comercios y profesionales independientes con teléfono, nombre y autorización de Habeas Data.
                   </p>
+                  <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-900/30 border border-purple-500/30 text-[11px] text-purple-200">
+                    <Shield className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                    <span><strong className="text-white">Blindaje Soberano de Datos:</strong> Aunque una marca o sede sea dada de baja o eliminada del sistema, los registros de usuarios finales <strong>JAMÁS se borran</strong>; permanecen de por vida en este Big Data Lake como el activo más importante de Prestigia.</span>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -9553,13 +9557,17 @@ export default function MasterAdminPage() {
                 <div className="p-3.5 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-200 text-xs space-y-2">
                   <p className="font-bold flex items-center gap-1.5 text-rose-400">
                     <AlertTriangle className="w-4 h-4" />
-                    ⚠️ Purga Definitiva e Irreversible de la Base de Datos
+                    ⚠️ Baja Corporativa Definitiva (Purga de Marca)
                   </p>
                   <ul className="text-[11px] text-slate-300 space-y-1 list-disc list-inside leading-relaxed">
-                    <li>Se eliminará todo el registro de <strong>{decommissionTarget.name}</strong> de la base de datos de Prestigia.</li>
-                    <li>Sus sedes, credenciales de acceso y configuraciones de plan serán destruidas.</li>
-                    <li>Esta acción es permanente y no podrá deshacerse ni recuperarse.</li>
+                    <li>Se revocarán las credenciales y accesos administrativos de <strong>{decommissionTarget.name}</strong>.</li>
+                    <li>Sus sedes y configuraciones de plan contratado serán desvinculadas.</li>
+                    <li>Esta acción es permanente para el perfil corporativo de la empresa.</li>
                   </ul>
+                  <div className="mt-2.5 p-2.5 rounded-xl bg-purple-950/60 border border-purple-500/40 text-[11px] text-purple-200 flex items-start gap-2">
+                    <Shield className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                    <span><strong className="text-white">Blindaje Soberano de Datos Prestigia:</strong> Los registros de usuarios finales captados (Habeas Data, teléfonos, reseñas y opiniones) <strong>JAMÁS se borran</strong>. Permanecen intactos para siempre en el Big Data Lake corporativo como activo estratégico supremo.</span>
+                  </div>
                 </div>
               )}
             </div>

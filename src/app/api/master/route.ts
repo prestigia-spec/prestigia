@@ -790,6 +790,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Negocio no encontrado' }, { status: 404 });
       }
 
+      // REGLA FUNDAMENTAL DE ARQUITECTURA PRESTIGIA:
+      // Los registros de usuarios finales (campaignParticipants, feedbacks, leads, Habeas Data Lake)
+      // JAMÁS se borran, ya que constituyen el activo estratégico y comercial más importante de Prestigia.
+      // La purga únicamente desvincula los accesos corporativos y la ficha de la empresa cliente.
       const deleted = await deleteBusiness(businessId);
       if (!deleted) {
         return NextResponse.json({ error: 'Error al purgar la marca de la base de datos' }, { status: 500 });
@@ -797,7 +801,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: `La marca '${existing.name}' (${businessId}) ha sido purgada y eliminada definitivamente de la base de datos.`,
+        message: `La marca '${existing.name}' (${businessId}) ha sido dada de baja del sistema corporativo. Su base de datos de usuarios finales y consentimientos Habeas Data se preserva 100% blindada e intacta en el Big Data Lake de Prestigia.`,
       });
     }
 
