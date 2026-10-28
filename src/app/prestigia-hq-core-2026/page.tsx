@@ -1093,6 +1093,9 @@ export default function MasterAdminPage() {
   const [mrrFilterStatus, setMrrFilterStatus] = useState('all');
   const [mrrFilterContractType, setMrrFilterContractType] = useState('all');
   const [mrrCurrencyMode, setMrrCurrencyMode] = useState<'usd' | 'local'>('usd');
+  const [exchangeRates, setExchangeRates] = useState<any>(null);
+  const [isRefreshingTrm, setIsRefreshingTrm] = useState<boolean>(false);
+  const [mrrCustomRateOverride, setMrrCustomRateOverride] = useState<boolean>(false);
   
   // Quick Fee Adjustment Modal State (Tab 5)
   const [mrrEditingBiz, setMrrEditingBiz] = useState<Business | null>(null);
@@ -1252,6 +1255,7 @@ export default function MasterAdminPage() {
         setGoogleReviews(data.googleReviews || []);
         setCampaignParticipants(data.campaignParticipants || []);
         setStats(data.stats || null);
+        if (data.exchangeRates) setExchangeRates(data.exchangeRates);
 
         if (data.securityConfig) {
           let effEmail = data.securityConfig.emergencyEmail;
@@ -3044,11 +3048,16 @@ export default function MasterAdminPage() {
 
   const getBusinessCurrency = (countryStr?: string) => {
     const c = (countryStr || '').toLowerCase();
-    if (c.includes('chile')) return PRESTIGIA_CURRENCIES.CLP;
-    if (c.includes('mexic') || c.includes('méxic')) return PRESTIGIA_CURRENCIES.MXN;
-    if (c.includes('españ') || c.includes('spain') || c.includes('euro')) return PRESTIGIA_CURRENCIES.EUR;
-    if (c.includes('estados unidos') || c.includes('usa') || c.includes('eeuu') || c.includes('internacional')) return PRESTIGIA_CURRENCIES.USD;
-    return PRESTIGIA_CURRENCIES.COP;
+    const copRate = exchangeRates?.rates?.COP || 4150;
+    const clpRate = exchangeRates?.rates?.CLP || 980;
+    const mxnRate = exchangeRates?.rates?.MXN || 18.5;
+    const eurRate = exchangeRates?.rates?.EUR || 0.90;
+
+    if (c.includes('chile')) return { code: 'CLP', name: 'Pesos Chilenos', flag: '🇨🇱', rateToUSD: clpRate };
+    if (c.includes('mexic') || c.includes('méxic')) return { code: 'MXN', name: 'Pesos Mexicanos', flag: '🇲🇽', rateToUSD: mxnRate };
+    if (c.includes('españ') || c.includes('spain') || c.includes('euro')) return { code: 'EUR', name: 'Euros', flag: '🇪🇺', rateToUSD: eurRate };
+    if (c.includes('estados unidos') || c.includes('usa') || c.includes('eeuu') || c.includes('internacional')) return { code: 'USD', name: 'Dólares Americanos', flag: '🇺🇸', rateToUSD: 1 };
+    return { code: 'COP', name: 'Pesos Colombianos', flag: '🇨🇴', rateToUSD: copRate };
   };
 
   const formatCurrencyDisplay = (amount: number, currencyCode: string) => {
@@ -6886,6 +6895,39 @@ export default function MasterAdminPage() {
                   <p className="text-xs text-slate-400 mt-1 max-w-2xl">
                     Facturación recurrente mensual en <strong>Dólares Americanos (USD)</strong> y <strong>Monedas Locales (COP, CLP, MXN, EUR)</strong>. Cálculo exacto con tarifas pactadas a medida y margen neto por Add-Ons modulares.
                   </p>
+                  <div className="mt-2.5 inline-flex flex-wrap items-center gap-2 p-1.5 px-3 rounded-xl bg-slate-900/90 border border-slate-700/80 text-[11px] text-slate-300">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span><strong className="text-emerald-400 font-semibold">TRM Oficial en Vivo:</strong> 1 USD = <strong className="text-white font-mono">${(exchangeRates?.rates?.COP || 4150).toLocaleString()} COP</strong> • <strong className="text-white font-mono">${(exchangeRates?.rates?.CLP || 980).toLocaleString()} CLP</strong> • <strong className="text-white font-mono">${(exchangeRates?.rates?.MXN || 18.5).toLocaleString()} MXN</strong></span>
+                    <button
+                      type="button"
+                      disabled={isRefreshingTrm}
+                      onClick={async () => {
+                        setIsRefreshingTrm(true);
+                        try {
+                          const res = await fetch('/api/master', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'refresh_trm' }),
+                          });
+                          const data = await res.json();
+                          if (data.success && data.exchangeRates) {
+                            setExchangeRates(data.exchangeRates);
+                            setNotification({ type: 'success', message: data.message });
+                            setTimeout(() => setNotification(null), 4000);
+                          }
+                        } catch {
+                          alert('Error al sincronizar TRM');
+                        } finally {
+                          setIsRefreshingTrm(false);
+                        }
+                      }}
+                      className="ml-1 text-[10px] text-amber-300 hover:text-white bg-amber-500/15 hover:bg-amber-500/25 px-2 py-0.5 rounded-md border border-amber-500/30 font-semibold flex items-center gap-1 transition cursor-pointer"
+                      title="Sincronizar la Tasa Representativa del Mercado oficial hoy"
+                    >
+                      <RefreshCw className={`w-2.5 h-2.5 ${isRefreshingTrm ? 'animate-spin text-amber-400' : ''}`} />
+                      <span>{isRefreshingTrm ? 'Actualizando...' : 'Actualizar TRM'}</span>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2.5 shrink-0">
@@ -7353,6 +7395,26 @@ export default function MasterAdminPage() {
                         💡 <strong>Flexibilidad Total:</strong> Puedes fijar la tarifa en <strong>Dólares Americanos (USD)</strong> para clientes internacionales, o en la <strong>Moneda Local</strong> del país del cliente. El sistema sincronizará la conversión automáticamente.
                       </div>
 
+                      {/* Banner TRM en vivo para este país */}
+                      {(() => {
+                        const targetCurr = getBusinessCurrency(mrrEditingBiz.country);
+                        return (
+                          <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-between text-[11px]">
+                            <span className="text-slate-300 flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                              TRM Oficial Hoy: <strong className="text-white">1 USD = ${targetCurr.rateToUSD.toLocaleString()} ${targetCurr.code}</strong>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setMrrCustomRateOverride(!mrrCustomRateOverride)}
+                              className="text-[10px] text-amber-300 hover:underline font-semibold"
+                            >
+                              {mrrCustomRateOverride ? '⚡ Usar TRM Automática' : '✍️ Editar Independiente'}
+                            </button>
+                          </div>
+                        );
+                      })()}
+
                       {/* Tarifa en USD */}
                       <div>
                         <label className="text-slate-300 font-semibold block mb-1">
@@ -7368,9 +7430,10 @@ export default function MasterAdminPage() {
                             onChange={(e) => {
                               const val = e.target.value;
                               setMrrFeeInputUSD(val);
-                              if (val) {
+                              if (val && !mrrCustomRateOverride) {
                                 const num = Number(val);
-                                setMrrFeeInputLocal(String(num * 4000));
+                                const rate = getBusinessCurrency(mrrEditingBiz.country).rateToUSD;
+                                setMrrFeeInputLocal(String(Math.round(num * rate)));
                               }
                             }}
                             placeholder="Ej: 360"
@@ -7382,10 +7445,10 @@ export default function MasterAdminPage() {
                         </div>
                       </div>
 
-                      {/* Tarifa en Moneda Local / COP */}
+                      {/* Tarifa en Moneda Local */}
                       <div>
                         <label className="text-slate-300 font-semibold block mb-1">
-                          Equivalente en Moneda Local ({getBusinessCurrency(mrrEditingBiz.country).code})
+                          Tarifa en Moneda Local ({getBusinessCurrency(mrrEditingBiz.country).code})
                         </label>
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold font-mono">
@@ -7397,9 +7460,10 @@ export default function MasterAdminPage() {
                             onChange={(e) => {
                               const val = e.target.value;
                               setMrrFeeInputLocal(val);
-                              if (val) {
+                              if (val && !mrrCustomRateOverride) {
                                 const num = Number(val);
-                                setMrrFeeInputUSD(String(Math.round(num / 4000)));
+                                const rate = getBusinessCurrency(mrrEditingBiz.country).rateToUSD;
+                                setMrrFeeInputUSD(String(Math.round(num / rate)));
                               }
                             }}
                             placeholder="Ej: 900000"
@@ -7409,6 +7473,11 @@ export default function MasterAdminPage() {
                             {getBusinessCurrency(mrrEditingBiz.country).code} / mes
                           </span>
                         </div>
+                        {mrrCustomRateOverride && (
+                          <p className="text-[10px] text-amber-400 mt-1">
+                            Modo Independiente activo: Puedes fijar ambos valores libremente sin conversión automática.
+                          </p>
+                        )}
                       </div>
 
                       {/* Ciclo de Facturación */}

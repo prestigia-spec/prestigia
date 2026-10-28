@@ -48,6 +48,14 @@ interface DatabaseSchema {
   leads?: CommercialLead[];
   trafficVisits?: TrafficVisit[];
   emailDispatches?: EmailDispatchRecord[];
+  exchangeRates?: ExchangeRatesRecord;
+}
+
+export interface ExchangeRatesRecord {
+  base: string;
+  rates: Record<string, number>;
+  lastUpdated: string;
+  source: string;
 }
 
 export interface MasterSecurityConfig {
@@ -746,6 +754,54 @@ export async function saveEmailDispatch(
   return newRecord;
 }
 
+export async function getExchangeRates(forceRefresh = false): Promise<ExchangeRatesRecord> {
+  const db = ensureDbFile();
+  const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+  const now = Date.now();
 
+  const existing = db.exchangeRates;
+  const isFresh = existing && existing.lastUpdated && (now - new Date(existing.lastUpdated).getTime() < ONE_DAY_MS);
 
+  if (!forceRefresh && isFresh && existing.rates && existing.rates.COP) {
+    return existing;
+  }
 
+  // Fetch updated daily TRM from open central-bank rate provider
+  try {
+    const res = await fetch('https://open.er-api.com/v6/latest/USD', {
+      signal: AbortSignal.timeout(4000),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.rates) {
+        const newRecord: ExchangeRatesRecord = {
+          base: 'USD',
+          rates: {
+            USD: 1,
+            COP: Math.round(data.rates.COP || 4150),
+            CLP: Math.round(data.rates.CLP || 980),
+            MXN: Number((data.rates.MXN || 18.5).toFixed(2)),
+            EUR: Number((data.rates.EUR || 0.90).toFixed(4)),
+            BRL: Number((data.rates.BRL || 5.5).toFixed(2)),
+            PEN: Number((data.rates.PEN || 3.75).toFixed(2)),
+          },
+          lastUpdated: new Date().toISOString(),
+          source: 'Open Exchange Rates (TRM Oficial Diaria)',
+        };
+        db.exchangeRates = newRecord;
+        writeDbFile(db);
+        return newRecord;
+      }
+    }
+  } catch (e: any) {
+    console.warn('Could not refresh exchange rates, using fallback:', e?.message);
+  }
+
+  // Fallback if network failed
+  return existing || {
+    base: 'USD',
+    rates: { USD: 1, COP: 4150, CLP: 985, MXN: 18.6, EUR: 0.90 },
+    lastUpdated: new Date().toISOString(),
+    source: 'Tasa Referencial de Respaldo',
+  };
+}

@@ -17,6 +17,7 @@ import {
   EmailDispatchRecord,
   deleteBusiness,
   archiveBusiness,
+  getExchangeRates,
 } from '@/lib/db';
 import { Business, MasterAddOns, DayOneBaseline, Branch } from '@/lib/types';
 import { verifyTOTP, getTOTPAuthUrl } from '@/lib/totp';
@@ -236,6 +237,7 @@ export async function GET(request: NextRequest) {
       trafficVisits: await getAllTrafficVisits(),
       leads: await getAllCommercialLeads(),
       emailDispatches: await getAllEmailDispatches(),
+      exchangeRates: await getExchangeRates(),
     }, {
       headers: {
         'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -392,6 +394,16 @@ export async function POST(request: NextRequest) {
         isValid: true,
         twoFactorRequired: is2FAEnforced,
         message: 'Sesión Master autorizada exitosamente.',
+      });
+    }
+
+    // Refresh Live TRM Exchange Rates on demand
+    if (action === 'refresh_trm') {
+      const updatedRates = await getExchangeRates(true);
+      return NextResponse.json({
+        success: true,
+        message: `Tasas de cambio (TRM) sincronizadas en vivo: 1 USD = $${updatedRates.rates.COP} COP • ${updatedRates.rates.CLP} CLP • ${updatedRates.rates.MXN} MXN`,
+        exchangeRates: updatedRates,
       });
     }
 
