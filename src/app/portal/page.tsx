@@ -8767,7 +8767,7 @@ export default function PortalPage() {
             <p className="text-[11px] text-slate-400">
               {lang === 'en' ? 'Forgot your credentials? ' : '¿Olvidaste tus credenciales? '}
               <a
-                href={`https://wa.me/573001234567?text=${encodeURIComponent(
+                href={`https://wa.me/573058314049?text=${encodeURIComponent(
                   lang === 'en'
                     ? 'Hello Prestigia, I need assistance recovering access to my portal account.'
                     : 'Hola Prestigia, requiero soporte con el acceso a mi portal Prestigia'
@@ -8829,7 +8829,7 @@ export default function PortalPage() {
 
           <div className="space-y-3 pt-2">
             <a
-              href="https://wa.me/573001234567?text=Hola%20Prestigia,%20mi%20cuenta%20se%20encuentra%20suspendida%20y%20deseo%20reactivarla"
+              href="https://wa.me/573058314049?text=Hola%20Prestigia,%20mi%20cuenta%20se%20encuentra%20suspendida%20y%20deseo%20reactivarla"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2 cursor-pointer"
@@ -9156,7 +9156,7 @@ export default function PortalPage() {
                   </span>
                   {/* Support Quota Indicator */}
                   <a
-                    href={`https://wa.me/573001234567?text=${encodeURIComponent(
+                    href={`https://wa.me/573058314049?text=${encodeURIComponent(
                       lang === 'en'
                         ? `Hello Prestigia, I am the owner of ${session.business.name} (${
                             effectivePlan === 'elite' ? '👑 Elite Plan' : effectivePlan === 'pro' ? '⭐ Pro Plan' : 'Independent Plan'
@@ -18024,7 +18024,7 @@ export default function PortalPage() {
                         {/* WhatsApp Shift Closing to Owner (Plan Empresarial) */}
                         {effectivePlan === 'elite' ? (
                           <a
-                            href={`https://wa.me/${(session.business.ownerPhone || '573001234567').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                            href={`https://wa.me/${(session.business.ownerPhone || '573058314049').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
                               lang === 'en'
                                 ? `*OFFICIAL SHIFT CLOSING - PRESTIGIA*\n` +
                                   `📍 *Location:* ${session.activeBranch?.name || 'Branch'}\n` +
@@ -21745,7 +21745,7 @@ export default function PortalPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        const phone = '573001234567';
+                        const phone = '573058314049';
                         const curBizId = session?.business.id;
                         const message = encodeURIComponent(
                           lang === 'en'
@@ -22912,7 +22912,7 @@ export default function PortalPage() {
                           <button
                             type="button"
                             onClick={() => {
-                              const phone = '573001234567';
+                              const phone = '573058314049';
                               const currentBranch = profileBranches[activeBranchEditIdx];
                               const message = encodeURIComponent(
                                 lang === 'en'
@@ -23205,7 +23205,7 @@ export default function PortalPage() {
                                   <button
                                     type="button"
                                     onClick={() => {
-                                      const phone = '573001234567';
+                                      const phone = '573058314049';
                                       const message = encodeURIComponent(
                                         lang === 'en'
                                           ? `Hello Prestigia Support, I am ${profileOwnerName || 'Owner'} from "${profileName}". I request assistance with the Google Business Profile connection for branch: ${curBranch?.name} (ID: ${curBranch?.id}).`
@@ -23323,7 +23323,7 @@ export default function PortalPage() {
                             <button
                               type="button"
                               onClick={() => {
-                                const phone = '573001234567';
+                                const phone = '573058314049';
                                 const currentBranch = profileBranches[activeBranchEditIdx];
                                 const message = encodeURIComponent(
                                   lang === 'en'
@@ -26006,7 +26006,7 @@ export default function PortalPage() {
                 </div>
 
                 <a
-                  href={`https://wa.me/573009876543?text=${encodeURIComponent(
+                  href={`https://wa.me/573058314049?text=${encodeURIComponent(
                     lang === 'en'
                       ? `Hello Prestigia Team, I am using the Independent Plan for "${profileName || 'My Business'}" and I would like to speak with an advisor to upgrade my plan and activate advanced tools.`
                       : `Hola Prestigia, tengo el Plan Independiente para "${profileName || 'Mi Negocio'}" y me gustaría comunicarme con un asesor para mejorar mi plan y activar nuevas funciones.`
@@ -26082,7 +26082,7 @@ export default function PortalPage() {
                     </div>
 
                     <a
-                      href={`https://wa.me/573009876543?text=${encodeURIComponent(
+                      href={`https://wa.me/573058314049?text=${encodeURIComponent(
                         lang === 'en'
                           ? `Hello Prestigia, I want to request the Plan Pro evaluation for "${profileName || 'My Business'}".`
                           : `Hola Prestigia, quiero solicitar la activación del Plan Pro para "${profileName || 'Mi Negocio'}".`
@@ -26140,7 +26140,7 @@ export default function PortalPage() {
                     </div>
 
                     <a
-                      href={`https://wa.me/573009876543?text=${encodeURIComponent(
+                      href={`https://wa.me/573058314049?text=${encodeURIComponent(
                         lang === 'en'
                           ? `Hello Prestigia, I want to request the Plan Élite evaluation for "${profileName || 'My Business'}".`
                           : `Hola Prestigia, quiero solicitar la activación del Plan Élite para "${profileName || 'Mi Negocio'}".`
@@ -26167,7 +26167,7 @@ export default function PortalPage() {
                   </p>
                 </div>
                 <a
-                  href={`https://wa.me/573009876543?text=${encodeURIComponent(
+                  href={`https://wa.me/573058314049?text=${encodeURIComponent(
                     lang === 'en'
                       ? `Hello Prestigia, I have 4+ locations for "${profileName || 'My Brand'}" and need an Enterprise custom quote.`
                       : `Hola Prestigia, cuento con 4 o más sedes para "${profileName || 'Mi Marca'}" y requiero una cotización para el Plan Empresarial.`
@@ -26431,7 +26431,7 @@ export default function PortalPage() {
                 </div>
                 <button
                   onClick={() => {
-                    const waUrl = `https://wa.me/573001234567?text=${encodeURIComponent(
+                    const waUrl = `https://wa.me/573058314049?text=${encodeURIComponent(
                       lang === 'en'
                         ? `Hello Prestigia Commercial, I am interested in quoting the Basic Plan for my business ${session.business.name}. Please provide custom corporate rates.`
                         : `Hola Prestigia Comercial, me interesa cotizar el Plan Básico para mi negocio ${session.business.name}. Quisiera conocer la tarifa corporativa según nuestras sedes.`
@@ -26462,7 +26462,7 @@ export default function PortalPage() {
                 </div>
                 <button
                   onClick={() => {
-                    const waUrl = `https://wa.me/573001234567?text=${encodeURIComponent(
+                    const waUrl = `https://wa.me/573058314049?text=${encodeURIComponent(
                       lang === 'en'
                         ? `Hello Prestigia Commercial, I am interested in quoting the Pro Plan for my business ${session.business.name}. Please provide custom corporate rates.`
                         : `Hola Prestigia Comercial, me interesa cotizar el Plan Pro para mi negocio ${session.business.name}. Quisiera conocer la tarifa corporativa según nuestras sedes.`
@@ -26514,7 +26514,7 @@ export default function PortalPage() {
               </div>
               <button
                 onClick={() => {
-                  const waUrl = `https://wa.me/573001234567?text=${encodeURIComponent(
+                  const waUrl = `https://wa.me/573058314049?text=${encodeURIComponent(
                     lang === 'en'
                       ? `Hello Prestigia Billing, I require payment support or invoice assistance for my business ${session.business.name}.`
                       : `Hola Prestigia Facturación, requiero soporte de cobro o factura para mi negocio ${session.business.name}.`

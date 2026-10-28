@@ -762,7 +762,7 @@ export default function HomePage() {
               </p>
               <div className="pt-3">
                 <a
-                  href={`https://wa.me/573172606093?text=${encodeURIComponent(
+                  href={`https://wa.me/573058314049?text=${encodeURIComponent(
                     `Hola, acabo de agendar mi llamada estratégica en Prestigia para mi negocio *${leadForm.businessName}* (${leadForm.fullName}). Me gustaría confirmar el horario para revisar el diagnóstico.`
                   )}`}
                   target="_blank"
@@ -969,7 +969,7 @@ export default function HomePage() {
               <span>Portal de Clientes</span>
             </Link>
             <a
-              href="https://wa.me/573172606093?text=Hola%20Prestigia,%20solicito%20información%20sobre%20el%20blindaje%20comercial"
+              href="https://wa.me/573058314049?text=Hola%20Prestigia,%20solicito%20información%20sobre%20el%20blindaje%20comercial"
               target="_blank"
               rel="noopener noreferrer"
               className="text-slate-300 hover:text-white transition flex items-center gap-1.5 font-semibold"

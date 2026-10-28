@@ -262,7 +262,7 @@ export function LegalModal({
           </span>
           <div className="flex items-center gap-2">
             <a
-              href={`https://wa.me/573001234567?text=${encodeURIComponent(
+              href={`https://wa.me/573058314049?text=${encodeURIComponent(
                 jurisdiction === 'us'
                   ? `Hello Prestigia Support, I would like to request an official PDF copy of our service agreement for ${businessName}.`
                   : `Hola Soporte Prestigia, solicito una copia oficial en PDF de nuestro contrato de servicio para ${businessName}.`

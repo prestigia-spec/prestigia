@@ -538,3 +538,8 @@ export interface TrafficVisit {
   referrer?: string;
   action?: string;
 }
+
+
+// WhatsApp Oficial Central y Exclusivo de Prestigia (Soporte, Pagos, Consultas, Asesorías)
+export const PRESTIGIA_OFFICIAL_WHATSAPP = '573058314049';
+export const PRESTIGIA_OFFICIAL_PHONE_DISPLAY = '+57 305 831 4049';
