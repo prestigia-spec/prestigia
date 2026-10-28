@@ -46,6 +46,7 @@ import {
   Phone,
   Mail,
   Sliders,
+  ChevronLeft,
   ChevronRight,
   ChevronDown,
   Globe,
@@ -1080,7 +1081,8 @@ export default function MasterAdminPage() {
   const [dataFilterBranch, setDataFilterBranch] = useState('all');
   const [dataFilterNiche, setDataFilterNiche] = useState('all');
   const [dataFilterRating, setDataFilterRating] = useState('all');
-  const [dataPageLimit, setDataPageLimit] = useState<'30' | '50' | 'all'>('all');
+  const [dataPageLimit, setDataPageLimit] = useState<'30' | '50' | '100' | 'all'>('30');
+  const [dataCurrentPage, setDataCurrentPage] = useState<number>(1);
 
   // Alertas Tempranas Filters State
   const [alertFilterBusiness, setAlertFilterBusiness] = useState<string>('all');
@@ -3349,12 +3351,47 @@ export default function MasterAdminPage() {
   const dataLakeDetractorsCount = useMemo(() => filteredDataLake.filter((r) => r.rating < 4).length, [filteredDataLake]);
   const dataLakeTouristsCount = useMemo(() => filteredDataLake.filter((r) => r.isTourist).length, [filteredDataLake]);
 
+  // Pagination calculations for Big Data Lake
+  const dataPageSize = dataPageLimit === 'all' ? (filteredDataLake.length || 1) : parseInt(dataPageLimit, 10);
+  const dataTotalPages = Math.max(1, Math.ceil(filteredDataLake.length / (dataPageLimit === 'all' ? (filteredDataLake.length || 1) : parseInt(dataPageLimit, 10))));
+  const safeDataCurrentPage = Math.min(Math.max(1, dataCurrentPage), dataTotalPages);
+
+  // Auto-reset page when filters or limit change
+  useEffect(() => {
+    setDataCurrentPage(1);
+  }, [
+    dataFilterCountry,
+    dataFilterCity,
+    dataFilterLocality,
+    dataFilterBusiness,
+    dataFilterBranch,
+    dataFilterNiche,
+    dataFilterRating,
+    searchTerm,
+    dataPageLimit,
+  ]);
+
   // Displayed records according to pagination / limit
   const displayedDataLake = useMemo(() => {
-    if (dataPageLimit === '30') return filteredDataLake.slice(0, 30);
-    if (dataPageLimit === '50') return filteredDataLake.slice(0, 50);
-    return filteredDataLake;
-  }, [filteredDataLake, dataPageLimit]);
+    if (dataPageLimit === 'all') return filteredDataLake;
+    const size = parseInt(dataPageLimit, 10);
+    const start = (safeDataCurrentPage - 1) * size;
+    return filteredDataLake.slice(start, start + size);
+  }, [filteredDataLake, safeDataCurrentPage, dataPageLimit]);
+
+  // Numbered pagination array generator (e.g. [1, 2, 3], or [1, 2, 3, 4, 5, '...', 20])
+  const getDataLakePageNumbers = (current: number, total: number) => {
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+    if (current <= 4) {
+      return [1, 2, 3, 4, 5, '...', total];
+    }
+    if (current >= total - 3) {
+      return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+    }
+    return [1, '...', current - 1, current, current + 1, '...', total];
+  };
 
   // Filtered Alerts for Tab 5 (Radar de Quejas en Vivo)
   const filteredAlerts = useMemo(() => {
@@ -6262,14 +6299,15 @@ export default function MasterAdminPage() {
                   >
                     <option value="30">30 filas</option>
                     <option value="50">50 filas</option>
-                    <option value="all">Todos los {filteredDataLake.length} registros</option>
+                    <option value="100">100 filas</option>
+                    <option value="all">Ver todos ({filteredDataLake.length})</option>
                   </select>
                 </div>
               </div>
 
               <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800/80">
                 <span>
-                  Mostrando <strong className="text-white">{displayedDataLake.length}</strong> de <strong className="text-white">{filteredDataLake.length}</strong> clientes filtrados (Total en Data Lake: <strong className="text-purple-300">{unifiedDataLakeRecords.length}</strong>)
+                  Mostrando registros <strong className="text-white">{filteredDataLake.length === 0 ? 0 : (safeDataCurrentPage - 1) * dataPageSize + 1} - {Math.min(safeDataCurrentPage * dataPageSize, filteredDataLake.length)}</strong> de <strong className="text-white">{filteredDataLake.length}</strong> clientes filtrados (Página <strong className="text-purple-300">{safeDataCurrentPage}</strong> de <strong className="text-purple-300">{dataTotalPages}</strong> • Base total: <strong className="text-purple-300">{unifiedDataLakeRecords.length}</strong>)
                 </span>
                 {(dataFilterCountry !== 'all' || dataFilterCity !== 'all' || dataFilterLocality !== 'all' || dataFilterBusiness !== 'all' || dataFilterBranch !== 'all' || dataFilterNiche !== 'all' || dataFilterRating !== 'all') && (
                   <button
@@ -6429,14 +6467,76 @@ export default function MasterAdminPage() {
                 </table>
               </div>
 
-              {/* Table Footer */}
-              <div className="py-3 px-4 bg-[#121622] border-t border-slate-800 text-slate-400 text-xs flex flex-col sm:flex-row items-center justify-between gap-2">
-                <span>
-                  Mostrando <strong className="text-white">{displayedDataLake.length}</strong> de <strong className="text-white">{filteredDataLake.length}</strong> resultados filtrados (Base total: <strong className="text-white">{unifiedDataLakeRecords.length}</strong>)
-                </span>
-                <span className="text-[11px] text-purple-400 font-medium">
-                  Directorio & Fidelización: Base lista para campañas cruzadas y Páginas Amarillas Prestigia
-                </span>
+              {/* Table Footer with Numbered Pagination Bar */}
+              <div className="py-3.5 px-4 bg-[#121622] border-t border-slate-800 text-slate-400 text-xs flex flex-col md:flex-row items-center justify-between gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2.5 text-center sm:text-left">
+                  <span>
+                    Mostrando registros <strong className="text-white">{filteredDataLake.length === 0 ? 0 : (safeDataCurrentPage - 1) * dataPageSize + 1} - {Math.min(safeDataCurrentPage * dataPageSize, filteredDataLake.length)}</strong> de <strong className="text-white">{filteredDataLake.length}</strong> filtrados
+                  </span>
+                  <span className="text-slate-600 hidden sm:inline">•</span>
+                  <span className="text-[11px] text-purple-400 font-medium">
+                    Página <strong className="text-purple-300 font-bold">{safeDataCurrentPage}</strong> de <strong className="text-purple-300 font-bold">{dataTotalPages}</strong>
+                  </span>
+                </div>
+
+                {/* Numbered Pagination Buttons */}
+                {dataPageLimit !== 'all' && dataTotalPages > 1 && (
+                  <div className="flex items-center gap-1.5 select-none">
+                    {/* Botón Anterior */}
+                    <button
+                      type="button"
+                      disabled={safeDataCurrentPage <= 1}
+                      onClick={() => setDataCurrentPage((prev) => Math.max(1, prev - 1))}
+                      className="px-2.5 py-1.5 rounded-lg border border-slate-700 bg-[#141A26] hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 hover:text-white transition flex items-center gap-1 text-xs font-semibold cursor-pointer"
+                      title="Página Anterior"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Anterior</span>
+                    </button>
+
+                    {/* Selector de Páginas [1] [2] [3] [4] [5]... */}
+                    <div className="flex items-center gap-1">
+                      {getDataLakePageNumbers(safeDataCurrentPage, dataTotalPages).map((p, idx) => {
+                        if (p === '...') {
+                          return (
+                            <span key={`dots-${idx}`} className="px-1 text-slate-500 font-mono text-xs select-none">
+                              ...
+                            </span>
+                          );
+                        }
+                        const pageNum = p as number;
+                        const isActive = pageNum === safeDataCurrentPage;
+                        return (
+                          <button
+                            key={pageNum}
+                            type="button"
+                            onClick={() => setDataCurrentPage(pageNum)}
+                            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs font-bold transition flex items-center justify-center cursor-pointer ${
+                              isActive
+                                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 border border-purple-400 font-extrabold ring-1 ring-purple-400'
+                                : 'bg-[#141A26] border border-slate-700/80 text-slate-300 hover:text-white hover:bg-slate-800 hover:border-slate-600'
+                            }`}
+                            title={`Ir a página ${pageNum}`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Botón Siguiente */}
+                    <button
+                      type="button"
+                      disabled={safeDataCurrentPage >= dataTotalPages}
+                      onClick={() => setDataCurrentPage((prev) => Math.min(dataTotalPages, prev + 1))}
+                      className="px-2.5 py-1.5 rounded-lg border border-slate-700 bg-[#141A26] hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 hover:text-white transition flex items-center gap-1 text-xs font-semibold cursor-pointer"
+                      title="Página Siguiente"
+                    >
+                      <span className="hidden sm:inline">Siguiente</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
