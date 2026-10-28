@@ -1092,7 +1092,7 @@ export default function MasterAdminPage() {
   const [mrrFilterCountry, setMrrFilterCountry] = useState('all');
   const [mrrFilterStatus, setMrrFilterStatus] = useState('all');
   const [mrrFilterContractType, setMrrFilterContractType] = useState('all');
-  const [mrrCurrencyMode, setMrrCurrencyMode] = useState<'dual' | 'usd' | 'local' | 'cop'>('dual');
+  const [mrrCurrencyMode, setMrrCurrencyMode] = useState<'usd' | 'local'>('usd');
   
   // Quick Fee Adjustment Modal State (Tab 5)
   const [mrrEditingBiz, setMrrEditingBiz] = useState<Business | null>(null);
@@ -6889,55 +6889,33 @@ export default function MasterAdminPage() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-                  {/* Currency View Mode Toggle */}
+                  {/* Selector Simple: Dólares vs Moneda Local */}
                   <div className="bg-[#141A26] border border-slate-700/80 p-1 rounded-xl flex items-center gap-1 text-xs font-semibold">
                     <button
                       type="button"
-                      onClick={() => setMrrCurrencyMode('dual')}
-                      className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
-                        mrrCurrencyMode === 'dual'
-                          ? 'bg-emerald-500 text-slate-950 font-bold shadow'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                      title="Ver Dólares USD ($) con referencia en moneda local de cada país"
-                    >
-                      🌐 Dual (USD / Local)
-                    </button>
-                    <button
-                      type="button"
                       onClick={() => setMrrCurrencyMode('usd')}
-                      className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1.5 ${
                         mrrCurrencyMode === 'usd'
                           ? 'bg-emerald-500 text-slate-950 font-bold shadow'
                           : 'text-slate-400 hover:text-white'
                       }`}
-                      title="Ver todos los montos convertidos a Dólares USD"
+                      title="Ver todos los montos en Dólares Americanos (USD)"
                     >
-                      🇺🇸 USD ($)
+                      <DollarSign className="w-3.5 h-3.5" />
+                      <span>Dólares (USD)</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setMrrCurrencyMode('local')}
-                      className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1.5 ${
                         mrrCurrencyMode === 'local'
                           ? 'bg-emerald-500 text-slate-950 font-bold shadow'
                           : 'text-slate-400 hover:text-white'
                       }`}
-                      title="Ver en la moneda local de cada establecimiento (COP, CLP, MXN)"
+                      title="Ver en la moneda local de cada país (Pesos COP, Pesos CLP, etc.)"
                     >
-                      🏳️ Moneda Local
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMrrCurrencyMode('cop')}
-                      className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
-                        mrrCurrencyMode === 'cop'
-                          ? 'bg-emerald-500 text-slate-950 font-bold shadow'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                      title="Ver todo consolidado en Pesos Colombianos (COP)"
-                    >
-                      🇨🇴 COP ($)
+                      <Globe className="w-3.5 h-3.5" />
+                      <span>Moneda Local</span>
                     </button>
                   </div>
 
@@ -6963,11 +6941,11 @@ export default function MasterAdminPage() {
                     <DollarSign className="w-4 h-4 text-emerald-400" />
                   </div>
                   <p className="text-xl font-extrabold text-white font-mono mt-1">
-                    {privacyMode ? '••••••••' : formatCurrencyDisplay(totalUSD, 'USD')}
+                    {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(totalUSD, 'USD') : formatCurrencyDisplay(totalCOP, 'COP'))}
                     <span className="text-xs text-emerald-300 font-sans ml-1 font-normal">/mes</span>
                   </p>
                   <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
-                    ≈ {privacyMode ? '••••••••' : formatCurrencyDisplay(totalCOP, 'COP')}
+                    ≈ {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(totalCOP, 'COP') : formatCurrencyDisplay(totalUSD, 'USD'))}
                   </p>
                 </div>
 
@@ -7175,25 +7153,19 @@ export default function MasterAdminPage() {
                         const isSuspended = biz.status === 'suspended' || (biz as any).isArchived;
                         const addons = biz.masterAddOns;
 
-                        // Display formatted amount depending on selected currency mode
+                        // Display formatted amount: either USD or Moneda Local
                         let primaryPrice = '';
                         let secondaryPrice = '';
 
                         if (mrrCurrencyMode === 'usd') {
-                          primaryPrice = formatCurrencyDisplay(fin.totalUSD, 'USD');
-                          secondaryPrice = `ARR: ${formatCurrencyDisplay(fin.arrUSD, 'USD')}/año`;
-                        } else if (mrrCurrencyMode === 'cop') {
-                          primaryPrice = formatCurrencyDisplay(fin.totalCOP, 'COP');
-                          secondaryPrice = `USD: ${formatCurrencyDisplay(fin.totalUSD, 'USD')}`;
-                        } else if (mrrCurrencyMode === 'local') {
-                          primaryPrice = formatCurrencyDisplay(fin.totalLocal, fin.currency.code);
-                          secondaryPrice = `USD: ${formatCurrencyDisplay(fin.totalUSD, 'USD')}`;
-                        } else {
-                          // Dual default: USD prominent + local currency
                           primaryPrice = `${formatCurrencyDisplay(fin.totalUSD, 'USD')} USD`;
                           secondaryPrice = fin.currency.code === 'USD'
                             ? `ARR: ${formatCurrencyDisplay(fin.arrUSD, 'USD')}/año`
-                            : `${formatCurrencyDisplay(fin.totalLocal, fin.currency.code)} • ARR ${formatCurrencyDisplay(fin.arrUSD, 'USD')}`;
+                            : `≈ ${formatCurrencyDisplay(fin.totalLocal, fin.currency.code)}`;
+                        } else {
+                          // Moneda Local de la marca
+                          primaryPrice = formatCurrencyDisplay(fin.totalLocal, fin.currency.code);
+                          secondaryPrice = `≈ ${formatCurrencyDisplay(fin.totalUSD, 'USD')} USD`;
                         }
 
                         return (
