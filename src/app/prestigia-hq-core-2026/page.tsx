@@ -2961,7 +2961,7 @@ export default function MasterAdminPage() {
     const preservedRevenueCOP = privateComplaintsIntercepted * (baseline.averageTicketCOP || 45000);
     const preservedRevenueUSD = baseline.averageTicketUSD
       ? privateComplaintsIntercepted * baseline.averageTicketUSD
-      : Math.round(preservedRevenueCOP / 4000);
+      : Math.round(preservedRevenueCOP / (exchangeRates?.rates?.COP || 3148));
 
     // Multiplicador de Retorno de Inversión (ROI)
     // Sin precios fijos de planes: calculamos según la tarifa acordada negociada por cliente / sede
@@ -3041,18 +3041,18 @@ export default function MasterAdminPage() {
 
   const PRESTIGIA_CURRENCIES: Record<string, { code: string; name: string; flag: string; rateToUSD: number }> = {
     USD: { code: 'USD', name: 'Dólares Americanos', flag: '🇺🇸', rateToUSD: 1 },
-    COP: { code: 'COP', name: 'Pesos Colombianos', flag: '🇨🇴', rateToUSD: 4000 },
-    CLP: { code: 'CLP', name: 'Pesos Chilenos', flag: '🇨🇱', rateToUSD: 950 },
-    MXN: { code: 'MXN', name: 'Pesos Mexicanos', flag: '🇲🇽', rateToUSD: 18 },
-    EUR: { code: 'EUR', name: 'Euros', flag: '🇪🇺', rateToUSD: 0.92 },
+    COP: { code: 'COP', name: 'Pesos Colombianos', flag: '🇨🇴', rateToUSD: exchangeRates?.rates?.COP || 3148 },
+    CLP: { code: 'CLP', name: 'Pesos Chilenos', flag: '🇨🇱', rateToUSD: exchangeRates?.rates?.CLP || 989 },
+    MXN: { code: 'MXN', name: 'Pesos Mexicanos', flag: '🇲🇽', rateToUSD: exchangeRates?.rates?.MXN || 18.67 },
+    EUR: { code: 'EUR', name: 'Euros', flag: '🇪🇺', rateToUSD: exchangeRates?.rates?.EUR || 0.8975 },
   };
 
   const getBusinessCurrency = (countryStr?: string) => {
     const c = (countryStr || '').toLowerCase();
-    const copRate = exchangeRates?.rates?.COP || 4150;
-    const clpRate = exchangeRates?.rates?.CLP || 980;
-    const mxnRate = exchangeRates?.rates?.MXN || 18.5;
-    const eurRate = exchangeRates?.rates?.EUR || 0.90;
+    const copRate = exchangeRates?.rates?.COP || 3148;
+    const clpRate = exchangeRates?.rates?.CLP || 989;
+    const mxnRate = exchangeRates?.rates?.MXN || 18.67;
+    const eurRate = exchangeRates?.rates?.EUR || 0.8975;
 
     if (c.includes('chile')) return { code: 'CLP', name: 'Pesos Chilenos', flag: '🇨🇱', rateToUSD: clpRate };
     if (c.includes('mexic') || c.includes('méxic')) return { code: 'MXN', name: 'Pesos Mexicanos', flag: '🇲🇽', rateToUSD: mxnRate };
@@ -3084,6 +3084,7 @@ export default function MasterAdminPage() {
 
   const getBusinessFinancials = (biz: Business) => {
     const curr = getBusinessCurrency(biz.country);
+    const liveCopRate = exchangeRates?.rates?.COP || 3148;
     
     // Custom negotiated fee has top priority
     const branchesFeeCOP = (biz.branches || []).reduce((acc: number, b: any) => acc + (b.agreedMonthlyFeeCOP || 0), 0);
@@ -3097,20 +3098,26 @@ export default function MasterAdminPage() {
     let baseLocal = 0;
 
     if (isCustomAgreed) {
-      if (agreedUSD > 0) {
-        baseUSD = agreedUSD;
-        baseCOP = Math.round(agreedUSD * 4000);
-        baseLocal = curr.code === 'USD' ? baseUSD : curr.code === 'COP' ? baseCOP : Math.round(baseUSD * curr.rateToUSD);
+      if (curr.code === 'USD') {
+        baseUSD = agreedUSD > 0 ? agreedUSD : (liveCopRate > 0 ? Math.round(agreedCOP / liveCopRate) : agreedCOP);
+        baseCOP = Math.round(baseUSD * liveCopRate);
+        baseLocal = baseUSD;
+      } else if (curr.code === 'COP') {
+        // Para marcas en Colombia, el monto en pesos COP se convierte a USD con la TRM en vivo
+        baseCOP = agreedCOP > 0 ? agreedCOP : Math.round(agreedUSD * curr.rateToUSD);
+        baseUSD = curr.rateToUSD > 0 ? Math.round(baseCOP / curr.rateToUSD) : Math.round(baseCOP / liveCopRate);
+        baseLocal = baseCOP;
       } else {
-        baseCOP = agreedCOP;
-        baseUSD = Math.round(agreedCOP / 4000);
-        baseLocal = curr.code === 'COP' ? baseCOP : curr.code === 'USD' ? baseUSD : Math.round(baseUSD * curr.rateToUSD);
+        // Otras monedas (CLP, MXN, EUR, etc.)
+        baseLocal = agreedCOP > 0 ? agreedCOP : (curr.rateToUSD > 0 ? Math.round(agreedUSD * curr.rateToUSD) : 0);
+        baseUSD = curr.rateToUSD > 0 ? Math.round(baseLocal / curr.rateToUSD) : (agreedUSD || 0);
+        baseCOP = Math.round(baseUSD * liveCopRate);
       }
     } else {
       const std = PRESTIGIA_PLAN_PRICING[biz.plan] || PRESTIGIA_PLAN_PRICING.pro;
       baseCOP = std.cop;
-      baseUSD = std.usd;
-      baseLocal = curr.code === 'COP' ? std.cop : curr.code === 'USD' ? std.usd : Math.round(std.usd * curr.rateToUSD);
+      baseUSD = curr.rateToUSD > 0 ? Math.round(std.cop / curr.rateToUSD) : std.usd;
+      baseLocal = curr.code === 'COP' ? std.cop : curr.code === 'USD' ? std.usd : Math.round(baseUSD * curr.rateToUSD);
     }
 
     // Add-Ons Modulares
@@ -7453,8 +7460,8 @@ Quedamos atentos a la confirmación o recepción de tu soporte de pago para mant
                                   type="button"
                                   onClick={() => {
                                     setMrrEditingBiz(biz);
-                                    setMrrFeeInputUSD(String(biz.agreedMonthlyFeeUSD || fin.totalUSD || ''));
-                                    setMrrFeeInputLocal(String(biz.agreedMonthlyFeeCOP || fin.totalLocal || ''));
+                                    setMrrFeeInputUSD(String(fin.totalUSD || ''));
+                                    setMrrFeeInputLocal(String(fin.totalLocal || ''));
                                     setMrrBillingCycle(biz.billingCycle || 'monthly');
                                     setMrrBillingDay(biz.billingDay || 5);
                                   }}
@@ -9344,7 +9351,7 @@ Quedamos atentos a la confirmación o recepción de tu soporte de pago para mant
                           setOnboardForm({
                             ...onboardForm,
                             agreedMonthlyFeeCOP: cop,
-                            agreedMonthlyFeeUSD: cop > 0 ? Math.round(cop / 4000) : 0,
+                            agreedMonthlyFeeUSD: cop > 0 ? Math.round(cop / (exchangeRates?.rates?.COP || 3148)) : 0,
                           });
                         }}
                         placeholder="Ej: 900000"
@@ -10850,7 +10857,7 @@ Quedamos atentos a la confirmación o recepción de tu soporte de pago para mant
                           setOwnerEditForm({
                             ...ownerEditForm,
                             agreedMonthlyFeeCOP: cop,
-                            agreedMonthlyFeeUSD: cop > 0 ? Math.round(cop / 4000) : 0,
+                            agreedMonthlyFeeUSD: cop > 0 ? Math.round(cop / (exchangeRates?.rates?.COP || 3148)) : 0,
                           });
                         }}
                         placeholder="Ej: 900000"
@@ -11567,7 +11574,7 @@ Quedamos atentos a la confirmación o recepción de tu soporte de pago para mant
                           setBranchFormData({
                             ...branchFormData,
                             agreedMonthlyFeeCOP: cop,
-                            agreedMonthlyFeeUSD: cop > 0 ? Math.round(cop / 4000) : 0,
+                            agreedMonthlyFeeUSD: cop > 0 ? Math.round(cop / (exchangeRates?.rates?.COP || 3148)) : 0,
                           });
                         }}
                         placeholder="Ej: 450000"

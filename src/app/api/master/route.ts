@@ -78,6 +78,10 @@ export async function GET(request: NextRequest) {
     const googleReviews = await getAllGoogleReviews();
     const campaignParticipants = await getAllCampaignParticipants();
 
+    // Live TRM Exchange Rates
+    const liveExchangeRates = await getExchangeRates();
+    const liveCopRate = liveExchangeRates?.rates?.COP || 3148;
+
     // Calculate MRR Financials
     let mrrPlansCOP = 0;
     let mrrPlansUSD = 0;
@@ -94,8 +98,8 @@ export async function GET(request: NextRequest) {
       const isAgreed = (agreedCOP > 0) || (agreedUSD > 0);
       const planCost = isAgreed
         ? {
-            cop: agreedCOP > 0 ? agreedCOP : Math.round((agreedUSD || 0) * 4000),
-            usd: (agreedUSD && agreedUSD > 0) ? agreedUSD : Math.round((agreedCOP || 0) / 4000)
+            cop: agreedCOP > 0 ? agreedCOP : Math.round((agreedUSD || 0) * liveCopRate),
+            usd: (agreedUSD && agreedUSD > 0) ? agreedUSD : (liveCopRate > 0 ? Math.round((agreedCOP || 0) / liveCopRate) : 0)
           }
         : (PLAN_PRICING[biz.plan] || PLAN_PRICING.pro);
 
@@ -237,7 +241,7 @@ export async function GET(request: NextRequest) {
       trafficVisits: await getAllTrafficVisits(),
       leads: await getAllCommercialLeads(),
       emailDispatches: await getAllEmailDispatches(),
-      exchangeRates: await getExchangeRates(),
+      exchangeRates: liveExchangeRates,
     }, {
       headers: {
         'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
