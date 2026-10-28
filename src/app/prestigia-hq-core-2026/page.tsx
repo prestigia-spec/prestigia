@@ -3159,9 +3159,12 @@ export default function MasterAdminPage() {
 
     const addOnsLocal = curr.code === 'COP' ? addOnsCOP : curr.code === 'USD' ? addOnsUSD : Math.round(addOnsUSD * curr.rateToUSD);
 
-    const totalUSD = baseUSD + addOnsUSD;
-    const totalCOP = baseCOP + addOnsCOP;
-    const totalLocal = baseLocal + addOnsLocal;
+    // En el modelo B2B Prestigia, la tarifa pactada es un retainer mensual 'Todo Incluido'.
+    // Si la marca tiene tarifa pactada, ese ES el valor total del contrato (los módulos ya van incluidos).
+    // Solo si está en plan estándar de catálogo sin pactar, se le suman add-ons encima.
+    const totalUSD = isCustomAgreed ? baseUSD : (baseUSD + addOnsUSD);
+    const totalCOP = isCustomAgreed ? baseCOP : (baseCOP + addOnsCOP);
+    const totalLocal = isCustomAgreed ? baseLocal : (baseLocal + addOnsLocal);
     const arrUSD = totalUSD * 12;
     const arrCOP = totalCOP * 12;
 

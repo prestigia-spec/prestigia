@@ -106,7 +106,8 @@ export async function GET(request: NextRequest) {
       mrrPlansCOP += planCost.cop;
       mrrPlansUSD += planCost.usd;
 
-      if (biz.masterAddOns) {
+      // Solo sumamos add-ons adicionales si la cuenta no tiene una tarifa comercial pactada todo-incluido
+      if (biz.masterAddOns && !isAgreed) {
         const addons = biz.masterAddOns;
         // Extra branches
         if (addons.extraBranches > 0) {
