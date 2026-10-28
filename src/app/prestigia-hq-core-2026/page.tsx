@@ -873,7 +873,7 @@ export default function MasterAdminPage() {
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('la-burguesia');
 
   // Navigation & View State
-  const [activeTab, setActiveTab] = useState<'directorio' | 'conmutador' | 'bigdata' | 'casos' | 'alertas' | 'mrr' | 'trafico' | 'comunicaciones'>('directorio');
+  const [activeTab, setActiveTab] = useState<'directorio' | 'conmutador' | 'casos' | 'bigdata' | 'mrr' | 'trafico' | 'comunicaciones'>('directorio');
   const [privacyMode, setPrivacyMode] = useState(false); // Masks financial numbers & phones
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlanFilter, setSelectedPlanFilter] = useState<string>('all');
@@ -1084,10 +1084,7 @@ export default function MasterAdminPage() {
   const [dataPageLimit, setDataPageLimit] = useState<'30' | '50' | '100' | 'all'>('30');
   const [dataCurrentPage, setDataCurrentPage] = useState<number>(1);
 
-  // Alertas Tempranas Filters State
-  const [alertFilterBusiness, setAlertFilterBusiness] = useState<string>('all');
-  const [alertFilterStatus, setAlertFilterStatus] = useState<string>('all');
-  const [alertSearchTerm, setAlertSearchTerm] = useState<string>('');
+// Alertas operativas desacopladas (delegadas al portal de cada sede)
 
   // Case Study Generator Edit State
   const [editQuoteMode, setEditQuoteMode] = useState(false);
@@ -3393,63 +3390,6 @@ export default function MasterAdminPage() {
     return [1, '...', current - 1, current, current + 1, '...', total];
   };
 
-  // Filtered Alerts for Tab 5 (Radar de Quejas en Vivo)
-  const filteredAlerts = useMemo(() => {
-    return feedbacks.filter((f) => {
-      // Focus on complaints / low ratings (1-3 stars)
-      if (Number(f.rating) > 3) return false;
-
-      // 1. Business filter
-      if (alertFilterBusiness !== 'all' && f.businessId !== alertFilterBusiness) return false;
-
-      // 2. Status filter
-      if (alertFilterStatus === 'pending' && f.status === 'resolved') return false;
-      if (alertFilterStatus === 'resolved' && f.status !== 'resolved') return false;
-
-      // 3. Search filter
-      if (alertSearchTerm) {
-        const term = alertSearchTerm.toLowerCase();
-        return (
-          (f.customerName || '').toLowerCase().includes(term) ||
-          (f.customerPhone || '').includes(term) ||
-          (f.complaintReason || '').toLowerCase().includes(term) ||
-          (f.businessName || '').toLowerCase().includes(term) ||
-          (f.attendedBy || '').toLowerCase().includes(term)
-        );
-      }
-
-      return true;
-    });
-  }, [feedbacks, alertFilterBusiness, alertFilterStatus, alertSearchTerm]);
-
-  // Handle Mark Resolved from Master
-  const handleToggleResolveAlert = async (feedbackId: string, currentStatus: string) => {
-    const nextStatus = currentStatus === 'resolved' ? 'pending' : 'resolved';
-    try {
-      const res = await fetch(`/api/feedbacks/${feedbackId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          status: nextStatus,
-          resolvedBy: 'Dirección Central Master Prestigia',
-          resolvedByRole: 'owner',
-          rescueMessage: nextStatus === 'resolved' ? 'Resuelto y conciliado desde la Consola Central Prestigia.' : undefined,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setNotification({
-          type: 'success',
-          message: nextStatus === 'resolved' ? 'Alerta marcada como RESUELTA' : 'Alerta reabierta como PENDIENTE',
-        });
-        setTimeout(() => setNotification(null), 3000);
-        fetchMasterData();
-      }
-    } catch {
-      alert('Error al actualizar el estado de la alerta');
-    }
-  };
-
   // -------------------------------------------------------------
   // VIEW: BANKING ACCESS GATEWAY (IF NOT AUTHENTICATED)
   // -------------------------------------------------------------
@@ -3886,19 +3826,6 @@ export default function MasterAdminPage() {
 
           <button
             type="button"
-            onClick={() => setActiveTab('alertas')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
-              activeTab === 'alertas'
-                ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-            }`}
-          >
-            <ShieldAlert className="w-4 h-4" />
-            5. Monitor de Alertas en Red
-          </button>
-
-          <button
-            type="button"
             onClick={() => setActiveTab('mrr')}
             className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
               activeTab === 'mrr'
@@ -3907,7 +3834,7 @@ export default function MasterAdminPage() {
             }`}
           >
             <DollarSign className="w-4 h-4" />
-            6. Facturación Master & MRR
+            5. Facturación Master & MRR
           </button>
 
           <button
@@ -3920,7 +3847,7 @@ export default function MasterAdminPage() {
             }`}
           >
             <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
-            7. Tráfico Web & Prospectos (Leads)
+            6. Tráfico Web & Prospectos (Leads)
             {commercialLeads.filter((l) => l.status === 'new').length > 0 && (
               <span className="px-1.5 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-bold text-[10px]">
                 {commercialLeads.filter((l) => l.status === 'new').length} nuevos
@@ -3938,7 +3865,7 @@ export default function MasterAdminPage() {
             }`}
           >
             <Mail className="w-4 h-4" />
-            8. Comunicaciones VIP & Mailer
+            7. Comunicaciones VIP & Mailer
             {emailDispatches.length > 0 && (
               <span className="px-1.5 py-0.5 rounded-full bg-amber-950/80 text-amber-300 text-[10px] font-mono border border-amber-500/30">
                 {emailDispatches.length} envíos
@@ -6704,172 +6631,7 @@ export default function MasterAdminPage() {
         )}
 
         {/* ============================================================== */}
-        {/* TAB 5: MONITOR DE ALERTAS & SALUD DE LA RED */}
-        {/* ============================================================== */}
-        {activeTab === 'alertas' && (
-          <div className="space-y-6">
-            <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-6 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <ShieldAlert className="w-5 h-5 text-rose-400" />
-                  Radar de Quejas en Vivo (Toda la Red de Marcas)
-                </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Monitoreo proactivo de clientes inconformes en sala para evitar crisis o reseñas negativas en Google Maps.
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Red 98.6% Libre de Fugas
-                </span>
-              </div>
-            </div>
-
-            {/* Filter Bar for Alertas */}
-            <div className="bg-[#0E121B] border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
-              <div className="flex flex-wrap items-center gap-3 text-xs">
-                {/* Brand Filter */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-slate-400 font-medium">Marca:</span>
-                  <select
-                    value={alertFilterBusiness}
-                    onChange={(e) => setAlertFilterBusiness(e.target.value)}
-                    className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-3 py-1.5 outline-none cursor-pointer"
-                  >
-                    <option value="all">Todas las Marcas ({businesses.length})</option>
-                    {businesses.map((b) => (
-                      <option key={b.id} value={b.id}>{b.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Status Filter */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-slate-400 font-medium">Estado:</span>
-                  <select
-                    value={alertFilterStatus}
-                    onChange={(e) => setAlertFilterStatus(e.target.value)}
-                    className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-3 py-1.5 outline-none cursor-pointer"
-                  >
-                    <option value="all">Todos los Estados</option>
-                    <option value="pending">🚨 Pendientes de Contacto</option>
-                    <option value="resolved">✅ Resueltos en Sala</option>
-                  </select>
-                </div>
-
-                {/* Search Input */}
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={alertSearchTerm}
-                    onChange={(e) => setAlertSearchTerm(e.target.value)}
-                    placeholder="Buscar cliente, teléfono o motivo..."
-                    className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg pl-3 pr-8 py-1.5 outline-none w-60 focus:border-amber-400"
-                  />
-                  {alertSearchTerm && (
-                    <button
-                      type="button"
-                      onClick={() => setAlertSearchTerm('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div className="text-xs text-slate-400">
-                Mostrando <strong className="text-white">{filteredAlerts.length}</strong> quejas interceptadas
-              </div>
-            </div>
-
-            {/* List of Alerts */}
-            {filteredAlerts.length === 0 ? (
-              <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-10 text-center space-y-3">
-                <div className="w-12 h-12 mx-auto rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                  <CheckCircle2 className="w-6 h-6" />
-                </div>
-                <h3 className="text-base font-bold text-white">0 Quejas Pendientes en este Filtro</h3>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Todas las alertas tempranas se encuentran resueltas o no hay reportes que coincidan con la búsqueda.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {filteredAlerts.map((fb) => {
-                  const cleanPhone = (fb.customerPhone || '').replace(/[^0-9]/g, '');
-                  const waPhone = cleanPhone.length === 10 && cleanPhone.startsWith('3') ? `57${cleanPhone}` : cleanPhone;
-                  const waUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(
-                    `Hola ${fb.customerName || 'estimado cliente'}, te contactamos de la Dirección Central de ${fb.businessName || 'nuestro establecimiento'}. Lamentamos tu experiencia y queremos asistirte de inmediato.`
-                  )}`;
-
-                  return (
-                    <div
-                      key={fb.id}
-                      className="bg-[#0E121B] border border-slate-800 hover:border-slate-700 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all"
-                    >
-                      <div className="flex items-start gap-3.5">
-                        <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center shrink-0">
-                          <AlertTriangle className="w-5 h-5 text-rose-400" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <strong className="text-white text-sm">{fb.businessName || fb.businessId}</strong>
-                            <span className="text-slate-400 text-xs">• {fb.branchName || 'Sede Principal'}</span>
-                            <span className="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold font-mono">
-                              {fb.rating}★
-                            </span>
-                            <span className="text-[10px] text-slate-500 font-mono">
-                              {fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
-                            </span>
-                          </div>
-                          <p className="text-xs text-slate-200 mt-1.5 font-medium leading-relaxed">&ldquo;{fb.complaintReason}&rdquo;</p>
-                          <div className="text-[11px] text-slate-400 mt-1 flex flex-wrap items-center gap-2">
-                            <span>Cliente: <strong className="text-slate-300">{privacyMode ? 'Anónimo' : fb.customerName}</strong> ({maskPhone(fb.customerPhone)})</span>
-                            <span>•</span>
-                            <span>Atendido por: <strong className="text-slate-300">{fb.attendedBy || 'Personal de Sala'}</strong></span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
-                        {/* WhatsApp Contact Button */}
-                        <a
-                          href={waUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
-                          title="Abrir chat de WhatsApp para rescatar al cliente"
-                        >
-                          <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>WhatsApp</span>
-                        </a>
-
-                        {/* Toggle Resolved Button */}
-                        <button
-                          type="button"
-                          onClick={() => handleToggleResolveAlert(fb.id, fb.status)}
-                          className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
-                            fb.status === 'resolved'
-                              ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/25'
-                              : 'bg-amber-500/15 border-amber-500/40 text-amber-300 hover:bg-amber-500/25'
-                          }`}
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>{fb.status === 'resolved' ? 'Resuelta' : 'Marcar Resuelta'}</span>
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ============================================================== */}
-        {/* TAB 6: FACTURACIÓN MASTER & MRR */}
+        {/* TAB 5: FACTURACIÓN MASTER & MRR */}
         {/* ============================================================== */}
         {activeTab === 'mrr' && stats && (
           <div className="space-y-6">
