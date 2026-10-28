@@ -842,7 +842,7 @@ export async function POST(request: NextRequest) {
 
     // Update Owner Details (from Tab 2 Cuenta Dueño card)
     if (action === 'update_owner_details') {
-      const { businessId, ownerName, ownerPhone, legalName, taxId, password, ownerEmail, agreedMonthlyFeeCOP, agreedMonthlyFeeUSD, billingCycle } = body;
+      const { businessId, ownerName, ownerPhone, legalName, taxId, password, ownerEmail, agreedMonthlyFeeCOP, agreedMonthlyFeeUSD, billingCycle, billingDay } = body;
       if (!businessId) {
         return NextResponse.json({ error: 'Falta identificador de negocio' }, { status: 400 });
       }
@@ -860,6 +860,7 @@ export async function POST(request: NextRequest) {
       if (agreedMonthlyFeeCOP !== undefined) biz.agreedMonthlyFeeCOP = Number(agreedMonthlyFeeCOP);
       if (agreedMonthlyFeeUSD !== undefined) biz.agreedMonthlyFeeUSD = Number(agreedMonthlyFeeUSD);
       if (billingCycle !== undefined) biz.billingCycle = billingCycle;
+      if (billingDay !== undefined) biz.billingDay = Math.min(31, Math.max(1, Number(billingDay) || 5));
 
       await saveBusiness(biz);
       return NextResponse.json({

@@ -206,6 +206,7 @@ export interface Business {
   agreedMonthlyFeeCOP?: number; // Tarifa mensual pactada contratada oficial de la marca en COP (sin planes fijos)
   agreedMonthlyFeeUSD?: number; // Tarifa mensual pactada contratada oficial de la marca en USD
   billingCycle?: 'monthly' | 'quarterly' | 'semiannual' | 'annual'; // Ciclo comercial pactado
+  billingDay?: number; // Día del mes para corte y cobro de factura (1 al 31, default: 5)
 }
 
 export interface DayOneBaseline {

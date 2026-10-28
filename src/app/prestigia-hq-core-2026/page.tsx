@@ -1102,6 +1102,7 @@ export default function MasterAdminPage() {
   const [mrrFeeInputUSD, setMrrFeeInputUSD] = useState<string>('');
   const [mrrFeeInputLocal, setMrrFeeInputLocal] = useState<string>('');
   const [mrrBillingCycle, setMrrBillingCycle] = useState<'monthly' | 'quarterly' | 'semiannual' | 'annual'>('monthly');
+  const [mrrBillingDay, setMrrBillingDay] = useState<number>(5);
   const [mrrSavingFee, setMrrSavingFee] = useState<boolean>(false);
 
   // Case Study Generator Edit State
@@ -6891,12 +6892,15 @@ export default function MasterAdminPage() {
 
           // CSV Export Handler
           const handleExportMrrCsv = () => {
-            const header = 'Marca,Titular,Pais,Moneda_Local,Plan_Contratado,Sedes_Activas,Tipo_Tarifa,Tarifa_Base_USD,Tarifa_Base_Local,Margen_AddOns_USD,Margen_AddOns_Local,Total_Mensual_USD,Total_Mensual_Local,Total_Equivalente_COP,ARR_Proyectado_Anual_USD,Estado_Cuenta\n';
+            const header = 'Marca,Titular,Telefono_WhatsApp,Pais,Moneda_Local,Plan_Contratado,Sedes_Activas,Dia_Corte_Mensual,Ciclo_Cobro,Tipo_Tarifa,Total_Mensual_USD,Total_Mensual_Local,Total_Equivalente_COP,ARR_Proyectado_Anual_USD,Estado_Cuenta\n';
             const rows = displayedBusinesses.map((b) => {
               const fin = getBusinessFinancials(b);
               const statusStr = (b.status === 'suspended' || (b as any).isArchived) ? 'Suspendido' : 'Al Dia';
               const tariffStr = fin.isCustomAgreed ? 'Pactada Comercial' : 'Plan Estandar';
-              return `"${b.name}","${b.ownerName || ''}","${b.country || 'Colombia'}","${fin.currency.code}","${b.plan}","${b.branches?.length || 1}","${fin.baseUSD}","${fin.baseLocal}","${fin.addOnsUSD}","${fin.addOnsLocal}","${fin.totalUSD}","${fin.totalLocal}","${fin.totalCOP}","${fin.arrUSD}","${statusStr}","${tariffStr}"`;
+              const phoneStr = b.ownerPhone || b.contractSignerPhone || (b.branches?.[0]?.managerPhone) || '';
+              const cutDay = b.billingDay || 5;
+              const cycleStr = b.billingCycle || 'monthly';
+              return `"${b.name}","${b.ownerName || ''}","${phoneStr}","${b.country || 'Colombia'}","${fin.currency.code}","${b.plan}","${b.branches?.length || 1}","${cutDay}","${cycleStr}","${tariffStr}","${fin.totalUSD}","${fin.totalLocal}","${fin.totalCOP}","${fin.arrUSD}","${statusStr}"`;
             }).join('\n');
             const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
@@ -6904,6 +6908,55 @@ export default function MasterAdminPage() {
             a.href = url;
             a.download = `Prestigia_MRR_Facturacion_${Date.now()}.csv`;
             a.click();
+          };
+
+          // WhatsApp Invoice / Payment Reminder Handler
+          const handleSendWhatsAppInvoice = (biz: Business, fin: any) => {
+            const rawPhone = biz.ownerPhone || biz.contractSignerPhone || (biz.branches?.[0]?.managerPhone) || '';
+            let cleanPhone = rawPhone.replace(/[^0-9]/g, '');
+
+            if (!cleanPhone) {
+              alert(`No se encontró un número de teléfono para '${biz.name}'. Por favor regístralo en la Cuenta Dueño en el Directorio.`);
+              return;
+            }
+
+            // Normalización para Colombia (si tiene 10 dígitos y empieza por 3, agregar prefijo país 57)
+            if (cleanPhone.length === 10 && cleanPhone.startsWith('3')) {
+              cleanPhone = `57${cleanPhone}`;
+            }
+
+            const clientName = biz.ownerName || biz.contractSignerName || 'Estimado(a) Cliente';
+            const cutDay = biz.billingDay || 5;
+            const branchesCount = biz.branches?.length || 1;
+            const branchLabel = branchesCount === 1 ? '1 Sede' : `${branchesCount} Sedes`;
+
+            const feeDisplay = mrrCurrencyMode === 'usd'
+              ? `${formatCurrencyDisplay(fin.totalUSD, 'USD')} USD`
+              : `${formatCurrencyDisplay(fin.totalLocal, fin.currency.code)} ${fin.currency.code} (≈ ${formatCurrencyDisplay(fin.totalUSD, 'USD')} USD)`;
+
+            const cycleDisplay = biz.billingCycle === 'annual'
+              ? 'Anual Contratado'
+              : biz.billingCycle === 'quarterly'
+              ? 'Trimestral Anticipado'
+              : biz.billingCycle === 'semiannual'
+              ? 'Semestral'
+              : 'Mensual Recurrente';
+
+            const messageText = `Hola *${clientName}*, un cordial saludo del equipo de Finanzas & Facturación de *Prestigia Enterprise*.
+
+Te compartimos el resumen de facturación de tu plataforma para *${biz.name}*:
+
+📅 *Día de corte mensual:* Día ${cutDay} de cada mes
+💼 *Plan & Alcance:* Plan ${biz.plan.toUpperCase()} (${branchLabel} blindadas)
+💳 *Inversión acordada:* ${feeDisplay}
+🔄 *Modalidad de cobro:* ${cycleDisplay}
+
+Quedamos atentos a la confirmación o recepción de tu soporte de pago para mantener tus servicios y soporte VIP activos.
+
+¡Agradecemos tu confianza en Prestigia!`;
+
+            const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(messageText)}`;
+            window.open(waUrl, '_blank');
           };
 
           return (
@@ -7369,14 +7422,18 @@ export default function MasterAdminPage() {
                               </span>
                             </td>
 
-                            {/* Annual Contract Value (ARR) */}
+                            {/* Annual Contract Value (ARR) & Billing Cut Day */}
                             <td className="py-3.5 px-4 text-right whitespace-nowrap">
                               <p className="text-xs font-bold text-purple-300 font-mono">
                                 {privacyMode ? '••••••••' : arrDisplay}
                               </p>
-                              <p className="text-[10px] text-slate-500 font-mono mt-0.5">
-                                Ciclo: {biz.billingCycle === 'annual' ? 'Anual' : biz.billingCycle === 'quarterly' ? 'Trimestral' : 'Mensual'}
+                              <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                                Ciclo: {biz.billingCycle === 'annual' ? 'Anual' : biz.billingCycle === 'quarterly' ? 'Trimestral' : biz.billingCycle === 'semiannual' ? 'Semestral' : 'Mensual'}
                               </p>
+                              <span className="inline-flex items-center gap-1 text-[9.5px] font-mono text-cyan-300 bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/25 mt-1" title="Día pactado del mes para corte y cobro">
+                                <Calendar className="w-2.5 h-2.5 text-cyan-400" />
+                                Corte: Día {biz.billingDay || 5}
+                              </span>
                             </td>
 
                             {/* Actions */}
@@ -7384,11 +7441,22 @@ export default function MasterAdminPage() {
                               <div className="flex items-center justify-center gap-1.5">
                                 <button
                                   type="button"
+                                  onClick={() => handleSendWhatsAppInvoice(biz, fin)}
+                                  className="px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 hover:text-white text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer"
+                                  title={`Enviar cuenta de cobro / recordatorio por WhatsApp a ${biz.ownerName || 'titular'}`}
+                                >
+                                  <MessageCircle className="w-3 h-3 text-emerald-400" />
+                                  <span>Cobro</span>
+                                </button>
+
+                                <button
+                                  type="button"
                                   onClick={() => {
                                     setMrrEditingBiz(biz);
                                     setMrrFeeInputUSD(String(biz.agreedMonthlyFeeUSD || fin.totalUSD || ''));
                                     setMrrFeeInputLocal(String(biz.agreedMonthlyFeeCOP || fin.totalLocal || ''));
                                     setMrrBillingCycle(biz.billingCycle || 'monthly');
+                                    setMrrBillingDay(biz.billingDay || 5);
                                   }}
                                   className="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 hover:text-white text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer"
                                   title="Ajustar tarifa personalizada para esta marca"
@@ -7544,21 +7612,41 @@ export default function MasterAdminPage() {
                         )}
                       </div>
 
-                      {/* Ciclo de Facturación */}
-                      <div>
-                        <label className="text-slate-300 font-semibold block mb-1">
-                          Ciclo Comercial Pactado
-                        </label>
-                        <select
-                          value={mrrBillingCycle}
-                          onChange={(e) => setMrrBillingCycle(e.target.value as any)}
-                          className="w-full bg-[#141A26] border border-slate-700 rounded-xl px-3 py-2 text-white text-xs outline-none cursor-pointer focus:border-amber-400"
-                        >
-                          <option value="monthly">Facturación Mensual Recurrente</option>
-                          <option value="quarterly">Facturación Trimestral Anticipada (3 meses)</option>
-                          <option value="semiannual">Facturación Semestral (6 meses)</option>
-                          <option value="annual">Facturación Anual Contratada (12 meses)</option>
-                        </select>
+                      {/* Fila: Ciclo Comercial & Día de Corte */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-slate-300 font-semibold block mb-1">
+                            Ciclo Comercial Pactado
+                          </label>
+                          <select
+                            value={mrrBillingCycle}
+                            onChange={(e) => setMrrBillingCycle(e.target.value as any)}
+                            className="w-full bg-[#141A26] border border-slate-700 rounded-xl px-3 py-2 text-white text-xs outline-none cursor-pointer focus:border-amber-400"
+                          >
+                            <option value="monthly">Mensual Recurrente</option>
+                            <option value="quarterly">Trimestral Anticipado</option>
+                            <option value="semiannual">Semestral</option>
+                            <option value="annual">Anual Contratado</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-slate-300 font-semibold mb-1 flex items-center gap-1">
+                            <Calendar className="w-3.5 h-3.5 text-cyan-400" />
+                            <span>Día de Corte Mensual</span>
+                          </label>
+                          <select
+                            value={mrrBillingDay}
+                            onChange={(e) => setMrrBillingDay(Number(e.target.value))}
+                            className="w-full bg-[#141A26] border border-slate-700 rounded-xl px-3 py-2 text-white text-xs outline-none cursor-pointer focus:border-cyan-400 font-mono"
+                          >
+                            {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                              <option key={day} value={day}>
+                                Día {day} {day === 1 ? '(Inicio mes)' : day === 5 ? '(Estándar Prestigia)' : day === 15 ? '(Quincena)' : day === 30 ? '(Fin de mes)' : ''}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                     </div>
 
@@ -7586,6 +7674,7 @@ export default function MasterAdminPage() {
                                 agreedMonthlyFeeUSD: Number(mrrFeeInputUSD) || 0,
                                 agreedMonthlyFeeCOP: Number(mrrFeeInputLocal) || 0,
                                 billingCycle: mrrBillingCycle,
+                                billingDay: Number(mrrBillingDay) || 5,
                               }),
                             });
                             const data = await res.json();
