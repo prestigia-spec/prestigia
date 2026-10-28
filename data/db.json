@@ -2935,5 +2935,19 @@
       "id": "visit-1792352412640-3854k",
       "timestamp": "2026-10-18T19:40:12.640Z"
     }
-  ]
+  ],
+  "exchangeRates": {
+    "base": "USD",
+    "rates": {
+      "USD": 1,
+      "COP": 3143,
+      "CLP": 989,
+      "MXN": 18.67,
+      "EUR": 0.8975,
+      "BRL": 5.35,
+      "PEN": 3.45
+    },
+    "lastUpdated": "2026-10-28T03:18:38.726Z",
+    "source": "Open Exchange Rates (TRM Oficial Diaria)"
+  }
 }

@@ -7003,90 +7003,132 @@ export default function MasterAdminPage() {
               {/* 6 Executive KPI Metric Cards (Alineadas al Modelo B2B Negociado) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
                 {/* 1. MRR Total */}
-                <div className="bg-[#0E121B] border border-emerald-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-emerald-500/10 to-transparent">
-                  <div className="flex items-center justify-between text-xs text-emerald-400 font-semibold">
-                    <span>MRR Total Cartera</span>
-                    <DollarSign className="w-4 h-4 text-emerald-400" />
+                <div className="bg-[#0E121B] border border-emerald-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-emerald-500/10 to-transparent flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between text-xs text-emerald-400 font-semibold">
+                      <span>MRR Total Cartera</span>
+                      <DollarSign className="w-4 h-4 text-emerald-400" />
+                    </div>
+                    <p className="text-xl font-extrabold text-white font-mono mt-1">
+                      {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(totalUSD, 'USD') : formatCurrencyDisplay(totalCOP, 'COP'))}
+                      <span className="text-xs text-emerald-300 font-sans ml-1 font-normal">/mes</span>
+                    </p>
+                    <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
+                      ≈ {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(totalCOP, 'COP') : formatCurrencyDisplay(totalUSD, 'USD'))}
+                    </p>
                   </div>
-                  <p className="text-xl font-extrabold text-white font-mono mt-1">
-                    {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(totalUSD, 'USD') : formatCurrencyDisplay(totalCOP, 'COP'))}
-                    <span className="text-xs text-emerald-300 font-sans ml-1 font-normal">/mes</span>
-                  </p>
-                  <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
-                    ≈ {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(totalCOP, 'COP') : formatCurrencyDisplay(totalUSD, 'USD'))}
-                  </p>
+                  <div className="mt-3 pt-2.5 border-t border-emerald-500/15">
+                    <p className="text-[10.5px] text-emerald-300/90 leading-tight">
+                      💡 <strong className="text-emerald-200">¿Qué es?</strong> Dinero total que recibes al mes sumando todas tus marcas clientes.
+                    </p>
+                  </div>
                 </div>
 
                 {/* 2. ARR Run-Rate */}
-                <div className="bg-[#0E121B] border border-purple-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-purple-500/10 to-transparent">
-                  <div className="flex items-center justify-between text-xs text-purple-400 font-semibold">
-                    <span>ARR Anual Contratado</span>
-                    <TrendingUp className="w-4 h-4 text-purple-400" />
+                <div className="bg-[#0E121B] border border-purple-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-purple-500/10 to-transparent flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between text-xs text-purple-400 font-semibold">
+                      <span>ARR Anual Contratado</span>
+                      <TrendingUp className="w-4 h-4 text-purple-400" />
+                    </div>
+                    <p className="text-xl font-extrabold text-white font-mono mt-1">
+                      {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(arrUSD, 'USD') : formatCurrencyDisplay(arrCOP, 'COP'))}
+                      <span className="text-xs text-purple-300 font-sans ml-1 font-normal">/año</span>
+                    </p>
+                    <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
+                      ≈ {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(arrCOP, 'COP') : formatCurrencyDisplay(arrUSD, 'USD'))}
+                    </p>
                   </div>
-                  <p className="text-xl font-extrabold text-white font-mono mt-1">
-                    {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(arrUSD, 'USD') : formatCurrencyDisplay(arrCOP, 'COP'))}
-                    <span className="text-xs text-purple-300 font-sans ml-1 font-normal">/año</span>
-                  </p>
-                  <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
-                    ≈ {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(arrCOP, 'COP') : formatCurrencyDisplay(arrUSD, 'USD'))}
-                  </p>
+                  <div className="mt-3 pt-2.5 border-t border-purple-500/15">
+                    <p className="text-[10.5px] text-purple-300/90 leading-tight">
+                      💡 <strong className="text-purple-200">¿Qué es?</strong> Proyección a 12 meses: lo que facturas en un año completo con estos contratos.
+                    </p>
+                  </div>
                 </div>
 
                 {/* 3. ARPA Ticket Promedio */}
-                <div className="bg-[#0E121B] border border-blue-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-blue-500/10 to-transparent">
-                  <div className="flex items-center justify-between text-xs text-blue-400 font-semibold">
-                    <span>Ticket Promedio (ARPA)</span>
-                    <BarChart3 className="w-4 h-4 text-blue-400" />
+                <div className="bg-[#0E121B] border border-blue-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-blue-500/10 to-transparent flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between text-xs text-blue-400 font-semibold">
+                      <span>Ticket Promedio (ARPA)</span>
+                      <BarChart3 className="w-4 h-4 text-blue-400" />
+                    </div>
+                    <p className="text-xl font-extrabold text-white font-mono mt-1">
+                      {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(arpaUSD, 'USD') : formatCurrencyDisplay(arpaCOP, 'COP'))}
+                      <span className="text-xs text-blue-300 font-sans ml-1 font-normal">/cuenta</span>
+                    </p>
+                    <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
+                      ≈ {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(arpaCOP, 'COP') : formatCurrencyDisplay(arpaUSD, 'USD'))}
+                    </p>
                   </div>
-                  <p className="text-xl font-extrabold text-white font-mono mt-1">
-                    {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(arpaUSD, 'USD') : formatCurrencyDisplay(arpaCOP, 'COP'))}
-                    <span className="text-xs text-blue-300 font-sans ml-1 font-normal">/cuenta</span>
-                  </p>
-                  <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
-                    ≈ {privacyMode ? '••••••••' : (mrrCurrencyMode === 'usd' ? formatCurrencyDisplay(arpaCOP, 'COP') : formatCurrencyDisplay(arpaUSD, 'USD'))}
-                  </p>
+                  <div className="mt-3 pt-2.5 border-t border-blue-500/15">
+                    <p className="text-[10.5px] text-blue-300/90 leading-tight">
+                      💡 <strong className="text-blue-200">¿Qué es?</strong> Promedio por marca: lo que te paga en promedio cada cliente al mes.
+                    </p>
+                  </div>
                 </div>
 
                 {/* 4. Marcas Activas */}
-                <div className="bg-[#0E121B] border border-slate-800 rounded-2xl p-4 shadow-lg">
-                  <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
-                    <span>Marcas Contratadas</span>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <div className="bg-[#0E121B] border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+                      <span>Marcas Contratadas</span>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    </div>
+                    <p className="text-xl font-extrabold text-white font-mono mt-1">
+                      {activeCount} <span className="text-xs text-slate-400 font-sans font-normal">empresas</span>
+                    </p>
+                    <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                      Clientes activos en cartera
+                    </p>
                   </div>
-                  <p className="text-xl font-extrabold text-white font-mono mt-1">
-                    {activeCount} <span className="text-xs text-slate-400 font-sans font-normal">empresas</span>
-                  </p>
-                  <p className="text-[11px] text-slate-400 font-medium mt-0.5">
-                    Clientes activos en cartera
-                  </p>
+                  <div className="mt-3 pt-2.5 border-t border-slate-800">
+                    <p className="text-[10.5px] text-slate-400 leading-tight">
+                      💡 <strong className="text-slate-300">¿Qué es?</strong> Cantidad de empresas o clientes con contrato activo hoy.
+                    </p>
+                  </div>
                 </div>
 
                 {/* 5. Sedes Operativas */}
-                <div className="bg-[#0E121B] border border-amber-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-amber-500/10 to-transparent">
-                  <div className="flex items-center justify-between text-xs text-amber-400 font-semibold">
-                    <span>Sedes en Operación</span>
-                    <Building2 className="w-4 h-4 text-amber-400" />
+                <div className="bg-[#0E121B] border border-amber-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-amber-500/10 to-transparent flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between text-xs text-amber-400 font-semibold">
+                      <span>Sedes en Operación</span>
+                      <Building2 className="w-4 h-4 text-amber-400" />
+                    </div>
+                    <p className="text-xl font-extrabold text-amber-300 font-mono mt-1">
+                      {businesses.reduce((acc, b) => acc + (b.branches?.length || 1), 0)} <span className="text-xs text-amber-400 font-sans font-normal">sedes</span>
+                    </p>
+                    <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                      Puntos físicos blindados
+                    </p>
                   </div>
-                  <p className="text-xl font-extrabold text-amber-300 font-mono mt-1">
-                    {businesses.reduce((acc, b) => acc + (b.branches?.length || 1), 0)} <span className="text-xs text-amber-400 font-sans font-normal">sedes</span>
-                  </p>
-                  <p className="text-[11px] text-slate-400 font-medium mt-0.5">
-                    Puntos físicos blindados
-                  </p>
+                  <div className="mt-3 pt-2.5 border-t border-amber-500/15">
+                    <p className="text-[10.5px] text-amber-300/90 leading-tight">
+                      💡 <strong className="text-amber-200">¿Qué es?</strong> Total de locales o sedes físicas protegidas por Prestigia.
+                    </p>
+                  </div>
                 </div>
 
                 {/* 6. Cartera & Estado */}
-                <div className="bg-[#0E121B] border border-slate-800 rounded-2xl p-4 shadow-lg">
-                  <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
-                    <span>Salud de Cartera</span>
-                    <Shield className="w-4 h-4 text-emerald-400" />
+                <div className="bg-[#0E121B] border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+                      <span>Salud de Cartera</span>
+                      <Shield className="w-4 h-4 text-emerald-400" />
+                    </div>
+                    <p className="text-xl font-extrabold text-emerald-400 font-mono mt-1">
+                      100% <span className="text-xs text-emerald-300 font-sans font-normal">al día</span>
+                    </p>
+                    <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                      0 facturas en mora
+                    </p>
                   </div>
-                  <p className="text-xl font-extrabold text-emerald-400 font-mono mt-1">
-                    100% <span className="text-xs text-emerald-300 font-sans font-normal">al día</span>
-                  </p>
-                  <p className="text-[11px] text-slate-400 font-medium mt-0.5">
-                    0 facturas en mora
-                  </p>
+                  <div className="mt-3 pt-2.5 border-t border-slate-800">
+                    <p className="text-[10.5px] text-emerald-300/90 leading-tight">
+                      💡 <strong className="text-emerald-200">¿Qué es?</strong> Estado de cobros: 100% al día significa cero clientes en mora.
+                    </p>
+                  </div>
                 </div>
               </div>
 
