@@ -1086,6 +1086,21 @@ export default function MasterAdminPage() {
 
 // Alertas operativas desacopladas (delegadas al portal de cada sede)
 
+  // Matriz Financiera & MRR Multi-Divisa States
+  const [mrrSearchTerm, setMrrSearchTerm] = useState('');
+  const [mrrFilterPlan, setMrrFilterPlan] = useState('all');
+  const [mrrFilterCountry, setMrrFilterCountry] = useState('all');
+  const [mrrFilterStatus, setMrrFilterStatus] = useState('all');
+  const [mrrFilterContractType, setMrrFilterContractType] = useState('all');
+  const [mrrCurrencyMode, setMrrCurrencyMode] = useState<'dual' | 'usd' | 'local' | 'cop'>('dual');
+  
+  // Quick Fee Adjustment Modal State (Tab 5)
+  const [mrrEditingBiz, setMrrEditingBiz] = useState<Business | null>(null);
+  const [mrrFeeInputUSD, setMrrFeeInputUSD] = useState<string>('');
+  const [mrrFeeInputLocal, setMrrFeeInputLocal] = useState<string>('');
+  const [mrrBillingCycle, setMrrBillingCycle] = useState<'monthly' | 'quarterly' | 'semiannual' | 'annual'>('monthly');
+  const [mrrSavingFee, setMrrSavingFee] = useState<boolean>(false);
+
   // Case Study Generator Edit State
   const [editQuoteMode, setEditQuoteMode] = useState(false);
   const [customTestimonialQuote, setCustomTestimonialQuote] = useState('');
@@ -2999,6 +3014,156 @@ export default function MasterAdminPage() {
       topStaff,
     };
   }, [currentBusiness, selectedHistoricalBranchId, feedbacks, googleReviews]);
+
+  // Universal Multi-Currency Constants & Pricing Rules
+  const PRESTIGIA_PLAN_PRICING: Record<string, { cop: number; usd: number; name: string }> = {
+    independiente: { cop: 49000, usd: 19, name: 'Independiente' },
+    basic: { cop: 49000, usd: 19, name: 'Básico' },
+    pro: { cop: 120000, usd: 49, name: 'Profesional (Pro)' },
+    elite: { cop: 290000, usd: 110, name: 'Élite Multi-Sede' },
+    empresarial: { cop: 690000, usd: 280, name: 'Empresarial Corporativo' },
+  };
+
+  const PRESTIGIA_ADDON_PRICING = {
+    extraBranch: { cop: 50000, usd: 20 },
+    extraManager: { cop: 25000, usd: 10 },
+    staffBlock5: { cop: 20000, usd: 8 },
+    sentiment360: { cop: 60000, usd: 25 },
+    liveWallboard: { cop: 50000, usd: 20 },
+    giveawayCrm: { cop: 40000, usd: 15 },
+    deviceAudit: { cop: 35000, usd: 15 },
+  };
+
+  const PRESTIGIA_CURRENCIES: Record<string, { code: string; name: string; flag: string; rateToUSD: number }> = {
+    USD: { code: 'USD', name: 'Dólares Americanos', flag: '🇺🇸', rateToUSD: 1 },
+    COP: { code: 'COP', name: 'Pesos Colombianos', flag: '🇨🇴', rateToUSD: 4000 },
+    CLP: { code: 'CLP', name: 'Pesos Chilenos', flag: '🇨🇱', rateToUSD: 950 },
+    MXN: { code: 'MXN', name: 'Pesos Mexicanos', flag: '🇲🇽', rateToUSD: 18 },
+    EUR: { code: 'EUR', name: 'Euros', flag: '🇪🇺', rateToUSD: 0.92 },
+  };
+
+  const getBusinessCurrency = (countryStr?: string) => {
+    const c = (countryStr || '').toLowerCase();
+    if (c.includes('chile')) return PRESTIGIA_CURRENCIES.CLP;
+    if (c.includes('mexic') || c.includes('méxic')) return PRESTIGIA_CURRENCIES.MXN;
+    if (c.includes('españ') || c.includes('spain') || c.includes('euro')) return PRESTIGIA_CURRENCIES.EUR;
+    if (c.includes('estados unidos') || c.includes('usa') || c.includes('eeuu') || c.includes('internacional')) return PRESTIGIA_CURRENCIES.USD;
+    return PRESTIGIA_CURRENCIES.COP;
+  };
+
+  const formatCurrencyDisplay = (amount: number, currencyCode: string) => {
+    if (privacyMode) return '••••••••';
+    try {
+      if (currencyCode === 'COP') {
+        return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(amount);
+      }
+      if (currencyCode === 'CLP') {
+        return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount);
+      }
+      if (currencyCode === 'MXN') {
+        return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(amount);
+      }
+      if (currencyCode === 'EUR') {
+        return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount);
+      }
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
+    } catch {
+      return `${currencyCode} ${amount.toLocaleString()}`;
+    }
+  };
+
+  const getBusinessFinancials = (biz: Business) => {
+    const curr = getBusinessCurrency(biz.country);
+    
+    // Custom negotiated fee has top priority
+    const branchesFeeCOP = (biz.branches || []).reduce((acc: number, b: any) => acc + (b.agreedMonthlyFeeCOP || 0), 0);
+    const branchesFeeUSD = (biz.branches || []).reduce((acc: number, b: any) => acc + (b.agreedMonthlyFeeUSD || 0), 0);
+    const agreedCOP = (biz.agreedMonthlyFeeCOP && biz.agreedMonthlyFeeCOP > 0) ? biz.agreedMonthlyFeeCOP : branchesFeeCOP;
+    const agreedUSD = (biz.agreedMonthlyFeeUSD && biz.agreedMonthlyFeeUSD > 0) ? biz.agreedMonthlyFeeUSD : branchesFeeUSD;
+    const isCustomAgreed = agreedCOP > 0 || agreedUSD > 0;
+
+    let baseUSD = 0;
+    let baseCOP = 0;
+    let baseLocal = 0;
+
+    if (isCustomAgreed) {
+      if (agreedUSD > 0) {
+        baseUSD = agreedUSD;
+        baseCOP = Math.round(agreedUSD * 4000);
+        baseLocal = curr.code === 'USD' ? baseUSD : curr.code === 'COP' ? baseCOP : Math.round(baseUSD * curr.rateToUSD);
+      } else {
+        baseCOP = agreedCOP;
+        baseUSD = Math.round(agreedCOP / 4000);
+        baseLocal = curr.code === 'COP' ? baseCOP : curr.code === 'USD' ? baseUSD : Math.round(baseUSD * curr.rateToUSD);
+      }
+    } else {
+      const std = PRESTIGIA_PLAN_PRICING[biz.plan] || PRESTIGIA_PLAN_PRICING.pro;
+      baseCOP = std.cop;
+      baseUSD = std.usd;
+      baseLocal = curr.code === 'COP' ? std.cop : curr.code === 'USD' ? std.usd : Math.round(std.usd * curr.rateToUSD);
+    }
+
+    // Add-Ons Modulares
+    let addOnsUSD = 0;
+    let addOnsCOP = 0;
+    const addons = biz.masterAddOns;
+
+    if (addons) {
+      if (addons.extraBranches > 0) {
+        addOnsUSD += addons.extraBranches * PRESTIGIA_ADDON_PRICING.extraBranch.usd;
+        addOnsCOP += addons.extraBranches * PRESTIGIA_ADDON_PRICING.extraBranch.cop;
+      }
+      if (addons.extraManagers > 0) {
+        addOnsUSD += addons.extraManagers * PRESTIGIA_ADDON_PRICING.extraManager.usd;
+        addOnsCOP += addons.extraManagers * PRESTIGIA_ADDON_PRICING.extraManager.cop;
+      }
+      if (addons.extraStaffQuota > 0) {
+        const blocks = Math.ceil(addons.extraStaffQuota / 5);
+        addOnsUSD += blocks * PRESTIGIA_ADDON_PRICING.staffBlock5.usd;
+        addOnsCOP += blocks * PRESTIGIA_ADDON_PRICING.staffBlock5.cop;
+      }
+      if (addons.sentiment360?.enabled && addons.sentiment360.mode === 'permanent' && biz.plan !== 'elite' && biz.plan !== 'empresarial') {
+        addOnsUSD += PRESTIGIA_ADDON_PRICING.sentiment360.usd;
+        addOnsCOP += PRESTIGIA_ADDON_PRICING.sentiment360.cop;
+      }
+      if (addons.liveWallboard?.enabled && addons.liveWallboard.mode === 'permanent' && biz.plan !== 'elite' && biz.plan !== 'empresarial') {
+        addOnsUSD += PRESTIGIA_ADDON_PRICING.liveWallboard.usd;
+        addOnsCOP += PRESTIGIA_ADDON_PRICING.liveWallboard.cop;
+      }
+      if (addons.giveawayCrm && biz.plan === 'independiente') {
+        addOnsUSD += PRESTIGIA_ADDON_PRICING.giveawayCrm.usd;
+        addOnsCOP += PRESTIGIA_ADDON_PRICING.giveawayCrm.cop;
+      }
+      if (addons.deviceAudit && biz.plan !== 'elite' && biz.plan !== 'empresarial') {
+        addOnsUSD += PRESTIGIA_ADDON_PRICING.deviceAudit.usd;
+        addOnsCOP += PRESTIGIA_ADDON_PRICING.deviceAudit.cop;
+      }
+    }
+
+    const addOnsLocal = curr.code === 'COP' ? addOnsCOP : curr.code === 'USD' ? addOnsUSD : Math.round(addOnsUSD * curr.rateToUSD);
+
+    const totalUSD = baseUSD + addOnsUSD;
+    const totalCOP = baseCOP + addOnsCOP;
+    const totalLocal = baseLocal + addOnsLocal;
+    const arrUSD = totalUSD * 12;
+    const arrCOP = totalCOP * 12;
+
+    return {
+      currency: curr,
+      isCustomAgreed,
+      baseUSD,
+      baseCOP,
+      baseLocal,
+      addOnsUSD,
+      addOnsCOP,
+      addOnsLocal,
+      totalUSD,
+      totalCOP,
+      totalLocal,
+      arrUSD,
+      arrCOP,
+    };
+  };
 
   // Format currency helper respecting Privacy Mode
   const formatMoneyCOP = (amount: number) => {
@@ -6631,102 +6796,729 @@ export default function MasterAdminPage() {
         )}
 
         {/* ============================================================== */}
-        {/* TAB 5: FACTURACIÓN MASTER & MRR */}
+        {/* TAB 5: FACTURACIÓN MASTER & MRR MULTI-DIVISA (USD & MONEDAS LOCALES) */}
         {/* ============================================================== */}
-        {activeTab === 'mrr' && stats && (
-          <div className="space-y-6">
-            <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-6 shadow-xl">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-amber-400" />
-                Matriz Financiera de Ingresos Recurrentes (MRR)
-              </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Consolidado de suscripciones base y margen neto generado por Add-Ons modulares a la carta.
-              </p>
-            </div>
+        {activeTab === 'mrr' && (() => {
+          // Calculate global financial summary dynamically using actual agreed fees and add-ons
+          let totalUSD = 0;
+          let totalCOP = 0;
+          let plansUSD = 0;
+          let plansCOP = 0;
+          let addOnsUSD = 0;
+          let addOnsCOP = 0;
+          let activeCount = 0;
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-              <div className="bg-[#0E121B] border border-slate-800 rounded-3xl p-5 shadow-lg">
-                <p className="text-xs text-slate-400">MRR Planes Base</p>
-                <p className="text-2xl font-extrabold text-white font-mono mt-1">
-                  {privacyMode ? '••••••••••' : formatMoneyCOP(stats.mrr?.plansCOP || 1149000)}
-                </p>
-                <p className="text-[11px] text-slate-400 font-mono mt-0.5">
-                  {privacyMode ? '••••••••' : formatMoneyUSD(stats.mrr?.plansUSD || 458)}
-                </p>
+          businesses.forEach((biz) => {
+            const fin = getBusinessFinancials(biz);
+            if (biz.status !== 'suspended' && !(biz as any).isArchived) {
+              activeCount++;
+              totalUSD += fin.totalUSD;
+              totalCOP += fin.totalCOP;
+              plansUSD += fin.baseUSD;
+              plansCOP += fin.baseCOP;
+              addOnsUSD += fin.addOnsUSD;
+              addOnsCOP += fin.addOnsCOP;
+            }
+          });
+
+          const arrUSD = totalUSD * 12;
+          const arrCOP = totalCOP * 12;
+          const arpaUSD = activeCount > 0 ? Math.round(totalUSD / activeCount) : 0;
+          const arpaCOP = activeCount > 0 ? Math.round(totalCOP / activeCount) : 0;
+
+          // Filter businesses for table
+          const displayedBusinesses = businesses.filter((biz) => {
+            if (mrrSearchTerm) {
+              const term = mrrSearchTerm.toLowerCase();
+              const matchName = (biz.name || '').toLowerCase().includes(term);
+              const matchOwner = (biz.ownerName || '').toLowerCase().includes(term);
+              const matchId = (biz.id || '').toLowerCase().includes(term);
+              const matchTax = (biz.taxId || '').toLowerCase().includes(term);
+              if (!matchName && !matchOwner && !matchId && !matchTax) return false;
+            }
+            if (mrrFilterPlan !== 'all' && biz.plan !== mrrFilterPlan) return false;
+            if (mrrFilterCountry !== 'all') {
+              const curr = getBusinessCurrency(biz.country);
+              if (curr.code !== mrrFilterCountry && !biz.country?.toLowerCase().includes(mrrFilterCountry.toLowerCase())) return false;
+            }
+            if (mrrFilterStatus !== 'all') {
+              const isSuspended = biz.status === 'suspended' || (biz as any).isArchived;
+              if (mrrFilterStatus === 'active' && isSuspended) return false;
+              if (mrrFilterStatus === 'suspended' && !isSuspended) return false;
+            }
+            if (mrrFilterContractType !== 'all') {
+              const fin = getBusinessFinancials(biz);
+              if (mrrFilterContractType === 'custom' && !fin.isCustomAgreed) return false;
+              if (mrrFilterContractType === 'standard' && fin.isCustomAgreed) return false;
+            }
+            return true;
+          });
+
+          // CSV Export Handler
+          const handleExportMrrCsv = () => {
+            const header = 'Marca,Titular,Pais,Moneda_Local,Plan_Contratado,Sedes_Activas,Tipo_Tarifa,Tarifa_Base_USD,Tarifa_Base_Local,Margen_AddOns_USD,Margen_AddOns_Local,Total_Mensual_USD,Total_Mensual_Local,Total_Equivalente_COP,ARR_Proyectado_Anual_USD,Estado_Cuenta\n';
+            const rows = displayedBusinesses.map((b) => {
+              const fin = getBusinessFinancials(b);
+              const statusStr = (b.status === 'suspended' || (b as any).isArchived) ? 'Suspendido' : 'Al Dia';
+              const tariffStr = fin.isCustomAgreed ? 'Pactada Comercial' : 'Plan Estandar';
+              return `"${b.name}","${b.ownerName || ''}","${b.country || 'Colombia'}","${fin.currency.code}","${b.plan}","${b.branches?.length || 1}","${fin.baseUSD}","${fin.baseLocal}","${fin.addOnsUSD}","${fin.addOnsLocal}","${fin.totalUSD}","${fin.totalLocal}","${fin.totalCOP}","${fin.arrUSD}","${statusStr}","${tariffStr}"`;
+            }).join('\n');
+            const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Prestigia_MRR_Facturacion_${Date.now()}.csv`;
+            a.click();
+          };
+
+          return (
+            <div className="space-y-6 animate-fade-in">
+              {/* Header & Global Currency Switcher */}
+              <div className="bg-gradient-to-r from-emerald-950/30 via-[#0E121B] to-purple-950/30 border border-emerald-500/30 rounded-3xl p-6 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold tracking-wider uppercase mb-1.5">
+                    <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
+                    Consola Financiera Multi-Divisa & SaaS MRR
+                  </div>
+                  <h2 className="text-xl font-bold text-white">
+                    Matriz Financiera de Ingresos Recurrentes (MRR & ARR Global)
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+                    Facturación recurrente mensual en <strong>Dólares Americanos (USD)</strong> y <strong>Monedas Locales (COP, CLP, MXN, EUR)</strong>. Cálculo exacto con tarifas pactadas a medida y margen neto por Add-Ons modulares.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                  {/* Currency View Mode Toggle */}
+                  <div className="bg-[#141A26] border border-slate-700/80 p-1 rounded-xl flex items-center gap-1 text-xs font-semibold">
+                    <button
+                      type="button"
+                      onClick={() => setMrrCurrencyMode('dual')}
+                      className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                        mrrCurrencyMode === 'dual'
+                          ? 'bg-emerald-500 text-slate-950 font-bold shadow'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                      title="Ver Dólares USD ($) con referencia en moneda local de cada país"
+                    >
+                      🌐 Dual (USD / Local)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMrrCurrencyMode('usd')}
+                      className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                        mrrCurrencyMode === 'usd'
+                          ? 'bg-emerald-500 text-slate-950 font-bold shadow'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                      title="Ver todos los montos convertidos a Dólares USD"
+                    >
+                      🇺🇸 USD ($)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMrrCurrencyMode('local')}
+                      className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                        mrrCurrencyMode === 'local'
+                          ? 'bg-emerald-500 text-slate-950 font-bold shadow'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                      title="Ver en la moneda local de cada establecimiento (COP, CLP, MXN)"
+                    >
+                      🏳️ Moneda Local
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMrrCurrencyMode('cop')}
+                      className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                        mrrCurrencyMode === 'cop'
+                          ? 'bg-emerald-500 text-slate-950 font-bold shadow'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                      title="Ver todo consolidado en Pesos Colombianos (COP)"
+                    >
+                      🇨🇴 COP ($)
+                    </button>
+                  </div>
+
+                  {/* Export CSV Button */}
+                  <button
+                    type="button"
+                    onClick={handleExportMrrCsv}
+                    className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shadow"
+                    title="Exportar informe contable en Excel / CSV"
+                  >
+                    <Download className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Exportar CSV</span>
+                  </button>
+                </div>
               </div>
 
-              <div className="bg-[#0E121B] border border-amber-500/30 rounded-3xl p-5 shadow-lg bg-gradient-to-br from-amber-500/5 to-transparent">
-                <p className="text-xs text-amber-400 font-semibold">MRR Add-Ons Modulares (Margen &gt;90%)</p>
-                <p className="text-2xl font-extrabold text-amber-300 font-mono mt-1">
-                  {privacyMode ? '••••••••••' : formatMoneyCOP(stats.mrr?.addOnsCOP || 320000)}
-                </p>
-                <p className="text-[11px] text-amber-400/80 font-mono mt-0.5">
-                  {privacyMode ? '••••••••' : formatMoneyUSD(stats.mrr?.addOnsUSD || 128)}
-                </p>
+              {/* 6 Executive KPI Metric Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
+                {/* 1. MRR Total */}
+                <div className="bg-[#0E121B] border border-emerald-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-emerald-500/10 to-transparent">
+                  <div className="flex items-center justify-between text-xs text-emerald-400 font-semibold">
+                    <span>MRR Total Consolidado</span>
+                    <DollarSign className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <p className="text-xl font-extrabold text-white font-mono mt-1">
+                    {privacyMode ? '••••••••' : formatCurrencyDisplay(totalUSD, 'USD')}
+                    <span className="text-xs text-emerald-300 font-sans ml-1 font-normal">/mes</span>
+                  </p>
+                  <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
+                    ≈ {privacyMode ? '••••••••' : formatCurrencyDisplay(totalCOP, 'COP')}
+                  </p>
+                </div>
+
+                {/* 2. ARR Run-Rate */}
+                <div className="bg-[#0E121B] border border-purple-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-purple-500/10 to-transparent">
+                  <div className="flex items-center justify-between text-xs text-purple-400 font-semibold">
+                    <span>ARR Anual Proyectado</span>
+                    <TrendingUp className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <p className="text-xl font-extrabold text-white font-mono mt-1">
+                    {privacyMode ? '••••••••' : formatCurrencyDisplay(arrUSD, 'USD')}
+                    <span className="text-xs text-purple-300 font-sans ml-1 font-normal">/año</span>
+                  </p>
+                  <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
+                    ≈ {privacyMode ? '••••••••' : formatCurrencyDisplay(arrCOP, 'COP')}
+                  </p>
+                </div>
+
+                {/* 3. Add-Ons Modulares */}
+                <div className="bg-[#0E121B] border border-amber-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-amber-500/10 to-transparent">
+                  <div className="flex items-center justify-between text-xs text-amber-400 font-semibold">
+                    <span>Margen Add-Ons (&gt;90%)</span>
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <p className="text-xl font-extrabold text-amber-300 font-mono mt-1">
+                    {privacyMode ? '••••••••' : formatCurrencyDisplay(addOnsUSD, 'USD')}
+                    <span className="text-xs text-amber-400 font-sans ml-1 font-normal">/mes</span>
+                  </p>
+                  <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
+                    ≈ {privacyMode ? '••••••••' : formatCurrencyDisplay(addOnsCOP, 'COP')}
+                  </p>
+                </div>
+
+                {/* 4. MRR Planes Base */}
+                <div className="bg-[#0E121B] border border-slate-800 rounded-2xl p-4 shadow-lg">
+                  <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+                    <span>MRR Planes Base</span>
+                    <Building2 className="w-4 h-4 text-slate-400" />
+                  </div>
+                  <p className="text-xl font-extrabold text-white font-mono mt-1">
+                    {privacyMode ? '••••••••' : formatCurrencyDisplay(plansUSD, 'USD')}
+                    <span className="text-xs text-slate-400 font-sans ml-1 font-normal">/mes</span>
+                  </p>
+                  <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
+                    ≈ {privacyMode ? '••••••••' : formatCurrencyDisplay(plansCOP, 'COP')}
+                  </p>
+                </div>
+
+                {/* 5. ARPA Ticket Promedio */}
+                <div className="bg-[#0E121B] border border-blue-500/30 rounded-2xl p-4 shadow-lg bg-gradient-to-br from-blue-500/10 to-transparent">
+                  <div className="flex items-center justify-between text-xs text-blue-400 font-semibold">
+                    <span>Ticket Promedio (ARPA)</span>
+                    <BarChart3 className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <p className="text-xl font-extrabold text-white font-mono mt-1">
+                    {privacyMode ? '••••••••' : formatCurrencyDisplay(arpaUSD, 'USD')}
+                    <span className="text-xs text-blue-300 font-sans ml-1 font-normal">/cuenta</span>
+                  </p>
+                  <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
+                    ≈ {privacyMode ? '••••••••' : formatCurrencyDisplay(arpaCOP, 'COP')}
+                  </p>
+                </div>
+
+                {/* 6. Total Marcas Activas */}
+                <div className="bg-[#0E121B] border border-slate-800 rounded-2xl p-4 shadow-lg">
+                  <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+                    <span>Marcas Facturando</span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <p className="text-xl font-extrabold text-white font-mono mt-1">
+                    {activeCount} <span className="text-xs text-slate-400 font-sans font-normal">activas</span>
+                  </p>
+                  <p className="text-[11px] text-emerald-400 font-semibold mt-0.5">
+                    100% de la red al día
+                  </p>
+                </div>
               </div>
 
-              <div className="bg-[#0E121B] border border-emerald-500/30 rounded-3xl p-5 shadow-lg bg-gradient-to-br from-emerald-500/5 to-transparent">
-                <p className="text-xs text-emerald-400 font-semibold">MRR Total Consolidado</p>
-                <p className="text-2xl font-extrabold text-emerald-400 font-mono mt-1">
-                  {privacyMode ? '••••••••••' : formatMoneyCOP(stats.mrr?.totalCOP || 1469000)}
-                </p>
-                <p className="text-[11px] text-emerald-300/80 font-mono mt-0.5">
-                  {privacyMode ? '••••••••' : formatMoneyUSD(stats.mrr?.totalUSD || 586)}
-                </p>
-              </div>
-            </div>
+              {/* Filter & Search Bar */}
+              <div className="bg-[#0E121B] border border-slate-800 rounded-2xl p-4 space-y-3 shadow-md">
+                <div className="flex flex-wrap items-center gap-3 text-xs">
+                  {/* Search Bar */}
+                  <div className="relative flex-1 min-w-[220px]">
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={mrrSearchTerm}
+                      onChange={(e) => setMrrSearchTerm(e.target.value)}
+                      placeholder="Buscar marca, titular, NIT o ID..."
+                      className="w-full bg-[#141A26] border border-slate-700 text-white text-xs rounded-xl pl-8 pr-8 py-2 outline-none focus:border-amber-400 placeholder:text-slate-500"
+                    />
+                    {mrrSearchTerm && (
+                      <button
+                        type="button"
+                        onClick={() => setMrrSearchTerm('')}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
 
-            {/* Breakdown per client table */}
-            <div className="bg-[#0E121B] border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
-              <div className="p-4 bg-[#141A26] border-b border-slate-800 flex items-center justify-between">
-                <span className="text-xs font-bold text-white uppercase tracking-wider">Desglose por Marca & Servicio</span>
-                <span className="text-[11px] text-slate-400">Total Marcas Facturando: {businesses.length}</span>
+                  {/* Plan Filter */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-slate-400 font-medium">Plan:</span>
+                    <select
+                      value={mrrFilterPlan}
+                      onChange={(e) => setMrrFilterPlan(e.target.value)}
+                      className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
+                    >
+                      <option value="all">Todos los Planes</option>
+                      <option value="independiente">Independiente ($19 USD / $49k COP)</option>
+                      <option value="pro">Profesional Pro ($49 USD / $120k COP)</option>
+                      <option value="elite">Élite Multi-Sede ($110 USD / $290k COP)</option>
+                      <option value="empresarial">Empresarial ($280 USD / $690k COP)</option>
+                    </select>
+                  </div>
+
+                  {/* Country / Currency Filter */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-slate-400 font-medium">País / Moneda:</span>
+                    <select
+                      value={mrrFilterCountry}
+                      onChange={(e) => setMrrFilterCountry(e.target.value)}
+                      className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
+                    >
+                      <option value="all">Todas las Divisas</option>
+                      <option value="COP">🇨🇴 Colombia (Pesos COP)</option>
+                      <option value="CLP">🇨🇱 Chile (Pesos CLP)</option>
+                      <option value="MXN">🇲🇽 México (Pesos MXN)</option>
+                      <option value="USD">🇺🇸 Internacional (Dólares USD)</option>
+                      <option value="EUR">🇪🇺 Europa (Euros EUR)</option>
+                    </select>
+                  </div>
+
+                  {/* Contract Type (Pactada vs Estandar) */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-slate-400 font-medium">Tarifa:</span>
+                    <select
+                      value={mrrFilterContractType}
+                      onChange={(e) => setMrrFilterContractType(e.target.value)}
+                      className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
+                    >
+                      <option value="all">Todas las Tarifas</option>
+                      <option value="custom">⭐ Tarifas Especiales Pactadas</option>
+                      <option value="standard">📦 Planes Oficiales Estándar</option>
+                    </select>
+                  </div>
+
+                  {/* Status Filter */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-slate-400 font-medium">Estado:</span>
+                    <select
+                      value={mrrFilterStatus}
+                      onChange={(e) => setMrrFilterStatus(e.target.value)}
+                      className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
+                    >
+                      <option value="all">Todos los Estados</option>
+                      <option value="active">🟢 Al Día / Activas</option>
+                      <option value="suspended">🔴 Suspendidas / Congeladas</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800/80">
+                  <span>
+                    Mostrando <strong className="text-white">{displayedBusinesses.length}</strong> de <strong className="text-white">{businesses.length}</strong> marcas registradas en facturación
+                  </span>
+                  {(mrrSearchTerm || mrrFilterPlan !== 'all' || mrrFilterCountry !== 'all' || mrrFilterStatus !== 'all' || mrrFilterContractType !== 'all') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMrrSearchTerm('');
+                        setMrrFilterPlan('all');
+                        setMrrFilterCountry('all');
+                        setMrrFilterStatus('all');
+                        setMrrFilterContractType('all');
+                      }}
+                      className="text-[11px] text-amber-400 hover:underline cursor-pointer"
+                    >
+                      Limpiar filtros de facturación
+                    </button>
+                  )}
+                </div>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-[#121622] text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
-                    <tr>
-                      <th className="py-3 px-4">Marca</th>
-                      <th className="py-3 px-4">Plan Base</th>
-                      <th className="py-3 px-4">Sedes</th>
-                      <th className="py-3 px-4">Add-Ons Activos</th>
-                      <th className="py-3 px-4 text-right">Facturación Mensual</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800/80 text-slate-300">
-                    {businesses.map((biz) => {
-                      const addons = biz.masterAddOns;
-                      return (
-                        <tr key={biz.id} className="hover:bg-[#121622]">
-                          <td className="py-3 px-4 font-semibold text-white">{biz.name}</td>
-                          <td className="py-3 px-4 capitalize">{biz.plan}</td>
-                          <td className="py-3 px-4">{biz.branches?.length || 1} Sedes</td>
-                          <td className="py-3 px-4 text-[11px] text-slate-400">
-                            {addons?.extraBranches ? `+${addons.extraBranches} Sedes • ` : ''}
-                            {addons?.extraManagers ? `+${addons.extraManagers} Encargados • ` : ''}
-                            {addons?.sentiment360?.enabled ? 'Sentimiento IA • ' : ''}
-                            {addons?.liveWallboard?.enabled ? 'Wallboard' : ''}
-                            {!addons?.extraBranches && !addons?.extraManagers && !addons?.sentiment360?.enabled ? 'Plan Base Estándar' : ''}
-                          </td>
-                          <td className="py-3 px-4 text-right font-mono font-bold text-amber-300">
-                            {privacyMode
-                              ? '••••••••••'
-                              : formatMoneyCOP(
-                                  (biz.plan === 'elite' ? 290000 : biz.plan === 'pro' ? 120000 : biz.plan === 'empresarial' ? 690000 : 49000) +
-                                  ((addons?.extraBranches || 0) * 50000) +
-                                  ((addons?.extraManagers || 0) * 25000)
+
+              {/* Detailed Multi-Currency Billing Table */}
+              <div className="bg-[#0E121B] border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-[#141A26] border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider font-semibold">
+                      <tr>
+                        <th className="py-3.5 px-4">Marca & Titular Comercial</th>
+                        <th className="py-3.5 px-3">País & Divisa</th>
+                        <th className="py-3.5 px-3">Plan & Sedes</th>
+                        <th className="py-3.5 px-3">Add-Ons Modulares</th>
+                        <th className="py-3.5 px-3">Tarifa Base</th>
+                        <th className="py-3.5 px-4 text-right">Facturación Mensual (MRR)</th>
+                        <th className="py-3.5 px-3.5 text-center">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/80 text-slate-300">
+                      {displayedBusinesses.map((biz) => {
+                        const fin = getBusinessFinancials(biz);
+                        const isSuspended = biz.status === 'suspended' || (biz as any).isArchived;
+                        const addons = biz.masterAddOns;
+
+                        // Display formatted amount depending on selected currency mode
+                        let primaryPrice = '';
+                        let secondaryPrice = '';
+
+                        if (mrrCurrencyMode === 'usd') {
+                          primaryPrice = formatCurrencyDisplay(fin.totalUSD, 'USD');
+                          secondaryPrice = `ARR: ${formatCurrencyDisplay(fin.arrUSD, 'USD')}/año`;
+                        } else if (mrrCurrencyMode === 'cop') {
+                          primaryPrice = formatCurrencyDisplay(fin.totalCOP, 'COP');
+                          secondaryPrice = `USD: ${formatCurrencyDisplay(fin.totalUSD, 'USD')}`;
+                        } else if (mrrCurrencyMode === 'local') {
+                          primaryPrice = formatCurrencyDisplay(fin.totalLocal, fin.currency.code);
+                          secondaryPrice = `USD: ${formatCurrencyDisplay(fin.totalUSD, 'USD')}`;
+                        } else {
+                          // Dual default: USD prominent + local currency
+                          primaryPrice = `${formatCurrencyDisplay(fin.totalUSD, 'USD')} USD`;
+                          secondaryPrice = fin.currency.code === 'USD'
+                            ? `ARR: ${formatCurrencyDisplay(fin.arrUSD, 'USD')}/año`
+                            : `${formatCurrencyDisplay(fin.totalLocal, fin.currency.code)} • ARR ${formatCurrencyDisplay(fin.arrUSD, 'USD')}`;
+                        }
+
+                        return (
+                          <tr key={biz.id} className="hover:bg-[#121622] transition-colors">
+                            {/* Brand & Owner */}
+                            <td className="py-3.5 px-4">
+                              <div className="flex items-center gap-2">
+                                <span className={`w-2 h-2 rounded-full shrink-0 ${
+                                  isSuspended ? 'bg-rose-500' : 'bg-emerald-400'
+                                }`} title={isSuspended ? 'Cuenta Suspendida' : 'Cuenta Activa y al Día'} />
+                                <strong className="font-bold text-white text-sm">
+                                  {privacyMode ? 'Marca Confidencial' : biz.name}
+                                </strong>
+                              </div>
+                              <p className="text-[11px] text-slate-400 pl-4 mt-0.5">
+                                Titular: <span className="text-slate-300 font-medium">{privacyMode ? '••••••••' : (biz.ownerName || 'No registrado')}</span>
+                                {biz.taxId && <span className="font-mono text-slate-500 ml-1.5">• NIT/ID: {privacyMode ? '••••' : biz.taxId}</span>}
+                              </p>
+                            </td>
+
+                            {/* Country & Currency */}
+                            <td className="py-3.5 px-3 whitespace-nowrap">
+                              <div className="flex items-center gap-1.5 font-medium text-slate-200">
+                                <span className="text-base">{fin.currency.flag}</span>
+                                <span>{biz.country?.replace(/\s*\(NIT\)/, '') || 'Colombia'}</span>
+                              </div>
+                              <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30 inline-block mt-0.5">
+                                {fin.currency.code}
+                              </span>
+                            </td>
+
+                            {/* Plan & Branches */}
+                            <td className="py-3.5 px-3 whitespace-nowrap">
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
+                                biz.plan === 'elite'
+                                  ? 'bg-purple-500/15 text-purple-300 border-purple-500/30'
+                                  : biz.plan === 'empresarial'
+                                  ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                                  : biz.plan === 'pro'
+                                  ? 'bg-blue-500/15 text-blue-300 border-blue-500/30'
+                                  : 'bg-slate-700/50 text-slate-300 border-slate-600'
+                              }`}>
+                                Plan {biz.plan}
+                              </span>
+                              <p className="text-[11px] text-slate-400 font-mono mt-1">
+                                {biz.branches?.length || 1} {(biz.branches?.length || 1) === 1 ? 'Sede' : 'Sedes'}
+                              </p>
+                            </td>
+
+                            {/* Add-Ons */}
+                            <td className="py-3.5 px-3">
+                              <div className="flex flex-wrap gap-1 max-w-xs">
+                                {addons?.extraBranches ? (
+                                  <span className="px-1.5 py-0.5 rounded bg-purple-500/10 border border-purple-500/30 text-purple-300 text-[10px] font-semibold whitespace-nowrap">
+                                    +{addons.extraBranches} Sedes (+${addons.extraBranches * 20} USD)
+                                  </span>
+                                ) : null}
+                                {addons?.extraManagers ? (
+                                  <span className="px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/30 text-blue-300 text-[10px] font-semibold whitespace-nowrap">
+                                    +{addons.extraManagers} Encargados (+${addons.extraManagers * 10} USD)
+                                  </span>
+                                ) : null}
+                                {addons?.sentiment360?.enabled ? (
+                                  <span className="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-semibold whitespace-nowrap">
+                                    Sentimiento 360 (+$25 USD)
+                                  </span>
+                                ) : null}
+                                {addons?.liveWallboard?.enabled ? (
+                                  <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[10px] font-semibold whitespace-nowrap">
+                                    Wallboard (+$20 USD)
+                                  </span>
+                                ) : null}
+                                {!addons?.extraBranches && !addons?.extraManagers && !addons?.sentiment360?.enabled && !addons?.liveWallboard?.enabled && (
+                                  <span className="text-[11px] text-slate-500 italic">Sin Add-Ons</span>
                                 )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                              </div>
+                            </td>
+
+                            {/* Base Fee */}
+                            <td className="py-3.5 px-3 whitespace-nowrap">
+                              <p className="font-mono font-bold text-white text-xs">
+                                {privacyMode ? '••••••••' : formatCurrencyDisplay(fin.baseUSD, 'USD')}
+                              </p>
+                              {fin.isCustomAgreed ? (
+                                <span className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-400 bg-amber-500/15 px-1.5 py-0.5 rounded border border-amber-500/30 mt-0.5">
+                                  ⭐ Pactada Comercial
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">
+                                  Plan Estándar
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Monthly Invoicing (MRR) */}
+                            <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                              <p className="text-sm font-extrabold text-emerald-400 font-mono">
+                                {privacyMode ? '••••••••' : primaryPrice}
+                              </p>
+                              <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                                {privacyMode ? '••••••••' : secondaryPrice}
+                              </p>
+                            </td>
+
+                            {/* Actions */}
+                            <td className="py-3.5 px-3.5 text-center whitespace-nowrap">
+                              <div className="flex items-center justify-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setMrrEditingBiz(biz);
+                                    setMrrFeeInputUSD(String(biz.agreedMonthlyFeeUSD || fin.totalUSD || ''));
+                                    setMrrFeeInputLocal(String(biz.agreedMonthlyFeeCOP || fin.totalLocal || ''));
+                                    setMrrBillingCycle(biz.billingCycle || 'monthly');
+                                  }}
+                                  className="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 hover:text-white text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer"
+                                  title="Ajustar tarifa personalizada para esta marca"
+                                >
+                                  <Edit3 className="w-3 h-3 text-amber-400" />
+                                  <span>Tarifa</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedBusinessId(biz.id);
+                                    setActiveTab('directorio');
+                                  }}
+                                  className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer"
+                                  title="Ver expediente en Directorio"
+                                >
+                                  <ExternalLink className="w-3 h-3 text-slate-400" />
+                                  <span>Ficha</span>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Table Footer */}
+                <div className="py-3.5 px-4 bg-[#121622] border-t border-slate-800 text-slate-400 text-xs flex flex-col sm:flex-row items-center justify-between gap-2">
+                  <span>
+                    Consolidado de <strong className="text-white">{displayedBusinesses.length}</strong> marcas • Total MRR Global: <strong className="text-emerald-400 font-mono font-bold">{formatCurrencyDisplay(totalUSD, 'USD')}</strong> (≈ {formatCurrencyDisplay(totalCOP, 'COP')})
+                  </span>
+                  <span className="text-[11px] text-purple-400 font-medium">
+                    Prestigia B2B Billing System: Multi-Divisa (USD, COP, CLP, MXN, EUR)
+                  </span>
+                </div>
               </div>
+
+              {/* Quick Fee Adjustment Modal */}
+              {mrrEditingBiz && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in">
+                  <div className="relative w-full max-w-md bg-[#0C101A] border border-amber-500/40 rounded-3xl shadow-2xl p-6 text-white space-y-4">
+                    <div className="flex items-start justify-between pb-3 border-b border-slate-800">
+                      <div>
+                        <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider block">
+                          Ajuste de Tarifa Comercial Contratada
+                        </span>
+                        <h3 className="text-base font-bold text-white mt-0.5">
+                          {mrrEditingBiz.name}
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          {mrrEditingBiz.country?.replace(/\s*\(NIT\)/, '') || 'Colombia'} • Plan {mrrEditingBiz.plan} ({mrrEditingBiz.branches?.length || 1} Sedes)
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setMrrEditingBiz(null)}
+                        className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="space-y-3.5 text-xs">
+                      <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-[11px] leading-relaxed">
+                        💡 <strong>Flexibilidad Total:</strong> Puedes fijar la tarifa en <strong>Dólares Americanos (USD)</strong> para clientes internacionales, o en la <strong>Moneda Local</strong> del país del cliente. El sistema sincronizará la conversión automáticamente.
+                      </div>
+
+                      {/* Tarifa en USD */}
+                      <div>
+                        <label className="text-slate-300 font-semibold block mb-1">
+                          Tarifa Mensual en USD ($ Dólares Americanos)
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400 font-bold font-mono">
+                            $
+                          </span>
+                          <input
+                            type="number"
+                            value={mrrFeeInputUSD}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setMrrFeeInputUSD(val);
+                              if (val) {
+                                const num = Number(val);
+                                setMrrFeeInputLocal(String(num * 4000));
+                              }
+                            }}
+                            placeholder="Ej: 360"
+                            className="w-full bg-[#141A26] border border-slate-700 rounded-xl pl-8 pr-14 py-2 font-mono text-white text-xs outline-none focus:border-amber-400"
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] font-mono">
+                            USD / mes
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Tarifa en Moneda Local / COP */}
+                      <div>
+                        <label className="text-slate-300 font-semibold block mb-1">
+                          Equivalente en Moneda Local ({getBusinessCurrency(mrrEditingBiz.country).code})
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold font-mono">
+                            $
+                          </span>
+                          <input
+                            type="number"
+                            value={mrrFeeInputLocal}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setMrrFeeInputLocal(val);
+                              if (val) {
+                                const num = Number(val);
+                                setMrrFeeInputUSD(String(Math.round(num / 4000)));
+                              }
+                            }}
+                            placeholder="Ej: 900000"
+                            className="w-full bg-[#141A26] border border-slate-700 rounded-xl pl-8 pr-14 py-2 font-mono text-white text-xs outline-none focus:border-amber-400"
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] font-mono">
+                            {getBusinessCurrency(mrrEditingBiz.country).code} / mes
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Ciclo de Facturación */}
+                      <div>
+                        <label className="text-slate-300 font-semibold block mb-1">
+                          Ciclo Comercial Pactado
+                        </label>
+                        <select
+                          value={mrrBillingCycle}
+                          onChange={(e) => setMrrBillingCycle(e.target.value as any)}
+                          className="w-full bg-[#141A26] border border-slate-700 rounded-xl px-3 py-2 text-white text-xs outline-none cursor-pointer focus:border-amber-400"
+                        >
+                          <option value="monthly">Facturación Mensual Recurrente</option>
+                          <option value="quarterly">Facturación Trimestral Anticipada (3 meses)</option>
+                          <option value="semiannual">Facturación Semestral (6 meses)</option>
+                          <option value="annual">Facturación Anual Contratada (12 meses)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2 pt-3 border-t border-slate-800">
+                      <button
+                        type="button"
+                        onClick={() => setMrrEditingBiz(null)}
+                        className="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        disabled={mrrSavingFee}
+                        onClick={async () => {
+                          setMrrSavingFee(true);
+                          try {
+                            const res = await fetch('/api/master', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                action: 'update_owner_details',
+                                businessId: mrrEditingBiz.id,
+                                agreedMonthlyFeeUSD: Number(mrrFeeInputUSD) || 0,
+                                agreedMonthlyFeeCOP: Number(mrrFeeInputLocal) || 0,
+                                billingCycle: mrrBillingCycle,
+                              }),
+                            });
+                            const data = await res.json();
+                            if (data.success) {
+                              setNotification({
+                                type: 'success',
+                                message: `¡Tarifa contratada de '${mrrEditingBiz.name}' actualizada con éxito!`,
+                              });
+                              setTimeout(() => setNotification(null), 4000);
+                              setMrrEditingBiz(null);
+                              fetchMasterData();
+                            } else {
+                              alert(data.error || 'Error al actualizar la tarifa');
+                            }
+                          } catch {
+                            alert('Error de conexión con el servidor');
+                          } finally {
+                            setMrrSavingFee(false);
+                          }
+                        }}
+                        className="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-amber-500/20"
+                      >
+                        {mrrSavingFee ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Guardando...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Guardar Tarifa</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {activeTab === 'trafico' && (
           <div className="space-y-6">

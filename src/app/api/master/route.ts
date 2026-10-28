@@ -90,8 +90,12 @@ export async function GET(request: NextRequest) {
       const agreedCOP = biz.agreedMonthlyFeeCOP || branchesFeeCOP;
       const agreedUSD = biz.agreedMonthlyFeeUSD || branchesFeeUSD;
 
-      const planCost = agreedCOP > 0
-        ? { cop: agreedCOP, usd: agreedUSD > 0 ? agreedUSD : Math.round(agreedCOP / 4000) }
+      const isAgreed = (agreedCOP > 0) || (agreedUSD > 0);
+      const planCost = isAgreed
+        ? {
+            cop: agreedCOP > 0 ? agreedCOP : Math.round((agreedUSD || 0) * 4000),
+            usd: (agreedUSD && agreedUSD > 0) ? agreedUSD : Math.round((agreedCOP || 0) / 4000)
+          }
         : (PLAN_PRICING[biz.plan] || PLAN_PRICING.pro);
 
       mrrPlansCOP += planCost.cop;
