@@ -3185,6 +3185,20 @@ export default function MasterAdminPage() {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
   };
 
+  // Live Consolidated MRR Totals synchronized across the entire Master HQ
+  const activeMrrTotals = useMemo(() => {
+    let usd = 0;
+    let cop = 0;
+    businesses.forEach((biz) => {
+      if (biz.status !== 'suspended' && !(biz as any).isArchived) {
+        const fin = getBusinessFinancials(biz);
+        usd += fin.totalUSD;
+        cop += fin.totalCOP;
+      }
+    });
+    return { usd, cop };
+  }, [businesses, exchangeRates]);
+
   const maskPhone = (phone: string) => {
     if (privacyMode) return '+57 ••• ••• ••XX';
     return phone;
@@ -3855,9 +3869,21 @@ export default function MasterAdminPage() {
             <Users className="w-3.5 h-3.5 text-purple-400" />
             <span>Data Lake: <strong className="text-white">{campaignParticipants.length + feedbacks.length}</strong></span>
           </div>
-          <div className="px-2 py-1 rounded-xl bg-[#141A26] border border-slate-800 text-slate-300 flex items-center gap-1.5 whitespace-nowrap">
+          <div
+            onClick={() => setActiveTab('mrr')}
+            className="px-2.5 py-1 rounded-xl bg-[#141A26] hover:bg-slate-800/80 border border-slate-800 text-slate-300 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition-all shadow-sm"
+            title="Ver Matriz Financiera & MRR en tiempo real"
+          >
             <DollarSign className="w-3.5 h-3.5 text-amber-400" />
-            <span>MRR: <strong className="text-amber-300">{formatMoneyCOP(stats?.mrr?.totalCOP || 1469000)}</strong></span>
+            <span>
+              MRR: <strong className="text-amber-300 font-mono">
+                {privacyMode
+                  ? '••••••••'
+                  : mrrCurrencyMode === 'usd'
+                  ? formatCurrencyDisplay(activeMrrTotals.usd, 'USD')
+                  : formatCurrencyDisplay(activeMrrTotals.cop, 'COP')}
+              </strong>
+            </span>
           </div>
         </div>
 
