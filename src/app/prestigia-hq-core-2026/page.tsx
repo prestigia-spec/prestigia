@@ -7099,10 +7099,10 @@ export default function MasterAdminPage() {
                       className="bg-[#141A26] border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5 outline-none cursor-pointer"
                     >
                       <option value="all">Todos los Planes</option>
-                      <option value="independiente">Independiente ($19 USD / $49k COP)</option>
-                      <option value="pro">Profesional Pro ($49 USD / $120k COP)</option>
-                      <option value="elite">Élite Multi-Sede ($110 USD / $290k COP)</option>
-                      <option value="empresarial">Empresarial ($280 USD / $690k COP)</option>
+                      <option value="independiente">Plan Independiente (1 Sede)</option>
+                      <option value="pro">Plan Profesional Pro (1 Sede)</option>
+                      <option value="elite">Plan Élite Multi-Sede</option>
+                      <option value="empresarial">Plan Empresarial Corporativo</option>
                     </select>
                   </div>
 
@@ -7262,22 +7262,22 @@ export default function MasterAdminPage() {
                               <div className="flex flex-wrap gap-1 max-w-xs">
                                 {addons?.extraBranches ? (
                                   <span className="px-1.5 py-0.5 rounded bg-purple-500/10 border border-purple-500/30 text-purple-300 text-[10px] font-semibold whitespace-nowrap">
-                                    +{addons.extraBranches} Sedes (+${addons.extraBranches * 20} USD)
+                                    +{addons.extraBranches} {addons.extraBranches === 1 ? 'Sede Extra' : 'Sedes Extra'}
                                   </span>
                                 ) : null}
                                 {addons?.extraManagers ? (
                                   <span className="px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/30 text-blue-300 text-[10px] font-semibold whitespace-nowrap">
-                                    +{addons.extraManagers} Encargados (+${addons.extraManagers * 10} USD)
+                                    +{addons.extraManagers} {addons.extraManagers === 1 ? 'Encargado Extra' : 'Encargados Extra'}
                                   </span>
                                 ) : null}
                                 {addons?.sentiment360?.enabled ? (
                                   <span className="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-semibold whitespace-nowrap">
-                                    Sentimiento 360 (+$25 USD)
+                                    Sentimiento 360 IA
                                   </span>
                                 ) : null}
                                 {addons?.liveWallboard?.enabled ? (
                                   <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[10px] font-semibold whitespace-nowrap">
-                                    Wallboard (+$20 USD)
+                                    Live Wallboard
                                   </span>
                                 ) : null}
                                 {!addons?.extraBranches && !addons?.extraManagers && !addons?.sentiment360?.enabled && !addons?.liveWallboard?.enabled && (
