@@ -745,135 +745,136 @@ export default function HomePage() {
       />
 
       {/* ============================================================== */}
-      {/* 1. TOP LIVE STATUS STRIP */}
+      {/* FIXED / STICKY HEADER WRAPPER (Top Strip + Main Navigation Bar) */}
       {/* ============================================================== */}
-      <div className="relative z-50 bg-[#090D17] border-b border-slate-800/80 px-4 sm:px-8 lg:px-12 py-2 text-[11px] font-semibold text-slate-300">
-        <div className="w-full max-w-[1700px] mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5 overflow-hidden min-w-0">
-            <span className="relative flex h-2 w-2 shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="text-emerald-400 font-bold uppercase tracking-wider text-[10px] sm:text-[11px] shrink-0">
-              {t.topBar.liveStatus}
-            </span>
-            <span className="text-slate-600 hidden sm:inline">•</span>
-            <span className="text-slate-400 truncate hidden sm:inline">
-              {t.topBar.coverage}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3.5 text-[11px] font-mono shrink-0">
-            {/* Bilingual Language Switcher Toggle */}
-            <div className="flex items-center bg-slate-900 border border-slate-700/80 rounded-xl p-0.5 text-[10px] font-bold">
-              <button
-                type="button"
-                onClick={() => handleLanguageChange('es')}
-                className={`px-2 py-0.5 rounded-lg transition cursor-pointer ${lang === 'es' ? 'bg-amber-500 text-slate-950 font-black shadow' : 'text-slate-400 hover:text-white'}`}
-                title="Cambiar a Español"
-              >
-                🇪🇸 ES
-              </button>
-              <button
-                type="button"
-                onClick={() => handleLanguageChange('en')}
-                className={`px-2 py-0.5 rounded-lg transition cursor-pointer ${lang === 'en' ? 'bg-amber-500 text-slate-950 font-black shadow' : 'text-slate-400 hover:text-white'}`}
-                title="Switch to English"
-              >
-                🇺🇸 EN
-              </button>
+      <div className="sticky top-0 z-50 w-full shadow-2xl shadow-black/60 transition-all">
+        {/* 1. TOP LIVE STATUS STRIP */}
+        <div className="bg-[#090D17]/95 backdrop-blur-xl border-b border-slate-800/80 px-4 sm:px-8 lg:px-12 py-1.5 sm:py-2 text-[11px] font-semibold text-slate-300">
+          <div className="w-full max-w-[1700px] mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5 overflow-hidden min-w-0">
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-emerald-400 font-bold uppercase tracking-wider text-[10px] sm:text-[11px] shrink-0">
+                {t.topBar.liveStatus}
+              </span>
+              <span className="text-slate-600 hidden sm:inline">•</span>
+              <span className="text-slate-400 truncate hidden sm:inline">
+                {t.topBar.coverage}
+              </span>
             </div>
 
-            <span className="text-amber-400 font-bold flex items-center gap-1">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span>{t.topBar.rating}</span>
-            </span>
-            <a
-              href="https://wa.me/573058314049?text=Hola%20Prestigia,%20me%20gustar%C3%ADa%20consultar%20sobre%20el%20blindaje%20comercial"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-slate-400 hover:text-white transition hidden md:flex items-center gap-1.5"
-            >
-              <Phone className="w-3 h-3 text-emerald-400" />
-              <span>{t.topBar.support}</span>
-            </a>
+            <div className="flex items-center gap-3.5 text-[11px] font-mono shrink-0">
+              {/* Bilingual Language Switcher Toggle */}
+              <div className="flex items-center bg-slate-900 border border-slate-700/80 rounded-xl p-0.5 text-[10px] font-bold">
+                <button
+                  type="button"
+                  onClick={() => handleLanguageChange('es')}
+                  className={`px-2 py-0.5 rounded-lg transition cursor-pointer ${lang === 'es' ? 'bg-amber-500 text-slate-950 font-black shadow' : 'text-slate-400 hover:text-white'}`}
+                  title="Cambiar a Español"
+                >
+                  🇪🇸 ES
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleLanguageChange('en')}
+                  className={`px-2 py-0.5 rounded-lg transition cursor-pointer ${lang === 'en' ? 'bg-amber-500 text-slate-950 font-black shadow' : 'text-slate-400 hover:text-white'}`}
+                  title="Switch to English"
+                >
+                  🇺🇸 EN
+                </button>
+              </div>
+
+              <span className="text-amber-400 font-bold flex items-center gap-1">
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <span>{t.topBar.rating}</span>
+              </span>
+              <a
+                href="https://wa.me/573058314049?text=Hola%20Prestigia,%20me%20gustar%C3%ADa%20consultar%20sobre%20el%20blindaje%20comercial"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-slate-400 hover:text-white transition hidden md:flex items-center gap-1.5"
+              >
+                <Phone className="w-3 h-3 text-emerald-400" />
+                <span>{t.topBar.support}</span>
+              </a>
+            </div>
           </div>
         </div>
+
+        {/* 2. TOP NAVBAR — EXPANSIVE FULL-WIDTH LAYOUT */}
+        <header className="backdrop-blur-2xl bg-[#06080E]/95 border-b border-slate-800/80 px-4 sm:px-8 lg:px-12 py-2.5 sm:py-3 transition-all">
+          <div className="w-full max-w-[1700px] mx-auto flex items-center justify-between gap-4">
+            {/* Brand Logo (Clean, sleek, non-wrapping) */}
+            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group cursor-pointer shrink-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-indigo-800 flex items-center justify-center p-2 shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform duration-300">
+                <PrestigiaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-lg sm:text-xl font-black tracking-widest text-white">
+                  PRESTIGIA
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold tracking-wider uppercase hidden 2xl:inline-block">
+                  5★ SUITE
+                </span>
+              </div>
+            </Link>
+
+            {/* Navigation Links with adaptive breathing room */}
+            <nav className="hidden xl:flex items-center gap-3.5 2xl:gap-6 text-[11px] 2xl:text-xs font-semibold text-slate-300">
+              <a href="#como-funciona" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.howItWorks}</a>
+              <a href="#simulador" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.simulator}</a>
+              <a href="#calculadora-roi" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.roiCalc}</a>
+              <a href="#tour-sistema" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.systemTour}</a>
+              <a href="#auditor-preview" className="hover:text-cyan-300 transition whitespace-nowrap text-cyan-400 flex items-center gap-1 font-bold">
+                <Search className="w-3 h-3 text-cyan-400" />
+                <span>{t.nav.auditor}</span>
+              </a>
+              <a href="#planes" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.plans}</a>
+              <Link
+                href="/dossier"
+                className="hover:text-amber-300 transition whitespace-nowrap text-amber-400/90 flex items-center gap-1 font-bold"
+              >
+                <FileSpreadsheet className="w-3 h-3 text-amber-400" />
+                <span>{t.nav.dossier}</span>
+              </Link>
+            </nav>
+
+            {/* Action CTAs */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <Link
+                href="/auditor"
+                onClick={() => trackAction('click_auditor_from_navbar')}
+                className="px-3 sm:px-4 py-2 rounded-xl bg-cyan-950/70 hover:bg-cyan-900 text-cyan-300 font-bold text-xs border border-cyan-500/40 transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
+              >
+                <Search className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="hidden sm:inline">{t.nav.auditBusiness}</span>
+                <span className="sm:hidden">{t.nav.auditor}</span>
+              </Link>
+
+              <Link
+                href="/portal"
+                onClick={() => trackAction('click_portal_from_navbar')}
+                className="px-3 sm:px-4 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
+              >
+                <Lock className="w-3.5 h-3.5 text-indigo-400" />
+                <span className="hidden sm:inline">{t.nav.clientPortal}</span>
+                <span className="sm:hidden">Portal</span>
+              </Link>
+
+              <a
+                href="#agendar"
+                onClick={() => trackAction('click_agendar_navbar')}
+                className="px-3.5 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/25 active:scale-95 cursor-pointer flex items-center gap-1.5 animate-shimmer whitespace-nowrap"
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                <span>{t.nav.bookCall}</span>
+              </a>
+            </div>
+          </div>
+        </header>
       </div>
-
-      {/* ============================================================== */}
-      {/* 2. TOP NAVBAR — EXPANSIVE FULL-WIDTH LAYOUT */}
-      {/* ============================================================== */}
-      <header className="sticky top-0 z-40 backdrop-blur-2xl bg-[#06080E]/90 border-b border-slate-800/80 px-4 sm:px-8 lg:px-12 py-3 transition-all">
-        <div className="w-full max-w-[1700px] mx-auto flex items-center justify-between gap-4">
-          {/* Brand Logo (Clean, sleek, non-wrapping) */}
-          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group cursor-pointer shrink-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-indigo-800 flex items-center justify-center p-2 shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform duration-300">
-              <PrestigiaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-lg sm:text-xl font-black tracking-widest text-white">
-                PRESTIGIA
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold tracking-wider uppercase hidden 2xl:inline-block">
-                5★ SUITE
-              </span>
-            </div>
-          </Link>
-
-          {/* Navigation Links with adaptive breathing room */}
-          <nav className="hidden xl:flex items-center gap-3.5 2xl:gap-6 text-[11px] 2xl:text-xs font-semibold text-slate-300">
-            <a href="#como-funciona" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.howItWorks}</a>
-            <a href="#simulador" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.simulator}</a>
-            <a href="#calculadora-roi" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.roiCalc}</a>
-            <a href="#tour-sistema" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.systemTour}</a>
-            <a href="#auditor-preview" className="hover:text-cyan-300 transition whitespace-nowrap text-cyan-400 flex items-center gap-1 font-bold">
-              <Search className="w-3 h-3 text-cyan-400" />
-              <span>{t.nav.auditor}</span>
-            </a>
-            <a href="#planes" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.plans}</a>
-            <Link
-              href="/dossier"
-              className="hover:text-amber-300 transition whitespace-nowrap text-amber-400/90 flex items-center gap-1 font-bold"
-            >
-              <FileSpreadsheet className="w-3 h-3 text-amber-400" />
-              <span>{t.nav.dossier}</span>
-            </Link>
-          </nav>
-
-          {/* Action CTAs */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <Link
-              href="/auditor"
-              onClick={() => trackAction('click_auditor_from_navbar')}
-              className="px-3 sm:px-4 py-2 rounded-xl bg-cyan-950/70 hover:bg-cyan-900 text-cyan-300 font-bold text-xs border border-cyan-500/40 transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
-            >
-              <Search className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden sm:inline">{t.nav.auditBusiness}</span>
-              <span className="sm:hidden">{t.nav.auditor}</span>
-            </Link>
-
-            <Link
-              href="/portal"
-              onClick={() => trackAction('click_portal_from_navbar')}
-              className="px-3 sm:px-4 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
-            >
-              <Lock className="w-3.5 h-3.5 text-indigo-400" />
-              <span className="hidden sm:inline">{t.nav.clientPortal}</span>
-              <span className="sm:hidden">Portal</span>
-            </Link>
-
-            <a
-              href="#agendar"
-              onClick={() => trackAction('click_agendar_navbar')}
-              className="px-3.5 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/25 active:scale-95 cursor-pointer flex items-center gap-1.5 animate-shimmer whitespace-nowrap"
-            >
-              <Calendar className="w-3.5 h-3.5" />
-              <span>{t.nav.bookCall}</span>
-            </a>
-          </div>
-        </div>
-      </header>
 
       {/* ============================================================== */}
       {/* 3. HERO SECTION — EXPANSIVE FULL-WIDTH DUAL COLUMN */}
@@ -976,7 +977,7 @@ export default function HomePage() {
           </div>
 
           {/* Right Column: Titanium 3D Smartphone Interactive Simulator */}
-          <div className="lg:col-span-5 xl:col-span-5 flex flex-col items-center justify-center">
+          <div id="simulador" className="scroll-mt-36 lg:col-span-5 xl:col-span-5 flex flex-col items-center justify-center">
             <div className="relative w-full max-w-[340px] animate-float">
               {/* Outer Glow on Phone */}
               <div className="absolute -inset-1.5 bg-gradient-to-r from-amber-500/30 via-indigo-500/30 to-purple-500/30 rounded-[44px] blur-xl opacity-70" />
@@ -1184,7 +1185,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 5. CÓMO FUNCIONA EL EMBUDO BIFURCADO DE DOS VÍAS */}
       {/* ============================================================== */}
-      <section id="como-funciona" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
+      <section id="como-funciona" className="scroll-mt-32 py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3.5 py-1 rounded-full border border-indigo-500/20">
             {t.funnel.tag}
@@ -1249,7 +1250,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 5.1. AUDITORÍA REPUTACIONAL EN TIEMPO REAL (ACCESO OFICIAL AL AUDITOR) */}
       {/* ============================================================== */}
-      <section id="auditor-preview" className="py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
+      <section id="auditor-preview" className="scroll-mt-32 py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="p-8 sm:p-14 rounded-3xl bg-gradient-to-br from-cyan-950/40 via-[#0A101F] to-[#070B16] border-2 border-cyan-500/40 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
 
@@ -1358,7 +1359,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 6. CALCULADORA INTERACTIVA DE ROI (PÉRDIDAS & GANANCIAS) */}
       {/* ============================================================== */}
-      <section id="calculadora-roi" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
+      <section id="calculadora-roi" className="scroll-mt-32 py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 px-3.5 py-1 rounded-full border border-amber-500/20">
             {t.calculator.tag}
@@ -1492,7 +1493,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 7. SHOWCASE DINÁMICO POR INDUSTRIAS (TABS INTERACTIVAS) */}
       {/* ============================================================== */}
-      <section id="nichos" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
+      <section id="nichos" className="scroll-mt-32 py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
             {t.niches.tag}
@@ -1600,7 +1601,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 8. COMPARATIVA INTERACTIVA: ANTES VS DESPUÉS DE PRESTIGIA */}
       {/* ============================================================== */}
-      <section id="comparativa" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
+      <section id="comparativa" className="scroll-mt-32 py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <span className="text-xs font-bold uppercase tracking-widest text-purple-400 bg-purple-500/10 px-3.5 py-1 rounded-full border border-purple-500/20">
             {t.comparison.tag}
@@ -1686,7 +1687,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 9. CASOS DE ÉXITO REALES CON RESULTADOS (CARRUSEL INTERACTIVO INTERNACIONAL) */}
       {/* ============================================================== */}
-      <section id="testimonios" className="py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
+      <section id="testimonios" className="scroll-mt-32 py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="max-w-3xl text-left mb-10">
           <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
             {t.cases.tag}
@@ -1775,7 +1776,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 10. TOUR DEL SISTEMA: RECORRIDO PESTAÑA POR PESTAÑA */}
       {/* ============================================================== */}
-      <section id="tour-sistema" className="py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
+      <section id="tour-sistema" className="scroll-mt-32 py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3.5 py-1 rounded-full border border-indigo-500/20">
             {t.tour.tag}
@@ -1874,7 +1875,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 11. PLANES A LA MEDIDA: CERO PRECIOS PÚBLICOS, TRATO EXCLUSIVO */}
       {/* ============================================================== */}
-      <section id="planes" className="py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
+      <section id="planes" className="scroll-mt-32 py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div id="propuesta" className="-mt-20 pt-20" />
         <div className="text-center max-w-3xl mx-auto mb-14">
           <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 px-3.5 py-1 rounded-full border border-amber-500/20">
@@ -2195,7 +2196,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 12. FORMULARIO DE AGENDAMIENTO DE LLAMADA ESTRATÉGICA VIP */}
       {/* ============================================================== */}
-      <section id="agendar" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1500px] mx-auto border-t border-slate-800/80">
+      <section id="agendar" className="scroll-mt-32 py-20 px-6 sm:px-12 lg:px-20 max-w-[1500px] mx-auto border-t border-slate-800/80">
         <div className="bg-gradient-to-br from-[#101728] via-[#0E1322] to-[#0A0E18] border-2 border-amber-500/40 rounded-3xl p-7 sm:p-14 shadow-2xl relative overflow-hidden max-w-[1200px] mx-auto">
           {/* Header */}
           <div className="text-center max-w-xl mx-auto space-y-3">
