@@ -50,6 +50,13 @@ import {
 } from 'lucide-react';
 import { PRESTIGIA_NICHES } from '@/lib/types';
 import { LANDING_TRANSLATIONS, type LandingLang } from '@/lib/landing-translations';
+import {
+  getPortalModules,
+  getLiveTickerItems,
+  getShowcaseNiches,
+  getFaqs,
+  getSuccessCases,
+} from '@/lib/landing-data';
 
 // Live Social Proof Notification Feed Data
 const LIVE_TICKER_ITEMS = [
@@ -579,6 +586,12 @@ export default function HomePage() {
   };
 
   const t = LANDING_TRANSLATIONS[lang];
+  const isEn = lang === 'en';
+  const portalModules = getPortalModules(lang);
+  const liveTickerList = getLiveTickerItems(lang);
+  const showcaseNiches = getShowcaseNiches(lang);
+  const faqsList = getFaqs(lang);
+  const successCases = getSuccessCases(lang);
 
   // Realistic Social Proof Timing (Shows 6s, then hides and waits 18s between toasts)
   useEffect(() => {
@@ -598,7 +611,7 @@ export default function HomePage() {
     // Periodic interval: repeats every 24s (6s visible + 18s pause)
     const cycleInterval = setInterval(() => {
       if (tickerDismissed) return;
-      setTickerIndex((prev) => (prev + 1) % LIVE_TICKER_ITEMS.length);
+      setTickerIndex((prev) => (prev + 1) % liveTickerList.length);
       setIsTickerVisible(true);
 
       hideTimeout = setTimeout(() => {
@@ -611,7 +624,7 @@ export default function HomePage() {
       clearTimeout(hideTimeout);
       clearInterval(cycleInterval);
     };
-  }, [tickerDismissed]);
+  }, [tickerDismissed, liveTickerList.length]);
 
   // Silent Analytics Tracking on Load
   useEffect(() => {
@@ -708,8 +721,8 @@ export default function HomePage() {
   const estimatedLostMoneyMonthly = Math.round(estimatedLostClientsFromBadReviews * roiAverageTicket);
   const estimatedRetainedWithPrestigia = Math.round(estimatedLostMoneyMonthly * 0.82);
 
-  const activeNiche = SHOWCASE_NICHES.find((n) => n.id === activeNicheId) || SHOWCASE_NICHES[0];
-  const currentTicker = LIVE_TICKER_ITEMS[tickerIndex];
+  const activeNiche = showcaseNiches.find((n) => n.id === activeNicheId) || showcaseNiches[0];
+  const currentTicker = liveTickerList[tickerIndex] || liveTickerList[0];
 
 
 
@@ -872,22 +885,21 @@ export default function HomePage() {
             {/* Top Elite Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-wide uppercase shadow-lg shadow-amber-500/5">
               <Sparkles className="w-4 h-4 text-amber-400 animate-spin" style={{ animationDuration: '6s' }} />
-              <span>La Suite de Crecimiento Comercial & Blindaje Reputacional B2B</span>
+              <span>{t.hero.badge}</span>
             </div>
 
             {/* Main Headline */}
             <h1 className="text-3xl sm:text-5xl md:text-6xl xl:text-7xl font-black text-white tracking-tight leading-[1.08]">
-              Multiplica tus clientes en Google Maps,{' '}
+              {t.hero.headlineStart}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 underline decoration-amber-500/40 decoration-wavy">
-                frena quejas en privado
+                {t.hero.headlineHighlight}
               </span>{' '}
-              y aduéñate del mercado local.
+              {t.hero.headlineEnd}
             </h1>
 
             {/* Subtitle */}
             <p className="text-sm sm:text-lg text-slate-300 max-w-3xl leading-relaxed">
-              El <strong className="text-white">92% de los consumidores</strong> deciden a qué restaurante, clínica o negocio entrar basados en las reseñas de Google Maps. 
-              Prestigia intercepta inconformidades en <strong className="text-amber-400">&lt; 10 segundos</strong> antes de que salgan a internet, catapulta las 5★ al Top de tu zona y crea una <strong className="text-emerald-400">base de datos propia de clientes VIP</strong> bajo la Ley 1581.
+              {t.hero.subhead}
             </p>
 
             {/* Key Micro-Pillars */}
@@ -896,19 +908,19 @@ export default function HomePage() {
                 <div className="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0">
                   <Star className="w-4 h-4 fill-emerald-400 text-emerald-400" />
                 </div>
-                <span><strong>5★ Catapultadas</strong> a Google Maps</span>
+                <span><strong>{t.hero.pillar1}</strong></span>
               </div>
               <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-[#0D121E] border border-slate-800 text-xs text-slate-200 shadow-md">
                 <div className="w-8 h-8 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center shrink-0">
                   <ShieldCheck className="w-4 h-4 text-rose-400" />
                 </div>
-                <span><strong>1★ a 3★ Contenidas</strong> en privado</span>
+                <span><strong>{t.hero.pillar2}</strong></span>
               </div>
               <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-[#0D121E] border border-slate-800 text-xs text-slate-200 shadow-md">
                 <div className="w-8 h-8 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0">
                   <Database className="w-4 h-4 text-purple-400" />
                 </div>
-                <span><strong>Base Propia</strong> con Habeas Data</span>
+                <span><strong>{t.hero.pillar3}</strong></span>
               </div>
             </div>
 
@@ -920,7 +932,7 @@ export default function HomePage() {
                 className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/30 transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer animate-shimmer whitespace-nowrap"
               >
                 <Calendar className="w-4 h-4 text-slate-950" />
-                <span>Agendar Sesión Estratégica VIP</span>
+                <span>{t.hero.ctaBook}</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
 
@@ -932,20 +944,20 @@ export default function HomePage() {
                 className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 font-bold text-sm border border-slate-700/80 transition flex items-center justify-center gap-2 cursor-pointer shadow-md whitespace-nowrap"
               >
                 <MessageCircle className="w-4 h-4 text-emerald-400" />
-                <span>Hablar por WhatsApp Directo</span>
+                <span>{t.hero.ctaWhatsapp}</span>
               </a>
             </div>
 
             {/* Direct Auditor Quick Access Banner in Hero */}
             <div className="pt-1 flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-slate-400">¿Quieres conocer las fugas y calificación de tu negocio hoy?</span>
+              <span className="text-slate-400">{t.hero.auditorPrompt}</span>
               <Link
                 href="/auditor"
                 onClick={() => trackAction('click_hero_auditor_link')}
                 className="text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1 group/audit underline underline-offset-4 decoration-cyan-500/40 cursor-pointer"
               >
                 <Search className="w-3.5 h-3.5 text-cyan-400 group-hover/audit:scale-110 transition-transform" />
-                <span>Auditar mi Google Maps Gratis en Vivo ↗</span>
+                <span>{t.hero.auditorLink}</span>
               </Link>
             </div>
 
@@ -958,7 +970,7 @@ export default function HomePage() {
                 <span className="w-8 h-8 rounded-full bg-emerald-500/20 border-2 border-slate-900 flex items-center justify-center text-xs">💇</span>
               </div>
               <p>
-                Respaldado por más de <strong className="text-white">28 sedes comerciales</strong> activas en LATAM, USA y Europa.
+                {t.hero.socialProof}
               </p>
             </div>
           </div>
@@ -982,25 +994,25 @@ export default function HomePage() {
                   <div className="flex items-center justify-between pb-2 border-b border-slate-800/80 text-[10px] text-slate-400">
                     <span className="flex items-center gap-1 font-bold text-slate-300">
                       <PrestigiaIcon className="w-3.5 h-3.5 text-amber-400" />
-                      PRESTIGIA SMART QR
+                      {t.phoneSim.watermark}
                     </span>
                     <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-[9px] font-bold">
-                      EN MESA
+                      {t.phoneSim.tableTag}
                     </span>
                   </div>
 
                   {/* Main Screen Body */}
                   <div className="py-3">
                     <span className="text-3xl">🍔</span>
-                    <h3 className="text-sm font-black text-white mt-1">La Burguesía Artesanal</h3>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Sede Chapinero • Mesa #4</p>
+                    <h3 className="text-sm font-black text-white mt-1">{t.phoneSim.venueName}</h3>
+                    <p className="text-[10px] text-slate-400 mt-0.5">{t.phoneSim.venueSub}</p>
 
                     <div className="my-3 p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
                       <p className="text-[11px] font-bold text-slate-200">
-                        ¿Cómo calificarías tu experiencia hoy?
+                        {t.phoneSim.prompt}
                       </p>
                       <p className="text-[9px] text-slate-400 mt-0.5">
-                        Toca una estrella para probar la respuesta del sistema:
+                        {t.phoneSim.subprompt}
                       </p>
 
                       {/* Interactive Stars */}
@@ -1034,14 +1046,14 @@ export default function HomePage() {
                       <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-left space-y-2 animate-fade-in">
                         <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[10px] uppercase">
                           <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                          <span>¡Experiencia 5★ Catapultada!</span>
+                          <span>{t.phoneSim.path5Title}</span>
                         </div>
                         <p className="text-[10px] text-slate-300 leading-tight">
-                          El cliente es enviado a tu ficha de <strong>Google Maps</strong> con 5 estrellas listas para publicar.
+                          {t.phoneSim.path5Desc}
                         </p>
                         <div className="p-2 rounded-xl bg-[#141E30] border border-slate-800 flex items-center justify-between">
-                          <span className="text-[9px] text-amber-300 font-bold">🎁 Sorteo VIP de la Casa</span>
-                          <span className="text-[8px] bg-amber-500 text-slate-950 font-black px-1.5 py-0.5 rounded">Habeas Data</span>
+                          <span className="text-[9px] text-amber-300 font-bold">{isEn ? '🎁 VIP House Giveaway' : '🎁 Sorteo VIP de la Casa'}</span>
+                          <span className="text-[8px] bg-amber-500 text-slate-950 font-black px-1.5 py-0.5 rounded">{isEn ? 'Data Consent' : 'Habeas Data'}</span>
                         </div>
                         <a
                           href="https://maps.google.com"
@@ -1049,7 +1061,7 @@ export default function HomePage() {
                           rel="noopener noreferrer"
                           className="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] text-center block transition shadow-md shadow-emerald-500/20"
                         >
-                          Publicar 5★ en Google Maps ↗
+                          {t.phoneSim.path5Btn}
                         </a>
                       </div>
                     ) : (
@@ -1057,14 +1069,14 @@ export default function HomePage() {
                       <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-left space-y-2 animate-fade-in">
                         <div className="flex items-center gap-1.5 text-rose-400 font-bold text-[10px] uppercase">
                           <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-                          <span>Blindaje Activo: Google Maps Oculto</span>
+                          <span>{t.phoneSim.path2Title}</span>
                         </div>
                         <p className="text-[10px] text-slate-300 leading-tight">
-                          El cliente expresa su molestia <strong>en privado</strong>. La queja ingresa de inmediato al <strong>Portal Clientes</strong>, sin saturar teléfonos ni correos.
+                          {t.phoneSim.path2Desc}
                         </p>
                         {privateCommentSent ? (
                           <div className="p-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] text-center font-bold">
-                            ✅ Incidente registrado en vivo en el Portal Clientes.
+                            {t.phoneSim.path2Success}
                           </div>
                         ) : (
                           <div className="space-y-1.5">
@@ -1072,7 +1084,7 @@ export default function HomePage() {
                               rows={2}
                               value={privateComment}
                               onChange={(e) => setPrivateComment(e.target.value)}
-                              placeholder="Describe qué ocurrió (no se publica en internet)..."
+                              placeholder={t.phoneSim.path2Placeholder}
                               className="w-full bg-[#121828] border border-slate-700 text-white text-[10px] rounded-lg p-2 outline-none focus:border-rose-400"
                             />
                             <button
@@ -1080,7 +1092,7 @@ export default function HomePage() {
                               onClick={() => setPrivateCommentSent(true)}
                               className="w-full py-1.5 rounded-lg bg-rose-500 hover:bg-rose-400 text-white font-bold text-[10px] text-center transition cursor-pointer"
                             >
-                              Enviar Desahogo en Privado
+                              {t.phoneSim.path2Btn}
                             </button>
                           </div>
                         )}
@@ -1090,8 +1102,8 @@ export default function HomePage() {
 
                   {/* Micro Footer inside Simulator */}
                   <div className="pt-2 border-t border-slate-800 text-[9px] text-slate-500 flex items-center justify-between">
-                    <span>Sin descargar apps</span>
-                    <span className="text-amber-400 font-mono font-bold">0% Daño Público</span>
+                    <span>{t.phoneSim.footerNoApp}</span>
+                    <span className="text-amber-400 font-mono font-bold">{t.phoneSim.footerZeroDamage}</span>
                   </div>
                 </div>
               </div>
@@ -1108,7 +1120,7 @@ export default function HomePage() {
                   }`}
                 >
                   <Star className="w-3.5 h-3.5 fill-emerald-400 text-emerald-400" />
-                  <span>Probar Flujo 5★</span>
+                  <span>{t.phoneSim.btnTry5}</span>
                 </button>
                 <button
                   type="button"
@@ -1120,7 +1132,7 @@ export default function HomePage() {
                   }`}
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-rose-400" />
-                  <span>Probar Flujo 2★ (Blindaje)</span>
+                  <span>{t.phoneSim.btnTry2}</span>
                 </button>
               </div>
             </div>
@@ -1175,13 +1187,13 @@ export default function HomePage() {
       <section id="como-funciona" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3.5 py-1 rounded-full border border-indigo-500/20">
-            Arquitectura Quirúrgica
+            {t.funnel.tag}
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            El Embudo de Dos Vías que protege tu reputación
+            {t.funnel.title}
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2">
-            El cliente escanea el Smart QR sin descargar aplicaciones. Nuestro algoritmo inteligente bifurca el destino en milisegundos:
+            {t.funnel.subtitle}
           </p>
         </div>
 
@@ -1193,20 +1205,19 @@ export default function HomePage() {
                 <Star className="w-6 h-6 fill-emerald-400 text-emerald-400" />
               </div>
               <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider">
-                Ruta 5★ Google Maps
+                {t.funnel.pathATag}
               </span>
             </div>
 
-            <h3 className="text-xl font-bold text-white mt-2">1. Multiplicación Pública de Reseñas 5★</h3>
+            <h3 className="text-xl font-bold text-white mt-2">{t.funnel.pathATitle}</h3>
             <p className="text-xs sm:text-sm text-slate-300 mt-3 leading-relaxed">
-              El cliente satisfecho es enviado a la ficha oficial de <strong>Google Maps</strong> con las 5 estrellas pre-seleccionadas. El 80% confirma la publicación en 1 solo clic. 
-              Además, se le invita al <strong>sorteo mensual con Habeas Data</strong> para capturar su nombre y WhatsApp para tu negocio.
+              {t.funnel.pathADesc}
             </p>
 
             <div className="mt-6 pt-4 border-t border-slate-800/80 space-y-2 text-xs text-emerald-400 font-semibold">
-              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Posicionamiento orgánico en el Top 3 de Google Maps</div>
-              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Cero costos en anuncios pagados de Google Ads</div>
-              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Clientes recurrentes sumados a tu propia base de datos</div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> {t.funnel.pathAItem1}</div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> {t.funnel.pathAItem2}</div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> {t.funnel.pathAItem3}</div>
             </div>
           </div>
 
@@ -1217,20 +1228,19 @@ export default function HomePage() {
                 <ShieldCheck className="w-6 h-6 text-rose-400" />
               </div>
               <span className="px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 text-xs font-bold uppercase tracking-wider">
-                Blindaje Privado
+                {t.funnel.pathBTag}
               </span>
             </div>
 
-            <h3 className="text-xl font-bold text-white mt-2">2. Bloqueo Preventivo & Contención en Sala</h3>
+            <h3 className="text-xl font-bold text-white mt-2">{t.funnel.pathBTitle}</h3>
             <p className="text-xs sm:text-sm text-slate-300 mt-3 leading-relaxed">
-              <strong>Google Maps jamás se abre.</strong> El cliente inconforme encuentra una ventana de desahogo privado para expresar su queja. 
-              El sistema canaliza la inconformidad directamente hacia el <strong>Portal Clientes</strong> en tiempo real, evitando saturar teléfonos o bandejas de correo y permitiendo una resolución organizada con trazabilidad.
+              {t.funnel.pathBDesc}
             </p>
 
             <div className="mt-6 pt-4 border-t border-slate-800/80 space-y-2 text-xs text-rose-400 font-semibold">
-              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> 0% Daño público a la calificación de la empresa</div>
-              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Alerta en vivo y ticket en el Portal Clientes para resolución centralizada</div>
-              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Cero saturación de WhatsApps o correos personales</div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> {t.funnel.pathBItem1}</div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> {t.funnel.pathBItem2}</div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> {t.funnel.pathBItem3}</div>
             </div>
           </div>
         </div>
@@ -1248,35 +1258,35 @@ export default function HomePage() {
             <div className="lg:col-span-7 space-y-6 text-left">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-wide">
                 <Search className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Herramienta Oficial Gratuita</span>
+                <span>{t.auditorSection.tag}</span>
               </div>
 
               <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white leading-tight">
-                Audita tu Negocio en Google Maps{' '}
+                {t.auditorSection.title}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400">
-                  en tiempo real
+                  {t.auditorSection.titleHighlight}
                 </span>
               </h2>
 
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
-                ¿Sabes cuántos clientes nuevos estás perdiendo cada semana por reseñas sin responder, calificaciones bajas o fuga de prospectos hacia tu competencia directa?
+                {t.auditorSection.subtitle}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
                 <div className="p-3.5 rounded-2xl bg-[#0E1628]/80 border border-slate-800 text-xs text-slate-300 space-y-1">
                   <div className="flex items-center gap-2 text-cyan-300 font-bold">
                     <Activity className="w-4 h-4 text-cyan-400" />
-                    <span>Diagnóstico de Fugas</span>
+                    <span>{t.auditorSection.diagLeak}</span>
                   </div>
-                  <p className="text-slate-400">Calcula el dinero exacto que dejas sobre la mesa por cada cliente insatisfecho.</p>
+                  <p className="text-slate-400">{t.auditorSection.diagLeakDesc}</p>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-[#0E1628]/80 border border-slate-800 text-xs text-slate-300 space-y-1">
                   <div className="flex items-center gap-2 text-emerald-300 font-bold">
                     <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                    <span>Índice de Vulnerabilidad</span>
+                    <span>{t.auditorSection.vulnIndex}</span>
                   </div>
-                  <p className="text-slate-400">Verifica si tu ficha está en riesgo de caer bajo el umbral crítico de 4.2 estrellas.</p>
+                  <p className="text-slate-400">{t.auditorSection.vulnIndexDesc}</p>
                 </div>
               </div>
 
@@ -1287,12 +1297,12 @@ export default function HomePage() {
                   className="px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-black text-sm shadow-xl shadow-cyan-500/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer animate-shimmer whitespace-nowrap"
                 >
                   <Search className="w-4 h-4 text-slate-950" />
-                  <span>Abrir Auditor Google Maps en Vivo</span>
+                  <span>{t.auditorSection.cta}</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
 
                 <span className="text-[11px] text-slate-400 text-center sm:text-left">
-                  🔒 Diagnóstico instantáneo, sin registros previos ni tarjeta.
+                  {t.auditorSection.badgeInstant}
                 </span>
               </div>
             </div>
@@ -1313,31 +1323,31 @@ export default function HomePage() {
 
                 <div className="space-y-3 text-xs">
                   <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
-                    <span className="text-slate-400">Puntaje Google Maps Detectado:</span>
+                    <span className="text-slate-400">{t.auditorSection.cardRating}</span>
                     <span className="text-amber-400 font-bold flex items-center gap-1">
                       <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> 4.1 / 5.0
                     </span>
                   </div>
 
                   <div className="p-3 rounded-xl bg-rose-950/30 border border-rose-500/30 flex items-center justify-between">
-                    <span className="text-rose-300">Reseñas Negativas Expuestas:</span>
-                    <span className="text-rose-400 font-mono font-bold">14 incidentes</span>
+                    <span className="text-rose-300">{t.auditorSection.cardIncidents}</span>
+                    <span className="text-rose-400 font-mono font-bold">{isEn ? '14 incidents' : '14 incidentes'}</span>
                   </div>
 
                   <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 flex items-center justify-between">
-                    <span className="text-amber-300">Pérdida Mensual Estimada:</span>
+                    <span className="text-amber-300">{t.auditorSection.cardLoss}</span>
                     <span className="text-amber-400 font-mono font-bold">$1.850 USD / mes</span>
                   </div>
 
                   <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/30 flex items-center justify-between">
-                    <span className="text-emerald-300">Potencial con Blindaje Prestigia:</span>
-                    <span className="text-emerald-400 font-mono font-bold">+85 Clientes / mes</span>
+                    <span className="text-emerald-300">{t.auditorSection.cardPotential}</span>
+                    <span className="text-emerald-400 font-mono font-bold">{isEn ? '+85 Customers / mo' : '+85 Clientes / mes'}</span>
                   </div>
                 </div>
 
                 <div className="p-2.5 rounded-xl bg-slate-900/60 border border-cyan-500/20 flex items-center justify-center gap-2 text-[11px] text-cyan-300/80 font-medium">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Simulación de diagnóstico con Google Places API</span>
+                  <span>{t.auditorSection.cardStatus}</span>
                 </div>
               </div>
             </div>
@@ -1351,13 +1361,13 @@ export default function HomePage() {
       <section id="calculadora-roi" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 px-3.5 py-1 rounded-full border border-amber-500/20">
-            Calculadora de Impacto Financiero
+            {t.calculator.tag}
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            ¿Cuánto dinero estás perdiendo por no tener Prestigia?
+            {t.calculator.title}
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2">
-            Mueve los controles según el tamaño de tu negocio y descubre el impacto económico real de las malas reseñas:
+            {t.calculator.subtitle}
           </p>
         </div>
 
@@ -1369,10 +1379,10 @@ export default function HomePage() {
               <div className="flex items-center justify-between text-xs sm:text-sm mb-2">
                 <span className="text-slate-300 font-bold flex items-center gap-2">
                   <Users className="w-4 h-4 text-indigo-400" />
-                  Clientes atendidos por mes:
+                  {t.calculator.monthlyClients}
                 </span>
                 <span className="text-xl font-mono font-black text-amber-400">
-                  {roiMonthlyClients.toLocaleString()} clientes
+                  {roiMonthlyClients.toLocaleString()} {isEn ? 'customers' : 'clientes'}
                 </span>
               </div>
               <input
@@ -1385,9 +1395,9 @@ export default function HomePage() {
                 className="w-full h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400"
               />
               <div className="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
-                <span>100 clientes</span>
-                <span>2,500 clientes</span>
-                <span>5,000 clientes</span>
+                <span>100 {isEn ? 'customers' : 'clientes'}</span>
+                <span>2,500 {isEn ? 'customers' : 'clientes'}</span>
+                <span>5,000 {isEn ? 'customers' : 'clientes'}</span>
               </div>
             </div>
 
@@ -1396,10 +1406,10 @@ export default function HomePage() {
               <div className="flex items-center justify-between text-xs sm:text-sm mb-2">
                 <span className="text-slate-300 font-bold flex items-center gap-2">
                   <DollarSign className="w-4 h-4 text-emerald-400" />
-                  Ticket promedio de consumo:
+                  {t.calculator.averageTicket}
                 </span>
                 <span className="text-xl font-mono font-black text-emerald-400">
-                  ${roiAverageTicket} USD / consumo
+                  ${roiAverageTicket} USD {isEn ? '/ check' : '/ consumo'}
                 </span>
               </div>
               <input
@@ -1422,10 +1432,12 @@ export default function HomePage() {
             <div className="p-4 rounded-2xl bg-[#141A28] border border-slate-700/80 text-xs text-slate-300 space-y-1.5">
               <p className="font-semibold text-white flex items-center gap-1.5">
                 <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-                Dato de la industria (Harvard Business Review & BrightLocal):
+                {isEn ? 'Industry Data (Harvard Business Review & BrightLocal):' : 'Dato de la industria (Harvard Business Review & BrightLocal):'}
               </p>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                Cada estrella de caída en Google Maps representa entre un <strong>15% y 22% de pérdida en ventas</strong> frente a competidores cercanos mejor calificados.
+                {isEn
+                  ? 'Each single-star drop on Google Maps represents between 15% and 22% in direct revenue loss to better-rated nearby competitors.'
+                  : 'Cada estrella de caída en Google Maps representa entre un 15% y 22% de pérdida en ventas frente a competidores cercanos mejor calificados.'}
               </p>
             </div>
           </div>
@@ -1433,26 +1445,30 @@ export default function HomePage() {
           {/* Dynamic Financial Results Card (5 cols) */}
           <div className="lg:col-span-5 p-6 rounded-2xl bg-gradient-to-b from-[#141E34] to-[#0A1020] border-2 border-amber-500/40 shadow-xl space-y-5 text-center">
             <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30">
-              Proyección Mensual Estimada
+              {isEn ? 'Estimated Monthly Projection' : 'Proyección Mensual Estimada'}
             </span>
 
             <div>
-              <p className="text-xs text-slate-400 uppercase font-semibold">Fuga invisible hacia tu competencia:</p>
+              <p className="text-xs text-slate-400 uppercase font-semibold">{t.calculator.monthlyLoss}:</p>
               <p className="text-3xl sm:text-4xl font-black text-rose-400 font-mono mt-1">
-                -${estimatedLostMoneyMonthly.toLocaleString()} <span className="text-xs text-slate-400">USD/mes</span>
+                -${estimatedLostMoneyMonthly.toLocaleString()} <span className="text-xs text-slate-400">USD/mo</span>
               </p>
               <p className="text-[11px] text-slate-400 mt-0.5">
-                Aprox. <strong>{estimatedLostClientsFromBadReviews} clientes perdidos</strong> que eligen a tu vecino.
+                {isEn
+                  ? `Approx. ${estimatedLostClientsFromBadReviews} customers lost who choose your competitor.`
+                  : `Aprox. ${estimatedLostClientsFromBadReviews} clientes perdidos que eligen a tu vecino.`}
               </p>
             </div>
 
             <div className="pt-4 border-t border-slate-800">
-              <p className="text-xs text-slate-300 uppercase font-semibold">Facturación Recuperable con Prestigia:</p>
+              <p className="text-xs text-slate-300 uppercase font-semibold">{t.calculator.retainedMoney}:</p>
               <p className="text-3xl sm:text-4xl font-black text-emerald-400 font-mono mt-1">
-                +${estimatedRetainedWithPrestigia.toLocaleString()} <span className="text-xs text-slate-400">USD/mes</span>
+                +${estimatedRetainedWithPrestigia.toLocaleString()} <span className="text-xs text-slate-400">USD/mo</span>
               </p>
               <p className="text-[11px] text-slate-400 mt-0.5">
-                Más visitas orgánicas, blindaje de quejas y clientes leales.
+                {isEn
+                  ? 'More organic walk-ins, contained complaints, and loyal repeat patrons.'
+                  : 'Más visitas orgánicas, blindaje de quejas y clientes leales.'}
               </p>
             </div>
 
@@ -1467,7 +1483,7 @@ export default function HomePage() {
               }}
               className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/25 active:scale-95 block cursor-pointer"
             >
-              Quiero Blindar Estos Ingresos en Mi Negocio ↗
+              {isEn ? 'I Want to Protect this Revenue in My Business ↗' : 'Quiero Blindar Estos Ingresos en Mi Negocio ↗'}
             </a>
           </div>
         </div>
@@ -1479,19 +1495,19 @@ export default function HomePage() {
       <section id="nichos" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
-            Especialización Vertical
+            {t.niches.tag}
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            Adaptado a la dinámica exacta de tu sector comercial
+            {t.niches.title}
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2">
-            Selecciona tu industria para ver cómo opera el sistema en tu día a día:
+            {t.niches.subtitle}
           </p>
         </div>
 
         {/* Niche Tabs Navigation */}
         <div className="flex flex-wrap items-center justify-center gap-2 max-w-4xl mx-auto mb-10">
-          {SHOWCASE_NICHES.map((niche) => (
+          {showcaseNiches.map((niche) => (
             <button
               key={niche.id}
               type="button"
@@ -1525,12 +1541,12 @@ export default function HomePage() {
 
               <div className="space-y-3 pt-2 text-xs sm:text-sm">
                 <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-slate-200">
-                  <p className="font-bold text-rose-400 text-xs uppercase mb-1">❌ El Dolor del Sector:</p>
+                  <p className="font-bold text-rose-400 text-xs uppercase mb-1">{t.niches.painTitle}</p>
                   <p className="text-slate-300 leading-relaxed text-xs">{activeNiche.pain}</p>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-slate-200">
-                  <p className="font-bold text-emerald-400 text-xs uppercase mb-1">🛡️ La Solución Prestigia:</p>
+                  <p className="font-bold text-emerald-400 text-xs uppercase mb-1">{t.niches.solutionTitle}</p>
                   <p className="text-slate-300 leading-relaxed text-xs">{activeNiche.solution}</p>
                 </div>
               </div>
@@ -1559,9 +1575,9 @@ export default function HomePage() {
                 <div className="p-4 rounded-2xl bg-[#090D18] border border-slate-800 flex items-center justify-center gap-2">
                   <QrCode className="w-12 h-12 text-white" />
                   <div className="text-left">
-                    <p className="text-[10px] font-bold text-emerald-400">Smart QR Activo</p>
-                    <p className="text-[9px] text-slate-400">Escaneo sin apps</p>
-                    <p className="text-[9px] text-amber-400 font-mono font-bold">Respuesta &lt; 10s</p>
+                    <p className="text-[10px] font-bold text-emerald-400">{t.niches.activeSmartQr}</p>
+                    <p className="text-[9px] text-slate-400">{t.niches.scanNoApps}</p>
+                    <p className="text-[9px] text-amber-400 font-mono font-bold">{t.niches.responseSpeed}</p>
                   </div>
                 </div>
 
@@ -1573,7 +1589,7 @@ export default function HomePage() {
                   }}
                   className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-black text-xs text-center transition block shadow-md cursor-pointer"
                 >
-                  Solicitar Auditoría para {activeNiche.name} ↗
+                  {t.niches.ctaAudit} {activeNiche.name} ↗
                 </a>
               </div>
             </div>
@@ -1587,13 +1603,13 @@ export default function HomePage() {
       <section id="comparativa" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <span className="text-xs font-bold uppercase tracking-widest text-purple-400 bg-purple-500/10 px-3.5 py-1 rounded-full border border-purple-500/20">
-            Impacto Operativo
+            {t.comparison.tag}
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            La transformación real de tu negocio
+            {t.comparison.title}
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2">
-            Alterna el interruptor para ver cómo cambia tu negocio desde el día uno:
+            {t.comparison.subtitle}
           </p>
 
           {/* Interactive Switcher */}
@@ -1607,7 +1623,7 @@ export default function HomePage() {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              ❌ Sin Prestigia (Vulnerable)
+              {t.comparison.withoutBtn}
             </button>
             <button
               type="button"
@@ -1618,7 +1634,7 @@ export default function HomePage() {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              🛡️ Con Prestigia (Blindado)
+              {t.comparison.withBtn}
             </button>
           </div>
         </div>
@@ -1629,32 +1645,19 @@ export default function HomePage() {
             <div className="flex items-center gap-3 pb-6 border-b border-rose-500/20">
               <span className="text-3xl">⚠️</span>
               <div>
-                <h3 className="text-xl font-black text-rose-400">Estado Vulnerable (Sin Prestigia)</h3>
-                <p className="text-xs text-slate-400">Tu reputación y ventas a merced de clientes inconformes.</p>
+                <h3 className="text-xl font-black text-rose-400">{t.comparison.withoutHeader}</h3>
+                <p className="text-xs text-slate-400">{t.comparison.withoutSub}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-              <div className="p-5 rounded-2xl bg-[#141A28] border border-rose-500/20">
-                <p className="text-2xl font-mono font-black text-rose-400">3.7★</p>
-                <p className="text-xs font-bold text-white mt-1">Calificación en Google Maps</p>
-                <p className="text-[11px] text-slate-400 mt-1">Pierdes clientes ante competidores mejor calificados en la zona.</p>
-              </div>
-              <div className="p-5 rounded-2xl bg-[#141A28] border border-rose-500/20">
-                <p className="text-2xl font-mono font-black text-rose-400">Público</p>
-                <p className="text-xs font-bold text-white mt-1">Desahogo de Quejas</p>
-                <p className="text-[11px] text-slate-400 mt-1">Las inconformidades terminan en internet y quedan para siempre.</p>
-              </div>
-              <div className="p-5 rounded-2xl bg-[#141A28] border border-rose-500/20">
-                <p className="text-2xl font-mono font-black text-rose-400">0 Datos</p>
-                <p className="text-xs font-bold text-white mt-1">Base de Clientes</p>
-                <p className="text-[11px] text-slate-400 mt-1">Atiendes cientos de comensales pero no puedes contactarlos después.</p>
-              </div>
-              <div className="p-5 rounded-2xl bg-[#141A28] border border-rose-500/20">
-                <p className="text-2xl font-mono font-black text-rose-400">A Ciegas</p>
-                <p className="text-xs font-bold text-white mt-1">Auditoría del Personal</p>
-                <p className="text-[11px] text-slate-400 mt-1">No sabes qué mesero o empleado está tratando mal a tus clientes.</p>
-              </div>
+              {t.comparison.withoutCards.map((card, idx) => (
+                <div key={idx} className="p-5 rounded-2xl bg-[#141A28] border border-rose-500/20">
+                  <p className="text-2xl font-mono font-black text-rose-400">{card.val}</p>
+                  <p className="text-xs font-bold text-white mt-1">{card.title}</p>
+                  <p className="text-[11px] text-slate-400 mt-1">{card.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         ) : (
@@ -1662,32 +1665,19 @@ export default function HomePage() {
             <div className="flex items-center gap-3 pb-6 border-b border-emerald-500/20">
               <span className="text-3xl">🏆</span>
               <div>
-                <h3 className="text-xl font-black text-emerald-400">Estado Blindado (Con Prestigia Enterprise)</h3>
-                <p className="text-xs text-slate-300">Control reputacional absoluto, facturación protegida y base de datos propia.</p>
+                <h3 className="text-xl font-black text-emerald-400">{t.comparison.withHeader}</h3>
+                <p className="text-xs text-slate-300">{t.comparison.withSub}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-              <div className="p-5 rounded-2xl bg-[#141E30] border border-emerald-500/30">
-                <p className="text-2xl font-mono font-black text-emerald-400">4.9★</p>
-                <p className="text-xs font-bold text-white mt-1">Top 3 en Google Maps</p>
-                <p className="text-[11px] text-slate-300 mt-1">Tu negocio aparece de primero cuando buscan tu comida o servicio.</p>
-              </div>
-              <div className="p-5 rounded-2xl bg-[#141E30] border border-emerald-500/30">
-                <p className="text-2xl font-mono font-black text-emerald-400">100%</p>
-                <p className="text-xs font-bold text-white mt-1">Contención en Privado</p>
-                <p className="text-[11px] text-slate-300 mt-1">Las quejas llegan al gerente en privado antes de salir del local.</p>
-              </div>
-              <div className="p-5 rounded-2xl bg-[#141E30] border border-emerald-500/30">
-                <p className="text-2xl font-mono font-black text-emerald-400">Base Propia</p>
-                <p className="text-xs font-bold text-white mt-1">Sorteos & Habeas Data</p>
-                <p className="text-[11px] text-slate-300 mt-1">Cientos de números de WhatsApp para llenar la agenda cuando quieras.</p>
-              </div>
-              <div className="p-5 rounded-2xl bg-[#141E30] border border-emerald-500/30">
-                <p className="text-2xl font-mono font-black text-emerald-400">En Vivo</p>
-                <p className="text-xs font-bold text-white mt-1">Auditoría del Equipo</p>
-                <p className="text-[11px] text-slate-300 mt-1">Sabes con métricas exactas qué colaborador atiende mejor en cada turno.</p>
-              </div>
+              {t.comparison.withCards.map((card, idx) => (
+                <div key={idx} className="p-5 rounded-2xl bg-[#141E30] border border-emerald-500/30">
+                  <p className="text-2xl font-mono font-black text-emerald-400">{card.val}</p>
+                  <p className="text-xs font-bold text-white mt-1">{card.title}</p>
+                  <p className="text-[11px] text-slate-300 mt-1">{card.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -1699,13 +1689,13 @@ export default function HomePage() {
       <section id="testimonios" className="py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="max-w-3xl text-left mb-10">
           <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
-            Casos de Éxito Internacionales
+            {t.cases.tag}
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            Marcas que transformaron su reputación en facturación
+            {t.cases.title}
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2">
-            Resultados certificados en más de 28 sedes activas en Latinoamérica, Estados Unidos y Europa:
+            {t.cases.subtitle}
           </p>
         </div>
 
@@ -1724,7 +1714,7 @@ export default function HomePage() {
             className="animate-infinite-glide flex gap-6"
             style={{ animationPlayState: isGlidePaused ? 'paused' : undefined }}
           >
-            {[...SUCCESS_CASES, ...SUCCESS_CASES].map((c, idx) => (
+            {[...successCases, ...successCases].map((c, idx) => (
               <div
                 key={`${c.id}-${idx}`}
                 className="w-[340px] sm:w-[410px] shrink-0 p-7 rounded-3xl bg-[#0D1424] border border-slate-800 hover:border-amber-500/50 hover:bg-[#11192e] transition-all duration-300 shadow-xl flex flex-col justify-between cursor-default group/card"
@@ -1788,19 +1778,19 @@ export default function HomePage() {
       <section id="tour-sistema" className="py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3.5 py-1 rounded-full border border-indigo-500/20">
-            Transparencia Operativa Absoluta
+            {t.tour.tag}
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            Recorrido Pestaña por Pestaña del Sistema
+            {t.tour.title}
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2">
-            Cada módulo del Portal Prestigia fue concebido para ahorrarte tiempo, blindar tu prestigio y generar facturación recurrente:
+            {t.tour.subtitle}
           </p>
         </div>
 
-        {/* 8-Tab Selector Pills */}
+        {/* 9-Tab Selector Pills */}
         <div className="flex flex-wrap items-center justify-center gap-2 mb-8 max-w-5xl mx-auto">
-          {PORTAL_MODULES.map((mod, idx) => {
+          {portalModules.map((mod, idx) => {
             const ModIcon = mod.icon;
             const isActive = activePortalTab === idx;
             return (
@@ -1826,7 +1816,7 @@ export default function HomePage() {
 
         {/* Active Module Showcase Card */}
         {(() => {
-          const mod = PORTAL_MODULES[activePortalTab];
+          const mod = portalModules[activePortalTab] || portalModules[0];
           const ModIcon = mod.icon;
           return (
             <div className="max-w-4xl mx-auto p-7 sm:p-10 rounded-3xl bg-gradient-to-br from-[#0F1626] to-[#0A0E18] border-2 border-indigo-500/40 shadow-2xl space-y-6 animate-fade-in">
@@ -1837,7 +1827,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h3 className="text-lg sm:text-2xl font-black text-white">{mod.title}</h3>
-                    <p className="text-xs text-slate-400">Pestaña Oficial {mod.id} de 9 (Portal Clientes)</p>
+                    <p className="text-xs text-slate-400">{t.tour.tabIndicator} {mod.id} {t.tour.of9}</p>
                   </div>
                 </div>
                 <span className={`text-[11px] font-bold px-3 py-1 rounded-full border ${mod.badgeColor}`}>
@@ -1853,7 +1843,7 @@ export default function HomePage() {
                 <div className="p-4 rounded-2xl bg-[#090D17] border border-slate-800 text-xs space-y-1.5">
                   <div className="text-emerald-400 font-bold flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>Beneficio para el Propietario:</span>
+                    <span>{t.tour.ownerBenefit}</span>
                   </div>
                   <p className="text-slate-300 leading-relaxed">{mod.benefit}</p>
                 </div>
@@ -1861,19 +1851,19 @@ export default function HomePage() {
                 <div className="p-4 rounded-2xl bg-[#090D17] border border-slate-800 text-xs space-y-1.5">
                   <div className="text-amber-400 font-bold flex items-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-amber-400" />
-                    <span>Tip de Alta Rentabilidad:</span>
+                    <span>{t.tour.profitTip}</span>
                   </div>
                   <p className="text-slate-300 leading-relaxed">{mod.tip}</p>
                 </div>
               </div>
 
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400 border-t border-slate-800/80">
-                <span>Disponible con control de roles según el plan contratado.</span>
+                <span>{t.tour.rolesNote}</span>
                 <Link
                   href="/portal"
                   className="text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-1"
                 >
-                  <span>Ver en Portal Clientes ↗</span>
+                  <span>{t.tour.portalLink}</span>
                 </Link>
               </div>
             </div>
@@ -1888,13 +1878,13 @@ export default function HomePage() {
         <div id="propuesta" className="-mt-20 pt-20" />
         <div className="text-center max-w-3xl mx-auto mb-14">
           <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 px-3.5 py-1 rounded-full border border-amber-500/20">
-            Consultoría Estratégica & Modelo a la Medida
+            {t.plans.tag}
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            No vendemos software de caja. Diseñamos el plan para tu operación.
+            {t.plans.title}
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">
-            Cada empresa tiene un volumen de clientes, un número de sedes y una dinámica diferente. Sin precios genéricos ni paquetes rígidos: en nuestra sesión estratégica estructuramos la propuesta exacta según tu tráfico y objetivos comerciales.
+            {t.plans.subtitle}
           </p>
         </div>
 
@@ -1906,51 +1896,51 @@ export default function HomePage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
-                  1 Sede / Consultorio / Local
+                  {isEn ? '1 Location / Office / Store' : '1 Sede / Consultorio / Local'}
                 </span>
                 <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-bold border border-slate-700">
-                  Punto Físico Único
+                  {isEn ? 'Single Physical Venue' : 'Punto Físico Único'}
                 </span>
               </div>
 
               <div>
-                <h3 className="text-2xl font-black text-white">Punto Único</h3>
-                <span className="text-xs text-emerald-400 font-bold block mt-0.5">Propuesta a la Medida</span>
+                <h3 className="text-2xl font-black text-white">{t.plans.plan1Name}</h3>
+                <span className="text-xs text-emerald-400 font-bold block mt-0.5">{isEn ? 'Tailored Proposal' : 'Propuesta a la Medida'}</span>
                 <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">
-                  Ideal para profesionales independientes, consultorios médicos o locales comerciales de 1 punto físico.
+                  {t.plans.plan1Desc}
                 </p>
                 <div className="mt-3 p-2 rounded-xl bg-slate-900 border border-slate-800 text-[10px] text-emerald-400 font-bold">
-                  🎁 <strong>Setup & Smart QR:</strong> 100% BONIFICADO en fase de prueba
+                  🎁 <strong>Setup & Smart QR:</strong> {isEn ? '100% INCLUDED in pilot phase' : '100% BONIFICADO en fase de prueba'}
                 </div>
               </div>
 
               <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-slate-300 space-y-1">
                 <div className="font-bold text-white flex items-center gap-1.5">
                   <Lock className="w-3 h-3 text-slate-400" />
-                  <span>Pantallas: 1 Pantalla Central del Dueño</span>
+                  <span>{isEn ? 'Displays: 1 Owner Central Command Screen' : 'Pantallas: 1 Pantalla Central del Dueño'}</span>
                 </div>
               </div>
 
               <ul className="space-y-2.5 text-xs text-slate-300 border-t border-slate-800 pt-4">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Filtro Smart QR anti-reseñas 1 a 3★</span>
+                  <span>{isEn ? 'Smart QR filter anti-reviews 1 to 3★' : 'Filtro Smart QR anti-reseñas 1 a 3★'}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Radar de Google Maps básico en tiempo real</span>
+                  <span>{isEn ? 'Google Maps basic real-time radar' : 'Radar de Google Maps básico en tiempo real'}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Contención de quejas privada en Portal Clientes</span>
+                  <span>{isEn ? 'Private complaint containment in Client Portal' : 'Contención de quejas privada en Portal Clientes'}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Reporte mensual de rendimiento y auditoría</span>
+                  <span>{isEn ? 'Monthly executive performance report' : 'Reporte mensual de rendimiento y auditoría'}</span>
                 </li>
                 <li className="flex items-start gap-2 text-slate-500">
                   <Lock className="w-4 h-4 text-slate-600 shrink-0 mt-0.5" />
-                  <span>Sin Asistente IA Google (disponible en Alto Rendimiento)</span>
+                  <span>{isEn ? 'Without Google AI Assistant (available in Pro)' : 'Sin Asistente IA Google (disponible en Alto Rendimiento)'}</span>
                 </li>
               </ul>
             </div>
@@ -1963,72 +1953,72 @@ export default function HomePage() {
               }}
               className="mt-6 w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center transition block cursor-pointer active:scale-95 shadow-md"
             >
-              Solicitar Propuesta Personalizada
+              {t.plans.ctaRequest}
             </a>
           </div>
 
           {/* NIVEL 2: ALTO RENDIMIENTO (MÁS POPULAR) */}
           <div className="p-7 sm:p-8 rounded-3xl bg-gradient-to-b from-[#141E34] via-[#0E1526] to-[#0A0F1D] border-2 border-amber-500 shadow-2xl relative flex flex-col justify-between">
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-lg shadow-amber-500/25">
-              ⭐ MÁS SOLICITADO
+              ⭐ {isEn ? 'MOST POPULAR' : 'MÁS SOLICITADO'}
             </div>
 
             <div className="space-y-4 pt-1">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400">
-                  Gastrobares, Clínicas & Retail
+                  {isEn ? 'Hospitality, Clinics & High-End Retail' : 'Gastrobares, Clínicas & Retail'}
                 </span>
                 <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                  Alto Flujo
+                  {isEn ? 'High Footfall' : 'Alto Flujo'}
                 </span>
               </div>
 
               <div>
-                <h3 className="text-2xl font-black text-white">Alto Rendimiento</h3>
-                <span className="text-xs text-amber-400 font-bold block mt-0.5">Estructura a la Medida</span>
+                <h3 className="text-2xl font-black text-white">{t.plans.plan2Name}</h3>
+                <span className="text-xs text-amber-400 font-bold block mt-0.5">{isEn ? 'Tailored Architecture' : 'Estructura a la Medida'}</span>
                 <p className="text-[11px] text-slate-300 mt-2 leading-relaxed">
-                  Para negocios consolidados con alto tráfico de clientes que requieren captar base de datos, blindar Google Maps y auditar meseros.
+                  {t.plans.plan2Desc}
                 </p>
                 <div className="mt-3 p-2 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-[10px] text-emerald-300 font-bold">
-                  🎁 <strong>Setup & Smart QR:</strong> 100% BONIFICADO en fase de prueba
+                  🎁 <strong>Setup & Smart QR:</strong> {isEn ? '100% INCLUDED in pilot phase' : '100% BONIFICADO en fase de prueba'}
                 </div>
               </div>
 
               <div className="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30 text-[11px] text-slate-200 space-y-1">
                 <div className="font-bold text-indigo-300 flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Pantallas: 1 Dueño + 2 Pantallas en Local/Caja con 2FA</span>
+                  <span>{isEn ? 'Displays: 1 Owner + 2 Floor/Checkout Displays with 2FA' : 'Pantallas: 1 Dueño + 2 Pantallas en Local/Caja con 2FA'}</span>
                 </div>
               </div>
 
               <ul className="space-y-2.5 text-xs text-slate-200 border-t border-slate-800 pt-4">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <span><strong>Todo lo del Plan Punto Único</strong></span>
+                  <span><strong>{isEn ? 'Everything in Basic Plan' : 'Todo lo del Plan Punto Único'}</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <span><strong>Asistente IA Google Ilimitado</strong> (3 tonos de respuesta)</span>
+                  <span><strong>{isEn ? 'Unlimited Google AI Assistant' : 'Asistente IA Google Ilimitado'}</strong> ({isEn ? '3 strategic tones' : '3 tonos de respuesta'})</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <span><strong>Alertas en Vivo Sonoras & Push</strong> en sala y celulares</span>
+                  <span><strong>{isEn ? 'Audible & Visual In-Room Alerts' : 'Alertas en Vivo Sonoras & Push'}</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <span><strong>Sorteo del Mes Oficial</strong> con 1 ganador verificado</span>
+                  <span><strong>{isEn ? 'Official Monthly Giveaway Module' : 'Sorteo del Mes Oficial'}</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <span><strong>Exportación CSV de Clientes</strong> con Ley 1581 Habeas Data</span>
+                  <span><strong>{isEn ? 'Customer CSV Export with Legal Consent' : 'Exportación CSV de Clientes con Consentimiento Legal'}</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <span>Auditoría de personal y meseros en turno</span>
+                  <span>{isEn ? 'Server/Staff performance audit by shift' : 'Auditoría de personal y meseros en turno'}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <span>Soporte ejecutivo comercial prioritario</span>
+                  <span>{isEn ? 'Priority VIP executive support' : 'Soporte ejecutivo comercial prioritario'}</span>
                 </li>
               </ul>
             </div>
@@ -2041,68 +2031,68 @@ export default function HomePage() {
               }}
               className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs text-center shadow-lg shadow-amber-500/25 transition active:scale-95 block cursor-pointer animate-shimmer"
             >
-              Agendar Sesión Estratégica VIP
+              {t.plans.ctaRequestPro}
             </a>
           </div>
 
           {/* NIVEL 3: CADENAS & FRANQUICIAS */}
           <div className="p-7 sm:p-8 rounded-3xl bg-[#0D1424] border-2 border-purple-500/70 flex flex-col justify-between shadow-2xl relative">
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-wider shadow">
-              👑 MÁXIMA POTENCIA MULTISEDE
+              👑 {isEn ? 'MULTI-LOCATION POWER' : 'MÁXIMA POTENCIA MULTISEDE'}
             </div>
 
             <div className="space-y-4 pt-1">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-purple-400">
-                  Multi-Sedes & Corporativo
+                  {isEn ? 'Multi-Branch & Enterprise Groups' : 'Multi-Sedes & Corporativo'}
                 </span>
                 <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">
-                  Multi-Sede
+                  {isEn ? 'Multi-Location' : 'Multi-Sede'}
                 </span>
               </div>
 
               <div>
-                <h3 className="text-2xl font-black text-white">Cadenas & Franquicias</h3>
-                <span className="text-xs text-purple-400 font-bold block mt-0.5">Arquitectura Empresarial a la Medida</span>
+                <h3 className="text-2xl font-black text-white">{t.plans.plan3Name}</h3>
+                <span className="text-xs text-purple-400 font-bold block mt-0.5">{isEn ? 'Enterprise Bespoke Architecture' : 'Arquitectura Empresarial a la Medida'}</span>
                 <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">
-                  Para holdings, grupos gastronómicos, cadenas hoteleras o marcas con 2 o más sedes que requieren control macro centralizado.
+                  {t.plans.plan3Desc}
                 </p>
                 <div className="mt-3 p-2 rounded-xl bg-purple-950/40 border border-purple-500/40 text-[10px] text-purple-300 font-bold">
-                  🎁 <strong>Setup & Smart QR:</strong> 100% BONIFICADO
+                  🎁 <strong>Setup & Smart QR:</strong> {isEn ? '100% INCLUDED' : '100% BONIFICADO'}
                 </div>
               </div>
 
               <div className="p-3 rounded-xl bg-purple-950/30 border border-purple-500/30 text-[11px] text-slate-200 space-y-1">
                 <div className="font-bold text-purple-300 flex items-center gap-1.5">
                   <Building2 className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Multisede: Sedes ilimitadas con administradores independientes</span>
+                  <span>{isEn ? 'Multi-Branch: Unlimited venues with independent shift managers' : 'Multisede: Sedes ilimitadas con administradores independientes'}</span>
                 </div>
               </div>
 
               <ul className="space-y-2.5 text-xs text-slate-300 border-t border-slate-800 pt-4">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                  <span><strong>Todo lo de Alto Rendimiento incluido</strong></span>
+                  <span><strong>{isEn ? 'Everything in Pro Plan included' : 'Todo lo de Alto Rendimiento incluido'}</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                  <span><strong>Modo TV Live Wallboard</strong> para salón y cocina</span>
+                  <span><strong>{isEn ? 'Live TV Wallboard mode for floor & kitchen' : 'Modo TV Live Wallboard para salón y cocina'}</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                  <span><strong>Sorteos VIP Multi-Ganador</strong> (de 1 a 10+ premios)</span>
+                  <span><strong>{isEn ? 'Multi-Winner VIP Giveaways' : 'Sorteos VIP Multi-Ganador'}</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                  <span><strong>Bitácora y Podio de Personal</strong> consolidado</span>
+                  <span><strong>{isEn ? 'Consolidated staff podium & audit log' : 'Bitácora y Podio de Personal consolidado'}</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                  <span><strong>Control Macro Multisede</strong> y comparativa entre locales</span>
+                  <span><strong>{isEn ? 'Macro Multi-Branch benchmark & comparison' : 'Control Macro Multisede y comparativa entre locales'}</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                  <span><strong>Asesor ejecutivo dedicado & Onboarding VIP</strong></span>
+                  <span><strong>{isEn ? 'Dedicated Growth Engineer & VIP Onboarding' : 'Asesor ejecutivo dedicado & Onboarding VIP'}</strong></span>
                 </li>
               </ul>
             </div>
@@ -2115,7 +2105,7 @@ export default function HomePage() {
               }}
               className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs text-center shadow-lg shadow-purple-600/20 transition active:scale-95 block cursor-pointer"
             >
-              Solicitar Propuesta Multi-Sede
+              {t.plans.ctaRequestElite}
             </a>
           </div>
         </div>
@@ -2158,18 +2148,18 @@ export default function HomePage() {
       <section className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1500px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3.5 py-1 rounded-full border border-indigo-500/20">
-            Dudas Resueltas
+            {isEn ? 'FAQ & Inquiries' : 'Dudas Resueltas'}
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            Preguntas Frecuentes
+            {isEn ? 'Frequently Asked Questions' : 'Preguntas Frecuentes'}
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2">
-            Todo lo que necesitas saber antes de iniciar con Prestigia:
+            {isEn ? 'Everything you need to know before starting with Prestigia:' : 'Todo lo que necesitas saber antes de iniciar con Prestigia:'}
           </p>
         </div>
 
         <div className="space-y-3.5 max-w-[1200px] mx-auto">
-          {FAQS.map((faq, index) => {
+          {faqsList.map((faq, index) => {
             const isOpen = openFaqIndex === index;
             return (
               <div
@@ -2211,13 +2201,13 @@ export default function HomePage() {
           <div className="text-center max-w-xl mx-auto space-y-3">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-bold tracking-wider uppercase">
               <Calendar className="w-3.5 h-3.5" />
-              Sesión Estratégica 1 a 1 Sin Costo
+              {t.booking.tag}
             </div>
             <h2 className="text-2xl sm:text-4xl font-black text-white">
-              Agenda tu llamada estratégica con la dirección de Prestigia
+              {t.booking.title}
             </h2>
             <p className="text-xs sm:text-sm text-slate-300">
-              Revisaremos en vivo el estado actual de tu negocio en Google Maps, calcularemos cuántos clientes estás perdiendo y te presentaremos la <strong className="text-white">propuesta exacta adaptada a tu presupuesto</strong>.
+              {t.booking.subtitle}
             </p>
           </div>
 
@@ -2227,10 +2217,9 @@ export default function HomePage() {
               <div className="w-16 h-16 mx-auto rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
                 <CheckCircle2 className="w-9 h-9" />
               </div>
-              <h3 className="text-xl font-bold text-white">¡Llamada Agendada Exitosamente!</h3>
+              <h3 className="text-xl font-bold text-white">{t.booking.successTitle}</h3>
               <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
-                Hemos recibido tu solicitud para <strong className="text-white">{leadForm.businessName}</strong>. 
-                El equipo directivo de Prestigia te contactará en el horario seleccionado (<strong className="text-amber-400">{leadForm.preferredTime}</strong>) con el diagnóstico de tu negocio listo.
+                {t.booking.successDesc}
               </p>
               <div className="pt-3">
                 <a
@@ -2242,7 +2231,7 @@ export default function HomePage() {
                   className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition shadow-lg shadow-emerald-500/25 cursor-pointer"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>Confirmar por WhatsApp Inmediato</span>
+                  <span>{isEn ? 'Confirm via Direct WhatsApp' : 'Confirmar por WhatsApp Inmediato'}</span>
                 </a>
               </div>
             </div>
@@ -2259,14 +2248,14 @@ export default function HomePage() {
                 {/* Nombre Titular */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Tu Nombre y Apellido *
+                    {t.booking.nameLabel}
                   </label>
                   <input
                     type="text"
                     required
                     value={leadForm.fullName}
                     onChange={(e) => setLeadForm({ ...leadForm, fullName: e.target.value })}
-                    placeholder="Ej: Carlos Gómez"
+                    placeholder={isEn ? 'e.g. John Miller' : 'Ej: Carlos Gómez'}
                     className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 text-white text-xs rounded-xl px-4 py-3 outline-none transition"
                   />
                 </div>
@@ -2274,14 +2263,14 @@ export default function HomePage() {
                 {/* Nombre Comercial */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Nombre de tu Negocio / Marca *
+                    {t.booking.businessLabel}
                   </label>
                   <input
                     type="text"
                     required
                     value={leadForm.businessName}
                     onChange={(e) => setLeadForm({ ...leadForm, businessName: e.target.value })}
-                    placeholder="Ej: La Burguesía Artesanal"
+                    placeholder={isEn ? 'e.g. The Artisan Burger Co.' : 'Ej: La Burguesía Artesanal'}
                     className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 text-white text-xs rounded-xl px-4 py-3 outline-none transition"
                   />
                 </div>
@@ -2291,7 +2280,7 @@ export default function HomePage() {
                 {/* Nicho Comercial */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Nicho / Sector de tu Negocio *
+                    {isEn ? 'Business Sector / Niche *' : 'Nicho / Sector de tu Negocio *'}
                   </label>
                   <select
                     value={leadForm.category}
@@ -2309,14 +2298,14 @@ export default function HomePage() {
                 {/* Ciudad */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Ciudad / Ubicación *
+                    {isEn ? 'City / Location *' : 'Ciudad / Ubicación *'}
                   </label>
                   <input
                     type="text"
                     required
                     value={leadForm.city}
                     onChange={(e) => setLeadForm({ ...leadForm, city: e.target.value })}
-                    placeholder="Ej: Bogotá, Medellín, Cali, CDMX..."
+                    placeholder={isEn ? 'e.g. Miami, Madrid, Bogotá...' : 'Ej: Bogotá, Medellín, Cali, CDMX...'}
                     className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 text-white text-xs rounded-xl px-4 py-3 outline-none transition"
                   />
                 </div>
@@ -2326,14 +2315,14 @@ export default function HomePage() {
                 {/* WhatsApp */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Número de WhatsApp *
+                    {t.booking.phoneLabel}
                   </label>
                   <input
                     type="tel"
                     required
                     value={leadForm.phone}
                     onChange={(e) => setLeadForm({ ...leadForm, phone: e.target.value })}
-                    placeholder="+57 300 123 4567"
+                    placeholder="+1 305 123 4567"
                     className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 text-white text-xs rounded-xl px-4 py-3 outline-none font-mono transition"
                   />
                 </div>
@@ -2341,17 +2330,17 @@ export default function HomePage() {
                 {/* Número de Sedes */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    ¿Cuántas Sedes Físicas Tienes?
+                    {isEn ? 'How many physical venues do you operate?' : '¿Cuántas Sedes Físicas Tienes?'}
                   </label>
                   <select
                     value={leadForm.branchCount}
                     onChange={(e) => setLeadForm({ ...leadForm, branchCount: e.target.value })}
                     className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 text-white text-xs rounded-xl px-4 py-3 outline-none cursor-pointer transition"
                   >
-                    <option value="1">1 Sede (Punto Único)</option>
-                    <option value="2-3">2 a 3 Sedes</option>
-                    <option value="4-10">4 a 10 Sedes (Cadena)</option>
-                    <option value="10+">Más de 10 Sedes (Holding)</option>
+                    <option value="1">{isEn ? '1 Venue (Single Location)' : '1 Sede (Punto Único)'}</option>
+                    <option value="2-3">{isEn ? '2 to 3 Venues' : '2 a 3 Sedes'}</option>
+                    <option value="4-10">{isEn ? '4 to 10 Venues (Chain)' : '4 a 10 Sedes (Cadena)'}</option>
+                    <option value="10+">{isEn ? '10+ Venues (Holding / Enterprise)' : 'Más de 10 Sedes (Holding)'}</option>
                   </select>
                 </div>
               </div>
@@ -2362,17 +2351,17 @@ export default function HomePage() {
                 <div>
                   <label className="text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Horario Preferido para la Llamada</span>
+                    <span>{t.booking.timeLabel}</span>
                   </label>
                   <select
                     value={leadForm.preferredTime}
                     onChange={(e) => setLeadForm({ ...leadForm, preferredTime: e.target.value })}
                     className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 text-white text-xs rounded-xl px-4 py-3 outline-none cursor-pointer transition"
                   >
-                    <option value="Mañana (9:00 AM - 12:00 PM)">Mañana (9:00 AM - 12:00 PM)</option>
-                    <option value="Tarde (2:00 PM - 6:00 PM)">Tarde (2:00 PM - 6:00 PM)</option>
-                    <option value="Noche (6:00 PM - 8:00 PM)">Noche (6:00 PM - 8:00 PM)</option>
-                    <option value="Cualquier Horario Laboral">Cualquier Horario Laboral</option>
+                    <option value="Mañana (9:00 AM - 12:00 PM)">{isEn ? 'Morning (9:00 AM - 12:00 PM)' : 'Mañana (9:00 AM - 12:00 PM)'}</option>
+                    <option value="Tarde (2:00 PM - 6:00 PM)">{isEn ? 'Afternoon (2:00 PM - 6:00 PM)' : 'Tarde (2:00 PM - 6:00 PM)'}</option>
+                    <option value="Noche (6:00 PM - 8:00 PM)">{isEn ? 'Evening (6:00 PM - 8:00 PM)' : 'Noche (6:00 PM - 8:00 PM)'}</option>
+                    <option value="Cualquier Horario Laboral">{isEn ? 'Any Business Hours' : 'Cualquier Horario Laboral'}</option>
                   </select>
                 </div>
 
@@ -2380,17 +2369,17 @@ export default function HomePage() {
                 <div>
                   <label className="text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
                     <Target className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Tu Objetivo Prioritario</span>
+                    <span>{t.booking.goalLabel}</span>
                   </label>
                   <select
                     value={leadForm.primaryGoal}
                     onChange={(e) => setLeadForm({ ...leadForm, primaryGoal: e.target.value })}
                     className="w-full bg-[#141A26] border border-slate-700 focus:border-amber-400 text-white text-xs rounded-xl px-4 py-3 outline-none cursor-pointer transition"
                   >
-                    <option value="Aumentar clientes y reseñas 5★ en Google Maps">Aumentar clientes y 5★ en Google Maps</option>
-                    <option value="Frenar quejas privadas antes de que salgan a internet">Frenar quejas privadas antes de internet</option>
-                    <option value="Crear base de datos propia de clientes (WhatsApp)">Crear base de datos propia (WhatsApp)</option>
-                    <option value="Auditar la atención del personal y meseros">Auditar la atención del personal</option>
+                    <option value="Aumentar clientes y reseñas 5★ en Google Maps">{isEn ? 'Grow customers and 5★ reviews on Google Maps' : 'Aumentar clientes y 5★ en Google Maps'}</option>
+                    <option value="Frenar quejas privadas antes de que salgan a internet">{isEn ? 'Contain private complaints before the web' : 'Frenar quejas privadas antes de internet'}</option>
+                    <option value="Crear base de datos propia de clientes (WhatsApp)">{isEn ? 'Build owned customer WhatsApp database' : 'Crear base de datos propia (WhatsApp)'}</option>
+                    <option value="Auditar la atención del personal y meseros">{isEn ? 'Audit server and staff performance' : 'Auditar la atención del personal'}</option>
                   </select>
                 </div>
               </div>
@@ -2403,11 +2392,11 @@ export default function HomePage() {
                   className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 transition active:scale-98 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 animate-shimmer"
                 >
                   {submittingLead ? (
-                    <span>Agendando sesión estratégica...</span>
+                    <span>{t.booking.sendingBtn}</span>
                   ) : (
                     <>
                       <Calendar className="w-4 h-4 text-slate-950" />
-                      <span>AGENDAR MI SESIÓN ESTRATÉGICA 1 A 1 (SIN COSTO)</span>
+                      <span>{t.booking.submitBtn}</span>
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}
@@ -2415,7 +2404,9 @@ export default function HomePage() {
               </div>
 
               <p className="text-[10px] text-slate-500 text-center">
-                🔒 Tus datos se tratan bajo estricta confidencialidad y Ley de Habeas Data (Ley 1581). Sin compromisos ni llamadas insistentes.
+                {isEn
+                  ? '🔒 Your data is processed under strict confidentiality and privacy consent. No spam, no pushy calls.'
+                  : '🔒 Tus datos se tratan bajo estricta confidencialidad y Ley de Habeas Data (Ley 1581). Sin compromisos ni llamadas insistentes.'}
               </p>
             </form>
           )}
@@ -2431,14 +2422,22 @@ export default function HomePage() {
             <PrestigiaIcon className="w-8 h-8 text-white" />
             <div>
               <p className="text-white font-extrabold tracking-wider text-sm">PRESTIGIA TECHNOLOGIES ENTERPRISE</p>
-              <p className="text-[11px] text-slate-500">Suite de Crecimiento Comercial, Blindaje Reputacional & Conversión Local 5★</p>
+              <p className="text-[11px] text-slate-500">{t.footer.brandDesc}</p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-6 text-xs">
             <Link href="/portal" className="text-slate-300 hover:text-white transition flex items-center gap-1.5 font-semibold">
               <Lock className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Portal de Clientes</span>
+              <span>{t.nav.clientPortal}</span>
+            </Link>
+            <Link href="/dossier" className="text-amber-400 hover:text-amber-300 transition flex items-center gap-1.5 font-semibold">
+              <FileSpreadsheet className="w-3.5 h-3.5 text-amber-400" />
+              <span>{t.nav.dossier}</span>
+            </Link>
+            <Link href="/auditor" className="text-cyan-400 hover:text-cyan-300 transition flex items-center gap-1.5 font-semibold">
+              <Search className="w-3.5 h-3.5 text-cyan-400" />
+              <span>{t.nav.auditor}</span>
             </Link>
             <a
               href="https://wa.me/573058314049?text=Hola%20Prestigia,%20solicito%20información%20sobre%20el%20blindaje%20comercial"
@@ -2447,23 +2446,16 @@ export default function HomePage() {
               className="text-slate-300 hover:text-white transition flex items-center gap-1.5 font-semibold"
             >
               <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Atención Directa WhatsApp</span>
-            </a>
-            <a
-              href="mailto:prestigiaprincipal@gmail.com"
-              className="text-slate-300 hover:text-white transition flex items-center gap-1.5 font-semibold"
-            >
-              <Mail className="w-3.5 h-3.5 text-blue-400" />
-              <span>prestigiaprincipal@gmail.com</span>
+              <span>{isEn ? 'Direct WhatsApp Support' : 'Atención Directa WhatsApp'}</span>
             </a>
             <span className="text-slate-700 hidden sm:inline">|</span>
-            <span className="text-slate-500 font-medium">Colombia • México • Chile • Estados Unidos • España</span>
+            <span className="text-slate-500 font-medium">Colombia • México • Chile • United States • Spain</span>
           </div>
         </div>
 
         <div className="max-w-[1700px] mx-auto mt-8 pt-6 border-t border-slate-900 text-[10px] text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>© {new Date().getFullYear()} Prestigia Technologies. Todos los derechos reservados.</p>
-          <p>Cumplimiento Normativo RGPD, Ley 1581 de Habeas Data & Políticas Oficiales de Reseñas de Google Maps.</p>
+          <p>© {new Date().getFullYear()} Prestigia Technologies. {isEn ? 'All rights reserved.' : 'Todos los derechos reservados.'}</p>
+          <p>{t.footer.compliance}</p>
         </div>
       </footer>
     </div>
