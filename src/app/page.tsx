@@ -434,12 +434,44 @@ export default function HomePage() {
   // Before vs After Comparison Switch
   const [comparisonMode, setComparisonMode] = useState<'with' | 'without'>('with');
 
-  // Success Cases Carousel State
-  const [carouselIndex, setCarouselIndex] = useState(0);
-  const [selectedCountryFilter, setSelectedCountryFilter] = useState<'all' | 'co' | 'us' | 'es' | 'cl' | 'pa'>('all');
-
   // FAQ Accordion State
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
+  // Auto-advance Testimonials Carousel smoothly (with pause on hover/interaction)
+  useEffect(() => {
+    const el = document.getElementById('testimonials-scroll-container');
+    if (!el) return;
+
+    let isPaused = false;
+    const onEnter = () => { isPaused = true; };
+    const onLeave = () => { isPaused = false; };
+
+    el.addEventListener('mouseenter', onEnter);
+    el.addEventListener('mouseleave', onLeave);
+    el.addEventListener('touchstart', onEnter, { passive: true });
+    el.addEventListener('touchend', onLeave, { passive: true });
+
+    const interval = setInterval(() => {
+      if (isPaused) return;
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      if (el.scrollLeft >= maxScroll - 25) {
+        // Smoothly loop back to start when reaching end
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        const card = el.firstElementChild as HTMLElement;
+        const step = card ? card.offsetWidth + 24 : 380;
+        el.scrollBy({ left: step, behavior: 'smooth' });
+      }
+    }, 4500);
+
+    return () => {
+      clearInterval(interval);
+      el.removeEventListener('mouseenter', onEnter);
+      el.removeEventListener('mouseleave', onLeave);
+      el.removeEventListener('touchstart', onEnter);
+      el.removeEventListener('touchend', onLeave);
+    };
+  }, []);
 
   // Realistic Social Proof Timing (Shows 6s, then hides and waits 18s between toasts)
   useEffect(() => {
@@ -572,18 +604,7 @@ export default function HomePage() {
   const activeNiche = SHOWCASE_NICHES.find((n) => n.id === activeNicheId) || SHOWCASE_NICHES[0];
   const currentTicker = LIVE_TICKER_ITEMS[tickerIndex];
 
-  // Success Cases Carousel Logic
-  const filteredCases = selectedCountryFilter === 'all'
-    ? SUCCESS_CASES
-    : SUCCESS_CASES.filter((c) => c.countryCode === selectedCountryFilter);
 
-  const prevCarouselSlide = () => {
-    setCarouselIndex((prev) => (prev > 0 ? prev - 1 : Math.max(0, filteredCases.length - 1)));
-  };
-
-  const nextCarouselSlide = () => {
-    setCarouselIndex((prev) => (prev < filteredCases.length - 1 ? prev + 1 : 0));
-  };
 
   return (
     <div className="min-h-screen bg-[#06080E] text-slate-100 selection:bg-amber-500/25 selection:text-amber-200 font-sans relative overflow-x-hidden">
@@ -1448,43 +1469,12 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Country Filter Badges */}
-        <div className="flex flex-wrap items-center gap-2 mb-8">
-          {[
-            { id: 'all', label: 'Todos los Países (10)', icon: '🌐' },
-            { id: 'co', label: 'Colombia (2)', icon: '🇨🇴' },
-            { id: 'us', label: 'Estados Unidos (2)', icon: '🇺🇸' },
-            { id: 'es', label: 'Europa / España (2)', icon: '🇪🇸' },
-            { id: 'cl', label: 'Chile (2)', icon: '🇨🇱' },
-            { id: 'pa', label: 'Panamá (2)', icon: '🇵🇦' },
-          ].map((country) => (
-            <button
-              key={country.id}
-              type="button"
-              onClick={() => {
-                setSelectedCountryFilter(country.id as any);
-                trackAction(`filter_country_${country.id}`);
-                const el = document.getElementById('testimonials-scroll-container');
-                if (el) el.scrollTo({ left: 0, behavior: 'smooth' });
-              }}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                selectedCountryFilter === country.id
-                  ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 font-black'
-                  : 'bg-[#0E1424] text-slate-400 border border-slate-800 hover:text-white hover:border-slate-700'
-              }`}
-            >
-              <span>{country.icon}</span>
-              <span>{country.label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Carousel Scroll Track (10 Cases) */}
+        {/* Carousel Scroll Track (10 International Cases - Auto-advancing) */}
         <div
           id="testimonials-scroll-container"
           className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4 pt-1"
         >
-          {filteredCases.map((c) => (
+          {SUCCESS_CASES.map((c) => (
             <div
               key={c.id}
               className="snap-start shrink-0 w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] p-7 rounded-3xl bg-[#0D1424] border border-slate-800 hover:border-amber-500/40 transition-all duration-300 shadow-xl flex flex-col justify-between group"
