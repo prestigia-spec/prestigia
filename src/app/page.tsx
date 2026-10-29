@@ -34,8 +34,164 @@ import {
   Brain,
   Tv,
   Mail,
+  Sliders,
+  DollarSign,
+  ChevronDown,
+  X,
+  Smartphone,
+  Flame,
+  HelpCircle,
+  Activity,
+  Layers,
 } from 'lucide-react';
 import { PRESTIGIA_NICHES } from '@/lib/types';
+
+// Live Social Proof Notification Feed Data
+const LIVE_TICKER_ITEMS = [
+  {
+    icon: '🍔',
+    brand: 'La Burguesía Artesanal (Sede Chapinero)',
+    event: 'Nueva reseña 5★ confirmada en Google Maps',
+    time: 'Hace 3 min',
+    type: 'positive',
+    tag: '5.0★ Google Maps',
+  },
+  {
+    icon: '🦷',
+    brand: 'Dr. Carlos Mendoza • Odontología',
+    event: 'Queja de 2★ contenida en privado (0 daño público)',
+    time: 'Hace 6 min',
+    type: 'shield',
+    tag: 'Blindaje Activo',
+  },
+  {
+    icon: '🚗',
+    brand: 'AutoElite Taller & Detailing',
+    event: '+14 Nuevos clientes registrados con Habeas Data',
+    time: 'Hace 11 min',
+    type: 'data',
+    tag: 'Base Propia',
+  },
+  {
+    icon: '💇',
+    brand: 'D’Luxe Spa & Barbería',
+    event: 'Colaborador auditado con 5★ por atención en sala',
+    time: 'Hace 16 min',
+    type: 'positive',
+    tag: 'Auditoría 5★',
+  },
+  {
+    icon: '☕',
+    brand: 'Bistro La Candelaria',
+    event: 'Subió al puesto #2 en búsquedas locales de Maps',
+    time: 'Hace 22 min',
+    type: 'growth',
+    tag: 'Top 3 Local',
+  },
+];
+
+// Interactive Niche Showcase Data
+const SHOWCASE_NICHES = [
+  {
+    id: 'gastronomia',
+    name: 'Gastronomía & Bares',
+    icon: '🍔',
+    badge: 'Restaurantes, Bares, Cafés & Gastrobares',
+    headline: 'Elimina las quejas de platos o demoras antes de que lleguen a internet',
+    pain: 'Un cliente enojado por un plato frío o demora paga la cuenta, se va en silencio y destruye tu reputación con 1★ en Google Maps un domingo.',
+    solution: 'El Smart QR en mesa o servilletero le ofrece desahogo inmediato. El sistema te avisa al instante y el capitán de turno soluciona el reclamo antes de que el cliente se levante.',
+    metrics: [
+      { label: 'Subida Promedio', val: '+1.1★' },
+      { label: 'Quejas Contenidas', val: '99.2%' },
+      { label: 'Base de Datos Mes', val: '+380 clientes' },
+    ],
+    qrDemoText: 'Califica tu experiencia en mesa',
+  },
+  {
+    id: 'salud',
+    name: 'Clínicas & Odontología',
+    icon: '🦷',
+    badge: 'Médicos, Dentistas, Cirujanos & Estética Médica',
+    headline: 'Multiplica pacientes particulares por recomendación directa de 5★',
+    pain: 'En el sector salud, 1 sola reseña negativa aleja a decenas de pacientes con tratamientos de alto ticket (ortodoncias, cirugías, implantes).',
+    solution: 'Tras finalizar la consulta, el paciente escanea el QR en recepción y en 10 segundos deja su testimonio 5★ verificando la excelencia de tu servicio profesional.',
+    metrics: [
+      { label: 'Citas Nuevas Maps', val: '+3.4x' },
+      { label: 'Índice de Confianza', val: '99.8%' },
+      { label: 'Protección Legal', val: '100% Habeas Data' },
+    ],
+    qrDemoText: 'Califica tu atención médica hoy',
+  },
+  {
+    id: 'estetica',
+    name: 'Belleza & Spas',
+    icon: '💇',
+    badge: 'Salones, Barberías, Spas & Centros de Estética',
+    headline: 'Crea tu propia base de datos comercial para llenar la agenda los días lentos',
+    pain: 'Atiendes cientos de clientes al mes pero no tienes sus números de WhatsApp organizados para escribirles promociones en días de baja afluencia.',
+    solution: 'Con el módulo de sorteos VIP, tus clientes registran su número felizmente bajo la Ley de Habeas Data para ganar premios de la casa.',
+    metrics: [
+      { label: 'Clientes en Base', val: '500+ / sede' },
+      { label: 'Reactivación Agenda', val: '+38%' },
+      { label: 'Reseñas 5★', val: '+95 / mes' },
+    ],
+    qrDemoText: 'Participa en el sorteo de belleza',
+  },
+  {
+    id: 'automotriz',
+    name: 'Automotriz & Talleres',
+    icon: '🚗',
+    badge: 'Talleres Mecánicos, Detailing & Concesionarios',
+    headline: 'Posiciónate de #1 en tu ciudad y gana contratos corporativos de flotas',
+    pain: 'Los conductores desconfían de los talleres mecánicos desconocidos a menos que tengan una avalancha de reseñas impecables y fotos reales.',
+    solution: 'Al entregar las llaves del vehículo, el cliente escanea el QR y confirma su satisfacción en Google Maps, generando autoridad comercial insuperable.',
+    metrics: [
+      { label: 'Posición Local', val: 'Top 1 en Ciudad' },
+      { label: 'Tráfico de Taller', val: '+45%' },
+      { label: 'Contención Privada', val: '100%' },
+    ],
+    qrDemoText: 'Valora la entrega de tu vehículo',
+  },
+  {
+    id: 'hoteleria',
+    name: 'Hoteles & Hospedaje',
+    icon: '🏨',
+    badge: 'Hoteles Boutique, Glampings & Alojamientos',
+    headline: 'Aumenta tus reservas directas sin depender de las comisiones de Booking',
+    pain: 'Las comisiones de plataformas intermediarias te quitan hasta un 20% de cada noche, y cualquier detalle en habitación termina en queja pública.',
+    solution: 'Durante el check-out, el huésped califica. Si hubo algún detalle, se atiende privadamente; si fue perfecto, catapulta tu perfil internacional 5★.',
+    metrics: [
+      { label: 'Ahorro Comisiones', val: 'Hasta 20%' },
+      { label: 'Turistas de Google', val: '+52%' },
+      { label: 'Reputación Global', val: '4.9★' },
+    ],
+    qrDemoText: 'Califica tu estancia con nosotros',
+  },
+];
+
+// FAQs Data
+const FAQS = [
+  {
+    q: '¿Google penaliza o bloquea el uso de este sistema?',
+    a: 'En absoluto. Prestigia cumple al 100% con las directrices oficiales de Google Maps y las normativas internacionales de protección de datos (RGPD y Ley 1581 de Habeas Data). Los clientes satisfechos que publican su opinión lo hacen directamente desde su propia cuenta de Google de forma 100% legítima y voluntaria.',
+  },
+  {
+    q: '¿Mis clientes o mis empleados tienen que descargar alguna aplicación?',
+    a: 'Cero aplicaciones. Todo funciona de forma instantánea a través de la cámara del celular y el navegador web. Al escanear el Smart QR con cualquier teléfono (iPhone o Android), la experiencia carga en menos de 1 segundo.',
+  },
+  {
+    q: '¿Cómo funciona la contención de quejas de 1 a 3 estrellas?',
+    a: 'Cuando un cliente insatisfecho presiona 1, 2 o 3 estrellas, el sistema oculta el enlace a Google Maps y abre una interfaz confidencial y cordial de atención al cliente. La inconformidad se envía inmediatamente al WhatsApp o correo del gerente de turno para que pueda intervenir y resolver el problema en sala antes de que el cliente se marche.',
+  },
+  {
+    q: '¿Puedo conectar varias sedes o franquicias en un mismo panel?',
+    a: 'Sí. Prestigia cuenta con arquitectura Multi-Sedes de nivel empresarial. Puedes asignar administradores de turno independientes por punto físico, comparar qué local tiene mejor atención y monitorear el desempeño global de tu marca desde un solo panel maestro.',
+  },
+  {
+    q: '¿Cuánto tiempo tarda la puesta en marcha en mi negocio?',
+    a: 'Menos de 24 horas. En nuestra sesión estratégica configuramos la identidad de tu marca, generamos tus Smart QRs de alta resolución listos para imprimir y activamos los accesos para ti y tu equipo.',
+  },
+];
 
 export default function HomePage() {
   // Strategic Call Booking Form State
@@ -54,10 +210,38 @@ export default function HomePage() {
   const [leadSuccess, setLeadSuccess] = useState(false);
   const [leadError, setLeadError] = useState<string | null>(null);
 
-  // Interactive Demo Simulator State
-  const [simulatedRating, setSimulatedRating] = useState<number | null>(5);
+  // Phone Simulator Interactive State
+  const [phoneRating, setPhoneRating] = useState<number>(5);
+  const [phoneExperienceState, setPhoneExperienceState] = useState<'stars' | 'google_maps' | 'private_containment'>('google_maps');
+  const [privateComment, setPrivateComment] = useState('');
+  const [privateCommentSent, setPrivateCommentSent] = useState(false);
 
-  // Silent Analytics Tracking
+  // Dynamic Ticker State
+  const [tickerIndex, setTickerIndex] = useState(0);
+  const [showTicker, setShowTicker] = useState(true);
+
+  // Niche Selector Tab State
+  const [activeNicheId, setActiveNicheId] = useState('gastronomia');
+
+  // Interactive ROI Calculator State
+  const [roiMonthlyClients, setRoiMonthlyClients] = useState<number>(950);
+  const [roiAverageTicket, setRoiAverageTicket] = useState<number>(35);
+
+  // Before vs After Comparison Switch
+  const [comparisonMode, setComparisonMode] = useState<'with' | 'without'>('with');
+
+  // FAQ Accordion State
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
+  // Automatic cycle for Live Social Proof Ticker
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTickerIndex((prev) => (prev + 1) % LIVE_TICKER_ITEMS.length);
+    }, 5500);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Silent Analytics Tracking on Load
   useEffect(() => {
     try {
       const isMobile = /mobile|iphone|android/i.test(navigator.userAgent);
@@ -91,6 +275,21 @@ export default function HomePage() {
     } catch {}
   };
 
+  // Handle Interactive Phone Star Selection
+  const handlePhoneStarClick = (rating: number) => {
+    setPhoneRating(rating);
+    setPrivateCommentSent(false);
+    if (rating >= 4) {
+      setPhoneExperienceState('google_maps');
+      try {
+        confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+      } catch {}
+    } else {
+      setPhoneExperienceState('private_containment');
+    }
+    trackAction(`phone_sim_star_${rating}`);
+  };
+
   // Submit Strategic Call Booking Form
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,7 +318,7 @@ export default function HomePage() {
         setLeadSuccess(true);
         trackAction('lead_submitted_success');
         try {
-          confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
+          confetti({ particleCount: 110, spread: 90, origin: { y: 0.5 } });
         } catch {}
       } else {
         setLeadError(data.error || 'Ocurrió un error al procesar tu solicitud.');
@@ -131,40 +330,95 @@ export default function HomePage() {
     }
   };
 
+  // ROI Calculated Metrics
+  const estimatedMonthlyTurnover = roiMonthlyClients * roiAverageTicket;
+  const estimatedLostClientsFromBadReviews = Math.round(roiMonthlyClients * 0.18);
+  const estimatedLostMoneyMonthly = Math.round(estimatedLostClientsFromBadReviews * roiAverageTicket);
+  const estimatedRetainedWithPrestigia = Math.round(estimatedLostMoneyMonthly * 0.82);
+
+  const activeNiche = SHOWCASE_NICHES.find((n) => n.id === activeNicheId) || SHOWCASE_NICHES[0];
+  const currentTicker = LIVE_TICKER_ITEMS[tickerIndex];
+
   return (
-    <div className="min-h-screen bg-[#07090E] text-slate-100 selection:bg-amber-500/20 selection:text-amber-300 font-sans relative overflow-x-hidden">
-      {/* Dynamic Background Glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-gradient-to-b from-indigo-600/15 via-purple-600/10 to-transparent blur-3xl pointer-events-none" />
-      <div className="absolute top-[800px] right-0 w-[500px] h-[500px] bg-amber-500/5 blur-3xl pointer-events-none" />
-      <div className="absolute top-[1800px] left-0 w-[600px] h-[600px] bg-emerald-500/5 blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-[#06080E] text-slate-100 selection:bg-amber-500/25 selection:text-amber-200 font-sans relative overflow-x-hidden">
+      {/* ============================================================== */}
+      {/* 0. AURORA DYNAMIC GLOW BACKGROUNDS */}
+      {/* ============================================================== */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[550px] bg-gradient-to-tr from-indigo-600/20 via-purple-600/15 to-amber-500/10 blur-[130px] rounded-full animate-pulse-glow" />
+        <div className="absolute top-[900px] -right-40 w-[600px] h-[600px] bg-emerald-500/10 blur-[140px] rounded-full" />
+        <div className="absolute top-[2200px] -left-40 w-[700px] h-[700px] bg-amber-500/8 blur-[150px] rounded-full" />
+        <div className="absolute top-[3600px] right-10 w-[650px] h-[650px] bg-blue-600/10 blur-[140px] rounded-full" />
+      </div>
+
+      {/* Grid Pattern Overlay for High-Tech Enterprise Feel */}
+      <div 
+        className="fixed inset-0 pointer-events-none opacity-[0.03] z-0" 
+        style={{ backgroundImage: `radial-gradient(#ffffff 1px, transparent 1px)`, backgroundSize: '32px 32px' }}
+      />
 
       {/* ============================================================== */}
-      {/* 1. TOP NAVBAR */}
+      {/* 1. TOP LIVE STATUS STRIP */}
       {/* ============================================================== */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#07090E]/90 border-b border-slate-800/80 px-4 sm:px-8 py-3.5 transition-all">
+      <div className="relative z-50 bg-[#090D17] border-b border-slate-800/80 px-4 py-2 text-[11px] font-semibold text-slate-300">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="text-emerald-400 font-bold uppercase tracking-wider text-[10px] sm:text-[11px]">
+              SISTEMA OPERANDO EN VIVO
+            </span>
+            <span className="text-slate-600 hidden sm:inline">•</span>
+            <span className="text-slate-400 truncate hidden sm:inline">
+              10 Sedes Blindadas • Filtro Inteligente de Reseñas Google Maps Activo
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4 text-[11px] font-mono shrink-0">
+            <span className="text-amber-400 font-bold">★ 4.93 Calificación Red</span>
+            <a
+              href="https://wa.me/573058314049?text=Hola%20Prestigia,%20me%20gustar%C3%ADa%20consultar%20sobre%20el%20blindaje%20comercial"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-white transition hidden md:flex items-center gap-1"
+            >
+              <Phone className="w-3 h-3 text-emerald-400" />
+              <span>Soporte Directo VIP</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* ============================================================== */}
+      {/* 2. TOP NAVBAR */}
+      {/* ============================================================== */}
+      <header className="sticky top-0 z-40 backdrop-blur-2xl bg-[#06080E]/85 border-b border-slate-800/80 px-4 sm:px-8 py-3.5 transition-all">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-amber-500 flex items-center justify-center p-2 shadow-lg shadow-indigo-600/20 group-hover:scale-105 transition">
+          <Link href="/" className="flex items-center gap-3 group cursor-pointer">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-indigo-800 flex items-center justify-center p-2 shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform duration-300">
               <PrestigiaIcon className="w-6 h-6 text-white" />
             </div>
             <div>
               <span className="text-lg font-black tracking-widest text-white flex items-center gap-1.5">
                 PRESTIGIA
               </span>
-              <p className="text-[10px] text-amber-400 font-semibold uppercase tracking-wider hidden sm:block">
-                Blindaje Reputacional & Ventas 5★
+              <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider hidden sm:block">
+                Tecnología de Blindaje Reputacional & Ventas 5★
               </p>
             </div>
           </Link>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-300">
-            <a href="#ventajas" className="hover:text-amber-400 transition">Ventajas para tu Negocio</a>
+          <nav className="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-300">
             <a href="#como-funciona" className="hover:text-amber-400 transition">Cómo Funciona</a>
             <a href="#simulador" className="hover:text-amber-400 transition">Simulador en Vivo</a>
-            <a href="#testimonios" className="hover:text-amber-400 transition">Casos Reales</a>
-            <a href="#a-medida" className="hover:text-amber-400 transition">Propuesta a Medida</a>
+            <a href="#calculadora-roi" className="hover:text-amber-400 transition">Calculadora ROI</a>
+            <a href="#nichos" className="hover:text-amber-400 transition">Por Industria</a>
+            <a href="#comparativa" className="hover:text-amber-400 transition">Antes vs Después</a>
+            <a href="#propuesta" className="hover:text-amber-400 transition">Planes a Medida</a>
           </nav>
 
           {/* Action CTAs */}
@@ -172,7 +426,7 @@ export default function HomePage() {
             <Link
               href="/portal"
               onClick={() => trackAction('click_portal_from_navbar')}
-              className="px-3.5 sm:px-4 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+              className="px-3.5 sm:px-4 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
             >
               <Lock className="w-3.5 h-3.5 text-indigo-400" />
               <span>Portal Clientes</span>
@@ -181,423 +435,790 @@ export default function HomePage() {
             <a
               href="#agendar"
               onClick={() => trackAction('click_agendar_navbar')}
-              className="px-3.5 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer hidden sm:flex items-center gap-1"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/25 active:scale-95 cursor-pointer hidden sm:flex items-center gap-1.5 animate-shimmer"
             >
               <Calendar className="w-3.5 h-3.5" />
-              <span>Agendar Llamada</span>
+              <span>Agendar Llamada VIP</span>
             </a>
           </div>
         </div>
       </header>
 
       {/* ============================================================== */}
-      {/* 2. HERO SECTION — VENTA INMEDIATA Y TRANSFORMACIÓN */}
+      {/* 3. HERO SECTION — DUAL COLUMN WITH INTERACTIVE SMARTPHONE */}
       {/* ============================================================== */}
-      <section className="relative pt-12 pb-16 sm:pt-20 sm:pb-24 px-4 sm:px-8 max-w-7xl mx-auto text-center">
-        {/* Elite Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-wide uppercase mb-6 animate-fade-in shadow-lg shadow-amber-500/5">
-          <Sparkles className="w-4 h-4 text-amber-400" />
-          <span>La Suite de Crecimiento & Blindaje Reputacional para Comercios Exitosos</span>
-        </div>
+      <section className="relative z-10 pt-10 pb-16 sm:pt-16 sm:pb-24 px-4 sm:px-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Left Column: Value Pitch & Conversion */}
+          <div className="lg:col-span-7 text-left space-y-6">
+            {/* Top Elite Badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-wide uppercase shadow-lg shadow-amber-500/5">
+              <Sparkles className="w-4 h-4 text-amber-400 animate-spin" style={{ animationDuration: '6s' }} />
+              <span>La Suite de Crecimiento & Blindaje Reputacional B2B</span>
+            </div>
 
-        {/* Main High-Ticket Headline */}
-        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight max-w-5xl mx-auto leading-[1.12]">
-          Multiplica tus clientes locales, <br className="hidden sm:block" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500">
-            frena quejas en privado
-          </span>{' '}
-          y convierte tus 5★ en ventas imparables
-        </h1>
+            {/* Main Headline */}
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.08]">
+              Multiplica tus clientes en Google Maps,{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 underline decoration-amber-500/40 decoration-wavy">
+                frena quejas en privado
+              </span>{' '}
+              y aduéñate del mercado local.
+            </h1>
 
-        {/* Subtitle */}
-        <p className="text-sm sm:text-lg text-slate-300 max-w-3xl mx-auto mt-6 leading-relaxed font-normal">
-          El 92% de los consumidores eligen un negocio por su calificación en <strong className="text-white font-semibold">Google Maps</strong>. 
-          Prestigia intercepta inconformidades de clientes en <strong className="text-amber-400 font-semibold">&lt; 10 segundos</strong> antes de que salgan a internet, 
-          catapulta las reseñas positivas al Top de tu zona y crea una <strong className="text-emerald-400 font-semibold">base de datos propia</strong> de clientes leales.
-        </p>
+            {/* Subtitle */}
+            <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
+              El <strong className="text-white">92% de los consumidores</strong> deciden a qué restaurante, clínica o negocio entrar basados en las reseñas de Google Maps. 
+              Prestigia intercepta inconformidades en <strong className="text-amber-400">&lt; 10 segundos</strong> antes de que salgan a internet, catapulta las 5★ al Top de tu zona y crea una <strong className="text-emerald-400">base de datos propia de clientes VIP</strong> bajo la Ley 1581.
+            </p>
 
-        {/* Primary Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mt-9 max-w-lg mx-auto">
-          <a
-            href="#agendar"
-            onClick={() => trackAction('click_hero_agendar')}
-            className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <Calendar className="w-4 h-4 text-slate-950" />
-            <span>Agendar Llamada Estratégica VIP</span>
-            <ArrowRight className="w-4 h-4" />
-          </a>
+            {/* Key Micro-Pillars */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-[#0D121E] border border-slate-800 text-xs text-slate-200">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0">
+                  <Star className="w-4 h-4 fill-emerald-400 text-emerald-400" />
+                </div>
+                <span><strong>5★ Catapultadas</strong> a Google Maps</span>
+              </div>
+              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-[#0D121E] border border-slate-800 text-xs text-slate-200">
+                <div className="w-7 h-7 rounded-lg bg-rose-500/15 text-rose-400 flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-4 h-4 text-rose-400" />
+                </div>
+                <span><strong>1★ a 3★ Contenidas</strong> en privado</span>
+              </div>
+              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-[#0D121E] border border-slate-800 text-xs text-slate-200">
+                <div className="w-7 h-7 rounded-lg bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0">
+                  <Database className="w-4 h-4 text-purple-400" />
+                </div>
+                <span><strong>Base Propia</strong> con Habeas Data</span>
+              </div>
+            </div>
 
-          <a
-            href="#simulador"
-            onClick={() => trackAction('click_hero_simulador')}
-            className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 font-bold text-sm border border-slate-700/80 transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
-          >
-            <QrCode className="w-4 h-4 text-indigo-400" />
-            <span>Probar Simulador en Vivo</span>
-          </a>
-        </div>
+            {/* Primary Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-center gap-3.5 pt-4">
+              <a
+                href="#agendar"
+                onClick={() => trackAction('click_hero_agendar')}
+                className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/30 transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer animate-shimmer"
+              >
+                <Calendar className="w-4 h-4 text-slate-950" />
+                <span>Agendar Sesión Estratégica VIP</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
 
-        {/* Value Proof Badges */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-14 max-w-5xl mx-auto">
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#0E121B] border border-slate-800 shadow-lg text-center">
-            <span className="text-2xl sm:text-3xl font-black text-amber-400 font-mono">+1.2★</span>
-            <p className="text-xs text-slate-300 font-semibold mt-1">Subida Promedio en Google Maps</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">Top 3 en búsquedas locales</p>
+              <a
+                href="https://wa.me/573058314049?text=Hola%20Prestigia,%20quiero%20conocer%20c%C3%B3mo%20blindar%20mi%20negocio%20con%20el%20sistema%20de%20rese%C3%B1as%205%E2%98%85"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackAction('click_hero_whatsapp')}
+                className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 font-bold text-sm border border-slate-700/80 transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
+              >
+                <MessageCircle className="w-4 h-4 text-emerald-400" />
+                <span>Hablar por WhatsApp Directo</span>
+              </a>
+            </div>
+
+            {/* Social Proof Trust Footer */}
+            <div className="flex items-center gap-3 pt-3 text-xs text-slate-400">
+              <div className="flex -space-x-2">
+                <span className="w-7 h-7 rounded-full bg-amber-500/20 border-2 border-slate-900 flex items-center justify-center text-xs">🍔</span>
+                <span className="w-7 h-7 rounded-full bg-blue-500/20 border-2 border-slate-900 flex items-center justify-center text-xs">🦷</span>
+                <span className="w-7 h-7 rounded-full bg-purple-500/20 border-2 border-slate-900 flex items-center justify-center text-xs">🚗</span>
+                <span className="w-7 h-7 rounded-full bg-emerald-500/20 border-2 border-slate-900 flex items-center justify-center text-xs">💇</span>
+              </div>
+              <p>
+                Respaldado por más de <strong className="text-white">10 sedes comerciales</strong> activas en Colombia y LATAM.
+              </p>
+            </div>
           </div>
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#0E121B] border border-slate-800 shadow-lg text-center">
-            <span className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">98.6%</span>
-            <p className="text-xs text-slate-300 font-semibold mt-1">Inconformidades Contenidas</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">Cero daño público a la marca</p>
-          </div>
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#0E121B] border border-slate-800 shadow-lg text-center">
-            <span className="text-2xl sm:text-3xl font-black text-blue-400 font-mono">100%</span>
-            <p className="text-xs text-slate-300 font-semibold mt-1">Base de Datos Propia</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">Clientes captados con Habeas Data</p>
-          </div>
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#0E121B] border border-slate-800 shadow-lg text-center">
-            <span className="text-2xl sm:text-3xl font-black text-purple-400 font-mono">&gt; 3.8x</span>
-            <p className="text-xs text-slate-300 font-semibold mt-1">Retorno de Inversión (ROI)</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">Más visitas, reservas y ventas</p>
+
+          {/* Right Column: Titanium 3D Smartphone Interactive Simulator */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center">
+            <div className="relative w-full max-w-[340px] animate-float">
+              {/* Outer Glow on Phone */}
+              <div className="absolute -inset-1.5 bg-gradient-to-r from-amber-500/30 via-indigo-500/30 to-purple-500/30 rounded-[44px] blur-xl opacity-70" />
+
+              {/* Physical Titanium Phone Frame */}
+              <div className="relative rounded-[40px] bg-[#0A0D16] border-[6px] border-[#22293A] shadow-2xl p-3.5 overflow-hidden">
+                {/* Dynamic Island / Notch */}
+                <div className="w-24 h-4 bg-black rounded-full mx-auto mb-3 flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-[#1A2234] ml-auto mr-2" />
+                </div>
+
+                {/* Smartphone Display Content */}
+                <div className="rounded-[28px] bg-gradient-to-b from-[#0F1424] to-[#090D18] border border-slate-800 p-4 min-h-[440px] flex flex-col justify-between text-center relative overflow-hidden">
+                  {/* Subtle Brand Watermark */}
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-800/80 text-[10px] text-slate-400">
+                    <span className="flex items-center gap-1 font-bold text-slate-300">
+                      <PrestigiaIcon className="w-3.5 h-3.5 text-amber-400" />
+                      PRESTIGIA SMART QR
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-[9px] font-bold">
+                      EN MESA
+                    </span>
+                  </div>
+
+                  {/* Main Screen Body */}
+                  <div className="py-3">
+                    <span className="text-3xl">🍔</span>
+                    <h3 className="text-sm font-black text-white mt-1">La Burguesía Artesanal</h3>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Sede Chapinero • Mesa #4</p>
+
+                    <div className="my-3 p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                      <p className="text-[11px] font-bold text-slate-200">
+                        ¿Cómo calificarías tu experiencia hoy?
+                      </p>
+                      <p className="text-[9px] text-slate-400 mt-0.5">
+                        Toca una estrella para probar la respuesta del sistema:
+                      </p>
+
+                      {/* Interactive Stars */}
+                      <div className="flex items-center justify-center gap-1.5 mt-2.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => handlePhoneStarClick(star)}
+                            className={`p-1.5 rounded-xl border transition-all cursor-pointer ${
+                              phoneRating === star
+                                ? 'bg-amber-500/20 border-amber-400 scale-125 shadow-md shadow-amber-500/30'
+                                : 'bg-[#141B2D] border-slate-800 hover:border-slate-600'
+                            }`}
+                          >
+                            <Star
+                              className={`w-5 h-5 ${
+                                star <= phoneRating
+                                  ? 'fill-amber-400 text-amber-400'
+                                  : 'text-slate-600'
+                              }`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* DYNAMIC SCREEN ROUTING BASED ON STAR SELECTION */}
+                    {phoneExperienceState === 'google_maps' ? (
+                      /* Camino A: 4 y 5 Estrellas (Google Maps + Sorteo) */
+                      <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-left space-y-2 animate-fade-in">
+                        <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[10px] uppercase">
+                          <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                          <span>¡Experiencia 5★ Catapultada!</span>
+                        </div>
+                        <p className="text-[10px] text-slate-300 leading-tight">
+                          El cliente es enviado a tu ficha de <strong>Google Maps</strong> con 5 estrellas listas para publicar.
+                        </p>
+                        <div className="p-2 rounded-xl bg-[#141E30] border border-slate-800 flex items-center justify-between">
+                          <span className="text-[9px] text-amber-300 font-bold">🎁 Sorteo VIP de la Casa</span>
+                          <span className="text-[8px] bg-amber-500 text-slate-950 font-black px-1.5 py-0.5 rounded">Habeas Data</span>
+                        </div>
+                        <a
+                          href="https://maps.google.com"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] text-center block transition shadow-md shadow-emerald-500/20"
+                        >
+                          Publicar 5★ en Google Maps ↗
+                        </a>
+                      </div>
+                    ) : (
+                      /* Camino B: 1 a 3 Estrellas (Contención Privada & Blindaje) */
+                      <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-left space-y-2 animate-fade-in">
+                        <div className="flex items-center gap-1.5 text-rose-400 font-bold text-[10px] uppercase">
+                          <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                          <span>Blindaje Activo: Google Maps Oculto</span>
+                        </div>
+                        <p className="text-[10px] text-slate-300 leading-tight">
+                          El cliente expresa su molestia <strong>en privado</strong>. Te llega una alerta al WhatsApp para arreglarlo en sala.
+                        </p>
+                        {privateCommentSent ? (
+                          <div className="p-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] text-center font-bold">
+                            ✅ Notificación enviada al Administrador de Turno.
+                          </div>
+                        ) : (
+                          <div className="space-y-1.5">
+                            <textarea
+                              rows={2}
+                              value={privateComment}
+                              onChange={(e) => setPrivateComment(e.target.value)}
+                              placeholder="Describe qué ocurrió (no se publica en internet)..."
+                              className="w-full bg-[#121828] border border-slate-700 text-white text-[10px] rounded-lg p-2 outline-none focus:border-rose-400"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setPrivateCommentSent(true)}
+                              className="w-full py-1.5 rounded-lg bg-rose-500 hover:bg-rose-400 text-white font-bold text-[10px] text-center transition cursor-pointer"
+                            >
+                              Enviar Desahogo en Privado
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Micro Footer inside Simulator */}
+                  <div className="pt-2 border-t border-slate-800 text-[9px] text-slate-500 flex items-center justify-between">
+                    <span>Sin descargar apps</span>
+                    <span className="text-amber-400 font-mono font-bold">0% Daño Público</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Simulator Switch Buttons below Phone */}
+              <div className="flex items-center justify-center gap-2 mt-3 text-xs">
+                <button
+                  type="button"
+                  onClick={() => handlePhoneStarClick(5)}
+                  className={`px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1 cursor-pointer ${
+                    phoneRating >= 4
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm'
+                      : 'bg-slate-900 text-slate-400 border-slate-800'
+                  }`}
+                >
+                  <Star className="w-3.5 h-3.5 fill-emerald-400 text-emerald-400" />
+                  <span>Probar Flujo 5★</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePhoneStarClick(2)}
+                  className={`px-3 py-1.5 rounded-xl border font-bold transition flex items-center gap-1 cursor-pointer ${
+                    phoneRating < 4
+                      ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 shadow-sm'
+                      : 'bg-slate-900 text-slate-400 border-slate-800'
+                  }`}
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Probar Flujo 2★ (Blindaje)</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ============================================================== */}
-      {/* 3. EL PROBLEMA REAL: LA FUGA INVISIBLE DE CLIENTES */}
+      {/* 4. FLOATING LIVE SOCIAL PROOF TICKER (BOTTOM-LEFT TOAST) */}
       {/* ============================================================== */}
-      <section className="py-16 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-800/80">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-widest text-rose-400 bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20">
-            La Realidad del Mercado Actual
+      {showTicker && (
+        <div className="fixed bottom-5 left-5 z-50 max-w-sm bg-[#0E1322]/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-3.5 shadow-2xl transition-all transform animate-fade-in">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-lg shrink-0">
+              {currentTicker.icon}
+            </div>
+            <div className="flex-1 min-w-0 pr-4">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+                  {currentTicker.tag}
+                </span>
+                <span className="text-[10px] text-slate-500">• {currentTicker.time}</span>
+              </div>
+              <p className="text-xs font-bold text-white truncate mt-0.5">
+                {currentTicker.brand}
+              </p>
+              <p className="text-[11px] text-slate-300 leading-tight mt-0.5">
+                {currentTicker.event}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowTicker(false)}
+              className="text-slate-500 hover:text-slate-300 transition cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* 5. CÓMO FUNCIONA EL EMBUDO BIFURCADO DE DOS VÍAS */}
+      {/* ============================================================== */}
+      <section id="como-funciona" className="py-20 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-800/80">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3.5 py-1 rounded-full border border-indigo-500/20">
+            Arquitectura Quirúrgica
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            El 95% de los clientes insatisfechos nunca se quejan en caja.
+            El Embudo de Dos Vías que protege tu reputación
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2">
-            Pagan la cuenta, se van en silencio y destruyen la reputación de tu negocio con una reseña de 1 estrella en Google Maps.
+            El cliente escanea el Smart QR sin descargar aplicaciones. Nuestro algoritmo inteligente bifurca el destino en milisegundos:
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <div className="p-6 rounded-3xl bg-[#0D1424] border border-rose-500/20 shadow-xl space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-lg">
-              ❌
-            </div>
-            <h3 className="text-base font-bold text-white">Clientes que se van a la competencia</h3>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Un cliente nuevo busca en su celular tu producto o servicio. Si ve una calificación menor a 4.5★ o quejas sin resolver, no entra y se va al negocio de al lado.
-            </p>
-          </div>
-
-          <div className="p-6 rounded-3xl bg-[#0D1424] border border-rose-500/20 shadow-xl space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-lg">
-              📉
-            </div>
-            <h3 className="text-base font-bold text-white">Depender de pagar publicidad cara</h3>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Pagar anuncios en Instagram o Facebook cada día cuesta más y no genera lealtad. Las reseñas orgánicas de 5★ en Google Maps te traen clientes todos los días gratis.
-            </p>
-          </div>
-
-          <div className="p-6 rounded-3xl bg-[#0D1424] border border-rose-500/20 shadow-xl space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-lg">
-              🕵️
-            </div>
-            <h3 className="text-base font-bold text-white">Clientes anónimos que no vuelven</h3>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Atiendes a cientos de personas al mes pero no tienes sus números de WhatsApp para escribirles, invitarlos a volver o lanzarles promociones exclusivas.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================================== */}
-      {/* 4. LAS VENTAJAS PRESTIGIA: QUÉ HACE EL SISTEMA POR TU NEGOCIO */}
-      {/* ============================================================== */}
-      <section id="ventajas" className="py-20 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-800/80">
-        <div className="text-center max-w-3xl mx-auto mb-14">
-          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
-            El Arma Comercial de tu Marca
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            Lo que Prestigia logra por tus ventas desde la primera semana
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-2">
-            No es solo software; es un sistema integral de conversión, lealtad y protección operativa para tu negocio.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-          {/* Ventaja 1 */}
-          <div className="p-6 rounded-3xl bg-[#0D1424] border border-slate-800 hover:border-amber-500/40 transition-all shadow-xl flex flex-col justify-between">
-            <div>
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center mb-4">
-                <Star className="w-6 h-6 fill-amber-400 text-amber-400" />
-              </div>
-              <h3 className="text-base font-bold text-white">Despegue 5★ en Google Maps</h3>
-              <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-                Tus clientes felices escanean el Smart QR en mesa o recepción y en 1 solo clic confirman su reseña de 5 estrellas en tu perfil oficial de Google Maps.
-              </p>
-            </div>
-            <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-amber-400 font-semibold flex items-center gap-1.5">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>Más visitas y reservas diarias</span>
-            </div>
-          </div>
-
-          {/* Ventaja 2 */}
-          <div className="p-6 rounded-3xl bg-[#0D1424] border border-slate-800 hover:border-rose-500/40 transition-all shadow-xl flex flex-col justify-between">
-            <div>
-              <div className="w-12 h-12 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center mb-4">
-                <ShieldCheck className="w-6 h-6 text-rose-400" />
-              </div>
-              <h3 className="text-base font-bold text-white">Blindaje Privado contra Quejas</h3>
-              <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-                Si un cliente califica con 1, 2 o 3 estrellas, Google Maps queda 100% bloqueado. La queja te llega en privado para que la resuelvas antes de que el cliente salga del local.
-              </p>
-            </div>
-            <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-rose-400 font-semibold flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>0% Daño público a tu reputación</span>
-            </div>
-          </div>
-
-          {/* Ventaja 3 */}
-          <div className="p-6 rounded-3xl bg-[#0D1424] border border-slate-800 hover:border-emerald-500/40 transition-all shadow-xl flex flex-col justify-between">
-            <div>
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-4">
-                <Database className="w-6 h-6 text-emerald-400" />
-              </div>
-              <h3 className="text-base font-bold text-white">Big Data Propio & Sorteos VIP</h3>
-              <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-                A través de sorteos mensuales de fidelización, cada cliente registra su nombre y WhatsApp bajo la Ley de Habeas Data. Tienes tu propia base de datos comercial sin intermediarios.
-              </p>
-            </div>
-            <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-emerald-400 font-semibold flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5" />
-              <span>Cientos de clientes registrados</span>
-            </div>
-          </div>
-
-          {/* Ventaja 4 */}
-          <div className="p-6 rounded-3xl bg-[#0D1424] border border-slate-800 hover:border-purple-500/40 transition-all shadow-xl flex flex-col justify-between">
-            <div>
-              <div className="w-12 h-12 rounded-2xl bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center mb-4">
-                <Brain className="w-6 h-6 text-purple-400" />
-              </div>
-              <h3 className="text-base font-bold text-white">Sentimiento 360 IA & Wallboard</h3>
-              <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-                Inteligencia Artificial que audita qué meseros o colaboradores atienden mejor, mientras tus clientes ven en una pantalla TV en vivo cómo celebras las 5 estrellas en sala.
-              </p>
-            </div>
-            <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-purple-400 font-semibold flex items-center gap-1.5">
-              <Tv className="w-3.5 h-3.5" />
-              <span>Motivación y control operativo</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================================== */}
-      {/* 5. CÓMO FUNCIONA EL FILTRO INTELIGENTE BIFURCADO */}
-      {/* ============================================================== */}
-      <section id="como-funciona" className="py-16 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-800/80">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">
-            Arquitectura del Blindaje
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            El Embudo Quirúrgico de Dos Vías
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-2">
-            El cliente escanea el Smart QR con la cámara de su celular sin descargar ninguna aplicación. Esto es lo que sucede:
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Camino A: Experiencia 4 y 5 Estrellas */}
-          <div className="p-7 rounded-3xl bg-gradient-to-br from-emerald-950/20 via-[#0D1424] to-[#0A0F1D] border border-emerald-500/30 shadow-xl relative overflow-hidden">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center font-black mb-4">
-              <Star className="w-6 h-6 fill-emerald-400 text-emerald-400" />
+          <div className="p-8 rounded-3xl bg-gradient-to-br from-emerald-950/25 via-[#0D1424] to-[#0A0F1D] border-2 border-emerald-500/40 shadow-2xl relative overflow-hidden group hover:border-emerald-400 transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center font-black">
+                <Star className="w-6 h-6 fill-emerald-400 text-emerald-400" />
+              </div>
+              <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                Ruta 5★ Google Maps
+              </span>
             </div>
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold uppercase tracking-wider">
-              Flujo Positivo (4★ y 5★)
-            </span>
-            <h3 className="text-lg font-bold text-white mt-2">Multiplicación Pública en Google Maps</h3>
-            <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-              El cliente satisfecho es enviado directamente al enlace de tu ficha de Google Maps para publicar su opinión con 1 toque. También puede participar en el sorteo mensual y seguir tus redes.
+
+            <h3 className="text-xl font-bold text-white mt-2">1. Multiplicación Pública de Reseñas 5★</h3>
+            <p className="text-xs sm:text-sm text-slate-300 mt-3 leading-relaxed">
+              El cliente satisfecho es enviado a la ficha oficial de <strong>Google Maps</strong> con las 5 estrellas pre-seleccionadas. El 80% confirma la publicación en 1 solo clic. 
+              Además, se le invita al <strong>sorteo mensual con Habeas Data</strong> para capturar su nombre y WhatsApp para tu negocio.
             </p>
-            <div className="mt-4 pt-3 border-t border-slate-800/80 text-[11px] text-emerald-400 font-semibold flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Google premia tu negocio posicionándote de primero</span>
+
+            <div className="mt-6 pt-4 border-t border-slate-800/80 space-y-2 text-xs text-emerald-400 font-semibold">
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Posicionamiento orgánico en el Top 3 de Google Maps</div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Cero costos en anuncios pagados de Google Ads</div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Clientes recurrentes sumados a tu propia base de datos</div>
             </div>
           </div>
 
           {/* Camino B: Experiencia 1 a 3 Estrellas */}
-          <div className="p-7 rounded-3xl bg-gradient-to-br from-rose-950/20 via-[#0D1424] to-[#0A0F1D] border border-rose-500/30 shadow-xl relative overflow-hidden">
-            <div className="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center font-black mb-4">
-              <ShieldCheck className="w-6 h-6 text-rose-400" />
+          <div className="p-8 rounded-3xl bg-gradient-to-br from-rose-950/25 via-[#0D1424] to-[#0A0F1D] border-2 border-rose-500/40 shadow-2xl relative overflow-hidden group hover:border-rose-400 transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center font-black">
+                <ShieldCheck className="w-6 h-6 text-rose-400" />
+              </div>
+              <span className="px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 text-xs font-bold uppercase tracking-wider">
+                Blindaje Privado
+              </span>
             </div>
-            <span className="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[11px] font-bold uppercase tracking-wider">
-              Flujo Crítico (1★ a 3★)
-            </span>
-            <h3 className="text-lg font-bold text-white mt-2">Bloqueo Preventivo & Solución en Sala</h3>
-            <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-              Google Maps nunca aparece. El cliente encuentra una ventana cordial de desahogo privado. El sistema captura su inconformidad y te notifica de inmediato para resolverla antes de que se retire.
+
+            <h3 className="text-xl font-bold text-white mt-2">2. Bloqueo Preventivo & Contención en Sala</h3>
+            <p className="text-xs sm:text-sm text-slate-300 mt-3 leading-relaxed">
+              <strong>Google Maps jamás se abre.</strong> El cliente inconforme encuentra una ventana de desahogo privado para expresar su queja. 
+              El sistema notifica al instante al administrador de turno vía WhatsApp para resolver el inconveniente antes de que el cliente salga del local.
             </p>
-            <div className="mt-4 pt-3 border-t border-slate-800/80 text-[11px] text-rose-400 font-semibold flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Conviertes un cliente enojado en un cliente agradecido</span>
+
+            <div className="mt-6 pt-4 border-t border-slate-800/80 space-y-2 text-xs text-rose-400 font-semibold">
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> 0% Daño público a la calificación de la empresa</div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Alerta sonora inmediata al celular del encargado de turno</div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Transformación de clientes molestos en embajadores fieles</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* ============================================================== */}
-      {/* 6. SIMULADOR INTERACTIVO DEL SMART QR */}
+      {/* 6. CALCULADORA INTERACTIVA DE ROI (PÉRDIDAS & GANANCIAS) */}
       {/* ============================================================== */}
-      <section id="simulador" className="py-16 px-4 sm:px-8 max-w-4xl mx-auto text-center">
-        <div className="p-7 sm:p-10 rounded-3xl bg-[#0D1424] border border-indigo-500/30 shadow-2xl relative overflow-hidden">
-          <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">
-            Simulador Interactivo
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-3">
-            Experimenta cómo reacciona el sistema
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-md mx-auto">
-            Haz clic en una estrella para simular lo que ve un cliente al calificar tu negocio:
-          </p>
-
-          {/* Star Buttons */}
-          <div className="flex items-center justify-center gap-3 mt-6">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                type="button"
-                onClick={() => {
-                  setSimulatedRating(star);
-                  trackAction(`simulated_rating_${star}`);
-                }}
-                className={`p-3 sm:p-3.5 rounded-2xl border transition-all cursor-pointer ${
-                  simulatedRating === star
-                    ? 'bg-amber-500/20 border-amber-400 scale-110 shadow-lg shadow-amber-500/20'
-                    : 'bg-[#141A26] border-slate-700 hover:border-slate-500'
-                }`}
-              >
-                <Star
-                  className={`w-7 h-7 sm:w-9 sm:h-9 ${
-                    simulatedRating && star <= simulatedRating
-                      ? 'fill-amber-400 text-amber-400'
-                      : 'text-slate-500 hover:text-amber-400'
-                  }`}
-                />
-              </button>
-            ))}
-          </div>
-
-          {/* Simulation Feedback Card */}
-          {simulatedRating && (
-            <div className="mt-6 p-5 rounded-2xl bg-[#141A26] border border-slate-700 max-w-md mx-auto text-left animate-fade-in shadow-lg">
-              {simulatedRating >= 4 ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider">
-                    <CheckCircle2 className="w-4 h-4 shrink-0" />
-                    <span>Experiencia 5★ Detectada ({simulatedRating} Estrellas)</span>
-                  </div>
-                  <p className="text-xs text-slate-200 leading-relaxed">
-                    🟢 <strong>Acción Prestigia:</strong> Se activa el redireccionamiento inmediato a tu ficha oficial de Google Maps con las 5 estrellas pre-seleccionadas y se invita al cliente al sorteo VIP.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-rose-400 font-bold text-xs uppercase tracking-wider">
-                    <AlertTriangle className="w-4 h-4 shrink-0" />
-                    <span>Contención Privada Activada ({simulatedRating} Estrellas)</span>
-                  </div>
-                  <p className="text-xs text-slate-200 leading-relaxed">
-                    🛡️ <strong>Acción Prestigia:</strong> Google Maps queda 100% oculto. El cliente ve una ventana de atención cordial donde expresa su molestia en privado, protegiendo tu negocio de daños públicos.
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ============================================================== */}
-      {/* 7. CASOS DE ÉXITO REALES CON RESULTADOS */}
-      {/* ============================================================== */}
-      <section id="testimonios" className="py-16 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-800/80">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-            Casos de Éxito Reales
+      <section id="calculadora-roi" className="py-20 px-4 sm:px-8 max-w-6xl mx-auto border-t border-slate-800/80">
+        <div className="text-center max-w-3xl mx-auto mb-14">
+          <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 px-3.5 py-1 rounded-full border border-amber-500/20">
+            Calculadora de Impacto Financiero
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            Marcas que transformaron su reputación en ingresos
+            ¿Cuánto dinero estás perdiendo por no tener Prestigia?
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2">
-            Resultados comprobados en operaciones reales del mercado:
+            Mueve los controles según el tamaño de tu negocio y descubre el impacto económico real de las malas reseñas:
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-[#0D1322] border-2 border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl">
+          {/* Sliders Input Controls (7 cols) */}
+          <div className="lg:col-span-7 space-y-8">
+            {/* Slider 1: Clientes Atendidos por Mes */}
+            <div>
+              <div className="flex items-center justify-between text-xs sm:text-sm mb-2">
+                <span className="text-slate-300 font-bold flex items-center gap-2">
+                  <Users className="w-4 h-4 text-indigo-400" />
+                  Clientes atendidos por mes:
+                </span>
+                <span className="text-xl font-mono font-black text-amber-400">
+                  {roiMonthlyClients.toLocaleString()} clientes
+                </span>
+              </div>
+              <input
+                type="range"
+                min={100}
+                max={5000}
+                step={50}
+                value={roiMonthlyClients}
+                onChange={(e) => setRoiMonthlyClients(Number(e.target.value))}
+                className="w-full h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400"
+              />
+              <div className="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+                <span>100 clientes</span>
+                <span>2,500 clientes</span>
+                <span>5,000 clientes</span>
+              </div>
+            </div>
+
+            {/* Slider 2: Ticket Promedio por Cliente */}
+            <div>
+              <div className="flex items-center justify-between text-xs sm:text-sm mb-2">
+                <span className="text-slate-300 font-bold flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-emerald-400" />
+                  Ticket promedio de consumo:
+                </span>
+                <span className="text-xl font-mono font-black text-emerald-400">
+                  ${roiAverageTicket} USD / consumo
+                </span>
+              </div>
+              <input
+                type="range"
+                min={10}
+                max={200}
+                step={5}
+                value={roiAverageTicket}
+                onChange={(e) => setRoiAverageTicket(Number(e.target.value))}
+                className="w-full h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-400"
+              />
+              <div className="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+                <span>$10 USD</span>
+                <span>$100 USD</span>
+                <span>$200 USD</span>
+              </div>
+            </div>
+
+            {/* Context Info Box */}
+            <div className="p-4 rounded-2xl bg-[#141A28] border border-slate-700/80 text-xs text-slate-300 space-y-1.5">
+              <p className="font-semibold text-white flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                Dato de la industria (Harvard Business Review & BrightLocal):
+              </p>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                Cada estrella de caída en Google Maps representa entre un <strong>15% y 22% de pérdida en ventas</strong> frente a competidores cercanos mejor calificados.
+              </p>
+            </div>
+          </div>
+
+          {/* Dynamic Financial Results Card (5 cols) */}
+          <div className="lg:col-span-5 p-6 rounded-2xl bg-gradient-to-b from-[#141E34] to-[#0A1020] border-2 border-amber-500/40 shadow-xl space-y-5 text-center">
+            <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30">
+              Proyección Mensual Estimada
+            </span>
+
+            <div>
+              <p className="text-xs text-slate-400 uppercase font-semibold">Fuga invisible hacia tu competencia:</p>
+              <p className="text-3xl sm:text-4xl font-black text-rose-400 font-mono mt-1">
+                -${estimatedLostMoneyMonthly.toLocaleString()} <span className="text-xs text-slate-400">USD/mes</span>
+              </p>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                Aprox. <strong>{estimatedLostClientsFromBadReviews} clientes perdidos</strong> que eligen a tu vecino.
+              </p>
+            </div>
+
+            <div className="pt-4 border-t border-slate-800">
+              <p className="text-xs text-slate-300 uppercase font-semibold">Facturación Recuperable con Prestigia:</p>
+              <p className="text-3xl sm:text-4xl font-black text-emerald-400 font-mono mt-1">
+                +${estimatedRetainedWithPrestigia.toLocaleString()} <span className="text-xs text-slate-400">USD/mes</span>
+              </p>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                Más visitas orgánicas, blindaje de quejas y clientes leales.
+              </p>
+            </div>
+
+            <a
+              href="#agendar"
+              onClick={() => {
+                setLeadForm((prev) => ({
+                  ...prev,
+                  notes: `[Calculadora ROI: ${roiMonthlyClients} clientes/mes a $${roiAverageTicket} USD/ticket. Fuga estimada: $${estimatedLostMoneyMonthly} USD]`,
+                }));
+                trackAction('click_recuperar_ventas_calculator');
+              }}
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/25 active:scale-95 block cursor-pointer"
+            >
+              Quiero Blindar Estos Ingresos en Mi Negocio ↗
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================== */}
+      {/* 7. SHOWCASE DINÁMICO POR INDUSTRIAS (TABS INTERACTIVAS) */}
+      {/* ============================================================== */}
+      <section id="nichos" className="py-20 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-800/80">
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
+            Especialización Vertical
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
+            Adaptado a la dinámica exacta de tu sector comercial
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-400 mt-2">
+            Selecciona tu industria para ver cómo opera el sistema en tu día a día:
+          </p>
+        </div>
+
+        {/* Niche Tabs Navigation */}
+        <div className="flex flex-wrap items-center justify-center gap-2 max-w-4xl mx-auto mb-10">
+          {SHOWCASE_NICHES.map((niche) => (
+            <button
+              key={niche.id}
+              type="button"
+              onClick={() => {
+                setActiveNicheId(niche.id);
+                trackAction(`select_niche_tab_${niche.id}`);
+              }}
+              className={`px-4 py-2.5 rounded-2xl font-bold text-xs transition-all flex items-center gap-2 cursor-pointer ${
+                activeNicheId === niche.id
+                  ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 scale-105'
+                  : 'bg-[#0D1424] text-slate-300 border border-slate-800 hover:border-slate-600'
+              }`}
+            >
+              <span className="text-base">{niche.icon}</span>
+              <span>{niche.name}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Active Niche Showcase Content Card */}
+        <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-[#0F1626] to-[#0A0E18] border-2 border-slate-800 shadow-2xl max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            {/* Left Content */}
+            <div className="lg:col-span-7 space-y-4 text-left">
+              <span className="text-xs font-black uppercase text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30">
+                {activeNiche.badge}
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-black text-white">
+                {activeNiche.headline}
+              </h3>
+
+              <div className="space-y-3 pt-2 text-xs sm:text-sm">
+                <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-slate-200">
+                  <p className="font-bold text-rose-400 text-xs uppercase mb-1">❌ El Dolor del Sector:</p>
+                  <p className="text-slate-300 leading-relaxed text-xs">{activeNiche.pain}</p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-slate-200">
+                  <p className="font-bold text-emerald-400 text-xs uppercase mb-1">🛡️ La Solución Prestigia:</p>
+                  <p className="text-slate-300 leading-relaxed text-xs">{activeNiche.solution}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-800 text-center">
+                {activeNiche.metrics.map((m, idx) => (
+                  <div key={idx} className="p-3 rounded-xl bg-[#141A28] border border-slate-800">
+                    <p className="text-lg font-black text-amber-400 font-mono">{m.val}</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">{m.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Mini Graphic Representation */}
+            <div className="lg:col-span-5 flex flex-col items-center justify-center">
+              <div className="p-6 rounded-3xl bg-[#141C30] border border-slate-700/80 shadow-xl w-full text-center space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 mx-auto flex items-center justify-center text-3xl">
+                  {activeNiche.icon}
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-white uppercase tracking-wider">{activeNiche.name}</p>
+                  <p className="text-[11px] text-slate-400 mt-1">{activeNiche.qrDemoText}</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-[#090D18] border border-slate-800 flex items-center justify-center gap-2">
+                  <QrCode className="w-12 h-12 text-white" />
+                  <div className="text-left">
+                    <p className="text-[10px] font-bold text-emerald-400">Smart QR Activo</p>
+                    <p className="text-[9px] text-slate-400">Escaneo sin apps</p>
+                    <p className="text-[9px] text-amber-400 font-mono font-bold">Respuesta &lt; 10s</p>
+                  </div>
+                </div>
+
+                <a
+                  href="#agendar"
+                  onClick={() => {
+                    setLeadForm((prev) => ({ ...prev, category: activeNiche.name }));
+                    trackAction(`click_cotizar_niche_${activeNiche.id}`);
+                  }}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-black text-xs text-center transition block shadow-md cursor-pointer"
+                >
+                  Solicitar Auditoría para {activeNiche.name} ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================== */}
+      {/* 8. COMPARATIVA INTERACTIVA: ANTES VS DESPUÉS DE PRESTIGIA */}
+      {/* ============================================================== */}
+      <section id="comparativa" className="py-20 px-4 sm:px-8 max-w-6xl mx-auto border-t border-slate-800/80">
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <span className="text-xs font-bold uppercase tracking-widest text-purple-400 bg-purple-500/10 px-3.5 py-1 rounded-full border border-purple-500/20">
+            Impacto Operativo
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
+            La transformación real de tu negocio
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-400 mt-2">
+            Alterna el interruptor para ver cómo cambia tu negocio desde el día uno:
+          </p>
+
+          {/* Interactive Switcher */}
+          <div className="inline-flex items-center gap-2 p-1.5 rounded-2xl bg-[#0E1322] border border-slate-700 mt-6">
+            <button
+              type="button"
+              onClick={() => setComparisonMode('without')}
+              className={`px-5 py-2.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                comparisonMode === 'without'
+                  ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              ❌ Sin Prestigia (Vulnerable)
+            </button>
+            <button
+              type="button"
+              onClick={() => setComparisonMode('with')}
+              className={`px-5 py-2.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                comparisonMode === 'with'
+                  ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/30 font-black'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              🛡️ Con Prestigia (Blindado)
+            </button>
+          </div>
+        </div>
+
+        {/* Dynamic Comparison Cards */}
+        {comparisonMode === 'without' ? (
+          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-rose-950/20 via-[#0E1322] to-[#0A0D18] border-2 border-rose-500/40 shadow-2xl animate-fade-in">
+            <div className="flex items-center gap-3 pb-6 border-b border-rose-500/20">
+              <span className="text-3xl">⚠️</span>
+              <div>
+                <h3 className="text-xl font-black text-rose-400">Estado Vulnerable (Sin Prestigia)</h3>
+                <p className="text-xs text-slate-400">Tu reputación y ventas a merced de clientes inconformes.</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+              <div className="p-5 rounded-2xl bg-[#141A28] border border-rose-500/20">
+                <p className="text-2xl font-mono font-black text-rose-400">3.7★</p>
+                <p className="text-xs font-bold text-white mt-1">Calificación en Google Maps</p>
+                <p className="text-[11px] text-slate-400 mt-1">Pierdes clientes ante competidores mejor calificados en la zona.</p>
+              </div>
+              <div className="p-5 rounded-2xl bg-[#141A28] border border-rose-500/20">
+                <p className="text-2xl font-mono font-black text-rose-400">Público</p>
+                <p className="text-xs font-bold text-white mt-1">Desahogo de Quejas</p>
+                <p className="text-[11px] text-slate-400 mt-1">Las inconformidades terminan en internet y quedan para siempre.</p>
+              </div>
+              <div className="p-5 rounded-2xl bg-[#141A28] border border-rose-500/20">
+                <p className="text-2xl font-mono font-black text-rose-400">0 Datos</p>
+                <p className="text-xs font-bold text-white mt-1">Base de Clientes</p>
+                <p className="text-[11px] text-slate-400 mt-1">Atiendes cientos de comensales pero no puedes contactarlos después.</p>
+              </div>
+              <div className="p-5 rounded-2xl bg-[#141A28] border border-rose-500/20">
+                <p className="text-2xl font-mono font-black text-rose-400">A Ciegas</p>
+                <p className="text-xs font-bold text-white mt-1">Auditoría del Personal</p>
+                <p className="text-[11px] text-slate-400 mt-1">No sabes qué mesero o empleado está tratando mal a tus clientes.</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-emerald-950/25 via-[#0E1322] to-[#0A0D18] border-2 border-emerald-500/40 shadow-2xl animate-fade-in">
+            <div className="flex items-center gap-3 pb-6 border-b border-emerald-500/20">
+              <span className="text-3xl">🏆</span>
+              <div>
+                <h3 className="text-xl font-black text-emerald-400">Estado Blindado (Con Prestigia Enterprise)</h3>
+                <p className="text-xs text-slate-300">Control reputacional absoluto, facturación protegida y base de datos propia.</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+              <div className="p-5 rounded-2xl bg-[#141E30] border border-emerald-500/30">
+                <p className="text-2xl font-mono font-black text-emerald-400">4.9★</p>
+                <p className="text-xs font-bold text-white mt-1">Top 3 en Google Maps</p>
+                <p className="text-[11px] text-slate-300 mt-1">Tu negocio aparece de primero cuando buscan tu comida o servicio.</p>
+              </div>
+              <div className="p-5 rounded-2xl bg-[#141E30] border border-emerald-500/30">
+                <p className="text-2xl font-mono font-black text-emerald-400">100%</p>
+                <p className="text-xs font-bold text-white mt-1">Contención en Privado</p>
+                <p className="text-[11px] text-slate-300 mt-1">Las quejas llegan al gerente en privado antes de salir del local.</p>
+              </div>
+              <div className="p-5 rounded-2xl bg-[#141E30] border border-emerald-500/30">
+                <p className="text-2xl font-mono font-black text-emerald-400">Base Propia</p>
+                <p className="text-xs font-bold text-white mt-1">Sorteos & Habeas Data</p>
+                <p className="text-[11px] text-slate-300 mt-1">Cientos de números de WhatsApp para llenar la agenda cuando quieras.</p>
+              </div>
+              <div className="p-5 rounded-2xl bg-[#141E30] border border-emerald-500/30">
+                <p className="text-2xl font-mono font-black text-emerald-400">En Vivo</p>
+                <p className="text-xs font-bold text-white mt-1">Auditoría del Equipo</p>
+                <p className="text-[11px] text-slate-300 mt-1">Sabes con métricas exactas qué colaborador atiende mejor en cada turno.</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* ============================================================== */}
+      {/* 9. CASOS DE ÉXITO REALES CON RESULTADOS */}
+      {/* ============================================================== */}
+      <section id="testimonios" className="py-20 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-800/80">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
+            Casos de Éxito Comprobados
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
+            Marcas que convirtieron su reputación en ingresos
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-400 mt-2">
+            Métricas reales de clientes activos en nuestra plataforma:
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Caso 1: La Burguesía */}
-          <div className="p-6 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl">
+          <div className="p-7 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl hover:border-amber-500/40 transition">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <span className="text-2xl">🍔</span>
-                <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
                   Gastrobar Gourmet • 2 Sedes
                 </span>
               </div>
               <h3 className="text-base font-bold text-white mt-3">La Burguesía Artesanal</h3>
-              <p className="text-xs text-slate-300 mt-2 italic leading-relaxed">
+              <p className="text-xs text-slate-300 mt-3 italic leading-relaxed">
                 &ldquo;Prestigia interceptó más de 120 quejas privadas en mesa antes de que salieran a Google Maps. Subimos de 3.8★ a 4.9★ en 5 meses y blindamos la facturación de nuestros dos restaurantes.&rdquo;
               </p>
             </div>
-            <div className="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-              <span className="text-slate-400">Carlos Gómez • Titular</span>
+            <div className="mt-6 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <span className="text-slate-400 font-medium">Carlos Gómez • Titular</span>
               <span className="text-emerald-400 font-bold font-mono">4.9★ Google Maps</span>
             </div>
           </div>
 
           {/* Caso 2: Dr. Carlos Mendoza */}
-          <div className="p-6 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl">
+          <div className="p-7 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl hover:border-blue-500/40 transition">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <span className="text-2xl">🦷</span>
-                <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
+                <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-500/20">
                   Salud & Consulta Especializada
                 </span>
               </div>
               <h3 className="text-base font-bold text-white mt-3">Dr. Carlos Mendoza</h3>
-              <p className="text-xs text-slate-300 mt-2 italic leading-relaxed">
+              <p className="text-xs text-slate-300 mt-3 italic leading-relaxed">
                 &ldquo;En el sector salud una mala reseña es letal para conseguir nuevos pacientes. Con el Smart QR en recepción mis pacientes satisfechos me dejan 5 estrellas y tripliqué las citas agendadas.&rdquo;
               </p>
             </div>
-            <div className="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-              <span className="text-slate-400">Dr. Carlos Mendoza</span>
-              <span className="text-blue-400 font-bold font-mono">+3x Citas Nuevas</span>
+            <div className="mt-6 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <span className="text-slate-400 font-medium">Dr. Carlos Mendoza</span>
+              <span className="text-blue-400 font-bold font-mono">+3.4x Citas Nuevas</span>
             </div>
           </div>
 
           {/* Caso 3: AutoElite */}
-          <div className="p-6 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl">
+          <div className="p-7 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl hover:border-purple-500/40 transition">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <span className="text-2xl">🚗</span>
-                <span className="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+                <span className="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20">
                   Automotriz & Detailing de Lujo
                 </span>
               </div>
               <h3 className="text-base font-bold text-white mt-3">AutoElite Taller & Detailing</h3>
-              <p className="text-xs text-slate-300 mt-2 italic leading-relaxed">
+              <p className="text-xs text-slate-300 mt-3 italic leading-relaxed">
                 &ldquo;El módulo de sorteos y captura con Habeas Data nos permitió crear una base de datos de más de 400 clientes recurrentes. Cada mes llenamos la agenda con promociones directas por WhatsApp.&rdquo;
               </p>
             </div>
-            <div className="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-              <span className="text-slate-400">Mauricio Varela • Gerente</span>
+            <div className="mt-6 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <span className="text-slate-400 font-medium">Mauricio Varela • Gerente</span>
               <span className="text-purple-400 font-bold font-mono">400+ Clientes en Base</span>
             </div>
           </div>
@@ -605,15 +1226,15 @@ export default function HomePage() {
       </section>
 
       {/* ============================================================== */}
-      {/* 8. MODELO A LA MEDIDA: CERO PRECIOS PÚBLICOS, TRATO EXCLUSIVO */}
+      {/* 10. MODELO A LA MEDIDA: CERO PRECIOS PÚBLICOS, TRATO EXCLUSIVO */}
       {/* ============================================================== */}
-      <section id="a-medida" className="py-20 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-800/80">
+      <section id="propuesta" className="py-20 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 px-3.5 py-1 rounded-full border border-amber-500/20">
-            Consultoría & Traje a la Medida
+            Consultoría Estratégica
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            No vendemos software de catálogo. Diseñamos una solución para tu negocio.
+            No vendemos software de caja. Diseñamos el plan para tu operación.
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">
             Cada empresa tiene un volumen de clientes, un número de sedes y una dinámica diferente. Hablaremos directamente contigo en una sesión estratégica para estructurar el plan que mejor se ajuste a tu operación y presupuesto.
@@ -677,7 +1298,7 @@ export default function HomePage() {
                 setLeadForm((prev) => ({ ...prev, branchCount: '2-3' }));
                 trackAction('click_cotizar_alto_rendimiento');
               }}
-              className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs text-center shadow-lg shadow-amber-500/20 transition active:scale-95 block cursor-pointer"
+              className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs text-center shadow-lg shadow-amber-500/20 transition active:scale-95 block cursor-pointer animate-shimmer"
             >
               Agendar Sesión Estratégica VIP
             </a>
@@ -732,7 +1353,57 @@ export default function HomePage() {
       </section>
 
       {/* ============================================================== */}
-      {/* 9. FORMULARIO DE AGENDAMIENTO DE LLAMADA ESTRATÉGICA VIP */}
+      {/* 11. ACORDEÓN INTERACTIVO DE PREGUNTAS FRECUENTES (FAQ) */}
+      {/* ============================================================== */}
+      <section className="py-20 px-4 sm:px-8 max-w-4xl mx-auto border-t border-slate-800/80">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3.5 py-1 rounded-full border border-indigo-500/20">
+            Dudas Resueltas
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
+            Preguntas Frecuentes
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-400 mt-2">
+            Todo lo que necesitas saber antes de iniciar con Prestigia:
+          </p>
+        </div>
+
+        <div className="space-y-3.5">
+          {FAQS.map((faq, index) => {
+            const isOpen = openFaqIndex === index;
+            return (
+              <div
+                key={index}
+                className="rounded-2xl bg-[#0D1322] border border-slate-800 transition-all overflow-hidden"
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenFaqIndex(isOpen ? null : index)}
+                  className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-white hover:text-amber-400 transition cursor-pointer"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <HelpCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                    {faq.q}
+                  </span>
+                  <ChevronDown
+                    className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${
+                      isOpen ? 'rotate-180 text-amber-400' : ''
+                    }`}
+                  />
+                </button>
+                {isOpen && (
+                  <div className="px-5 pb-5 pt-1 text-xs text-slate-300 leading-relaxed border-t border-slate-800/60 animate-fade-in">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ============================================================== */}
+      {/* 12. FORMULARIO DE AGENDAMIENTO DE LLAMADA ESTRATÉGICA VIP */}
       {/* ============================================================== */}
       <section id="agendar" className="py-20 px-4 sm:px-8 max-w-4xl mx-auto border-t border-slate-800/80">
         <div className="bg-gradient-to-br from-[#101728] via-[#0E1322] to-[#0A0E18] border-2 border-amber-500/40 rounded-3xl p-7 sm:p-12 shadow-2xl relative overflow-hidden">
@@ -768,7 +1439,7 @@ export default function HomePage() {
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition shadow-lg shadow-emerald-500/20 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition shadow-lg shadow-emerald-500/25 cursor-pointer"
                 >
                   <MessageCircle className="w-4 h-4" />
                   <span>Confirmar por WhatsApp Inmediato</span>
@@ -929,7 +1600,7 @@ export default function HomePage() {
                 <button
                   type="submit"
                   disabled={submittingLead}
-                  className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 transition active:scale-98 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 transition active:scale-98 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 animate-shimmer"
                 >
                   {submittingLead ? (
                     <span>Agendando sesión estratégica...</span>
@@ -952,7 +1623,7 @@ export default function HomePage() {
       </section>
 
       {/* ============================================================== */}
-      {/* 10. FOOTER CORPORATIVO */}
+      {/* 13. FOOTER CORPORATIVO */}
       {/* ============================================================== */}
       <footer className="border-t border-slate-800/80 py-12 px-4 sm:px-8 bg-[#05070B] text-slate-400 text-xs">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
