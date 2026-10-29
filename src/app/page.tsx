@@ -37,8 +37,6 @@ import {
   Sliders,
   DollarSign,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   X,
   Smartphone,
   Flame,
