@@ -1,29 +1,5 @@
 const nextConfig = {
   reactStrictMode: true,
-  async redirects() {
-    return [
-      {
-        source: '/propuesta',
-        destination: '/#planes',
-        permanent: false,
-      },
-      {
-        source: '/propuesta-servicios',
-        destination: '/#planes',
-        permanent: false,
-      },
-      {
-        source: '/propuesta-internacional',
-        destination: '/#planes',
-        permanent: false,
-      },
-      {
-        source: '/proposal-en',
-        destination: '/#planes',
-        permanent: false,
-      },
-    ];
-  },
   async headers() {
     return [
       {
