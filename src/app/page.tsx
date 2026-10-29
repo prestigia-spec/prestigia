@@ -1186,6 +1186,41 @@ export default function HomePage() {
       )}
 
       {/* ============================================================== */}
+      {/* 4.1. FLOATING WHATSAPP SUPPORT BUTTON (BOTTOM-RIGHT) */}
+      {/* ============================================================== */}
+      <aside aria-label={isEn ? 'Direct WhatsApp Support' : 'Soporte Directo de WhatsApp'}>
+        <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 flex items-center">
+          <a
+            href={`https://wa.me/573058314049?text=${encodeURIComponent(
+              isEn
+                ? 'Hello Prestigia, I would like to consult with an advisor about the reputation protection system.'
+                : 'Hola Prestigia, me gustaría consultar con un asesor sobre el sistema de blindaje de reputación.'
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackAction('click_floating_whatsapp')}
+            className="group relative flex items-center gap-2.5 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold shadow-2xl shadow-emerald-500/50 hover:shadow-emerald-500/70 border border-emerald-300/40 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+            aria-label={isEn ? 'Direct WhatsApp Support' : 'Soporte y Asesoría WhatsApp'}
+            title={isEn ? 'Chat with an advisor on WhatsApp' : 'Hablar con un asesor en WhatsApp'}
+          >
+            <div className="relative flex items-center justify-center">
+              <span className="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-white opacity-40"></span>
+              <MessageCircle className="w-5 h-5 text-white fill-white/20 shrink-0 relative" />
+            </div>
+            <div className="flex flex-col text-left leading-tight pr-0.5">
+              <span className="text-[10px] text-emerald-100 font-semibold uppercase tracking-wider flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span>
+                {isEn ? 'Live Advisor' : 'Asesor en línea'}
+              </span>
+              <span className="text-xs font-black text-white whitespace-nowrap">
+                WhatsApp
+              </span>
+            </div>
+          </a>
+        </div>
+      </aside>
+
+      {/* ============================================================== */}
       {/* 5. CÓMO FUNCIONA EL EMBUDO BIFURCADO DE DOS VÍAS */}
       {/* ============================================================== */}
       <section id="como-funciona" className="scroll-mt-32 py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
