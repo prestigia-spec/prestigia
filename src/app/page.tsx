@@ -821,16 +821,16 @@ export default function HomePage() {
               </div>
             </Link>
 
-            {/* Navigation Links with adaptive breathing room */}
+            {/* Navigation Links in Exact Sequential Order of the Landing Page */}
             <nav className="hidden xl:flex items-center gap-3.5 2xl:gap-6 text-[11px] 2xl:text-xs font-semibold text-slate-300">
-              <a href="#como-funciona" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.howItWorks}</a>
               <a href="#simulador" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.simulator}</a>
-              <a href="#calculadora-roi" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.roiCalc}</a>
-              <a href="#tour-sistema" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.systemTour}</a>
+              <a href="#como-funciona" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.howItWorks}</a>
               <a href="#auditor-preview" className="hover:text-cyan-300 transition whitespace-nowrap text-cyan-400 flex items-center gap-1 font-bold">
                 <Search className="w-3 h-3 text-cyan-400" />
                 <span>{t.nav.auditor}</span>
               </a>
+              <a href="#calculadora-roi" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.roiCalc}</a>
+              <a href="#tour-sistema" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.systemTour}</a>
               <a href="#planes" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.plans}</a>
               <Link
                 href="/dossier"
