@@ -1285,12 +1285,10 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <Link
-                  href="/auditor"
-                  className="w-full py-3 rounded-xl bg-cyan-600/20 hover:bg-cyan-600/30 border border-cyan-500/40 text-cyan-300 font-bold text-xs flex items-center justify-center gap-2 transition"
-                >
-                  <span>Probar tu propio local en el Auditor ↗</span>
-                </Link>
+                <div className="p-2.5 rounded-xl bg-slate-900/60 border border-cyan-500/20 flex items-center justify-center gap-2 text-[11px] text-cyan-300/80 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Simulación de diagnóstico con Google Places API</span>
+                </div>
               </div>
             </div>
           </div>
