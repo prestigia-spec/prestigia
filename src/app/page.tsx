@@ -49,6 +49,7 @@ import {
   Rocket,
 } from 'lucide-react';
 import { PRESTIGIA_NICHES } from '@/lib/types';
+import { LANDING_TRANSLATIONS, type LandingLang } from '@/lib/landing-translations';
 
 // Live Social Proof Notification Feed Data
 const LIVE_TICKER_ITEMS = [
@@ -557,6 +558,28 @@ export default function HomePage() {
   // Testimonials Infinite Carousel Glide Pause on Touch / Interaction
   const [isGlidePaused, setIsGlidePaused] = useState(false);
 
+  // Bilingual Language State with LocalStorage Persistence
+  const [lang, setLang] = useState<LandingLang>('es');
+
+  useEffect(() => {
+    try {
+      const savedLang = localStorage.getItem('prestigia_landing_lang') as LandingLang | null;
+      if (savedLang === 'es' || savedLang === 'en') {
+        setLang(savedLang);
+      }
+    } catch {}
+  }, []);
+
+  const handleLanguageChange = (newLang: LandingLang) => {
+    setLang(newLang);
+    try {
+      localStorage.setItem('prestigia_landing_lang', newLang);
+    } catch {}
+    trackAction(`lang_switch_${newLang}`);
+  };
+
+  const t = LANDING_TRANSLATIONS[lang];
+
   // Realistic Social Proof Timing (Shows 6s, then hides and waits 18s between toasts)
   useEffect(() => {
     if (tickerDismissed) return;
@@ -719,18 +742,38 @@ export default function HomePage() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
             <span className="text-emerald-400 font-bold uppercase tracking-wider text-[10px] sm:text-[11px] shrink-0">
-              SISTEMA OPERANDO EN VIVO
+              {t.topBar.liveStatus}
             </span>
             <span className="text-slate-600 hidden sm:inline">•</span>
             <span className="text-slate-400 truncate hidden sm:inline">
-              28 Sedes Blindadas • LATAM, USA & Europa • Filtro Google Maps Activo
+              {t.topBar.coverage}
             </span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] font-mono shrink-0">
+          <div className="flex items-center gap-3.5 text-[11px] font-mono shrink-0">
+            {/* Bilingual Language Switcher Toggle */}
+            <div className="flex items-center bg-slate-900 border border-slate-700/80 rounded-xl p-0.5 text-[10px] font-bold">
+              <button
+                type="button"
+                onClick={() => handleLanguageChange('es')}
+                className={`px-2 py-0.5 rounded-lg transition cursor-pointer ${lang === 'es' ? 'bg-amber-500 text-slate-950 font-black shadow' : 'text-slate-400 hover:text-white'}`}
+                title="Cambiar a Español"
+              >
+                🇪🇸 ES
+              </button>
+              <button
+                type="button"
+                onClick={() => handleLanguageChange('en')}
+                className={`px-2 py-0.5 rounded-lg transition cursor-pointer ${lang === 'en' ? 'bg-amber-500 text-slate-950 font-black shadow' : 'text-slate-400 hover:text-white'}`}
+                title="Switch to English"
+              >
+                🇺🇸 EN
+              </button>
+            </div>
+
             <span className="text-amber-400 font-bold flex items-center gap-1">
               <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span>4.93 Calificación</span>
+              <span>{t.topBar.rating}</span>
             </span>
             <a
               href="https://wa.me/573058314049?text=Hola%20Prestigia,%20me%20gustar%C3%ADa%20consultar%20sobre%20el%20blindaje%20comercial"
@@ -739,7 +782,7 @@ export default function HomePage() {
               className="text-slate-400 hover:text-white transition hidden md:flex items-center gap-1.5"
             >
               <Phone className="w-3 h-3 text-emerald-400" />
-              <span>Soporte VIP</span>
+              <span>{t.topBar.support}</span>
             </a>
           </div>
         </div>
@@ -767,15 +810,22 @@ export default function HomePage() {
 
           {/* Navigation Links with adaptive breathing room */}
           <nav className="hidden xl:flex items-center gap-3.5 2xl:gap-6 text-[11px] 2xl:text-xs font-semibold text-slate-300">
-            <a href="#como-funciona" className="hover:text-amber-400 transition whitespace-nowrap">Cómo Funciona</a>
-            <a href="#simulador" className="hover:text-amber-400 transition whitespace-nowrap">Simulador</a>
-            <a href="#calculadora-roi" className="hover:text-amber-400 transition whitespace-nowrap">Calculadora ROI</a>
-            <a href="#tour-sistema" className="hover:text-amber-400 transition whitespace-nowrap">Tour del Sistema</a>
+            <a href="#como-funciona" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.howItWorks}</a>
+            <a href="#simulador" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.simulator}</a>
+            <a href="#calculadora-roi" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.roiCalc}</a>
+            <a href="#tour-sistema" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.systemTour}</a>
             <a href="#auditor-preview" className="hover:text-cyan-300 transition whitespace-nowrap text-cyan-400 flex items-center gap-1 font-bold">
               <Search className="w-3 h-3 text-cyan-400" />
-              <span>Auditor</span>
+              <span>{t.nav.auditor}</span>
             </a>
-            <a href="#planes" className="hover:text-amber-400 transition whitespace-nowrap">Planes a Medida</a>
+            <a href="#planes" className="hover:text-amber-400 transition whitespace-nowrap">{t.nav.plans}</a>
+            <Link
+              href="/dossier"
+              className="hover:text-amber-300 transition whitespace-nowrap text-amber-400/90 flex items-center gap-1 font-bold"
+            >
+              <FileSpreadsheet className="w-3 h-3 text-amber-400" />
+              <span>{t.nav.dossier}</span>
+            </Link>
           </nav>
 
           {/* Action CTAs */}
@@ -786,8 +836,8 @@ export default function HomePage() {
               className="px-3 sm:px-4 py-2 rounded-xl bg-cyan-950/70 hover:bg-cyan-900 text-cyan-300 font-bold text-xs border border-cyan-500/40 transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
             >
               <Search className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden sm:inline">Auditar Negocio</span>
-              <span className="sm:hidden">Auditor</span>
+              <span className="hidden sm:inline">{t.nav.auditBusiness}</span>
+              <span className="sm:hidden">{t.nav.auditor}</span>
             </Link>
 
             <Link
@@ -796,7 +846,7 @@ export default function HomePage() {
               className="px-3 sm:px-4 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
             >
               <Lock className="w-3.5 h-3.5 text-indigo-400" />
-              <span className="hidden sm:inline">Portal Clientes</span>
+              <span className="hidden sm:inline">{t.nav.clientPortal}</span>
               <span className="sm:hidden">Portal</span>
             </Link>
 
@@ -806,7 +856,7 @@ export default function HomePage() {
               className="px-3.5 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/25 active:scale-95 cursor-pointer flex items-center gap-1.5 animate-shimmer whitespace-nowrap"
             >
               <Calendar className="w-3.5 h-3.5" />
-              <span>Agendar Llamada VIP</span>
+              <span>{t.nav.bookCall}</span>
             </a>
           </div>
         </div>
@@ -2070,25 +2120,34 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Corporate Peace of Mind Banner */}
+        {/* Corporate Peace of Mind Banner (Dossier & ROI Commitment) */}
         <div className="mt-12 p-6 rounded-3xl bg-slate-900/60 border border-slate-800 max-w-[1300px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0">
               <HeartHandshake className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-white text-xs font-bold">Compromiso de Retorno de Inversión Prestigia</p>
-              <p className="text-[11px] text-slate-400">Pactamos tarifas justas y personalizadas en sesión privada. Prestigia se paga sola desde el primer mes evitando fugas de clientes.</p>
+              <p className="text-white text-xs font-bold">{t.plans.roiBannerTitle}</p>
+              <p className="text-[11px] text-slate-400">{t.plans.roiBannerDesc}</p>
             </div>
           </div>
-          <div className="shrink-0 flex items-center gap-2">
+          <div className="shrink-0 flex flex-wrap items-center justify-center gap-2.5">
             <Link
-              href="/auditor"
-              className="px-4 py-2 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 text-cyan-300 border border-cyan-500/40 text-xs font-bold transition flex items-center gap-1.5"
+              href="/dossier"
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/30 hover:from-amber-500/30 hover:to-amber-600/40 text-amber-300 border border-amber-500/50 text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-amber-500/10 cursor-pointer active:scale-95"
             >
-              <Search className="w-3.5 h-3.5" />
-              <span>Ver Auditor en Vivo</span>
+              <FileSpreadsheet className="w-4 h-4 text-amber-400" />
+              <span>{t.plans.dossierBtn}</span>
             </Link>
+            <a
+              href="https://wa.me/573058314049?text=Hola%20Prestigia,%20solicito%20el%20Dossier%20Ejecutivo%20y%20cotizaci%C3%B3n%20personalizada"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+            >
+              <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{t.plans.whatsappBtn}</span>
+            </a>
           </div>
         </div>
       </section>
