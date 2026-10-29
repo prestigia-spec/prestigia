@@ -33,6 +33,7 @@ import {
   Database,
   Brain,
   Tv,
+  Mail,
 } from 'lucide-react';
 import { PRESTIGIA_NICHES } from '@/lib/types';
 
@@ -976,6 +977,13 @@ export default function HomePage() {
             >
               <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
               <span>Atención Directa WhatsApp</span>
+            </a>
+            <a
+              href="mailto:prestigiaprincipal@gmail.com"
+              className="text-slate-300 hover:text-white transition flex items-center gap-1.5 font-semibold"
+            >
+              <Mail className="w-3.5 h-3.5 text-blue-400" />
+              <span>prestigiaprincipal@gmail.com</span>
             </a>
             <span className="text-slate-700 hidden sm:inline">|</span>
             <span className="text-slate-500 font-medium">Colombia • México • Chile • Estados Unidos • España</span>

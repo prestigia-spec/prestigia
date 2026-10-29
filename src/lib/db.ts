@@ -668,7 +668,7 @@ export async function getMasterSecuritySettings(): Promise<MasterSecurityConfig>
     db.masterSecurity = {
       masterKey: 'PRESTIGIA-MASTER-2026',
       emergencyPhone: '+57 305 831 4049',
-      emergencyEmail: 'info@prestigia.app',
+      emergencyEmail: 'prestigiaprincipal@gmail.com',
       totpSecret: 'JBSWY3DPEHPK3PXP',
       twoFactorEnabled: false,
       updatedAt: new Date().toISOString(),

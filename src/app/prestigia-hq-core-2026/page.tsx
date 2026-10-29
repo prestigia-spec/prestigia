@@ -728,8 +728,8 @@ export default function MasterAdminPage() {
 
   // Emergency SOS Dynamic Key State (Zero-Trust)
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
-  const [emergencyPhone, setEmergencyPhone] = useState('+57 317 260 6093');
-  const [emergencyEmail, setEmergencyEmail] = useState('info@prestigia.app');
+  const [emergencyPhone, setEmergencyPhone] = useState('+57 305 831 4049');
+  const [emergencyEmail, setEmergencyEmail] = useState('prestigiaprincipal@gmail.com');
   const [emergencyOtpSent, setEmergencyOtpSent] = useState(false);
   const [emergencyOtpInput, setEmergencyOtpInput] = useState('');
   const [showEmergencyOtp, setShowEmergencyOtp] = useState(false);
@@ -742,8 +742,8 @@ export default function MasterAdminPage() {
     currentMasterKey: '',
     newMasterKey: '',
     confirmNewMasterKey: '',
-    newEmergencyPhone: '+57 317 260 6093',
-    newEmergencyEmail: 'info@prestigia.app',
+    newEmergencyPhone: '+57 305 831 4049',
+    newEmergencyEmail: 'prestigiaprincipal@gmail.com',
     newTotpSecret: 'JBSWY3DPEHPK3PXP',
     twoFactorEnabled: false,
     resendApiKey: '',
@@ -775,8 +775,8 @@ export default function MasterAdminPage() {
     maskedPhone?: string;
     maskedEmail?: string;
   }>({
-    emergencyPhone: '+57 317 260 6093',
-    emergencyEmail: 'info@prestigia.app',
+    emergencyPhone: '+57 305 831 4049',
+    emergencyEmail: 'prestigiaprincipal@gmail.com',
     twoFactorEnabled: false,
     totpSecret: 'JBSWY3DPEHPK3PXP',
   });
@@ -9964,7 +9964,7 @@ Quedamos atentos a la confirmación o recepción de tu soporte de pago para mant
                           required
                           value={securityForm.newEmergencyEmail}
                           onChange={(e) => setSecurityForm({ ...securityForm, newEmergencyEmail: e.target.value })}
-                          placeholder="luisma0603@gmail.com"
+                          placeholder="prestigiaprincipal@gmail.com"
                           className="w-full bg-[#141A26] border border-slate-700 text-white rounded-xl px-3.5 py-2 outline-none focus:border-amber-400"
                         />
                         <p className="text-[10px] text-slate-400 mt-1">Copia de auditoría para eventos críticos.</p>

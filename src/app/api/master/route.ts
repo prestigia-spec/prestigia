@@ -483,8 +483,8 @@ export async function POST(request: NextRequest) {
 
     // 1. Dispatch Emergency OTP (Out-of-band to WhatsApp and Email)
     if (action === 'request_emergency_otp') {
-      const targetPhone = body.phone || currentSec.emergencyPhone || '+57 317 260 6093';
-      const targetEmail = body.email || currentSec.emergencyEmail || 'info@prestigia.app';
+      const targetPhone = body.phone || currentSec.emergencyPhone || '+57 305 831 4049';
+      const targetEmail = body.email || currentSec.emergencyEmail || 'prestigiaprincipal@gmail.com';
 
       // Generate high-entropy 6-digit OTP
       const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -526,8 +526,8 @@ export async function POST(request: NextRequest) {
 
     // 1.5 Test Notification Gateway Dispatch (Live Connectivity Test)
     if (action === 'test_notification_dispatch') {
-      const targetEmail = body.email || currentSec.emergencyEmail || 'luisma0603@gmail.com';
-      const targetPhone = body.phone || currentSec.emergencyPhone || '+57 317 260 6093';
+      const targetEmail = body.email || currentSec.emergencyEmail || 'prestigiaprincipal@gmail.com';
+      const targetPhone = body.phone || currentSec.emergencyPhone || '+57 305 831 4049';
 
       const dispatchResult = await dispatchEmergencyOtpNotification({
         toEmail: targetEmail,
