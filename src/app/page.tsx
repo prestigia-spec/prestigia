@@ -181,7 +181,7 @@ const FAQS = [
   },
   {
     q: '¿Cómo funciona la contención de quejas de 1 a 3 estrellas?',
-    a: 'Cuando un cliente insatisfecho presiona 1, 2 o 3 estrellas, el sistema oculta el enlace a Google Maps y abre una interfaz confidencial y cordial de atención al cliente. La inconformidad se envía inmediatamente al WhatsApp o correo del gerente de turno para que pueda intervenir y resolver el problema en sala antes de que el cliente se marche.',
+    a: 'Cuando un cliente insatisfecho presiona 1, 2 o 3 estrellas, el sistema oculta el enlace a Google Maps y abre una interfaz confidencial de atención al cliente. La queja entra inmediatamente al Portal Clientes en la Central de Contención, con alerta visual y sonora en tiempo real. Esto evita saturar teléfonos personales o correos, centraliza la trazabilidad en un solo lugar y permite al equipo gestionar y resolver la inconformidad con auditoría completa.',
   },
   {
     q: '¿Puedo conectar varias sedes o franquicias en un mismo panel?',
@@ -865,11 +865,11 @@ export default function HomePage() {
                           <span>Blindaje Activo: Google Maps Oculto</span>
                         </div>
                         <p className="text-[10px] text-slate-300 leading-tight">
-                          El cliente expresa su molestia <strong>en privado</strong>. Te llega una alerta al WhatsApp para arreglarlo en sala.
+                          El cliente expresa su molestia <strong>en privado</strong>. La queja ingresa de inmediato al <strong>Portal Clientes</strong>, sin saturar teléfonos ni correos.
                         </p>
                         {privateCommentSent ? (
                           <div className="p-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] text-center font-bold">
-                            ✅ Notificación enviada al Administrador de Turno.
+                            ✅ Incidente registrado en vivo en el Portal Clientes.
                           </div>
                         ) : (
                           <div className="space-y-1.5">
@@ -1029,13 +1029,13 @@ export default function HomePage() {
             <h3 className="text-xl font-bold text-white mt-2">2. Bloqueo Preventivo & Contención en Sala</h3>
             <p className="text-xs sm:text-sm text-slate-300 mt-3 leading-relaxed">
               <strong>Google Maps jamás se abre.</strong> El cliente inconforme encuentra una ventana de desahogo privado para expresar su queja. 
-              El sistema notifica al instante al administrador de turno vía WhatsApp para resolver el inconveniente antes de que el cliente salga del local.
+              El sistema canaliza la inconformidad directamente hacia el <strong>Portal Clientes</strong> en tiempo real, evitando saturar teléfonos o bandejas de correo y permitiendo una resolución organizada con trazabilidad.
             </p>
 
             <div className="mt-6 pt-4 border-t border-slate-800/80 space-y-2 text-xs text-rose-400 font-semibold">
               <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> 0% Daño público a la calificación de la empresa</div>
-              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Alerta sonora inmediata al celular del encargado de turno</div>
-              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Transformación de clientes molestos en embajadores fieles</div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Alerta en vivo y ticket en el Portal Clientes para resolución centralizada</div>
+              <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Cero saturación de WhatsApps o correos personales</div>
             </div>
           </div>
         </div>
