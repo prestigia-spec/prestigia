@@ -372,7 +372,7 @@ export default function HomePage() {
             </span>
             <span className="text-slate-600 hidden sm:inline">•</span>
             <span className="text-slate-400 truncate hidden sm:inline">
-              10 Sedes Blindadas • Filtro Inteligente de Reseñas Google Maps Activo en Tiempo Real
+              28 Sedes Blindadas • LATAM, USA & Europa • Filtro Inteligente de Reseñas Google Maps Activo en Tiempo Real
             </span>
           </div>
 
@@ -530,7 +530,7 @@ export default function HomePage() {
                 <span className="w-8 h-8 rounded-full bg-emerald-500/20 border-2 border-slate-900 flex items-center justify-center text-xs">💇</span>
               </div>
               <p>
-                Respaldado por más de <strong className="text-white">10 sedes comerciales</strong> activas en Colombia y Latinoamérica.
+                Respaldado por más de <strong className="text-white">28 sedes comerciales</strong> activas en LATAM, USA y Europa.
               </p>
             </div>
           </div>
