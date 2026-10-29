@@ -1393,29 +1393,16 @@ export default function HomePage() {
       {/* 9. CASOS DE ÉXITO REALES CON RESULTADOS (CARRUSEL INTERACTIVO INTERNACIONAL) */}
       {/* ============================================================== */}
       <section id="testimonios" className="py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-          <div className="max-w-3xl text-left">
-            <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
-              Casos de Éxito Internacionales
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-              Marcas que transformaron su reputación en facturación
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-2">
-              Resultados certificados en más de 28 sedes activas en Latinoamérica, Estados Unidos y Europa:
-            </p>
-          </div>
-
-          {/* Interactive Pause Hint */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-[#0D1424] border border-slate-800 text-xs text-slate-300 shadow-md self-start md:self-auto">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="font-semibold text-slate-300 text-[11px] sm:text-xs">
-              Pase continuo automático • Pasa el cursor para pausar la lectura
-            </span>
-          </div>
+        <div className="max-w-3xl text-left mb-10">
+          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
+            Casos de Éxito Internacionales
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
+            Marcas que transformaron su reputación en facturación
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-400 mt-2">
+            Resultados certificados en más de 28 sedes activas en Latinoamérica, Estados Unidos y Europa:
+          </p>
         </div>
 
         {/* Carousel Infinite Cyclic Marquee Track */}
