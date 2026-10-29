@@ -419,9 +419,10 @@ export default function HomePage() {
   const [privateComment, setPrivateComment] = useState('');
   const [privateCommentSent, setPrivateCommentSent] = useState(false);
 
-  // Dynamic Ticker State
+  // Dynamic Ticker State with Natural Waiting Interval
   const [tickerIndex, setTickerIndex] = useState(0);
-  const [showTicker, setShowTicker] = useState(true);
+  const [isTickerVisible, setIsTickerVisible] = useState(false);
+  const [tickerDismissed, setTickerDismissed] = useState(false);
 
   // Niche Selector Tab State
   const [activeNicheId, setActiveNicheId] = useState('gastronomia');
@@ -440,13 +441,38 @@ export default function HomePage() {
   // FAQ Accordion State
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
-  // Automatic cycle for Live Social Proof Ticker
+  // Realistic Social Proof Timing (Shows 6s, then hides and waits 18s between toasts)
   useEffect(() => {
-    const timer = setInterval(() => {
+    if (tickerDismissed) return;
+
+    let hideTimeout: NodeJS.Timeout;
+    let showTimeout: NodeJS.Timeout;
+
+    // Show initial toast after 4 seconds of reading
+    showTimeout = setTimeout(() => {
+      setIsTickerVisible(true);
+      hideTimeout = setTimeout(() => {
+        setIsTickerVisible(false);
+      }, 6000);
+    }, 4000);
+
+    // Periodic interval: repeats every 24s (6s visible + 18s pause)
+    const cycleInterval = setInterval(() => {
+      if (tickerDismissed) return;
       setTickerIndex((prev) => (prev + 1) % LIVE_TICKER_ITEMS.length);
-    }, 5500);
-    return () => clearInterval(timer);
-  }, []);
+      setIsTickerVisible(true);
+
+      hideTimeout = setTimeout(() => {
+        setIsTickerVisible(false);
+      }, 6000);
+    }, 24000);
+
+    return () => {
+      clearTimeout(showTimeout);
+      clearTimeout(hideTimeout);
+      clearInterval(cycleInterval);
+    };
+  }, [tickerDismissed]);
 
   // Silent Analytics Tracking on Load
   useEffect(() => {
@@ -923,8 +949,14 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 4. FLOATING LIVE SOCIAL PROOF TICKER (BOTTOM-LEFT TOAST) */}
       {/* ============================================================== */}
-      {showTicker && (
-        <div className="fixed bottom-5 left-5 z-50 max-w-sm bg-[#0E1322]/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-3.5 shadow-2xl transition-all transform animate-fade-in">
+      {!tickerDismissed && (
+        <div
+          className={`fixed bottom-5 left-5 z-50 max-w-sm bg-[#0E1322]/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-3.5 shadow-2xl transition-all duration-700 transform ${
+            isTickerVisible
+              ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+              : 'opacity-0 translate-y-6 scale-95 pointer-events-none'
+          }`}
+        >
           <div className="flex items-start gap-3">
             <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-lg shrink-0">
               {currentTicker.icon}
@@ -945,8 +977,9 @@ export default function HomePage() {
             </div>
             <button
               type="button"
-              onClick={() => setShowTicker(false)}
-              className="text-slate-500 hover:text-slate-300 transition cursor-pointer"
+              onClick={() => setTickerDismissed(true)}
+              className="text-slate-500 hover:text-slate-300 transition cursor-pointer p-0.5"
+              aria-label="Cerrar notificación"
             >
               <X className="w-4 h-4" />
             </button>
