@@ -430,9 +430,9 @@ export default function DossierOficialPage() {
               : 'Prestigia opera bajo un modelo de consultoría estratégica sin tarifas genéricas rígidas. Analizamos el número de sedes físicas, volumen de clientes mensuales y nivel de soporte requerido para estructurar una tarifa que se pague sola desde el primer mes.'}
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 text-xs">
             <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
-              <span className="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Nivel 1</span>
+              <span className="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Nivel 1 • {isEn ? '1 Location' : '1 Sede'}</span>
               <h4 className="font-black text-base text-white">Plan Básico</h4>
               <p className="text-slate-400 text-[11px]">
                 {isEn ? 'Essential protection for single-location venues.' : 'Blindaje esencial para negocios de 1 sola sede.'}
@@ -479,28 +479,54 @@ export default function DossierOficialPage() {
               </ul>
             </div>
 
-            <div className="p-4 rounded-2xl bg-amber-950/20 border-2 border-amber-500/40 space-y-3">
-              <span className="text-[10px] font-mono uppercase text-amber-400 tracking-wider">Nivel 3 • {isEn ? 'Enterprise' : 'Multisede'}</span>
+            <div className="p-4 rounded-2xl bg-purple-950/20 border-2 border-purple-500/40 space-y-3">
+              <span className="text-[10px] font-mono uppercase text-purple-400 tracking-wider">Nivel 3 • {isEn ? 'Up to 3 Venues' : 'Hasta 3 Sedes'}</span>
               <h4 className="font-black text-base text-white">Plan Élite</h4>
               <p className="text-slate-400 text-[11px]">
-                {isEn ? 'Franchises, multi-branch holdings, and TV displays.' : 'Cadenas, holdings multisede y TV en salón.'}
+                {isEn ? 'Multi-branch brands with TV displays.' : 'Marcas multisede con TV en salón.'}
               </p>
               <ul className="space-y-1.5 text-slate-300 text-[11px]">
                 <li className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                   <span>{isEn ? 'All features from Pro' : 'Todo lo incluido en Plan Pro'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span>{isEn ? 'Central multi-branch management' : 'Conmutador multisede centralizado'}</span>
+                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                  <span>{isEn ? 'Central multi-branch switcher (1-3)' : 'Conmutador multisede (1 a 3 sedes)'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                   <span>{isEn ? 'Live TV Wallboard mode for screens' : 'Modo TV Wallboard para pantallas'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span>{isEn ? 'Dedicated priority growth engineer' : 'Ingeniero de crecimiento dedicado'}</span>
+                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                  <span>{isEn ? 'Multi-winner VIP giveaways' : 'Sorteos VIP multi-ganador'}</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-cyan-950/20 border-2 border-cyan-500/40 space-y-3">
+              <span className="text-[10px] font-mono uppercase text-cyan-400 tracking-wider">Nivel 4 • {isEn ? 'Enterprise Unlimited' : 'Holding Ilimitado'}</span>
+              <h4 className="font-black text-base text-white">Plan Empresarial</h4>
+              <p className="text-slate-400 text-[11px]">
+                {isEn ? 'Franchises, nationwide holdings, and API integration.' : 'Franquicias, holdings nacionales y API dedicada.'}
+              </p>
+              <ul className="space-y-1.5 text-slate-300 text-[11px]">
+                <li className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                  <span>{isEn ? 'All features from Élite' : 'Todo lo incluido en Plan Élite'}</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                  <span>{isEn ? 'Unlimited physical branches & venues' : 'Sedes físicas y locales ilimitados'}</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                  <span>{isEn ? 'REST API & Webhooks data stream' : 'Integración vía API REST & Webhooks'}</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                  <span>{isEn ? 'Dedicated Account Manager & 24/7 SLA' : 'Account Manager dedicado & SLA 99.98%'}</span>
                 </li>
               </ul>
             </div>

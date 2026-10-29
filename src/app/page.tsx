@@ -1889,8 +1889,8 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* 3 Main Bespoke Architecture Cards (Zero Public Prices) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1600px] mx-auto items-stretch">
+        {/* 4 Main Bespoke Architecture Cards (Zero Public Prices) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-[1700px] mx-auto items-stretch">
           
           {/* NIVEL 1: PUNTO ÚNICO */}
           <div className="p-7 sm:p-8 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl hover:border-slate-700 transition">
@@ -1960,7 +1960,7 @@ export default function HomePage() {
 
           {/* NIVEL 2: ALTO RENDIMIENTO (MÁS POPULAR) */}
           <div className="p-7 sm:p-8 rounded-3xl bg-gradient-to-b from-[#141E34] via-[#0E1526] to-[#0A0F1D] border-2 border-amber-500 shadow-2xl relative flex flex-col justify-between">
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-lg shadow-amber-500/25">
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-lg shadow-amber-500/25 whitespace-nowrap">
               ⭐ {isEn ? 'MOST POPULAR' : 'MÁS SOLICITADO'}
             </div>
 
@@ -2036,25 +2036,25 @@ export default function HomePage() {
             </a>
           </div>
 
-          {/* NIVEL 3: CADENAS & FRANQUICIAS */}
-          <div className="p-7 sm:p-8 rounded-3xl bg-[#0D1424] border-2 border-purple-500/70 flex flex-col justify-between shadow-2xl relative">
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-wider shadow">
-              👑 {isEn ? 'MULTI-LOCATION POWER' : 'MÁXIMA POTENCIA MULTISEDE'}
+          {/* NIVEL 3: MULTI-SEDES (PLAN ÉLITE) */}
+          <div className="p-7 sm:p-8 rounded-3xl bg-[#0D1424] border-2 border-purple-500/70 flex flex-col justify-between shadow-2xl relative hover:border-purple-400 transition">
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-wider shadow whitespace-nowrap">
+              👑 {isEn ? 'MULTI-LOCATION POWER' : 'POTENCIA MULTISEDE (2-3 SEDES)'}
             </div>
 
             <div className="space-y-4 pt-1">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-purple-400">
-                  {isEn ? 'Multi-Branch & Enterprise Groups' : 'Multi-Sedes & Corporativo'}
+                  {isEn ? 'Multi-Branch Groups (2-3 Venues)' : 'Grupos Multi-Sedes (2-3 Sedes)'}
                 </span>
                 <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">
-                  {isEn ? 'Multi-Location' : 'Multi-Sede'}
+                  {isEn ? 'Up to 3 Venues' : 'Hasta 3 Sedes'}
                 </span>
               </div>
 
               <div>
                 <h3 className="text-2xl font-black text-white">{t.plans.plan3Name}</h3>
-                <span className="text-xs text-purple-400 font-bold block mt-0.5">{isEn ? 'Enterprise Bespoke Architecture' : 'Arquitectura Empresarial a la Medida'}</span>
+                <span className="text-xs text-purple-400 font-bold block mt-0.5">{isEn ? 'Multi-Location Architecture' : 'Arquitectura Multi-Local a la Medida'}</span>
                 <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">
                   {t.plans.plan3Desc}
                 </p>
@@ -2066,7 +2066,7 @@ export default function HomePage() {
               <div className="p-3 rounded-xl bg-purple-950/30 border border-purple-500/30 text-[11px] text-slate-200 space-y-1">
                 <div className="font-bold text-purple-300 flex items-center gap-1.5">
                   <Building2 className="w-3.5 h-3.5 text-purple-400" />
-                  <span>{isEn ? 'Multi-Branch: Unlimited venues with independent shift managers' : 'Multisede: Sedes ilimitadas con administradores independientes'}</span>
+                  <span>{isEn ? 'Multi-Branch: Up to 3 venues with independent shift managers' : 'Multisede: Hasta 3 sedes con administradores independientes'}</span>
                 </div>
               </div>
 
@@ -2093,7 +2093,7 @@ export default function HomePage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                  <span><strong>{isEn ? 'Dedicated Growth Engineer & VIP Onboarding' : 'Asesor ejecutivo dedicado & Onboarding VIP'}</strong></span>
+                  <span>{isEn ? 'Dedicated Growth Engineer & VIP Onboarding' : 'Asesor ejecutivo dedicado & Onboarding VIP'}</span>
                 </li>
               </ul>
             </div>
@@ -2107,6 +2107,80 @@ export default function HomePage() {
               className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs text-center shadow-lg shadow-purple-600/20 transition active:scale-95 block cursor-pointer"
             >
               {t.plans.ctaRequestElite}
+            </a>
+          </div>
+
+          {/* NIVEL 4: HOLDINGS & FRANQUICIAS (PLAN EMPRESARIAL) */}
+          <div className="p-7 sm:p-8 rounded-3xl bg-gradient-to-b from-[#0D1829] via-[#09101C] to-[#060B14] border-2 border-cyan-500/70 flex flex-col justify-between shadow-2xl relative hover:border-cyan-400 transition">
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-lg shadow-cyan-500/30 whitespace-nowrap">
+              🏢 {isEn ? 'UNLIMITED ENTERPRISE' : 'HOLDING CORPORATIVO'}
+            </div>
+
+            <div className="space-y-4 pt-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-400">
+                  {isEn ? 'Chains & National Holdings' : 'Franquicias & Holdings'}
+                </span>
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30">
+                  {isEn ? 'Unlimited Venues' : 'Sedes Ilimitadas'}
+                </span>
+              </div>
+
+              <div>
+                <h3 className="text-2xl font-black text-white">{t.plans.plan4Name}</h3>
+                <span className="text-xs text-cyan-400 font-bold block mt-0.5">{isEn ? 'Enterprise SLA & Infrastructure' : 'Infraestructura & SLA Corporativo'}</span>
+                <p className="text-[11px] text-slate-300 mt-2 leading-relaxed">
+                  {t.plans.plan4Desc}
+                </p>
+                <div className="mt-3 p-2 rounded-xl bg-cyan-950/50 border border-cyan-500/40 text-[10px] text-cyan-300 font-bold">
+                  🎁 <strong>Onboarding & Setup:</strong> {isEn ? '100% INCLUDED with Dedicated Engineer' : '100% BONIFICADO con Ingeniero Dedicado'}
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/30 text-[11px] text-slate-200 space-y-1">
+                <div className="font-bold text-cyan-300 flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>{isEn ? 'Holdings: Unlimited branches & multi-tenant hierarchy' : 'Holding: Sedes ilimitadas y jerarquía multisede'}</span>
+                </div>
+              </div>
+
+              <ul className="space-y-2.5 text-xs text-slate-200 border-t border-slate-800 pt-4">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                  <span><strong>{isEn ? 'Everything in Elite Plan included' : 'Todo lo del Plan Élite incluido'}</strong></span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                  <span><strong>{isEn ? 'Unlimited physical branches & locations' : 'Sedes físicas y locales ilimitados'}</strong></span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                  <span><strong>{isEn ? 'REST API & Webhook data stream integration' : 'Integración vía API REST & Webhooks'}</strong></span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                  <span><strong>{isEn ? 'Custom POS / ERP data sync connection' : 'Sincronización con POS / ERP o CRM de la marca'}</strong></span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                  <span><strong>{isEn ? 'Dedicated Account Manager & 24/7 SLA' : 'Account Manager dedicado & SLA 99.98%'}</strong></span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                  <span>{isEn ? 'Bespoke staff training & in-situ rollout' : 'Capacitación in-situ al equipo operativo'}</span>
+                </li>
+              </ul>
+            </div>
+
+            <a
+              href="#agendar"
+              onClick={() => {
+                setLeadForm((prev) => ({ ...prev, branchCount: '10+' }));
+                trackAction('click_cotizar_empresarial');
+              }}
+              className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs text-center shadow-lg shadow-cyan-500/25 transition active:scale-95 block cursor-pointer"
+            >
+              {t.plans.ctaRequestEnterprise}
             </a>
           </div>
         </div>
