@@ -37,6 +37,8 @@ import {
   Sliders,
   DollarSign,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   X,
   Smartphone,
   Flame,
@@ -193,6 +195,207 @@ const FAQS = [
   },
 ];
 
+export interface SuccessCase {
+  id: string;
+  country: string;
+  countryCode: 'co' | 'us' | 'es' | 'cl' | 'pa';
+  flag: string;
+  emoji: string;
+  brand: string;
+  city: string;
+  category: string;
+  badgeStyle: string;
+  quote: string;
+  author: string;
+  authorRole: string;
+  metricVal: string;
+  metricLabel: string;
+  metricColor: string;
+}
+
+const SUCCESS_CASES: SuccessCase[] = [
+  // 1. Colombia 1
+  {
+    id: 'la-burguesia-co',
+    country: 'Colombia',
+    countryCode: 'co',
+    flag: '🇨🇴',
+    emoji: '🍔',
+    brand: 'La Burguesía Artesanal',
+    city: 'Bogotá & Medellín, Colombia',
+    category: 'Gastrobar Gourmet • 2 Sedes',
+    badgeStyle: 'text-amber-400 bg-amber-500/10 border-amber-500/30',
+    quote: 'Prestigia interceptó más de 120 quejas privadas en mesa antes de que salieran a Google Maps. Subimos de 3.8★ a 4.9★ en 5 meses y blindamos la facturación de nuestros dos restaurantes.',
+    author: 'Carlos Gómez',
+    authorRole: 'Titular & Fundador',
+    metricVal: '4.9★',
+    metricLabel: 'Google Maps',
+    metricColor: 'text-emerald-400',
+  },
+  // 2. Colombia 2
+  {
+    id: 'dr-carlos-mendoza-co',
+    country: 'Colombia',
+    countryCode: 'co',
+    flag: '🇨🇴',
+    emoji: '🦷',
+    brand: 'Dr. Carlos Mendoza • Odontología',
+    city: 'Bogotá D.C., Colombia',
+    category: 'Salud & Consulta Especializada',
+    badgeStyle: 'text-blue-400 bg-blue-500/10 border-blue-500/30',
+    quote: 'En el sector salud una mala reseña es letal para conseguir nuevos pacientes. Con el Smart QR en recepción mis pacientes satisfechos me dejan 5 estrellas y tripliqué las citas agendadas.',
+    author: 'Dr. Carlos Mendoza',
+    authorRole: 'Cirujano & Especialista',
+    metricVal: '+3.4x',
+    metricLabel: 'Citas Nuevas',
+    metricColor: 'text-blue-400',
+  },
+  // 3. USA 1
+  {
+    id: 'miami-prime-us',
+    country: 'USA',
+    countryCode: 'us',
+    flag: '🇺🇸',
+    emoji: '🥩',
+    brand: 'Miami Prime Steakhouse',
+    city: 'Miami Beach, Florida (USA)',
+    category: 'Cortes Finos & VIP Dining',
+    badgeStyle: 'text-rose-400 bg-rose-500/10 border-rose-500/30',
+    quote: 'En South Beach los turistas internacionales eligen dónde cenar basándose estrictamente en Google Maps. Prestigia nos posicionó en el Top 3 local y captamos comensales extranjeros a diario.',
+    author: 'David Miller',
+    authorRole: 'General Manager',
+    metricVal: '+48%',
+    metricLabel: 'Comensales Turistas',
+    metricColor: 'text-emerald-400',
+  },
+  // 4. USA 2
+  {
+    id: 'apex-dental-us',
+    country: 'USA',
+    countryCode: 'us',
+    flag: '🇺🇸',
+    emoji: '✨',
+    brand: 'Apex Dental & Aesthetics',
+    city: 'Orlando, Florida (USA)',
+    category: 'Odontología & Estética Dental',
+    badgeStyle: 'text-sky-400 bg-sky-500/10 border-sky-500/30',
+    quote: 'Cualquier demora en sala antes se convertía en 1 estrella en internet. Con Prestigia resolvemos la queja en privado con un beneficio inmediato. Subimos a 4.93★ y somos líderes en Orlando.',
+    author: 'Dra. Sarah Jenkins',
+    authorRole: 'Directora Médica',
+    metricVal: '4.93★',
+    metricLabel: 'Top 1 en Orlando',
+    metricColor: 'text-amber-400',
+  },
+  // 5. Europa 1 (España)
+  {
+    id: 'taberna-del-mar-es',
+    country: 'Europa',
+    countryCode: 'es',
+    flag: '🇪🇸',
+    emoji: '🍷',
+    brand: 'Taberna del Mar',
+    city: 'Madrid & Valencia (España)',
+    category: 'Restauración Mediterránea • 3 Sedes',
+    badgeStyle: 'text-amber-400 bg-amber-500/10 border-amber-500/30',
+    quote: 'La arquitectura multi-sede nos permite auditar la calidad del servicio de los camareros en cada turno. Durante el verano multiplicamos las opiniones de 5★ un 310% sin pagar publicidad.',
+    author: 'Javier Montes',
+    authorRole: 'Propietario & Chef',
+    metricVal: '+310%',
+    metricLabel: 'Reseñas 5★ Verificadas',
+    metricColor: 'text-emerald-400',
+  },
+  // 6. Europa 2 (España)
+  {
+    id: 'clinique-royale-es',
+    country: 'Europa',
+    countryCode: 'es',
+    flag: '🇪🇸',
+    emoji: '💎',
+    brand: 'Clinique Esthétique Royale',
+    city: 'Barcelona (España)',
+    category: 'Medicina Estética & Spa VIP',
+    badgeStyle: 'text-purple-400 bg-purple-500/10 border-purple-500/30',
+    quote: 'Nuestros clientes de alto poder adquisitivo valoran enormemente la discreción. El canal privado nos salvó de crisis reputacionales y disparó las reservas para tratamientos premium.',
+    author: 'Elena Puig',
+    authorRole: 'Socia Fundadora',
+    metricVal: '+2.8x',
+    metricLabel: 'Tratamientos VIP',
+    metricColor: 'text-purple-400',
+  },
+  // 7. Chile 1
+  {
+    id: 'bistro-patagonia-cl',
+    country: 'Chile',
+    countryCode: 'cl',
+    flag: '🇨🇱',
+    emoji: '🥘',
+    brand: 'Bistró Patagonia & Vinos',
+    city: 'Santiago & Viña del Mar (Chile)',
+    category: 'Gastronomía de Autor • 2 Sedes',
+    badgeStyle: 'text-red-400 bg-red-500/10 border-red-500/30',
+    quote: 'En Providencia la competencia es implacable. Pasamos del puesto #18 al Top 3 en Google Maps en solo 90 días. Los clientes escanean el QR felices para participar en el sorteo de la casa.',
+    author: 'Matías Undurraga',
+    authorRole: 'Gerente de Operaciones',
+    metricVal: 'Top 3',
+    metricLabel: 'Santiago de Chile',
+    metricColor: 'text-amber-400',
+  },
+  // 8. Chile 2
+  {
+    id: 'autoklass-cl',
+    country: 'Chile',
+    countryCode: 'cl',
+    flag: '🇨🇱',
+    emoji: '🏎️',
+    brand: 'AutoKlass Detailing & Taller',
+    city: 'Las Condes, Santiago (Chile)',
+    category: 'Automotriz & Detailing de Lujo',
+    badgeStyle: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/30',
+    quote: 'Con el sorteo VIP construimos una base de datos propia de 650 clientes con autos de gama alta. Al enviar una campaña directa por WhatsApp llenamos los cupos de mantenimiento en horas.',
+    author: 'Rodrigo Sanhueza',
+    authorRole: 'Gerente General',
+    metricVal: '650+',
+    metricLabel: 'Base Propia WhatsApp',
+    metricColor: 'text-emerald-400',
+  },
+  // 9. Panamá 1
+  {
+    id: 'peninsula-sky-pa',
+    country: 'Panamá',
+    countryCode: 'pa',
+    flag: '🇵🇦',
+    emoji: '🍸',
+    brand: 'Península Sky Lounge',
+    city: 'Ciudad de Panamá (Panamá)',
+    category: 'Rooftop & Coctelería Casco Antiguo',
+    badgeStyle: 'text-amber-400 bg-amber-500/10 border-amber-500/30',
+    quote: 'En Casco Antiguo los diplomáticos y turistas deciden su visita por Google Maps. Prestigia nos sostiene en 4.95★ y blindó nuestras barras ante quejas por volumen de música o demoras.',
+    author: 'Roberto Chen',
+    authorRole: 'Director de Alimentos & Bebidas',
+    metricVal: '4.95★',
+    metricLabel: 'Google Maps Panamá',
+    metricColor: 'text-emerald-400',
+  },
+  // 10. Panamá 2
+  {
+    id: 'pacific-smile-pa',
+    country: 'Panamá',
+    countryCode: 'pa',
+    flag: '🇵🇦',
+    emoji: '🦷',
+    brand: 'Pacific Smile Dental Studio',
+    city: 'Costa del Este (Panamá)',
+    category: 'Odontología Digital & Diseño Sonrisa',
+    badgeStyle: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30',
+    quote: 'El filtro inteligente contuvo más de 35 inconformidades privadas en sala este año, manteniendo nuestra clínica impecable en internet y generando un flujo ininterrumpido de pacientes.',
+    author: 'Dr. Ernesto Icaza',
+    authorRole: 'Director Clínico',
+    metricVal: '100%',
+    metricLabel: 'Contención Privada',
+    metricColor: 'text-cyan-400',
+  },
+];
+
 export default function HomePage() {
   // Strategic Call Booking Form State
   const [leadForm, setLeadForm] = useState({
@@ -229,6 +432,10 @@ export default function HomePage() {
 
   // Before vs After Comparison Switch
   const [comparisonMode, setComparisonMode] = useState<'with' | 'without'>('with');
+
+  // Success Cases Carousel State
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [selectedCountryFilter, setSelectedCountryFilter] = useState<'all' | 'co' | 'us' | 'es' | 'cl' | 'pa'>('all');
 
   // FAQ Accordion State
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
@@ -338,6 +545,19 @@ export default function HomePage() {
 
   const activeNiche = SHOWCASE_NICHES.find((n) => n.id === activeNicheId) || SHOWCASE_NICHES[0];
   const currentTicker = LIVE_TICKER_ITEMS[tickerIndex];
+
+  // Success Cases Carousel Logic
+  const filteredCases = selectedCountryFilter === 'all'
+    ? SUCCESS_CASES
+    : SUCCESS_CASES.filter((c) => c.countryCode === selectedCountryFilter);
+
+  const prevCarouselSlide = () => {
+    setCarouselIndex((prev) => (prev > 0 ? prev - 1 : Math.max(0, filteredCases.length - 1)));
+  };
+
+  const nextCarouselSlide = () => {
+    setCarouselIndex((prev) => (prev < filteredCases.length - 1 ? prev + 1 : 0));
+  };
 
   return (
     <div className="min-h-screen bg-[#06080E] text-slate-100 selection:bg-amber-500/25 selection:text-amber-200 font-sans relative overflow-x-hidden">
@@ -1150,81 +1370,146 @@ export default function HomePage() {
       </section>
 
       {/* ============================================================== */}
-      {/* 9. CASOS DE ÉXITO REALES CON RESULTADOS */}
+      {/* 9. CASOS DE ÉXITO REALES CON RESULTADOS (CARRUSEL INTERACTIVO INTERNACIONAL) */}
       {/* ============================================================== */}
       <section id="testimonios" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
-            Casos de Éxito Comprobados
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            Marcas que convirtieron su reputación en ingresos
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-2">
-            Métricas reales de clientes activos en nuestra plataforma:
-          </p>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div className="max-w-3xl text-left">
+            <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
+              Casos de Éxito Internacionales
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
+              Marcas que transformaron su reputación en facturación
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-400 mt-2">
+              Resultados certificados en más de 28 sedes activas en Latinoamérica, Estados Unidos y Europa:
+            </p>
+          </div>
+
+          {/* Carousel Arrows Navigation */}
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                const el = document.getElementById('testimonials-scroll-container');
+                if (el) el.scrollBy({ left: -380, behavior: 'smooth' });
+                trackAction('carousel_prev_click');
+              }}
+              className="w-11 h-11 rounded-2xl bg-[#0D1424] hover:bg-slate-800 border border-slate-700/80 hover:border-amber-400 text-white flex items-center justify-center transition shadow-lg cursor-pointer active:scale-95"
+              aria-label="Anterior testimonio"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const el = document.getElementById('testimonials-scroll-container');
+                if (el) el.scrollBy({ left: 380, behavior: 'smooth' });
+                trackAction('carousel_next_click');
+              }}
+              className="w-11 h-11 rounded-2xl bg-[#0D1424] hover:bg-slate-800 border border-slate-700/80 hover:border-amber-400 text-white flex items-center justify-center transition shadow-lg cursor-pointer active:scale-95"
+              aria-label="Siguiente testimonio"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1600px] mx-auto">
-          {/* Caso 1: La Burguesía */}
-          <div className="p-7 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl hover:border-amber-500/40 transition">
-            <div>
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <span className="text-2xl">🍔</span>
-                <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
-                  Gastrobar Gourmet • 2 Sedes
-                </span>
-              </div>
-              <h3 className="text-base font-bold text-white mt-3">La Burguesía Artesanal</h3>
-              <p className="text-xs text-slate-300 mt-3 italic leading-relaxed">
-                &ldquo;Prestigia interceptó más de 120 quejas privadas en mesa antes de que salieran a Google Maps. Subimos de 3.8★ a 4.9★ en 5 meses y blindamos la facturación de nuestros dos restaurantes.&rdquo;
-              </p>
-            </div>
-            <div className="mt-6 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-              <span className="text-slate-400 font-medium">Carlos Gómez • Titular</span>
-              <span className="text-emerald-400 font-bold font-mono">4.9★ Google Maps</span>
-            </div>
-          </div>
+        {/* Country Filter Badges */}
+        <div className="flex flex-wrap items-center gap-2 mb-8">
+          {[
+            { id: 'all', label: 'Todos los Países (10)', icon: '🌐' },
+            { id: 'co', label: 'Colombia (2)', icon: '🇨🇴' },
+            { id: 'us', label: 'Estados Unidos (2)', icon: '🇺🇸' },
+            { id: 'es', label: 'Europa / España (2)', icon: '🇪🇸' },
+            { id: 'cl', label: 'Chile (2)', icon: '🇨🇱' },
+            { id: 'pa', label: 'Panamá (2)', icon: '🇵🇦' },
+          ].map((country) => (
+            <button
+              key={country.id}
+              type="button"
+              onClick={() => {
+                setSelectedCountryFilter(country.id as any);
+                trackAction(`filter_country_${country.id}`);
+                const el = document.getElementById('testimonials-scroll-container');
+                if (el) el.scrollTo({ left: 0, behavior: 'smooth' });
+              }}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                selectedCountryFilter === country.id
+                  ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 font-black'
+                  : 'bg-[#0E1424] text-slate-400 border border-slate-800 hover:text-white hover:border-slate-700'
+              }`}
+            >
+              <span>{country.icon}</span>
+              <span>{country.label}</span>
+            </button>
+          ))}
+        </div>
 
-          {/* Caso 2: Dr. Carlos Mendoza */}
-          <div className="p-7 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl hover:border-blue-500/40 transition">
-            <div>
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <span className="text-2xl">🦷</span>
-                <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-500/20">
-                  Salud & Consulta Especializada
-                </span>
-              </div>
-              <h3 className="text-base font-bold text-white mt-3">Dr. Carlos Mendoza</h3>
-              <p className="text-xs text-slate-300 mt-3 italic leading-relaxed">
-                &ldquo;En el sector salud una mala reseña es letal para conseguir nuevos pacientes. Con el Smart QR en recepción mis pacientes satisfechos me dejan 5 estrellas y tripliqué las citas agendadas.&rdquo;
-              </p>
-            </div>
-            <div className="mt-6 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-              <span className="text-slate-400 font-medium">Dr. Carlos Mendoza</span>
-              <span className="text-blue-400 font-bold font-mono">+3.4x Citas Nuevas</span>
-            </div>
-          </div>
+        {/* Carousel Scroll Track (10 Cases) */}
+        <div
+          id="testimonials-scroll-container"
+          className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4 pt-1"
+        >
+          {filteredCases.map((c) => (
+            <div
+              key={c.id}
+              className="snap-start shrink-0 w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] p-7 rounded-3xl bg-[#0D1424] border border-slate-800 hover:border-amber-500/40 transition-all duration-300 shadow-xl flex flex-col justify-between group"
+            >
+              <div>
+                {/* Top Strip: Emoji + Country Flag + Category Badge */}
+                <div className="flex items-center justify-between pb-3.5 border-b border-slate-800/80 gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{c.emoji}</span>
+                    <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1">
+                      <span>{c.flag}</span>
+                      <span>{c.country}</span>
+                    </span>
+                  </div>
+                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${c.badgeStyle} truncate max-w-[200px]`}>
+                    {c.category}
+                  </span>
+                </div>
 
-          {/* Caso 3: AutoElite */}
-          <div className="p-7 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl hover:border-purple-500/40 transition">
-            <div>
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <span className="text-2xl">🚗</span>
-                <span className="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20">
-                  Automotriz & Detailing de Lujo
-                </span>
+                {/* Brand & City */}
+                <div className="mt-4">
+                  <h3 className="text-lg font-black text-white group-hover:text-amber-400 transition-colors">
+                    {c.brand}
+                  </h3>
+                  <p className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
+                    <MapPin className="w-3 h-3 text-slate-500" />
+                    <span>{c.city}</span>
+                  </p>
+                </div>
+
+                {/* Testimonial Quote */}
+                <p className="text-xs text-slate-300 mt-3.5 italic leading-relaxed">
+                  &ldquo;{c.quote}&rdquo;
+                </p>
               </div>
-              <h3 className="text-base font-bold text-white mt-3">AutoElite Taller & Detailing</h3>
-              <p className="text-xs text-slate-300 mt-3 italic leading-relaxed">
-                &ldquo;El módulo de sorteos y captura con Habeas Data nos permitió crear una base de datos de más de 400 clientes recurrentes. Cada mes llenamos la agenda con promociones directas por WhatsApp.&rdquo;
-              </p>
+
+              {/* Footer: Author & Key Highlight Metric */}
+              <div className="mt-6 pt-3.5 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                <div>
+                  <p className="text-slate-200 font-bold">{c.author}</p>
+                  <p className="text-[10px] text-slate-500">{c.authorRole}</p>
+                </div>
+                <div className="text-right">
+                  <span className={`font-mono font-black text-sm ${c.metricColor} block`}>
+                    {c.metricVal}
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-medium">
+                    {c.metricLabel}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="mt-6 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-              <span className="text-slate-400 font-medium">Mauricio Varela • Gerente</span>
-              <span className="text-purple-400 font-bold font-mono">400+ Clientes en Base</span>
-            </div>
-          </div>
+          ))}
+        </div>
+
+        {/* Carousel Visual Swipe Hint on Mobile */}
+        <div className="flex items-center justify-center gap-2 mt-4 text-[11px] text-slate-500 sm:hidden">
+          <span>Desliza para ver más casos ↔</span>
         </div>
       </section>
 
