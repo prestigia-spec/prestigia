@@ -530,32 +530,8 @@ export default function HomePage() {
   // FAQ Accordion State
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
-  // Currency Switcher State for Transparent Pricing (Fusión con Propuesta)
-  const [currency, setCurrency] = useState<'COP' | 'USD' | 'EUR' | 'MXN'>('COP');
-
   // Interactive 8-Module Portal Walkthrough State
   const [activePortalTab, setActivePortalTab] = useState<number>(0);
-
-  // Dynamic Price Formatter according to Selected Currency
-  const formatPlanPrice = (plan: 'basico' | 'pro' | 'elite') => {
-    switch (plan) {
-      case 'basico':
-        if (currency === 'USD') return '$19 USD';
-        if (currency === 'EUR') return '18 €';
-        if (currency === 'MXN') return '$390 MXN';
-        return '$49.000 COP';
-      case 'pro':
-        if (currency === 'USD') return '$49 USD';
-        if (currency === 'EUR') return '45 €';
-        if (currency === 'MXN') return '$990 MXN';
-        return '$120.000 COP';
-      case 'elite':
-        if (currency === 'USD') return '$110 USD';
-        if (currency === 'EUR') return '99 €';
-        if (currency === 'MXN') return '$2.300 MXN';
-        return '$290.000 COP';
-    }
-  };
 
   // Testimonials Infinite Carousel Glide Pause on Touch / Interaction
   const [isGlidePaused, setIsGlidePaused] = useState(false);
@@ -778,7 +754,7 @@ export default function HomePage() {
               <Search className="w-3 h-3 text-cyan-400" />
               <span>Auditor</span>
             </a>
-            <a href="#planes" className="hover:text-amber-400 transition whitespace-nowrap">Planes & Precios</a>
+            <a href="#planes" className="hover:text-amber-400 transition whitespace-nowrap">Planes a Medida</a>
           </nav>
 
           {/* Action CTAs */}
@@ -1837,71 +1813,45 @@ export default function HomePage() {
       </section>
 
       {/* ============================================================== */}
-      {/* 11. PLANES & PRECIOS TRANSPARENTES (FUSIÓN MASTER CON PROPUESTA) */}
+      {/* 11. PLANES A LA MEDIDA: CERO PRECIOS PÚBLICOS, TRATO EXCLUSIVO */}
       {/* ============================================================== */}
       <section id="planes" className="py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div id="propuesta" className="-mt-20 pt-20" />
-        <div className="text-center max-w-3xl mx-auto mb-10">
+        <div className="text-center max-w-3xl mx-auto mb-14">
           <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 px-3.5 py-1 rounded-full border border-amber-500/20">
-            Estructura Comercial Transparente
+            Consultoría Estratégica & Modelo a la Medida
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            Tres Planes Claros. Un Solo Objetivo: Multiplicar tu Negocio.
+            No vendemos software de caja. Diseñamos el plan para tu operación.
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">
-            Sin cláusulas de permanencia oculta ni costos sorpresa. Selecciona tu moneda local para ver la tarifa exacta:
+            Cada empresa tiene un volumen de clientes, un número de sedes y una dinámica diferente. Sin precios genéricos ni paquetes rígidos: en nuestra sesión estratégica estructuramos la propuesta exacta según tu tráfico y objetivos comerciales.
           </p>
-
-          {/* Currency Switcher Tabs */}
-          <div className="inline-flex items-center gap-2 p-1.5 rounded-2xl bg-[#0E1424] border border-slate-800 mt-6 shadow-lg">
-            {[
-              { id: 'COP', label: 'COP ($) 🇨🇴' },
-              { id: 'USD', label: 'USD ($) 🇺🇸' },
-              { id: 'EUR', label: 'EUR (€) 🇪🇸' },
-              { id: 'MXN', label: 'MXN ($) 🇲🇽' },
-            ].map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => {
-                  setCurrency(c.id as any);
-                  trackAction(`change_currency_${c.id}`);
-                }}
-                className={`px-3 sm:px-4 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                  currency === c.id
-                    ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                {c.label}
-              </button>
-            ))}
-          </div>
         </div>
 
-        {/* 3 Main Pricing Cards */}
+        {/* 3 Main Bespoke Architecture Cards (Zero Public Prices) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1600px] mx-auto items-stretch">
           
-          {/* PLAN BÁSICO / PILOTO */}
+          {/* NIVEL 1: PUNTO ÚNICO */}
           <div className="p-7 sm:p-8 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl hover:border-slate-700 transition">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-400">PLAN BÁSICO</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
+                  1 Sede / Consultorio / Local
+                </span>
                 <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-bold border border-slate-700">
-                  1 Sede Única
+                  Punto Físico Único
                 </span>
               </div>
 
               <div>
-                <div className="text-3xl font-black text-white">
-                  {formatPlanPrice('basico')}
-                  <span className="text-xs font-normal text-slate-400 block sm:inline sm:ml-1">/ mes</span>
-                </div>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Ideal para consultorios, tiendas o locales comerciales de 1 punto físico.
+                <h3 className="text-2xl font-black text-white">Punto Único</h3>
+                <span className="text-xs text-emerald-400 font-bold block mt-0.5">Propuesta a la Medida</span>
+                <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                  Ideal para profesionales independientes, consultorios médicos o locales comerciales de 1 punto físico.
                 </p>
-                <div className="mt-2.5 p-2 rounded-xl bg-slate-900 border border-slate-800 text-[10px] text-emerald-400 font-bold">
-                  🎁 <strong>Setup & Smart QR:</strong> 100% BONIFICADO
+                <div className="mt-3 p-2 rounded-xl bg-slate-900 border border-slate-800 text-[10px] text-emerald-400 font-bold">
+                  🎁 <strong>Setup & Smart QR:</strong> 100% BONIFICADO en fase de prueba
                 </div>
               </div>
 
@@ -1919,23 +1869,19 @@ export default function HomePage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Radar de Google Maps básico</span>
+                  <span>Radar de Google Maps básico en tiempo real</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Contención de quejas en Portal Clientes</span>
+                  <span>Contención de quejas privada en Portal Clientes</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Reporte mensual de rendimiento</span>
+                  <span>Reporte mensual de rendimiento y auditoría</span>
                 </li>
                 <li className="flex items-start gap-2 text-slate-500">
                   <Lock className="w-4 h-4 text-slate-600 shrink-0 mt-0.5" />
-                  <span>Sin Asistente IA Google</span>
-                </li>
-                <li className="flex items-start gap-2 text-slate-500">
-                  <Lock className="w-4 h-4 text-slate-600 shrink-0 mt-0.5" />
-                  <span>Sin Alertas Sonoras en Vivo</span>
+                  <span>Sin Asistente IA Google (disponible en Alto Rendimiento)</span>
                 </li>
               </ul>
             </div>
@@ -1944,38 +1890,38 @@ export default function HomePage() {
               href="#agendar"
               onClick={() => {
                 setLeadForm((prev) => ({ ...prev, branchCount: '1' }));
-                trackAction('click_plan_basico');
+                trackAction('click_cotizar_punto_unico');
               }}
-              className="mt-6 w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center transition block cursor-pointer"
+              className="mt-6 w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center transition block cursor-pointer active:scale-95 shadow-md"
             >
-              Solicitar Plan Básico
+              Solicitar Propuesta Personalizada
             </a>
           </div>
 
-          {/* PLAN PRO (DESTACADO / MÁS POPULAR) */}
-          <div className="p-7 sm:p-8 rounded-3xl bg-gradient-to-b from-[#141E34] via-[#0E1526] to-[#0A0F1D] border-2 border-indigo-500 shadow-2xl relative flex flex-col justify-between">
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-indigo-600 text-white text-[10px] font-black uppercase tracking-wider shadow-lg shadow-indigo-600/30">
-              ⭐ EL MÁS POPULAR PARA LOCALES
+          {/* NIVEL 2: ALTO RENDIMIENTO (MÁS POPULAR) */}
+          <div className="p-7 sm:p-8 rounded-3xl bg-gradient-to-b from-[#141E34] via-[#0E1526] to-[#0A0F1D] border-2 border-amber-500 shadow-2xl relative flex flex-col justify-between">
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-lg shadow-amber-500/25">
+              ⭐ MÁS SOLICITADO
             </div>
 
             <div className="space-y-4 pt-1">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black uppercase tracking-wider text-indigo-400">PLAN PRO</span>
-                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">
-                  1 Sede de Alto Tráfico
+                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400">
+                  Gastrobares, Clínicas & Retail
+                </span>
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                  Alto Flujo
                 </span>
               </div>
 
               <div>
-                <div className="text-3xl font-black text-white">
-                  {formatPlanPrice('pro')}
-                  <span className="text-xs font-normal text-slate-400 block sm:inline sm:ml-1">/ mes</span>
-                </div>
-                <p className="text-[11px] text-slate-300 mt-1">
-                  Para restaurantes, gastrobares, clínicas y comercios que buscan liderar su zona.
+                <h3 className="text-2xl font-black text-white">Alto Rendimiento</h3>
+                <span className="text-xs text-amber-400 font-bold block mt-0.5">Estructura a la Medida</span>
+                <p className="text-[11px] text-slate-300 mt-2 leading-relaxed">
+                  Para negocios consolidados con alto tráfico de clientes que requieren captar base de datos, blindar Google Maps y auditar meseros.
                 </p>
-                <div className="mt-2.5 p-2 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-[10px] text-emerald-300 font-bold">
-                  🎁 <strong>Setup & Smart QR:</strong> 100% BONIFICADO
+                <div className="mt-3 p-2 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-[10px] text-emerald-300 font-bold">
+                  🎁 <strong>Setup & Smart QR:</strong> 100% BONIFICADO en fase de prueba
                 </div>
               </div>
 
@@ -1988,28 +1934,32 @@ export default function HomePage() {
 
               <ul className="space-y-2.5 text-xs text-slate-200 border-t border-slate-800 pt-4">
                 <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-                  <span><strong>Todo lo del Plan Básico</strong></span>
+                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <span><strong>Todo lo del Plan Punto Único</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                   <span><strong>Asistente IA Google Ilimitado</strong> (3 tonos de respuesta)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                   <span><strong>Alertas en Vivo Sonoras & Push</strong> en sala y celulares</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                   <span><strong>Sorteo del Mes Oficial</strong> con 1 ganador verificado</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                   <span><strong>Exportación CSV de Clientes</strong> con Ley 1581 Habeas Data</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-                  <span>2 Soportes técnicos ejecutivos al mes</span>
+                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <span>Auditoría de personal y meseros en turno</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <span>Soporte ejecutivo comercial prioritario</span>
                 </li>
               </ul>
             </div>
@@ -2018,68 +1968,72 @@ export default function HomePage() {
               href="#agendar"
               onClick={() => {
                 setLeadForm((prev) => ({ ...prev, branchCount: '1' }));
-                trackAction('click_plan_pro');
+                trackAction('click_cotizar_alto_rendimiento');
               }}
-              className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 hover:from-indigo-500 hover:to-indigo-400 text-white font-black text-xs text-center shadow-lg shadow-indigo-600/30 transition active:scale-95 block cursor-pointer animate-shimmer"
+              className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs text-center shadow-lg shadow-amber-500/25 transition active:scale-95 block cursor-pointer animate-shimmer"
             >
-              Activar Plan Pro (Más Solicitado)
+              Agendar Sesión Estratégica VIP
             </a>
           </div>
 
-          {/* PLAN ÉLITE TOTAL (MULTISEDE & HOLDINGS) */}
-          <div className="p-7 sm:p-8 rounded-3xl bg-[#0D1424] border-2 border-amber-500/80 flex flex-col justify-between shadow-2xl relative">
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow">
+          {/* NIVEL 3: CADENAS & FRANQUICIAS */}
+          <div className="p-7 sm:p-8 rounded-3xl bg-[#0D1424] border-2 border-purple-500/70 flex flex-col justify-between shadow-2xl relative">
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-wider shadow">
               👑 MÁXIMA POTENCIA MULTISEDE
             </div>
 
             <div className="space-y-4 pt-1">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black uppercase tracking-wider text-amber-400">PLAN ÉLITE TOTAL</span>
-                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                  Hasta 3 Sedes Físicas
+                <span className="text-[11px] font-bold uppercase tracking-wider text-purple-400">
+                  Multi-Sedes & Corporativo
+                </span>
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">
+                  Multi-Sede
                 </span>
               </div>
 
               <div>
-                <div className="text-3xl font-black text-white">
-                  {formatPlanPrice('elite')}
-                  <span className="text-xs font-normal text-slate-400 block sm:inline sm:ml-1">/ mes</span>
-                </div>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Para grupos gastronómicos, holdings, cadenas y marcas de alta exigencia.
+                <h3 className="text-2xl font-black text-white">Cadenas & Franquicias</h3>
+                <span className="text-xs text-purple-400 font-bold block mt-0.5">Arquitectura Empresarial a la Medida</span>
+                <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                  Para holdings, grupos gastronómicos, cadenas hoteleras o marcas con 2 o más sedes que requieren control macro centralizado.
                 </p>
-                <div className="mt-2.5 p-2 rounded-xl bg-amber-950/40 border border-amber-500/40 text-[10px] text-amber-300 font-bold">
+                <div className="mt-3 p-2 rounded-xl bg-purple-950/40 border border-purple-500/40 text-[10px] text-purple-300 font-bold">
                   🎁 <strong>Setup & Smart QR:</strong> 100% BONIFICADO
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 text-[11px] text-slate-200 space-y-1">
-                <div className="font-bold text-amber-300 flex items-center gap-1.5">
-                  <Building2 className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Multisede: Hasta 3 sedes con administradores independientes</span>
+              <div className="p-3 rounded-xl bg-purple-950/30 border border-purple-500/30 text-[11px] text-slate-200 space-y-1">
+                <div className="font-bold text-purple-300 flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Multisede: Sedes ilimitadas con administradores independientes</span>
                 </div>
               </div>
 
               <ul className="space-y-2.5 text-xs text-slate-300 border-t border-slate-800 pt-4">
                 <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <span><strong>Todo lo del Plan Pro incluido</strong></span>
+                  <Check className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                  <span><strong>Todo lo de Alto Rendimiento incluido</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                   <span><strong>Modo TV Live Wallboard</strong> para salón y cocina</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                   <span><strong>Sorteos VIP Multi-Ganador</strong> (de 1 a 10+ premios)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <span><strong>Podio y Bitácora de Personal</strong> completa</span>
+                  <Check className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                  <span><strong>Bitácora y Podio de Personal</strong> consolidado</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <span><strong>Onboarding y Soporte Prioritario VIP</strong></span>
+                  <Check className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                  <span><strong>Control Macro Multisede</strong> y comparativa entre locales</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                  <span><strong>Asesor ejecutivo dedicado & Onboarding VIP</strong></span>
                 </li>
               </ul>
             </div>
@@ -2088,11 +2042,11 @@ export default function HomePage() {
               href="#agendar"
               onClick={() => {
                 setLeadForm((prev) => ({ ...prev, branchCount: '2-3' }));
-                trackAction('click_plan_elite');
+                trackAction('click_cotizar_multi_sede');
               }}
-              className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs text-center shadow-lg shadow-amber-500/20 transition active:scale-95 block cursor-pointer"
+              className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs text-center shadow-lg shadow-purple-600/20 transition active:scale-95 block cursor-pointer"
             >
-              Solicitar Plan Élite Multisede
+              Solicitar Propuesta Multi-Sede
             </a>
           </div>
         </div>
@@ -2105,7 +2059,7 @@ export default function HomePage() {
             </div>
             <div>
               <p className="text-white text-xs font-bold">Compromiso de Retorno de Inversión Prestigia</p>
-              <p className="text-[11px] text-slate-400">Pactamos tarifas justas y transparentes con proyección de facturación real. Prestigia se paga sola desde el primer mes evitando fugas de clientes.</p>
+              <p className="text-[11px] text-slate-400">Pactamos tarifas justas y personalizadas en sesión privada. Prestigia se paga sola desde el primer mes evitando fugas de clientes.</p>
             </div>
           </div>
           <div className="shrink-0 flex items-center gap-2">
