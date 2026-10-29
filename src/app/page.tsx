@@ -727,7 +727,7 @@ export default function HomePage() {
 
 
   return (
-    <div className="min-h-screen w-full max-w-full bg-[#06080E] text-slate-100 selection:bg-amber-500/25 selection:text-amber-200 font-sans relative overflow-x-hidden">
+    <div className="min-h-screen w-full max-w-full bg-[#06080E] text-slate-100 selection:bg-amber-500/25 selection:text-amber-200 font-sans relative overflow-x-clip">
       {/* ============================================================== */}
       {/* 0. AURORA DYNAMIC GLOW BACKGROUNDS */}
       {/* ============================================================== */}
@@ -745,9 +745,9 @@ export default function HomePage() {
       />
 
       {/* ============================================================== */}
-      {/* FIXED / STICKY HEADER WRAPPER (Top Strip + Main Navigation Bar) */}
+      {/* 100% FIXED HEADER (Top Live Strip + Main Navigation Bar) */}
       {/* ============================================================== */}
-      <div className="sticky top-0 z-50 w-full shadow-2xl shadow-black/60 transition-all">
+      <div className="fixed top-0 left-0 right-0 z-50 w-full shadow-2xl shadow-black/80 transition-all">
         {/* 1. TOP LIVE STATUS STRIP */}
         <div className="bg-[#090D17]/95 backdrop-blur-xl border-b border-slate-800/80 px-4 sm:px-8 lg:px-12 py-1.5 sm:py-2 text-[11px] font-semibold text-slate-300">
           <div className="w-full max-w-[1700px] mx-auto flex items-center justify-between gap-4">
@@ -875,6 +875,9 @@ export default function HomePage() {
           </div>
         </header>
       </div>
+
+      {/* Spacer so page content flows cleanly below the fixed header */}
+      <div className="h-[94px] sm:h-[102px]" aria-hidden="true" />
 
       {/* ============================================================== */}
       {/* 3. HERO SECTION — EXPANSIVE FULL-WIDTH DUAL COLUMN */}
