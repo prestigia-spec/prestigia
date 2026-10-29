@@ -2898,7 +2898,8 @@
     "emergencyEmail": "prestigiaprincipal@gmail.com",
     "totpSecret": "JBSWY3DPEHPK3PXP",
     "twoFactorEnabled": false,
-    "updatedAt": "2026-10-21T10:18:00.000Z"
+    "resendFromEmail": "Prestigia Enterprise <onboarding@resend.dev>",
+    "updatedAt": "2026-10-29T02:33:00.000Z"
   },
   "leads": [
     {

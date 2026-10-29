@@ -671,6 +671,8 @@ export async function getMasterSecuritySettings(): Promise<MasterSecurityConfig>
       emergencyEmail: 'prestigiaprincipal@gmail.com',
       totpSecret: 'JBSWY3DPEHPK3PXP',
       twoFactorEnabled: false,
+      resendApiKey: process.env.RESEND_API_KEY,
+      resendFromEmail: process.env.RESEND_FROM_EMAIL || 'Prestigia Enterprise <onboarding@resend.dev>',
       updatedAt: new Date().toISOString(),
     };
   }
@@ -679,6 +681,12 @@ export async function getMasterSecuritySettings(): Promise<MasterSecurityConfig>
   }
   if (!db.masterSecurity.totpSecret || db.masterSecurity.totpSecret.includes('PRESTIGIA-TOTP')) {
     db.masterSecurity.totpSecret = 'JBSWY3DPEHPK3PXP';
+  }
+  if (!db.masterSecurity.resendApiKey && process.env.RESEND_API_KEY) {
+    db.masterSecurity.resendApiKey = process.env.RESEND_API_KEY;
+  }
+  if (!db.masterSecurity.emergencyEmail || db.masterSecurity.emergencyEmail.includes('info@prestigia')) {
+    db.masterSecurity.emergencyEmail = 'prestigiaprincipal@gmail.com';
   }
   return db.masterSecurity;
 }
