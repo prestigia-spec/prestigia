@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-// Redirección unificada al Centro Comercial Maestro de Prestigia
+// Redirección unificada a la Súper Página de Ventas Maestra de Prestigia (Sección Planes & Propuesta)
 export default function ProposalEnRedirectPage() {
-  redirect('/propuesta');
+  redirect('/#planes');
 }
