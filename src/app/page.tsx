@@ -360,29 +360,32 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 1. TOP LIVE STATUS STRIP */}
       {/* ============================================================== */}
-      <div className="relative z-50 bg-[#090D17] border-b border-slate-800/80 px-4 py-2 text-[11px] font-semibold text-slate-300">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 overflow-hidden">
-            <span className="relative flex h-2 w-2">
+      <div className="relative z-50 bg-[#090D17] border-b border-slate-800/80 px-6 sm:px-12 lg:px-16 py-2 text-[11px] font-semibold text-slate-300">
+        <div className="w-full flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5 overflow-hidden">
+            <span className="relative flex h-2 w-2 shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="text-emerald-400 font-bold uppercase tracking-wider text-[10px] sm:text-[11px]">
+            <span className="text-emerald-400 font-bold uppercase tracking-wider text-[10px] sm:text-[11px] shrink-0">
               SISTEMA OPERANDO EN VIVO
             </span>
             <span className="text-slate-600 hidden sm:inline">•</span>
             <span className="text-slate-400 truncate hidden sm:inline">
-              10 Sedes Blindadas • Filtro Inteligente de Reseñas Google Maps Activo
+              10 Sedes Blindadas • Filtro Inteligente de Reseñas Google Maps Activo en Tiempo Real
             </span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] font-mono shrink-0">
-            <span className="text-amber-400 font-bold">★ 4.93 Calificación Red</span>
+          <div className="flex items-center gap-5 text-[11px] font-mono shrink-0">
+            <span className="text-amber-400 font-bold flex items-center gap-1">
+              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+              <span>4.93 Calificación Red</span>
+            </span>
             <a
               href="https://wa.me/573058314049?text=Hola%20Prestigia,%20me%20gustar%C3%ADa%20consultar%20sobre%20el%20blindaje%20comercial"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-400 hover:text-white transition hidden md:flex items-center gap-1"
+              className="text-slate-400 hover:text-white transition hidden md:flex items-center gap-1.5"
             >
               <Phone className="w-3 h-3 text-emerald-400" />
               <span>Soporte Directo VIP</span>
@@ -392,41 +395,41 @@ export default function HomePage() {
       </div>
 
       {/* ============================================================== */}
-      {/* 2. TOP NAVBAR */}
+      {/* 2. TOP NAVBAR — EXPANSIVE FULL-WIDTH LAYOUT */}
       {/* ============================================================== */}
-      <header className="sticky top-0 z-40 backdrop-blur-2xl bg-[#06080E]/85 border-b border-slate-800/80 px-4 sm:px-8 py-3.5 transition-all">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-3 group cursor-pointer">
+      <header className="sticky top-0 z-40 backdrop-blur-2xl bg-[#06080E]/90 border-b border-slate-800/80 px-6 sm:px-12 lg:px-16 py-3.5 transition-all">
+        <div className="w-full flex items-center justify-between gap-6">
+          {/* Brand Logo (Clean, sleek, non-wrapping) */}
+          <Link href="/" className="flex items-center gap-3 group cursor-pointer shrink-0">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-indigo-800 flex items-center justify-center p-2 shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform duration-300">
               <PrestigiaIcon className="w-6 h-6 text-white" />
             </div>
-            <div>
-              <span className="text-lg font-black tracking-widest text-white flex items-center gap-1.5">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xl font-black tracking-widest text-white">
                 PRESTIGIA
               </span>
-              <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider hidden sm:block">
-                Tecnología de Blindaje Reputacional & Ventas 5★
-              </p>
+              <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold tracking-wider uppercase hidden sm:inline-block">
+                5★ SUITE
+              </span>
             </div>
           </Link>
 
-          {/* Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-300">
-            <a href="#como-funciona" className="hover:text-amber-400 transition">Cómo Funciona</a>
-            <a href="#simulador" className="hover:text-amber-400 transition">Simulador en Vivo</a>
-            <a href="#calculadora-roi" className="hover:text-amber-400 transition">Calculadora ROI</a>
-            <a href="#nichos" className="hover:text-amber-400 transition">Por Industria</a>
-            <a href="#comparativa" className="hover:text-amber-400 transition">Antes vs Después</a>
-            <a href="#propuesta" className="hover:text-amber-400 transition">Planes a Medida</a>
+          {/* Navigation Links with generous breathing room */}
+          <nav className="hidden xl:flex items-center gap-8 text-xs font-semibold text-slate-300">
+            <a href="#como-funciona" className="hover:text-amber-400 transition whitespace-nowrap">Cómo Funciona</a>
+            <a href="#simulador" className="hover:text-amber-400 transition whitespace-nowrap">Simulador en Vivo</a>
+            <a href="#calculadora-roi" className="hover:text-amber-400 transition whitespace-nowrap">Calculadora ROI</a>
+            <a href="#nichos" className="hover:text-amber-400 transition whitespace-nowrap">Por Industria</a>
+            <a href="#comparativa" className="hover:text-amber-400 transition whitespace-nowrap">Antes vs Después</a>
+            <a href="#propuesta" className="hover:text-amber-400 transition whitespace-nowrap">Planes a Medida</a>
           </nav>
 
           {/* Action CTAs */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3 shrink-0">
             <Link
               href="/portal"
               onClick={() => trackAction('click_portal_from_navbar')}
-              className="px-3.5 sm:px-4 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
             >
               <Lock className="w-3.5 h-3.5 text-indigo-400" />
               <span>Portal Clientes</span>
@@ -435,7 +438,7 @@ export default function HomePage() {
             <a
               href="#agendar"
               onClick={() => trackAction('click_agendar_navbar')}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/25 active:scale-95 cursor-pointer hidden sm:flex items-center gap-1.5 animate-shimmer"
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/25 active:scale-95 cursor-pointer flex items-center gap-1.5 animate-shimmer whitespace-nowrap"
             >
               <Calendar className="w-3.5 h-3.5" />
               <span>Agendar Llamada VIP</span>
@@ -445,20 +448,20 @@ export default function HomePage() {
       </header>
 
       {/* ============================================================== */}
-      {/* 3. HERO SECTION — DUAL COLUMN WITH INTERACTIVE SMARTPHONE */}
+      {/* 3. HERO SECTION — EXPANSIVE FULL-WIDTH DUAL COLUMN */}
       {/* ============================================================== */}
-      <section className="relative z-10 pt-10 pb-16 sm:pt-16 sm:pb-24 px-4 sm:px-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <section className="relative z-10 pt-10 pb-16 sm:pt-16 sm:pb-24 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-16 items-center">
           {/* Left Column: Value Pitch & Conversion */}
-          <div className="lg:col-span-7 text-left space-y-6">
+          <div className="lg:col-span-7 xl:col-span-7 text-left space-y-7">
             {/* Top Elite Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-wide uppercase shadow-lg shadow-amber-500/5">
               <Sparkles className="w-4 h-4 text-amber-400 animate-spin" style={{ animationDuration: '6s' }} />
-              <span>La Suite de Crecimiento & Blindaje Reputacional B2B</span>
+              <span>La Suite de Crecimiento Comercial & Blindaje Reputacional B2B</span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.08]">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl xl:text-7xl font-black text-white tracking-tight leading-[1.08]">
               Multiplica tus clientes en Google Maps,{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 underline decoration-amber-500/40 decoration-wavy">
                 frena quejas en privado
@@ -467,27 +470,27 @@ export default function HomePage() {
             </h1>
 
             {/* Subtitle */}
-            <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
+            <p className="text-sm sm:text-lg text-slate-300 max-w-3xl leading-relaxed">
               El <strong className="text-white">92% de los consumidores</strong> deciden a qué restaurante, clínica o negocio entrar basados en las reseñas de Google Maps. 
               Prestigia intercepta inconformidades en <strong className="text-amber-400">&lt; 10 segundos</strong> antes de que salgan a internet, catapulta las 5★ al Top de tu zona y crea una <strong className="text-emerald-400">base de datos propia de clientes VIP</strong> bajo la Ley 1581.
             </p>
 
             {/* Key Micro-Pillars */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-[#0D121E] border border-slate-800 text-xs text-slate-200">
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2 max-w-3xl">
+              <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-[#0D121E] border border-slate-800 text-xs text-slate-200 shadow-md">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0">
                   <Star className="w-4 h-4 fill-emerald-400 text-emerald-400" />
                 </div>
                 <span><strong>5★ Catapultadas</strong> a Google Maps</span>
               </div>
-              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-[#0D121E] border border-slate-800 text-xs text-slate-200">
-                <div className="w-7 h-7 rounded-lg bg-rose-500/15 text-rose-400 flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-[#0D121E] border border-slate-800 text-xs text-slate-200 shadow-md">
+                <div className="w-8 h-8 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center shrink-0">
                   <ShieldCheck className="w-4 h-4 text-rose-400" />
                 </div>
                 <span><strong>1★ a 3★ Contenidas</strong> en privado</span>
               </div>
-              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-[#0D121E] border border-slate-800 text-xs text-slate-200">
-                <div className="w-7 h-7 rounded-lg bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-[#0D121E] border border-slate-800 text-xs text-slate-200 shadow-md">
+                <div className="w-8 h-8 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0">
                   <Database className="w-4 h-4 text-purple-400" />
                 </div>
                 <span><strong>Base Propia</strong> con Habeas Data</span>
@@ -495,11 +498,11 @@ export default function HomePage() {
             </div>
 
             {/* Primary Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-center gap-3.5 pt-4">
+            <div className="flex flex-col sm:flex-row items-center gap-4 pt-3 max-w-2xl">
               <a
                 href="#agendar"
                 onClick={() => trackAction('click_hero_agendar')}
-                className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/30 transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer animate-shimmer"
+                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/30 transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer animate-shimmer whitespace-nowrap"
               >
                 <Calendar className="w-4 h-4 text-slate-950" />
                 <span>Agendar Sesión Estratégica VIP</span>
@@ -511,7 +514,7 @@ export default function HomePage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackAction('click_hero_whatsapp')}
-                className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 font-bold text-sm border border-slate-700/80 transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 font-bold text-sm border border-slate-700/80 transition flex items-center justify-center gap-2 cursor-pointer shadow-md whitespace-nowrap"
               >
                 <MessageCircle className="w-4 h-4 text-emerald-400" />
                 <span>Hablar por WhatsApp Directo</span>
@@ -519,21 +522,21 @@ export default function HomePage() {
             </div>
 
             {/* Social Proof Trust Footer */}
-            <div className="flex items-center gap-3 pt-3 text-xs text-slate-400">
+            <div className="flex items-center gap-3 pt-2 text-xs text-slate-400">
               <div className="flex -space-x-2">
-                <span className="w-7 h-7 rounded-full bg-amber-500/20 border-2 border-slate-900 flex items-center justify-center text-xs">🍔</span>
-                <span className="w-7 h-7 rounded-full bg-blue-500/20 border-2 border-slate-900 flex items-center justify-center text-xs">🦷</span>
-                <span className="w-7 h-7 rounded-full bg-purple-500/20 border-2 border-slate-900 flex items-center justify-center text-xs">🚗</span>
-                <span className="w-7 h-7 rounded-full bg-emerald-500/20 border-2 border-slate-900 flex items-center justify-center text-xs">💇</span>
+                <span className="w-8 h-8 rounded-full bg-amber-500/20 border-2 border-slate-900 flex items-center justify-center text-xs">🍔</span>
+                <span className="w-8 h-8 rounded-full bg-blue-500/20 border-2 border-slate-900 flex items-center justify-center text-xs">🦷</span>
+                <span className="w-8 h-8 rounded-full bg-purple-500/20 border-2 border-slate-900 flex items-center justify-center text-xs">🚗</span>
+                <span className="w-8 h-8 rounded-full bg-emerald-500/20 border-2 border-slate-900 flex items-center justify-center text-xs">💇</span>
               </div>
               <p>
-                Respaldado por más de <strong className="text-white">10 sedes comerciales</strong> activas en Colombia y LATAM.
+                Respaldado por más de <strong className="text-white">10 sedes comerciales</strong> activas en Colombia y Latinoamérica.
               </p>
             </div>
           </div>
 
           {/* Right Column: Titanium 3D Smartphone Interactive Simulator */}
-          <div className="lg:col-span-5 flex flex-col items-center justify-center">
+          <div className="lg:col-span-5 xl:col-span-5 flex flex-col items-center justify-center">
             <div className="relative w-full max-w-[340px] animate-float">
               {/* Outer Glow on Phone */}
               <div className="absolute -inset-1.5 bg-gradient-to-r from-amber-500/30 via-indigo-500/30 to-purple-500/30 rounded-[44px] blur-xl opacity-70" />
@@ -734,7 +737,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 5. CÓMO FUNCIONA EL EMBUDO BIFURCADO DE DOS VÍAS */}
       {/* ============================================================== */}
-      <section id="como-funciona" className="py-20 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-800/80">
+      <section id="como-funciona" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3.5 py-1 rounded-full border border-indigo-500/20">
             Arquitectura Quirúrgica
@@ -747,7 +750,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1500px] mx-auto">
           {/* Camino A: Experiencia 4 y 5 Estrellas */}
           <div className="p-8 rounded-3xl bg-gradient-to-br from-emerald-950/25 via-[#0D1424] to-[#0A0F1D] border-2 border-emerald-500/40 shadow-2xl relative overflow-hidden group hover:border-emerald-400 transition-all">
             <div className="flex items-center justify-between mb-4">
@@ -801,7 +804,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 6. CALCULADORA INTERACTIVA DE ROI (PÉRDIDAS & GANANCIAS) */}
       {/* ============================================================== */}
-      <section id="calculadora-roi" className="py-20 px-4 sm:px-8 max-w-6xl mx-auto border-t border-slate-800/80">
+      <section id="calculadora-roi" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 px-3.5 py-1 rounded-full border border-amber-500/20">
             Calculadora de Impacto Financiero
@@ -929,7 +932,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 7. SHOWCASE DINÁMICO POR INDUSTRIAS (TABS INTERACTIVAS) */}
       {/* ============================================================== */}
-      <section id="nichos" className="py-20 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-800/80">
+      <section id="nichos" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
             Especialización Vertical
@@ -965,7 +968,7 @@ export default function HomePage() {
         </div>
 
         {/* Active Niche Showcase Content Card */}
-        <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-[#0F1626] to-[#0A0E18] border-2 border-slate-800 shadow-2xl max-w-5xl mx-auto">
+        <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-[#0F1626] to-[#0A0E18] border-2 border-slate-800 shadow-2xl max-w-[1550px] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left Content */}
             <div className="lg:col-span-7 space-y-4 text-left">
@@ -1037,7 +1040,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 8. COMPARATIVA INTERACTIVA: ANTES VS DESPUÉS DE PRESTIGIA */}
       {/* ============================================================== */}
-      <section id="comparativa" className="py-20 px-4 sm:px-8 max-w-6xl mx-auto border-t border-slate-800/80">
+      <section id="comparativa" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <span className="text-xs font-bold uppercase tracking-widest text-purple-400 bg-purple-500/10 px-3.5 py-1 rounded-full border border-purple-500/20">
             Impacto Operativo
@@ -1078,7 +1081,7 @@ export default function HomePage() {
 
         {/* Dynamic Comparison Cards */}
         {comparisonMode === 'without' ? (
-          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-rose-950/20 via-[#0E1322] to-[#0A0D18] border-2 border-rose-500/40 shadow-2xl animate-fade-in">
+          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-rose-950/20 via-[#0E1322] to-[#0A0D18] border-2 border-rose-500/40 shadow-2xl animate-fade-in max-w-[1550px] mx-auto">
             <div className="flex items-center gap-3 pb-6 border-b border-rose-500/20">
               <span className="text-3xl">⚠️</span>
               <div>
@@ -1111,7 +1114,7 @@ export default function HomePage() {
             </div>
           </div>
         ) : (
-          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-emerald-950/25 via-[#0E1322] to-[#0A0D18] border-2 border-emerald-500/40 shadow-2xl animate-fade-in">
+          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-emerald-950/25 via-[#0E1322] to-[#0A0D18] border-2 border-emerald-500/40 shadow-2xl animate-fade-in max-w-[1550px] mx-auto">
             <div className="flex items-center gap-3 pb-6 border-b border-emerald-500/20">
               <span className="text-3xl">🏆</span>
               <div>
@@ -1149,7 +1152,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 9. CASOS DE ÉXITO REALES CON RESULTADOS */}
       {/* ============================================================== */}
-      <section id="testimonios" className="py-20 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-800/80">
+      <section id="testimonios" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
             Casos de Éxito Comprobados
@@ -1162,7 +1165,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1600px] mx-auto">
           {/* Caso 1: La Burguesía */}
           <div className="p-7 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl hover:border-amber-500/40 transition">
             <div>
@@ -1228,7 +1231,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 10. MODELO A LA MEDIDA: CERO PRECIOS PÚBLICOS, TRATO EXCLUSIVO */}
       {/* ============================================================== */}
-      <section id="propuesta" className="py-20 px-4 sm:px-8 max-w-7xl mx-auto border-t border-slate-800/80">
+      <section id="propuesta" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 px-3.5 py-1 rounded-full border border-amber-500/20">
             Consultoría Estratégica
@@ -1241,7 +1244,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1600px] mx-auto">
           {/* Nivel 1: Punto Único */}
           <div className="p-7 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl hover:border-slate-700 transition">
             <div>
@@ -1336,7 +1339,7 @@ export default function HomePage() {
         </div>
 
         {/* Corporate Peace of Mind Banner */}
-        <div className="mt-12 p-6 rounded-3xl bg-slate-900/60 border border-slate-800 max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+        <div className="mt-12 p-6 rounded-3xl bg-slate-900/60 border border-slate-800 max-w-[1300px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0">
               <HeartHandshake className="w-5 h-5" />
@@ -1355,7 +1358,7 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 11. ACORDEÓN INTERACTIVO DE PREGUNTAS FRECUENTES (FAQ) */}
       {/* ============================================================== */}
-      <section className="py-20 px-4 sm:px-8 max-w-4xl mx-auto border-t border-slate-800/80">
+      <section className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1500px] mx-auto border-t border-slate-800/80">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3.5 py-1 rounded-full border border-indigo-500/20">
             Dudas Resueltas
@@ -1368,7 +1371,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="space-y-3.5">
+        <div className="space-y-3.5 max-w-[1200px] mx-auto">
           {FAQS.map((faq, index) => {
             const isOpen = openFaqIndex === index;
             return (
@@ -1405,8 +1408,8 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 12. FORMULARIO DE AGENDAMIENTO DE LLAMADA ESTRATÉGICA VIP */}
       {/* ============================================================== */}
-      <section id="agendar" className="py-20 px-4 sm:px-8 max-w-4xl mx-auto border-t border-slate-800/80">
-        <div className="bg-gradient-to-br from-[#101728] via-[#0E1322] to-[#0A0E18] border-2 border-amber-500/40 rounded-3xl p-7 sm:p-12 shadow-2xl relative overflow-hidden">
+      <section id="agendar" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1500px] mx-auto border-t border-slate-800/80">
+        <div className="bg-gradient-to-br from-[#101728] via-[#0E1322] to-[#0A0E18] border-2 border-amber-500/40 rounded-3xl p-7 sm:p-14 shadow-2xl relative overflow-hidden max-w-[1200px] mx-auto">
           {/* Header */}
           <div className="text-center max-w-xl mx-auto space-y-3">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-bold tracking-wider uppercase">
@@ -1447,7 +1450,7 @@ export default function HomePage() {
               </div>
             </div>
           ) : (
-            <form onSubmit={handleLeadSubmit} className="mt-8 space-y-4 max-w-xl mx-auto text-left">
+            <form onSubmit={handleLeadSubmit} className="mt-8 space-y-4 max-w-2xl mx-auto text-left">
               {leadError && (
                 <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-medium flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 shrink-0" />
@@ -1625,13 +1628,13 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 13. FOOTER CORPORATIVO */}
       {/* ============================================================== */}
-      <footer className="border-t border-slate-800/80 py-12 px-4 sm:px-8 bg-[#05070B] text-slate-400 text-xs">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <footer className="border-t border-slate-800/80 py-14 px-6 sm:px-12 lg:px-20 bg-[#05070B] text-slate-400 text-xs">
+        <div className="max-w-[1700px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <PrestigiaIcon className="w-7 h-7 text-white" />
+            <PrestigiaIcon className="w-8 h-8 text-white" />
             <div>
-              <p className="text-white font-extrabold tracking-wider">PRESTIGIA TECHNOLOGIES ENTERPRISE</p>
-              <p className="text-[10px] text-slate-500">Suite de Crecimiento Comercial, Blindaje Reputacional & Conversión Local 5★</p>
+              <p className="text-white font-extrabold tracking-wider text-sm">PRESTIGIA TECHNOLOGIES ENTERPRISE</p>
+              <p className="text-[11px] text-slate-500">Suite de Crecimiento Comercial, Blindaje Reputacional & Conversión Local 5★</p>
             </div>
           </div>
 
@@ -1661,7 +1664,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-slate-900 text-[10px] text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="max-w-[1700px] mx-auto mt-8 pt-6 border-t border-slate-900 text-[10px] text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p>© {new Date().getFullYear()} Prestigia Technologies. Todos los derechos reservados.</p>
           <p>Cumplimiento Normativo RGPD, Ley 1581 de Habeas Data & Políticas Oficiales de Reseñas de Google Maps.</p>
         </div>
