@@ -418,56 +418,62 @@ export default function RatingCapturePage() {
   // State: Loading skeleton
   if (loading) {
     return (
-      <main className="w-full max-w-md min-h-screen p-6 flex flex-col justify-center items-center text-center animate-pulse">
-        <div className="w-16 h-16 rounded-2xl bg-slate-800 mb-6"></div>
-        <div className="h-6 w-48 bg-slate-800 rounded-lg mb-3"></div>
-        <div className="h-4 w-32 bg-slate-800 rounded-lg mb-8"></div>
-        <div className="h-12 w-64 bg-slate-800 rounded-xl mb-4"></div>
-      </main>
+      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-prestigia-bg px-4 py-8">
+        <main className="w-full max-w-md p-6 flex flex-col justify-center items-center text-center animate-pulse mx-auto">
+          <div className="w-16 h-16 rounded-2xl bg-slate-800 mb-6"></div>
+          <div className="h-6 w-48 bg-slate-800 rounded-lg mb-3"></div>
+          <div className="h-4 w-32 bg-slate-800 rounded-lg mb-8"></div>
+          <div className="h-12 w-64 bg-slate-800 rounded-xl mb-4"></div>
+        </main>
+      </div>
     );
   }
 
   // State: Error / Not found
   if (error || !business) {
     return (
-      <main className="w-full max-w-md min-h-screen p-6 flex flex-col justify-center items-center text-center">
-        <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-prestigia-alert mb-4">
-          <AlertTriangle className="w-10 h-10" />
-        </div>
-        <h1 className="text-xl font-bold text-white mb-2">
-          {isEn ? 'Location Unavailable' : 'Sede no disponible'}
-        </h1>
-        <p className="text-sm text-slate-400 mb-6 max-w-xs">
-          {error || (isEn ? 'The location identifier is invalid or has expired.' : 'El identificador de la sede no es válido o ha expirado.')}
-        </p>
-        <span className="text-xs text-slate-500">
-          {isEn ? 'Prestigia Platform' : 'Plataforma Prestigia'}
-        </span>
-      </main>
+      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-prestigia-bg px-4 py-8">
+        <main className="w-full max-w-md p-6 flex flex-col justify-center items-center text-center mx-auto">
+          <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-prestigia-alert mb-4">
+            <AlertTriangle className="w-10 h-10" />
+          </div>
+          <h1 className="text-xl font-bold text-white mb-2">
+            {isEn ? 'Location Unavailable' : 'Sede no disponible'}
+          </h1>
+          <p className="text-sm text-slate-400 mb-6 max-w-xs">
+            {error || (isEn ? 'The location identifier is invalid or has expired.' : 'El identificador de la sede no es válido o ha expirado.')}
+          </p>
+          <span className="text-xs text-slate-500">
+            {isEn ? 'Prestigia Platform' : 'Plataforma Prestigia'}
+          </span>
+        </main>
+      </div>
     );
   }
 
   // State: Suspended business (Kill Switch / Morosidad)
   if (business.status === 'suspended') {
     return (
-      <main className="w-full max-w-md min-h-screen p-6 flex flex-col justify-center items-center text-center">
-        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 mb-4">
-          <AlertTriangle className="w-10 h-10" />
-        </div>
-        <h1 className="text-xl font-bold text-white mb-2">
-          {isEn ? 'Service Under Maintenance' : 'Servicio en Mantenimiento'}
-        </h1>
-        <p className="text-sm text-slate-400 mb-6 max-w-xs">
-          {isEn ? (
-            <>The evaluation channel for <strong className="text-white">{business.businessName} ({business.branchName})</strong> is temporarily inactive.</>
-          ) : (
-            <>El canal de evaluación de <strong className="text-white">{business.businessName} ({business.branchName})</strong> se encuentra temporalmente inactivo.</>
-          )}
-        </p>
-        <div className="text-xs text-slate-500">
-          Prestigia • {isEn ? 'Reputation System' : 'Sistema de Reputación'}
-        </div>
-      </main>
+      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-prestigia-bg px-4 py-8">
+        <main className="w-full max-w-md p-6 flex flex-col justify-center items-center text-center mx-auto">
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 mb-4">
+            <AlertTriangle className="w-10 h-10" />
+          </div>
+          <h1 className="text-xl font-bold text-white mb-2">
+            {isEn ? 'Service Under Maintenance' : 'Servicio en Mantenimiento'}
+          </h1>
+          <p className="text-sm text-slate-400 mb-6 max-w-xs">
+            {isEn ? (
+              <>The evaluation channel for <strong className="text-white">{business.businessName} ({business.branchName})</strong> is temporarily inactive.</>
+            ) : (
+              <>El canal de evaluación de <strong className="text-white">{business.businessName} ({business.branchName})</strong> se encuentra temporalmente inactivo.</>
+            )}
+          </p>
+          <div className="text-xs text-slate-500">
+            Prestigia • {isEn ? 'Reputation System' : 'Sistema de Reputación'}
+          </div>
+        </main>
+      </div>
     );
   }
 
@@ -480,10 +486,48 @@ export default function RatingCapturePage() {
 
   const brandColor = business.branding?.primaryColor || '#6366F1';
 
+  const getLocalizedCampaignTitle = (title?: string) => {
+    if (!title) return isEn ? 'Monthly Satisfaction Campaign' : 'Campaña de Satisfacción del Mes';
+    if (!isEn) return title;
+    if (title.toLowerCase().includes('sorteo mensual vip')) {
+      return title.replace(/sorteo mensual vip:\s*/i, 'VIP Monthly Giveaway: ')
+                  .replace(/experiencia burger para 2/i, 'Burger Experience for 2');
+    }
+    return title;
+  };
+
+  const getLocalizedCampaignReward = (reward?: string) => {
+    if (!reward) return '';
+    if (!isEn) return reward;
+    if (reward.toLowerCase().includes('cena gourmet')) {
+      return 'Gourmet Dinner for 2 (Signature Burgers + Cocktails + Dessert)';
+    }
+    return reward;
+  };
+
+  const getLocalizedDrawDate = (date?: string) => {
+    if (!date) return '';
+    if (!isEn) return date;
+    if (date.toLowerCase().includes('septiembre')) {
+      return 'September 30, 2026';
+    }
+    return date;
+  };
+
+  const getLocalizedCategory = (cat?: string) => {
+    if (!cat) return '';
+    if (!isEn) return cat;
+    if (cat.toLowerCase().includes('hamburguesería & gastrobar')) {
+      return 'Burger Restaurant & Gastrobar';
+    }
+    return cat;
+  };
+
   return (
-    <main className="w-full max-w-md min-h-screen flex flex-col justify-between p-5 sm:p-6 select-none">
-      {/* Top Bar / Branding */}
-      <header className="flex items-center justify-between pt-2 pb-4 border-b border-slate-800/80">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-prestigia-bg px-3 py-4 sm:py-8">
+      <main className="w-full max-w-md min-h-screen sm:min-h-0 flex flex-col justify-between p-5 sm:p-6 select-none bg-prestigia-bg mx-auto">
+        {/* Top Bar / Branding */}
+        <header className="flex items-center justify-between pt-2 pb-4 border-b border-slate-800/80">
         <div className="flex items-center gap-2.5">
           <PrestigiaIcon className="w-8 h-8 drop-shadow-md" />
           <span className="text-xs font-black tracking-widest text-white">PRESTIGIA</span>
@@ -595,7 +639,7 @@ export default function RatingCapturePage() {
                   <div className="flex items-center gap-2 min-w-0">
                     <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
                     <span className="text-xs font-black text-amber-300 uppercase tracking-wide truncate">
-                      {business.campaign.title || (isEn ? 'Satisfaction Giveaway' : 'Sorteo de Satisfacción')}
+                      {getLocalizedCampaignTitle(business.campaign.title)}
                     </span>
                   </div>
                   <span className="shrink-0 inline-flex items-center justify-center px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold tracking-wide whitespace-nowrap shadow-sm">
@@ -606,7 +650,7 @@ export default function RatingCapturePage() {
 
                 <p className="text-xs text-slate-300">
                   {isEn ? (
-                    <>Enter your WhatsApp to participate for <strong>{business.campaign.reward}</strong>!</>
+                    <>Enter your WhatsApp to participate for <strong>{getLocalizedCampaignReward(business.campaign.reward)}</strong>!</>
                   ) : (
                     <>¡Anota tu WhatsApp para participar por <strong>{business.campaign.reward}</strong>!</>
                   )}
@@ -624,7 +668,7 @@ export default function RatingCapturePage() {
                       </h4>
                       <p className="text-[11px] text-slate-300 mt-1 leading-relaxed max-w-xs mx-auto">
                         {isEn ? (
-                          <>Your number was securely registered. If you are the winner, we will contact you via WhatsApp on <strong className="text-emerald-300">{business.campaign.drawDate || 'month end'}</strong>. Good luck! 🍀</>
+                          <>Your number was securely registered. If you are the winner, we will contact you via WhatsApp on <strong className="text-emerald-300">{getLocalizedDrawDate(business.campaign.drawDate) || 'month end'}</strong>. Good luck! 🍀</>
                         ) : (
                           <>Tu número quedó registrado de forma segura. Si resultas ganador(a), te contactaremos por WhatsApp el <strong className="text-emerald-300">{business.campaign.drawDate || 'cierre de mes'}</strong>. ¡Mucha suerte! 🍀</>
                         )}
@@ -893,7 +937,9 @@ export default function RatingCapturePage() {
                   color: brandColor,
                 }}
               >
-                {business.branchName}
+                {isEn && business.branchName.startsWith('Sede ')
+                  ? `${business.branchName.replace('Sede ', '')} Location`
+                  : business.branchName}
               </span>
             </div>
 
@@ -901,7 +947,7 @@ export default function RatingCapturePage() {
             <div className="flex flex-wrap items-center justify-center gap-2 mb-6 text-xs text-slate-400">
               {business.category && (
                 <span className="px-2.5 py-0.5 rounded-full bg-slate-800/80 border border-slate-700/50">
-                  {business.category}
+                  {getLocalizedCategory(business.category)}
                 </span>
               )}
               {business.city && (
@@ -920,19 +966,19 @@ export default function RatingCapturePage() {
                     <Gift className="w-4 h-4" />
                   </div>
                   <span className="text-xs font-black uppercase tracking-wider text-amber-300">
-                    {business.campaign.title || (isEn ? 'Monthly Satisfaction Campaign' : 'Campaña de Satisfacción del Mes')}
+                    {getLocalizedCampaignTitle(business.campaign.title)}
                   </span>
                 </div>
                 <p className="text-xs text-white font-medium leading-relaxed">
                   {isEn ? (
-                    <>🎁 Enter our campaign for a chance to win: <strong className="text-amber-200">{business.campaign.reward}</strong>.</>
+                    <>🎁 Enter our campaign for a chance to win: <strong className="text-amber-200">{getLocalizedCampaignReward(business.campaign.reward)}</strong>.</>
                   ) : (
                     <>🎁 Participa en nuestra campaña y puedes ganar: <strong className="text-amber-200">{business.campaign.reward}</strong>.</>
                   )}
                 </p>
                 {business.campaign.drawDate && (
                   <div className="text-[10px] text-slate-300 mt-2 pt-2 border-t border-slate-700/50 flex items-center justify-between">
-                    <span>{isEn ? '📅 Draw:' : '📅 Sorteo:'} <strong>{business.campaign.drawDate}</strong></span>
+                    <span>{isEn ? '📅 Draw:' : '📅 Sorteo:'} <strong>{getLocalizedDrawDate(business.campaign.drawDate)}</strong></span>
                     <span className="text-emerald-400 font-bold">{isEn ? '100% Free with your rating!' : '¡100% Gratis con tu voto!'}</span>
                   </div>
                 )}
@@ -1049,5 +1095,6 @@ export default function RatingCapturePage() {
         </p>
       </footer>
     </main>
+  </div>
   );
 }
