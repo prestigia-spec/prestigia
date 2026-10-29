@@ -43,6 +43,9 @@ import {
   HelpCircle,
   Activity,
   Layers,
+  Search,
+  Gift,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { PRESTIGIA_NICHES } from '@/lib/types';
 
@@ -394,6 +397,98 @@ const SUCCESS_CASES: SuccessCase[] = [
   },
 ];
 
+// 8 Core Operational Modules of Prestigia Client Portal (Fusión de Propuesta & Landing)
+const PORTAL_MODULES = [
+  {
+    id: 1,
+    title: 'Panel Central & Semáforo Operativo',
+    shortName: '1. Dashboard',
+    badge: 'Incluido en Básico, Pro y Élite',
+    badgeColor: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
+    icon: BarChart3,
+    desc: 'Cabina de mando en tiempo real. Muestra el Índice de Aprobación Neta (% de clientes satisfechos), total de opiniones recibidas, tiempo medio de respuesta y acceso instantáneo a tus Smart QRs listos para descargar.',
+    benefit: 'El dueño entiende la salud operativa de su negocio en 5 segundos sin pedirle cuentas al administrador.',
+    tip: 'Si la aprobación baja del 90%, revisa el turno de la tarde para detectar demoras en cocina o servicio.',
+  },
+  {
+    id: 2,
+    title: 'Radar Google Maps & Asistente IA',
+    shortName: '2. Radar Google',
+    badge: 'Lectura en Básico • IA en Pro y Élite',
+    badgeColor: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+    icon: Sparkles,
+    desc: 'Monitorea en vivo todas las reseñas públicas de Google Maps. En Plan Pro y Élite, genera respuestas inteligentes instantáneas con IA en 3 tonos (Cálido, Corporativo y Promocional) y traduce automáticamente si el cliente escribe en otro idioma.',
+    benefit: 'Ahorra costos de Community Management y posiciona tu local en el Top 3 del mapa de Google Maps.',
+    tip: 'Usar el tono Promocional fideliza al cliente para que regrese la semana siguiente por un producto nuevo.',
+  },
+  {
+    id: 3,
+    title: 'Central de Contención & Incidentes Privados',
+    shortName: '3. Contención Privada',
+    badge: 'Cero Saturación • Alertas en Vivo',
+    badgeColor: 'text-rose-400 bg-rose-500/10 border-rose-500/20',
+    icon: ShieldCheck,
+    desc: 'Bóveda blindada donde quedan retenidas todas las calificaciones de 1, 2 y 3 estrellas. Cero mensajes a WhatsApp o correos personales para no saturar. Genera alertas visuales y sonoras en la pantalla del establecimiento con tickets de auditoría completa.',
+    benefit: 'Evita el 100% de quejas públicas en internet y retiene al cliente inconforme de forma confidencial.',
+    tip: 'Resolver el incidente en los primeros 15 minutos tiene una tasa de recuperación del cliente del 89%.',
+  },
+  {
+    id: 4,
+    title: 'Sorteos VIP & Motor de Ruleta',
+    shortName: '4. Sorteos VIP',
+    badge: 'Pro (1 Ganador) • Élite (Multi-Ganador)',
+    badgeColor: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+    icon: Gift,
+    desc: 'Motor de gamificación interactiva que motiva a los clientes a calificar desde su celular para participar por incentivos del establecimiento. Incluye ruleta animada, verificación de Habeas Data y generador oficial de certificados de ganadores.',
+    benefit: 'Multiplica por 4 el número de personas que escanean el QR en mesa, caja o recepción.',
+    tip: 'Premia un bono o producto estrella; el costo para el negocio es mínimo comparado con cientos de contactos captados.',
+  },
+  {
+    id: 5,
+    title: 'Base de Datos Propia & Exportación CSV',
+    shortName: '5. Base de Datos',
+    badge: 'Ley 1581 Habeas Data • Descarga 1-Clic',
+    badgeColor: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+    icon: Database,
+    desc: 'Directorio centralizado de todos los clientes que han visitado tu negocio, con nombre, teléfono WhatsApp, fecha, sede y consentimiento legal firmado. Permite descargar todo a Excel o CSV con 1 solo clic.',
+    benefit: 'Te independiza de intermediarios costosos y te entrega una base propia para promociones sin pagar pauta.',
+    tip: 'Descarga la base periódicamente y envía promociones directas para llenar días de menor afluencia.',
+  },
+  {
+    id: 6,
+    title: 'Podio de Colaboradores & Auditoría de Personal',
+    shortName: '6. Podio Personal',
+    badge: 'Pro (Básico) • Élite (Ranking Completo)',
+    badgeColor: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+    icon: Award,
+    desc: 'Asocia cada calificación recibida al colaborador que atendió al cliente (asesor, recepcionista, mesero, cajero). Genera el podio semanal de servicio y registra bitácoras de incidentes con hora y turno exacto.',
+    benefit: 'Sabes con exactitud matemática a quién premiar con bonos y a quién capacitar para evitar quejas.',
+    tip: 'Reconocer semanalmente al colaborador del podio eleva la motivación de todo el equipo de inmediato.',
+  },
+  {
+    id: 7,
+    title: 'Pantalla TV Wallboard en Vivo para Salón',
+    shortName: '7. TV Wallboard',
+    badge: 'Exclusivo Plan Élite',
+    badgeColor: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+    icon: Tv,
+    desc: 'Modo de visualización en pantalla completa para proyectar en Smart TV o tablet en salón o cocina. Oculta la barra de navegador, incluye selector bilingüe instantáneo y tacómetro radial con las opiniones que entran en vivo.',
+    benefit: 'Motiva al personal en tiempo real y transmite un estándar de calidad y tecnología frente a los comensales.',
+    tip: 'Colócalo en zona visible para que el equipo celebre cada calificación 5 estrellas que ingresa en vivo.',
+  },
+  {
+    id: 8,
+    title: 'Control Multisede & Franquicias',
+    shortName: '8. Multisede',
+    badge: 'Exclusivo Plan Élite & Holdings',
+    badgeColor: 'text-teal-400 bg-teal-500/10 border-teal-500/20',
+    icon: Building2,
+    desc: 'Conmutador inteligente para supervisar múltiples sucursales con 1 solo clic. Permite alternar entre sedes individuales o activar la vista macro de "Todas las Sedes" para un consolidado financiero y de reputación.',
+    benefit: 'Centraliza la administración de marcas con varias sedes sin enredos de contraseñas ni desorden.',
+    tip: 'Compara el rendimiento entre sedes para identificar qué administrador está ejecutando mejor la operación.',
+  },
+];
+
 export default function HomePage() {
   // Strategic Call Booking Form State
   const [leadForm, setLeadForm] = useState({
@@ -434,6 +529,33 @@ export default function HomePage() {
 
   // FAQ Accordion State
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
+  // Currency Switcher State for Transparent Pricing (Fusión con Propuesta)
+  const [currency, setCurrency] = useState<'COP' | 'USD' | 'EUR' | 'MXN'>('COP');
+
+  // Interactive 8-Module Portal Walkthrough State
+  const [activePortalTab, setActivePortalTab] = useState<number>(0);
+
+  // Dynamic Price Formatter according to Selected Currency
+  const formatPlanPrice = (plan: 'basico' | 'pro' | 'elite') => {
+    switch (plan) {
+      case 'basico':
+        if (currency === 'USD') return '$19 USD';
+        if (currency === 'EUR') return '18 €';
+        if (currency === 'MXN') return '$390 MXN';
+        return '$49.000 COP';
+      case 'pro':
+        if (currency === 'USD') return '$49 USD';
+        if (currency === 'EUR') return '45 €';
+        if (currency === 'MXN') return '$990 MXN';
+        return '$120.000 COP';
+      case 'elite':
+        if (currency === 'USD') return '$110 USD';
+        if (currency === 'EUR') return '99 €';
+        if (currency === 'MXN') return '$2.300 MXN';
+        return '$290.000 COP';
+    }
+  };
 
   // Testimonials Infinite Carousel Glide Pause on Touch / Interaction
   const [isGlidePaused, setIsGlidePaused] = useState(false);
@@ -651,13 +773,26 @@ export default function HomePage() {
             <a href="#como-funciona" className="hover:text-amber-400 transition whitespace-nowrap">Cómo Funciona</a>
             <a href="#simulador" className="hover:text-amber-400 transition whitespace-nowrap">Simulador</a>
             <a href="#calculadora-roi" className="hover:text-amber-400 transition whitespace-nowrap">Calculadora ROI</a>
-            <a href="#nichos" className="hover:text-amber-400 transition whitespace-nowrap">Por Industria</a>
-            <a href="#comparativa" className="hover:text-amber-400 transition whitespace-nowrap">Antes vs Después</a>
-            <a href="#propuesta" className="hover:text-amber-400 transition whitespace-nowrap">Planes</a>
+            <a href="#tour-sistema" className="hover:text-amber-400 transition whitespace-nowrap">Tour del Sistema</a>
+            <a href="#auditor-preview" className="hover:text-cyan-300 transition whitespace-nowrap text-cyan-400 flex items-center gap-1 font-bold">
+              <Search className="w-3 h-3 text-cyan-400" />
+              <span>Auditor</span>
+            </a>
+            <a href="#planes" className="hover:text-amber-400 transition whitespace-nowrap">Planes & Precios</a>
           </nav>
 
           {/* Action CTAs */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <Link
+              href="/auditor"
+              onClick={() => trackAction('click_auditor_from_navbar')}
+              className="px-3 sm:px-4 py-2 rounded-xl bg-cyan-950/70 hover:bg-cyan-900 text-cyan-300 font-bold text-xs border border-cyan-500/40 transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
+            >
+              <Search className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="hidden sm:inline">Auditar Negocio</span>
+              <span className="sm:hidden">Auditor</span>
+            </Link>
+
             <Link
               href="/portal"
               onClick={() => trackAction('click_portal_from_navbar')}
@@ -752,6 +887,19 @@ export default function HomePage() {
                 <MessageCircle className="w-4 h-4 text-emerald-400" />
                 <span>Hablar por WhatsApp Directo</span>
               </a>
+            </div>
+
+            {/* Direct Auditor Quick Access Banner in Hero */}
+            <div className="pt-1 flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-slate-400">¿Quieres conocer las fugas y calificación de tu negocio hoy?</span>
+              <Link
+                href="/auditor"
+                onClick={() => trackAction('click_hero_auditor_link')}
+                className="text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1 group/audit underline underline-offset-4 decoration-cyan-500/40 cursor-pointer"
+              >
+                <Search className="w-3.5 h-3.5 text-cyan-400 group-hover/audit:scale-110 transition-transform" />
+                <span>Auditar mi Google Maps Gratis en Vivo ↗</span>
+              </Link>
             </div>
 
             {/* Social Proof Trust Footer */}
@@ -1036,6 +1184,117 @@ export default function HomePage() {
               <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> 0% Daño público a la calificación de la empresa</div>
               <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Alerta en vivo y ticket en el Portal Clientes para resolución centralizada</div>
               <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> Cero saturación de WhatsApps o correos personales</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================== */}
+      {/* 5.1. AUDITORÍA REPUTACIONAL EN TIEMPO REAL (ACCESO OFICIAL AL AUDITOR) */}
+      {/* ============================================================== */}
+      <section id="auditor-preview" className="py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
+        <div className="p-8 sm:p-14 rounded-3xl bg-gradient-to-br from-cyan-950/40 via-[#0A101F] to-[#070B16] border-2 border-cyan-500/40 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            {/* Left Column: Pitch & Live Scan Explanation */}
+            <div className="lg:col-span-7 space-y-6 text-left">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-wide">
+                <Search className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Herramienta Oficial Gratuita</span>
+              </div>
+
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white leading-tight">
+                Audita tu Negocio en Google Maps{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400">
+                  en tiempo real
+                </span>
+              </h2>
+
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
+                ¿Sabes cuántos clientes nuevos estás perdiendo cada semana por reseñas sin responder, calificaciones bajas o fuga de prospectos hacia tu competencia directa?
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                <div className="p-3.5 rounded-2xl bg-[#0E1628]/80 border border-slate-800 text-xs text-slate-300 space-y-1">
+                  <div className="flex items-center gap-2 text-cyan-300 font-bold">
+                    <Activity className="w-4 h-4 text-cyan-400" />
+                    <span>Diagnóstico de Fugas</span>
+                  </div>
+                  <p className="text-slate-400">Calcula el dinero exacto que dejas sobre la mesa por cada cliente insatisfecho.</p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-[#0E1628]/80 border border-slate-800 text-xs text-slate-300 space-y-1">
+                  <div className="flex items-center gap-2 text-emerald-300 font-bold">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <span>Índice de Vulnerabilidad</span>
+                  </div>
+                  <p className="text-slate-400">Verifica si tu ficha está en riesgo de caer bajo el umbral crítico de 4.2 estrellas.</p>
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                <Link
+                  href="/auditor"
+                  onClick={() => trackAction('click_auditor_preview_btn')}
+                  className="px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-black text-sm shadow-xl shadow-cyan-500/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer animate-shimmer whitespace-nowrap"
+                >
+                  <Search className="w-4 h-4 text-slate-950" />
+                  <span>Abrir Auditor Google Maps en Vivo</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+
+                <span className="text-[11px] text-slate-400 text-center sm:text-left">
+                  🔒 Diagnóstico instantáneo, sin registros previos ni tarjeta.
+                </span>
+              </div>
+            </div>
+
+            {/* Right Column: Auditor Card Mockup Preview */}
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="w-full max-w-md p-6 rounded-3xl bg-[#090F1C] border-2 border-cyan-500/30 shadow-2xl space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-rose-500" />
+                    <div className="w-3 h-3 rounded-full bg-amber-500" />
+                    <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                  </div>
+                  <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider">
+                    AUDITOR_PRESTIGIA_V2
+                  </span>
+                </div>
+
+                <div className="space-y-3 text-xs">
+                  <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                    <span className="text-slate-400">Puntaje Google Maps Detectado:</span>
+                    <span className="text-amber-400 font-bold flex items-center gap-1">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> 4.1 / 5.0
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-rose-950/30 border border-rose-500/30 flex items-center justify-between">
+                    <span className="text-rose-300">Reseñas Negativas Expuestas:</span>
+                    <span className="text-rose-400 font-mono font-bold">14 incidentes</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 flex items-center justify-between">
+                    <span className="text-amber-300">Pérdida Mensual Estimada:</span>
+                    <span className="text-amber-400 font-mono font-bold">$1.850 USD / mes</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/30 flex items-center justify-between">
+                    <span className="text-emerald-300">Potencial con Blindaje Prestigia:</span>
+                    <span className="text-emerald-400 font-mono font-bold">+85 Clientes / mes</span>
+                  </div>
+                </div>
+
+                <Link
+                  href="/auditor"
+                  className="w-full py-3 rounded-xl bg-cyan-600/20 hover:bg-cyan-600/30 border border-cyan-500/40 text-cyan-300 font-bold text-xs flex items-center justify-center gap-2 transition"
+                >
+                  <span>Probar tu propio local en el Auditor ↗</span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -1479,111 +1738,361 @@ export default function HomePage() {
       </section>
 
       {/* ============================================================== */}
-      {/* 10. MODELO A LA MEDIDA: CERO PRECIOS PÚBLICOS, TRATO EXCLUSIVO */}
+      {/* 10. TOUR DEL SISTEMA: RECORRIDO PESTAÑA POR PESTAÑA */}
       {/* ============================================================== */}
-      <section id="propuesta" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
-        <div className="text-center max-w-3xl mx-auto mb-14">
-          <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 px-3.5 py-1 rounded-full border border-amber-500/20">
-            Consultoría Estratégica
+      <section id="tour-sistema" className="py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-3.5 py-1 rounded-full border border-indigo-500/20">
+            Transparencia Operativa Absoluta
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            No vendemos software de caja. Diseñamos el plan para tu operación.
+            Recorrido Pestaña por Pestaña del Sistema
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">
-            Cada empresa tiene un volumen de clientes, un número de sedes y una dinámica diferente. Hablaremos directamente contigo en una sesión estratégica para estructurar el plan que mejor se ajuste a tu operación y presupuesto.
+          <p className="text-xs sm:text-sm text-slate-400 mt-2">
+            Cada módulo del Portal Prestigia fue concebido para ahorrarte tiempo, blindar tu prestigio y generar facturación recurrente:
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1600px] mx-auto">
-          {/* Nivel 1: Punto Único */}
-          <div className="p-7 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl hover:border-slate-700 transition">
-            <div>
-              <span className="text-[11px] font-bold uppercase text-emerald-400 tracking-wider">
-                1 Sede / Consultorio / Local
-              </span>
-              <h3 className="text-xl font-black text-white mt-1">Punto Único</h3>
-              <p className="text-xs text-slate-400 mt-2">
-                Ideal para profesionales independientes, consultorios médicos o locales comerciales de 1 punto físico.
+        {/* 8-Tab Selector Pills */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-8 max-w-5xl mx-auto">
+          {PORTAL_MODULES.map((mod, idx) => {
+            const ModIcon = mod.icon;
+            const isActive = activePortalTab === idx;
+            return (
+              <button
+                key={mod.id}
+                type="button"
+                onClick={() => {
+                  setActivePortalTab(idx);
+                  trackAction(`click_portal_tab_${mod.id}`);
+                }}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                  isActive
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 scale-105'
+                    : 'bg-[#0E1424] text-slate-400 border border-slate-800 hover:text-white hover:border-slate-700'
+                }`}
+              >
+                <ModIcon className="w-3.5 h-3.5 shrink-0" />
+                <span>{mod.shortName}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Active Module Showcase Card */}
+        {(() => {
+          const mod = PORTAL_MODULES[activePortalTab];
+          const ModIcon = mod.icon;
+          return (
+            <div className="max-w-4xl mx-auto p-7 sm:p-10 rounded-3xl bg-gradient-to-br from-[#0F1626] to-[#0A0E18] border-2 border-indigo-500/40 shadow-2xl space-y-6 animate-fade-in">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+                    <ModIcon className="w-5 h-5 text-indigo-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg sm:text-2xl font-black text-white">{mod.title}</h3>
+                    <p className="text-xs text-slate-400">Módulo Operativo {mod.id} de 8</p>
+                  </div>
+                </div>
+                <span className={`text-[11px] font-bold px-3 py-1 rounded-full border ${mod.badgeColor}`}>
+                  {mod.badge}
+                </span>
+              </div>
+
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                {mod.desc}
               </p>
-              <div className="mt-5 pt-4 border-t border-slate-800 space-y-2.5 text-xs text-slate-300">
-                <div className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> Smart QR digital para sala o recepción</div>
-                <div className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> Contención privada de 1★ a 3★</div>
-                <div className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> Catapulta 5★ directa a Google Maps</div>
-                <div className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> Acceso al Portal del Propietario</div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div className="p-4 rounded-2xl bg-[#090D17] border border-slate-800 text-xs space-y-1.5">
+                  <div className="text-emerald-400 font-bold flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span>Beneficio para el Propietario:</span>
+                  </div>
+                  <p className="text-slate-300 leading-relaxed">{mod.benefit}</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-[#090D17] border border-slate-800 text-xs space-y-1.5">
+                  <div className="text-amber-400 font-bold flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                    <span>Tip de Alta Rentabilidad:</span>
+                  </div>
+                  <p className="text-slate-300 leading-relaxed">{mod.tip}</p>
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400 border-t border-slate-800/80">
+                <span>Disponible con control de roles según el plan contratado.</span>
+                <Link
+                  href="/portal"
+                  className="text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-1"
+                >
+                  <span>Ver en Portal Clientes ↗</span>
+                </Link>
               </div>
             </div>
+          );
+        })()}
+      </section>
+
+      {/* ============================================================== */}
+      {/* 11. PLANES & PRECIOS TRANSPARENTES (FUSIÓN MASTER CON PROPUESTA) */}
+      {/* ============================================================== */}
+      <section id="planes" className="py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
+        <div id="propuesta" className="-mt-20 pt-20" />
+        <div className="text-center max-w-3xl mx-auto mb-10">
+          <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 px-3.5 py-1 rounded-full border border-amber-500/20">
+            Estructura Comercial Transparente
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
+            Tres Planes Claros. Un Solo Objetivo: Multiplicar tu Negocio.
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">
+            Sin cláusulas de permanencia oculta ni costos sorpresa. Selecciona tu moneda local para ver la tarifa exacta:
+          </p>
+
+          {/* Currency Switcher Tabs */}
+          <div className="inline-flex items-center gap-2 p-1.5 rounded-2xl bg-[#0E1424] border border-slate-800 mt-6 shadow-lg">
+            {[
+              { id: 'COP', label: 'COP ($) 🇨🇴' },
+              { id: 'USD', label: 'USD ($) 🇺🇸' },
+              { id: 'EUR', label: 'EUR (€) 🇪🇸' },
+              { id: 'MXN', label: 'MXN ($) 🇲🇽' },
+            ].map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => {
+                  setCurrency(c.id as any);
+                  trackAction(`change_currency_${c.id}`);
+                }}
+                className={`px-3 sm:px-4 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  currency === c.id
+                    ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 3 Main Pricing Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1600px] mx-auto items-stretch">
+          
+          {/* PLAN BÁSICO / PILOTO */}
+          <div className="p-7 sm:p-8 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl hover:border-slate-700 transition">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-400">PLAN BÁSICO</span>
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-bold border border-slate-700">
+                  1 Sede Única
+                </span>
+              </div>
+
+              <div>
+                <div className="text-3xl font-black text-white">
+                  {formatPlanPrice('basico')}
+                  <span className="text-xs font-normal text-slate-400 block sm:inline sm:ml-1">/ mes</span>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Ideal para consultorios, tiendas o locales comerciales de 1 punto físico.
+                </p>
+                <div className="mt-2.5 p-2 rounded-xl bg-slate-900 border border-slate-800 text-[10px] text-emerald-400 font-bold">
+                  🎁 <strong>Setup & Smart QR:</strong> 100% BONIFICADO
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-slate-300 space-y-1">
+                <div className="font-bold text-white flex items-center gap-1.5">
+                  <Lock className="w-3 h-3 text-slate-400" />
+                  <span>Pantallas: 1 Pantalla Central del Dueño</span>
+                </div>
+              </div>
+
+              <ul className="space-y-2.5 text-xs text-slate-300 border-t border-slate-800 pt-4">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <span>Filtro Smart QR anti-reseñas 1 a 3★</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <span>Radar de Google Maps básico</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <span>Contención de quejas en Portal Clientes</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <span>Reporte mensual de rendimiento</span>
+                </li>
+                <li className="flex items-start gap-2 text-slate-500">
+                  <Lock className="w-4 h-4 text-slate-600 shrink-0 mt-0.5" />
+                  <span>Sin Asistente IA Google</span>
+                </li>
+                <li className="flex items-start gap-2 text-slate-500">
+                  <Lock className="w-4 h-4 text-slate-600 shrink-0 mt-0.5" />
+                  <span>Sin Alertas Sonoras en Vivo</span>
+                </li>
+              </ul>
+            </div>
+
             <a
               href="#agendar"
               onClick={() => {
                 setLeadForm((prev) => ({ ...prev, branchCount: '1' }));
-                trackAction('click_cotizar_punto_unico');
+                trackAction('click_plan_basico');
               }}
               className="mt-6 w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center transition block cursor-pointer"
             >
-              Solicitar Propuesta Personalizada
+              Solicitar Plan Básico
             </a>
           </div>
 
-          {/* Nivel 2: Comercio de Alto Tráfico */}
-          <div className="p-7 rounded-3xl bg-gradient-to-b from-[#141C30] to-[#0D1424] border-2 border-amber-500 shadow-2xl relative flex flex-col justify-between">
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow">
-              ⭐ Más Solicitado
+          {/* PLAN PRO (DESTACADO / MÁS POPULAR) */}
+          <div className="p-7 sm:p-8 rounded-3xl bg-gradient-to-b from-[#141E34] via-[#0E1526] to-[#0A0F1D] border-2 border-indigo-500 shadow-2xl relative flex flex-col justify-between">
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-indigo-600 text-white text-[10px] font-black uppercase tracking-wider shadow-lg shadow-indigo-600/30">
+              ⭐ EL MÁS POPULAR PARA LOCALES
             </div>
-            <div>
-              <span className="text-[11px] font-bold uppercase text-amber-400 tracking-wider">
-                Gastrobares, Clínicas & Retail
-              </span>
-              <h3 className="text-xl font-black text-white mt-1">Alto Rendimiento</h3>
-              <p className="text-xs text-slate-300 mt-2">
-                Para negocios consolidados con alto tráfico de clientes que requieren captar base de datos y auditar meseros.
-              </p>
-              <div className="mt-5 pt-4 border-t border-slate-800 space-y-2.5 text-xs text-slate-200">
-                <div className="flex items-center gap-2"><Check className="w-4 h-4 text-amber-400 shrink-0" /> Multi-pantallas (Caja, Mesas, Recepción)</div>
-                <div className="flex items-center gap-2"><Check className="w-4 h-4 text-amber-400 shrink-0" /> Módulo de Sorteos VIP & Big Data Habeas Data</div>
-                <div className="flex items-center gap-2"><Check className="w-4 h-4 text-amber-400 shrink-0" /> Auditoría de personal y meseros en turno</div>
-                <div className="flex items-center gap-2"><Check className="w-4 h-4 text-amber-400 shrink-0" /> Alertas sonoras e instantáneas al encargado</div>
-                <div className="flex items-center gap-2"><Check className="w-4 h-4 text-amber-400 shrink-0" /> Soporte ejecutivo prioritario</div>
+
+            <div className="space-y-4 pt-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black uppercase tracking-wider text-indigo-400">PLAN PRO</span>
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">
+                  1 Sede de Alto Tráfico
+                </span>
               </div>
+
+              <div>
+                <div className="text-3xl font-black text-white">
+                  {formatPlanPrice('pro')}
+                  <span className="text-xs font-normal text-slate-400 block sm:inline sm:ml-1">/ mes</span>
+                </div>
+                <p className="text-[11px] text-slate-300 mt-1">
+                  Para restaurantes, gastrobares, clínicas y comercios que buscan liderar su zona.
+                </p>
+                <div className="mt-2.5 p-2 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-[10px] text-emerald-300 font-bold">
+                  🎁 <strong>Setup & Smart QR:</strong> 100% BONIFICADO
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30 text-[11px] text-slate-200 space-y-1">
+                <div className="font-bold text-indigo-300 flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Pantallas: 1 Dueño + 2 Pantallas en Local/Caja con 2FA</span>
+                </div>
+              </div>
+
+              <ul className="space-y-2.5 text-xs text-slate-200 border-t border-slate-800 pt-4">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                  <span><strong>Todo lo del Plan Básico</strong></span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                  <span><strong>Asistente IA Google Ilimitado</strong> (3 tonos de respuesta)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                  <span><strong>Alertas en Vivo Sonoras & Push</strong> en sala y celulares</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                  <span><strong>Sorteo del Mes Oficial</strong> con 1 ganador verificado</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                  <span><strong>Exportación CSV de Clientes</strong> con Ley 1581 Habeas Data</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                  <span>2 Soportes técnicos ejecutivos al mes</span>
+                </li>
+              </ul>
             </div>
+
+            <a
+              href="#agendar"
+              onClick={() => {
+                setLeadForm((prev) => ({ ...prev, branchCount: '1' }));
+                trackAction('click_plan_pro');
+              }}
+              className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 hover:from-indigo-500 hover:to-indigo-400 text-white font-black text-xs text-center shadow-lg shadow-indigo-600/30 transition active:scale-95 block cursor-pointer animate-shimmer"
+            >
+              Activar Plan Pro (Más Solicitado)
+            </a>
+          </div>
+
+          {/* PLAN ÉLITE TOTAL (MULTISEDE & HOLDINGS) */}
+          <div className="p-7 sm:p-8 rounded-3xl bg-[#0D1424] border-2 border-amber-500/80 flex flex-col justify-between shadow-2xl relative">
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow">
+              👑 MÁXIMA POTENCIA MULTISEDE
+            </div>
+
+            <div className="space-y-4 pt-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black uppercase tracking-wider text-amber-400">PLAN ÉLITE TOTAL</span>
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                  Hasta 3 Sedes Físicas
+                </span>
+              </div>
+
+              <div>
+                <div className="text-3xl font-black text-white">
+                  {formatPlanPrice('elite')}
+                  <span className="text-xs font-normal text-slate-400 block sm:inline sm:ml-1">/ mes</span>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Para grupos gastronómicos, holdings, cadenas y marcas de alta exigencia.
+                </p>
+                <div className="mt-2.5 p-2 rounded-xl bg-amber-950/40 border border-amber-500/40 text-[10px] text-amber-300 font-bold">
+                  🎁 <strong>Setup & Smart QR:</strong> 100% BONIFICADO
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 text-[11px] text-slate-200 space-y-1">
+                <div className="font-bold text-amber-300 flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Multisede: Hasta 3 sedes con administradores independientes</span>
+                </div>
+              </div>
+
+              <ul className="space-y-2.5 text-xs text-slate-300 border-t border-slate-800 pt-4">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <span><strong>Todo lo del Plan Pro incluido</strong></span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <span><strong>Modo TV Live Wallboard</strong> para salón y cocina</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <span><strong>Sorteos VIP Multi-Ganador</strong> (de 1 a 10+ premios)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <span><strong>Podio y Bitácora de Personal</strong> completa</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <span><strong>Onboarding y Soporte Prioritario VIP</strong></span>
+                </li>
+              </ul>
+            </div>
+
             <a
               href="#agendar"
               onClick={() => {
                 setLeadForm((prev) => ({ ...prev, branchCount: '2-3' }));
-                trackAction('click_cotizar_alto_rendimiento');
+                trackAction('click_plan_elite');
               }}
-              className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs text-center shadow-lg shadow-amber-500/20 transition active:scale-95 block cursor-pointer animate-shimmer"
+              className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs text-center shadow-lg shadow-amber-500/20 transition active:scale-95 block cursor-pointer"
             >
-              Agendar Sesión Estratégica VIP
-            </a>
-          </div>
-
-          {/* Nivel 3: Cadenas & Franquicias */}
-          <div className="p-7 rounded-3xl bg-[#0D1424] border border-slate-800 flex flex-col justify-between shadow-xl hover:border-slate-700 transition">
-            <div>
-              <span className="text-[11px] font-bold uppercase text-purple-400 tracking-wider">
-                Multi-Sedes & Corporativo
-              </span>
-              <h3 className="text-xl font-black text-white mt-1">Cadenas & Franquicias</h3>
-              <p className="text-xs text-slate-400 mt-2">
-                Arquitectura empresarial para holdings, grupos gastronómicos, cadenas hoteleras o marcas con 2 o más sedes.
-              </p>
-              <div className="mt-5 pt-4 border-t border-slate-800 space-y-2.5 text-xs text-slate-300">
-                <div className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400 shrink-0" /> Multi-Sedes físicas con control centralizado</div>
-                <div className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400 shrink-0" /> Administradores de turno independientes</div>
-                <div className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400 shrink-0" /> Sentimiento 360 IA para análisis de patrones</div>
-                <div className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400 shrink-0" /> Live TV Wallboard en vivo para sala y cocina</div>
-                <div className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400 shrink-0" /> Asesor ejecutivo comercial dedicado</div>
-              </div>
-            </div>
-            <a
-              href="#agendar"
-              onClick={() => {
-                setLeadForm((prev) => ({ ...prev, branchCount: '4-10' }));
-                trackAction('click_cotizar_multi_sede');
-              }}
-              className="mt-6 w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center transition block cursor-pointer"
-            >
-              Solicitar Propuesta Multi-Sede
+              Solicitar Plan Élite Multisede
             </a>
           </div>
         </div>
@@ -1596,12 +2105,18 @@ export default function HomePage() {
             </div>
             <div>
               <p className="text-white text-xs font-bold">Compromiso de Retorno de Inversión Prestigia</p>
-              <p className="text-[11px] text-slate-400">Pactamos tarifas justas y transparentes con proyección de facturación real.</p>
+              <p className="text-[11px] text-slate-400">Pactamos tarifas justas y transparentes con proyección de facturación real. Prestigia se paga sola desde el primer mes evitando fugas de clientes.</p>
             </div>
           </div>
-          <span className="px-3.5 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold shrink-0">
-            ⭐ Tarifa Pactada Todo Incluido
-          </span>
+          <div className="shrink-0 flex items-center gap-2">
+            <Link
+              href="/auditor"
+              className="px-4 py-2 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 text-cyan-300 border border-cyan-500/40 text-xs font-bold transition flex items-center gap-1.5"
+            >
+              <Search className="w-3.5 h-3.5" />
+              <span>Ver Auditor en Vivo</span>
+            </Link>
+          </div>
         </div>
       </section>
 
