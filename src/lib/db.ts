@@ -207,21 +207,139 @@ export async function getBranchOrBusiness(
     return { business: foundBusiness, branch: foundBusiness.branches[0] };
   }
 
+  // 3. Fallback: Check Supabase Cloud via getBusinessById
+  const cloudBiz = await getBusinessById(target);
+  if (cloudBiz && cloudBiz.branches && cloudBiz.branches.length > 0) {
+    return { business: cloudBiz, branch: cloudBiz.branches[0] };
+  }
+
   return null;
 }
 
 export async function getBusinessById(id: string): Promise<Business | null> {
   await syncWithRemoteKv();
   const db = ensureDbFile();
+  const targetId = id.toLowerCase().trim();
   const business = db.businesses.find(
-    (b) => b.id.toLowerCase() === id.toLowerCase().trim()
+    (b) => b.id.toLowerCase() === targetId
   );
-  return business || null;
+  if (business) return business;
+
+  // Supabase Cloud live fallback
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data: bData } = await supabase.from('businesses').select('*').eq('id', targetId).single();
+      if (bData) {
+        const { data: branchesData } = await supabase.from('branches').select('*').eq('business_id', targetId);
+        const mappedBranches: Branch[] = (branchesData || []).map((br: any) => ({
+          id: br.id,
+          name: br.name,
+          address: br.address || '',
+          city: br.city || '',
+          locality: br.locality || '',
+          googleReviewUrl: br.google_review_url || '',
+          googlePlaceId: br.google_place_id || undefined,
+          managerPhone: br.manager_phone || '',
+          managerPassword: br.manager_password || undefined,
+          managerUsername: br.manager_username || undefined,
+          status: br.status || 'active',
+          containmentMessage: br.containment_message || undefined,
+          websiteUrl: br.website_url || br.google_review_url || '',
+        }));
+
+        const restoredBusiness: Business = {
+          id: bData.id,
+          name: bData.name,
+          legalName: bData.legal_name || undefined,
+          taxId: bData.tax_id || undefined,
+          address: bData.address || undefined,
+          ownerName: bData.owner_name,
+          ownerPhone: bData.owner_phone,
+          ownerEmail: bData.owner_email || undefined,
+          plan: bData.plan || 'pro',
+          status: bData.status || 'active',
+          trialEndsAt: bData.trial_ends_at || new Date(Date.now() + 30 * 86400000).toISOString(),
+          category: bData.category || 'General',
+          country: bData.country || 'Colombia',
+          createdAt: bData.created_at || new Date().toISOString(),
+          password: bData.password,
+          branding: bData.branding || {},
+          baseline: bData.baseline || {},
+          masterAddOns: bData.master_add_ons || {},
+          customStaffRoles: bData.custom_staff_roles || [],
+          branches: mappedBranches,
+        };
+
+        db.businesses.push(restoredBusiness);
+        writeDbFile(db);
+        return restoredBusiness;
+      }
+    }
+  } catch {}
+
+  return null;
 }
 
 export async function getAllBusinesses(): Promise<Business[]> {
   await syncWithRemoteKv();
   const db = ensureDbFile();
+
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data: bList } = await supabase.from('businesses').select('*');
+      if (bList && bList.length > 0) {
+        const { data: allBranches } = await supabase.from('branches').select('*');
+        for (const bData of bList) {
+          const exists = db.businesses.find((b) => b.id.toLowerCase() === bData.id.toLowerCase());
+          if (!exists) {
+            const mappedBranches: Branch[] = (allBranches || [])
+              .filter((br: any) => br.business_id.toLowerCase() === bData.id.toLowerCase())
+              .map((br: any) => ({
+                id: br.id,
+                name: br.name,
+                address: br.address || '',
+                city: br.city || '',
+                locality: br.locality || '',
+                googleReviewUrl: br.google_review_url || '',
+                googlePlaceId: br.google_place_id || undefined,
+                managerPhone: br.manager_phone || '',
+                managerPassword: br.manager_password || undefined,
+                managerUsername: br.manager_username || undefined,
+                status: br.status || 'active',
+                containmentMessage: br.containment_message || undefined,
+                websiteUrl: br.website_url || br.google_review_url || '',
+              }));
+
+            db.businesses.push({
+              id: bData.id,
+              name: bData.name,
+              legalName: bData.legal_name || undefined,
+              taxId: bData.tax_id || undefined,
+              address: bData.address || undefined,
+              ownerName: bData.owner_name,
+              ownerPhone: bData.owner_phone,
+              ownerEmail: bData.owner_email || undefined,
+              plan: bData.plan || 'pro',
+              status: bData.status || 'active',
+              trialEndsAt: bData.trial_ends_at || new Date(Date.now() + 30 * 86400000).toISOString(),
+              category: bData.category || 'General',
+              country: bData.country || 'Colombia',
+              createdAt: bData.created_at || new Date().toISOString(),
+              password: bData.password,
+              branding: bData.branding || {},
+              baseline: bData.baseline || {},
+              masterAddOns: bData.master_add_ons || {},
+              customStaffRoles: bData.custom_staff_roles || [],
+              branches: mappedBranches,
+            });
+          }
+        }
+      }
+    }
+  } catch {}
+
   return db.businesses;
 }
 
@@ -234,6 +352,56 @@ export async function saveBusiness(business: Business): Promise<void> {
     db.businesses.push(business);
   }
   writeDbFile(db);
+
+  // Sync real-time to Supabase cloud
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      Promise.resolve(
+        supabase.from('businesses').upsert({
+          id: business.id,
+          name: business.name,
+          legal_name: business.legalName || null,
+          tax_id: business.taxId || null,
+          address: business.address || null,
+          owner_name: business.ownerName,
+          owner_phone: business.ownerPhone,
+          owner_email: business.ownerEmail || null,
+          plan: business.plan,
+          status: business.status,
+          category: business.category,
+          country: business.country || 'Colombia',
+          password: business.password,
+          branding: business.branding || {},
+          baseline: business.baseline || {},
+          master_add_ons: business.masterAddOns || {},
+          custom_staff_roles: business.customStaffRoles || [],
+        })
+      ).catch(() => {});
+
+      if (business.branches && business.branches.length > 0) {
+        for (const br of business.branches) {
+          Promise.resolve(
+            supabase.from('branches').upsert({
+              id: br.id,
+              business_id: business.id,
+              name: br.name,
+              address: br.address || null,
+              city: br.city,
+              locality: br.locality,
+              google_review_url: br.googleReviewUrl,
+              google_place_id: br.googlePlaceId || null,
+              manager_phone: br.managerPhone,
+              manager_password: br.managerPassword || null,
+              manager_username: br.managerUsername || null,
+              status: br.status,
+              containment_message: br.containmentMessage || null,
+            })
+          ).catch(() => {});
+        }
+      }
+    }
+  } catch {}
 }
 
 export async function updateBusinessStatus(
@@ -256,6 +424,15 @@ export async function deleteBusiness(id: string): Promise<boolean> {
 
   db.businesses.splice(index, 1);
   writeDbFile(db);
+
+  // Sync deletion to Supabase cloud
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      Promise.resolve(supabase.from('businesses').delete().eq('id', targetId)).catch(() => {});
+    }
+  } catch {}
+
   return true;
 }
 
