@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { getSupabase } from './supabase';
 import path from 'path';
 import {
   Business,
@@ -294,6 +295,35 @@ export async function createFeedback(
 
   db.feedbacks.unshift(newFeedback);
   writeDbFile(db);
+
+  // Sync real-time to Supabase
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      Promise.resolve(
+        supabase.from('feedbacks').insert({
+          id: newFeedback.id,
+          business_id: newFeedback.businessId,
+          business_name: newFeedback.businessName,
+          branch_id: newFeedback.branchId,
+          branch_name: newFeedback.branchName,
+          rating: newFeedback.rating,
+          customer_name: newFeedback.customerName,
+          customer_phone: newFeedback.customerPhone,
+          complaint_reason: newFeedback.complaintReason || null,
+          attended_by: newFeedback.attendedBy || null,
+          club_consent: Boolean(newFeedback.clubConsent),
+          status: newFeedback.status,
+          created_at: newFeedback.createdAt,
+          category: newFeedback.category || 'General',
+          country: newFeedback.country || 'Colombia',
+          city: newFeedback.city || 'Bogotá',
+          locality: newFeedback.locality || 'Centro',
+        })
+      ).catch(() => {});
+    }
+  } catch {}
+
   return newFeedback;
 }
 
@@ -710,6 +740,34 @@ export async function saveCommercialLead(
 
   db.leads.unshift(newLead);
   writeDbFile(db);
+
+  // Sync real-time to Supabase
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      Promise.resolve(
+        supabase.from('commercial_leads').insert({
+          id: newLead.id,
+          created_at: newLead.createdAt,
+          full_name: newLead.fullName,
+          business_name: newLead.businessName,
+          category: newLead.category || null,
+          city: newLead.city,
+          country: newLead.country || 'Colombia',
+          phone: newLead.phone,
+          email: newLead.email || null,
+          branch_count: newLead.branchCount || 1,
+          preferred_time: newLead.preferredTime || null,
+          primary_goal: newLead.primaryGoal || null,
+          status: newLead.status,
+          ip: newLead.ip || null,
+          device: newLead.device || null,
+          notes: newLead.notes || null,
+        })
+      ).catch(() => {});
+    }
+  } catch {}
+
   return newLead;
 }
 
@@ -728,6 +786,15 @@ export async function updateCommercialLeadStatus(
   if (!lead) return false;
   lead.status = status;
   writeDbFile(db);
+
+  // Sync status to Supabase
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      Promise.resolve(supabase.from('commercial_leads').update({ status }).eq('id', id)).catch(() => {});
+    }
+  } catch {}
+
   return true;
 }
 
