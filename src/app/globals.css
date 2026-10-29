@@ -372,4 +372,27 @@ input[type=number] {
   animation: pulseGlow 4s ease-in-out infinite;
 }
 
+/* =========================================================================
+   INFINITE CYCLIC GLIDE (Continuous Smooth Right-to-Left, Pause on Hover)
+   ========================================================================= */
+@keyframes infiniteGlide {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-infinite-glide {
+  display: flex;
+  width: max-content;
+  animation: infiniteGlide 52s linear infinite;
+  will-change: transform;
+}
+
+.animate-infinite-glide:hover {
+  animation-play-state: paused !important;
+}
+
 

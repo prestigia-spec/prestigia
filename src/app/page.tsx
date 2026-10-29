@@ -437,41 +437,8 @@ export default function HomePage() {
   // FAQ Accordion State
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
-  // Auto-advance Testimonials Carousel smoothly (with pause on hover/interaction)
-  useEffect(() => {
-    const el = document.getElementById('testimonials-scroll-container');
-    if (!el) return;
-
-    let isPaused = false;
-    const onEnter = () => { isPaused = true; };
-    const onLeave = () => { isPaused = false; };
-
-    el.addEventListener('mouseenter', onEnter);
-    el.addEventListener('mouseleave', onLeave);
-    el.addEventListener('touchstart', onEnter, { passive: true });
-    el.addEventListener('touchend', onLeave, { passive: true });
-
-    const interval = setInterval(() => {
-      if (isPaused) return;
-      const maxScroll = el.scrollWidth - el.clientWidth;
-      if (el.scrollLeft >= maxScroll - 25) {
-        // Smoothly loop back to start when reaching end
-        el.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        const card = el.firstElementChild as HTMLElement;
-        const step = card ? card.offsetWidth + 24 : 380;
-        el.scrollBy({ left: step, behavior: 'smooth' });
-      }
-    }, 4500);
-
-    return () => {
-      clearInterval(interval);
-      el.removeEventListener('mouseenter', onEnter);
-      el.removeEventListener('mouseleave', onLeave);
-      el.removeEventListener('touchstart', onEnter);
-      el.removeEventListener('touchend', onLeave);
-    };
-  }, []);
+  // Testimonials Infinite Carousel Glide Pause on Touch / Interaction
+  const [isGlidePaused, setIsGlidePaused] = useState(false);
 
   // Realistic Social Proof Timing (Shows 6s, then hides and waits 18s between toasts)
   useEffect(() => {
@@ -1427,8 +1394,8 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 9. CASOS DE ÉXITO REALES CON RESULTADOS (CARRUSEL INTERACTIVO INTERNACIONAL) */}
       {/* ============================================================== */}
-      <section id="testimonios" className="py-20 px-6 sm:px-12 lg:px-20 max-w-[1700px] mx-auto border-t border-slate-800/80">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+      <section id="testimonios" className="py-20 px-4 sm:px-8 lg:px-12 max-w-[1700px] mx-auto border-t border-slate-800/80">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div className="max-w-3xl text-left">
             <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
               Casos de Éxito Internacionales
@@ -1441,99 +1408,88 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Carousel Arrows Navigation */}
-          <div className="flex items-center gap-3 shrink-0">
-            <button
-              type="button"
-              onClick={() => {
-                const el = document.getElementById('testimonials-scroll-container');
-                if (el) el.scrollBy({ left: -380, behavior: 'smooth' });
-                trackAction('carousel_prev_click');
-              }}
-              className="w-11 h-11 rounded-2xl bg-[#0D1424] hover:bg-slate-800 border border-slate-700/80 hover:border-amber-400 text-white flex items-center justify-center transition shadow-lg cursor-pointer active:scale-95"
-              aria-label="Anterior testimonio"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                const el = document.getElementById('testimonials-scroll-container');
-                if (el) el.scrollBy({ left: 380, behavior: 'smooth' });
-                trackAction('carousel_next_click');
-              }}
-              className="w-11 h-11 rounded-2xl bg-[#0D1424] hover:bg-slate-800 border border-slate-700/80 hover:border-amber-400 text-white flex items-center justify-center transition shadow-lg cursor-pointer active:scale-95"
-              aria-label="Siguiente testimonio"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+          {/* Interactive Pause Hint */}
+          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-[#0D1424] border border-slate-800 text-xs text-slate-300 shadow-md self-start md:self-auto">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="font-semibold text-slate-300 text-[11px] sm:text-xs">
+              Pase continuo automático • Pasa el cursor para pausar la lectura
+            </span>
           </div>
         </div>
 
-        {/* Carousel Scroll Track (10 International Cases - Auto-advancing) */}
+        {/* Carousel Infinite Cyclic Marquee Track */}
         <div
-          id="testimonials-scroll-container"
-          className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4 pt-1"
+          className="relative w-full overflow-hidden py-4 group"
+          onTouchStart={() => setIsGlidePaused(true)}
+          onTouchEnd={() => setIsGlidePaused(false)}
         >
-          {SUCCESS_CASES.map((c) => (
-            <div
-              key={c.id}
-              className="snap-start shrink-0 w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] p-7 rounded-3xl bg-[#0D1424] border border-slate-800 hover:border-amber-500/40 transition-all duration-300 shadow-xl flex flex-col justify-between group"
-            >
-              <div>
-                {/* Top Strip: Emoji + Country Flag + Category Badge */}
-                <div className="flex items-center justify-between pb-3.5 border-b border-slate-800/80 gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">{c.emoji}</span>
-                    <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1">
-                      <span>{c.flag}</span>
-                      <span>{c.country}</span>
+          {/* Subtle gradient side fades for smooth appearance/exit */}
+          <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-20 bg-gradient-to-r from-[#06080E] to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-20 bg-gradient-to-l from-[#06080E] to-transparent z-10 pointer-events-none" />
+
+          {/* The gliding track: 10 cases duplicated for seamless 100% infinite cycle */}
+          <div
+            className="animate-infinite-glide flex gap-6"
+            style={{ animationPlayState: isGlidePaused ? 'paused' : undefined }}
+          >
+            {[...SUCCESS_CASES, ...SUCCESS_CASES].map((c, idx) => (
+              <div
+                key={`${c.id}-${idx}`}
+                className="w-[340px] sm:w-[410px] shrink-0 p-7 rounded-3xl bg-[#0D1424] border border-slate-800 hover:border-amber-500/50 hover:bg-[#11192e] transition-all duration-300 shadow-xl flex flex-col justify-between cursor-default group/card"
+              >
+                <div>
+                  {/* Top Strip: Emoji + Country Flag + Category Badge */}
+                  <div className="flex items-center justify-between pb-3.5 border-b border-slate-800/80 gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{c.emoji}</span>
+                      <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1">
+                        <span>{c.flag}</span>
+                        <span>{c.country}</span>
+                      </span>
+                    </div>
+                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${c.badgeStyle} truncate max-w-[190px]`}>
+                      {c.category}
                     </span>
                   </div>
-                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${c.badgeStyle} truncate max-w-[200px]`}>
-                    {c.category}
-                  </span>
-                </div>
 
-                {/* Brand & City */}
-                <div className="mt-4">
-                  <h3 className="text-lg font-black text-white group-hover:text-amber-400 transition-colors">
-                    {c.brand}
-                  </h3>
-                  <p className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
-                    <MapPin className="w-3 h-3 text-slate-500" />
-                    <span>{c.city}</span>
+                  {/* Brand & City */}
+                  <div className="mt-4">
+                    <h3 className="text-lg font-black text-white group-hover/card:text-amber-400 transition-colors">
+                      {c.brand}
+                    </h3>
+                    <p className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
+                      <MapPin className="w-3 h-3 text-slate-500" />
+                      <span>{c.city}</span>
+                    </p>
+                  </div>
+
+                  {/* Testimonial Quote */}
+                  <p className="text-xs text-slate-300 mt-3.5 italic leading-relaxed">
+                    &ldquo;{c.quote}&rdquo;
                   </p>
                 </div>
 
-                {/* Testimonial Quote */}
-                <p className="text-xs text-slate-300 mt-3.5 italic leading-relaxed">
-                  &ldquo;{c.quote}&rdquo;
-                </p>
-              </div>
-
-              {/* Footer: Author & Key Highlight Metric */}
-              <div className="mt-6 pt-3.5 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                <div>
-                  <p className="text-slate-200 font-bold">{c.author}</p>
-                  <p className="text-[10px] text-slate-500">{c.authorRole}</p>
-                </div>
-                <div className="text-right">
-                  <span className={`font-mono font-black text-sm ${c.metricColor} block`}>
-                    {c.metricVal}
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-medium">
-                    {c.metricLabel}
-                  </span>
+                {/* Footer: Author & Key Highlight Metric */}
+                <div className="mt-6 pt-3.5 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                  <div>
+                    <p className="text-slate-200 font-bold">{c.author}</p>
+                    <p className="text-[10px] text-slate-500">{c.authorRole}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className={`font-mono font-black text-sm ${c.metricColor} block`}>
+                      {c.metricVal}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">
+                      {c.metricLabel}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Carousel Visual Swipe Hint on Mobile */}
-        <div className="flex items-center justify-center gap-2 mt-4 text-[11px] text-slate-500 sm:hidden">
-          <span>Desliza para ver más casos ↔</span>
+            ))}
+          </div>
         </div>
       </section>
 
