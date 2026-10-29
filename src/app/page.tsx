@@ -607,7 +607,7 @@ export default function HomePage() {
 
 
   return (
-    <div className="min-h-screen bg-[#06080E] text-slate-100 selection:bg-amber-500/25 selection:text-amber-200 font-sans relative overflow-x-hidden">
+    <div className="min-h-screen w-full max-w-full bg-[#06080E] text-slate-100 selection:bg-amber-500/25 selection:text-amber-200 font-sans relative overflow-x-hidden">
       {/* ============================================================== */}
       {/* 0. AURORA DYNAMIC GLOW BACKGROUNDS */}
       {/* ============================================================== */}
@@ -627,9 +627,9 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 1. TOP LIVE STATUS STRIP */}
       {/* ============================================================== */}
-      <div className="relative z-50 bg-[#090D17] border-b border-slate-800/80 px-6 sm:px-12 lg:px-16 py-2 text-[11px] font-semibold text-slate-300">
-        <div className="w-full flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5 overflow-hidden">
+      <div className="relative z-50 bg-[#090D17] border-b border-slate-800/80 px-4 sm:px-8 lg:px-12 py-2 text-[11px] font-semibold text-slate-300">
+        <div className="w-full max-w-[1700px] mx-auto flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5 overflow-hidden min-w-0">
             <span className="relative flex h-2 w-2 shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -639,14 +639,14 @@ export default function HomePage() {
             </span>
             <span className="text-slate-600 hidden sm:inline">•</span>
             <span className="text-slate-400 truncate hidden sm:inline">
-              28 Sedes Blindadas • LATAM, USA & Europa • Filtro Inteligente de Reseñas Google Maps Activo en Tiempo Real
+              28 Sedes Blindadas • LATAM, USA & Europa • Filtro Google Maps Activo
             </span>
           </div>
 
-          <div className="flex items-center gap-5 text-[11px] font-mono shrink-0">
+          <div className="flex items-center gap-4 text-[11px] font-mono shrink-0">
             <span className="text-amber-400 font-bold flex items-center gap-1">
               <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span>4.93 Calificación Red</span>
+              <span>4.93 Calificación</span>
             </span>
             <a
               href="https://wa.me/573058314049?text=Hola%20Prestigia,%20me%20gustar%C3%ADa%20consultar%20sobre%20el%20blindaje%20comercial"
@@ -655,7 +655,7 @@ export default function HomePage() {
               className="text-slate-400 hover:text-white transition hidden md:flex items-center gap-1.5"
             >
               <Phone className="w-3 h-3 text-emerald-400" />
-              <span>Soporte Directo VIP</span>
+              <span>Soporte VIP</span>
             </a>
           </div>
         </div>
@@ -664,48 +664,49 @@ export default function HomePage() {
       {/* ============================================================== */}
       {/* 2. TOP NAVBAR — EXPANSIVE FULL-WIDTH LAYOUT */}
       {/* ============================================================== */}
-      <header className="sticky top-0 z-40 backdrop-blur-2xl bg-[#06080E]/90 border-b border-slate-800/80 px-6 sm:px-12 lg:px-16 py-3.5 transition-all">
-        <div className="w-full flex items-center justify-between gap-6">
+      <header className="sticky top-0 z-40 backdrop-blur-2xl bg-[#06080E]/90 border-b border-slate-800/80 px-4 sm:px-8 lg:px-12 py-3 transition-all">
+        <div className="w-full max-w-[1700px] mx-auto flex items-center justify-between gap-4">
           {/* Brand Logo (Clean, sleek, non-wrapping) */}
-          <Link href="/" className="flex items-center gap-3 group cursor-pointer shrink-0">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-indigo-800 flex items-center justify-center p-2 shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform duration-300">
-              <PrestigiaIcon className="w-6 h-6 text-white" />
+          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group cursor-pointer shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-indigo-800 flex items-center justify-center p-2 shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform duration-300">
+              <PrestigiaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <div className="flex items-center gap-2.5">
-              <span className="text-xl font-black tracking-widest text-white">
+            <div className="flex items-center gap-2">
+              <span className="text-lg sm:text-xl font-black tracking-widest text-white">
                 PRESTIGIA
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold tracking-wider uppercase hidden sm:inline-block">
+              <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold tracking-wider uppercase hidden 2xl:inline-block">
                 5★ SUITE
               </span>
             </div>
           </Link>
 
-          {/* Navigation Links with generous breathing room */}
-          <nav className="hidden xl:flex items-center gap-8 text-xs font-semibold text-slate-300">
+          {/* Navigation Links with adaptive breathing room */}
+          <nav className="hidden xl:flex items-center gap-3.5 2xl:gap-6 text-[11px] 2xl:text-xs font-semibold text-slate-300">
             <a href="#como-funciona" className="hover:text-amber-400 transition whitespace-nowrap">Cómo Funciona</a>
-            <a href="#simulador" className="hover:text-amber-400 transition whitespace-nowrap">Simulador en Vivo</a>
+            <a href="#simulador" className="hover:text-amber-400 transition whitespace-nowrap">Simulador</a>
             <a href="#calculadora-roi" className="hover:text-amber-400 transition whitespace-nowrap">Calculadora ROI</a>
             <a href="#nichos" className="hover:text-amber-400 transition whitespace-nowrap">Por Industria</a>
             <a href="#comparativa" className="hover:text-amber-400 transition whitespace-nowrap">Antes vs Después</a>
-            <a href="#propuesta" className="hover:text-amber-400 transition whitespace-nowrap">Planes a Medida</a>
+            <a href="#propuesta" className="hover:text-amber-400 transition whitespace-nowrap">Planes</a>
           </nav>
 
           {/* Action CTAs */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
               href="/portal"
               onClick={() => trackAction('click_portal_from_navbar')}
-              className="px-4 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
+              className="px-3 sm:px-4 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
             >
               <Lock className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Portal Clientes</span>
+              <span className="hidden sm:inline">Portal Clientes</span>
+              <span className="sm:hidden">Portal</span>
             </Link>
 
             <a
               href="#agendar"
               onClick={() => trackAction('click_agendar_navbar')}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/25 active:scale-95 cursor-pointer flex items-center gap-1.5 animate-shimmer whitespace-nowrap"
+              className="px-3.5 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/25 active:scale-95 cursor-pointer flex items-center gap-1.5 animate-shimmer whitespace-nowrap"
             >
               <Calendar className="w-3.5 h-3.5" />
               <span>Agendar Llamada VIP</span>

@@ -35,7 +35,7 @@ export default function RootLayout({
         <link rel="alternate icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/favicon.svg" />
       </head>
-      <body className="min-h-screen bg-prestigia-bg text-white antialiased flex flex-col items-center print:block print:p-0 print:m-0 print:bg-[#070A12]">
+      <body className="min-h-screen w-full bg-prestigia-bg text-white antialiased flex flex-col print:block print:p-0 print:m-0 print:bg-[#070A12]">
         {children}
       </body>
     </html>
