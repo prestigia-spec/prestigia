@@ -862,7 +862,7 @@ export const DICTIONARY: Record<Language, Translations> = {
     },
     tabs: {
       radar: 'Radar Google',
-      complaints: 'Quejas WA',
+      complaints: 'Contención Privada',
       qr: 'Smart QR',
       reactivate: 'Reactivar 5★',
       giveaways: 'Sorteos VIP',
@@ -1700,7 +1700,7 @@ export const DICTIONARY: Record<Language, Translations> = {
     },
     tabs: {
       radar: 'Google Radar',
-      complaints: 'WA Complaints',
+      complaints: 'Private Containment',
       qr: 'Smart QR',
       reactivate: 'Reactivate 5★',
       giveaways: 'VIP Giveaways',
