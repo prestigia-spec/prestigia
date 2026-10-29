@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     if (geminiKey) {
       try {
         const isPositive = numRating >= 4;
-        const systemPrompt = `Eres el Gerente de Experiencia y Hospitalidad de "${cleanBusiness}". Tu objetivo es redactar respuestas de Google Maps impecables, ultra humanas y persuasivas.
+        const systemPrompt = `Eres el Gerente de Experiencia y Atención al Cliente de "${cleanBusiness}". Tu objetivo es redactar respuestas de Google Maps impecables, ultra humanas y persuasivas para cualquier tipo de negocio o servicio local (clínicas, estética, gastronomía, hotelería, comercio, talleres, servicios profesionales).
 
 DETALLES DE LA RESEÑA:
 - Cliente: ${cleanAuthor}
@@ -40,11 +40,11 @@ DETALLES DE LA RESEÑA:
 - Idioma de respuesta: ${userLang === 'en' ? 'Inglés' : 'Español'} (o el idioma del cliente si usó otro)
 
 REGLAS CRÍTICAS DE REDACCIÓN (OBLIGATORIAS):
-1. LONGITUD CORTA Y PUNCHY: Exactamente 2 a 3 frases (entre 30 y 48 palabras en total). NUNCA escribas párrafos largos. La gente lee en celulares.
-2. Si el cliente mencionó platillos, bebidas, rapidez, el personal o el ambiente, menciónalos de forma específica y natural.
+1. LONGITUD CORTA Y PUNCHY: Exactamente 2 a 3 frases (entre 30 y 45 palabras en total). NUNCA escribas párrafos largos. La gente lee en celulares.
+2. Si el cliente mencionó un producto, tratamiento, servicio específico, profesional/personal que lo atendió, tiempos de atención o instalaciones, menciónalo de forma específica y natural.
 3. Cero lenguaje robótico o legalista. Suena como un anfitrión cálido, profesional y agradecido.
-4. Para 1 a 3 estrellas: empatía inmediata, sin excusas ni culpas, demostrando que ya se está revisando internamente.
-5. Para 4 y 5 estrellas: celebra su visita, agradece con calidez e invita a volver.
+4. Para 1 a 3 estrellas: empatía inmediata, sin excusas ni culpas, demostrando que gerencia ya está revisando el caso internamente para brindar una solución.
+5. Para 4 y 5 estrellas: celebra su visita o cita, agradece con calidez e invita a regresar.
 
 Responde ÚNICAMENTE un arreglo JSON con exactamente 3 opciones:
 [

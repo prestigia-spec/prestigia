@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     const geminiKey = process.env.GEMINI_API_KEY;
     if (geminiKey) {
       try {
-        const prompt = `Eres el Gerente General de "${cleanBusiness}". Un cliente tuvo una mala experiencia en sala y dejó esta queja privada:
+        const prompt = `Eres el Gerente o Administrador de "${cleanBusiness}" (aplica a cualquier negocio: clínicas, consultorios, estética, spas, hoteles, talleres, comercio, gastronomía o servicios). Un cliente tuvo una inconformidad con la atención o servicio y dejó esta queja privada:
 - Cliente: ${cleanCustomer}
 - Sede: ${cleanBranch || 'Principal'}
 - Motivo de molestia: "${cleanReason}"
@@ -45,15 +45,15 @@ export async function POST(request: Request) {
 Tu objetivo es redactar un mensaje de WHATSAPP directo para rescatarlo de inmediato.
 
 REGLAS DE ORO DE WHATSAPP:
-1. LONGITUD: Muy breve y directo (máximo 2 a 3 frases, 35 a 45 palabras). Nadie lee textos largos en WhatsApp.
+1. LONGITUD: Muy breve y directo (máximo 2 a 3 frases, 30 a 45 palabras). Nadie lee textos largos en WhatsApp.
 2. Tono personal, empático y resolutivo. Cero lenguaje legalista.
-3. Menciona brevemente el motivo "${cleanReason}" para que sienta que fue escuchado/a.
+3. Menciona con tacto el motivo "${cleanReason}" para que sienta que fue escuchado/a y tomado/a en serio.
 
 Genera un JSON con exactamente 3 opciones:
 [
   {
-    "tone": "${userLang === 'en' ? 'Immediate Courtesy (On the house)' : 'Compensación Inmediata (Cortesía de la casa)'}",
-    "strategy": "${userLang === 'en' ? 'Invites them back with expenses covered' : 'Invita a repetir la experiencia por cuenta de la casa'}",
+    "tone": "${userLang === 'en' ? 'Immediate Courtesy & Compensation' : 'Compensación Inmediata / Cortesía Especial'}",
+    "strategy": "${userLang === 'en' ? 'Offers compensation, courtesy benefit, or complimentary appointment' : 'Ofrece compensación, bono de cortesía o cita prioritaria para resarcir el error'}",
     "text": "..."
   },
   {
@@ -63,7 +63,7 @@ Genera un JSON con exactamente 3 opciones:
   },
   {
     "tone": "${userLang === 'en' ? 'VIP Loyalty Perk' : 'Fidelización VIP y Beneficio'}",
-    "strategy": "${userLang === 'en' ? 'Grants exclusive VIP discount and gift' : 'Habilita un beneficio exclusivo y cortesía especial'}",
+    "strategy": "${userLang === 'en' ? 'Grants exclusive VIP benefit and priority attention' : 'Habilita un beneficio exclusivo y atención preferencial'}",
     "text": "..."
   }
 ]`;
