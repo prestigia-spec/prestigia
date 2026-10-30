@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { businessName, authorName, rating, reviewText, plan, tone } = body;
+    const { businessName, authorName, rating, reviewText, plan, tone, businessPhone, branchPhone } = body;
 
     // Gating check: Feature for Pro, Elite and Empresarial Plans
     if (plan !== 'pro' && plan !== 'elite' && plan !== 'empresarial') {
@@ -19,6 +19,7 @@ export async function POST(request: Request) {
 
     const cleanAuthor = (authorName || 'estimado cliente').trim();
     const cleanBusiness = (businessName || 'nuestro equipo').trim();
+    const cleanPhone = (branchPhone || businessPhone || '').trim();
     const cleanText = (reviewText || '').trim();
     const numRating = Number(rating) || 5;
 
@@ -31,6 +32,10 @@ export async function POST(request: Request) {
     if (geminiKey) {
       try {
         const isPositive = numRating >= 4;
+        const phoneInstruction = cleanPhone
+          ? `Si la calificación es de 1 a 3 estrellas, incluye sutilmente la línea directa de atención de "${cleanBusiness}": WhatsApp o teléfono ${cleanPhone}. IMPORTANTE: Usa ÚNICAMENTE este número oficial del negocio cliente, NUNCA inventes números ni uses teléfonos de terceros.`
+          : `Si la calificación es de 1 a 3 estrellas, invita al cliente a contactar a la línea directa de gerencia de "${cleanBusiness}".`;
+
         const systemPrompt = `Eres el Gerente de Experiencia y Atención al Cliente de "${cleanBusiness}". Tu objetivo es redactar respuestas de Google Maps impecables, ultra humanas y persuasivas para cualquier tipo de negocio o servicio local (clínicas, estética, gastronomía, hotelería, comercio, talleres, servicios profesionales).
 
 DETALLES DE LA RESEÑA:
@@ -38,12 +43,13 @@ DETALLES DE LA RESEÑA:
 - Calificación: ${numRating} de 5 estrellas
 - Comentario: "${cleanText || (isPositive ? 'Calificación positiva sin texto adicional' : 'Calificación con inconformidad')}"
 - Idioma de respuesta: ${userLang === 'en' ? 'Inglés' : 'Español'} (o el idioma del cliente si usó otro)
+- Teléfono oficial del negocio: ${cleanPhone || 'Línea gerencial del establecimiento'}
 
 REGLAS CRÍTICAS DE REDACCIÓN (OBLIGATORIAS):
 1. LONGITUD CORTA Y PUNCHY: Exactamente 2 a 3 frases (entre 30 y 45 palabras en total). NUNCA escribas párrafos largos. La gente lee en celulares.
 2. Si el cliente mencionó un producto, tratamiento, servicio específico, profesional/personal que lo atendió, tiempos de atención o instalaciones, menciónalo de forma específica y natural.
 3. Cero lenguaje robótico o legalista. Suena como un anfitrión cálido, profesional y agradecido.
-4. Para 1 a 3 estrellas: empatía inmediata, sin excusas ni culpas, demostrando que gerencia ya está revisando el caso internamente para brindar una solución.
+4. Para 1 a 3 estrellas: empatía inmediata, sin excusas ni culpas, demostrando que gerencia ya está revisando el caso internamente para brindar una solución o compensación de cortesía. ${phoneInstruction}
 5. Para 4 y 5 estrellas: celebra su visita o cita, agradece con calidez e invita a regresar.
 
 Responde ÚNICAMENTE un arreglo JSON con exactamente 3 opciones:

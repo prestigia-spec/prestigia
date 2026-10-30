@@ -3714,6 +3714,7 @@ export default function PortalPage() {
     setActiveTab('ia');
 
     try {
+      const targetBranch = session?.branches.find((b) => b.id === review.branchId) || session?.branches[0];
       const res = await fetch('/api/portal/ai-reply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -3723,6 +3724,8 @@ export default function PortalPage() {
           rating: review.rating,
           reviewText: review.text,
           plan: session?.business.plan,
+          businessPhone: session?.business.ownerPhone,
+          branchPhone: targetBranch?.managerPhone,
           lang,
         }),
       });
@@ -10600,7 +10603,45 @@ export default function PortalPage() {
                             </button>
                           </div>
                         ) : (
-                          <div />
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              onClick={() => handleGenerateAiReply(rev)}
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 shadow-sm ${
+                                theme === 'light'
+                                  ? 'bg-purple-100 hover:bg-purple-200 text-purple-900 border border-purple-300'
+                                  : 'bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/40 text-purple-300'
+                              }`}
+                              title={lang === 'en' ? 'Edit and rectify reply using Google Gemini AI' : 'Rectificar o editar respuesta en Google con IA'}
+                            >
+                              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                              <span>{lang === 'en' ? 'Rectify with AI' : 'Rectificar con IA'}</span>
+                              {(effectivePlan === 'basic' || effectivePlan === 'independiente') && (
+                                <Lock className="w-3 h-3 text-amber-400" />
+                              )}
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                if (manualReplyReviewId === rev.id) {
+                                  setManualReplyReviewId(null);
+                                } else {
+                                  setManualReplyReviewId(rev.id);
+                                  setManualReplyText(rev.replyText || '');
+                                }
+                              }}
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-medium transition active:scale-95 ${
+                                manualReplyReviewId === rev.id
+                                  ? 'bg-amber-500 text-slate-950 border-amber-400 font-bold shadow-sm'
+                                  : theme === 'light'
+                                    ? 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
+                                    : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
+                              }`}
+                              title={lang === 'en' ? 'Edit official reply manually' : 'Editar respuesta oficial manualmente'}
+                            >
+                              <FileText className="w-3.5 h-3.5" />
+                              <span>{lang === 'en' ? 'Edit' : 'Editar'}</span>
+                            </button>
+                          </div>
                         )}
 
                         <a
