@@ -1057,3 +1057,54 @@ export async function getExchangeRates(forceRefresh = false): Promise<ExchangeRa
     source: 'Tasa Referencial de Respaldo',
   };
 }
+
+export async function updateBranchGoogleTokens(
+  branchOrBusinessId: string,
+  tokens: {
+    accessToken?: string;
+    refreshToken?: string;
+    connectedEmail?: string;
+    accountId?: string;
+    locationId?: string;
+  }
+): Promise<boolean> {
+  const db = ensureDbFile();
+  const target = branchOrBusinessId.toLowerCase().trim();
+  let updated = false;
+
+  for (const b of db.businesses) {
+    if (b.branches) {
+      for (const br of b.branches) {
+        if (br.id.toLowerCase() === target || b.id.toLowerCase() === target) {
+          br.googleBusinessStatus = 'connected';
+          br.googleManagedBy = 'client_self_service';
+          (br as any).googleAccessToken = tokens.accessToken;
+          if (tokens.refreshToken) (br as any).googleRefreshToken = tokens.refreshToken;
+          if (tokens.connectedEmail) (br as any).googleConnectedEmail = tokens.connectedEmail;
+          if (tokens.accountId) (br as any).googleAccountId = tokens.accountId;
+          if (tokens.locationId) (br as any).googleLocationId = tokens.locationId;
+          br.googleAuditedAt = new Date().toISOString();
+          br.googleAuditNotes = `Vinculado exitosamente vía Google OAuth (${tokens.connectedEmail || 'Gmail'})`;
+          updated = true;
+
+          const supabase = getSupabase();
+          if (supabase) {
+            Promise.resolve(
+              supabase.from('branches').update({
+                google_business_status: 'connected',
+                google_managed_by: 'client_self_service',
+                google_audited_at: new Date().toISOString(),
+                google_audit_notes: `OAuth Vinculado: ${tokens.connectedEmail || 'OK'}`,
+              }).eq('id', br.id)
+            ).catch(() => {});
+          }
+        }
+      }
+    }
+  }
+
+  if (updated) {
+    writeDbFile(db);
+  }
+  return updated;
+}

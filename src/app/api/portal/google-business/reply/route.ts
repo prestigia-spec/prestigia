@@ -38,6 +38,44 @@ export async function POST(request: Request) {
       );
     }
 
+    // 4. Live dispatch via Google Business Profile API if OAuth token exists
+    const refreshToken = (branch as any)?.googleRefreshToken;
+    const existingAccessToken = (branch as any)?.googleAccessToken;
+    let liveGoogleStatus = 'saved_in_prestigia';
+
+    if (refreshToken && process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+      try {
+        const refreshRes = await fetch('https://oauth2.googleapis.com/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            client_id: process.env.GOOGLE_CLIENT_ID,
+            client_secret: process.env.GOOGLE_CLIENT_SECRET,
+            refresh_token: refreshToken,
+            grant_type: 'refresh_token',
+          }),
+        });
+        const refreshData = await refreshRes.json();
+        const activeToken = refreshData.access_token || existingAccessToken;
+
+        if (activeToken && (reviewId.includes('accounts/') || reviewId.includes('locations/'))) {
+          const googleReplyRes = await fetch(`https://mybusiness.googleapis.com/v4/${reviewId}/reply`, {
+            method: 'PUT',
+            headers: {
+              Authorization: `Bearer ${activeToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ comment: replyText.trim() }),
+          });
+          if (googleReplyRes.ok) {
+            liveGoogleStatus = 'published_live_to_google';
+          }
+        }
+      } catch (e) {
+        console.warn('Google Business API live dispatch fallback:', e);
+      }
+    }
+
     const placeId = branch?.googlePlaceId || 'ChIJj61dQgK6j4AR4GeTYWZsKWw';
 
     return NextResponse.json({
@@ -47,6 +85,7 @@ export async function POST(request: Request) {
       branchId: branch?.id || 'main',
       branchName: branch?.name || business.name,
       placeId,
+      liveGoogleStatus,
       publishedAt: new Date().toISOString(),
       repliedBy: actor,
       repliedByRole: role,
