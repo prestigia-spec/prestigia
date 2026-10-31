@@ -2590,23 +2590,14 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                         : 'Los tres números maestros que todo dueño necesita para detener la fuga de dinero y dominar su ciudad.'}
                     </p>
                   </div>
-                  <div className="flex flex-wrap items-center justify-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setAuditDisplayMode('complete')}
-                      className="px-4 py-2.5 rounded-xl bg-slate-950/80 hover:bg-slate-900 text-slate-300 hover:text-white border border-slate-700 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-lg active:scale-95"
-                    >
-                      <BarChart3 className="w-4 h-4 text-indigo-400" />
-                      <span>{lang === 'en' ? 'Switch to Full 360° Study' : 'Ver Estudio Técnico 360°'}</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-                    </button>
+                  <div className="flex items-center justify-center shrink-0">
                     <button
                       type="button"
                       onClick={handlePrint}
-                      className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-lg active:scale-95"
+                      className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition flex items-center gap-2 cursor-pointer shadow-lg active:scale-95"
                     >
                       <Printer className="w-4 h-4" />
-                      <span>PDF</span>
+                      <span>{lang === 'en' ? 'Export PDF' : 'Imprimir / PDF'}</span>
                     </button>
                   </div>
                 </div>
