@@ -2590,7 +2590,15 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                         : 'Los tres números maestros que todo dueño necesita para detener la fuga de dinero y dominar su ciudad.'}
                     </p>
                   </div>
-                  <div className="flex items-center justify-center shrink-0">
+                  <div className="flex flex-wrap items-center justify-center gap-2.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setShowDemoModal(true)}
+                      className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-amber-500/25 cursor-pointer active:scale-95"
+                    >
+                      <QrCode className="w-4 h-4" />
+                      <span>{lang === 'en' ? 'Scan Live QR Demo' : 'Escanear Demo QR en Vivo'}</span>
+                    </button>
                     <button
                       type="button"
                       onClick={handlePrint}
@@ -2789,6 +2797,39 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* BANNER INTERACTIVO DEMO QR EN VIVO (EL GANCHO PRINCIPAL) */}
+                <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-amber-500/15 via-slate-900 to-amber-500/15 border-2 border-amber-500/50 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden">
+                  <div className="flex items-center gap-4 text-center md:text-left">
+                    <div className="w-14 h-14 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black shadow-xl shadow-amber-500/30 shrink-0">
+                      <QrCode className="w-7 h-7" />
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-center md:justify-start gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                        <span className="text-[11px] font-black uppercase tracking-wider text-amber-400">
+                          {lang === 'en' ? 'Live Interactive Demonstration' : 'Demostración Interactiva en Vivo'}
+                        </span>
+                      </div>
+                      <h3 className="text-base sm:text-lg font-black text-white mt-0.5">
+                        {lang === 'en' ? 'Test the Private Shield live right now with your phone' : 'Comprueba cómo funciona el sistema en vivo con tu celular'}
+                      </h3>
+                      <p className="text-xs text-slate-300 max-w-xl">
+                        {lang === 'en'
+                          ? 'Scan the QR code to experience how negative reviews are intercepted via WhatsApp while 5-star reviews go straight to Google Maps.'
+                          : 'Escanea el código QR interactivo para ver en caliente cómo una queja de 1★ se intercepta en privado y cómo una opinión de 5★ vuela directo a Google.'}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowDemoModal(true)}
+                    className="px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2.5 shadow-xl shadow-amber-500/30 cursor-pointer active:scale-95 shrink-0 w-full md:w-auto"
+                  >
+                    <QrCode className="w-5 h-5" />
+                    <span>{lang === 'en' ? 'Scan Live QR Demo' : 'Escanear Demo QR en Vivo'}</span>
+                  </button>
                 </div>
               </div>
             ) : (
