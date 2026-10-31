@@ -1132,47 +1132,127 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
   };
 
   return (
-    <div className="auditor-root-container min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white print:bg-slate-950 print:m-0 print:p-6">
-      {/* Global Print Styles - Preserves Full Edge-to-Edge Dark Mode with Zero White Borders */}
+    <div className="auditor-root-container min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white print:bg-white print:text-slate-900 print:m-0 print:p-0">
+      {/* Global Print Styles - Clean Corporate White Dossier Theme */}
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
           @page {
-            margin: 0 !important;
+            margin: 8mm 10mm !important;
             size: A4 portrait;
           }
-          html, body {
+          html, body, .auditor-root-container {
             margin: 0 !important;
             padding: 0 !important;
-            background-color: #020617 !important;
-            color: #ffffff !important;
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            color: #0f172a !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
             width: 100% !important;
+            font-size: 10pt !important;
           }
           * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
           }
           .auditor-root-container {
-            background-color: #020617 !important;
-            min-height: 100vh !important;
+            background-color: #ffffff !important;
+            min-height: auto !important;
             width: 100% !important;
-            padding: 8mm 10mm !important;
+            padding: 0 !important;
             margin: 0 !important;
             box-sizing: border-box !important;
+          }
+          /* Typography Resets for Light Mode Corporate Print */
+          h1, h2, h3, h4, h5, h6, strong, b, .font-black, .font-extrabold {
+            color: #0f172a !important;
+          }
+          p, span, div, li, td, th {
+            color: #334155;
           }
           .bg-clip-text {
             -webkit-background-clip: unset !important;
             background-clip: unset !important;
             -webkit-text-fill-color: initial !important;
-            color: #FBBF24 !important;
+            color: #0f172a !important;
           }
-          header, .print-hidden {
-            display: none !important;
+          /* Card & Container Resets to Clean White with Subtle Borders */
+          section, .rounded-3xl, .rounded-2xl, .rounded-xl {
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+            box-shadow: none !important;
           }
-          section, .print-avoid-break {
+          .bg-slate-900, .bg-slate-900\\/90, .bg-slate-950, .bg-slate-950\\/70, .bg-slate-950\\/80, .bg-slate-950\\/60, .bg-slate-950\\/40, .bg-slate-950\\/90 {
+            background-color: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+          }
+          /* Themed Alert Cards */
+          .bg-rose-950, .bg-rose-950\\/60, .bg-rose-950\\/40, .border-rose-500\\/30, .border-rose-500\\/40, .border-rose-500\\/50 {
+            background-color: #fff1f2 !important;
+            border-color: #fecdd3 !important;
+          }
+          .bg-rose-950 *, .text-rose-200, .text-rose-300, .text-rose-400 {
+            color: #9f1239 !important;
+          }
+          .bg-rose-950 strong, .bg-rose-950 .text-white {
+            color: #881337 !important;
+          }
+          .bg-emerald-950, .bg-emerald-950\\/60, .bg-emerald-950\\/40, .border-emerald-500\\/30, .border-emerald-500\\/40, .border-emerald-500\\/50 {
+            background-color: #ecfdf5 !important;
+            border-color: #a7f3d0 !important;
+          }
+          .bg-emerald-950 *, .text-emerald-200, .text-emerald-300, .text-emerald-400 {
+            color: #065f46 !important;
+          }
+          .bg-emerald-950 strong, .bg-emerald-950 .text-white {
+            color: #022c22 !important;
+          }
+          .bg-amber-950, .bg-amber-950\\/80, .bg-amber-950\\/60, .border-amber-500\\/30, .border-amber-500\\/40, .border-amber-500\\/50 {
+            background-color: #fffbeb !important;
+            border-color: #fde68a !important;
+          }
+          .bg-amber-950 *, .text-amber-200, .text-amber-300, .text-amber-400 {
+            color: #92400e !important;
+          }
+          .bg-amber-950 strong, .bg-amber-950 .text-white {
+            color: #78350f !important;
+          }
+          .bg-indigo-950, .bg-indigo-950\\/80, .bg-indigo-950\\/60, .border-indigo-500\\/30, .border-indigo-500\\/40 {
+            background-color: #f5f3ff !important;
+            border-color: #ddd6fe !important;
+          }
+          .bg-indigo-950 *, .text-indigo-200, .text-indigo-300, .text-indigo-400 {
+            color: #4338ca !important;
+          }
+          .bg-indigo-950 strong, .bg-indigo-950 .text-white {
+            color: #312e81 !important;
+          }
+          /* Subtle border reset */
+          .border-slate-800, .border-slate-700, .border-slate-855 {
+            border-color: #e2e8f0 !important;
+          }
+          /* Text colors */
+          .text-white {
+            color: #0f172a !important;
+          }
+          .text-slate-300, .text-slate-400 {
+            color: #475569 !important;
+          }
+          /* Compact Spacing and Prevent Orphaned Breaks */
+          section, .print-avoid-break, .print-card-avoid {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
+            margin-bottom: 3.5mm !important;
+          }
+          .space-y-4, .space-y-6, .space-y-8 {
+            margin-top: 0 !important;
+          }
+          /* Hide all screen interactive elements */
+          header, footer, .print-hidden, [class*="print:hidden"] {
+            display: none !important;
           }
         }
       ` }} />
@@ -1286,7 +1366,7 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8 print:max-w-none print:p-0 print:m-0 print:space-y-0">
         {/* PAGE 1: PORTADA EJECUTIVA Y FICHA PRINCIPAL */}
-        <div className="space-y-6 print:space-y-2 print:print-sheet">
+        <div className={`space-y-6 print:space-y-2 print:print-sheet ${auditDisplayMode === 'executive' ? 'print:hidden' : ''}`}>
           {/* Print-only Executive Header */}
           <div className="hidden print:flex items-center justify-between pb-1.5 border-b border-slate-800/80 text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1.5">
             <div className="flex items-center gap-2">
@@ -1331,7 +1411,7 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
           </section>
 
         {/* STEP 1: FICHA PRINCIPAL DE LA MARCA (SEDE 1 O MARCA ÚNICA) */}
-        <section className="bg-slate-900/90 border border-slate-800 rounded-3xl print:rounded-2xl p-5 sm:p-8 print:p-3 shadow-2xl relative overflow-hidden backdrop-blur-xl space-y-6 print:space-y-2">
+        <section className={`bg-slate-900/90 border border-slate-800 rounded-3xl print:rounded-2xl p-5 sm:p-8 print:p-3 shadow-2xl relative overflow-hidden backdrop-blur-xl space-y-6 print:space-y-2 ${auditDisplayMode === 'executive' ? 'print:hidden' : ''}`}>
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-amber-500" />
 
           {/* Header of Section 1 */}
@@ -2212,7 +2292,7 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
         </div>
 
         {/* STEP 1.B: AGREGAR SEDES ADICIONALES (OPCIONAL PARA CADENAS) */}
-        <section className={`bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden space-y-4 ${additionalBranches.length === 0 ? 'print:hidden' : ''}`}>
+        <section className={`bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden space-y-4 ${additionalBranches.length === 0 || auditDisplayMode === 'executive' ? 'print:hidden' : ''}`}>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
@@ -2573,24 +2653,24 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
             {auditDisplayMode === 'executive' ? (
               <div className="space-y-6 animate-in fade-in duration-300">
                 {/* Header Banner */}
-                <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950/60 to-slate-900 border-2 border-amber-500/50 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="p-6 print:p-4 rounded-3xl print:rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/60 to-slate-900 print:bg-white print:border print:border-slate-300 border-2 border-amber-500/50 shadow-2xl print:shadow-none flex flex-col md:flex-row items-center justify-between gap-4 print:mb-2 print-avoid-break">
                   <div className="space-y-1 text-center md:text-left">
                     <div className="flex items-center justify-center md:justify-start gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
-                      <span className="text-[11px] font-black uppercase tracking-wider text-amber-300">
-                        {lang === 'en' ? 'Executive Briefing • 3-Minute Strategic Summary' : 'Resumen Estratégico Ejecutivo • 3 Minutos'}
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-400 print:bg-amber-600 animate-pulse print:animate-none" />
+                      <span className="text-[11px] print:text-[10px] font-black uppercase tracking-wider text-amber-300 print:text-amber-700">
+                        {lang === 'en' ? 'Executive Briefing • Prestigia Enterprise' : 'Resumen Estratégico Ejecutivo • Prestigia Enterprise'}
                       </span>
                     </div>
-                    <h2 className="text-xl sm:text-2xl font-black text-white">
+                    <h2 className="text-xl sm:text-2xl print:text-base font-black text-white print:text-slate-950">
                       {calculations.activeTitle}: {lang === 'en' ? 'The Cost of Inaction vs Prestigia ROI' : 'Radiografía Rápida de Pérdida vs Retorno'}
                     </h2>
-                    <p className="text-xs text-slate-300 max-w-xl">
+                    <p className="text-xs print:text-[10px] text-slate-300 print:text-slate-600 max-w-xl">
                       {lang === 'en'
                         ? 'The three core numbers every business owner needs to protect revenue and dominate the local map.'
                         : 'Los tres números maestros que todo dueño necesita para detener la fuga de dinero y dominar su ciudad.'}
                     </p>
                   </div>
-                  <div className="flex flex-wrap items-center justify-center gap-2.5 shrink-0">
+                  <div className="flex flex-wrap items-center justify-center gap-2.5 shrink-0 print:hidden">
                     <button
                       type="button"
                       onClick={() => setShowDemoModal(true)}
@@ -2608,12 +2688,17 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                       <span>{lang === 'en' ? 'Export PDF' : 'Imprimir / PDF'}</span>
                     </button>
                   </div>
+                  <div className="hidden print:flex flex-col items-end text-[10px] text-slate-600">
+                    <span className="font-black text-slate-900 text-xs">PRESTIGIA REPUTATION SYSTEM</span>
+                    <span className="font-semibold">Expediente Oficial B2B</span>
+                    <span className="text-amber-700 font-bold uppercase text-[9px] mt-0.5">Confidencial • Valorado en $500 USD</span>
+                  </div>
                 </div>
 
                 {/* The 3 Golden Cards of the Executive Pitch */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 lg:grid-cols-3 print:grid-cols-3 gap-5 print:gap-2.5 print:my-1">
                   {/* TARJETA 1: TU RADIOGRAFÍA EN GOOGLE (30 SEGUNDOS) */}
-                  <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between space-y-5 shadow-xl relative overflow-hidden group hover:border-slate-700 transition">
+                  <div className="p-6 print:p-3.5 rounded-3xl print:rounded-2xl bg-slate-900/90 print:bg-white border border-slate-800 print:border-slate-300 flex flex-col justify-between space-y-5 print:space-y-3 shadow-xl print:shadow-none relative overflow-hidden group hover:border-slate-700 transition print-avoid-break">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 flex items-center gap-1.5">
@@ -2674,7 +2759,7 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                   </div>
 
                   {/* TARJETA 2: LA FUGA DE DINERO MENSUAL (EL DOLOR FINANCIERO) */}
-                  <div className="p-6 rounded-3xl bg-gradient-to-b from-rose-950/40 via-slate-900 to-slate-900 border-2 border-rose-500/40 flex flex-col justify-between space-y-5 shadow-2xl relative overflow-hidden">
+                  <div className="p-6 print:p-3.5 rounded-3xl print:rounded-2xl bg-gradient-to-b from-rose-950/40 via-slate-900 to-slate-900 print:bg-rose-50/50 border-2 border-rose-500/40 print:border-rose-300 flex flex-col justify-between space-y-5 print:space-y-3 shadow-2xl print:shadow-none relative overflow-hidden print-avoid-break">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300 flex items-center gap-1.5">
@@ -2721,7 +2806,7 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                   </div>
 
                   {/* TARJETA 3: LA SOLUCIÓN Y EL RETORNO (EL CIERRE MAESTRO) */}
-                  <div className="p-6 rounded-3xl bg-gradient-to-b from-emerald-950/50 via-slate-900 to-slate-900 border-2 border-emerald-500/50 flex flex-col justify-between space-y-5 shadow-2xl relative overflow-hidden">
+                  <div className="p-6 print:p-3.5 rounded-3xl print:rounded-2xl bg-gradient-to-b from-emerald-950/50 via-slate-900 to-slate-900 print:bg-emerald-50/50 border-2 border-emerald-500/50 print:border-emerald-300 flex flex-col justify-between space-y-5 print:space-y-3 shadow-2xl print:shadow-none relative overflow-hidden print-avoid-break">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-950 border border-emerald-500/40 text-emerald-300 flex items-center gap-1.5">
@@ -2765,7 +2850,7 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                     </div>
 
                     {/* CTA Button */}
-                    <div className="pt-4 border-t border-emerald-500/30 space-y-2">
+                    <div className="pt-4 border-t border-emerald-500/30 space-y-2 print:hidden">
                       <a
                         href={`https://wa.me/573058314049?text=${encodeURIComponent(
                           `Hola Prestigia, acabo de realizar la auditoría ejecutiva de "${businessName || calculations.activeTitle}". Queremos activar el blindaje reputacional y subir al Top 3 de Google Maps.`
@@ -2796,11 +2881,22 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                         </button>
                       </div>
                     </div>
+
+                    {/* Print-only Executive Agreement block in Card 3 */}
+                    <div className="hidden print:block pt-3 border-t border-emerald-300 space-y-1.5 text-[10px]">
+                      <div className="flex items-center justify-between font-bold text-emerald-950">
+                        <span>Garantía de Retención B2B</span>
+                        <span className="text-emerald-700 font-extrabold">Retorno Estimado +{calculations.roiMultiplier}x</span>
+                      </div>
+                      <div className="p-2 rounded-lg bg-emerald-100/60 border border-emerald-300 text-[9.5px] text-emerald-950 leading-snug">
+                        Blindaje activo de 12 meses: Bóvedas QR en mesa, contención privada por WhatsApp y motor IA de respuesta oficial en Google Maps.
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 {/* BANNER INTERACTIVO DEMO QR EN VIVO (EL GANCHO PRINCIPAL) */}
-                <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-amber-500/15 via-slate-900 to-amber-500/15 border-2 border-amber-500/50 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden">
+                <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-amber-500/15 via-slate-900 to-amber-500/15 border-2 border-amber-500/50 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden print:hidden">
                   <div className="flex items-center gap-4 text-center md:text-left">
                     <div className="w-14 h-14 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black shadow-xl shadow-amber-500/30 shrink-0">
                       <QrCode className="w-7 h-7" />
@@ -2830,6 +2926,20 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                     <QrCode className="w-5 h-5" />
                     <span>{lang === 'en' ? 'Scan Live QR Demo' : 'Escanear Demo QR en Vivo'}</span>
                   </button>
+                </div>
+
+                {/* Print-only Executive Signature & Contact Footer */}
+                <div className="hidden print:flex items-center justify-between pt-3 mt-4 border-t border-slate-300 text-[10px] text-slate-600 print-avoid-break">
+                  <div className="space-y-0.5">
+                    <span className="font-black text-slate-900 block text-xs">PRESTIGIA REPUTATION PROTECTION LATAM</span>
+                    <span className="text-slate-600 block">Soporte y Consultoría Comercial: +57 305 831 4049 • info@prestigia.app</span>
+                    <span className="text-slate-500 block text-[9px]">Sede Principal: Medellín / Bogotá • www.prestigia.app</span>
+                  </div>
+                  <div className="text-right space-y-1">
+                    <span className="text-slate-500 block text-[9px] uppercase tracking-wider font-bold">Autorización de Implementación</span>
+                    <div className="w-52 border-b border-slate-400 pt-3" />
+                    <span className="text-[9px] text-slate-500 block">Firma Dirección General / Propietario</span>
+                  </div>
                 </div>
               </div>
             ) : (
