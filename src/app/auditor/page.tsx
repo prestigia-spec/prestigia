@@ -1165,25 +1165,45 @@ _Asesor Comercial: Luisma â€¢ Director de Crecimiento & Blindaje Reputacional â€
             font-size: 10pt !important;
           }
 
-          /* 2. All cards become clean white boxes with crisp thin slate border */
-          section, article, div {
-            background-color: transparent !important;
-          }
-          
-          .p-6, .p-5, .p-4, .p-3, [class*="rounded-2xl"], [class*="rounded-3xl"] {
-            border: 1px solid #cbd5e1 !important;
-            border-radius: 8px !important;
+          /* 2. FORCE NO BACKGROUNDS ON ALL TAILWIND COLOR UTILITIES */
+          [class*="bg-slate-"],
+          [class*="bg-rose-"],
+          [class*="bg-red-"],
+          [class*="bg-amber-"],
+          [class*="bg-emerald-"],
+          [class*="bg-indigo-"],
+          [class*="bg-purple-"],
+          [class*="bg-teal-"],
+          [class*="bg-gradient-"] {
             background-color: #ffffff !important;
+            background-image: none !important;
           }
 
-          /* 3. Typography: pure dark slate / black, crystal clear */
+          /* 3. CARDS & SECTIONS: CRISP SUBTLE BORDERS */
+          section, article, .p-6, .p-5, [class*="rounded-3xl"] {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 10px !important;
+          }
+
+          [class*="border-slate-"],
+          [class*="border-rose-"],
+          [class*="border-red-"],
+          [class*="border-amber-"],
+          [class*="border-emerald-"],
+          [class*="border-indigo-"],
+          [class*="border-purple-"] {
+            border-color: #cbd5e1 !important;
+          }
+
+          /* 4. Typography: pure dark slate / black, crystal clear */
           h1, h2, h3, h4, h5, h6, strong, b, .font-black, .font-extrabold {
             color: #0f172a !important;
           }
           p, span, div, li, td, th {
             color: #1e293b !important;
           }
-          .text-white, [class*="text-slate-"] {
+          .text-white, [class*="text-slate-1"], [class*="text-slate-2"], [class*="text-slate-3"], [class*="text-slate-4"], [class*="text-slate-5"] {
             color: #0f172a !important;
           }
           .bg-clip-text {
@@ -1193,8 +1213,8 @@ _Asesor Comercial: Luisma â€¢ Director de Crecimiento & Blindaje Reputacional â€
             color: #0f172a !important;
           }
 
-          /* 4. Numbers: vivid clean text colors ONLY (zero background tint) */
-          .text-rose-200, .text-rose-300, .text-rose-400, .text-rose-500, .text-rose-600 {
+          /* 5. Numbers: vivid clean text colors ONLY (zero background tint) */
+          .text-rose-200, .text-rose-300, .text-rose-400, .text-rose-500, .text-rose-600, .text-red-400, .text-red-500, .text-red-600 {
             color: #dc2626 !important;
           }
           .text-emerald-200, .text-emerald-300, .text-emerald-400, .text-emerald-500, .text-emerald-600 {
@@ -1203,22 +1223,38 @@ _Asesor Comercial: Luisma â€¢ Director de Crecimiento & Blindaje Reputacional â€
           .text-amber-200, .text-amber-300, .text-amber-400, .text-amber-500, .text-amber-600 {
             color: #d97706 !important;
           }
-          .text-indigo-200, .text-indigo-300, .text-indigo-400 {
+          .text-indigo-200, .text-indigo-300, .text-indigo-400, .text-purple-400 {
             color: #4f46e5 !important;
           }
 
-          /* 5. Spacing & Avoid Orphaned Cuts */
-          section, .print-avoid-break, .print-card-avoid {
+          /* 6. Spacing & Avoid Orphaned Cuts */
+          section, .print-avoid-break, .print-card-avoid, table, tr {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
-            margin-bottom: 2.5mm !important;
+            margin-bottom: 3mm !important;
           }
           .space-y-4, .space-y-5, .space-y-6, .space-y-8 {
             margin-top: 0 !important;
           }
 
-          /* 6. Hide interactive buttons and screen-only controls */
-          header, footer, nav, button, input, select, .print-hidden, [class*="print:hidden"] {
+          /* 7. Corporate Table Formatting */
+          table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+          }
+          th, td {
+            border: 1px solid #cbd5e1 !important;
+            padding: 6px 8px !important;
+            color: #0f172a !important;
+            background-color: #ffffff !important;
+          }
+          th {
+            background-color: #f8fafc !important;
+            font-weight: 700 !important;
+          }
+
+          /* 8. Hide interactive buttons and screen-only controls */
+          header, footer, nav, button, input, textarea, select, .print-hidden, [class*="print:hidden"] {
             display: none !important;
           }
         }
