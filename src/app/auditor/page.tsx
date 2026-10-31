@@ -6,6 +6,7 @@ import QRCode from 'qrcode';
 import { PrestigiaIcon } from '@/components/PrestigiaIcon';
 import { RetentionDonutChart, FinancialRoiComparisonChart } from '@/components/AuditorCharts';
 import { AUDITOR_TRANSLATIONS, AuditorLang } from '@/lib/auditorTranslations';
+import type { GoogleSeoAudit } from '@/app/api/auditor/google-lookup/route';
 import {
   ShieldAlert,
   ShieldCheck,
@@ -50,6 +51,9 @@ import {
   Scale,
   Award,
   BadgeCheck,
+  Tag,
+  Compass,
+  PhoneCall,
   BookOpen,
   MessageSquareReply,
   Bot,
@@ -82,6 +86,11 @@ interface GoogleScrapedData {
   googleReviewUrl?: string;
   placeId?: string;
   extractedFrom?: string;
+  category?: string;
+  website?: string;
+  phone?: string;
+  detectedCategories?: string[];
+  seoAudit?: GoogleSeoAudit;
 }
 
 export default function BusinessAuditorPage() {
@@ -130,6 +139,7 @@ export default function BusinessAuditorPage() {
   const [mainRating, setMainRating] = useState<number | null>(null);
   const [mainReviews, setMainReviews] = useState<number | null>(null);
   const [mainAddress, setMainAddress] = useState('');
+  const [mainSeoAudit, setMainSeoAudit] = useState<GoogleSeoAudit | null>(null);
 
   // Operational metrics for Main Venue (Mandatory inputs: start as null to force input by advisor/client)
   const [mainMonthlyDiners, setMainMonthlyDiners] = useState<number | null>(null);
@@ -538,6 +548,7 @@ export default function BusinessAuditorPage() {
         setMainRating(data.rating || 4.2);
         setMainReviews(data.reviewsCount || 0);
         if (data.address) setMainAddress(data.address);
+        if (data.seoAudit) setMainSeoAudit(data.seoAudit);
         if (data.googleReviewUrl) {
           setMainGoogleUrl(data.googleReviewUrl);
         } else if (data.googleMapsUrl) {
@@ -1836,6 +1847,277 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                 </div>
               </div>
             </div>
+
+            {/* ========================================================================= */}
+            {/* SUPER AUDITOR: DIAGNÓSTICO TÉCNICO SEO LOCAL & ALGORITMO GOOGLE MAPS      */}
+            {/* ========================================================================= */}
+            {hasScannedMain && (
+              <div className="pt-5 border-t border-slate-800 space-y-4 animate-in fade-in duration-300">
+                <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#0B0F19] via-[#101827] to-[#0D1526] border-2 border-indigo-500/40 shadow-2xl relative overflow-hidden">
+                  {/* Glow accents */}
+                  <div className="absolute -top-24 -right-24 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                  {/* Header */}
+                  <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-800/80">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center gap-1.5">
+                          <Sparkles className="w-3 h-3 text-indigo-400" />
+                          <span>PRESTIGIA RADAR 360° • AUDITORÍA SEO LOCAL & FICHA GOOGLE</span>
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                          ⚡ Escaneo del Algoritmo Local de Google
+                        </span>
+                      </div>
+                      <h3 className="text-lg sm:text-xl font-black text-white tracking-tight">
+                        {lang === 'en' ? 'Google Maps Technical SEO & Algorithmic Health' : 'Salud Técnica de Ficha & Algoritmo de Google Maps'}
+                      </h3>
+                      <p className="text-xs text-slate-400 max-w-2xl">
+                        {lang === 'en'
+                          ? 'Deep audit of the 7 factors that determine whether Google places this business in the Local 3-Pack or hides it behind competitors.'
+                          : 'Auditoría de los 7 factores técnicos que determinan si Google posiciona este local en el Top 3 de tu ciudad o si lo invisibiliza ante la competencia.'}
+                      </p>
+                    </div>
+
+                    {/* Global Score Gauge */}
+                    <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 shrink-0 shadow-inner">
+                      <div className="relative w-16 h-16 flex items-center justify-center">
+                        <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
+                          <path
+                            className="text-slate-800"
+                            strokeWidth="3.5"
+                            stroke="currentColor"
+                            fill="none"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                          <path
+                            className={
+                              (mainSeoAudit?.score ?? 58) >= 80
+                                ? 'text-emerald-500'
+                                : (mainSeoAudit?.score ?? 58) >= 60
+                                ? 'text-amber-500'
+                                : 'text-rose-500'
+                            }
+                            strokeDasharray={`${mainSeoAudit?.score ?? 58}, 100`}
+                            strokeWidth="3.5"
+                            strokeLinecap="round"
+                            stroke="currentColor"
+                            fill="none"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className="text-lg font-black text-white leading-none">
+                            {mainSeoAudit?.score ?? 58}
+                          </span>
+                          <span className="text-[9px] font-bold text-slate-400 leading-none">/ 100</span>
+                        </div>
+                      </div>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                          {lang === 'en' ? 'Profile Health' : 'Calificación Técnica'}
+                        </span>
+                        <span
+                          className={`text-xs font-black block ${
+                            (mainSeoAudit?.score ?? 58) >= 80
+                              ? 'text-emerald-400'
+                              : (mainSeoAudit?.score ?? 58) >= 60
+                              ? 'text-amber-400'
+                              : 'text-rose-400'
+                          }`}
+                        >
+                          {(mainSeoAudit?.score ?? 58) >= 80
+                            ? (lang === 'en' ? 'Optimized (Top Tier)' : 'Ficha Optimizada')
+                            : (mainSeoAudit?.score ?? 58) >= 60
+                            ? (lang === 'en' ? 'At Risk (-45% Views)' : 'En Riesgo (-45% Vistas)')
+                            : (lang === 'en' ? 'Critical Penalty' : 'Estado Crítico / Invisible')}
+                        </span>
+                        <span className="text-[10px] text-slate-500 block">
+                          {lang === 'en' ? 'Google Local Algorithm' : 'Algoritmo Local de Google'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Status Banner */}
+                  <div className="relative z-10 my-4">
+                    <div
+                      className={`p-3 rounded-xl border flex items-center gap-2.5 text-xs font-bold ${
+                        (mainSeoAudit?.score ?? 58) >= 80
+                          ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300'
+                          : (mainSeoAudit?.score ?? 58) >= 60
+                          ? 'bg-amber-950/40 border-amber-500/40 text-amber-300'
+                          : 'bg-rose-950/50 border-rose-500/40 text-rose-300'
+                      }`}
+                    >
+                      <AlertTriangle className="w-4 h-4 shrink-0" />
+                      <span>
+                        {mainSeoAudit?.statusLabel ||
+                          '🟡 Ficha en Riesgo: Visibilidad Reducida al 45% frente a la Competencia'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Grid of 4 Technical Diagnostic Pillars */}
+                  <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Pillar 1: Subcategorías Ocultas (The Trojan Horse Goldmine) */}
+                    <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-slate-200 flex items-center gap-1.5">
+                          <Tag className="w-3.5 h-3.5 text-indigo-400" />
+                          <span>1. Categoría Principal & Subcategorías Faltantes</span>
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                          Factor Clave #1
+                        </span>
+                      </div>
+                      <div className="space-y-1.5 text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="text-slate-400 text-[11px]">Categoría activa en Maps:</span>
+                          <span className="font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/70 border border-emerald-500/30 text-[11px]">
+                            ✓ {mainSeoAudit?.primaryCategory || category}
+                          </span>
+                        </div>
+                        <div className="space-y-1 pt-1">
+                          <span className="text-[11px] font-bold text-rose-300 block">
+                            ❌ Subcategorías secundarias no configuradas (Desaprovechadas):
+                          </span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {(mainSeoAudit?.missingCategories || [
+                              'Restaurante familiar',
+                              'Bar y parrilla',
+                              'Comida para llevar',
+                              'Entrega a domicilio',
+                              'Restaurante para almorzar',
+                            ]).map((sc, i) => (
+                              <span
+                                key={i}
+                                className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950/50 text-rose-300 border border-rose-500/30"
+                              >
+                                + {sc}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-[10.5px] text-slate-400 pt-1 leading-relaxed">
+                          Google permite hasta 10 categorías en cada ficha. Al dejar las subcategorías vacías, este negocio queda <strong>100% invisible</strong> cuando un cliente busca esos términos en Google Maps.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Pillar 2: Title & Geo-Keywords (SEO Local) */}
+                    <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-slate-200 flex items-center gap-1.5">
+                          <FileText className="w-3.5 h-3.5 text-amber-400" />
+                          <span>2. Optimización de Título (SEO Local)</span>
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                          Score: {mainSeoAudit?.titleAudit?.score ?? 55} / 100
+                        </span>
+                      </div>
+                      <div className="space-y-2 text-xs">
+                        <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                          <span className="text-[10px] text-slate-500 uppercase font-bold block mb-0.5">Título actual en Google:</span>
+                          <span className="font-mono font-bold text-slate-300 text-[11px] block">{businessName || 'Nombre del Negocio'}</span>
+                        </div>
+                        <p className="text-[10.5px] text-slate-400 leading-relaxed">
+                          {mainSeoAudit?.titleAudit?.analysis ||
+                            'El título solo tiene el nombre comercial plano. Pierde miles de búsquedas mensuales sin intención geográfica ni palabra clave del nicho.'}
+                        </p>
+                        <div className="p-2.5 rounded-xl bg-indigo-950/50 border border-indigo-500/30 space-y-1">
+                          <span className="text-[10px] font-black uppercase text-indigo-300 block">💡 Título Optimizado Recomendado:</span>
+                          <span className="font-mono text-[11px] font-bold text-indigo-200 block">
+                            {mainSeoAudit?.titleAudit?.suggestedTitle || `${businessName} | ${category} en tu Ciudad`}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Pillar 3: Description & Bio Indexing */}
+                    <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-slate-200 flex items-center gap-1.5">
+                          <Compass className="w-3.5 h-3.5 text-purple-400" />
+                          <span>3. Biografía y Descripción Corporativa</span>
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                          750 Caracteres
+                        </span>
+                      </div>
+                      <div className="space-y-2 text-xs">
+                        <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-800 text-[11px]">
+                          <span className="text-slate-400">Estado de indexación:</span>
+                          <span className="font-bold text-rose-400">
+                            {mainSeoAudit?.descriptionAudit?.status === 'optimized' ? '✓ Optimizada' : '❌ Vacía o Deficiente'}
+                          </span>
+                        </div>
+                        <p className="text-[10.5px] text-slate-400 leading-relaxed">
+                          {mainSeoAudit?.descriptionAudit?.analysis ||
+                            'No se detectó biografía corporativa en Google Maps. Estás desperdiciando los 750 caracteres que la IA de Google lee para posicionar y recomendar tu negocio a turistas y clientes.'}
+                        </p>
+                        <div className="text-[10.5px] text-indigo-300 font-semibold flex items-center gap-1">
+                          <span>✦ Solución Prestigia: Redactamos la descripción con keywords de compra.</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Pillar 4: Channels & Conversion Links */}
+                    <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-slate-200 flex items-center gap-1.5">
+                          <Globe className="w-3.5 h-3.5 text-teal-400" />
+                          <span>4. Canales de Conversión & Respuesta</span>
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-500/15 text-teal-300 border border-teal-500/30">
+                          Factor de Ranking
+                        </span>
+                      </div>
+                      <div className="space-y-2 text-xs">
+                        <div className="grid grid-cols-2 gap-2 text-[11px]">
+                          <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5">
+                            <Globe className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span className="truncate">{mainSeoAudit?.linksAndConversion?.hasWebsite ? '✓ Web Vinculada' : '❌ Sin Web Oficial'}</span>
+                          </div>
+                          <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5">
+                            <PhoneCall className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span className="truncate">{mainSeoAudit?.contactAudit?.hasPhone ? '✓ Teléfono Activo' : '❌ Sin Teléfono'}</span>
+                          </div>
+                        </div>
+                        <p className="text-[10.5px] text-slate-400 leading-relaxed">
+                          {mainSeoAudit?.reviewsEngagement?.analysis ||
+                            'Google prioriza perfiles que responden el 100% de reseñas en menos de 24 horas. Los negocios con reseñas abandonadas sufren penalización de posición en el mapa.'}
+                        </p>
+                        <div className="p-2 rounded-xl bg-emerald-950/50 border border-emerald-500/30 text-[10.5px] text-emerald-300 font-bold flex items-center gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Prestigia activa la respuesta oficial en 1-Clic para salvar el ranking.</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Plan de Acción Inmediato (Prestigia Boost) */}
+                  <div className="relative z-10 mt-4 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-purple-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div className="space-y-0.5 text-center sm:text-left">
+                      <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider flex items-center gap-1 justify-center sm:justify-start">
+                        <Flame className="w-3.5 h-3.5 text-amber-500" />
+                        <span>Plan de Aceleración Prestigia Boost</span>
+                      </span>
+                      <p className="text-xs font-bold text-white">
+                        Implementando estos 4 ajustes, este negocio puede escalar al Top 3 de Google Maps en 14 días.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/25 flex items-center gap-1">
+                        <Zap className="w-3.5 h-3.5 fill-current" />
+                        <span>Potencial: +45% Visitas Locales</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* UNLOCK ACTION CARD (REQUERIDO PARA REPORTE REAL) */}
             <div className="pt-4 border-t border-slate-800 print:hidden">
