@@ -395,4 +395,23 @@ input[type=number] {
   animation-play-state: paused !important;
 }
 
+/* =========================================================================
+   GLOBAL PRINT ENGINE (Pure White Paper, Zero Backgrounds)
+   ========================================================================= */
+@media print {
+  @page {
+    margin: 10mm 12mm !important;
+    size: A4 portrait;
+    background-color: #ffffff !important;
+  }
+  html, body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+
 

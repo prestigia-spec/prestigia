@@ -1257,6 +1257,26 @@ _Asesor Comercial: Luisma â€¢ Director de Crecimiento & Blindaje Reputacional â€
           header, footer, nav, button, input, textarea, select, .print-hidden, [class*="print:hidden"] {
             display: none !important;
           }
+
+          /* 9. Page break sheets in complete audit */
+          .print-sheet,
+          .\\print\\:print-sheet {
+            page-break-after: always !important;
+            break-after: page !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            background-color: #ffffff !important;
+          }
+          .print-sheet-last,
+          .\\print\\:print-sheet-last {
+            page-break-after: auto !important;
+            break-after: auto !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            background-color: #ffffff !important;
+          }
         }
       ` }} />
 
@@ -1323,48 +1343,6 @@ _Asesor Comercial: Luisma â€¢ Director de Crecimiento & Blindaje Reputacional â€
           </button>
         </div>
       </header>
-
-      {/* Embedded Print Engine Styles */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media print {
-          @page { margin: 0 !important; size: A4 portrait !important; }
-          *, *:before, *:after { box-sizing: border-box !important; overflow: visible !important; }
-          html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            background-color: #020617 !important;
-            color: #FFFFFF !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-            width: 100% !important;
-          }
-          header, footer, aside, nav, .no-print, button, input, select, .print-hidden {
-            display: none !important;
-          }
-          .print-avoid-break, .print-card-avoid, table, tr {
-            break-inside: avoid !important;
-            page-break-inside: avoid !important;
-          }
-          .print-sheet,
-          .\print\:print-sheet {
-            page-break-after: always !important;
-            break-after: page !important;
-            padding: 8mm 10mm !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-            background-color: #020617 !important;
-          }
-          .print-sheet-last,
-          .\print\:print-sheet-last {
-            page-break-after: auto !important;
-            break-after: auto !important;
-            padding: 8mm 10mm !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-            background-color: #020617 !important;
-          }
-        }
-      `}} />
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8 print:max-w-none print:p-0 print:m-0 print:space-y-0">
