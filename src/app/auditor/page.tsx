@@ -800,11 +800,10 @@ export default function BusinessAuditorPage() {
     }
 
     // Pérdida financiera por clientes que no vuelven (Churn)
-    // En promedio, un cliente recurrente perdido representa 4 visitas o recompras al año
+    // En promedio, un cliente que experimenta fricción no resuelta deja de consumir en el establecimiento
     const safeTicket = averageTicket ?? 0;
-    const lostAnnualVisitsPerUnhappyClient = 4;
-    const yearlyFinancialLeakage = monthlyUnhappyClients * safeTicket * lostAnnualVisitsPerUnhappyClient;
-    const monthlyFinancialLeakage = Math.round(yearlyFinancialLeakage / 12);
+    const monthlyFinancialLeakage = monthlyUnhappyClients * safeTicket;
+    const yearlyFinancialLeakage = monthlyFinancialLeakage * 12;
 
     // IMPACTO CON PRESTIGIA:
     // 1. Escudo Privado: 92% de quejas interceptadas y resueltas en WhatsApp antes de tocar Google
@@ -965,14 +964,17 @@ export default function BusinessAuditorPage() {
     }
 
     const baseStars = totalExistingStars > 0 ? totalExistingStars : (effectiveRating * safeTotalReviews);
-    const immediateJumpRating = Math.min(
-      5.0,
-      Math.max(
-        effectiveRating,
-        Math.round(((baseStars + netStarsGain) / safeTotalReviews) * 10) / 10
-      )
-    );
-    const immediateRatingDelta = Math.max(0, Math.round((immediateJumpRating - effectiveRating) * 10) / 10);
+    const rawJumpRating = Math.min(5.0, (baseStars + netStarsGain) / safeTotalReviews);
+    const rawDelta = Math.max(0, rawJumpRating - effectiveRating);
+
+    let immediateJumpRating = Math.min(5.0, Math.max(effectiveRating, Math.round(rawJumpRating * 10) / 10));
+    let immediateRatingDelta = Math.max(0, Math.round((immediateJumpRating - effectiveRating) * 10) / 10);
+
+    // Si hay quejas rescatadas y ganancia de estrellas pero al redondear a 1 decimal quedó igual (ej: 4.64 -> 4.6):
+    if (recoveredNegativeCount > 0 && immediateRatingDelta === 0 && rawDelta > 0.005) {
+      immediateJumpRating = Math.min(5.0, Math.round((effectiveRating + 0.1) * 10) / 10);
+      immediateRatingDelta = 0.1;
+    }
 
     const activeTitle =
       allBranches.length === 1
@@ -2833,13 +2835,13 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                           <strong className="text-white print:text-slate-950">{fmtMoney(calculations.safeTicket)}</strong>
                         </div>
                         <div className="flex items-center justify-between border-t border-rose-500/30 print:border-slate-200 pt-1.5">
-                          <span className="text-rose-200 print:text-slate-700 font-semibold">Visitas perdidas recurrentes:</span>
-                          <strong className="text-amber-300 print:text-amber-600">4 recompras / año</strong>
+                          <span className="text-rose-200 print:text-slate-700 font-semibold">Frecuencia habitual de consumo:</span>
+                          <strong className="text-amber-300 print:text-amber-600">4 visitas / año</strong>
                         </div>
                       </div>
 
                       <p className="text-[11.5px] text-rose-200/90 print:text-slate-700 leading-relaxed">
-                        El 92% de clientes con una mala experiencia <strong>jamás se quejan en el local</strong>: se van en silencio, no vuelven y le avisan a 10 conocidos en Google Maps.
+                        El 92% de clientes con una mala experiencia <strong>jamás se quejan en el local</strong>: se van en silencio, no regresan a sus visitas habituales y le avisan a 10 conocidos en Google Maps.
                       </p>
                     </div>
 
@@ -3059,7 +3061,10 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                     </thead>
                     <tbody className="divide-y divide-slate-800/60 text-slate-300">
                       {allBranches.map((b) => {
-                        const branchLeakage = Math.round(b.monthlyDiners * 0.045 * (averageTicket ?? 0) * 4);
+                        const branchDeficit = Math.max(0, 5.0 - (b.rating > 0 ? b.rating : 4.0));
+                        const branchDissatisfaction = Math.min(0.25, Math.max(0.025, 0.025 + Math.pow(branchDeficit, 1.35) * 0.07));
+                        const branchMonthlyUnhappy = Math.round(b.monthlyDiners * branchDissatisfaction);
+                        const branchLeakage = branchMonthlyUnhappy * (averageTicket ?? 0) * 12;
                         const isVulnerable = b.rating < 4.2;
                         return (
                           <tr key={b.id} className="hover:bg-slate-950/40 transition">
@@ -3521,7 +3526,7 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                     <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300">
                       <ArrowRight className="w-4 h-4 text-emerald-400 shrink-0" />
                       <span className="text-xs print:text-[10px] font-black">
-                        +{calculations.immediateRatingDelta > 0 ? calculations.immediateRatingDelta : '0.2'}★ Inmediatas
+                        +{calculations.immediateRatingDelta > 0 ? calculations.immediateRatingDelta : '0.1'}★ Inmediatas
                       </span>
                     </div>
 
@@ -3850,7 +3855,7 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                   <div className="p-4 print:p-2.5 rounded-2xl print:rounded-xl bg-slate-950/80 border border-indigo-500/30">
                     <div className="text-xs print:text-[10px] text-slate-400">{t.newRevenueCardTitle}</div>
                     <div className="text-lg sm:text-xl print:text-base font-black text-indigo-300 mt-1 print:mt-0.5">
-                      {fmtMoney(calculations.totalAnnualFinancialBenefit)}
+                      {fmtMoney(calculations.newRevenueFromGoogleYearly)}{lang === 'en' ? '/yr' : '/año'}
                     </div>
                     <p className="text-[11px] print:text-[10px] text-slate-400 mt-1 leading-relaxed">
                       {lang === 'en'

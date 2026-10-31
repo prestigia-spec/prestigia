@@ -78,7 +78,7 @@ export function RetentionDonutChart({
               🟢 {lang === 'en' ? 'Loyal Clients' : 'Clientes Fieles'}
             </span>
             <strong className="text-white print:text-slate-950 text-sm block mt-0.5">
-              ~{satisfiedCount.toLocaleString()} <span className="text-[10px] font-normal text-slate-400 print:text-slate-500">/{lang === 'en' ? 'mo' : 'mes'}</span>
+              ~{Math.round(satisfiedCount || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} <span className="text-[10px] font-normal text-slate-400 print:text-slate-500">/{lang === 'en' ? 'mo' : 'mes'}</span>
             </strong>
           </div>
 
@@ -87,7 +87,7 @@ export function RetentionDonutChart({
               🔴 {lang === 'en' ? 'Unhappy Churn' : 'Fuga Silenciosa'}
             </span>
             <strong className="text-rose-400 print:text-rose-700 text-sm block mt-0.5">
-              ~{silentUnhappyCount.toLocaleString()} <span className="text-[10px] font-normal text-rose-300/70 print:text-slate-500">/{lang === 'en' ? 'mo' : 'mes'}</span>
+              ~{Math.round(silentUnhappyCount || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} <span className="text-[10px] font-normal text-rose-300/70 print:text-slate-500">/{lang === 'en' ? 'mo' : 'mes'}</span>
             </strong>
           </div>
         </div>
@@ -123,7 +123,7 @@ export function FinancialRoiComparisonChart({
   const savedPct = Math.max(8, Math.round((moneySavedYearly / maxVal) * 100));
   const newRevPct = Math.max(8, Math.round((newRevenueYearly / maxVal) * 100));
 
-  const fmt = (num: number) => `${currencySymbol}${num.toLocaleString()}`;
+  const fmt = (num: number) => `${currencySymbol}${Math.round(num || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
 
   return (
     <div className="p-5 print:p-3 rounded-2xl bg-slate-950 print:bg-white border border-slate-800 print:border-slate-300 space-y-3.5 print:space-y-2">
