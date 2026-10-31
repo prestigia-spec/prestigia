@@ -1132,45 +1132,59 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
   };
 
   return (
-    <div className="auditor-root-container min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white print:bg-white print:text-slate-900 print:m-0 print:p-0">
-      {/* Global Print Styles - Clean Corporate White Dossier Theme */}
+    <div className="auditor-root-container min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white print:min-h-0 print:h-auto print:bg-white print:text-slate-900 print:m-0 print:p-0">
+      {/* Global Print Styles - 100% White Paper Corporate Dossier (Zero Backgrounds) */}
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
           @page {
-            margin: 8mm 10mm !important;
+            margin: 10mm 12mm !important;
             size: A4 portrait;
           }
-          html, body, .auditor-root-container {
-            margin: 0 !important;
-            padding: 0 !important;
+          
+          /* 1. Global Reset: PURE WHITE, ZERO BACKGROUNDS, ZERO GRADIENTS */
+          *, *::before, *::after {
+            background-color: transparent !important;
+            background-image: none !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
+            filter: none !important;
+            backdrop-filter: none !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          
+          html, body, .auditor-root-container, main {
             background: #ffffff !important;
             background-color: #ffffff !important;
             color: #0f172a !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
+            margin: 0 !important;
+            padding: 0 !important;
             width: 100% !important;
+            min-height: 0 !important;
+            height: auto !important;
             font-size: 10pt !important;
           }
-          * {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-            box-shadow: none !important;
-            text-shadow: none !important;
+
+          /* 2. All cards become clean white boxes with crisp thin slate border */
+          section, article, div {
+            background-color: transparent !important;
           }
-          .auditor-root-container {
+          
+          .p-6, .p-5, .p-4, .p-3, [class*="rounded-2xl"], [class*="rounded-3xl"] {
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 8px !important;
             background-color: #ffffff !important;
-            min-height: auto !important;
-            width: 100% !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            box-sizing: border-box !important;
           }
-          /* Typography Resets for Light Mode Corporate Print */
+
+          /* 3. Typography: pure dark slate / black, crystal clear */
           h1, h2, h3, h4, h5, h6, strong, b, .font-black, .font-extrabold {
             color: #0f172a !important;
           }
           p, span, div, li, td, th {
-            color: #334155;
+            color: #1e293b !important;
+          }
+          .text-white, [class*="text-slate-"] {
+            color: #0f172a !important;
           }
           .bg-clip-text {
             -webkit-background-clip: unset !important;
@@ -1178,80 +1192,33 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
             -webkit-text-fill-color: initial !important;
             color: #0f172a !important;
           }
-          /* Card & Container Resets to Clean White with Subtle Borders */
-          section, .rounded-3xl, .rounded-2xl, .rounded-xl {
-            background-color: #ffffff !important;
-            border: 1px solid #e2e8f0 !important;
-            border-radius: 12px !important;
-            box-shadow: none !important;
+
+          /* 4. Numbers: vivid clean text colors ONLY (zero background tint) */
+          .text-rose-200, .text-rose-300, .text-rose-400, .text-rose-500, .text-rose-600 {
+            color: #dc2626 !important;
           }
-          .bg-slate-900, .bg-slate-900\\/90, .bg-slate-950, .bg-slate-950\\/70, .bg-slate-950\\/80, .bg-slate-950\\/60, .bg-slate-950\\/40, .bg-slate-950\\/90 {
-            background-color: #f8fafc !important;
-            border-color: #e2e8f0 !important;
+          .text-emerald-200, .text-emerald-300, .text-emerald-400, .text-emerald-500, .text-emerald-600 {
+            color: #16a34a !important;
           }
-          /* Themed Alert Cards */
-          .bg-rose-950, .bg-rose-950\\/60, .bg-rose-950\\/40, .border-rose-500\\/30, .border-rose-500\\/40, .border-rose-500\\/50 {
-            background-color: #fff1f2 !important;
-            border-color: #fecdd3 !important;
+          .text-amber-200, .text-amber-300, .text-amber-400, .text-amber-500, .text-amber-600 {
+            color: #d97706 !important;
           }
-          .bg-rose-950 *, .text-rose-200, .text-rose-300, .text-rose-400 {
-            color: #9f1239 !important;
+          .text-indigo-200, .text-indigo-300, .text-indigo-400 {
+            color: #4f46e5 !important;
           }
-          .bg-rose-950 strong, .bg-rose-950 .text-white {
-            color: #881337 !important;
-          }
-          .bg-emerald-950, .bg-emerald-950\\/60, .bg-emerald-950\\/40, .border-emerald-500\\/30, .border-emerald-500\\/40, .border-emerald-500\\/50 {
-            background-color: #ecfdf5 !important;
-            border-color: #a7f3d0 !important;
-          }
-          .bg-emerald-950 *, .text-emerald-200, .text-emerald-300, .text-emerald-400 {
-            color: #065f46 !important;
-          }
-          .bg-emerald-950 strong, .bg-emerald-950 .text-white {
-            color: #022c22 !important;
-          }
-          .bg-amber-950, .bg-amber-950\\/80, .bg-amber-950\\/60, .border-amber-500\\/30, .border-amber-500\\/40, .border-amber-500\\/50 {
-            background-color: #fffbeb !important;
-            border-color: #fde68a !important;
-          }
-          .bg-amber-950 *, .text-amber-200, .text-amber-300, .text-amber-400 {
-            color: #92400e !important;
-          }
-          .bg-amber-950 strong, .bg-amber-950 .text-white {
-            color: #78350f !important;
-          }
-          .bg-indigo-950, .bg-indigo-950\\/80, .bg-indigo-950\\/60, .border-indigo-500\\/30, .border-indigo-500\\/40 {
-            background-color: #f5f3ff !important;
-            border-color: #ddd6fe !important;
-          }
-          .bg-indigo-950 *, .text-indigo-200, .text-indigo-300, .text-indigo-400 {
-            color: #4338ca !important;
-          }
-          .bg-indigo-950 strong, .bg-indigo-950 .text-white {
-            color: #312e81 !important;
-          }
-          /* Subtle border reset */
-          .border-slate-800, .border-slate-700, .border-slate-855 {
-            border-color: #e2e8f0 !important;
-          }
-          /* Text colors */
-          .text-white {
-            color: #0f172a !important;
-          }
-          .text-slate-300, .text-slate-400 {
-            color: #475569 !important;
-          }
-          /* Compact Spacing and Prevent Orphaned Breaks */
+
+          /* 5. Spacing & Avoid Orphaned Cuts */
           section, .print-avoid-break, .print-card-avoid {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
-            margin-bottom: 3.5mm !important;
+            margin-bottom: 2.5mm !important;
           }
-          .space-y-4, .space-y-6, .space-y-8 {
+          .space-y-4, .space-y-5, .space-y-6, .space-y-8 {
             margin-top: 0 !important;
           }
-          /* Hide all screen interactive elements */
-          header, footer, .print-hidden, [class*="print:hidden"] {
+
+          /* 6. Hide interactive buttons and screen-only controls */
+          header, footer, nav, button, input, select, .print-hidden, [class*="print:hidden"] {
             display: none !important;
           }
         }
@@ -2759,10 +2726,10 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                   </div>
 
                   {/* TARJETA 2: LA FUGA DE DINERO MENSUAL (EL DOLOR FINANCIERO) */}
-                  <div className="p-6 print:p-3.5 rounded-3xl print:rounded-2xl bg-gradient-to-b from-rose-950/40 via-slate-900 to-slate-900 print:bg-rose-50/50 border-2 border-rose-500/40 print:border-rose-300 flex flex-col justify-between space-y-5 print:space-y-3 shadow-2xl print:shadow-none relative overflow-hidden print-avoid-break">
+                  <div className="p-6 print:p-3.5 rounded-3xl print:rounded-2xl bg-gradient-to-b from-rose-950/40 via-slate-900 to-slate-900 print:bg-white border-2 border-rose-500/40 print:border-slate-300 flex flex-col justify-between space-y-5 print:space-y-3 shadow-2xl print:shadow-none relative overflow-hidden print-avoid-break">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300 flex items-center gap-1.5">
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-rose-950 print:bg-white border border-rose-500/40 print:border-slate-300 text-rose-300 print:text-rose-600 flex items-center gap-1.5">
                           <Flame className="w-3 h-3 text-rose-400" />
                           <span>02. Lo Que Pierdes Hoy</span>
                         </span>
@@ -2770,46 +2737,46 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                       </div>
 
                       <div>
-                        <span className="text-xs font-bold text-rose-300/80 block mb-1">Pérdida Financiera Estimada</span>
+                        <span className="text-xs font-bold text-rose-300/80 print:text-slate-600 block mb-1">Pérdida Financiera Estimada</span>
                         <div className="text-3xl sm:text-4xl font-black text-rose-400 tracking-tight">
                           -{fmtMoney(calculations.monthlyFinancialLeakage)}
-                          <span className="text-xs font-bold text-rose-300/80 block sm:inline sm:ml-1">/ mes</span>
+                          <span className="text-xs font-bold text-rose-300/80 print:text-slate-600 block sm:inline sm:ml-1">/ mes</span>
                         </div>
-                        <span className="text-[11px] text-rose-300/60 font-mono block mt-0.5">
+                        <span className="text-[11px] text-rose-300/60 print:text-slate-500 font-mono block mt-0.5">
                           (-{fmtMoney(calculations.yearlyFinancialLeakage)} al año)
                         </span>
                       </div>
 
-                      <div className="p-3.5 rounded-2xl bg-rose-950/60 border border-rose-500/30 space-y-2 text-xs">
+                      <div className="p-3.5 rounded-2xl bg-rose-950/60 print:bg-white border border-rose-500/30 print:border-slate-200 space-y-2 text-xs">
                         <div className="flex items-center justify-between">
-                          <span className="text-rose-200 font-semibold">{categoryTerms.clientLabel} insatisfechos:</span>
-                          <strong className="text-white">~{calculations.monthlyUnhappyClients} / mes</strong>
+                          <span className="text-rose-200 print:text-slate-700 font-semibold">{categoryTerms.clientLabel} insatisfechos:</span>
+                          <strong className="text-white print:text-slate-950">~{calculations.monthlyUnhappyClients} / mes</strong>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-rose-200 font-semibold">Ticket promedio verificado:</span>
-                          <strong className="text-white">{fmtMoney(calculations.safeTicket)}</strong>
+                          <span className="text-rose-200 print:text-slate-700 font-semibold">Ticket promedio verificado:</span>
+                          <strong className="text-white print:text-slate-950">{fmtMoney(calculations.safeTicket)}</strong>
                         </div>
-                        <div className="flex items-center justify-between border-t border-rose-500/30 pt-1.5">
-                          <span className="text-rose-200 font-semibold">Visitas perdidas recurrentes:</span>
-                          <strong className="text-amber-300">4 recompras / año</strong>
+                        <div className="flex items-center justify-between border-t border-rose-500/30 print:border-slate-200 pt-1.5">
+                          <span className="text-rose-200 print:text-slate-700 font-semibold">Visitas perdidas recurrentes:</span>
+                          <strong className="text-amber-300 print:text-amber-600">4 recompras / año</strong>
                         </div>
                       </div>
 
-                      <p className="text-[11.5px] text-rose-200/90 leading-relaxed">
+                      <p className="text-[11.5px] text-rose-200/90 print:text-slate-700 leading-relaxed">
                         El 92% de clientes con una mala experiencia <strong>jamás se quejan en el local</strong>: se van en silencio, no vuelven y le avisan a 10 conocidos en Google Maps.
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-rose-500/30 text-[11px] text-rose-300/70 font-semibold">
+                    <div className="pt-3 border-t border-rose-500/30 print:border-slate-200 text-[11px] text-rose-300/70 print:text-slate-500 font-semibold">
                       Fórmula auditada basada en tu volumen de {fmtNumber(calculations.totalDinersMonth)} {categoryTerms.clientLabel.toLowerCase()}/mes.
                     </div>
                   </div>
 
                   {/* TARJETA 3: LA SOLUCIÓN Y EL RETORNO (EL CIERRE MAESTRO) */}
-                  <div className="p-6 print:p-3.5 rounded-3xl print:rounded-2xl bg-gradient-to-b from-emerald-950/50 via-slate-900 to-slate-900 print:bg-emerald-50/50 border-2 border-emerald-500/50 print:border-emerald-300 flex flex-col justify-between space-y-5 print:space-y-3 shadow-2xl print:shadow-none relative overflow-hidden print-avoid-break">
+                  <div className="p-6 print:p-3.5 rounded-3xl print:rounded-2xl bg-gradient-to-b from-emerald-950/50 via-slate-900 to-slate-900 print:bg-white border-2 border-emerald-500/50 print:border-slate-300 flex flex-col justify-between space-y-5 print:space-y-3 shadow-2xl print:shadow-none relative overflow-hidden print-avoid-break">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-950 border border-emerald-500/40 text-emerald-300 flex items-center gap-1.5">
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-950 print:bg-white border border-emerald-500/40 print:border-slate-300 text-emerald-300 print:text-emerald-700 flex items-center gap-1.5">
                           <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                           <span>03. Tu Ganancia con Prestigia</span>
                         </span>
@@ -2817,33 +2784,33 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                       </div>
 
                       <div>
-                        <span className="text-xs font-bold text-emerald-300/80 block mb-1">Dinero Protegido + Nuevas Ventas</span>
+                        <span className="text-xs font-bold text-emerald-300/80 print:text-slate-600 block mb-1">Dinero Protegido + Nuevas Ventas</span>
                         <div className="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">
                           +{fmtMoney(calculations.moneySavedMonthly + Math.round((calculations.newRevenueFromGoogleYearly || 0) / 12))}
-                          <span className="text-xs font-bold text-emerald-300/80 block sm:inline sm:ml-1">/ mes</span>
+                          <span className="text-xs font-bold text-emerald-300/80 print:text-slate-600 block sm:inline sm:ml-1">/ mes</span>
                         </div>
-                        <span className="text-[11px] text-emerald-300/70 font-mono block mt-0.5">
+                        <span className="text-[11px] text-emerald-300/70 print:text-slate-500 font-mono block mt-0.5">
                           (+{fmtMoney(calculations.totalAnnualFinancialBenefit)} de beneficio anual)
                         </span>
                       </div>
 
                       <div className="space-y-2 text-xs text-slate-200">
-                        <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center gap-2">
+                        <div className="p-2.5 rounded-xl bg-emerald-950/40 print:bg-white border border-emerald-500/30 print:border-slate-200 flex items-center gap-2">
                           <span className="w-5 h-5 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-xs shrink-0">1</span>
-                          <p className="text-[11px]">
+                          <p className="text-[11px] print:text-slate-800">
                             <strong>Bóveda QR en Mesa:</strong> Intercepta el 92% de quejas en caliente y las resuelve por WhatsApp antes de internet.
                           </p>
                         </div>
-                        <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center gap-2">
+                        <div className="p-2.5 rounded-xl bg-emerald-950/40 print:bg-white border border-emerald-500/30 print:border-slate-200 flex items-center gap-2">
                           <span className="w-5 h-5 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-xs shrink-0">2</span>
-                          <p className="text-[11px]">
+                          <p className="text-[11px] print:text-slate-800">
                             <strong>Respuesta IA en 1-Clic:</strong> Responde reseñas públicas con Gemini y recupera al 25% de clientes perdidos.
                           </p>
                         </div>
-                        <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center gap-2">
+                        <div className="p-2.5 rounded-xl bg-emerald-950/40 print:bg-white border border-emerald-500/30 print:border-slate-200 flex items-center gap-2">
                           <span className="w-5 h-5 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-xs shrink-0">3</span>
-                          <p className="text-[11px]">
-                            <strong>Subida al Top 3:</strong> Tu calificación sube a <strong className="text-amber-300">+{calculations.projectedRatingIn90Days}★</strong> atrayendo clientes nuevos cada semana.
+                          <p className="text-[11px] print:text-slate-800">
+                            <strong>Subida al Top 3:</strong> Tu calificación sube a <strong className="text-amber-300 print:text-amber-600">+{calculations.projectedRatingIn90Days}★</strong> atrayendo clientes nuevos cada semana.
                           </p>
                         </div>
                       </div>
@@ -2883,12 +2850,12 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                     </div>
 
                     {/* Print-only Executive Agreement block in Card 3 */}
-                    <div className="hidden print:block pt-3 border-t border-emerald-300 space-y-1.5 text-[10px]">
-                      <div className="flex items-center justify-between font-bold text-emerald-950">
+                    <div className="hidden print:block pt-3 border-t border-slate-200 space-y-1.5 text-[10px]">
+                      <div className="flex items-center justify-between font-bold text-slate-950">
                         <span>Garantía de Retención B2B</span>
-                        <span className="text-emerald-700 font-extrabold">Retorno Estimado +{calculations.roiMultiplier}x</span>
+                        <span className="text-emerald-600 font-extrabold">Retorno Estimado +{calculations.roiMultiplier}x</span>
                       </div>
-                      <div className="p-2 rounded-lg bg-emerald-100/60 border border-emerald-300 text-[9.5px] text-emerald-950 leading-snug">
+                      <div className="p-2 rounded-lg bg-white border border-slate-200 text-[9.5px] text-slate-800 leading-snug">
                         Blindaje activo de 12 meses: Bóvedas QR en mesa, contención privada por WhatsApp y motor IA de respuesta oficial en Google Maps.
                       </div>
                     </div>
