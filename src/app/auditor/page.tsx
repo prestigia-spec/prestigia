@@ -146,6 +146,7 @@ export default function BusinessAuditorPage() {
   const [mainStaffCount, setMainStaffCount] = useState<number | null>(null);
   const [averageTicket, setAverageTicket] = useState<number | null>(null);
   const [isReportUnlocked, setIsReportUnlocked] = useState(false);
+  const [auditDisplayMode, setAuditDisplayMode] = useState<'executive' | 'complete'>('executive');
 
   // Recovery Rate simulation for existing unanswered negative reviews (defaults to 25%)
   const [unansweredRecoveryRate, setUnansweredRecoveryRate] = useState<number>(25);
@@ -1037,6 +1038,7 @@ export default function BusinessAuditorPage() {
       recoveredNegativeCount,
       immediateJumpRating,
       immediateRatingDelta,
+      safeTicket,
     };
   }, [
     allBranches,
@@ -2516,6 +2518,291 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
           </section>
         ) : (
           <>
+            {/* SELECTOR DE FORMATO DE PRESENTACIÓN (EJECUTIVO VS COMPLETO) */}
+            <section className="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-2xl relative overflow-hidden print:hidden">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3 text-center sm:text-left">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                    <Zap className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-center sm:justify-start gap-2">
+                      <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-300">
+                        {lang === 'en' ? 'Presentation Format for Meeting' : 'Formato de Presentación para Reunión'}
+                      </span>
+                    </div>
+                    <h3 className="text-sm sm:text-base font-black text-white">
+                      {auditDisplayMode === 'executive'
+                        ? (lang === 'en' ? '⚡ Executive Pitch Mode (3-Minute Quick Closing)' : '⚡ Modo Ejecutivo (Pitch Rápido de 3 Minutos)')
+                        : (lang === 'en' ? '🔬 Full 360° Technical Audit Study' : '🔬 Estudio Técnico y Algorítmico 360°')}
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 p-1.5 rounded-2xl bg-slate-950 border border-slate-800 w-full sm:w-auto shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setAuditDisplayMode('executive')}
+                    className={`px-4 py-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                      auditDisplayMode === 'executive'
+                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/25'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Zap className="w-3.5 h-3.5 fill-current" />
+                    <span>{lang === 'en' ? 'Executive (3 Min)' : '⚡ Resumen Ejecutivo'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAuditDisplayMode('complete')}
+                    className={`px-4 py-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                      auditDisplayMode === 'complete'
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <BarChart3 className="w-3.5 h-3.5" />
+                    <span>{lang === 'en' ? 'Full 360° Audit' : '🔬 Auditoría Completa'}</span>
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* VISTA 1: MODO EJECUTIVO (PITCH RÁPIDO DE 3 MINUTOS) */}
+            {auditDisplayMode === 'executive' ? (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                {/* Header Banner */}
+                <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950/60 to-slate-900 border-2 border-amber-500/50 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+                  <div className="space-y-1 text-center md:text-left">
+                    <div className="flex items-center justify-center md:justify-start gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+                      <span className="text-[11px] font-black uppercase tracking-wider text-amber-300">
+                        {lang === 'en' ? 'Executive Briefing • 3-Minute Strategic Summary' : 'Resumen Estratégico Ejecutivo • 3 Minutos'}
+                      </span>
+                    </div>
+                    <h2 className="text-xl sm:text-2xl font-black text-white">
+                      {calculations.activeTitle}: {lang === 'en' ? 'The Cost of Inaction vs Prestigia ROI' : 'Radiografía Rápida de Pérdida vs Retorno'}
+                    </h2>
+                    <p className="text-xs text-slate-300 max-w-xl">
+                      {lang === 'en'
+                        ? 'The three core numbers every business owner needs to protect revenue and dominate the local map.'
+                        : 'Los tres números maestros que todo dueño necesita para detener la fuga de dinero y dominar su ciudad.'}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setAuditDisplayMode('complete')}
+                      className="px-4 py-2.5 rounded-xl bg-slate-950/80 hover:bg-slate-900 text-slate-300 hover:text-white border border-slate-700 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-lg active:scale-95"
+                    >
+                      <BarChart3 className="w-4 h-4 text-indigo-400" />
+                      <span>{lang === 'en' ? 'Switch to Full 360° Study' : 'Ver Estudio Técnico 360°'}</span>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handlePrint}
+                      className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-lg active:scale-95"
+                    >
+                      <Printer className="w-4 h-4" />
+                      <span>PDF</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* The 3 Golden Cards of the Executive Pitch */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                  {/* TARJETA 1: TU RADIOGRAFÍA EN GOOGLE (30 SEGUNDOS) */}
+                  <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between space-y-5 shadow-xl relative overflow-hidden group hover:border-slate-700 transition">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 flex items-center gap-1.5">
+                          <span>01. Tu Situación Actual</span>
+                        </span>
+                        <span className="text-xs font-bold text-slate-400">Google Maps</span>
+                      </div>
+
+                      <div>
+                        <span className="text-xs font-bold text-slate-400 block mb-1">Calificación y Salud de Ficha</span>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-4xl font-black text-amber-400 tracking-tight">
+                            {calculations.effectiveRating}★
+                          </span>
+                          <span className="text-xs font-bold text-slate-400">
+                            ({fmtNumber(calculations.totalReviews)} reseñas públicas)
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Mini Health Bar */}
+                      <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-2">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-slate-400 font-semibold">Salud Algorítmica:</span>
+                          <span className={`font-black ${(mainSeoAudit?.score ?? 58) >= 80 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                            {mainSeoAudit?.score ?? 58} / 100
+                          </span>
+                        </div>
+                        <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              (mainSeoAudit?.score ?? 58) >= 80 ? 'bg-emerald-500' : 'bg-amber-500'
+                            }`}
+                            style={{ width: `${mainSeoAudit?.score ?? 58}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 text-xs text-slate-300">
+                        <div className="flex items-start gap-2">
+                          <span className="text-rose-400 font-black">❌</span>
+                          <p className="text-[11.5px] leading-relaxed">
+                            <strong>Subcategorías Ocultas:</strong> Faltan subcategorías secundarias en Google Maps, haciéndote invisible para el 50% de búsquedas locales.
+                          </p>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-amber-400 font-black">⚠️</span>
+                          <p className="text-[11.5px] leading-relaxed">
+                            <strong>Reseñas Vulnerables:</strong> Las quejas de 1★ a 3★ son leídas por nuevos clientes antes de visitarte, desviándolos a la competencia.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-slate-800 text-[11px] text-slate-500">
+                      Diagnóstico público extraído en vivo de Google Maps.
+                    </div>
+                  </div>
+
+                  {/* TARJETA 2: LA FUGA DE DINERO MENSUAL (EL DOLOR FINANCIERO) */}
+                  <div className="p-6 rounded-3xl bg-gradient-to-b from-rose-950/40 via-slate-900 to-slate-900 border-2 border-rose-500/40 flex flex-col justify-between space-y-5 shadow-2xl relative overflow-hidden">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300 flex items-center gap-1.5">
+                          <Flame className="w-3 h-3 text-rose-400" />
+                          <span>02. Lo Que Pierdes Hoy</span>
+                        </span>
+                        <span className="text-xs font-bold text-rose-400">Fuga Mensual</span>
+                      </div>
+
+                      <div>
+                        <span className="text-xs font-bold text-rose-300/80 block mb-1">Pérdida Financiera Estimada</span>
+                        <div className="text-3xl sm:text-4xl font-black text-rose-400 tracking-tight">
+                          -{fmtMoney(calculations.monthlyFinancialLeakage)}
+                          <span className="text-xs font-bold text-rose-300/80 block sm:inline sm:ml-1">/ mes</span>
+                        </div>
+                        <span className="text-[11px] text-rose-300/60 font-mono block mt-0.5">
+                          (-{fmtMoney(calculations.yearlyFinancialLeakage)} al año)
+                        </span>
+                      </div>
+
+                      <div className="p-3.5 rounded-2xl bg-rose-950/60 border border-rose-500/30 space-y-2 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="text-rose-200 font-semibold">{categoryTerms.clientLabel} insatisfechos:</span>
+                          <strong className="text-white">~{calculations.monthlyUnhappyClients} / mes</strong>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-rose-200 font-semibold">Ticket promedio verificado:</span>
+                          <strong className="text-white">{fmtMoney(calculations.safeTicket)}</strong>
+                        </div>
+                        <div className="flex items-center justify-between border-t border-rose-500/30 pt-1.5">
+                          <span className="text-rose-200 font-semibold">Visitas perdidas recurrentes:</span>
+                          <strong className="text-amber-300">4 recompras / año</strong>
+                        </div>
+                      </div>
+
+                      <p className="text-[11.5px] text-rose-200/90 leading-relaxed">
+                        El 92% de clientes con una mala experiencia <strong>jamás se quejan en el local</strong>: se van en silencio, no vuelven y le avisan a 10 conocidos en Google Maps.
+                      </p>
+                    </div>
+
+                    <div className="pt-3 border-t border-rose-500/30 text-[11px] text-rose-300/70 font-semibold">
+                      Fórmula auditada basada en tu volumen de {fmtNumber(calculations.totalDinersMonth)} {categoryTerms.clientLabel.toLowerCase()}/mes.
+                    </div>
+                  </div>
+
+                  {/* TARJETA 3: LA SOLUCIÓN Y EL RETORNO (EL CIERRE MAESTRO) */}
+                  <div className="p-6 rounded-3xl bg-gradient-to-b from-emerald-950/50 via-slate-900 to-slate-900 border-2 border-emerald-500/50 flex flex-col justify-between space-y-5 shadow-2xl relative overflow-hidden">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-950 border border-emerald-500/40 text-emerald-300 flex items-center gap-1.5">
+                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>03. Tu Ganancia con Prestigia</span>
+                        </span>
+                        <span className="text-xs font-bold text-emerald-400">Retorno Neto</span>
+                      </div>
+
+                      <div>
+                        <span className="text-xs font-bold text-emerald-300/80 block mb-1">Dinero Protegido + Nuevas Ventas</span>
+                        <div className="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">
+                          +{fmtMoney(calculations.moneySavedMonthly + Math.round((calculations.newRevenueFromGoogleYearly || 0) / 12))}
+                          <span className="text-xs font-bold text-emerald-300/80 block sm:inline sm:ml-1">/ mes</span>
+                        </div>
+                        <span className="text-[11px] text-emerald-300/70 font-mono block mt-0.5">
+                          (+{fmtMoney(calculations.totalAnnualFinancialBenefit)} de beneficio anual)
+                        </span>
+                      </div>
+
+                      <div className="space-y-2 text-xs text-slate-200">
+                        <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-xs shrink-0">1</span>
+                          <p className="text-[11px]">
+                            <strong>Bóveda QR en Mesa:</strong> Intercepta el 92% de quejas en caliente y las resuelve por WhatsApp antes de internet.
+                          </p>
+                        </div>
+                        <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-xs shrink-0">2</span>
+                          <p className="text-[11px]">
+                            <strong>Respuesta IA en 1-Clic:</strong> Responde reseñas públicas con Gemini y recupera al 25% de clientes perdidos.
+                          </p>
+                        </div>
+                        <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-xs shrink-0">3</span>
+                          <p className="text-[11px]">
+                            <strong>Subida al Top 3:</strong> Tu calificación sube a <strong className="text-amber-300">+{calculations.projectedRatingIn90Days}★</strong> atrayendo clientes nuevos cada semana.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CTA Button */}
+                    <div className="pt-4 border-t border-emerald-500/30 space-y-2">
+                      <a
+                        href={`https://wa.me/573058314049?text=${encodeURIComponent(
+                          `Hola Prestigia, acabo de realizar la auditoría ejecutiva de "${businessName || calculations.activeTitle}". Queremos activar el blindaje reputacional y subir al Top 3 de Google Maps.`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-emerald-500/25 hover:scale-[1.02] active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer text-center"
+                      >
+                        <Zap className="w-4 h-4 fill-slate-950 text-slate-950" />
+                        <span>Activar Protección Prestigia Ahora</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </a>
+                      <div className="flex items-center justify-center gap-3 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setShowDemoModal(true)}
+                          className="text-[11px] font-bold text-amber-400 hover:text-amber-300 underline cursor-pointer"
+                        >
+                          Escanear Demo QR en Vivo
+                        </button>
+                        <span className="text-slate-600">•</span>
+                        <button
+                          type="button"
+                          onClick={() => setAuditDisplayMode('complete')}
+                          className="text-[11px] font-bold text-indigo-400 hover:text-indigo-300 underline cursor-pointer"
+                        >
+                          Ver Auditoría Completa 360°
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* VISTA 2: AUDITORÍA TÉCNICA COMPLETA 360° */
+              <div className="space-y-4">
             {/* STEP 2: SELECTOR DE VISTA DE REPORTE (SOLO SI HAY MÁS DE 1 SEDE) */}
             {calculations.hasMultipleBranches && (
           <section className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl relative overflow-hidden space-y-4">
@@ -3828,8 +4115,10 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
             </div>
           </div>
         </section>
-      </>
+      </div>
     )}
+  </>
+)}
       </main>
 
       {/* Footer */}
