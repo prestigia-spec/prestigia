@@ -256,18 +256,18 @@ input[type=number] {
 
 @media print {
   @page {
-    margin: 0 !important;
+    margin: 8mm 10mm !important;
     size: A4 portrait;
   }
   *, *:before, *:after {
     box-sizing: border-box !important;
-    overflow: visible !important;
   }
   html, body {
     margin: 0 !important;
     padding: 0 !important;
-    background-color: #020617 !important;
-    color: #FFFFFF !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     width: 100% !important;
@@ -280,12 +280,12 @@ input[type=number] {
   button,
   input,
   select,
-  .print-hidden {
+  .print-hidden,
+  [class*="print:hidden"] {
     display: none !important;
   }
   .print-avoid-break,
   .print-card-avoid,
-  .grid > div,
   table,
   tr,
   tbody {
@@ -306,22 +306,17 @@ input[type=number] {
     gap: 8px !important;
   }
   .print-sheet,
-  .\print\:print-sheet {
-    page-break-after: always !important;
-    break-after: page !important;
-    padding: 8mm 10mm !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    background-color: #020617 !important;
-  }
+  .\print\:print-sheet,
   .print-sheet-last,
   .\print\:print-sheet-last {
     page-break-after: auto !important;
     break-after: auto !important;
-    padding: 8mm 10mm !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    padding: 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    background-color: #020617 !important;
+    background-color: #ffffff !important;
   }
 }
 
@@ -395,23 +390,7 @@ input[type=number] {
   animation-play-state: paused !important;
 }
 
-/* =========================================================================
-   GLOBAL PRINT ENGINE (Pure White Paper, Zero Backgrounds)
-   ========================================================================= */
-@media print {
-  @page {
-    margin: 10mm 12mm !important;
-    size: A4 portrait;
-    background-color: #ffffff !important;
-  }
-  html, body {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-    color: #0f172a !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-}
+
 
 
 

@@ -1133,15 +1133,15 @@ _Asesor Comercial: Luisma â€¢ Director de Crecimiento & Blindaje Reputacional â€
 
   return (
     <div className="auditor-root-container min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white print:min-h-0 print:h-auto print:bg-white print:text-slate-900 print:m-0 print:p-0">
-      {/* Global Print Styles - 100% White Paper Corporate Dossier (Zero Backgrounds) */}
+      {/* Global Print Styles - 100% White Paper Corporate Dossier (Zero Backgrounds, Tight Compact Spacing) */}
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
           @page {
-            margin: 10mm 12mm !important;
+            margin: 8mm 10mm !important;
             size: A4 portrait;
           }
           
-          /* 1. Global Reset: PURE WHITE, ZERO BACKGROUNDS, ZERO GRADIENTS */
+          /* 1. Global Reset: PURE WHITE, ZERO BACKGROUNDS, ZERO SHADOWS */
           *, *::before, *::after {
             background-color: transparent !important;
             background-image: none !important;
@@ -1162,7 +1162,8 @@ _Asesor Comercial: Luisma â€¢ Director de Crecimiento & Blindaje Reputacional â€
             width: 100% !important;
             min-height: 0 !important;
             height: auto !important;
-            font-size: 10pt !important;
+            font-size: 8.5pt !important;
+            line-height: 1.25 !important;
           }
 
           /* 2. FORCE NO BACKGROUNDS ON ALL TAILWIND COLOR UTILITIES */
@@ -1179,11 +1180,23 @@ _Asesor Comercial: Luisma â€¢ Director de Crecimiento & Blindaje Reputacional â€
             background-image: none !important;
           }
 
-          /* 3. CARDS & SECTIONS: CRISP SUBTLE BORDERS */
-          section, article, .p-6, .p-5, [class*="rounded-3xl"] {
+          /* 3. ELEGANT EXECUTIVE CARDS: HAIRLINE BORDERS ON LEAF CARDS ONLY */
+          .print-card-avoid,
+          .print-avoid-break,
+          [class*="rounded-3xl"]:not(.hero-clean-title),
+          [class*="rounded-2xl"]:not(.hero-clean-title) {
             background-color: #ffffff !important;
             border: 1px solid #cbd5e1 !important;
-            border-radius: 10px !important;
+            border-radius: 8px !important;
+          }
+
+          .hero-clean-title,
+          section.hero-clean-title,
+          section.text-center {
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+            margin: 0 0 2mm 0 !important;
           }
 
           [class*="border-slate-"],
@@ -1196,12 +1209,29 @@ _Asesor Comercial: Luisma â€¢ Director de Crecimiento & Blindaje Reputacional â€
             border-color: #cbd5e1 !important;
           }
 
-          /* 4. Typography: pure dark slate / black, crystal clear */
+          /* 4. HIGH-DENSITY TYPOGRAPHY: EXECUTIVE, CLEAR & TIGHT */
           h1, h2, h3, h4, h5, h6, strong, b, .font-black, .font-extrabold {
             color: #0f172a !important;
           }
+          h1 {
+            font-size: 15pt !important;
+            line-height: 1.2 !important;
+            margin: 0 0 2mm 0 !important;
+          }
+          h2 {
+            font-size: 11.5pt !important;
+            line-height: 1.2 !important;
+            margin: 0 0 1.5mm 0 !important;
+          }
+          h3 {
+            font-size: 10pt !important;
+            line-height: 1.2 !important;
+            margin: 0 0 1mm 0 !important;
+          }
           p, span, div, li, td, th {
             color: #1e293b !important;
+            font-size: 8.5pt !important;
+            line-height: 1.25 !important;
           }
           .text-white, [class*="text-slate-1"], [class*="text-slate-2"], [class*="text-slate-3"], [class*="text-slate-4"], [class*="text-slate-5"] {
             color: #0f172a !important;
@@ -1213,7 +1243,7 @@ _Asesor Comercial: Luisma â€¢ Director de Crecimiento & Blindaje Reputacional â€
             color: #0f172a !important;
           }
 
-          /* 5. Numbers: vivid clean text colors ONLY (zero background tint) */
+          /* 5. NUMBERS & BADGES: VIVID EXECUTIVE ACCENTS (ZERO BACKGROUND TINT) */
           .text-rose-200, .text-rose-300, .text-rose-400, .text-rose-500, .text-rose-600, .text-red-400, .text-red-500, .text-red-600 {
             color: #dc2626 !important;
           }
@@ -1227,26 +1257,63 @@ _Asesor Comercial: Luisma â€¢ Director de Crecimiento & Blindaje Reputacional â€
             color: #4f46e5 !important;
           }
 
-          /* 6. Spacing & Avoid Orphaned Cuts */
-          section, .print-avoid-break, .print-card-avoid, table, tr {
+          /* 6. COMPACT MARGINS & CONTINUOUS CONTENT FLOW (ZERO UNWANTED GAPS) */
+          /* Allow top-level sections to flow naturally across pages */
+          section, article, main, .auditor-root-container, .print-sheet, .\print\:print-sheet {
+            page-break-inside: auto !important;
+            break-inside: auto !important;
+            page-break-after: auto !important;
+            break-after: auto !important;
+            page-break-before: auto !important;
+            break-before: auto !important;
+          }
+
+          /* Prevent ugly splits ONLY on atomic cards and table rows */
+          .print-avoid-break,
+          .print-card-avoid,
+          .print-podium-5,
+          table,
+          tr {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
-            margin-bottom: 3mm !important;
           }
-          .space-y-4, .space-y-5, .space-y-6, .space-y-8 {
-            margin-top: 0 !important;
+          h1, h2, h3 {
+            page-break-after: avoid !important;
+            break-after: avoid !important;
+          }
+
+          /* Tighten vertical spacing between children */
+          [class*="space-y-"] > :not([hidden]) ~ :not([hidden]) {
+            margin-top: 4px !important;
+            margin-bottom: 0 !important;
+          }
+          [class*="gap-"] {
+            gap: 6px !important;
+          }
+          [class*="p-6"], [class*="p-8"], [class*="p-5"] {
+            padding: 8px 10px !important;
+          }
+          [class*="py-6"], [class*="py-8"], [class*="py-5"], [class*="py-4"] {
+            padding-top: 4px !important;
+            padding-bottom: 4px !important;
+          }
+          [class*="my-6"], [class*="my-8"], [class*="my-4"], [class*="my-5"] {
+            margin-top: 4px !important;
+            margin-bottom: 4px !important;
           }
 
           /* 7. Corporate Table Formatting */
           table {
             width: 100% !important;
             border-collapse: collapse !important;
+            margin: 4px 0 !important;
           }
           th, td {
             border: 1px solid #cbd5e1 !important;
-            padding: 6px 8px !important;
+            padding: 4px 6px !important;
             color: #0f172a !important;
             background-color: #ffffff !important;
+            font-size: 8pt !important;
           }
           th {
             background-color: #f8fafc !important;
@@ -1258,20 +1325,15 @@ _Asesor Comercial: Luisma â€¢ Director de Crecimiento & Blindaje Reputacional â€
             display: none !important;
           }
 
-          /* 9. Page break sheets in complete audit */
+          /* 9. Seamless sheets: continuous flow without forced page breaks */
           .print-sheet,
-          .\\print\\:print-sheet {
-            page-break-after: always !important;
-            break-after: page !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            width: 100% !important;
-            background-color: #ffffff !important;
-          }
+          .\\print\\:print-sheet,
           .print-sheet-last,
           .\\print\\:print-sheet-last {
             page-break-after: auto !important;
             break-after: auto !important;
+            page-break-inside: auto !important;
+            break-inside: auto !important;
             padding: 0 !important;
             margin: 0 !important;
             width: 100% !important;
@@ -1362,7 +1424,7 @@ _Asesor Comercial: Luisma â€¢ Director de Crecimiento & Blindaje Reputacional â€
           </div>
 
           {/* HERO TITLE & PRESENTATION */}
-          <section className="text-center max-w-4xl mx-auto pt-2 pb-4 print:pt-0 print:pb-1">
+          <section className="hero-clean-title text-center max-w-4xl mx-auto pt-2 pb-4 print:pt-0 print:pb-1 print:border-none print:shadow-none print:p-0">
             <div className="flex flex-wrap items-center justify-center gap-2 mb-3 print:mb-1 print:gap-1.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 print:px-2 print:py-0.5 rounded-full bg-indigo-950/80 border border-indigo-500/40 text-indigo-300 text-xs print:text-[10px] font-extrabold uppercase tracking-wider">
                 <Sparkles className="w-3.5 h-3.5 print:w-3 print:h-3 text-amber-400" />
