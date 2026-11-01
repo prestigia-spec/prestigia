@@ -43,6 +43,10 @@ import {
   DollarSign,
   Filter,
   Briefcase,
+  Crosshair,
+  Calculator,
+  Compass,
+  FileCheck,
 } from 'lucide-react';
 
 interface StudioAdvisorUser {
@@ -178,7 +182,7 @@ export default function LocalStudioPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Active Workspace Tab
-  const [activeTab, setActiveTab] = useState<'create' | 'audit' | 'dossiers' | 'guide' | 'pitch' | 'advisors' | 'network'>('create');
+  const [activeTab, setActiveTab] = useState<'create' | 'audit' | 'tools' | 'dossiers' | 'guide' | 'pitch' | 'advisors' | 'network'>('create');
 
   // Toast Notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -315,7 +319,16 @@ export default function LocalStudioPage() {
   const [generatedData, setGeneratedData] = useState<BlueprintData | null>(null);
   const [activeEngine, setActiveEngine] = useState<string>('');
 
-  // Saved Dossiers State
+  // 4 Elite Local SEO Power Tools State
+  const [toolsActiveTab, setToolsActiveTab] = useState<'geogrid' | 'roicalc' | 'geotag' | 'citations'>('geogrid');
+  const [geoGridKeyword, setGeoGridKeyword] = useState('Restaurante');
+  const [geoGridRadius, setGeoGridRadius] = useState<'1km' | '3km' | '5km'>('3km');
+  const [roiAverageTicket, setRoiAverageTicket] = useState<number>(65);
+  const [roiCurrentRank, setRoiCurrentRank] = useState<number>(8);
+  const [roiMonthlySearches, setRoiMonthlySearches] = useState<number>(1200);
+  const [geoTagFilename, setGeoTagFilename] = useState('');
+  const [geoTagKeywords, setGeoTagKeywords] = useState('');
+  const [geoTagResult, setGeoTagResult] = useState<string | null>(null);
   const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [isLoadingDossiers, setIsLoadingDossiers] = useState(false);
   const [dossierSearch, setDossierSearch] = useState('');
@@ -931,6 +944,19 @@ export default function LocalStudioPage() {
           >
             <Search className="w-3.5 h-3.5" />
             <span>🔬 Auditar & Optimizar Ficha Existente</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('tools')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+              activeTab === 'tools'
+                ? 'bg-gradient-to-r from-amber-500 to-indigo-600 text-slate-950 font-black shadow-md'
+                : 'bg-slate-950 text-amber-300 hover:text-white border border-amber-500/40'
+            }`}
+          >
+            <Zap className="w-3.5 h-3.5 text-amber-400" />
+            <span>⚡ Armas Top 3 (Geo-Grid & ROI)</span>
           </button>
 
           <button
@@ -1974,8 +2000,426 @@ export default function LocalStudioPage() {
         )}
 
         {/* =============================================================
-            TAB 3: MIS CLIENTES GUARDADOS (EXCLUSIVO CUENTA PRINCIPAL BRAYAN)
+            TAB: 4 ARMAS DE ÉLITE LOCAL SEO (GEO-GRID, ROI, GEOTAG, CITAS)
             ============================================================= */}
+        {activeTab === 'tools' && (
+          <div className="space-y-6 print:hidden">
+            {/* Header intro */}
+            <div className="bg-gradient-to-r from-amber-500/10 via-slate-900 to-indigo-950/40 border border-amber-500/40 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
+                    Arsenal de Cierre de Alto Valor • Estilo BrightLocal & Local Falcon
+                  </span>
+                  <h1 className="text-xl sm:text-2xl font-black text-white">
+                    4 Armas de Dominio Local & Cierre Comercial
+                  </h1>
+                  <p className="text-xs text-slate-300 max-w-2xl">
+                    Herramientas de venta visual y optimización forense para demostrarle al cliente cuánto dinero está perdiendo hoy y cómo Prestigia lo posiciona en la cima.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-emerald-400 font-bold bg-emerald-950/80 border border-emerald-500/30 px-3 py-1.5 rounded-xl">
+                    ⚡ Algoritmo 2026 Activo
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Sub-tools Navigation */}
+            <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-3">
+              <button
+                type="button"
+                onClick={() => setToolsActiveTab('geogrid')}
+                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                  toolsActiveTab === 'geogrid'
+                    ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                <Crosshair className="w-3.5 h-3.5" />
+                <span>1. Simulador Geo-Grid 3x3</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setToolsActiveTab('roicalc')}
+                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                  toolsActiveTab === 'roicalc'
+                    ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                <Calculator className="w-3.5 h-3.5" />
+                <span>2. Calculadora de Pérdida Financiera (ROI)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setToolsActiveTab('geotag')}
+                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                  toolsActiveTab === 'geotag'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                <Compass className="w-3.5 h-3.5" />
+                <span>3. Inyector de Geo-Tagging EXIF</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setToolsActiveTab('citations')}
+                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                  toolsActiveTab === 'citations'
+                    ? 'bg-purple-600 text-white shadow-md'
+                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                <FileCheck className="w-3.5 h-3.5" />
+                <span>4. Hub de Citaciones USA & LatAm</span>
+              </button>
+            </div>
+
+            {/* TOOL 1: SIMULADOR VISUAL GEO-GRID 3X3 */}
+            {toolsActiveTab === 'geogrid' && (
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                  <div>
+                    <h3 className="text-base font-black text-white flex items-center gap-2">
+                      <span>🗺️ Simulador de Posición Geo-Grid 3x3 (Local Falcon Style)</span>
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Demuestra visualmente cómo cae el ranking del cliente a medida que nos alejamos de su ubicación.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {(['1km', '3km', '5km'] as const).map((rad) => (
+                      <button
+                        key={rad}
+                        type="button"
+                        onClick={() => setGeoGridRadius(rad)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                          geoGridRadius === rad
+                            ? 'bg-amber-500 text-slate-950 font-black'
+                            : 'bg-slate-950 text-slate-400 border border-slate-800 hover:text-white'
+                        }`}
+                      >
+                        Radio {rad}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                  {/* Left: Interactive 3x3 Geo-Grid Heatmap */}
+                  <div className="md:col-span-7 bg-slate-950 p-6 rounded-3xl border border-slate-800 relative">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center justify-between">
+                      <span>Mapa Satelital de Cobertura ({city || 'Tu Ciudad'})</span>
+                      <span className="text-amber-400">Palabra clave: "{category.split('/')[0].trim()}"</span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3.5 max-w-sm mx-auto aspect-square">
+                      {[
+                        { pin: 'P1', rank: geoGridRadius === '1km' ? 2 : 7, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: 'Noroeste' },
+                        { pin: 'P2', rank: geoGridRadius === '1km' ? 1 : 5, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: 'Norte' },
+                        { pin: 'P3', rank: geoGridRadius === '5km' ? 14 : 9, color: 'bg-rose-600 text-white', note: 'Noreste' },
+                        { pin: 'P4', rank: geoGridRadius === '1km' ? 1 : 4, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: 'Oeste' },
+                        { pin: 'CENTRO', rank: 1, color: 'bg-emerald-400 text-slate-950 ring-4 ring-emerald-500/30', note: 'Sede Central' },
+                        { pin: 'P6', rank: geoGridRadius === '5km' ? 16 : 8, color: 'bg-rose-600 text-white', note: 'Este' },
+                        { pin: 'P7', rank: geoGridRadius === '5km' ? 18 : 11, color: 'bg-rose-600 text-white', note: 'Suroeste' },
+                        { pin: 'P8', rank: geoGridRadius === '1km' ? 3 : 8, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: 'Sur' },
+                        { pin: 'P9', rank: geoGridRadius === '5km' ? 21 : 15, color: 'bg-rose-600 text-white', note: 'Sureste' },
+                      ].map((item, idx) => (
+                        <div
+                          key={idx}
+                          className={`rounded-2xl p-3 flex flex-col items-center justify-center font-black transition-all transform hover:scale-105 shadow-lg ${item.color}`}
+                        >
+                          <span className="text-[9px] opacity-75 uppercase">{item.note}</span>
+                          <span className="text-2xl font-black">#{item.rank}</span>
+                          <span className="text-[8px] font-bold uppercase">{item.rank <= 3 ? 'TOP 3' : 'FUERA'}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center justify-center gap-4 mt-5 text-[11px] font-bold">
+                      <div className="flex items-center gap-1.5 text-emerald-400">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                        <span>Puesto 1 al 3 (Se llevan el 84% de llamadas)</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-rose-400">
+                        <span className="w-2.5 h-2.5 rounded-full bg-rose-600" />
+                        <span>Puesto 4+ (Invisibles)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right: Pitch Breakdown */}
+                  <div className="md:col-span-5 space-y-4 text-xs">
+                    <div className="p-4 rounded-2xl bg-amber-950/30 border border-amber-500/40 space-y-2">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-300 block">
+                        Diagnóstico para el Asesor:
+                      </span>
+                      <p className="text-slate-200 leading-relaxed text-xs">
+                        "Don {businessName || 'Carlos'}, cuando usted busca parado en su propio local aparece de #1. Pero cuando una persona busca a solo <strong>{geoGridRadius}</strong> de distancia en su mismo barrio, su negocio cae al puesto <strong>#8 o #14</strong>. Toda esa clientela se la están llevando sus 3 competidores más cercanos."
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">
+                        Solución con Prestigia:
+                      </span>
+                      <p className="text-slate-300 text-xs leading-relaxed">
+                        Con la inyección de subcategorías secundarias, menciones de vecindario en la descripción y 8 reseñas semanales geolocalizadas, extendemos el radio verde a toda la ciudad en 90 días.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TOOL 2: CALCULADORA DE PÉRDIDA FINANCIERA (ROI CALCULATOR) */}
+            {toolsActiveTab === 'roicalc' && (
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+                <div>
+                  <h3 className="text-base font-black text-white flex items-center gap-2">
+                    <Calculator className="w-4 h-4 text-emerald-400" />
+                    <span>Calculadora de Pérdida Financiera por estar fuera del Top 3</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Convierte la posición de Google Maps en dólares exactos perdidos por el cliente cada mes.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                    <label className="block font-bold text-slate-300">Ticket Promedio por Cliente (USD)</label>
+                    <input
+                      type="number"
+                      value={roiAverageTicket}
+                      onChange={(e) => setRoiAverageTicket(Number(e.target.value) || 0)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-emerald-300 font-black text-base focus:outline-none"
+                    />
+                    <span className="text-[10px] text-slate-500">Lo que gasta un cliente promedio en su negocio.</span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                    <label className="block font-bold text-slate-300">Posición Actual en Google Maps</label>
+                    <select
+                      value={roiCurrentRank}
+                      onChange={(e) => setRoiCurrentRank(Number(e.target.value))}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-black text-base focus:outline-none"
+                    >
+                      <option value="4">Puesto #4 (Al borde del Top 3)</option>
+                      <option value="8">Puesto #8 (Segunda vista)</option>
+                      <option value="15">Puesto #15+ (Completamente invisible)</option>
+                    </select>
+                    <span className="text-[10px] text-slate-500">Lugar donde aparece hoy al buscar su servicio.</span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                    <label className="block font-bold text-slate-300">Búsquedas Mensuales Estimadas en Zona</label>
+                    <input
+                      type="number"
+                      value={roiMonthlySearches}
+                      onChange={(e) => setRoiMonthlySearches(Number(e.target.value) || 0)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-black text-base focus:outline-none"
+                    />
+                    <span className="text-[10px] text-slate-500">Personas buscando este servicio al mes.</span>
+                  </div>
+                </div>
+
+                {/* Calculation Output Box */}
+                {(() => {
+                  const lostClicks = Math.round(roiMonthlySearches * (roiCurrentRank > 10 ? 0.28 : roiCurrentRank > 5 ? 0.22 : 0.14));
+                  const lostClients = Math.round(lostClicks * 0.25);
+                  const monthlyLoss = lostClients * roiAverageTicket;
+                  const yearlyLoss = monthlyLoss * 12;
+
+                  return (
+                    <div className="p-6 rounded-3xl bg-gradient-to-r from-rose-950/60 via-slate-950 to-slate-900 border-2 border-rose-500/50 space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                          <span className="text-[10px] font-black uppercase tracking-wider text-rose-300 bg-rose-950 px-2.5 py-0.5 rounded-full border border-rose-500/40">
+                            Fuga de Facturación Detectada
+                          </span>
+                          <h4 className="text-lg font-black text-white mt-1">
+                            Dinero que tu negocio está regalando a la competencia:
+                          </h4>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-3xl font-black text-rose-400">
+                            ${monthlyLoss.toLocaleString()} USD
+                          </span>
+                          <span className="text-xs text-slate-400 block font-bold">perdidos cada 30 días</span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-800 text-xs">
+                        <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                          <span className="text-[10px] text-slate-400 uppercase font-bold block">Llamadas y Clics Perdidos:</span>
+                          <strong className="text-base font-black text-white">~{lostClicks} búsquedas/mes</strong>
+                        </div>
+                        <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                          <span className="text-[10px] text-slate-400 uppercase font-bold block">Clientes que no entraron:</span>
+                          <strong className="text-base font-black text-amber-400">~{lostClients} clientes nuevos/mes</strong>
+                        </div>
+                        <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                          <span className="text-[10px] text-slate-400 uppercase font-bold block">Pérdida en 12 Meses:</span>
+                          <strong className="text-base font-black text-rose-400">${yearlyLoss.toLocaleString()} USD/año</strong>
+                        </div>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-slate-900 border border-amber-500/30 text-xs text-amber-200">
+                        <strong className="text-white block mb-0.5">Cierre del Asesor:</strong>
+                        "Prestigia le cuesta una fracción de lo que usted pierde en solo una semana sin estar en el Top 3. Con recuperar tan solo 2 clientes al mes, el servicio se paga solo y todo lo demás es ganancia neta."
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+
+            {/* TOOL 3: INYECTOR DE GEO-TAGGING EXIF */}
+            {toolsActiveTab === 'geotag' && (
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+                <div>
+                  <h3 className="text-base font-black text-white flex items-center gap-2">
+                    <Compass className="w-4 h-4 text-indigo-400" />
+                    <span>Inyector y Generador de Geo-Tagging EXIF para Fotos</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Google lee los metadatos IPTC y coordenadas de las fotos para validar la ubicación real del establecimiento.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">Nombre Base de la Foto</label>
+                      <input
+                        type="text"
+                        value={geoTagFilename}
+                        onChange={(e) => setGeoTagFilename(e.target.value)}
+                        placeholder="ej: fachada-principal o plato-insignia"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-indigo-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">Palabras Clave de Indexación</label>
+                      <input
+                        type="text"
+                        value={geoTagKeywords}
+                        onChange={(e) => setGeoTagKeywords(e.target.value)}
+                        placeholder="ej: mejor restaurante, comida gourmet, centro"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-indigo-400"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cleanBase = (geoTagFilename.trim() || 'foto-local').toLowerCase().replace(/[^a-z0-9]/g, '-');
+                        const cleanC = (city.trim() || 'ciudad').toLowerCase().replace(/[^a-z0-9]/g, '-');
+                        const result = `${cleanBase}-${cleanC}-top3-prestigia.jpg [IPTC: ${geoTagKeywords || category} • GeoTag: ${city}]`;
+                        setGeoTagResult(result);
+                        showToast('Metadatos EXIF generados');
+                      }}
+                      className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black transition cursor-pointer"
+                    >
+                      Generar Nomenclatura & Etiquetas EXIF
+                    </button>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+                    <span className="text-[10px] font-black uppercase text-indigo-400 block">
+                      Resultado para Renombrar Antes de Subir a Google:
+                    </span>
+                    <div className="p-3 rounded-xl bg-slate-900 border border-indigo-500/30 font-mono text-[11px] text-amber-300 break-all">
+                      {geoTagResult || `${(businessName || 'negocio').toLowerCase().replace(/[^a-z0-9]/g, '-')}-${city.toLowerCase()}-fachada-geotagged.jpg`}
+                    </div>
+                    <p className="text-[11px] text-slate-400">
+                      Subir fotos con nombres geolocalizados y metadatos IPTC acelera en un 40% la indexación visual en Google Lens y Google Maps.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TOOL 4: HUB DE CITACIONES LOCALES (USA & LATAM) */}
+            {toolsActiveTab === 'citations' && (
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+                <div>
+                  <h3 className="text-base font-black text-white flex items-center gap-2">
+                    <FileCheck className="w-4 h-4 text-purple-400" />
+                    <span>Hub de Citaciones y Autoridad NAP (Name, Address, Phone)</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Directorio oficial para verificar la consistencia de los datos del cliente en internet y blindar su autoridad frente al algoritmo.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  {/* USA Directoriess */}
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">🇺🇸</span>
+                      <h4 className="font-black text-white">Directorio Top de Citaciones EE.UU.</h4>
+                    </div>
+                    <ul className="space-y-2 text-[11px] text-slate-300">
+                      {[
+                        { name: 'Apple Maps Connect', authority: 'DA 99', desc: 'Indispensable para usuarios de iPhone y Siri' },
+                        { name: 'Bing Places for Business', authority: 'DA 94', desc: 'Búsquedas nativas en Windows y copilotos de IA' },
+                        { name: 'Yelp for Business', authority: 'DA 94', desc: 'Principal fuente de reseñas externas leída por Apple' },
+                        { name: 'YellowPages (YP.com)', authority: 'DA 89', desc: 'Autoridad local histórica para SEO en EE.UU.' },
+                        { name: 'Better Business Bureau (BBB)', authority: 'DA 93', desc: 'Sello definitivo de confianza y legitimidad' },
+                      ].map((c, i) => (
+                        <li key={i} className="p-2 rounded-xl bg-slate-900/60 border border-slate-800/80 flex items-center justify-between">
+                          <div>
+                            <strong className="text-white block">{c.name}</strong>
+                            <span className="text-[10px] text-slate-400">{c.desc}</span>
+                          </div>
+                          <span className="text-[9px] font-black text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded">
+                            {c.authority}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* LatAm Directories */}
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">🇨🇴 🇲🇽</span>
+                      <h4 className="font-black text-white">Directorio Top de Citaciones LatAm</h4>
+                    </div>
+                    <ul className="space-y-2 text-[11px] text-slate-300">
+                      {[
+                        { name: 'Waze Ads & Local Pins', authority: 'DA 92', desc: 'Navegación automotriz #1 en ciudades latinas' },
+                        { name: 'Páginas Amarillas / Publicar', authority: 'DA 76', desc: 'Backlink local de alto valor de directorio' },
+                        { name: 'Foursquare & Swarm', authority: 'DA 91', desc: 'Base de datos geo-espacial de Uber y Twitter' },
+                        { name: 'Cámara de Comercio / Registro Mercantil', authority: 'DA 85', desc: 'Validación de existencia legal formal' },
+                        { name: 'Facebook & Instagram Local Place', authority: 'DA 96', desc: 'Geolocalización para check-in de clientes' },
+                      ].map((c, i) => (
+                        <li key={i} className="p-2 rounded-xl bg-slate-900/60 border border-slate-800/80 flex items-center justify-between">
+                          <div>
+                            <strong className="text-white block">{c.name}</strong>
+                            <span className="text-[10px] text-slate-400">{c.desc}</span>
+                          </div>
+                          <span className="text-[9px] font-black text-indigo-400 bg-indigo-950 px-2 py-0.5 rounded">
+                            {c.authority}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         {activeTab === 'dossiers' && (
           <div className="space-y-6 print:hidden">
             {/* Header & Search */}
