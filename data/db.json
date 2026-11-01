@@ -9,26 +9,13 @@
   "emailDispatches": [],
   "studioAdvisors": [
     {
-      "id": "adv-brayan",
-      "name": "Brayan • Director General & Founder",
-      "username": "brayan",
+      "id": "adv-luisma",
+      "name": "Luisma • Director General & Founder",
+      "username": "luisma",
       "password": "admin",
       "phone": "+573058314049",
       "role": "admin",
       "accountType": "founder",
-      "country": "Colombia",
-      "city": "Bogotá",
-      "active": true,
-      "createdAt": "2026-01-01T00:00:00.000Z"
-    },
-    {
-      "id": "adv-luisma",
-      "name": "Luisma • Consultor Senior",
-      "username": "luisma",
-      "password": "1234",
-      "phone": "+573058314049",
-      "role": "advisor",
-      "accountType": "internal_advisor",
       "country": "Colombia",
       "city": "Bogotá",
       "active": true,
@@ -66,8 +53,8 @@
   "studioDossiers": [
     {
       "id": "dos-brayan-audit-01",
-      "advisorId": "adv-brayan",
-      "advisorName": "Brayan • Director General & Founder",
+      "advisorId": "adv-luisma",
+      "advisorName": "Luisma • Director General & Founder",
       "advisorPhone": "+573058314049",
       "clientName": "Restaurante & Grill Leña y Carbón",
       "category": "Restaurante / Gastronomía",
@@ -392,8 +379,8 @@
     },
     {
       "id": "dos-autospa-03",
-      "advisorId": "adv-brayan",
-      "advisorName": "Brayan • Director General & Founder",
+      "advisorId": "adv-luisma",
+      "advisorName": "Luisma • Director General & Founder",
       "advisorPhone": "+573058314049",
       "clientName": "AutoSpa Premium Detailing & Cerámico",
       "category": "Taller / Automotriz",

@@ -46,7 +46,7 @@ export interface StudioAdvisor {
   password: string;
   phone: string;
   role: 'admin' | 'advisor';
-  accountType?: 'internal_advisor' | 'partner_agency';
+  accountType?: 'internal_advisor' | 'partner_agency' | 'founder';
   country?: string;
   city?: string;
   monthlyFeeUsd?: number;
@@ -182,22 +182,24 @@ function ensureDbFile(): DatabaseSchema {
       if (!parsed.studioAdvisors || parsed.studioAdvisors.length === 0) {
         parsed.studioAdvisors = [
           {
-            id: 'adv-brayan',
-            name: 'Brayan • Director General & Founder',
-            username: 'brayan',
+            id: 'adv-luisma',
+            name: 'Luisma • Director General & Founder',
+            username: 'luisma',
             password: 'admin',
             phone: '+573058314049',
             role: 'admin',
+            accountType: 'founder',
             active: true,
             createdAt: '2026-01-01T00:00:00.000Z',
           },
           {
-            id: 'adv-luisma',
-            name: 'Luisma • Consultor Senior',
-            username: 'luisma',
+            id: 'adv-carlos',
+            name: 'Carlos Mendoza • Asesor Comercial',
+            username: 'carlos',
             password: '1234',
-            phone: '+573058314049',
+            phone: '+573104567890',
             role: 'advisor',
+            accountType: 'internal_advisor',
             active: true,
             createdAt: '2026-01-01T00:00:00.000Z',
           },
@@ -1180,29 +1182,31 @@ export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
   if (!db.studioAdvisors || db.studioAdvisors.length === 0) {
     db.studioAdvisors = [
       {
-        id: 'adv-brayan',
-        name: 'Brayan • Director General & Founder',
-        username: 'brayan',
+        id: 'adv-luisma',
+        name: 'Luisma • Director General & Founder',
+        username: 'luisma',
         password: 'admin',
         phone: '+573058314049',
         role: 'admin',
+        accountType: 'founder',
         active: true,
         createdAt: '2026-01-01T00:00:00.000Z',
       },
       {
-        id: 'adv-luisma',
-        name: 'Luisma • Consultor Senior',
-        username: 'luisma',
+        id: 'adv-carlos',
+        name: 'Carlos Mendoza • Asesor Comercial',
+        username: 'carlos',
         password: '1234',
-        phone: '+573058314049',
+        phone: '+573104567890',
         role: 'advisor',
+        accountType: 'internal_advisor',
         active: true,
         createdAt: '2026-01-01T00:00:00.000Z',
       },
     ];
     writeDbFile(db);
   }
-  return db.studioAdvisors;
+  return db.studioAdvisors || [];
 }
 
 export async function saveStudioAdvisor(advisor: StudioAdvisor): Promise<void> {

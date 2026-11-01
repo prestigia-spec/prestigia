@@ -174,13 +174,12 @@ export default function LocalStudioPage() {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed && parsed.id) {
-          // If stored was old default Luisma without explicit choice, upgrade to Brayan Director General
-          const explicit = localStorage.getItem('prestigia_studio_advisor_explicit');
-          if (parsed.id === 'adv-luisma' && !explicit) {
+          // If stored was old legacy advisor, upgrade to Luisma Director General
+          if (parsed.id === 'adv-brayan') {
             const founderUser: StudioAdvisorUser = {
-              id: 'adv-brayan',
-              name: 'Brayan • Director General & Founder',
-              username: 'brayan',
+              id: 'adv-luisma',
+              name: 'Luisma • Director General & Founder',
+              username: 'luisma',
               phone: '+573058314049',
               role: 'admin',
               active: true,
@@ -195,11 +194,11 @@ export default function LocalStudioPage() {
       }
     } catch {}
 
-    // Default: Brayan (Director General & Founder) with full admin authority
+    // Default: Luisma (Director General & Founder) with full admin authority
     const founderUser: StudioAdvisorUser = {
-      id: 'adv-brayan',
-      name: 'Brayan • Director General & Founder',
-      username: 'brayan',
+      id: 'adv-luisma',
+      name: 'Luisma • Director General & Founder',
+      username: 'luisma',
       phone: '+573058314049',
       role: 'admin',
       active: true,
@@ -208,12 +207,12 @@ export default function LocalStudioPage() {
     localStorage.setItem('prestigia_studio_advisor', JSON.stringify(founderUser));
   }, []);
 
-  const handleQuickLogin = (roleType: 'brayan' | 'luisma') => {
-    if (roleType === 'brayan') {
+  const handleQuickLogin = (roleType: 'luisma' | 'carlos') => {
+    if (roleType === 'luisma') {
       const founderUser: StudioAdvisorUser = {
-        id: 'adv-brayan',
-        name: 'Brayan • Director General & Founder',
-        username: 'brayan',
+        id: 'adv-luisma',
+        name: 'Luisma • Director General & Founder',
+        username: 'luisma',
         phone: '+573058314049',
         role: 'admin',
         active: true,
@@ -222,13 +221,13 @@ export default function LocalStudioPage() {
       localStorage.setItem('prestigia_studio_advisor', JSON.stringify(founderUser));
       localStorage.setItem('prestigia_studio_advisor_explicit', 'true');
       setShowAuthModal(false);
-      showToast('👑 Perfil activo: Brayan • Director General & Founder');
+      showToast('👑 Perfil activo: Luisma • Director General & Founder');
     } else {
       const advisorUser: StudioAdvisorUser = {
-        id: 'adv-luisma',
-        name: 'Luisma • Consultor Senior',
-        username: 'luisma',
-        phone: '+573058314049',
+        id: 'adv-carlos',
+        name: 'Carlos Mendoza • Asesor Comercial',
+        username: 'carlos',
+        phone: '+573104567890',
         role: 'advisor',
         active: true,
       };
@@ -236,7 +235,7 @@ export default function LocalStudioPage() {
       localStorage.setItem('prestigia_studio_advisor', JSON.stringify(advisorUser));
       localStorage.setItem('prestigia_studio_advisor_explicit', 'true');
       setShowAuthModal(false);
-      showToast('💼 Perfil activo: Luisma • Consultor Comercial');
+      showToast('💼 Perfil activo: Carlos • Consultor Comercial');
     }
   };
 
@@ -410,8 +409,8 @@ export default function LocalStudioPage() {
         // AUTO-SAVE to database so every generation is permanently audited
         try {
           const autoPayload = {
-            advisorId: currentUser?.id || 'adv-brayan',
-            advisorName: currentUser?.name || 'Brayan • Director General',
+            advisorId: currentUser?.id || 'adv-luisma',
+            advisorName: currentUser?.name || 'Luisma • Director General',
             advisorPhone: currentUser?.phone || '+573058314049',
             clientName: businessName.trim(),
             category,
@@ -449,8 +448,8 @@ export default function LocalStudioPage() {
 
     try {
       const payload = {
-        advisorId: currentUser?.id || 'adv-brayan',
-        advisorName: currentUser?.name || 'Brayan • Director General',
+        advisorId: currentUser?.id || 'adv-luisma',
+        advisorName: currentUser?.name || 'Luisma • Director General',
         advisorPhone: currentUser?.phone || '+573058314049',
         clientName: businessName.trim(),
         category,
@@ -495,13 +494,13 @@ export default function LocalStudioPage() {
     }
   };
 
-  // 100% PRIVATE DOSSIERS: ONLY Brayan's personal clients (Never mixed with team)
+  // 100% PRIVATE DOSSIERS: ONLY Luisma's personal clients (Never mixed with team)
   const myDossiers = useMemo(() => {
     return savedDossiers
       .filter(
         (d) =>
-          d.advisorId === 'adv-brayan' ||
-          d.advisorName.toLowerCase().includes('brayan') ||
+          d.advisorId === 'adv-luisma' ||
+          d.advisorName.toLowerCase().includes('luisma') ||
           d.advisorName.toLowerCase().includes('director')
       )
       .filter((d) => {
@@ -522,7 +521,7 @@ export default function LocalStudioPage() {
   // NETWORK DOSSIERS: All team advisors and licensed B2B partner agencies
   const networkFilteredDossiers = useMemo(() => {
     return savedDossiers
-      .filter((d) => d.advisorId !== 'adv-brayan') // Exclude Brayan's private records
+      .filter((d) => d.advisorId !== 'adv-luisma') // Exclude Luisma's private records
       .filter((d) => {
         if (networkAdvisorFilter !== 'all' && d.advisorId !== networkAdvisorFilter) return false;
         if (networkModeFilter !== 'all' && d.mode !== networkModeFilter) return false;
@@ -886,7 +885,7 @@ export default function LocalStudioPage() {
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>📁 Mis Clientes (Brayan)</span>
+            <span>📁 Mis Clientes (Luisma)</span>
           </button>
 
           <button
@@ -1654,7 +1653,7 @@ export default function LocalStudioPage() {
                   <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
                     ⭐ Cartera Personal Privada
                   </span>
-                  <span className="text-xs text-slate-500">• Brayan (Cuenta Principal)</span>
+                  <span className="text-xs text-slate-500">• Luisma (Cuenta Principal)</span>
                 </div>
                 <h1 className="text-xl sm:text-2xl font-black text-white mt-1">
                   Mis Clientes & Auditorías Privadas
@@ -1844,7 +1843,7 @@ export default function LocalStudioPage() {
                     <div className="pt-3 border-t border-slate-800/80 space-y-2.5">
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-[11px] font-bold text-amber-200 flex items-center gap-1.5">
-                          👑 Brayan (Cuenta Principal)
+                          👑 Luisma (Cuenta Principal)
                         </span>
                         <span className="text-[10px] text-slate-500 font-mono">{d.advisorPhone}</span>
                       </div>
@@ -2103,7 +2102,7 @@ export default function LocalStudioPage() {
                 <div>
                   <span className="text-[11px] text-slate-400 block">Asesores Internos</span>
                   <strong className="text-xl font-black text-white">
-                    {advisorsList.filter((a) => a.accountType !== 'partner_agency' && a.id !== 'adv-brayan' && a.id !== 'adv-admin').length}
+                    {advisorsList.filter((a) => a.accountType !== 'partner_agency' && a.id !== 'adv-luisma' && a.id !== 'adv-admin').length}
                   </strong>
                 </div>
               </div>
@@ -2186,7 +2185,7 @@ export default function LocalStudioPage() {
                 <Globe className="w-3.5 h-3.5" />
                 <span>
                   👥 Directorio de Cuentas Activas (
-                  {advisorsList.filter((a) => a.id !== 'adv-admin' && a.id !== 'adv-brayan').length})
+                  {advisorsList.filter((a) => a.id !== 'adv-admin' && a.id !== 'adv-luisma').length})
                 </span>
               </button>
             </div>
@@ -2214,7 +2213,7 @@ export default function LocalStudioPage() {
                       >
                         <option value="all">Todos los Miembros</option>
                         {advisorsList
-                          .filter((a) => a.id !== 'adv-admin' && a.id !== 'adv-brayan')
+                          .filter((a) => a.id !== 'adv-admin' && a.id !== 'adv-luisma')
                           .map((adv) => (
                             <option key={adv.id} value={adv.id}>
                               {adv.name} ({adv.accountType === 'partner_agency' ? 'Agencia' : 'Asesor'})
@@ -2592,7 +2591,7 @@ export default function LocalStudioPage() {
                   )}
 
                   <div>
-                    <label className="block font-bold text-slate-300 mb-1">Clave Maestra de Dueño (Brayan) *</label>
+                    <label className="block font-bold text-slate-300 mb-1">Clave Maestra de Dueño (Luisma) *</label>
                     <input
                       type="password"
                       value={adminMasterKey}
@@ -2622,7 +2621,7 @@ export default function LocalStudioPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
                   {advisorsList
-                    .filter((adv) => adv.id !== 'adv-admin' && adv.id !== 'adv-brayan')
+                    .filter((adv) => adv.id !== 'adv-admin' && adv.id !== 'adv-luisma')
                     .map((adv) => {
                       const advisorDossiers = savedDossiers.filter((d) => d.advisorId === adv.id);
                       const createsCount = advisorDossiers.filter((d) => d.mode === 'create').length;
@@ -2734,7 +2733,7 @@ export default function LocalStudioPage() {
 
               <button
                 type="button"
-                onClick={() => handleQuickLogin('brayan')}
+                onClick={() => handleQuickLogin('luisma')}
                 className="w-full p-3 rounded-2xl bg-gradient-to-r from-amber-950/60 to-slate-900 border border-amber-500/50 hover:border-amber-400 flex items-center justify-between text-left transition cursor-pointer group"
               >
                 <div className="flex items-center gap-3">
@@ -2743,7 +2742,7 @@ export default function LocalStudioPage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-black text-amber-200 text-xs">Brayan • Director General</span>
+                      <span className="font-black text-amber-200 text-xs">Luisma • Director General</span>
                       <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-500 text-slate-950">FOUNDER</span>
                     </div>
                     <span className="text-[10px] text-slate-400 block">Acceso total + Gestión de asesores + Control de expedientes</span>
@@ -2754,7 +2753,7 @@ export default function LocalStudioPage() {
 
               <button
                 type="button"
-                onClick={() => handleQuickLogin('luisma')}
+                onClick={() => handleQuickLogin('carlos')}
                 className="w-full p-3 rounded-2xl bg-gradient-to-r from-indigo-950/60 to-slate-900 border border-indigo-500/40 hover:border-indigo-400 flex items-center justify-between text-left transition cursor-pointer group"
               >
                 <div className="flex items-center gap-3">
@@ -2763,7 +2762,7 @@ export default function LocalStudioPage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-black text-indigo-200 text-xs">Luisma • Consultor Comercial</span>
+                      <span className="font-black text-indigo-200 text-xs">Carlos • Consultor Comercial</span>
                       <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">ASESOR</span>
                     </div>
                     <span className="text-[10px] text-slate-400 block">Vista comercial de ventas + Generador Top 3</span>
