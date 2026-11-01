@@ -284,6 +284,8 @@ export default function LocalStudioPage() {
   const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [isLoadingDossiers, setIsLoadingDossiers] = useState(false);
   const [dossierSearch, setDossierSearch] = useState('');
+  const [dossierModeFilter, setDossierModeFilter] = useState<'all' | 'create' | 'audit'>('all');
+  const [dossierAdvisorFilter, setDossierAdvisorFilter] = useState<string>('all');
 
   // Advisors List (for Admin tab)
   const [advisorsList, setAdvisorsList] = useState<StudioAdvisorUser[]>([]);
@@ -294,11 +296,11 @@ export default function LocalStudioPage() {
   const [adminMasterKey, setAdminMasterKey] = useState('admin');
   const [isSavingAdvisor, setIsSavingAdvisor] = useState(false);
 
-  // Fetch dossiers when entering dossiers tab
+  // Fetch dossiers when entering dossiers tab or on user change
   const fetchDossiers = async () => {
     setIsLoadingDossiers(true);
     try {
-      const isAdmin = currentUser?.role === 'admin';
+      const isAdmin = currentUser?.role === 'admin' || !currentUser;
       const url = isAdmin
         ? '/api/local-studio/dossiers?isAdmin=true'
         : `/api/local-studio/dossiers?advisorId=${currentUser?.id || 'adv-luisma'}`;
@@ -313,6 +315,11 @@ export default function LocalStudioPage() {
       setIsLoadingDossiers(false);
     }
   };
+
+  useEffect(() => {
+    fetchDossiers();
+    fetchAdvisors();
+  }, [currentUser]);
 
   useEffect(() => {
     if (activeTab === 'dossiers') {
@@ -373,7 +380,31 @@ export default function LocalStudioPage() {
       if (resData.success && resData.data) {
         setGeneratedData(resData.data);
         setActiveEngine(resData.engine || 'Prestigia AI');
-        showToast('✨ ¡Arquitectura Top 3 generada exitosamente!');
+        showToast('✨ ¡Arquitectura Top 3 generada y registrada en Cartera!');
+
+        // AUTO-SAVE to database so every generation is permanently audited
+        try {
+          const autoPayload = {
+            advisorId: currentUser?.id || 'adv-brayan',
+            advisorName: currentUser?.name || 'Brayan • Director General',
+            advisorPhone: currentUser?.phone || '+573058314049',
+            clientName: businessName.trim(),
+            category,
+            city: city.trim() || 'Colombia',
+            neighborhood: neighborhood.trim(),
+            googleUrl: googleUrl.trim(),
+            mode: targetMode,
+            status: 'draft',
+            data: resData.data,
+          };
+          fetch('/api/local-studio/dossiers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(autoPayload),
+          }).then(() => fetchDossiers());
+        } catch (autoErr) {
+          console.warn('Auto-save error:', autoErr);
+        }
       } else {
         showToast('⚠️ Error generando el expediente: ' + (resData.error || 'Reintente'));
       }
@@ -384,7 +415,7 @@ export default function LocalStudioPage() {
     }
   };
 
-  // Save current generated blueprint as a Dossier
+  // Save current generated blueprint as a Dossier manually
   const handleSaveDossier = async () => {
     if (!generatedData || !businessName.trim()) {
       showToast('⚠️ Primero genera un expediente para guardar');
@@ -393,8 +424,8 @@ export default function LocalStudioPage() {
 
     try {
       const payload = {
-        advisorId: currentUser?.id || 'adv-luisma',
-        advisorName: currentUser?.name || 'Luisma • Consultor',
+        advisorId: currentUser?.id || 'adv-brayan',
+        advisorName: currentUser?.name || 'Brayan • Director General',
         advisorPhone: currentUser?.phone || '+573058314049',
         clientName: businessName.trim(),
         category,
@@ -439,18 +470,27 @@ export default function LocalStudioPage() {
     }
   };
 
-  // Filtered dossiers
+  // Filtered dossiers with multi-criteria filtering
   const filteredDossiers = useMemo(() => {
-    if (!dossierSearch.trim()) return savedDossiers;
-    const q = dossierSearch.toLowerCase();
-    return savedDossiers.filter(
-      (d) =>
-        d.clientName.toLowerCase().includes(q) ||
-        d.city.toLowerCase().includes(q) ||
-        d.category.toLowerCase().includes(q) ||
-        d.advisorName.toLowerCase().includes(q)
-    );
-  }, [savedDossiers, dossierSearch]);
+    return savedDossiers.filter((d) => {
+      // Filter by mode
+      if (dossierModeFilter !== 'all' && d.mode !== dossierModeFilter) return false;
+      // Filter by advisor
+      if (dossierAdvisorFilter !== 'all' && d.advisorId !== dossierAdvisorFilter) return false;
+      // Filter by search text
+      if (dossierSearch.trim()) {
+        const q = dossierSearch.toLowerCase();
+        const match =
+          d.clientName.toLowerCase().includes(q) ||
+          d.city.toLowerCase().includes(q) ||
+          d.category.toLowerCase().includes(q) ||
+          d.advisorName.toLowerCase().includes(q) ||
+          (d.neighborhood && d.neighborhood.toLowerCase().includes(q));
+        if (!match) return false;
+      }
+      return true;
+    });
+  }, [savedDossiers, dossierSearch, dossierModeFilter, dossierAdvisorFilter]);
 
   // Load a dossier from list into workspace
   const handleLoadDossier = (dossier: StudioDossierRecord) => {
@@ -1455,89 +1495,260 @@ export default function LocalStudioPage() {
         )}
 
         {/* =============================================================
-            TAB 3: CARTERA DE CLIENTES GUARDADOS
+            TAB 3: CARTERA DE CLIENTES GUARDADOS (AUDITORÍA & REGISTROS)
             ============================================================= */}
         {activeTab === 'dossiers' && (
-          <div className="space-y-5 print:hidden">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="space-y-6 print:hidden">
+            {/* Header & Search */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl">
               <div>
-                <h1 className="text-xl font-black text-white">Expedientes & Cartera de Clientes</h1>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-950 border border-indigo-500/40 text-indigo-300">
+                    Historial de Operaciones
+                  </span>
+                  <span className="text-xs text-slate-500">• Base de Datos en Tiempo Real</span>
+                </div>
+                <h1 className="text-xl sm:text-2xl font-black text-white mt-1">
+                  Expedientes & Cartera de Clientes Auditados
+                </h1>
                 <p className="text-xs text-slate-400">
                   {currentUser?.role === 'admin'
-                    ? 'Visualizando todos los expedientes de la empresa generados por tu equipo.'
-                    : `Expedientes creados por ${currentUser?.name}.`}
+                    ? 'Monitorea en tiempo real todas las fichas y auditorías creadas por ti y tus asesores comerciales.'
+                    : `Expedientes creados y gestionados por ${currentUser?.name}.`}
                 </p>
               </div>
-              <div className="w-full sm:w-72 relative">
+
+              <div className="w-full sm:w-80 relative">
                 <input
                   type="text"
                   value={dossierSearch}
                   onChange={(e) => setDossierSearch(e.target.value)}
-                  placeholder="Buscar por cliente o ciudad..."
-                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition"
+                  placeholder="Buscar por cliente, asesor o ciudad..."
+                  className="w-full pl-9 pr-3 py-2.5 rounded-2xl bg-slate-950 border border-slate-700 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition"
                 />
-                <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
               </div>
             </div>
 
+            {/* Executive KPI Summary Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-slate-400 block">Total Expedientes</span>
+                  <strong className="text-xl font-black text-white">{savedDossiers.length}</strong>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-slate-400 block">Fichas Desde Cero</span>
+                  <strong className="text-xl font-black text-emerald-400">
+                    {savedDossiers.filter((d) => d.mode === 'create').length}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-600/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                  <Search className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-slate-400 block">Auditorías Top 3</span>
+                  <strong className="text-xl font-black text-amber-400">
+                    {savedDossiers.filter((d) => d.mode === 'audit').length}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/40 flex items-center justify-center text-purple-400 shrink-0">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-slate-400 block">Asesores Activos</span>
+                  <strong className="text-xl font-black text-purple-300">
+                    {new Set(savedDossiers.map((d) => d.advisorName)).size}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Filter Pills */}
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 text-[11px] font-bold">Tipo:</span>
+                <button
+                  type="button"
+                  onClick={() => setDossierModeFilter('all')}
+                  className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                    dossierModeFilter === 'all'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                  }`}
+                >
+                  Todos ({savedDossiers.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDossierModeFilter('create')}
+                  className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                    dossierModeFilter === 'create'
+                      ? 'bg-emerald-500 text-slate-950 font-black'
+                      : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                  }`}
+                >
+                  🏗️ Fichas Nuevas ({savedDossiers.filter((d) => d.mode === 'create').length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDossierModeFilter('audit')}
+                  className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                    dossierModeFilter === 'audit'
+                      ? 'bg-amber-500 text-slate-950 font-black'
+                      : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                  }`}
+                >
+                  🔬 Auditorías ({savedDossiers.filter((d) => d.mode === 'audit').length})
+                </button>
+              </div>
+
+              {currentUser?.role === 'admin' && (
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-400 text-[11px] font-bold">Asesor:</span>
+                  <select
+                    value={dossierAdvisorFilter}
+                    onChange={(e) => setDossierAdvisorFilter(e.target.value)}
+                    className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400"
+                  >
+                    <option value="all">Todos los Asesores</option>
+                    <option value="adv-brayan">Brayan • Director General</option>
+                    <option value="adv-luisma">Luisma • Consultor Senior</option>
+                  </select>
+                </div>
+              )}
+            </div>
+
+            {/* List / Grid of Dossiers */}
             {isLoadingDossiers ? (
-              <div className="text-center py-12 text-slate-400 text-xs">
-                <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-indigo-400" />
-                Cargando expedientes guardados...
+              <div className="text-center py-16 text-slate-400 text-xs space-y-2">
+                <RefreshCw className="w-6 h-6 animate-spin mx-auto text-indigo-400" />
+                <p>Cargando cartera de clientes en tiempo real...</p>
               </div>
             ) : filteredDossiers.length === 0 ? (
-              <div className="text-center py-16 p-8 rounded-3xl bg-slate-900/40 border border-slate-800 space-y-2">
-                <Layers className="w-8 h-8 text-slate-500 mx-auto" />
-                <h3 className="text-sm font-bold text-white">No hay expedientes guardados aún</h3>
+              <div className="text-center py-16 p-8 rounded-3xl bg-slate-900/40 border border-slate-800 space-y-3">
+                <Layers className="w-10 h-10 text-slate-600 mx-auto" />
+                <h3 className="text-base font-bold text-white">No se encontraron expedientes con los filtros aplicados</h3>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Genera una ficha desde cero o una auditoría en los módulos anteriores y presiona "Guardar en Cartera".
+                  Prueba cambiando los filtros de búsqueda o genera un nuevo análisis en los módulos de Ficha o Auditoría.
                 </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDossierSearch('');
+                    setDossierModeFilter('all');
+                    setDossierAdvisorFilter('all');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition cursor-pointer"
+                >
+                  Restablecer Filtros
+                </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredDossiers.map((d) => (
                   <div
                     key={d.id}
-                    className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition flex flex-col justify-between space-y-3"
+                    className="p-5 rounded-3xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition flex flex-col justify-between space-y-4 shadow-lg hover:shadow-indigo-500/5 group"
                   >
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between gap-2">
                         <span
-                          className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${
+                          className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
                             d.mode === 'create'
                               ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
                               : 'bg-amber-950 text-amber-300 border border-amber-500/40'
                           }`}
                         >
-                          {d.mode === 'create' ? 'Ficha Nueva' : 'Auditoría Top 3'}
+                          {d.mode === 'create' ? '🏗️ Ficha Nueva' : '🔬 Auditoría Top 3'}
                         </span>
-                        <span className="text-[10px] text-slate-500 font-mono">
+
+                        {d.data?.healthScore !== undefined && (
+                          <span
+                            className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                              d.data.healthScore < 50
+                                ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                                : 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                            }`}
+                          >
+                            Score: {d.data.healthScore}/100
+                          </span>
+                        )}
+
+                        <span className="text-[10px] text-slate-500 font-mono ml-auto">
                           {new Date(d.createdAt).toLocaleDateString()}
                         </span>
                       </div>
-                      <h4 className="text-base font-black text-white">{d.clientName}</h4>
-                      <p className="text-xs text-slate-400">
-                        {d.city} {d.neighborhood ? `• ${d.neighborhood}` : ''}
-                      </p>
-                      <span className="text-[11px] text-indigo-400 font-semibold block">{d.category}</span>
+
+                      <div>
+                        <h4 className="text-base font-black text-white group-hover:text-amber-300 transition">
+                          {d.clientName}
+                        </h4>
+                        <p className="text-xs text-slate-400">
+                          📍 {d.city} {d.neighborhood ? `• ${d.neighborhood}` : ''}
+                        </p>
+                        <span className="text-[11px] text-indigo-400 font-bold block mt-1">{d.category}</span>
+                      </div>
+
+                      {d.data?.criticalGaps && d.data.criticalGaps.length > 0 && (
+                        <p className="text-[11px] text-slate-400 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80 line-clamp-2">
+                          ⚠️ {d.data.criticalGaps[0]}
+                        </p>
+                      )}
                     </div>
 
-                    <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                      <span className="text-[10px] text-slate-400">Por: {d.advisorName}</span>
-                      <div className="flex items-center gap-1.5">
+                    <div className="pt-3 border-t border-slate-800/80 space-y-2.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                          {d.advisorName}
+                        </span>
+                        <span className="text-[10px] text-slate-500 font-mono">{d.advisorPhone}</span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => handleLoadDossier(d)}
-                          className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] transition cursor-pointer"
+                          className="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20 active:scale-98"
                         >
-                          Cargar
+                          <span>👁️ Cargar y Ver</span>
                         </button>
+
+                        {d.data?.whatsappOnboardingMessage && (
+                          <a
+                            href={`https://wa.me/?text=${encodeURIComponent(d.data.whatsappOnboardingMessage)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Enviar Kit por WhatsApp"
+                            className="p-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 transition cursor-pointer"
+                          >
+                            <MessageSquare className="w-4 h-4" />
+                          </a>
+                        )}
+
                         <button
                           type="button"
                           onClick={() => handleDeleteDossier(d.id)}
-                          className="p-1 rounded-lg text-slate-500 hover:text-rose-400 transition cursor-pointer"
+                          title="Eliminar Expediente"
+                          className="p-2 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-950/30 transition cursor-pointer"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>

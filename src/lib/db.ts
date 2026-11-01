@@ -1245,7 +1245,147 @@ export async function deleteStudioAdvisor(advisorId: string): Promise<boolean> {
 
 export async function getAllStudioDossiers(): Promise<StudioDossier[]> {
   const db = ensureDbFile();
-  if (!db.studioDossiers) db.studioDossiers = [];
+  if (!db.studioDossiers || db.studioDossiers.length === 0) {
+    db.studioDossiers = [
+      {
+        id: 'dos-trattoria-01',
+        advisorId: 'adv-luisma',
+        advisorName: 'Luisma • Consultor Senior',
+        advisorPhone: '+573058314049',
+        clientName: 'La Trattoria del Parque',
+        category: 'Restaurante / Gastronomía',
+        city: 'Bogotá',
+        neighborhood: 'Parque de la 93',
+        googleUrl: 'https://maps.google.com/?cid=1029384756',
+        mode: 'audit',
+        status: 'presented',
+        createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        updatedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        data: {
+          healthScore: 48,
+          criticalGaps: [
+            "Ficha configurada con una sola categoría genérica ('Restaurante'), perdiendo 68% de búsquedas de alta conversión.",
+            "Descripción comercial incompleta (solo 94 caracteres) sin palabras clave ni llamada a la acción.",
+            "Sin catálogo de servicios o menú cargado en Google Maps con precios.",
+            "Solo 14 fotos antiguas de baja resolución sin geonombres optimizados.",
+            "Cero preguntas frecuentes (Q&A) preventivas configuradas."
+          ],
+          topCompetitorInsights: 'Los 3 restaurantes líderes acumulan más de 450 reseñas con flujo semanal activo y responden en menos de 24h.',
+          actionRoadmap: [
+            { step: 1, title: 'Inyección de Categorías Secundarias', impact: '+35% Impresiones', action: 'Configurar Restaurante italiano como primaria y agregar Pizzería, Bar de vinos y Restaurante familiar.' },
+            { step: 2, title: 'Reemplazo de Copywriting Comercial', impact: '+28% Clics a Llamada', action: 'Cargar descripción optimizada con propuesta de valor y palabras clave locales.' },
+            { step: 3, title: 'Publicación de Catálogo de 6 Platos Insignia', impact: '+40% Clics al Menú', action: 'Subir pastas frescas y pizzas al horno de leña con fotos y precios.' },
+            { step: 4, title: 'Carga de 15 Fotografías Geonombradas', impact: '+22% Ruta en Maps', action: 'Reemplazar fotos con imágenes HD y nombres SEO de ubicación.' },
+            { step: 5, title: 'Activación del Sistema Prestigia QR en Mesa', impact: '+45 Reseñas 5⭐/Mes', action: 'Implementar atril QR para capturar comensales en caliente.' }
+          ],
+          optimizedTitle: 'La Trattoria del Parque | Restaurante Italiano & Pastas Artesanales',
+          primaryCategory: 'Restaurante italiano',
+          secondaryCategories: ['Restaurante', 'Pizzería', 'Bar de vinos', 'Restaurante familiar'],
+          commercialDescription: 'La Trattoria del Parque te ofrece la auténtica tradición italiana en el Parque de la 93 en Bogotá. Pastas frescas elaboradas a mano cada mañana, risottos cremosos, pizzas al horno de leña y cava de vinos. ¡Reserva tu mesa hoy!',
+          serviceCatalog: [
+            { name: 'Fettuccine al Tartufo & Funghi', description: 'Pasta fresca con crema de trufa negra, champiñones silvestres y queso Grana Padano DOP.', tag: 'Plato Insignia' },
+            { name: 'Pizza Napoletana Verace', description: 'Masa madre 48h, salsa San Marzano, mozzarella di bufala y albahaca.', tag: 'Horno de Leña' }
+          ],
+          photoChecklist: [
+            { item: 'Fachada con aviso visible', count: 2, tip: 'Toma limpia de día desde la acera opuesta.', filenameExample: 'trattoria-parque-fachada-restaurante-italiano-bogota.jpg' },
+            { item: 'Platos estrella servidos', count: 6, tip: 'Luz natural a 45 grados sobre mesa vestida.', filenameExample: 'pasta-artesanal-trufa-parque-93-bogota.jpg' }
+          ],
+          preventiveFaqs: [
+            { question: '¿Tienen parqueadero propio en el Parque de la 93?', answer: 'Sí, contamos con convenio de estacionamiento vigilado a solo media cuadra con tarifa preferencial.' }
+          ],
+          verificationGuide: {
+            title: 'Grabación de Video de Verificación de 60 Segundos',
+            overview: 'Google exige video continuo sin cortes de la calle, fachada, llave abriendo la puerta y datáfono en caja.',
+            cameraTake1: '0-15s: Calle con letrero legible y dirección exterior.',
+            cameraTake2: '15-40s: Entrada abriendo con llave física y mostrando salón y horno.',
+            cameraTake3: '40-60s: Terminal de pago (datáfono) con el nombre comercial en caja.',
+            documents: ['RUT con dirección del local', 'Factura de energía o internet', 'Datáfono en pantalla']
+          },
+          whatsappOnboardingMessage: 'Estimado equipo de La Trattoria del Parque, ya tenemos estructurada la optimización de Google Maps para llevarlos al Top 3. Por favor envíennos fotos y el video de 60s según la guía adjunta.'
+        }
+      },
+      {
+        id: 'dos-sonrisas-02',
+        advisorId: 'adv-luisma',
+        advisorName: 'Luisma • Consultor Senior',
+        advisorPhone: '+573058314049',
+        clientName: 'Clínica Dental Estética Sonrisas',
+        category: 'Salud / Odontología / Médica',
+        city: 'Medellín',
+        neighborhood: 'El Poblado',
+        googleUrl: '',
+        mode: 'create',
+        status: 'closed',
+        createdAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+        updatedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+        data: {
+          optimizedTitle: 'Clínica Dental Estética Sonrisas | Odontología & Diseño de Sonrisa',
+          primaryCategory: 'Clínica dental',
+          secondaryCategories: ['Dentista', 'Ortodoncista', 'Periodoncista de implantes dentales'],
+          commercialDescription: 'Centro odontológico de alta gama en El Poblado, Medellín. Diseño de sonrisa digital, ortodoncia invisible, implantes guiados 3D y blanqueamiento láser sin dolor.',
+          serviceCatalog: [
+            { name: 'Diseño de Sonrisa Digital', description: 'Carillas cerámicas y resina con prueba digital 3D.', tag: 'Estética' },
+            { name: 'Ortodoncia Invisible', description: 'Alineadores transparentes sin brackets.', tag: 'Ortodoncia' }
+          ],
+          photoChecklist: [
+            { item: 'Recepción y consultorios', count: 4, tip: 'Luz impecable y tecnología 3D visible.', filenameExample: 'clinica-dental-recepcion-poblado-medellin.jpg' }
+          ],
+          preventiveFaqs: [
+            { question: '¿La valoración incluye escaneo 3D?', answer: 'Sí, incluye diagnóstico completo digital en la primera cita.' }
+          ],
+          verificationGuide: {
+            title: 'Verificación en Consultorio Médico',
+            overview: 'Muestra placa exterior, títulos médicos y sillón odontológico.',
+            cameraTake1: '0-15s: Placa exterior con número de consultorio.',
+            cameraTake2: '15-40s: Entrada y unidad dental con instrumental médico.',
+            cameraTake3: '40-60s: Software de gestión médica y datáfono en recepción.',
+            documents: ['Registro médico / NIT', 'Contrato o factura del consultorio']
+          },
+          whatsappOnboardingMessage: 'Estimado Dr. Sonrisas, tenemos listo el expediente para crear su ficha en Google Maps en Medellín El Poblado. Requerimos las fotos y video de 60s para iniciar.'
+        }
+      },
+      {
+        id: 'dos-autospa-03',
+        advisorId: 'adv-brayan',
+        advisorName: 'Brayan • Director General & Founder',
+        advisorPhone: '+573058314049',
+        clientName: 'AutoSpa Premium Detailing & Cerámico',
+        category: 'Taller / Automotriz',
+        city: 'Cali',
+        neighborhood: 'Granada',
+        googleUrl: 'https://maps.google.com/?cid=987654321',
+        mode: 'create',
+        status: 'closed',
+        createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+        updatedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+        data: {
+          optimizedTitle: 'AutoSpa Premium Detailing | Corrección de Pintura & Recubrimiento Cerámico',
+          primaryCategory: 'Servicio de lavado y detallado de automóviles',
+          secondaryCategories: ['Taller de chapa y pintura', 'Tienda de repuestos'],
+          commercialDescription: 'Estética automotriz de alta gama en Cali Granada. Recubrimientos cerámicos 9H, corrección de pintura en 3 pasos y detailing interior a vapor.',
+          serviceCatalog: [
+            { name: 'Cerámico 9H 5 Años de Garantía', description: 'Protección hidrofóbica extrema y brillo espejo.', tag: 'Servicio Estrella' }
+          ],
+          photoChecklist: [
+            { item: 'Bahía de trabajo con luces LED', count: 3, tip: 'Enfoque de reflejo en pintura corregida.', filenameExample: 'autospa-detailing-cali-granada.jpg' }
+          ],
+          preventiveFaqs: [
+            { question: '¿Cuánto demora el tratamiento cerámico?', answer: 'Entre 24 y 48 horas en cabina climatizada.' }
+          ],
+          verificationGuide: {
+            title: 'Verificación de Taller o Detailing',
+            overview: 'Muestra bahía, herramientas profesionales y oficina de recepción.',
+            cameraTake1: '0-15s: Aviso exterior y rampa de acceso vehicular.',
+            cameraTake2: '15-40s: Bahía de trabajo con pulidoras y autos.',
+            cameraTake3: '40-60s: Mostrador de facturación y datáfono.',
+            documents: ['RUT del taller', 'Factura de servicios públicos']
+          },
+          whatsappOnboardingMessage: 'Hola equipo AutoSpa Cali, expediente listo para posicionar su taller en el Top 3 de detailing en Cali. Envíen fotos y video de 60s para activar.'
+        }
+      }
+    ];
+    writeDbFile(db);
+  }
   return db.studioDossiers;
 }
 
