@@ -332,6 +332,400 @@ const UI_TEXT = {
   },
 };
 
+const TXT_TOOLS = {
+  es: {
+    badge: 'Arsenal de Cierre de Alto Valor • Estilo BrightLocal & Local Falcon',
+    title: '4 Armas de Dominio Local & Cierre Comercial',
+    desc: 'Herramientas de venta visual y optimización forense para demostrarle al cliente cuánto dinero está perdiendo hoy y cómo Prestigia lo posiciona en la cima.',
+    activeAlgo: '⚡ Algoritmo 2026 Activo',
+    tab1: '1. Simulador Geo-Grid 3x3',
+    tab2: '2. Calculadora de Pérdida Financiera (ROI)',
+    tab3: '3. Inyector de Geo-Tagging EXIF',
+    tab4: '4. Hub de Citaciones USA & LatAm',
+    geogridTitle: '🗺️ Simulador de Posición Geo-Grid 3x3 (Local Falcon Style)',
+    geogridDesc: 'Demuestra visualmente cómo cae el ranking del cliente a medida que nos alejamos de su ubicación.',
+    radiusLabel: 'Radio',
+    satMap: 'Mapa Satelital de Cobertura',
+    keyword: 'Palabra clave:',
+    legendTop3: 'Puesto 1 al 3 (Se llevan el 84% de llamadas)',
+    legendDropped: 'Puesto 4+ (Invisibles)',
+    diagAdvisor: 'Diagnóstico para el Asesor:',
+    diagAdvisorBody: (name: string, rad: string) =>
+      `"Don ${name || 'Cliente'}, cuando usted busca parado en su propio local aparece de #1. Pero cuando una persona busca a solo ${rad} de distancia en su mismo barrio, su negocio cae al puesto #8 o #14. Toda esa clientela se la están llevando sus 3 competidores más cercanos."`,
+    solutionPrestigia: 'Solución con Prestigia:',
+    solutionPrestigiaBody:
+      'Con la inyección de subcategorías secundarias, menciones de vecindario en la descripción y 8 reseñas semanales geolocalizadas, extendemos el radio verde a toda la ciudad en 90 días.',
+    roiTitle: 'Calculadora de Pérdida Financiera por estar fuera del Top 3',
+    roiDesc: 'Convierte la posición de Google Maps en dólares exactos perdidos por el cliente cada mes.',
+    avgTicket: 'Ticket Promedio por Cliente (USD)',
+    avgTicketSub: 'Lo que gasta un cliente promedio en su negocio.',
+    currentRank: 'Posición Actual en Google Maps',
+    rankOpt1: 'Puesto #4 (Al borde del Top 3)',
+    rankOpt2: 'Puesto #8 (Segunda vista)',
+    rankOpt3: 'Puesto #15+ (Completamente invisible)',
+    currentRankSub: 'Lugar donde aparece hoy al buscar su servicio.',
+    searches: 'Búsquedas Mensuales Estimadas en Zona',
+    searchesSub: 'Personas buscando este servicio al mes.',
+    leakDetected: 'Fuga de Facturación Detectada',
+    leakHeading: 'Dinero que tu negocio está regalando a la competencia:',
+    lostPer30Days: 'perdidos cada 30 días',
+    lostCalls: 'Llamadas y Clics Perdidos:',
+    searchesPerMonth: 'búsquedas/mes',
+    lostClientsLabel: 'Clientes que no entraron:',
+    newClientsPerMonth: 'clientes nuevos/mes',
+    loss12Months: 'Pérdida en 12 Meses:',
+    advisorClose: 'Cierre del Asesor:',
+    advisorCloseBody:
+      '"Prestigia le cuesta una fracción de lo que usted pierde en solo una semana sin estar en el Top 3. Con recuperar tan solo 2 clientes al mes, el servicio se paga solo y todo lo demás es ganancia neta."',
+    geotagTitle: 'Inyector y Generador de Geo-Tagging EXIF para Fotos',
+    geotagDesc: 'Google lee los metadatos IPTC y coordenadas de las fotos para validar la ubicación real del establecimiento.',
+    photoName: 'Nombre Base de la Foto',
+    photoNamePlaceholder: 'ej: fachada-principal o plato-insignia',
+    indexingKeywords: 'Palabras Clave de Indexación',
+    indexingKeywordsPlaceholder: 'ej: mejor restaurante, comida gourmet, centro',
+    btnGeotag: 'Generar Nomenclatura & Etiquetas EXIF',
+    toastGeotag: 'Metadatos EXIF generados',
+    resultBox: 'Resultado para Renombrar Antes de Subir a Google:',
+    geotagNote: 'Subir fotos con nombres geolocalizados y metadatos IPTC acelera en un 40% la indexación visual en Google Lens y Google Maps.',
+    citationsTitle: 'Hub de Citaciones y Autoridad NAP (Name, Address, Phone)',
+    citationsDesc: 'Directorio oficial para verificar la consistencia de los datos del cliente en internet y blindar su autoridad frente al algoritmo.',
+    citationsUsa: 'Directorio Top de Citaciones EE.UU.',
+    citationsLatam: 'Directorio Top de Citaciones LatAm',
+  },
+  en: {
+    badge: 'High-Value Conversion Arsenal • BrightLocal & Local Falcon Style',
+    title: '4 Local Dominance & Commercial Closing Weapons',
+    desc: 'Visual sales and forensic optimization tools showing clients how much revenue they are losing today and how Prestigia positions them at the top.',
+    activeAlgo: '⚡ 2026 Algorithm Active',
+    tab1: '1. 3x3 Geo-Grid Heatmap',
+    tab2: '2. Financial Loss Calculator (ROI)',
+    tab3: '3. EXIF Geo-Tagging Injector',
+    tab4: '4. Citations Directory (USA/LatAm)',
+    geogridTitle: '🗺️ 3x3 Geo-Grid Position Heatmap (Local Falcon Style)',
+    geogridDesc: 'Visually demonstrates how the client’s ranking drops as distance increases from their location.',
+    radiusLabel: 'Radius',
+    satMap: 'Satellite Coverage Heatmap',
+    keyword: 'Target Keyword:',
+    legendTop3: 'Ranks #1 to #3 (Captures 84% of calls & visits)',
+    legendDropped: 'Rank #4+ (Completely Invisible)',
+    diagAdvisor: 'Sales Advisor Script:',
+    diagAdvisorBody: (name: string, rad: string) =>
+      `"${name || 'Client'}, when you search standing inside your storefront, you appear #1. But when someone searches just ${rad} away in your same neighborhood, your business drops to rank #8 or #14. All those ready-to-buy customers are going straight to your 3 closest competitors."`,
+    solutionPrestigia: 'Solution with Prestigia:',
+    solutionPrestigiaBody:
+      'With secondary category injection, geo-targeted neighborhood keywords in your commercial copy, and 8 weekly geo-tagged reviews, we expand your top-ranking radius across the entire metro area in 90 days.',
+    roiTitle: 'Financial Loss Calculator for Ranking Outside Top 3',
+    roiDesc: 'Converts Google Maps ranking drops into exact USD revenue lost by the business every month.',
+    avgTicket: 'Average Ticket Value per Customer (USD)',
+    avgTicketSub: 'Average amount spent by a customer at your business.',
+    currentRank: 'Current Position on Google Maps',
+    rankOpt1: 'Rank #4 (On the verge of Top 3)',
+    rankOpt2: 'Rank #8 (Second view / below the fold)',
+    rankOpt3: 'Rank #15+ (Completely invisible to searchers)',
+    currentRankSub: 'Where the business ranks today for buyer-intent queries.',
+    searches: 'Estimated Monthly Local Searches',
+    searchesSub: 'Number of people searching for this service each month.',
+    leakDetected: 'Revenue Leak Detected',
+    leakHeading: 'Money your business is handing directly to competitors:',
+    lostPer30Days: 'lost every 30 days',
+    lostCalls: 'Lost Calls & Searches:',
+    searchesPerMonth: 'searches/mo',
+    lostClientsLabel: 'Lost Paying Customers:',
+    newClientsPerMonth: 'new customers/mo',
+    loss12Months: '12-Month Financial Loss:',
+    advisorClose: 'Advisor Closing Pitch:',
+    advisorCloseBody:
+      '"Prestigia costs a fraction of what you lose in just one single week outside the Top 3. Recovering just 2 clients a month pays for the entire service, and every other client is pure profit for you."',
+    geotagTitle: 'EXIF & IPTC Geo-Tagging Photo Generator',
+    geotagDesc: 'Google scans IPTC metadata and GPS coordinates embedded in photos to verify authentic physical operations.',
+    photoName: 'Base Photo Filename',
+    photoNamePlaceholder: 'e.g. main-storefront or signature-dish',
+    indexingKeywords: 'Target SEO Indexing Keywords',
+    indexingKeywordsPlaceholder: 'e.g. best cosmetic dentist, dental implants, downtown',
+    btnGeotag: 'Generate SEO Filename & EXIF Tags',
+    toastGeotag: 'EXIF metadata tags generated',
+    resultBox: 'SEO Filename to Rename Before Uploading to Google:',
+    geotagNote: 'Uploading photos with geo-tagged names and IPTC keywords speeds up visual indexing in Google Lens and Maps by 40%.',
+    citationsTitle: 'NAP Authority & Citations Hub (Name, Address, Phone)',
+    citationsDesc: 'Official directory to verify client business data consistency across the web and build algorithm trust.',
+    citationsUsa: 'Top USA Business Citations Directory',
+    citationsLatam: 'Top LatAm Business Citations Directory',
+  },
+};
+
+const TXT_DOSSIERS = {
+  es: {
+    privateBadge: '⭐ Cartera Personal Privada',
+    accountOwner: '• Luisma (Cuenta Principal)',
+    title: 'Mis Clientes & Auditorías Privadas',
+    desc: 'Expedientes creados y auditados personalmente por ti. Tus clientes están 100% aislados y protegidos de la red comercial.',
+    searchPlaceholder: 'Buscar en mis clientes...',
+    kpiDossiers: 'Mis Expedientes',
+    kpiCreated: 'Fichas Desde Cero',
+    kpiAudited: 'Auditorías Top 3',
+    kpiPrivacy: 'Privacidad',
+    kpiPrivacyVal: '100% Blindado',
+    filterBy: 'Filtrar por:',
+    filterAll: 'Todos',
+    filterCreate: '🏗️ Fichas Nuevas',
+    filterAudit: '🔬 Auditorías Top 3',
+    showingNotice: 'Mostrando únicamente clientes de la cuenta principal',
+    loading: 'Cargando tu cartera personal...',
+    emptyTitle: 'No tienes clientes guardados en tu cuenta personal',
+    emptyDesc: 'Genera una nueva ficha desde cero o una auditoría en los módulos principales para registrar tu primer cliente.',
+    btnCreateFirst: '🏗️ Crear Primera Ficha Ganadora',
+    badgeCreate: '🏗️ Ficha Nueva',
+    badgeAudit: '🔬 Auditoría Top 3',
+    ownerBadge: '👑 Luisma (Cuenta Principal)',
+    btnLoadView: '👁️ Cargar y Ver',
+    sendWhatsappKit: 'Enviar Kit por WhatsApp',
+    deleteDossier: 'Eliminar Expediente',
+    confirmDelete: '¿Eliminar este expediente de forma definitiva?',
+  },
+  en: {
+    privateBadge: '⭐ Private Client Portfolio',
+    accountOwner: '• Luisma (Main Account)',
+    title: 'My Clients & Private Audits',
+    desc: 'Dossiers created and audited personally by you. Your clients are 100% isolated and protected from the advisor sales network.',
+    searchPlaceholder: 'Search in my clients...',
+    kpiDossiers: 'My Dossiers',
+    kpiCreated: 'Built From Scratch',
+    kpiAudited: 'Top 3 Audits',
+    kpiPrivacy: 'Privacy',
+    kpiPrivacyVal: '100% Shielded',
+    filterBy: 'Filter by:',
+    filterAll: 'All',
+    filterCreate: '🏗️ New Listings',
+    filterAudit: '🔬 Top 3 Audits',
+    showingNotice: 'Displaying exclusively main account clients',
+    loading: 'Loading your private portfolio...',
+    emptyTitle: 'No clients saved in your private account yet',
+    emptyDesc: 'Build a new listing from scratch or run an audit in the main modules to save your first client dossier.',
+    btnCreateFirst: '🏗️ Build First Winning Listing',
+    badgeCreate: '🏗️ New Listing',
+    badgeAudit: '🔬 Top 3 Audit',
+    ownerBadge: '👑 Luisma (Main Account)',
+    btnLoadView: '👁️ Load & View',
+    sendWhatsappKit: 'Send Kit via WhatsApp',
+    deleteDossier: 'Delete Dossier',
+    confirmDelete: 'Are you sure you want to permanently delete this dossier?',
+  },
+};
+
+const TXT_GUIDE = {
+  es: {
+    badge: 'Modo Piloto Automático • Cero Fricción Tecnológica',
+    title: 'Guía Paso a Paso: Dónde dar Clic en Google en 5 Minutos',
+    desc: 'Instrucciones exactas para ti o cualquiera de tus vendedores. No necesitas saber nada de sistemas: solo sigue los 6 pasos en orden.',
+    btnOpenGoogle: 'Abrir Google Business',
+    step1Title: 'Abrir Google Business',
+    step1Body: 'Entra a business.google.com usando el correo de Gmail del negocio o el tuyo. Si no tiene cuenta, inicia sesión con cualquier Gmail.',
+    step2Title: 'Escribir Nombre y Categoría',
+    step2Body: 'Pega el Título Optimizado que te dio Local Studio. En categoría escribe la Categoría Principal y elígela del menú desplegable oficial de Google.',
+    step3Title: 'Ubicación y Modelo de Negocio',
+    step3BodyStore: '• Si es Local Físico: Marca "Sí tienes local abierto al público" y ajusta el pin rojo sobre la entrada.',
+    step3BodySab: '• Si es Profesional Independiente (SAB): Marca "No, presto servicios en la ubicación del cliente". Esto oculta tu dirección de casa para evitar suspensiones de Google, y luego agregas las Zonas de Cobertura que te dio la herramienta.',
+    step4Title: 'Video de Verificación',
+    step4BodyStore: '• Para Locales: 1) Calle y fachada, 2) Llaves abriendo puerta, 3) Caja registradora y datáfono.',
+    step4BodySab: '• Para Independientes: 1) Herramientas o computador con software abierto, 2) RUT o documento fiscal y tarjetas, 3) Vehículo de trabajo o bodega. ¡Aprobación rápida en 1 intento!',
+    step5Title: 'Inyectar Subcategorías & Copy',
+    step5Body: 'Ve a "Editar Perfil". En descripción, pega el copy de 745 caracteres. En categorías adicionales, agrega las 5 subcategorías secundarias que te dio la herramienta.',
+    step6Title: 'Cargar Fotos y QR Prestigia',
+    step6Body: 'Sube las fotos renombradas según el checklist de la herramienta. Luego activa el código QR de Prestigia en las mesas o mostrador para empezar a recibir reseñas de 5★ de inmediato.',
+    trafficLightTitle: 'El Semáforo de Seguridad Anti-Suspensión de Google',
+    dangerTitle: '❌ LO QUE NUNCA DEBES HACER (PELIGRO DE BAN):',
+    danger1: '• No pongas nombres inventados o palabras spam como "EL MEJOR RESTAURANTE".',
+    danger2: '• No uses números telefónicos virtuales desechables.',
+    danger3: '• No pongas direcciones de apartamentos residenciales si el cliente dice atender público.',
+    safeTitle: '✅ LO QUE SÍ DEBES HACER (APROBACIÓN SEGURA):',
+    safe1: '• Usar el título con el separador "|" que generó Local Studio.',
+    safe2: '• Subir fotos reales con el letrero coincidente.',
+    safe3: '• Grabar el video continuo sin cortes mostrando la llave física.',
+  },
+  en: {
+    badge: 'Autopilot Mode • Zero Tech Friction',
+    title: 'Step-by-Step Guide: Where to Click in Google in 5 Minutes',
+    desc: 'Exact instructions for you or any of your sales reps. No technical expertise required: just follow these 6 steps in order.',
+    btnOpenGoogle: 'Open Google Business',
+    step1Title: 'Open Google Business Profile',
+    step1Body: 'Go to business.google.com using the business owner’s Gmail or your agency account. Sign in with any active Google account.',
+    step2Title: 'Enter Business Name & Category',
+    step2Body: 'Paste the Optimized Title generated by Local Studio. Type the Primary Category and select it from Google’s official dropdown taxonomy.',
+    step3Title: 'Location & Operating Business Model',
+    step3BodyStore: '• For Storefronts: Select "Yes, I have a physical location open to customers" and adjust the red pin precisely over the front entrance.',
+    step3BodySab: '• For Independent Contractors / SAB: Select "No, I deliver goods and services to my customers". This hides your residential address to prevent suspensions, and then enter the Target Service Areas provided by the tool.',
+    step4Title: 'One-Take Video Verification',
+    step4BodyStore: '• For Storefronts: 1) Street sign and exterior signage, 2) Physical key unlocking front door, 3) POS terminal and operational counters.',
+    step4BodySab: '• For Independents: 1) Professional tools or laptop with active business software, 2) Business license/EIN and branded business cards, 3) Work vehicle or inventory room. Instant approval on attempt #1!',
+    step5Title: 'Inject Subcategories & Commercial Copy',
+    step5Body: 'Click "Edit Profile". Under description, paste the 745-character SEO copy. Under additional categories, paste the 5 secondary subcategories provided by the tool.',
+    step6Title: 'Upload Photos & Activate Prestigia Smart QR',
+    step6Body: 'Upload the renamed photos following the tool’s SEO checklist. Then deploy the Prestigia Smart Review NFC/QR plates on counters to start capturing 5★ Google reviews immediately.',
+    trafficLightTitle: 'Google Anti-Suspension Security Traffic Light',
+    dangerTitle: '❌ WHAT TO NEVER DO (RISK OF IMMEDIATE BAN):',
+    danger1: '• Do not add spam keywords or fake names like "THE BEST RESTAURANT".',
+    danger2: '• Do not use burner VoIP or virtual forwarding phone numbers.',
+    danger3: '• Do not publish residential apartment addresses as physical storefronts.',
+    safeTitle: '✅ WHAT TO DO (GUARANTEED APPROVAL):',
+    safe1: '• Use the optimized title with separator "|" generated by Local Studio.',
+    safe2: '• Upload high-res photos showing matching permanent building signage.',
+    safe3: '• Record a single continuous unedited video showing physical access keys.',
+  },
+};
+
+const TXT_PITCH = {
+  es: {
+    badge: 'Manual de Cierre en Llamadas y Reuniones',
+    title: 'Guion Comercial: Respuestas a Objeciones para Asesores',
+    desc: 'Qué decirle al cliente cuando tiene dudas para asegurar el contrato de 12 meses de Prestigia.',
+    q1: '1. Si el cliente dice: "¿Y por qué no creo yo mismo la ficha de Google gratis?"',
+    a1: '"Claro que sí, don Carlos, Google permite crearla gratis. Pero el 92% de los negocios comete el error de poner solo una categoría y una descripción corta sin palabras clave. Por eso terminan en la página 4 de Google Maps donde nadie los ve. Nosotros aplicamos la arquitectura de categorías secretas y copywriting de los 3 líderes de su zona para que su ficha no solo exista, sino que le traiga clientes nuevos y reservas todos los días."',
+    q2: '2. Si el cliente dice: "¿Por qué necesito el servicio de Prestigia durante 12 meses?"',
+    a2: '"Porque Google Maps castiga la inactividad bajo la \'Ley de Recencia\'. Si dejas de recibir reseñas recientes durante 30 días, el algoritmo te oculta y premia a tu competencia activa. Además, Prestigia es su seguro de blindaje: contiene en caliente cualquier cliente furioso para que nunca publique una queja de 1 estrella en su perfil."',
+    q3: '3. Si el cliente dice: "¿En cuánto tiempo veo resultados de estar en el Top 3?"',
+    a3: '"En los primeros 7 a 14 días la optimización técnica de categorías y descripción genera un salto visible de impresiones. Y con el código QR en mesa capturando las primeras 30 a 50 opiniones de 5 estrellas en el primer mes, el algoritmo lo posiciona en la zona caliente de su barrio en menos de 60 a 90 días."',
+  },
+  en: {
+    badge: 'In-Person & Phone Closing Playbook',
+    title: 'Sales Pitch Playbook: Objection Handling for Advisors',
+    desc: 'Exact word-for-word scripts to overcome objections and close 12-month Prestigia retainers.',
+    q1: '1. If the client asks: "Why shouldn’t I just set up the Google profile myself for free?"',
+    a1: '"Absolutely, you can create it for free. But 92% of business owners make the critical mistake of selecting only one broad category and writing a generic description without purchase-intent keywords. That’s why they end up buried on page 4 of Google Maps where zero clients find them. We engineer the exact secret category hierarchy, geo-grid keywords, and copy architecture used by the top 3 market leaders in your city to make your phone ring with new paying customers every day."',
+    q2: '2. If the client asks: "Why do I need Prestigia on an ongoing 12-month plan?"',
+    a2: '"Because Google’s local algorithm strictly penalizes inactivity under the \'Recency Factor\'. If your profile stops getting consistent verified reviews every 30 days, your rankings drop and Google pushes active competitors above you. Furthermore, Prestigia acts as your private reputation firewall: filtering private negative feedback so angry customers never leave a public 1-star review on your listing."',
+    q3: '3. If the client asks: "How fast will I see results and reach the Top 3?"',
+    a3: '"Within the first 7 to 14 days, the category taxonomy and geo-targeted copy trigger a noticeable spike in Google search impressions. And once your Prestigia Smart QR plates generate the first 30 to 50 genuine 5-star reviews during month one, the algorithm propels your listing into the high-converting Top 3 map pack in under 60 to 90 days."',
+  },
+};
+
+const TXT_NETWORK = {
+  es: {
+    badge: '👑 Panel Ejecutivo Master • Red Comercial & Monetización B2B',
+    badgeSub: '• Licenciamiento & Equipos',
+    title: 'Red de Asesores Comerciales & Agencias Partners',
+    desc: 'Crea accesos individuales para tus vendedores a comisión o vende licencias de software mensual a agencias aliadas para que prospecten y auditen negocios locales en cualquier país o ciudad.',
+    btnDownloadCsv: '📥 Descargar Reporte CSV',
+    kpiInternal: 'Asesores Internos',
+    kpiAgencies: 'Agencias Licenciadas',
+    kpiAccounts: 'Cuentas de la Red',
+    kpiMrr: 'Ingreso Licencias (MRR)',
+    subviewMonitor: '📊 Monitor de Cuentas Prospectadas',
+    subviewRegister: '➕ Registrar Asesor o Licenciar Agencia',
+    subviewDirectory: '👥 Directorio de Cuentas Activas',
+    filterAdvisor: 'Filtrar por Asesor:',
+    allAdvisors: 'Todos los Asesores',
+    filterCountry: 'Filtrar por País:',
+    allCountries: 'Todos los Países',
+    filterCity: 'Filtrar por Ciudad:',
+    allCities: 'Todas las Ciudades',
+    registerTitle: 'Crear Nuevo Usuario en la Plataforma',
+    registerDesc: 'Genera un nuevo acceso para un vendedor comisionista de tu equipo o una licencia de software para una agencia aliada que paga una cuota mensual.',
+    nameLabel: 'Nombre del Asesor o Razón Social de la Agencia *',
+    accountTypeLabel: 'Tipo de Cuenta *',
+    optAdvisor: '💼 Asesor Interno (Comisionista)',
+    optAgency: '🏢 Agencia Aliada B2B (Licencia de Software)',
+    userLabel: 'Nombre de Usuario (Para Iniciar Sesión) *',
+    passLabel: 'Contraseña Temporal *',
+    phoneLabel: 'WhatsApp / Teléfono de Contacto',
+    countryLabel: 'País de Operación',
+    cityLabel: 'Ciudad Principal de Operación',
+    monthlyFeeLabel: 'Tarifa de Licencia Mensual (USD/mes)',
+    licenseStatusLabel: 'Estado de la Licencia',
+    statusActive: 'Activa (Al Día)',
+    statusPending: 'Pendiente de Pago',
+    statusSuspended: 'Suspendida',
+    btnSaveAdvisor: 'Guardar y Activar Usuario en el Sistema',
+    tableAdvisor: 'Asesor / Agencia',
+    tableType: 'Tipo',
+    tableLocation: 'Ubicación',
+    tableDossiers: 'Expedientes',
+    tableFee: 'Cuota Mensual',
+    tableStatus: 'Estado',
+    tableActions: 'Acciones',
+    btnDeactivate: 'Desactivar',
+    btnActivate: 'Activar',
+  },
+  en: {
+    badge: '👑 Executive Master Panel • Sales Network & B2B Monetization',
+    badgeSub: '• Licensing & Teams',
+    title: 'Sales Advisors & Partner Agency Network',
+    desc: 'Create individual accounts for commission-based sales reps or license monthly software access to partner marketing agencies prospecting and auditing local businesses in any country or city.',
+    btnDownloadCsv: '📥 Download CSV Report',
+    kpiInternal: 'Internal Advisors',
+    kpiAgencies: 'Licensed Agencies',
+    kpiAccounts: 'Network Accounts',
+    kpiMrr: 'License Revenue (MRR)',
+    subviewMonitor: '📊 Prospecting & Audits Monitor',
+    subviewRegister: '➕ Register Advisor or License Agency',
+    subviewDirectory: '👥 Active Accounts Directory',
+    filterAdvisor: 'Filter by Advisor:',
+    allAdvisors: 'All Advisors',
+    filterCountry: 'Filter by Country:',
+    allCountries: 'All Countries',
+    filterCity: 'Filter by City:',
+    allCities: 'All Cities',
+    registerTitle: 'Create New User Account',
+    registerDesc: 'Generate access credentials for a sales rep on your internal team or issue a software license for a partner marketing agency paying a monthly fee.',
+    nameLabel: 'Advisor Name or Agency Corporate Name *',
+    accountTypeLabel: 'Account Type *',
+    optAdvisor: '💼 Internal Sales Advisor (Commission)',
+    optAgency: '🏢 Partner Agency B2B (Software License)',
+    userLabel: 'Username (For Sign-In) *',
+    passLabel: 'Temporary Password *',
+    phoneLabel: 'Contact Phone / WhatsApp',
+    countryLabel: 'Operating Country',
+    cityLabel: 'Primary Operating City',
+    monthlyFeeLabel: 'Monthly License Fee (USD/month)',
+    licenseStatusLabel: 'License Status',
+    statusActive: 'Active (Paid)',
+    statusPending: 'Payment Pending',
+    statusSuspended: 'Suspended',
+    btnSaveAdvisor: 'Save & Activate User in System',
+    tableAdvisor: 'Advisor / Agency',
+    tableType: 'Type',
+    tableLocation: 'Location',
+    tableDossiers: 'Dossiers',
+    tableFee: 'Monthly Fee',
+    tableStatus: 'Status',
+    tableActions: 'Actions',
+    btnDeactivate: 'Deactivate',
+    btnActivate: 'Activate',
+  },
+};
+
+const TXT_AUTH = {
+  es: {
+    close: '✕ Cerrar',
+    title: 'Ingreso a Prestigia Local Studio',
+    subtitle: 'Selecciona tu perfil de acceso o ingresa con tus credenciales',
+    quickAccess: 'Acceso Rápido Directo:',
+    founderRole: 'FOUNDER',
+    founderDesc: 'Acceso total + Gestión de asesores + Control de expedientes',
+    advisorRole: 'ASESOR',
+    advisorDesc: 'Vista comercial de ventas + Generador Top 3',
+    orCredentials: 'o ingresar otro asesor con contraseña',
+    usernameLabel: 'Usuario',
+    passwordLabel: 'Contraseña',
+    btnLogin: 'Iniciar Sesión con Contraseña',
+    verifying: 'Verificando...',
+  },
+  en: {
+    close: '✕ Close',
+    title: 'Sign In to Prestigia Local Studio',
+    subtitle: 'Select your user profile or log in with credentials',
+    quickAccess: 'Quick 1-Click Access:',
+    founderRole: 'FOUNDER',
+    founderDesc: 'Full master access + Advisor management + Dossiers control',
+    advisorRole: 'ADVISOR',
+    advisorDesc: 'Sales rep workspace + Top 3 Blueprint Generator',
+    orCredentials: 'or enter advisor credentials with password',
+    usernameLabel: 'Username',
+    passwordLabel: 'Password',
+    btnLogin: 'Sign In with Password',
+    verifying: 'Verifying...',
+  },
+};
+
 export default function LocalStudioPage() {
   // -------------------------------------------------------------
   // 1. AUTHENTICATION & ADVISOR SESSION
@@ -477,6 +871,13 @@ export default function LocalStudioPage() {
   const [serviceAreas, setServiceAreas] = useState('');
 
   const t = UI_TEXT[lang] || UI_TEXT.es;
+  const tTools = TXT_TOOLS[lang] || TXT_TOOLS.es;
+  const tDossiers = TXT_DOSSIERS[lang] || TXT_DOSSIERS.es;
+  const tGuide = TXT_GUIDE[lang] || TXT_GUIDE.es;
+  const tPitch = TXT_PITCH[lang] || TXT_PITCH.es;
+  const tNetwork = TXT_NETWORK[lang] || TXT_NETWORK.es;
+  const tAuth = TXT_AUTH[lang] || TXT_AUTH.es;
+  const isEn = lang === 'en';
   const categoryOptions = lang === 'en' ? CATEGORY_OPTIONS_EN : CATEGORY_OPTIONS_ES;
 
   const handleToggleLang = (newLang: 'es' | 'en') => {
@@ -1033,7 +1434,7 @@ export default function LocalStudioPage() {
               <button
                 type="button"
                 onClick={() => setShowAuthModal(true)}
-                title="Cambiar de perfil (Director / Asesor)"
+                title={isEn ? 'Switch profile (Director / Advisor)' : 'Cambiar de perfil (Director / Asesor)'}
                 className="ml-2 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer text-[10px] font-bold"
               >
                 {t.switchProfile}
@@ -1194,10 +1595,14 @@ export default function LocalStudioPage() {
           <div className="flex items-center gap-2">
             <span className="font-black text-slate-950 text-xs">PRESTIGIA LOCAL STUDIO</span>
             <span>•</span>
-            <span className="text-amber-700">EXPEDIENTE MAESTRO DE POSICIONAMIENTO LOCAL TOP 3</span>
+            <span className="text-amber-700">
+              {isEn ? 'MASTER TOP 3 LOCAL RANKING DOSSIER' : 'EXPEDIENTE MAESTRO DE POSICIONAMIENTO LOCAL TOP 3'}
+            </span>
           </div>
           <div>
-            <span>CONSULTOR ASIGNADO: {currentUser?.name || 'Prestigia LatAm'} • WHATSAPP: {currentUser?.phone || '+57 305 831 4049'}</span>
+            <span>
+              {isEn ? 'ASSIGNED CONSULTANT' : 'CONSULTOR ASIGNADO'}: {currentUser?.name || (isEn ? 'Prestigia LatAm & USA' : 'Prestigia LatAm')} • WHATSAPP: {currentUser?.phone || '+57 305 831 4049'}
+            </span>
           </div>
         </div>
 
@@ -1400,7 +1805,7 @@ export default function LocalStudioPage() {
                     onClick={() =>
                       copyToClipboard(
                         generatedData.whatsappOnboardingMessage,
-                        'Mensaje para pedir fotos y video al cliente'
+                        isEn ? 'Client Media Request Kit' : 'Mensaje para pedir fotos y video al cliente'
                       )
                     }
                     className="w-full py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-emerald-500/30 text-emerald-300 font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer"
@@ -1444,7 +1849,7 @@ export default function LocalStudioPage() {
                       <div className="flex items-center gap-2 text-xs">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                         <span className="text-slate-300 font-semibold">
-                          Arquitectura Lista: <strong className="text-white">{businessName}</strong>
+                          {isEn ? 'Blueprint Ready: ' : 'Arquitectura Lista: '}<strong className="text-white">{businessName}</strong>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -1454,7 +1859,7 @@ export default function LocalStudioPage() {
                           className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
                         >
                           <Save className="w-3.5 h-3.5 text-amber-400" />
-                          <span>Guardar en Cartera</span>
+                          <span>{t.saveDossier}</span>
                         </button>
                         <button
                           type="button"
@@ -1462,7 +1867,7 @@ export default function LocalStudioPage() {
                           className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-amber-500/20"
                         >
                           <Printer className="w-3.5 h-3.5" />
-                          <span>Descargar PDF</span>
+                          <span>{t.downloadPdf}</span>
                         </button>
                       </div>
                     </div>
@@ -1471,7 +1876,7 @@ export default function LocalStudioPage() {
                     <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 print-card-box">
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-black uppercase tracking-wider text-indigo-400 bg-indigo-950 px-2.5 py-0.5 rounded-full border border-indigo-500/30">
-                          Paso Clave 1: Taxonomía Algorítmica
+                          {isEn ? 'Key Step 1: Algorithmic Taxonomy' : 'Paso Clave 1: Taxonomía Algorítmica'}
                         </span>
                         <button
                           type="button"
@@ -1484,21 +1889,21 @@ export default function LocalStudioPage() {
                           className="text-[11px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer print:hidden"
                         >
                           <Copy className="w-3.5 h-3.5" />
-                          <span>Copiar Todas</span>
+                          <span>{isEn ? 'Copy All' : 'Copiar Todas'}</span>
                         </button>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                         <div className="p-3 rounded-xl bg-slate-950 border border-emerald-500/40">
                           <span className="text-[10px] font-bold text-emerald-400 uppercase block mb-1">
-                            Categoría Principal (Oficial Google)
+                            {isEn ? 'Primary Category (Google Official)' : 'Categoría Principal (Oficial Google)'}
                           </span>
                           <span className="text-sm font-black text-white">{generatedData.primaryCategory}</span>
                         </div>
 
                         <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
                           <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">
-                            {generatedData.secondaryCategories.length} Subcategorías Secundarias (Para Ganar Búsquedas)
+                            {generatedData.secondaryCategories.length} {isEn ? 'Secondary Subcategories (To Capture Search Intent)' : 'Subcategorías Secundarias (Para Ganar Búsquedas)'}
                           </span>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {generatedData.secondaryCategories.map((sc, i) => (
@@ -1594,7 +1999,7 @@ export default function LocalStudioPage() {
                     <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2 print-card-box">
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-950 px-2.5 py-0.5 rounded-full border border-amber-500/30">
-                          Paso Clave 2: Título Estratégico Anti-Suspensión
+                          {isEn ? 'Key Step 2: Strategic Anti-Suspension Title' : 'Paso Clave 2: Título Estratégico Anti-Suspensión'}
                         </span>
                         <button
                           type="button"
@@ -1602,14 +2007,16 @@ export default function LocalStudioPage() {
                           className="text-[11px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer print:hidden"
                         >
                           <Copy className="w-3.5 h-3.5" />
-                          <span>Copiar Título</span>
+                          <span>{isEn ? 'Copy Title' : 'Copiar Título'}</span>
                         </button>
                       </div>
                       <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-sm font-black text-white flex items-center justify-between">
                         <span>{generatedData.optimizedTitle}</span>
                       </div>
                       <p className="text-[11px] text-slate-400">
-                        Combina el nombre oficial de la marca con la palabra clave local y la zona, garantizando máxima indexación sin riesgo de penalización por Google.
+                        {isEn
+                          ? 'Combines official brand name with local keyword and area, guaranteeing maximum indexing with zero suspension penalty risk.'
+                          : 'Combina el nombre oficial de la marca con la palabra clave local y la zona, garantizando máxima indexación sin riesgo de penalización por Google.'}
                       </p>
                     </div>
 
@@ -1618,10 +2025,10 @@ export default function LocalStudioPage() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
-                            Paso Clave 3: Descripción de Alto Impacto
+                            {isEn ? 'Key Step 3: High-Impact Description' : 'Paso Clave 3: Descripción de Alto Impacto'}
                           </span>
                           <span className="text-[10px] text-slate-400 font-mono">
-                            {generatedData.commercialDescription.length} / 750 Caracteres
+                            {generatedData.commercialDescription.length} / 750 {isEn ? 'Characters' : 'Caracteres'}
                           </span>
                         </div>
                         <button
@@ -1630,7 +2037,7 @@ export default function LocalStudioPage() {
                           className="text-[11px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer print:hidden"
                         >
                           <Copy className="w-3.5 h-3.5" />
-                          <span>Copiar Descripción</span>
+                          <span>{isEn ? 'Copy Description' : 'Copiar Descripción'}</span>
                         </button>
                       </div>
                       <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 leading-relaxed whitespace-pre-wrap">
@@ -1642,10 +2049,10 @@ export default function LocalStudioPage() {
                     <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 print-card-box">
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-black uppercase tracking-wider text-purple-400 bg-purple-950 px-2.5 py-0.5 rounded-full border border-purple-500/30">
-                          Paso Clave 4: Catálogo Estructurado de Servicios / Productos
+                          {isEn ? 'Key Step 4: Structured Product / Service Catalog' : 'Paso Clave 4: Catálogo Estructurado de Servicios / Productos'}
                         </span>
                         <span className="text-[10px] text-slate-400">
-                          Cargar en la pestaña "Productos" de Google
+                          {isEn ? 'Upload to the "Products" tab in Google' : 'Cargar en la pestaña "Productos" de Google'}
                         </span>
                       </div>
 
@@ -1668,7 +2075,9 @@ export default function LocalStudioPage() {
                     <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 print-card-box">
                       <div className="flex items-center gap-2">
                         <Camera className="w-4 h-4 text-amber-400" />
-                        <h3 className="text-sm font-black text-white">5. Checklist de Fotos para Pedir al Cliente</h3>
+                        <h3 className="text-sm font-black text-white">
+                          {isEn ? '5. Photo Checklist to Request from Client' : '5. Checklist de Fotos para Pedir al Cliente'}
+                        </h3>
                       </div>
                       <div className="space-y-2 text-xs">
                         {generatedData.photoChecklist.map((ph, i) => (
@@ -1678,12 +2087,14 @@ export default function LocalStudioPage() {
                           >
                             <div className="space-y-0.5">
                               <span className="font-bold text-white text-xs">
-                                📷 {ph.item} ({ph.count} {ph.count === 1 ? 'foto' : 'fotos'})
+                                📷 {ph.item} ({ph.count} {ph.count === 1 ? (isEn ? 'photo' : 'foto') : (isEn ? 'photos' : 'fotos')})
                               </span>
                               <p className="text-[11px] text-slate-400">{ph.tip}</p>
                             </div>
                             <div className="text-right shrink-0">
-                              <span className="text-[10px] text-slate-500 block">Nombre sugerido para SEO:</span>
+                              <span className="text-[10px] text-slate-500 block">
+                                {isEn ? 'Suggested SEO filename:' : 'Nombre sugerido para SEO:'}
+                              </span>
                               <code className="text-[10px] text-amber-300 font-mono bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
                                 {ph.filenameExample}
                               </code>
@@ -1698,14 +2109,14 @@ export default function LocalStudioPage() {
                       <div className="flex items-center gap-2">
                         <HelpCircle className="w-4 h-4 text-indigo-400" />
                         <h3 className="text-sm font-black text-white">
-                          6. Preguntas y Respuestas Oficiales (Q&A Seeding)
+                          {isEn ? '6. Official Q&A Seeding' : '6. Preguntas y Respuestas Oficiales (Q&A Seeding)'}
                         </h3>
                       </div>
                       <div className="space-y-2 text-xs">
                         {generatedData.preventiveFaqs.map((faq, i) => (
                           <div key={i} className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                            <span className="font-bold text-amber-300 block text-xs">P: {faq.question}</span>
-                            <p className="text-slate-300 text-[11px] leading-relaxed">R: {faq.answer}</p>
+                            <span className="font-bold text-amber-300 block text-xs">{isEn ? 'Q' : 'P'}: {faq.question}</span>
+                            <p className="text-slate-300 text-[11px] leading-relaxed">{isEn ? 'A' : 'R'}: {faq.answer}</p>
                           </div>
                         ))}
                       </div>
@@ -1719,7 +2130,7 @@ export default function LocalStudioPage() {
                           <h3 className="text-sm font-black text-white">{generatedData.verificationGuide.title}</h3>
                         </div>
                         <span className="text-[10px] font-black uppercase text-amber-300 bg-amber-950 px-2.5 py-0.5 rounded-full border border-amber-500/40">
-                          Video de 60s sin cortes
+                          {isEn ? 'Uncut 60s video' : 'Video de 60s sin cortes'}
                         </span>
                       </div>
                       <p className="text-xs text-slate-300 leading-relaxed">
@@ -1727,15 +2138,15 @@ export default function LocalStudioPage() {
                       </p>
                       <div className="space-y-2 text-xs">
                         <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800">
-                          <strong className="text-amber-400 block mb-0.5">Toma 1 (Exterior):</strong>
+                          <strong className="text-amber-400 block mb-0.5">{isEn ? 'Take 1 (Exterior):' : 'Toma 1 (Exterior):'}</strong>
                           <span className="text-slate-300 text-[11px]">{generatedData.verificationGuide.cameraTake1}</span>
                         </div>
                         <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800">
-                          <strong className="text-indigo-300 block mb-0.5">Toma 2 (Acceso):</strong>
+                          <strong className="text-indigo-300 block mb-0.5">{isEn ? 'Take 2 (Access / Street):' : 'Toma 2 (Acceso):'}</strong>
                           <span className="text-slate-300 text-[11px]">{generatedData.verificationGuide.cameraTake2}</span>
                         </div>
                         <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800">
-                          <strong className="text-emerald-400 block mb-0.5">Toma 3 (Interior y Facturación):</strong>
+                          <strong className="text-emerald-400 block mb-0.5">{isEn ? 'Take 3 (Interior & Billing Tools):' : 'Toma 3 (Interior y Facturación):'}</strong>
                           <span className="text-slate-300 text-[11px]">{generatedData.verificationGuide.cameraTake3}</span>
                         </div>
                       </div>
@@ -1746,17 +2157,17 @@ export default function LocalStudioPage() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <MessageSquare className="w-4 h-4 text-emerald-400" />
-                          <h3 className="text-sm font-black text-white">Kit para Pedir Fotos y Video por WhatsApp</h3>
+                          <h3 className="text-sm font-black text-white">{isEn ? 'WhatsApp Media Request Kit (Photos & Video)' : 'Kit para Pedir Fotos y Video por WhatsApp'}</h3>
                         </div>
                         <button
                           type="button"
                           onClick={() =>
-                            copyToClipboard(generatedData.whatsappOnboardingMessage, 'Mensaje de WhatsApp')
+                            copyToClipboard(generatedData.whatsappOnboardingMessage, isEn ? 'WhatsApp Message' : 'Mensaje de WhatsApp')
                           }
                           className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black transition flex items-center gap-1.5 cursor-pointer print:hidden"
                         >
                           <Copy className="w-3.5 h-3.5" />
-                          <span>Copiar Mensaje</span>
+                          <span>{isEn ? 'Copy Message' : 'Copiar Mensaje'}</span>
                         </button>
                       </div>
                       <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-300 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
@@ -1777,7 +2188,7 @@ export default function LocalStudioPage() {
                             </h3>
                           </div>
                           <span className="text-[10px] font-black uppercase text-emerald-300 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-500/40">
-                            Algoritmo Top 3
+                            {isEn ? 'Top 3 Algorithm' : 'Algoritmo Top 3'}
                           </span>
                         </div>
 
@@ -1805,7 +2216,7 @@ export default function LocalStudioPage() {
                               {lang === 'en' ? 'Pace per Week' : 'Ritmo Recomendado'}
                             </span>
                             <strong className="text-base font-black text-emerald-400">
-                              +{generatedData.reviewVelocityPlan.reviewsPerWeek} / sem
+                              +{generatedData.reviewVelocityPlan.reviewsPerWeek} {isEn ? '/ wk' : '/ sem'}
                             </strong>
                           </div>
 
@@ -1814,7 +2225,7 @@ export default function LocalStudioPage() {
                               {lang === 'en' ? 'Time to Top 3' : 'Tiempo al Top 3'}
                             </span>
                             <strong className="text-base font-black text-purple-300">
-                              {generatedData.reviewVelocityPlan.weeksToTop3} semanas
+                              {generatedData.reviewVelocityPlan.weeksToTop3} {isEn ? 'weeks' : 'semanas'}
                             </strong>
                           </div>
                         </div>
@@ -1839,7 +2250,7 @@ export default function LocalStudioPage() {
                             </h3>
                           </div>
                           <span className="text-[10px] font-black uppercase text-purple-300 bg-purple-950 px-2.5 py-0.5 rounded-full border border-purple-500/40">
-                            4 Semanas Listas
+                            {isEn ? '4 Ready Weeks' : '4 Semanas Listas'}
                           </span>
                         </div>
 
@@ -1849,22 +2260,22 @@ export default function LocalStudioPage() {
                               <div className="space-y-1">
                                 <div className="flex items-center justify-between">
                                   <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-500/30">
-                                    Semana {post.week} • {post.type}
+                                    {isEn ? 'Week' : 'Semana'} {post.week} • {post.type}
                                   </span>
                                   <button
                                     type="button"
-                                    onClick={() => copyToClipboard(`${post.title}\n\n${post.body}`, `Post Semana ${post.week}`)}
+                                    onClick={() => copyToClipboard(`${post.title}\n\n${post.body}`, `${isEn ? 'Week Post' : 'Post Semana'} ${post.week}`)}
                                     className="text-[10px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer print:hidden"
                                   >
                                     <Copy className="w-3 h-3" />
-                                    <span>Copiar</span>
+                                    <span>{isEn ? 'Copy' : 'Copiar'}</span>
                                   </button>
                                 </div>
                                 <h4 className="font-black text-white text-xs">{post.title}</h4>
                                 <p className="text-[11px] text-slate-300 leading-snug">{post.body}</p>
                               </div>
                               <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400 font-mono">
-                                <span>Botón CTA:</span>
+                                <span>{isEn ? 'CTA Button:' : 'Botón CTA:'}</span>
                                 <span className="font-bold text-emerald-400">{post.callToAction}</span>
                               </div>
                             </div>
@@ -1876,13 +2287,23 @@ export default function LocalStudioPage() {
                     {/* Advisor Sign-off Box */}
                     <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs print:border-t print:border-slate-300">
                       <div>
-                        <span className="text-[10px] text-slate-400 uppercase font-bold block">Expediente Generado por:</span>
-                        <span className="font-black text-white text-sm">{currentUser?.name || 'Prestigia LatAm'}</span>
-                        <span className="text-slate-400 text-xs block">Línea de Asesoría: {currentUser?.phone || '+57 305 831 4049'}</span>
+                        <span className="text-[10px] text-slate-400 uppercase font-bold block">
+                          {isEn ? 'Dossier Prepared by:' : 'Expediente Generado por:'}
+                        </span>
+                        <span className="font-black text-white text-sm">
+                          {currentUser?.name || (isEn ? 'Prestigia LatAm & USA' : 'Prestigia LatAm')}
+                        </span>
+                        <span className="text-slate-400 text-xs block">
+                          {isEn ? 'Advisory Line:' : 'Línea de Asesoría:'} {currentUser?.phone || '+57 305 831 4049'}
+                        </span>
                       </div>
                       <div className="text-right">
-                        <span className="text-[10px] text-emerald-400 uppercase font-bold block">Garantía Prestigia Top 3</span>
-                        <span className="text-xs text-slate-400">Arquitectura SEO Certificada 2026</span>
+                        <span className="text-[10px] text-emerald-400 uppercase font-bold block">
+                          {isEn ? 'Prestigia Top 3 Guarantee' : 'Garantía Prestigia Top 3'}
+                        </span>
+                        <span className="text-xs text-slate-400">
+                          {isEn ? 'Certified 2026 Local SEO Architecture' : 'Arquitectura SEO Certificada 2026'}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -2235,10 +2656,10 @@ export default function LocalStudioPage() {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
                   <div>
                     <h3 className="text-base font-black text-white flex items-center gap-2">
-                      <span>🗺️ Simulador de Posición Geo-Grid 3x3 (Local Falcon Style)</span>
+                      <span>{tTools.geogridTitle}</span>
                     </h3>
                     <p className="text-xs text-slate-400 mt-0.5">
-                      Demuestra visualmente cómo cae el ranking del cliente a medida que nos alejamos de su ubicación.
+                      {tTools.geogridDesc}
                     </p>
                   </div>
 
@@ -2254,7 +2675,7 @@ export default function LocalStudioPage() {
                             : 'bg-slate-950 text-slate-400 border border-slate-800 hover:text-white'
                         }`}
                       >
-                        Radio {rad}
+                        {tTools.radiusLabel} {rad}
                       </button>
                     ))}
                   </div>
@@ -2264,21 +2685,21 @@ export default function LocalStudioPage() {
                   {/* Left: Interactive 3x3 Geo-Grid Heatmap */}
                   <div className="md:col-span-7 bg-slate-950 p-6 rounded-3xl border border-slate-800 relative">
                     <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center justify-between">
-                      <span>Mapa Satelital de Cobertura ({city || 'Tu Ciudad'})</span>
-                      <span className="text-amber-400">Palabra clave: "{category.split('/')[0].trim()}"</span>
+                      <span>{tTools.satMap} ({city || (isEn ? 'Your City' : 'Tu Ciudad')})</span>
+                      <span className="text-amber-400">{tTools.keyword} "{category.split('/')[0].trim()}"</span>
                     </div>
 
                     <div className="grid grid-cols-3 gap-3.5 max-w-sm mx-auto aspect-square">
                       {[
-                        { pin: 'P1', rank: geoGridRadius === '1km' ? 2 : 7, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: 'Noroeste' },
-                        { pin: 'P2', rank: geoGridRadius === '1km' ? 1 : 5, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: 'Norte' },
-                        { pin: 'P3', rank: geoGridRadius === '5km' ? 14 : 9, color: 'bg-rose-600 text-white', note: 'Noreste' },
-                        { pin: 'P4', rank: geoGridRadius === '1km' ? 1 : 4, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: 'Oeste' },
-                        { pin: 'CENTRO', rank: 1, color: 'bg-emerald-400 text-slate-950 ring-4 ring-emerald-500/30', note: 'Sede Central' },
-                        { pin: 'P6', rank: geoGridRadius === '5km' ? 16 : 8, color: 'bg-rose-600 text-white', note: 'Este' },
-                        { pin: 'P7', rank: geoGridRadius === '5km' ? 18 : 11, color: 'bg-rose-600 text-white', note: 'Suroeste' },
-                        { pin: 'P8', rank: geoGridRadius === '1km' ? 3 : 8, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: 'Sur' },
-                        { pin: 'P9', rank: geoGridRadius === '5km' ? 21 : 15, color: 'bg-rose-600 text-white', note: 'Sureste' },
+                        { pin: 'P1', rank: geoGridRadius === '1km' ? 2 : 7, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: isEn ? 'Northwest' : 'Noroeste' },
+                        { pin: 'P2', rank: geoGridRadius === '1km' ? 1 : 5, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: isEn ? 'North' : 'Norte' },
+                        { pin: 'P3', rank: geoGridRadius === '5km' ? 14 : 9, color: 'bg-rose-600 text-white', note: isEn ? 'Northeast' : 'Noreste' },
+                        { pin: 'P4', rank: geoGridRadius === '1km' ? 1 : 4, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: isEn ? 'West' : 'Oeste' },
+                        { pin: 'CENTRO', rank: 1, color: 'bg-emerald-400 text-slate-950 ring-4 ring-emerald-500/30', note: isEn ? 'Main Location' : 'Sede Central' },
+                        { pin: 'P6', rank: geoGridRadius === '5km' ? 16 : 8, color: 'bg-rose-600 text-white', note: isEn ? 'East' : 'Este' },
+                        { pin: 'P7', rank: geoGridRadius === '5km' ? 18 : 11, color: 'bg-rose-600 text-white', note: isEn ? 'Southwest' : 'Suroeste' },
+                        { pin: 'P8', rank: geoGridRadius === '1km' ? 3 : 8, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: isEn ? 'South' : 'Sur' },
+                        { pin: 'P9', rank: geoGridRadius === '5km' ? 21 : 15, color: 'bg-rose-600 text-white', note: isEn ? 'Southeast' : 'Sureste' },
                       ].map((item, idx) => (
                         <div
                           key={idx}
@@ -2286,7 +2707,7 @@ export default function LocalStudioPage() {
                         >
                           <span className="text-[9px] opacity-75 uppercase">{item.note}</span>
                           <span className="text-2xl font-black">#{item.rank}</span>
-                          <span className="text-[8px] font-bold uppercase">{item.rank <= 3 ? 'TOP 3' : 'FUERA'}</span>
+                          <span className="text-[8px] font-bold uppercase">{item.rank <= 3 ? 'TOP 3' : (isEn ? 'DROPPED' : 'FUERA')}</span>
                         </div>
                       ))}
                     </div>
@@ -2294,11 +2715,11 @@ export default function LocalStudioPage() {
                     <div className="flex items-center justify-center gap-4 mt-5 text-[11px] font-bold">
                       <div className="flex items-center gap-1.5 text-emerald-400">
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                        <span>Puesto 1 al 3 (Se llevan el 84% de llamadas)</span>
+                        <span>{tTools.legendTop3}</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-rose-400">
                         <span className="w-2.5 h-2.5 rounded-full bg-rose-600" />
-                        <span>Puesto 4+ (Invisibles)</span>
+                        <span>{tTools.legendDropped}</span>
                       </div>
                     </div>
                   </div>
@@ -2307,19 +2728,19 @@ export default function LocalStudioPage() {
                   <div className="md:col-span-5 space-y-4 text-xs">
                     <div className="p-4 rounded-2xl bg-amber-950/30 border border-amber-500/40 space-y-2">
                       <span className="text-[10px] font-black uppercase tracking-wider text-amber-300 block">
-                        Diagnóstico para el Asesor:
+                        {tTools.diagAdvisor}
                       </span>
                       <p className="text-slate-200 leading-relaxed text-xs">
-                        "Don {businessName || 'Carlos'}, cuando usted busca parado en su propio local aparece de #1. Pero cuando una persona busca a solo <strong>{geoGridRadius}</strong> de distancia en su mismo barrio, su negocio cae al puesto <strong>#8 o #14</strong>. Toda esa clientela se la están llevando sus 3 competidores más cercanos."
+                        {tTools.diagAdvisorBody(businessName, geoGridRadius)}
                       </p>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
                       <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">
-                        Solución con Prestigia:
+                        {tTools.solutionPrestigia}
                       </span>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        Con la inyección de subcategorías secundarias, menciones de vecindario en la descripción y 8 reseñas semanales geolocalizadas, extendemos el radio verde a toda la ciudad en 90 días.
+                        {tTools.solutionPrestigiaBody}
                       </p>
                     </div>
                   </div>
@@ -2333,48 +2754,48 @@ export default function LocalStudioPage() {
                 <div>
                   <h3 className="text-base font-black text-white flex items-center gap-2">
                     <Calculator className="w-4 h-4 text-emerald-400" />
-                    <span>Calculadora de Pérdida Financiera por estar fuera del Top 3</span>
+                    <span>{tTools.roiTitle}</span>
                   </h3>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Convierte la posición de Google Maps en dólares exactos perdidos por el cliente cada mes.
+                    {tTools.roiDesc}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                   <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-                    <label className="block font-bold text-slate-300">Ticket Promedio por Cliente (USD)</label>
+                    <label className="block font-bold text-slate-300">{tTools.avgTicket}</label>
                     <input
                       type="number"
                       value={roiAverageTicket}
                       onChange={(e) => setRoiAverageTicket(Number(e.target.value) || 0)}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-emerald-300 font-black text-base focus:outline-none"
                     />
-                    <span className="text-[10px] text-slate-500">Lo que gasta un cliente promedio en su negocio.</span>
+                    <span className="text-[10px] text-slate-500">{tTools.avgTicketSub}</span>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-                    <label className="block font-bold text-slate-300">Posición Actual en Google Maps</label>
+                    <label className="block font-bold text-slate-300">{tTools.currentRank}</label>
                     <select
                       value={roiCurrentRank}
                       onChange={(e) => setRoiCurrentRank(Number(e.target.value))}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-black text-base focus:outline-none"
                     >
-                      <option value="4">Puesto #4 (Al borde del Top 3)</option>
-                      <option value="8">Puesto #8 (Segunda vista)</option>
-                      <option value="15">Puesto #15+ (Completamente invisible)</option>
+                      <option value="4">{tTools.rankOpt1}</option>
+                      <option value="8">{tTools.rankOpt2}</option>
+                      <option value="15">{tTools.rankOpt3}</option>
                     </select>
-                    <span className="text-[10px] text-slate-500">Lugar donde aparece hoy al buscar su servicio.</span>
+                    <span className="text-[10px] text-slate-500">{tTools.currentRankSub}</span>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-                    <label className="block font-bold text-slate-300">Búsquedas Mensuales Estimadas en Zona</label>
+                    <label className="block font-bold text-slate-300">{tTools.searches}</label>
                     <input
                       type="number"
                       value={roiMonthlySearches}
                       onChange={(e) => setRoiMonthlySearches(Number(e.target.value) || 0)}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-black text-base focus:outline-none"
                     />
-                    <span className="text-[10px] text-slate-500">Personas buscando este servicio al mes.</span>
+                    <span className="text-[10px] text-slate-500">{tTools.searchesSub}</span>
                   </div>
                 </div>
 
@@ -2390,38 +2811,38 @@ export default function LocalStudioPage() {
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                           <span className="text-[10px] font-black uppercase tracking-wider text-rose-300 bg-rose-950 px-2.5 py-0.5 rounded-full border border-rose-500/40">
-                            Fuga de Facturación Detectada
+                            {tTools.leakDetected}
                           </span>
                           <h4 className="text-lg font-black text-white mt-1">
-                            Dinero que tu negocio está regalando a la competencia:
+                            {tTools.leakHeading}
                           </h4>
                         </div>
                         <div className="text-right">
                           <span className="text-3xl font-black text-rose-400">
                             ${monthlyLoss.toLocaleString()} USD
                           </span>
-                          <span className="text-xs text-slate-400 block font-bold">perdidos cada 30 días</span>
+                          <span className="text-xs text-slate-400 block font-bold">{tTools.lostPer30Days}</span>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-800 text-xs">
                         <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
-                          <span className="text-[10px] text-slate-400 uppercase font-bold block">Llamadas y Clics Perdidos:</span>
-                          <strong className="text-base font-black text-white">~{lostClicks} búsquedas/mes</strong>
+                          <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.lostCalls}</span>
+                          <strong className="text-base font-black text-white">~{lostClicks} {tTools.searchesPerMonth}</strong>
                         </div>
                         <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
-                          <span className="text-[10px] text-slate-400 uppercase font-bold block">Clientes que no entraron:</span>
-                          <strong className="text-base font-black text-amber-400">~{lostClients} clientes nuevos/mes</strong>
+                          <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.lostClientsLabel}</span>
+                          <strong className="text-base font-black text-amber-400">~{lostClients} {tTools.newClientsPerMonth}</strong>
                         </div>
                         <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
-                          <span className="text-[10px] text-slate-400 uppercase font-bold block">Pérdida en 12 Meses:</span>
-                          <strong className="text-base font-black text-rose-400">${yearlyLoss.toLocaleString()} USD/año</strong>
+                          <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.loss12Months}</span>
+                          <strong className="text-base font-black text-rose-400">${yearlyLoss.toLocaleString()} USD/{isEn ? 'yr' : 'año'}</strong>
                         </div>
                       </div>
 
                       <div className="p-3 rounded-xl bg-slate-900 border border-amber-500/30 text-xs text-amber-200">
-                        <strong className="text-white block mb-0.5">Cierre del Asesor:</strong>
-                        "Prestigia le cuesta una fracción de lo que usted pierde en solo una semana sin estar en el Top 3. Con recuperar tan solo 2 clientes al mes, el servicio se paga solo y todo lo demás es ganancia neta."
+                        <strong className="text-white block mb-0.5">{tTools.advisorClose}</strong>
+                        {tTools.advisorCloseBody}
                       </div>
                     </div>
                   );
@@ -2435,33 +2856,33 @@ export default function LocalStudioPage() {
                 <div>
                   <h3 className="text-base font-black text-white flex items-center gap-2">
                     <Compass className="w-4 h-4 text-indigo-400" />
-                    <span>Inyector y Generador de Geo-Tagging EXIF para Fotos</span>
+                    <span>{tTools.geotagTitle}</span>
                   </h3>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Google lee los metadatos IPTC y coordenadas de las fotos para validar la ubicación real del establecimiento.
+                    {tTools.geotagDesc}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                   <div className="space-y-3">
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">Nombre Base de la Foto</label>
+                      <label className="block font-bold text-slate-300 mb-1">{tTools.photoName}</label>
                       <input
                         type="text"
                         value={geoTagFilename}
                         onChange={(e) => setGeoTagFilename(e.target.value)}
-                        placeholder="ej: fachada-principal o plato-insignia"
+                        placeholder={tTools.photoNamePlaceholder}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-indigo-400"
                       />
                     </div>
 
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">Palabras Clave de Indexación</label>
+                      <label className="block font-bold text-slate-300 mb-1">{tTools.indexingKeywords}</label>
                       <input
                         type="text"
                         value={geoTagKeywords}
                         onChange={(e) => setGeoTagKeywords(e.target.value)}
-                        placeholder="ej: mejor restaurante, comida gourmet, centro"
+                        placeholder={tTools.indexingKeywordsPlaceholder}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-indigo-400"
                       />
                     </div>
@@ -2473,23 +2894,23 @@ export default function LocalStudioPage() {
                         const cleanC = (city.trim() || 'ciudad').toLowerCase().replace(/[^a-z0-9]/g, '-');
                         const result = `${cleanBase}-${cleanC}-top3-prestigia.jpg [IPTC: ${geoTagKeywords || category} • GeoTag: ${city}]`;
                         setGeoTagResult(result);
-                        showToast('Metadatos EXIF generados');
+                        showToast(tTools.toastGeotag);
                       }}
                       className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black transition cursor-pointer"
                     >
-                      Generar Nomenclatura & Etiquetas EXIF
+                      {tTools.btnGeotag}
                     </button>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
                     <span className="text-[10px] font-black uppercase text-indigo-400 block">
-                      Resultado para Renombrar Antes de Subir a Google:
+                      {tTools.resultBox}
                     </span>
                     <div className="p-3 rounded-xl bg-slate-900 border border-indigo-500/30 font-mono text-[11px] text-amber-300 break-all">
                       {geoTagResult || `${(businessName || 'negocio').toLowerCase().replace(/[^a-z0-9]/g, '-')}-${city.toLowerCase()}-fachada-geotagged.jpg`}
                     </div>
                     <p className="text-[11px] text-slate-400">
-                      Subir fotos con nombres geolocalizados y metadatos IPTC acelera en un 40% la indexación visual en Google Lens y Google Maps.
+                      {tTools.geotagNote}
                     </p>
                   </div>
                 </div>
@@ -2502,10 +2923,10 @@ export default function LocalStudioPage() {
                 <div>
                   <h3 className="text-base font-black text-white flex items-center gap-2">
                     <FileCheck className="w-4 h-4 text-purple-400" />
-                    <span>Hub de Citaciones y Autoridad NAP (Name, Address, Phone)</span>
+                    <span>{tTools.citationsTitle}</span>
                   </h3>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Directorio oficial para verificar la consistencia de los datos del cliente en internet y blindar su autoridad frente al algoritmo.
+                    {tTools.citationsDesc}
                   </p>
                 </div>
 
@@ -2514,15 +2935,15 @@ export default function LocalStudioPage() {
                   <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
                     <div className="flex items-center gap-2">
                       <span className="text-base">🇺🇸</span>
-                      <h4 className="font-black text-white">Directorio Top de Citaciones EE.UU.</h4>
+                      <h4 className="font-black text-white">{tTools.citationsUsa}</h4>
                     </div>
                     <ul className="space-y-2 text-[11px] text-slate-300">
                       {[
-                        { name: 'Apple Maps Connect', authority: 'DA 99', desc: 'Indispensable para usuarios de iPhone y Siri' },
-                        { name: 'Bing Places for Business', authority: 'DA 94', desc: 'Búsquedas nativas en Windows y copilotos de IA' },
-                        { name: 'Yelp for Business', authority: 'DA 94', desc: 'Principal fuente de reseñas externas leída por Apple' },
-                        { name: 'YellowPages (YP.com)', authority: 'DA 89', desc: 'Autoridad local histórica para SEO en EE.UU.' },
-                        { name: 'Better Business Bureau (BBB)', authority: 'DA 93', desc: 'Sello definitivo de confianza y legitimidad' },
+                        { name: 'Apple Maps Connect', authority: 'DA 99', desc: isEn ? 'Essential for iPhone and Siri local queries' : 'Indispensable para usuarios de iPhone y Siri' },
+                        { name: 'Bing Places for Business', authority: 'DA 94', desc: isEn ? 'Native search on Windows and AI copilot agents' : 'Búsquedas nativas en Windows y copilotos de IA' },
+                        { name: 'Yelp for Business', authority: 'DA 94', desc: isEn ? 'Primary review feed read natively by Apple Maps' : 'Principal fuente de reseñas externas leída por Apple' },
+                        { name: 'YellowPages (YP.com)', authority: 'DA 89', desc: isEn ? 'Historic local authority backlink for USA SEO' : 'Autoridad local histórica para SEO en EE.UU.' },
+                        { name: 'Better Business Bureau (BBB)', authority: 'DA 93', desc: isEn ? 'Definitive badge of consumer trust and legitimacy' : 'Sello definitivo de confianza y legitimidad' },
                       ].map((c, i) => (
                         <li key={i} className="p-2 rounded-xl bg-slate-900/60 border border-slate-800/80 flex items-center justify-between">
                           <div>
@@ -2541,15 +2962,15 @@ export default function LocalStudioPage() {
                   <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
                     <div className="flex items-center gap-2">
                       <span className="text-base">🇨🇴 🇲🇽</span>
-                      <h4 className="font-black text-white">Directorio Top de Citaciones LatAm</h4>
+                      <h4 className="font-black text-white">{tTools.citationsLatam}</h4>
                     </div>
                     <ul className="space-y-2 text-[11px] text-slate-300">
                       {[
-                        { name: 'Waze Ads & Local Pins', authority: 'DA 92', desc: 'Navegación automotriz #1 en ciudades latinas' },
-                        { name: 'Páginas Amarillas / Publicar', authority: 'DA 76', desc: 'Backlink local de alto valor de directorio' },
-                        { name: 'Foursquare & Swarm', authority: 'DA 91', desc: 'Base de datos geo-espacial de Uber y Twitter' },
-                        { name: 'Cámara de Comercio / Registro Mercantil', authority: 'DA 85', desc: 'Validación de existencia legal formal' },
-                        { name: 'Facebook & Instagram Local Place', authority: 'DA 96', desc: 'Geolocalización para check-in de clientes' },
+                        { name: 'Waze Ads & Local Pins', authority: 'DA 92', desc: isEn ? '#1 driving navigation app in metropolitan hubs' : 'Navegación automotriz #1 en ciudades latinas' },
+                        { name: 'Páginas Amarillas / Publicar', authority: 'DA 76', desc: isEn ? 'High-domain authority local directory backlink' : 'Backlink local de alto valor de directorio' },
+                        { name: 'Foursquare & Swarm', authority: 'DA 91', desc: isEn ? 'Geo-spatial dataset powering Uber, Twitter, and apps' : 'Base de datos geo-espacial de Uber y Twitter' },
+                        { name: 'Cámara de Comercio / Registro Mercantil', authority: 'DA 85', desc: isEn ? 'Corporate registry proving legal business establishment' : 'Validación de existencia legal formal' },
+                        { name: 'Facebook & Instagram Local Place', authority: 'DA 96', desc: isEn ? 'Social check-in & location tagging for customers' : 'Geolocalización para check-in de clientes' },
                       ].map((c, i) => (
                         <li key={i} className="p-2 rounded-xl bg-slate-900/60 border border-slate-800/80 flex items-center justify-between">
                           <div>
@@ -2575,15 +2996,15 @@ export default function LocalStudioPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
-                    ⭐ Cartera Personal Privada
+                    {tDossiers.privateBadge}
                   </span>
-                  <span className="text-xs text-slate-500">• Luisma (Cuenta Principal)</span>
+                  <span className="text-xs text-slate-500">{tDossiers.accountOwner}</span>
                 </div>
                 <h1 className="text-xl sm:text-2xl font-black text-white mt-1">
-                  Mis Clientes & Auditorías Privadas
+                  {tDossiers.title}
                 </h1>
                 <p className="text-xs text-slate-400">
-                  Expedientes creados y auditados personalmente por ti. Tus clientes están 100% aislados y protegidos de la red comercial.
+                  {tDossiers.desc}
                 </p>
               </div>
 
@@ -2592,7 +3013,7 @@ export default function LocalStudioPage() {
                   type="text"
                   value={dossierSearch}
                   onChange={(e) => setDossierSearch(e.target.value)}
-                  placeholder="Buscar en mis clientes..."
+                  placeholder={tDossiers.searchPlaceholder}
                   className="w-full pl-9 pr-3 py-2.5 rounded-2xl bg-slate-950 border border-slate-700 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition"
                 />
                 <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
@@ -2606,7 +3027,7 @@ export default function LocalStudioPage() {
                   <Layers className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-400 block">Mis Expedientes</span>
+                  <span className="text-[11px] text-slate-400 block">{tDossiers.kpiDossiers}</span>
                   <strong className="text-xl font-black text-white">{myDossiers.length}</strong>
                 </div>
               </div>
@@ -2616,7 +3037,7 @@ export default function LocalStudioPage() {
                   <Building2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-400 block">Fichas Desde Cero</span>
+                  <span className="text-[11px] text-slate-400 block">{tDossiers.kpiCreated}</span>
                   <strong className="text-xl font-black text-emerald-400">
                     {myDossiers.filter((d) => d.mode === 'create').length}
                   </strong>
@@ -2628,7 +3049,7 @@ export default function LocalStudioPage() {
                   <Search className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-400 block">Auditorías Top 3</span>
+                  <span className="text-[11px] text-slate-400 block">{tDossiers.kpiAudited}</span>
                   <strong className="text-xl font-black text-indigo-300">
                     {myDossiers.filter((d) => d.mode === 'audit').length}
                   </strong>
@@ -2640,8 +3061,8 @@ export default function LocalStudioPage() {
                   <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-400 block">Privacidad</span>
-                  <strong className="text-xs font-black text-emerald-400 uppercase">100% Blindado</strong>
+                  <span className="text-[11px] text-slate-400 block">{tDossiers.kpiPrivacy}</span>
+                  <strong className="text-xs font-black text-emerald-400 uppercase">{tDossiers.kpiPrivacyVal}</strong>
                 </div>
               </div>
             </div>
@@ -2649,7 +3070,7 @@ export default function LocalStudioPage() {
             {/* Filter Pills (Clean, personal mode filters only) */}
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
               <div className="flex items-center gap-2">
-                <span className="text-slate-400 text-[11px] font-bold">Filtrar por:</span>
+                <span className="text-slate-400 text-[11px] font-bold">{tDossiers.filterBy}</span>
                 <button
                   type="button"
                   onClick={() => setDossierModeFilter('all')}
@@ -2659,7 +3080,7 @@ export default function LocalStudioPage() {
                       : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
                   }`}
                 >
-                  Todos ({myDossiers.length})
+                  {tDossiers.filterAll} ({myDossiers.length})
                 </button>
                 <button
                   type="button"
@@ -2670,7 +3091,7 @@ export default function LocalStudioPage() {
                       : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
                   }`}
                 >
-                  🏗️ Fichas Nuevas ({myDossiers.filter((d) => d.mode === 'create').length})
+                  {tDossiers.filterCreate} ({myDossiers.filter((d) => d.mode === 'create').length})
                 </button>
                 <button
                   type="button"
@@ -2681,12 +3102,12 @@ export default function LocalStudioPage() {
                       : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
                   }`}
                 >
-                  🔬 Auditorías Top 3 ({myDossiers.filter((d) => d.mode === 'audit').length})
+                  {tDossiers.filterAudit} ({myDossiers.filter((d) => d.mode === 'audit').length})
                 </button>
               </div>
 
               <span className="text-[11px] text-slate-400 font-medium">
-                Mostrando únicamente clientes de la cuenta principal
+                {tDossiers.showingNotice}
               </span>
             </div>
 
@@ -2694,21 +3115,21 @@ export default function LocalStudioPage() {
             {isLoadingDossiers ? (
               <div className="text-center py-16 text-slate-400 text-xs space-y-2">
                 <RefreshCw className="w-6 h-6 animate-spin mx-auto text-amber-400" />
-                <p>Cargando tu cartera personal...</p>
+                <p>{tDossiers.loading}</p>
               </div>
             ) : myDossiers.length === 0 ? (
               <div className="text-center py-16 p-8 rounded-3xl bg-slate-900/40 border border-slate-800 space-y-3">
                 <Layers className="w-10 h-10 text-slate-600 mx-auto" />
-                <h3 className="text-base font-bold text-white">No tienes clientes guardados en tu cuenta personal</h3>
+                <h3 className="text-base font-bold text-white">{tDossiers.emptyTitle}</h3>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Genera una nueva ficha desde cero o una auditoría en los módulos principales para registrar tu primer cliente.
+                  {tDossiers.emptyDesc}
                 </p>
                 <button
                   type="button"
                   onClick={() => setActiveTab('create')}
                   className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition cursor-pointer shadow-md"
                 >
-                  🏗️ Crear Primera Ficha Ganadora
+                  {tDossiers.btnCreateFirst}
                 </button>
               </div>
             ) : (
@@ -2727,7 +3148,7 @@ export default function LocalStudioPage() {
                               : 'bg-amber-950 text-amber-300 border border-amber-500/40'
                           }`}
                         >
-                          {d.mode === 'create' ? '🏗️ Ficha Nueva' : '🔬 Auditoría Top 3'}
+                          {d.mode === 'create' ? tDossiers.badgeCreate : tDossiers.badgeAudit}
                         </span>
 
                         {d.data?.healthScore !== undefined && (
@@ -2767,7 +3188,7 @@ export default function LocalStudioPage() {
                     <div className="pt-3 border-t border-slate-800/80 space-y-2.5">
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-[11px] font-bold text-amber-200 flex items-center gap-1.5">
-                          👑 Luisma (Cuenta Principal)
+                          {tDossiers.ownerBadge}
                         </span>
                         <span className="text-[10px] text-slate-500 font-mono">{d.advisorPhone}</span>
                       </div>
@@ -2778,7 +3199,7 @@ export default function LocalStudioPage() {
                           onClick={() => handleLoadDossier(d)}
                           className="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/10 active:scale-98"
                         >
-                          <span>👁️ Cargar y Ver</span>
+                          <span>{tDossiers.btnLoadView}</span>
                         </button>
 
                         {d.data?.whatsappOnboardingMessage && (
@@ -2786,7 +3207,7 @@ export default function LocalStudioPage() {
                             href={`https://wa.me/?text=${encodeURIComponent(d.data.whatsappOnboardingMessage)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            title="Enviar Kit por WhatsApp"
+                            title={tDossiers.sendWhatsappKit}
                             className="p-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 transition cursor-pointer"
                           >
                             <MessageSquare className="w-4 h-4" />
@@ -2796,7 +3217,7 @@ export default function LocalStudioPage() {
                         <button
                           type="button"
                           onClick={() => handleDeleteDossier(d.id)}
-                          title="Eliminar Expediente"
+                          title={tDossiers.deleteDossier}
                           className="p-2 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-950/30 transition cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -2819,13 +3240,13 @@ export default function LocalStudioPage() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-purple-950 border border-purple-500/40 text-purple-300">
-                    Modo Piloto Automático • Cero Fricción Tecnológica
+                    {tGuide.badge}
                   </span>
                   <h1 className="text-xl sm:text-2xl font-black text-white">
-                    Guía Paso a Paso: Dónde dar Clic en Google en 5 Minutos
+                    {tGuide.title}
                   </h1>
                   <p className="text-xs text-slate-300 max-w-2xl">
-                    Instrucciones exactas para ti o cualquiera de tus vendedores. No necesitas saber nada de sistemas: solo sigue los 6 pasos en orden.
+                    {tGuide.desc}
                   </p>
                 </div>
                 <a
@@ -2834,7 +3255,7 @@ export default function LocalStudioPage() {
                   rel="noopener noreferrer"
                   className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg cursor-pointer shrink-0"
                 >
-                  <span>Abrir Google Business</span>
+                  <span>{tGuide.btnOpenGoogle}</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
@@ -2845,10 +3266,10 @@ export default function LocalStudioPage() {
               <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-xs">1</span>
-                  <h3 className="font-bold text-white text-sm">Abrir Google Business</h3>
+                  <h3 className="font-bold text-white text-sm">{tGuide.step1Title}</h3>
                 </div>
                 <p className="text-slate-300 text-[11px] leading-relaxed">
-                  Entra a <strong className="text-purple-400">business.google.com</strong> usando el correo de Gmail del negocio o el tuyo. Si no tiene cuenta, inicia sesión con cualquier Gmail.
+                  {tGuide.step1Body}
                 </p>
               </div>
 
@@ -2856,10 +3277,10 @@ export default function LocalStudioPage() {
               <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-xs">2</span>
-                  <h3 className="font-bold text-white text-sm">Escribir Nombre y Categoría</h3>
+                  <h3 className="font-bold text-white text-sm">{tGuide.step2Title}</h3>
                 </div>
                 <p className="text-slate-300 text-[11px] leading-relaxed">
-                  Pega el <strong>Título Optimizado</strong> que te dio Local Studio. En categoría escribe la <strong>Categoría Principal</strong> y elígela del menú desplegable oficial de Google.
+                  {tGuide.step2Body}
                 </p>
               </div>
 
@@ -2867,12 +3288,12 @@ export default function LocalStudioPage() {
               <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-xs">3</span>
-                  <h3 className="font-bold text-white text-sm">Ubicación y Modelo de Negocio</h3>
+                  <h3 className="font-bold text-white text-sm">{tGuide.step3Title}</h3>
                 </div>
                 <p className="text-slate-300 text-[11px] leading-relaxed">
-                  <strong>• Si es Local Físico:</strong> Marca <em>"Sí tienes local abierto al público"</em> y ajusta el pin rojo sobre la entrada.
+                  {tGuide.step3BodyStore}
                   <br />
-                  <strong className="text-amber-300">• Si es Profesional Independiente (SAB):</strong> Marca <em>"No, presto servicios en la ubicación del cliente"</em>. Esto <strong>oculta tu dirección de casa</strong> para evitar suspensiones de Google, y luego agregas las <strong>Zonas de Cobertura</strong> que te dio la herramienta.
+                  <span className="text-amber-300 font-semibold">{tGuide.step3BodySab}</span>
                 </p>
               </div>
 
@@ -2880,14 +3301,12 @@ export default function LocalStudioPage() {
               <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-xs">4</span>
-                  <h3 className="font-bold text-white text-sm">Video de Verificación</h3>
+                  <h3 className="font-bold text-white text-sm">{tGuide.step4Title}</h3>
                 </div>
                 <p className="text-slate-300 text-[11px] leading-relaxed">
-                  Google exige un video de 60s sin cortes:
+                  {tGuide.step4BodyStore}
                   <br />
-                  <strong>• Para Locales:</strong> 1) Calle y fachada, 2) Llaves abriendo puerta, 3) Caja registradora y datáfono.
-                  <br />
-                  <strong className="text-indigo-300">• Para Independientes:</strong> 1) Herramientas o computador con software abierto, 2) RUT o documento fiscal y tarjetas, 3) Vehículo de trabajo o bodega. ¡Aprobación rápida en 1 intento!
+                  <span className="text-indigo-300 font-semibold">{tGuide.step4BodySab}</span>
                 </p>
               </div>
 
@@ -2895,10 +3314,10 @@ export default function LocalStudioPage() {
               <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-xs">5</span>
-                  <h3 className="font-bold text-white text-sm">Inyectar Subcategorías & Copy</h3>
+                  <h3 className="font-bold text-white text-sm">{tGuide.step5Title}</h3>
                 </div>
                 <p className="text-slate-300 text-[11px] leading-relaxed">
-                  Ve a <em>"Editar Perfil"</em>. En descripción, pega el copy de 745 caracteres. En categorías adicionales, agrega las <strong>5 subcategorías secundarias</strong> que te dio la herramienta.
+                  {tGuide.step5Body}
                 </p>
               </div>
 
@@ -2906,10 +3325,10 @@ export default function LocalStudioPage() {
               <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-xs">6</span>
-                  <h3 className="font-bold text-white text-sm">Cargar Fotos y QR Prestigia</h3>
+                  <h3 className="font-bold text-white text-sm">{tGuide.step6Title}</h3>
                 </div>
                 <p className="text-slate-300 text-[11px] leading-relaxed">
-                  Sube las fotos renombradas según el checklist de la herramienta. Luego activa el <strong>código QR de Prestigia</strong> en las mesas o mostrador para empezar a recibir reseñas de 5★ de inmediato.
+                  {tGuide.step6Body}
                 </p>
               </div>
             </div>
@@ -2918,21 +3337,21 @@ export default function LocalStudioPage() {
             <div className="p-6 rounded-3xl bg-slate-900 border-2 border-amber-500/40 space-y-3">
               <div className="flex items-center gap-2 text-amber-400">
                 <AlertTriangle className="w-5 h-5" />
-                <h3 className="text-base font-black text-white">El Semáforo de Seguridad Anti-Suspensión de Google</h3>
+                <h3 className="text-base font-black text-white">{tGuide.trafficLightTitle}</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 <div className="p-3.5 rounded-xl bg-slate-950 border border-rose-500/30 text-rose-300 space-y-1">
-                  <strong className="text-rose-400 block text-xs">❌ LO QUE NUNCA DEBES HACER (PELIGRO DE BAN):</strong>
-                  <p className="text-[11px] text-slate-300">• No pongas nombres inventados o palabras spam como "EL MEJOR RESTAURANTE".</p>
-                  <p className="text-[11px] text-slate-300">• No uses números telefónicos virtuales desechables.</p>
-                  <p className="text-[11px] text-slate-300">• No pongas direcciones de apartamentos residenciales si el cliente dice atender público.</p>
+                  <strong className="text-rose-400 block text-xs">{tGuide.dangerTitle}</strong>
+                  <p className="text-[11px] text-slate-300">{tGuide.danger1}</p>
+                  <p className="text-[11px] text-slate-300">{tGuide.danger2}</p>
+                  <p className="text-[11px] text-slate-300">{tGuide.danger3}</p>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-slate-950 border border-emerald-500/30 text-emerald-300 space-y-1">
-                  <strong className="text-emerald-400 block text-xs">✅ LO QUE SÍ DEBES HACER (APROBACIÓN SEGURA):</strong>
-                  <p className="text-[11px] text-slate-300">• Usar el título con el separador "|" que generó Local Studio.</p>
-                  <p className="text-[11px] text-slate-300">• Subir fotos reales con el letrero coincidente.</p>
-                  <p className="text-[11px] text-slate-300">• Grabar el video continuo sin cortes mostrando la llave física.</p>
+                  <strong className="text-emerald-400 block text-xs">{tGuide.safeTitle}</strong>
+                  <p className="text-[11px] text-slate-300">{tGuide.safe1}</p>
+                  <p className="text-[11px] text-slate-300">{tGuide.safe2}</p>
+                  <p className="text-[11px] text-slate-300">{tGuide.safe3}</p>
                 </div>
               </div>
             </div>
@@ -2947,13 +3366,13 @@ export default function LocalStudioPage() {
             <div className="bg-gradient-to-r from-rose-950/40 via-slate-900 to-slate-900 border border-rose-500/40 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
               <div className="space-y-1">
                 <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300">
-                  Manual de Cierre en Llamadas y Reuniones
+                  {tPitch.badge}
                 </span>
                 <h1 className="text-xl sm:text-2xl font-black text-white">
-                  Guion Comercial: Respuestas a Objeciones para Asesores
+                  {tPitch.title}
                 </h1>
                 <p className="text-xs text-slate-300 max-w-2xl">
-                  Qué decirle al cliente cuando tiene dudas para asegurar el contrato de 12 meses de Prestigia.
+                  {tPitch.desc}
                 </p>
               </div>
             </div>
@@ -2961,28 +3380,28 @@ export default function LocalStudioPage() {
             <div className="space-y-3.5 text-xs">
               <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
                 <strong className="text-amber-300 block text-sm">
-                  1. Si el cliente dice: "¿Y por qué no creo yo mismo la ficha de Google gratis?"
+                  {tPitch.q1}
                 </strong>
                 <p className="text-slate-300 text-xs leading-relaxed">
-                  <em>Respuesta del Asesor:</em> "Claro que sí, don Carlos, Google permite crearla gratis. Pero el 92% de los negocios comete el error de poner solo una categoría y una descripción corta sin palabras clave. Por eso terminan en la página 4 de Google Maps donde nadie los ve. Nosotros aplicamos la arquitectura de categorías secretas y copywriting de los 3 líderes de su zona para que su ficha no solo exista, sino que le traiga clientes nuevos y reservas todos los días."
+                  <em>{isEn ? 'Advisor Script:' : 'Respuesta del Asesor:'}</em> {tPitch.a1}
                 </p>
               </div>
 
               <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
                 <strong className="text-amber-300 block text-sm">
-                  2. Si el cliente dice: "¿Por qué necesito el servicio de Prestigia durante 12 meses?"
+                  {tPitch.q2}
                 </strong>
                 <p className="text-slate-300 text-xs leading-relaxed">
-                  <em>Respuesta del Asesor:</em> "Porque Google Maps castiga la inactividad bajo la 'Ley de Recencia'. Si dejas de recibir reseñas recientes durante 30 días, el algoritmo te oculta y premia a tu competencia activa. Además, Prestigia es su seguro de blindaje: contiene en caliente cualquier cliente furioso para que nunca publique una queja de 1 estrella en su perfil."
+                  <em>{isEn ? 'Advisor Script:' : 'Respuesta del Asesor:'}</em> {tPitch.a2}
                 </p>
               </div>
 
               <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
                 <strong className="text-amber-300 block text-sm">
-                  3. Si el cliente dice: "¿En cuánto tiempo veo resultados de estar en el Top 3?"
+                  {tPitch.q3}
                 </strong>
                 <p className="text-slate-300 text-xs leading-relaxed">
-                  <em>Respuesta del Asesor:</em> "En los primeros 7 a 14 días la optimización técnica de categorías y descripción genera un salto visible de impresiones. Y con el código QR en mesa capturando las primeras 30 a 50 opiniones de 5 estrellas en el primer mes, el algoritmo lo posiciona en la zona caliente de su barrio en menos de 60 a 90 días."
+                  <em>{isEn ? 'Advisor Script:' : 'Respuesta del Asesor:'}</em> {tPitch.a3}
                 </p>
               </div>
             </div>
@@ -3000,15 +3419,15 @@ export default function LocalStudioPage() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
-                      👑 Panel Ejecutivo Master • Red Comercial & Monetización B2B
+                      {tNetwork.badge}
                     </span>
-                    <span className="text-xs text-slate-500">• Licenciamiento & Equipos</span>
+                    <span className="text-xs text-slate-500">{tNetwork.badgeSub}</span>
                   </div>
                   <h1 className="text-xl sm:text-2xl font-black text-white mt-1">
-                    Red de Asesores Comerciales & Agencias Partners
+                    {tNetwork.title}
                   </h1>
                   <p className="text-xs text-slate-300 max-w-3xl">
-                    Crea accesos individuales para tus vendedores a comisión o vende licencias de software mensual a agencias aliadas para que prospecten y auditen negocios locales en cualquier país o ciudad.
+                    {tNetwork.desc}
                   </p>
                 </div>
 
@@ -3018,7 +3437,7 @@ export default function LocalStudioPage() {
                   className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs transition cursor-pointer flex items-center gap-2 shadow-lg shadow-emerald-500/20 shrink-0 active:scale-98"
                 >
                   <Download className="w-4 h-4" />
-                  <span>📥 Descargar Reporte CSV</span>
+                  <span>{tNetwork.btnDownloadCsv}</span>
                 </button>
               </div>
             </div>
@@ -3030,7 +3449,7 @@ export default function LocalStudioPage() {
                   <Briefcase className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-400 block">Asesores Internos</span>
+                  <span className="text-[11px] text-slate-400 block">{tNetwork.kpiInternal}</span>
                   <strong className="text-xl font-black text-white">
                     {advisorsList.filter((a) => a.accountType !== 'partner_agency' && a.id !== 'adv-luisma' && a.id !== 'adv-admin').length}
                   </strong>
@@ -3042,7 +3461,7 @@ export default function LocalStudioPage() {
                   <Building2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-400 block">Agencias Licenciadas</span>
+                  <span className="text-[11px] text-slate-400 block">{tNetwork.kpiAgencies}</span>
                   <strong className="text-xl font-black text-purple-300">
                     {advisorsList.filter((a) => a.accountType === 'partner_agency').length}
                   </strong>
@@ -3054,7 +3473,7 @@ export default function LocalStudioPage() {
                   <Layers className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-400 block">Cuentas de la Red</span>
+                  <span className="text-[11px] text-slate-400 block">{tNetwork.kpiAccounts}</span>
                   <strong className="text-xl font-black text-amber-400">{networkFilteredDossiers.length}</strong>
                 </div>
               </div>
@@ -3064,12 +3483,12 @@ export default function LocalStudioPage() {
                   <DollarSign className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-400 block">Ingreso Licencias (MRR)</span>
+                  <span className="text-[11px] text-slate-400 block">{tNetwork.kpiMrr}</span>
                   <strong className="text-xl font-black text-emerald-400">
                     ${advisorsList
                       .filter((a) => a.accountType === 'partner_agency' && a.licenseStatus === 'active')
                       .reduce((sum, a) => sum + (a.monthlyFeeUsd || 0), 0)}{' '}
-                    <span className="text-xs font-bold text-slate-400">USD/mes</span>
+                    <span className="text-xs font-bold text-slate-400">{isEn ? 'USD/mo' : 'USD/mes'}</span>
                   </strong>
                 </div>
               </div>
@@ -3087,7 +3506,7 @@ export default function LocalStudioPage() {
                 }`}
               >
                 <Search className="w-3.5 h-3.5" />
-                <span>📊 Monitor de Cuentas Prospectadas ({networkFilteredDossiers.length})</span>
+                <span>{tNetwork.subviewMonitor} ({networkFilteredDossiers.length})</span>
               </button>
 
               <button
@@ -3100,7 +3519,7 @@ export default function LocalStudioPage() {
                 }`}
               >
                 <Users className="w-3.5 h-3.5" />
-                <span>➕ Registrar Asesor o Licenciar Agencia</span>
+                <span>{tNetwork.subviewRegister}</span>
               </button>
 
               <button
@@ -3114,7 +3533,7 @@ export default function LocalStudioPage() {
               >
                 <Globe className="w-3.5 h-3.5" />
                 <span>
-                  👥 Directorio de Cuentas Activas (
+                  {tNetwork.subviewDirectory} (
                   {advisorsList.filter((a) => a.id !== 'adv-admin' && a.id !== 'adv-luisma').length})
                 </span>
               </button>
@@ -3127,26 +3546,26 @@ export default function LocalStudioPage() {
                 <div className="p-4 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
                   <div className="flex items-center gap-2 text-slate-300 font-bold">
                     <Filter className="w-4 h-4 text-amber-400" />
-                    <span>Filtros de Auditoría y Seguimiento de Red:</span>
+                    <span>{isEn ? 'Network Audit & Follow-Up Filters:' : 'Filtros de Auditoría y Seguimiento de Red:'}</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5">
                     {/* Filter Advisor */}
                     <div>
                       <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">
-                        Asesor / Agencia
+                        {isEn ? 'Advisor / Agency' : 'Asesor / Agencia'}
                       </label>
                       <select
                         value={networkAdvisorFilter}
                         onChange={(e) => setNetworkAdvisorFilter(e.target.value)}
                         className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                       >
-                        <option value="all">Todos los Miembros</option>
+                        <option value="all">{isEn ? 'All Members' : 'Todos los Miembros'}</option>
                         {advisorsList
                           .filter((a) => a.id !== 'adv-admin' && a.id !== 'adv-luisma')
                           .map((adv) => (
                             <option key={adv.id} value={adv.id}>
-                              {adv.name} ({adv.accountType === 'partner_agency' ? 'Agencia' : 'Asesor'})
+                              {adv.name} ({adv.accountType === 'partner_agency' ? (isEn ? 'Agency' : 'Agencia') : (isEn ? 'Advisor' : 'Asesor')})
                             </option>
                           ))}
                       </select>
@@ -3155,28 +3574,28 @@ export default function LocalStudioPage() {
                     {/* Filter Account Type */}
                     <div>
                       <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">
-                        Tipo de Cuenta
+                        {isEn ? 'Account Type' : 'Tipo de Cuenta'}
                       </label>
                       <select
                         value={networkTypeFilter}
                         onChange={(e) => setNetworkTypeFilter(e.target.value as any)}
                         className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                       >
-                        <option value="all">Todos los Tipos</option>
-                        <option value="internal_advisor">💼 Asesores Internos</option>
-                        <option value="partner_agency">🏢 Agencias Partners (B2B)</option>
+                        <option value="all">{isEn ? 'All Types' : 'Todos los Tipos'}</option>
+                        <option value="internal_advisor">{isEn ? '💼 Internal Advisors' : '💼 Asesores Internos'}</option>
+                        <option value="partner_agency">{isEn ? '🏢 Partner Agencies (B2B)' : '🏢 Agencias Partners (B2B)'}</option>
                       </select>
                     </div>
 
                     {/* Filter Country */}
                     <div>
-                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">País</label>
+                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">{isEn ? 'Country' : 'País'}</label>
                       <select
                         value={networkCountryFilter}
                         onChange={(e) => setNetworkCountryFilter(e.target.value)}
                         className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                       >
-                        <option value="all">Todos los Países</option>
+                        <option value="all">{isEn ? 'All Countries' : 'Todos los Países'}</option>
                         {availableCountries.map((c) => (
                           <option key={c} value={c}>
                             {c === 'Colombia' ? '🇨🇴 Colombia' : c === 'México' ? '🇲🇽 México' : c}
@@ -3187,13 +3606,13 @@ export default function LocalStudioPage() {
 
                     {/* Filter City */}
                     <div>
-                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">Ciudad</label>
+                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">{isEn ? 'City' : 'Ciudad'}</label>
                       <select
                         value={networkCityFilter}
                         onChange={(e) => setNetworkCityFilter(e.target.value)}
                         className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                       >
-                        <option value="all">Todas las Ciudades</option>
+                        <option value="all">{isEn ? 'All Cities' : 'Todas las Ciudades'}</option>
                         {availableCities.map((city) => (
                           <option key={city} value={city}>
                             {city}
@@ -3204,15 +3623,15 @@ export default function LocalStudioPage() {
 
                     {/* Filter Mode */}
                     <div>
-                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">Modalidad</label>
+                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">{isEn ? 'Mode' : 'Modalidad'}</label>
                       <select
                         value={networkModeFilter}
                         onChange={(e) => setNetworkModeFilter(e.target.value as any)}
                         className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                       >
-                        <option value="all">Todas las Modalidades</option>
-                        <option value="create">🏗️ Fichas Nuevas</option>
-                        <option value="audit">🔬 Auditorías Top 3</option>
+                        <option value="all">{isEn ? 'All Modes' : 'Todas las Modalidades'}</option>
+                        <option value="create">{isEn ? '🏗️ New Listings' : '🏗️ Fichas Nuevas'}</option>
+                        <option value="audit">{isEn ? '🔬 Top 3 Audits' : '🔬 Auditorías Top 3'}</option>
                       </select>
                     </div>
                   </div>
@@ -3224,7 +3643,7 @@ export default function LocalStudioPage() {
                         type="text"
                         value={networkSearch}
                         onChange={(e) => setNetworkSearch(e.target.value)}
-                        placeholder="Buscar por cliente, categoría o palabras clave..."
+                        placeholder={isEn ? 'Search by client, category, or keywords...' : 'Buscar por cliente, categoría o palabras clave...'}
                         className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
                       />
                       <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
@@ -3242,7 +3661,7 @@ export default function LocalStudioPage() {
                       }}
                       className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs transition cursor-pointer shrink-0"
                     >
-                      Restablecer Filtros
+                      {isEn ? 'Reset Filters' : 'Restablecer Filtros'}
                     </button>
                   </div>
                 </div>
@@ -3251,9 +3670,9 @@ export default function LocalStudioPage() {
                 {networkFilteredDossiers.length === 0 ? (
                   <div className="text-center py-16 p-8 rounded-3xl bg-slate-900/40 border border-slate-800 space-y-3">
                     <Layers className="w-10 h-10 text-slate-600 mx-auto" />
-                    <h3 className="text-base font-bold text-white">No hay expedientes con los filtros seleccionados</h3>
+                    <h3 className="text-base font-bold text-white">{isEn ? 'No dossiers found with current filters' : 'No hay expedientes con los filtros seleccionados'}</h3>
                     <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                      Intenta modificando los filtros de asesor, país o ciudad.
+                      {isEn ? 'Try adjusting advisor, country, or city filters.' : 'Intenta modificando los filtros de asesor, país o ciudad.'}
                     </p>
                   </div>
                 ) : (
@@ -3272,7 +3691,7 @@ export default function LocalStudioPage() {
                                   : 'bg-amber-950 text-amber-300 border border-amber-500/40'
                               }`}
                             >
-                              {d.mode === 'create' ? '🏗️ Ficha Nueva' : '🔬 Auditoría Top 3'}
+                              {d.mode === 'create' ? (isEn ? '🏗️ New Listing' : '🏗️ Ficha Nueva') : (isEn ? '🔬 Top 3 Audit' : '🔬 Auditoría Top 3')}
                             </span>
 
                             <span
@@ -3282,7 +3701,7 @@ export default function LocalStudioPage() {
                                   : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
                               }`}
                             >
-                              {d.advisorType === 'partner_agency' ? '🏢 Agencia Partner' : '💼 Asesor Interno'}
+                              {d.advisorType === 'partner_agency' ? (isEn ? '🏢 Partner Agency' : '🏢 Agencia Partner') : (isEn ? '💼 Internal Advisor' : '💼 Asesor Interno')}
                             </span>
 
                             <span className="text-[10px] text-slate-500 font-mono ml-auto">
@@ -3312,7 +3731,7 @@ export default function LocalStudioPage() {
                                 Score: {d.data.healthScore}/100
                               </span>
                               <span className="text-[10px] text-slate-500">
-                                {d.data.healthScore < 50 ? 'Oportunidad de Venta Alta' : 'Perfil Optimizado'}
+                                {d.data.healthScore < 50 ? (isEn ? 'High Sales Closing Opportunity' : 'Oportunidad de Venta Alta') : (isEn ? 'Optimized Profile' : 'Perfil Optimizado')}
                               </span>
                             </div>
                           )}
@@ -3333,7 +3752,7 @@ export default function LocalStudioPage() {
                               onClick={() => handleLoadDossier(d)}
                               className="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20 active:scale-98"
                             >
-                              <span>👁️ Cargar y Ver</span>
+                              <span>{isEn ? '👁️ Load & View' : '👁️ Cargar y Ver'}</span>
                             </button>
 
                             {d.data?.whatsappOnboardingMessage && (
@@ -3341,7 +3760,7 @@ export default function LocalStudioPage() {
                                 href={`https://wa.me/?text=${encodeURIComponent(d.data.whatsappOnboardingMessage)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                title="Enviar Kit por WhatsApp"
+                                title={isEn ? 'Send Kit via WhatsApp' : 'Enviar Kit por WhatsApp'}
                                 className="p-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 transition cursor-pointer"
                               >
                                 <MessageSquare className="w-4 h-4" />
@@ -3351,7 +3770,7 @@ export default function LocalStudioPage() {
                             <button
                               type="button"
                               onClick={() => handleDeleteDossier(d.id)}
-                              title="Eliminar Expediente"
+                              title={isEn ? 'Delete Dossier' : 'Eliminar Expediente'}
                               className="p-2 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-950/30 transition cursor-pointer"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -3369,9 +3788,9 @@ export default function LocalStudioPage() {
             {networkSubView === 'register' && (
               <div className="max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl">
                 <div>
-                  <h3 className="text-lg font-black text-white">Registrar Nueva Cuenta en la Red</h3>
+                  <h3 className="text-lg font-black text-white">{tNetwork.registerTitle}</h3>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Elige si vas a registrar un vendedor de tu equipo propio o una agencia aliada con cuota mensual.
+                    {tNetwork.registerDesc}
                   </p>
                 </div>
 
@@ -3387,7 +3806,7 @@ export default function LocalStudioPage() {
                     }`}
                   >
                     <Briefcase className="w-4 h-4" />
-                    <span>💼 Asesor Comercial Propio</span>
+                    <span>{tNetwork.optAdvisor}</span>
                   </button>
 
                   <button
@@ -3400,7 +3819,7 @@ export default function LocalStudioPage() {
                     }`}
                   >
                     <Building2 className="w-4 h-4" />
-                    <span>🏢 Agencia Partner (Licencia)</span>
+                    <span>{tNetwork.optAgency}</span>
                   </button>
                 </div>
 
@@ -3408,8 +3827,8 @@ export default function LocalStudioPage() {
                   <div>
                     <label className="block font-bold text-slate-300 mb-1">
                       {newAccountType === 'partner_agency'
-                        ? 'Razón Social o Nombre de la Agencia *'
-                        : 'Nombre Completo del Asesor *'}
+                        ? (isEn ? 'Partner Agency Business Name *' : 'Razón Social o Nombre de la Agencia *')
+                        : (isEn ? 'Sales Advisor Full Name *' : 'Nombre Completo del Asesor *')}
                     </label>
                     <input
                       type="text"
@@ -3417,8 +3836,8 @@ export default function LocalStudioPage() {
                       onChange={(e) => setNewAdvisorName(e.target.value)}
                       placeholder={
                         newAccountType === 'partner_agency'
-                          ? 'Ej: Agencia Digital Rocket 360'
-                          : 'Ej: Carlos Gómez'
+                          ? (isEn ? 'e.g. Apex Local Growth Agency' : 'Ej: Agencia Digital Rocket 360')
+                          : (isEn ? 'e.g. Michael Smith' : 'Ej: Carlos Gómez')
                       }
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                     />
@@ -3426,23 +3845,23 @@ export default function LocalStudioPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">País Sede *</label>
+                      <label className="block font-bold text-slate-300 mb-1">{tNetwork.countryLabel} *</label>
                       <input
                         type="text"
                         value={newAdvisorCountry}
                         onChange={(e) => setNewAdvisorCountry(e.target.value)}
-                        placeholder="Colombia, México, España..."
+                        placeholder={isEn ? 'USA, Mexico, Spain...' : 'Colombia, México, España...'}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                       />
                     </div>
 
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">Ciudad Sede *</label>
+                      <label className="block font-bold text-slate-300 mb-1">{tNetwork.cityLabel} *</label>
                       <input
                         type="text"
                         value={newAdvisorCity}
                         onChange={(e) => setNewAdvisorCity(e.target.value)}
-                        placeholder="Bogotá, Medellín, CDMX..."
+                        placeholder={isEn ? 'Miami, Austin, CDMX...' : 'Bogotá, Medellín, CDMX...'}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                       />
                     </div>
@@ -3450,18 +3869,18 @@ export default function LocalStudioPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">Usuario de Acceso *</label>
+                      <label className="block font-bold text-slate-300 mb-1">{tNetwork.userLabel}</label>
                       <input
                         type="text"
                         value={newAdvisorUser}
                         onChange={(e) => setNewAdvisorUser(e.target.value)}
-                        placeholder="ej: carlos o rocketagency"
+                        placeholder={isEn ? 'e.g. michael or apexagency' : 'ej: carlos o rocketagency'}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white lowercase focus:outline-none focus:border-amber-400"
                       />
                     </div>
 
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">Contraseña *</label>
+                      <label className="block font-bold text-slate-300 mb-1">{tNetwork.passLabel}</label>
                       <input
                         type="text"
                         value={newAdvisorPass}
@@ -3474,13 +3893,13 @@ export default function LocalStudioPage() {
 
                   <div>
                     <label className="block font-bold text-slate-300 mb-1">
-                      WhatsApp de Contacto (Para firmar expedientes)
+                      {tNetwork.phoneLabel}
                     </label>
                     <input
                       type="text"
                       value={newAdvisorPhone}
                       onChange={(e) => setNewAdvisorPhone(e.target.value)}
-                      placeholder="+573001234567 o +52..."
+                      placeholder="+13051234567 o +57..."
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                     />
                   </div>
@@ -3490,12 +3909,12 @@ export default function LocalStudioPage() {
                     <div className="p-4 rounded-2xl bg-purple-950/40 border border-purple-500/40 space-y-3">
                       <div className="flex items-center gap-2 text-purple-300 font-black">
                         <DollarSign className="w-4 h-4" />
-                        <span>Configuración de Licencia Mensual B2B:</span>
+                        <span>{isEn ? 'B2B Monthly Software License Settings:' : 'Configuración de Licencia Mensual B2B:'}</span>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="block font-bold text-slate-300 mb-1">Cuota Mensual Pactada (USD)</label>
+                          <label className="block font-bold text-slate-300 mb-1">{tNetwork.monthlyFeeLabel}</label>
                           <input
                             type="number"
                             value={newAdvisorMonthlyFee}
@@ -3506,14 +3925,14 @@ export default function LocalStudioPage() {
                         </div>
 
                         <div>
-                          <label className="block font-bold text-slate-300 mb-1">Estado de Licencia</label>
+                          <label className="block font-bold text-slate-300 mb-1">{tNetwork.licenseStatusLabel}</label>
                           <select
                             value={newAdvisorLicenseStatus}
                             onChange={(e) => setNewAdvisorLicenseStatus(e.target.value as any)}
                             className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-purple-500/50 text-white focus:outline-none"
                           >
-                            <option value="active">✅ Activa y al día</option>
-                            <option value="pending_payment">⏳ Pendiente de Pago</option>
+                            <option value="active">{isEn ? '✅ Active (Paid)' : '✅ Activa y al día'}</option>
+                            <option value="pending_payment">{isEn ? '⏳ Payment Pending' : '⏳ Pendiente de Pago'}</option>
                           </select>
                         </div>
                       </div>
@@ -3521,7 +3940,7 @@ export default function LocalStudioPage() {
                   )}
 
                   <div>
-                    <label className="block font-bold text-slate-300 mb-1">Clave Maestra de Dueño (Luisma) *</label>
+                    <label className="block font-bold text-slate-300 mb-1">{isEn ? 'Founder Master Key (Luisma) *' : 'Clave Maestra de Dueño (Luisma) *'}</label>
                     <input
                       type="password"
                       value={adminMasterKey}
@@ -3537,10 +3956,10 @@ export default function LocalStudioPage() {
                     className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg active:scale-98"
                   >
                     {isSavingAdvisor
-                      ? 'Registrando...'
+                      ? (isEn ? 'Saving...' : 'Registrando...')
                       : newAccountType === 'partner_agency'
-                      ? '🚀 Activar Licencia de Agencia Partner'
-                      : '+ Crear Asesor Comercial'}
+                      ? (isEn ? '🚀 Activate Partner Agency License' : '🚀 Activar Licencia de Agencia Partner')
+                      : (isEn ? '+ Create Sales Advisor' : '+ Crear Asesor Comercial')}
                   </button>
                 </form>
               </div>
@@ -3571,12 +3990,12 @@ export default function LocalStudioPage() {
                                     : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
                                 }`}
                               >
-                                {adv.accountType === 'partner_agency' ? '🏢 Agencia Partner' : '💼 Asesor Interno'}
+                                {adv.accountType === 'partner_agency' ? (isEn ? '🏢 Partner Agency' : '🏢 Agencia Partner') : (isEn ? '💼 Internal Advisor' : '💼 Asesor Interno')}
                               </span>
 
                               {adv.accountType === 'partner_agency' && (
                                 <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                                  ${adv.monthlyFeeUsd || 49} USD/mes
+                                  ${adv.monthlyFeeUsd || 49} {isEn ? 'USD/mo' : 'USD/mes'}
                                 </span>
                               )}
                             </div>
@@ -3599,12 +4018,12 @@ export default function LocalStudioPage() {
 
                             <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
                               <span className="text-[10px] font-bold text-slate-400 uppercase block">
-                                Cuentas Prospectadas:
+                                {isEn ? 'Prospecting & Audits Record:' : 'Cuentas Prospectadas:'}
                               </span>
                               <div className="flex items-center justify-between text-xs font-black text-white">
-                                <span>{advisorDossiers.length} Expedientes</span>
+                                <span>{advisorDossiers.length} {isEn ? 'Dossiers' : 'Expedientes'}</span>
                                 <span className="text-[10px] text-slate-400 font-normal">
-                                  ({createsCount} nuevas, {auditsCount} auditorías)
+                                  ({createsCount} {isEn ? 'new' : 'nuevas'}, {auditsCount} {isEn ? 'audits' : 'auditorías'})
                                 </span>
                               </div>
                             </div>
@@ -3615,11 +4034,11 @@ export default function LocalStudioPage() {
                             onClick={() => {
                               setNetworkAdvisorFilter(adv.id);
                               setNetworkSubView('monitor');
-                              showToast(`Filtrando cuentas de ${adv.name}`);
+                              showToast(isEn ? `Filtering dossiers for ${adv.name}` : `Filtrando cuentas de ${adv.name}`);
                             }}
                             className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-white font-black text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-md active:scale-98"
                           >
-                            <span>Ver Expedientes en Monitor</span>
+                            <span>{isEn ? 'View Dossiers in Monitor' : 'Ver Expedientes en Monitor'}</span>
                             <ArrowRight className="w-3.5 h-3.5" />
                           </button>
                         </div>
@@ -3642,7 +4061,7 @@ export default function LocalStudioPage() {
                 onClick={() => setShowAuthModal(false)}
                 className="absolute top-4 right-4 text-slate-500 hover:text-white text-xs font-bold px-2 py-1 rounded-lg hover:bg-slate-800 transition cursor-pointer"
               >
-                ✕ Cerrar
+                {tAuth.close}
               </button>
             )}
 
@@ -3651,14 +4070,14 @@ export default function LocalStudioPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-black text-white">Ingreso a Prestigia Local Studio</h3>
-              <p className="text-xs text-slate-400 mt-0.5">Selecciona tu perfil de acceso o ingresa con tus credenciales</p>
+              <h3 className="text-lg font-black text-white">{tAuth.title}</h3>
+              <p className="text-xs text-slate-400 mt-0.5">{tAuth.subtitle}</p>
             </div>
 
             {/* Quick 1-Click Selectors */}
             <div className="space-y-2 pt-1 text-left">
               <span className="text-[10px] font-black tracking-wider uppercase text-slate-400 block px-1">
-                Acceso Rápido Directo:
+                {tAuth.quickAccess}
               </span>
 
               <button
@@ -3673,9 +4092,9 @@ export default function LocalStudioPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-black text-amber-200 text-xs">Luisma • Director General</span>
-                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-500 text-slate-950">FOUNDER</span>
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-500 text-slate-950">{tAuth.founderRole}</span>
                     </div>
-                    <span className="text-[10px] text-slate-400 block">Acceso total + Gestión de asesores + Control de expedientes</span>
+                    <span className="text-[10px] text-slate-400 block">{tAuth.founderDesc}</span>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-amber-400 group-hover:translate-x-0.5 transition" />
@@ -3693,9 +4112,9 @@ export default function LocalStudioPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-black text-indigo-200 text-xs">Carlos • Consultor Comercial</span>
-                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">ASESOR</span>
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">{tAuth.advisorRole}</span>
                     </div>
-                    <span className="text-[10px] text-slate-400 block">Vista comercial de ventas + Generador Top 3</span>
+                    <span className="text-[10px] text-slate-400 block">{tAuth.advisorDesc}</span>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-indigo-400 group-hover:translate-x-0.5 transition" />
@@ -3704,24 +4123,24 @@ export default function LocalStudioPage() {
 
             <div className="flex items-center gap-2 my-2">
               <div className="flex-1 h-px bg-slate-800" />
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">o ingresar otro asesor</span>
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{tAuth.orCredentials}</span>
               <div className="flex-1 h-px bg-slate-800" />
             </div>
 
             <form onSubmit={handleLogin} className="space-y-3 text-left text-xs">
               <div>
-                <label className="block font-bold text-slate-300 mb-1">Usuario</label>
+                <label className="block font-bold text-slate-300 mb-1">{tAuth.usernameLabel}</label>
                 <input
                   type="text"
                   value={loginUsername}
                   onChange={(e) => setLoginUsername(e.target.value)}
-                  placeholder="ej: carlos o tu usuario"
+                  placeholder={isEn ? 'e.g. carlos or your username' : 'ej: carlos o tu usuario'}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-300 mb-1">Contraseña</label>
+                <label className="block font-bold text-slate-300 mb-1">{tAuth.passwordLabel}</label>
                 <input
                   type="password"
                   value={loginPassword}
@@ -3738,7 +4157,7 @@ export default function LocalStudioPage() {
                 disabled={isLoggingIn}
                 className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition cursor-pointer border border-slate-700 active:scale-98"
               >
-                {isLoggingIn ? 'Verificando...' : 'Iniciar Sesión con Contraseña'}
+                {isLoggingIn ? tAuth.verifying : tAuth.btnLogin}
               </button>
             </form>
           </div>
