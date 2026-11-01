@@ -42,6 +42,7 @@ import {
   Compass,
   FileCheck,
   Upload,
+  Eye,
 } from 'lucide-react';
 
 interface StudioAdvisorUser {
@@ -330,13 +331,14 @@ const UI_TEXT = {
 const TXT_TOOLS = {
   es: {
     badge: 'Arsenal de Cierre de Alto Valor • Estilo BrightLocal & Local Falcon',
-    title: '4 Armas de Dominio Local & Cierre Comercial',
+    title: '5 Armas de Dominio Local & Cierre Comercial',
     desc: 'Herramientas de venta visual y optimización forense para demostrarle al cliente cuánto dinero está perdiendo hoy y cómo Prestigia lo posiciona en la cima.',
     activeAlgo: '⚡ Algoritmo 2026 Activo',
     tab1: '1. Simulador Geo-Grid 3x3',
     tab2: '2. Calculadora de Pérdida Financiera (ROI)',
     tab3: '3. Inyector de Geo-Tagging EXIF',
     tab4: '4. Hub de Citaciones USA & LatAm',
+    tab5: '5. Rival Spy (Cara a Cara)',
     geogridTitle: '🗺️ Simulador de Posición Geo-Grid 3x3 (Local Falcon Style)',
     geogridDesc: 'Demuestra visualmente cómo cae el ranking del cliente a medida que nos alejamos de su ubicación.',
     radiusLabel: 'Radio',
@@ -386,16 +388,35 @@ const TXT_TOOLS = {
     citationsDesc: 'Directorio oficial para verificar la consistencia de los datos del cliente en internet y blindar su autoridad frente al algoritmo.',
     citationsUsa: 'Directorio Top de Citaciones EE.UU.',
     citationsLatam: 'Directorio Top de Citaciones LatAm',
+    spyTitle: '🥊 Rival Spy: Radar de Espionaje Cara a Cara',
+    spyDesc: 'Compara a tu cliente frente a su competidor #1 en Google Maps y genera la radiografía exacta para destronarlo en el Top 3.',
+    spyClientCol: 'Tu Negocio (Cliente)',
+    spyRivalCol: 'Competidor Líder #1',
+    spyRivalPlaceholder: 'ej: Clínica Dental Élite o Rival Principal',
+    spyMetricRating: 'Calificación Google Maps',
+    spyMetricReviews: 'Volumen de Reseñas',
+    spyMetricWeekly: 'Velocidad Semanal Actual',
+    spyMetricPhotos: 'Fotos en Ficha',
+    spyVerdictTitle: 'Radiografía Algorítmica & Veredicto Prestigia',
+    spyAttackPlan: 'Plan de Destronamiento en 3 Movimientos Tácticos:',
+    spyMove1: 'Acelerador de Reseñas 5★ con Dispositivos NFC Prestigia (+8 reseñas semanales para quebrar su ventaja)',
+    spyMove2: 'Inyección de 5 Subcategorías Secundarias que el rival no tiene registradas',
+    spyMove3: 'Booster de 30 Días de Google Posts & Geo-Tagging para superar su frescura algorítmica',
+    spyPitchBox: 'Argumento de Cierre para el Asesor Comercial:',
+    spyPitchText: (client: string, rival: string, weeks: number) =>
+      `"Mire ${client || 'Don Cliente'}, ${rival || 'su competidor'} no ofrece mejor servicio que usted; simplemente tiene ${weeks} semanas de ventaja algorítmica en volumen de reseñas. Al activar Prestigia y nuestros dispositivos inteligentes NFC, su velocidad semanal superará a la de ellos en un 300% y en menos de 90 días Google lo colocará a usted de #1."`,
+    spyBtnCopyPitch: 'Copiar Argumento de Cierre',
   },
   en: {
     badge: 'High-Value Conversion Arsenal • BrightLocal & Local Falcon Style',
-    title: '4 Local Dominance & Commercial Closing Weapons',
+    title: '5 Local Dominance & Commercial Closing Weapons',
     desc: 'Visual sales and forensic optimization tools showing clients how much revenue they are losing today and how Prestigia positions them at the top.',
     activeAlgo: '⚡ 2026 Algorithm Active',
     tab1: '1. 3x3 Geo-Grid Heatmap',
     tab2: '2. Financial Loss Calculator (ROI)',
     tab3: '3. EXIF Geo-Tagging Injector',
     tab4: '4. Citations Directory (USA/LatAm)',
+    tab5: '5. Rival Spy (Head-to-Head)',
     geogridTitle: '🗺️ 3x3 Geo-Grid Position Heatmap (Local Falcon Style)',
     geogridDesc: 'Visually demonstrates how the client’s ranking drops as distance increases from their location.',
     radiusLabel: 'Radius',
@@ -445,6 +466,24 @@ const TXT_TOOLS = {
     citationsDesc: 'Official directory to verify client business data consistency across the web and build algorithm trust.',
     citationsUsa: 'Top USA Business Citations Directory',
     citationsLatam: 'Top LatAm Business Citations Directory',
+    spyTitle: '🥊 Rival Spy: Head-to-Head Competitor Radar',
+    spyDesc: 'Compare your client directly against their #1 Google Maps competitor and generate the exact blueprint to dethrone them in the Top 3.',
+    spyClientCol: 'Your Business (Client)',
+    spyRivalCol: 'Target #1 Competitor to Beat',
+    spyRivalPlaceholder: 'e.g. Apex Dental or Top Competitor',
+    spyMetricRating: 'Google Maps Rating',
+    spyMetricReviews: 'Total Reviews Volume',
+    spyMetricWeekly: 'Current Weekly Pace',
+    spyMetricPhotos: 'Photos on Listing',
+    spyVerdictTitle: 'Algorithmic Radiography & Prestigia Verdict',
+    spyAttackPlan: '3 Tactical Dethroning Moves with Prestigia:',
+    spyMove1: '5★ Review Velocity Accelerator with Prestigia Smart NFC Devices (+8 weekly reviews to eliminate their lead)',
+    spyMove2: 'Secondary Category Injection capturing 5 high-intent keywords missing from competitor profile',
+    spyMove3: '30-Day Google Posts Booster & Geo-Tagging to outpace competitor freshness signals',
+    spyPitchBox: 'Advisor Closing Pitch Script:',
+    spyPitchText: (client: string, rival: string, weeks: number) =>
+      `"Take a look ${client || 'Client'}, ${rival || 'your competitor'} does not offer better quality than you; they simply have a ${weeks}-week algorithmic head-start in review volume. Once we activate Prestigia and our Smart NFC devices, your weekly velocity will beat theirs by 300% and Google will push you to #1 in under 90 days."`,
+    spyBtnCopyPitch: 'Copy Closing Pitch',
   },
 };
 
@@ -892,8 +931,8 @@ export default function LocalStudioPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedData, setGeneratedData] = useState<BlueprintData | null>(null);
 
-  // 4 Elite Local SEO Power Tools State
-  const [toolsActiveTab, setToolsActiveTab] = useState<'geogrid' | 'roicalc' | 'geotag' | 'citations'>('geogrid');
+  // 5 Elite Local SEO Power Tools State
+  const [toolsActiveTab, setToolsActiveTab] = useState<'geogrid' | 'roicalc' | 'geotag' | 'citations' | 'rivalspy'>('geogrid');
   const [geoGridRadius, setGeoGridRadius] = useState<'1km' | '3km' | '5km'>('3km');
   const [roiAverageTicket, setRoiAverageTicket] = useState<number>(65);
   const [roiCurrentRank, setRoiCurrentRank] = useState<number>(8);
@@ -901,6 +940,13 @@ export default function LocalStudioPage() {
   const [geoTagFilename, setGeoTagFilename] = useState('');
   const [geoTagKeywords, setGeoTagKeywords] = useState('');
   const [geoTagResult, setGeoTagResult] = useState<string | null>(null);
+
+  // Rival Spy (Head-to-Head Competitor Radar) State
+  const [rivalName, setRivalName] = useState('Competidor Líder');
+  const [rivalRating, setRivalRating] = useState<number>(4.8);
+  const [rivalReviews, setRivalReviews] = useState<number>(185);
+  const [rivalWeeklyPace, setRivalWeeklyPace] = useState<number>(3);
+  const [rivalPhotos, setRivalPhotos] = useState<number>(65);
 
   // White-label Custom Logo State
   const [customLogoUrl, setCustomLogoUrl] = useState<string>('');
@@ -2871,18 +2917,18 @@ export default function LocalStudioPage() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
-                    {lang === 'en' ? 'High-Value Conversion Arsenal • BrightLocal & Local Falcon Style' : 'Arsenal de Cierre de Alto Valor • Estilo BrightLocal & Local Falcon'}
+                    {tTools.badge}
                   </span>
                   <h1 className="text-xl sm:text-2xl font-black text-white">
-                    {lang === 'en' ? '4 Local Dominance & Commercial Closing Weapons' : '4 Armas de Dominio Local & Cierre Comercial'}
+                    {tTools.title}
                   </h1>
                   <p className="text-xs text-slate-300 max-w-2xl">
-                    {lang === 'en' ? 'Visual sales and forensic optimization tools showing clients how much revenue they are losing today and how Prestigia positions them at the top.' : 'Herramientas de venta visual y optimización forense para demostrarle al cliente cuánto dinero está perdiendo hoy y cómo Prestigia lo posiciona en la cima.'}
+                    {tTools.desc}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-emerald-400 font-bold bg-emerald-950/80 border border-emerald-500/30 px-3 py-1.5 rounded-xl">
-                    {lang === 'en' ? '⚡ 2026 Algorithm Active' : '⚡ Algoritmo 2026 Activo'}
+                    {tTools.activeAlgo}
                   </span>
                 </div>
               </div>
@@ -2900,7 +2946,7 @@ export default function LocalStudioPage() {
                 }`}
               >
                 <Crosshair className="w-3.5 h-3.5" />
-                <span>{lang === 'en' ? '1. 3x3 Geo-Grid Heatmap' : '1. Simulador Geo-Grid 3x3'}</span>
+                <span>{tTools.tab1}</span>
               </button>
 
               <button
@@ -2913,7 +2959,7 @@ export default function LocalStudioPage() {
                 }`}
               >
                 <Calculator className="w-3.5 h-3.5" />
-                <span>{lang === 'en' ? '2. Financial Loss Calculator (ROI)' : '2. Calculadora de Pérdida Financiera (ROI)'}</span>
+                <span>{tTools.tab2}</span>
               </button>
 
               <button
@@ -2926,7 +2972,7 @@ export default function LocalStudioPage() {
                 }`}
               >
                 <Compass className="w-3.5 h-3.5" />
-                <span>{lang === 'en' ? '3. EXIF Geo-Tagging Injector' : '3. Inyector de Geo-Tagging EXIF'}</span>
+                <span>{tTools.tab3}</span>
               </button>
 
               <button
@@ -2939,7 +2985,20 @@ export default function LocalStudioPage() {
                 }`}
               >
                 <FileCheck className="w-3.5 h-3.5" />
-                <span>{lang === 'en' ? '4. Citations Directory (USA/LatAm)' : '4. Hub de Citaciones USA & LatAm'}</span>
+                <span>{tTools.tab4}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setToolsActiveTab('rivalspy')}
+                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                  toolsActiveTab === 'rivalspy'
+                    ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
+                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>{tTools.tab5}</span>
               </button>
             </div>
 
@@ -3278,6 +3337,298 @@ export default function LocalStudioPage() {
                     </ul>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* TOOL 5: RIVAL SPY - RADAR DE ESPIONAJE CARA A CARA */}
+            {toolsActiveTab === 'rivalspy' && (
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 animate-in fade-in duration-200">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                  <div>
+                    <h3 className="text-base font-black text-white flex items-center gap-2">
+                      <span>{tTools.spyTitle}</span>
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {tTools.spyDesc}
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-black uppercase text-rose-300 bg-rose-950 px-2.5 py-1 rounded-full border border-rose-500/40">
+                    {isEn ? '⚔️ Head-to-Head Battle' : '⚔️ Batalla Cara a Cara'}
+                  </span>
+                </div>
+
+                {/* Dual Business Setup (Client vs Competitor) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                  {/* Left: Your Client */}
+                  <div className="p-5 rounded-2xl bg-slate-950 border border-emerald-500/40 space-y-3 relative overflow-hidden">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                      <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">
+                        {tTools.spyClientCol}
+                      </span>
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30">
+                        {isEn ? 'Your Profile' : 'Tu Ficha'}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      <div>
+                        <label className="block text-slate-400 font-bold mb-1">
+                          {isEn ? 'Business Name' : 'Nombre del Negocio'}
+                        </label>
+                        <input
+                          type="text"
+                          value={businessName || 'Tu Negocio'}
+                          onChange={(e) => setBusinessName(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-bold text-xs focus:outline-none focus:border-emerald-400"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-slate-400 font-bold mb-1">
+                            {tTools.spyMetricRating}
+                          </label>
+                          <input
+                            type="number"
+                            step="0.1"
+                            min="1"
+                            max="5"
+                            value={existingRating}
+                            onChange={(e) => setExistingRating(Number(e.target.value))}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-amber-300 font-black text-xs focus:outline-none focus:border-emerald-400"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-slate-400 font-bold mb-1">
+                            {tTools.spyMetricReviews}
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={existingReviews}
+                            onChange={(e) => setExistingReviews(Number(e.target.value))}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-black text-xs focus:outline-none focus:border-emerald-400"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-slate-400 font-bold mb-1">
+                            {tTools.spyMetricWeekly}
+                          </label>
+                          <div className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 font-bold text-xs flex items-center justify-between">
+                            <span>+1 / sem</span>
+                            <span className="text-[9px] text-slate-500 font-normal">{isEn ? 'Organic' : 'Orgánico'}</span>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-slate-400 font-bold mb-1">
+                            {tTools.spyMetricPhotos}
+                          </label>
+                          <div className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 font-bold text-xs flex items-center justify-between">
+                            <span>14 {isEn ? 'photos' : 'fotos'}</span>
+                            <span className="text-[9px] text-slate-500 font-normal">{isEn ? 'Current' : 'Actuales'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right: The Target Rival */}
+                  <div className="p-5 rounded-2xl bg-slate-950 border border-rose-500/40 space-y-3 relative overflow-hidden">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                      <span className="text-[10px] font-black uppercase text-rose-400 tracking-wider">
+                        {tTools.spyRivalCol}
+                      </span>
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/30">
+                        {isEn ? 'Current #1 in Maps' : 'Actual #1 en Maps'}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      <div>
+                        <label className="block text-slate-400 font-bold mb-1">
+                          {isEn ? 'Rival Name' : 'Nombre del Rival'}
+                        </label>
+                        <input
+                          type="text"
+                          value={rivalName}
+                          onChange={(e) => setRivalName(e.target.value)}
+                          placeholder={tTools.spyRivalPlaceholder}
+                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-rose-200 font-bold text-xs focus:outline-none focus:border-rose-400"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-slate-400 font-bold mb-1">
+                            {tTools.spyMetricRating}
+                          </label>
+                          <input
+                            type="number"
+                            step="0.1"
+                            min="1"
+                            max="5"
+                            value={rivalRating}
+                            onChange={(e) => setRivalRating(Number(e.target.value))}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-amber-300 font-black text-xs focus:outline-none focus:border-rose-400"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-slate-400 font-bold mb-1">
+                            {tTools.spyMetricReviews}
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={rivalReviews}
+                            onChange={(e) => setRivalReviews(Number(e.target.value))}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-black text-xs focus:outline-none focus:border-rose-400"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-slate-400 font-bold mb-1">
+                            {tTools.spyMetricWeekly}
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={rivalWeeklyPace}
+                            onChange={(e) => setRivalWeeklyPace(Number(e.target.value))}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-rose-300 font-black text-xs focus:outline-none focus:border-rose-400"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-slate-400 font-bold mb-1">
+                            {tTools.spyMetricPhotos}
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={rivalPhotos}
+                            onChange={(e) => setRivalPhotos(Number(e.target.value))}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-200 font-black text-xs focus:outline-none focus:border-rose-400"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Head-to-Head Comparison & Algorithm Metrics */}
+                {(() => {
+                  const reviewGap = Math.max(0, rivalReviews - (existingReviews || 0));
+                  const netVelocity = Math.max(1, 8 - rivalWeeklyPace);
+                  const weeksToSurpass = Math.max(3, Math.ceil(reviewGap / netVelocity));
+
+                  return (
+                    <div className="space-y-4">
+                      {/* Metric Comparison Cards */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
+                          <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
+                            {isEn ? 'Review Gap' : 'Brecha de Reseñas'}
+                          </span>
+                          <strong className="text-xl font-black text-rose-400">
+                            +{reviewGap}
+                          </strong>
+                          <span className="text-[10px] text-slate-500 block mt-0.5">
+                            {isEn ? 'in favor of rival' : 'a favor del rival'}
+                          </span>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
+                          <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
+                            {isEn ? 'Pace Advantage' : 'Ventaja con Prestigia'}
+                          </span>
+                          <strong className="text-xl font-black text-emerald-400">
+                            +8 / sem
+                          </strong>
+                          <span className="text-[10px] text-slate-500 block mt-0.5">
+                            {isEn ? `vs +${rivalWeeklyPace} rival pace` : `vs +${rivalWeeklyPace} del rival`}
+                          </span>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
+                          <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
+                            {isEn ? 'Time to Overtake' : 'Tiempo para Destronar'}
+                          </span>
+                          <strong className="text-xl font-black text-amber-400">
+                            {weeksToSurpass} {isEn ? 'weeks' : 'semanas'}
+                          </strong>
+                          <span className="text-[10px] text-slate-500 block mt-0.5">
+                            ~{Math.ceil(weeksToSurpass / 4)} {isEn ? 'months' : 'meses'}
+                          </span>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
+                          <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
+                            {isEn ? 'Photo Gap' : 'Déficit Visual'}
+                          </span>
+                          <strong className="text-xl font-black text-indigo-400">
+                            +{Math.max(0, rivalPhotos - 14)}
+                          </strong>
+                          <span className="text-[10px] text-slate-500 block mt-0.5">
+                            {isEn ? 'photos needed' : 'fotos a cargar'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Tactical Attack Plan */}
+                      <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/40 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                          <h4 className="font-black text-white text-sm">
+                            {tTools.spyAttackPlan}
+                          </h4>
+                        </div>
+                        <div className="space-y-2 text-xs">
+                          <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-2.5">
+                            <span className="font-black text-emerald-400">1.</span>
+                            <span className="text-slate-300">{tTools.spyMove1}</span>
+                          </div>
+                          <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-2.5">
+                            <span className="font-black text-amber-400">2.</span>
+                            <span className="text-slate-300">{tTools.spyMove2}</span>
+                          </div>
+                          <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-2.5">
+                            <span className="font-black text-indigo-400">3.</span>
+                            <span className="text-slate-300">{tTools.spyMove3}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Advisor Closing Pitch */}
+                      <div className="p-5 rounded-2xl bg-slate-950 border border-amber-500/40 space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider">
+                            {tTools.spyPitchBox}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              copyToClipboard(
+                                tTools.spyPitchText(businessName, rivalName, weeksToSurpass),
+                                isEn ? 'Closing Pitch' : 'Argumento de Cierre'
+                              )
+                            }
+                            className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>{tTools.spyBtnCopyPitch}</span>
+                          </button>
+                        </div>
+                        <p className="text-xs text-slate-300 italic leading-relaxed">
+                          {tTools.spyPitchText(businessName, rivalName, weeksToSurpass)}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
           </div>
