@@ -75,6 +75,59 @@ export interface StudioDossier {
   updatedAt: string;
 }
 
+export interface StudioLandingPage {
+  id: string;
+  slug: string;
+  advisorId: string;
+  advisorName: string;
+  advisorPhone?: string;
+  businessName: string;
+  category: string;
+  city: string;
+  phone: string;
+  whatsappMessage?: string;
+  status: 'active' | 'suspended';
+  theme: {
+    primaryColor: string;
+    accentColor: string;
+    bgColor?: string;
+    template: 'executive_dark' | 'medical_clean' | 'gourmet_warm' | 'high_impact_orange';
+  };
+  headline: string;
+  subheadline: string;
+  callToAction: string;
+  offerBadge?: string;
+  offerCountdownHours?: number;
+  services: Array<{
+    name: string;
+    description: string;
+    price?: string;
+    tag?: string;
+  }>;
+  reviews: Array<{
+    author: string;
+    rating: number;
+    text: string;
+    date: string;
+  }>;
+  testimonials: Array<{
+    name: string;
+    role: string;
+    quote: string;
+  }>;
+  features: {
+    showLiveOpen: boolean;
+    showUrgencyBanner: boolean;
+    showFomoPopups: boolean;
+    showReviewCarousel: boolean;
+    showWazeButton: boolean;
+    showPrestigiaBadge: boolean;
+  };
+  address?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface DatabaseSchema {
   businesses: Business[];
   feedbacks: Feedback[];
@@ -88,6 +141,7 @@ interface DatabaseSchema {
   exchangeRates?: ExchangeRatesRecord;
   studioAdvisors?: StudioAdvisor[];
   studioDossiers?: StudioDossier[];
+  studioLandingPages?: StudioLandingPage[];
 }
 
 export interface ExchangeRatesRecord {
@@ -1397,6 +1451,42 @@ export async function deleteStudioDossier(dossierId: string): Promise<boolean> {
   const db = ensureDbFile();
   if (!db.studioDossiers) return false;
   db.studioDossiers = db.studioDossiers.filter((d) => d.id !== dossierId);
+  writeDbFile(db);
+  return true;
+}
+
+export async function getAllStudioLandingPages(): Promise<StudioLandingPage[]> {
+  const db = ensureDbFile();
+  if (!db.studioLandingPages) {
+    db.studioLandingPages = [];
+    writeDbFile(db);
+  }
+  return db.studioLandingPages;
+}
+
+export async function getStudioLandingPageBySlug(slug: string): Promise<StudioLandingPage | null> {
+  const db = ensureDbFile();
+  if (!db.studioLandingPages) return null;
+  const match = db.studioLandingPages.find((p) => p.slug.toLowerCase() === slug.toLowerCase());
+  return match || null;
+}
+
+export async function saveStudioLandingPage(page: StudioLandingPage): Promise<void> {
+  const db = ensureDbFile();
+  if (!db.studioLandingPages) db.studioLandingPages = [];
+  const idx = db.studioLandingPages.findIndex((p) => p.id === page.id || p.slug === page.slug);
+  if (idx >= 0) {
+    db.studioLandingPages[idx] = { ...page, updatedAt: new Date().toISOString() };
+  } else {
+    db.studioLandingPages.unshift(page);
+  }
+  writeDbFile(db);
+}
+
+export async function deleteStudioLandingPage(idOrSlug: string): Promise<boolean> {
+  const db = ensureDbFile();
+  if (!db.studioLandingPages) return false;
+  db.studioLandingPages = db.studioLandingPages.filter((p) => p.id !== idOrSlug && p.slug !== idOrSlug);
   writeDbFile(db);
   return true;
 }
