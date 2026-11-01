@@ -155,28 +155,78 @@ export default function LocalStudioPage() {
   };
 
   // Check persisted session
+  // Check persisted session
   useEffect(() => {
     try {
       const stored = localStorage.getItem('prestigia_studio_advisor');
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed && parsed.id) {
+          // If stored was old default Luisma without explicit choice, upgrade to Brayan Director General
+          const explicit = localStorage.getItem('prestigia_studio_advisor_explicit');
+          if (parsed.id === 'adv-luisma' && !explicit) {
+            const founderUser: StudioAdvisorUser = {
+              id: 'adv-brayan',
+              name: 'Brayan • Director General & Founder',
+              username: 'brayan',
+              phone: '+573058314049',
+              role: 'admin',
+              active: true,
+            };
+            setCurrentUser(founderUser);
+            localStorage.setItem('prestigia_studio_advisor', JSON.stringify(founderUser));
+            return;
+          }
           setCurrentUser(parsed);
           return;
         }
       }
     } catch {}
-    // Default advisor for frictionless start
-    const defaultUser: StudioAdvisorUser = {
-      id: 'adv-luisma',
-      name: 'Luisma • Consultor Senior',
-      username: 'luisma',
+
+    // Default: Brayan (Director General & Founder) with full admin authority
+    const founderUser: StudioAdvisorUser = {
+      id: 'adv-brayan',
+      name: 'Brayan • Director General & Founder',
+      username: 'brayan',
       phone: '+573058314049',
-      role: 'advisor',
+      role: 'admin',
       active: true,
     };
-    setCurrentUser(defaultUser);
+    setCurrentUser(founderUser);
+    localStorage.setItem('prestigia_studio_advisor', JSON.stringify(founderUser));
   }, []);
+
+  const handleQuickLogin = (roleType: 'brayan' | 'luisma') => {
+    if (roleType === 'brayan') {
+      const founderUser: StudioAdvisorUser = {
+        id: 'adv-brayan',
+        name: 'Brayan • Director General & Founder',
+        username: 'brayan',
+        phone: '+573058314049',
+        role: 'admin',
+        active: true,
+      };
+      setCurrentUser(founderUser);
+      localStorage.setItem('prestigia_studio_advisor', JSON.stringify(founderUser));
+      localStorage.setItem('prestigia_studio_advisor_explicit', 'true');
+      setShowAuthModal(false);
+      showToast('👑 Perfil activo: Brayan • Director General & Founder');
+    } else {
+      const advisorUser: StudioAdvisorUser = {
+        id: 'adv-luisma',
+        name: 'Luisma • Consultor Senior',
+        username: 'luisma',
+        phone: '+573058314049',
+        role: 'advisor',
+        active: true,
+      };
+      setCurrentUser(advisorUser);
+      localStorage.setItem('prestigia_studio_advisor', JSON.stringify(advisorUser));
+      localStorage.setItem('prestigia_studio_advisor_explicit', 'true');
+      setShowAuthModal(false);
+      showToast('💼 Perfil activo: Luisma • Consultor Comercial');
+    }
+  };
 
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -191,6 +241,7 @@ export default function LocalStudioPage() {
       if (data.success && data.advisor) {
         setCurrentUser(data.advisor);
         localStorage.setItem('prestigia_studio_advisor', JSON.stringify(data.advisor));
+        localStorage.setItem('prestigia_studio_advisor_explicit', 'true');
         setShowAuthModal(false);
         showToast(`¡Bienvenido, ${data.advisor.name}!`);
       } else {
@@ -205,6 +256,7 @@ export default function LocalStudioPage() {
 
   const handleLogout = () => {
     localStorage.removeItem('prestigia_studio_advisor');
+    localStorage.removeItem('prestigia_studio_advisor_explicit');
     setCurrentUser(null);
     setShowAuthModal(true);
   };
@@ -547,29 +599,50 @@ export default function LocalStudioPage() {
         {/* Advisor Controls & Navigation */}
         <div className="flex items-center gap-2.5">
           {currentUser ? (
-            <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-xs">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div
+              className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs border transition shadow-sm ${
+                currentUser.role === 'admin'
+                  ? 'bg-gradient-to-r from-amber-950/60 to-slate-900 border-amber-500/40 text-amber-200'
+                  : 'bg-gradient-to-r from-indigo-950/60 to-slate-900 border-indigo-500/40 text-indigo-200'
+              }`}
+            >
+              <div
+                className={`w-2 h-2 rounded-full animate-pulse ${
+                  currentUser.role === 'admin' ? 'bg-amber-400' : 'bg-emerald-400'
+                }`}
+              />
               <div className="flex flex-col text-left">
-                <span className="font-extrabold text-white text-[11px] leading-tight">{currentUser.name}</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-extrabold text-white text-[11px] leading-tight">{currentUser.name}</span>
+                  <span
+                    className={`text-[9px] font-black uppercase px-1.5 py-0.2 rounded ${
+                      currentUser.role === 'admin'
+                        ? 'bg-amber-500 text-slate-950'
+                        : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
+                    }`}
+                  >
+                    {currentUser.role === 'admin' ? 'DIRECTOR' : 'ASESOR'}
+                  </span>
+                </div>
                 <span className="text-[9px] text-slate-400 font-mono">{currentUser.phone}</span>
               </div>
               <button
                 type="button"
-                onClick={handleLogout}
-                title="Cambiar de Asesor / Salir"
-                className="ml-2 text-slate-500 hover:text-rose-400 transition cursor-pointer text-[10px]"
+                onClick={() => setShowAuthModal(true)}
+                title="Cambiar de perfil (Director / Asesor)"
+                className="ml-2 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer text-[10px] font-bold"
               >
-                Salir
+                Cambiar
               </button>
             </div>
           ) : (
             <button
               type="button"
               onClick={() => setShowAuthModal(true)}
-              className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
             >
               <Lock className="w-3.5 h-3.5" />
-              <span>Ingresar Asesor</span>
+              <span>Ingresar Perfil</span>
             </button>
           )}
 
@@ -1776,17 +1849,80 @@ export default function LocalStudioPage() {
         )}
       </main>
 
-      {/* MODAL: LOGIN DE ASESORES */}
+      {/* MODAL: LOGIN / SELECTOR DE PERFIL */}
       {showAuthModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 print:hidden animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl relative text-center space-y-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative text-center space-y-4">
+            {currentUser && (
+              <button
+                type="button"
+                onClick={() => setShowAuthModal(false)}
+                className="absolute top-4 right-4 text-slate-500 hover:text-white text-xs font-bold px-2 py-1 rounded-lg hover:bg-slate-800 transition cursor-pointer"
+              >
+                ✕ Cerrar
+              </button>
+            )}
+
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center mx-auto shadow-xl">
               <Lock className="w-6 h-6 text-slate-950" />
             </div>
 
             <div>
               <h3 className="text-lg font-black text-white">Ingreso a Prestigia Local Studio</h3>
-              <p className="text-xs text-slate-400 mt-0.5">Acceso exclusivo para consultores y asesores comerciales</p>
+              <p className="text-xs text-slate-400 mt-0.5">Selecciona tu perfil de acceso o ingresa con tus credenciales</p>
+            </div>
+
+            {/* Quick 1-Click Selectors */}
+            <div className="space-y-2 pt-1 text-left">
+              <span className="text-[10px] font-black tracking-wider uppercase text-slate-400 block px-1">
+                Acceso Rápido Directo:
+              </span>
+
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('brayan')}
+                className="w-full p-3 rounded-2xl bg-gradient-to-r from-amber-950/60 to-slate-900 border border-amber-500/50 hover:border-amber-400 flex items-center justify-between text-left transition cursor-pointer group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center text-slate-950 font-black text-base shadow-md group-hover:scale-105 transition">
+                    👑
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-amber-200 text-xs">Brayan • Director General</span>
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-500 text-slate-950">FOUNDER</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 block">Acceso total + Gestión de asesores + Control de expedientes</span>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-amber-400 group-hover:translate-x-0.5 transition" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('luisma')}
+                className="w-full p-3 rounded-2xl bg-gradient-to-r from-indigo-950/60 to-slate-900 border border-indigo-500/40 hover:border-indigo-400 flex items-center justify-between text-left transition cursor-pointer group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-base shadow-md group-hover:scale-105 transition">
+                    💼
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-indigo-200 text-xs">Luisma • Consultor Comercial</span>
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">ASESOR</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 block">Vista comercial de ventas + Generador Top 3</span>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-indigo-400 group-hover:translate-x-0.5 transition" />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 my-2">
+              <div className="flex-1 h-px bg-slate-800" />
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">o ingresar otro asesor</span>
+              <div className="flex-1 h-px bg-slate-800" />
             </div>
 
             <form onSubmit={handleLogin} className="space-y-3 text-left text-xs">
@@ -1796,7 +1932,7 @@ export default function LocalStudioPage() {
                   type="text"
                   value={loginUsername}
                   onChange={(e) => setLoginUsername(e.target.value)}
-                  placeholder="luisma"
+                  placeholder="ej: carlos o tu usuario"
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                 />
               </div>
@@ -1817,15 +1953,11 @@ export default function LocalStudioPage() {
               <button
                 type="submit"
                 disabled={isLoggingIn}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg active:scale-98"
+                className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition cursor-pointer border border-slate-700 active:scale-98"
               >
-                {isLoggingIn ? 'Verificando...' : 'Iniciar Sesión'}
+                {isLoggingIn ? 'Verificando...' : 'Iniciar Sesión con Contraseña'}
               </button>
             </form>
-
-            <div className="pt-2 border-t border-slate-800 text-[10px] text-slate-500">
-              Demo: Usuario: <code className="text-slate-400">luisma</code> | Clave: <code className="text-slate-400">1234</code>
-            </div>
           </div>
         </div>
       )}

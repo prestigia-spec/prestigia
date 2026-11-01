@@ -175,6 +175,16 @@ function ensureDbFile(): DatabaseSchema {
       if (!parsed.studioAdvisors || parsed.studioAdvisors.length === 0) {
         parsed.studioAdvisors = [
           {
+            id: 'adv-brayan',
+            name: 'Brayan • Director General & Founder',
+            username: 'brayan',
+            password: 'admin',
+            phone: '+573058314049',
+            role: 'admin',
+            active: true,
+            createdAt: '2026-01-01T00:00:00.000Z',
+          },
+          {
             id: 'adv-admin',
             name: 'Director General Prestigia',
             username: 'admin',
@@ -1172,6 +1182,16 @@ export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
   const db = ensureDbFile();
   if (!db.studioAdvisors || db.studioAdvisors.length === 0) {
     db.studioAdvisors = [
+      {
+        id: 'adv-brayan',
+        name: 'Brayan • Director General & Founder',
+        username: 'brayan',
+        password: 'admin',
+        phone: '+573058314049',
+        role: 'admin',
+        active: true,
+        createdAt: '2026-01-01T00:00:00.000Z',
+      },
       {
         id: 'adv-admin',
         name: 'Director General Prestigia',

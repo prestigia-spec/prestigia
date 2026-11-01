@@ -6,5 +6,37 @@
   "campaignParticipants": [],
   "leads": [],
   "trafficVisits": [],
-  "emailDispatches": []
+  "emailDispatches": [],
+  "studioAdvisors": [
+    {
+      "id": "adv-brayan",
+      "name": "Brayan • Director General & Founder",
+      "username": "brayan",
+      "password": "admin",
+      "phone": "+573058314049",
+      "role": "admin",
+      "active": true,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "adv-admin",
+      "name": "Director General Prestigia",
+      "username": "admin",
+      "password": "admin",
+      "phone": "+573058314049",
+      "role": "admin",
+      "active": true,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "adv-luisma",
+      "name": "Luisma • Consultor Senior",
+      "username": "luisma",
+      "password": "1234",
+      "phone": "+573058314049",
+      "role": "advisor",
+      "active": true,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    }
+  ]
 }
