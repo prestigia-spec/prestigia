@@ -47,6 +47,7 @@ import {
   Calculator,
   Compass,
   FileCheck,
+  Upload,
 } from 'lucide-react';
 
 interface StudioAdvisorUser {
@@ -908,6 +909,137 @@ export default function LocalStudioPage() {
   const [geoTagFilename, setGeoTagFilename] = useState('');
   const [geoTagKeywords, setGeoTagKeywords] = useState('');
   const [geoTagResult, setGeoTagResult] = useState<string | null>(null);
+
+  // White-label Custom Logo State
+  const [customLogoUrl, setCustomLogoUrl] = useState<string>('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedLogo = localStorage.getItem('prestigia_studio_custom_logo');
+      if (savedLogo) setCustomLogoUrl(savedLogo);
+    }
+  }, []);
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      showToast(isEn ? '⚠️ Logo must be under 2MB' : '⚠️ El logo debe pesar menos de 2MB');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setCustomLogoUrl(result);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('prestigia_studio_custom_logo', result);
+      }
+      showToast(isEn ? '🎨 Custom logo saved for PDF reports!' : '🎨 ¡Logo personalizado guardado para reportes PDF!');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveLogo = () => {
+    setCustomLogoUrl('');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('prestigia_studio_custom_logo');
+    }
+    showToast(isEn ? 'Logo removed' : 'Logo eliminado');
+  };
+
+  // Interactive Implementation Checklist State
+  const [checkedSteps, setCheckedSteps] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && businessName.trim()) {
+      try {
+        const saved = localStorage.getItem(`prestigia_checklist_${businessName.trim()}`);
+        if (saved) {
+          setCheckedSteps(JSON.parse(saved));
+        } else {
+          setCheckedSteps({});
+        }
+      } catch {
+        setCheckedSteps({});
+      }
+    }
+  }, [businessName]);
+
+  const toggleChecklistStep = (stepId: string) => {
+    setCheckedSteps((prev) => {
+      const updated = { ...prev, [stepId]: !prev[stepId] };
+      if (typeof window !== 'undefined' && businessName.trim()) {
+        try {
+          localStorage.setItem(`prestigia_checklist_${businessName.trim()}`, JSON.stringify(updated));
+        } catch {}
+      }
+      return updated;
+    });
+  };
+
+  const checklistItems = useMemo(() => {
+    const isSab = businessModel === 'service_area';
+    return [
+      {
+        id: 'step_title',
+        title: isEn ? '1. Update Official Listing Title with Local SEO formula' : '1. Actualizar Título Oficial con la fórmula Local SEO',
+        desc: isEn ? 'Combines brand + category + city/zone in Google Business Profile' : 'Combina marca + categoría + ciudad/zona en Google Business Profile',
+      },
+      {
+        id: 'step_categories',
+        title: isEn ? '2. Set Primary Category and Secondary Subcategories' : '2. Configurar Categoría Principal y Subcategorías Secundarias',
+        desc: isEn ? 'Ensures maximum algorithmic match for high-intent search queries' : 'Garantiza coincidencia algorítmica para búsquedas de alta intención',
+      },
+      {
+        id: 'step_description',
+        title: isEn ? '3. Publish 745-Character Commercial SEO Description' : '3. Publicar Descripción Comercial SEO de 745 Caracteres',
+        desc: isEn ? 'Includes value proposition, local keywords, and closing call-to-action' : 'Incluye propuesta de valor, palabras clave locales y llamado a la acción',
+      },
+      {
+        id: 'step_catalog',
+        title: isEn ? '4. Upload Star Products & Services in Products tab' : '4. Cargar Productos y Servicios Estrella en la pestaña Productos',
+        desc: isEn ? 'Structured catalog with names, tags, and conversion copy' : 'Catálogo estructurado con nombres, tags y textos de conversión',
+      },
+      {
+        id: 'step_photos',
+        title: isEn ? '5. Upload 8+ Geo-Tagged Photos with SEO Filenames' : '5. Subir 8+ Fotos Geo-Etiquetadas con Nombres SEO',
+        desc: isEn ? 'Storefront/vehicle, team in action, work tools, and certificates' : 'Fachada/vehículo, equipo en acción, herramientas y certificados',
+      },
+      {
+        id: 'step_video',
+        title: isEn ? '6. Submit 60-Second Uncut Video Verification (3 Takes)' : '6. Enviar Video de Verificación de 60s sin Cortes (3 Tomas)',
+        desc: isEn ? 'Exterior street sign -> lock unlocking -> business equipment & invoices' : 'Letrero exterior -> apertura de acceso -> herramientas y facturación',
+      },
+      isSab
+        ? {
+            id: 'step_sab_areas',
+            title: isEn ? '7. Define 5+ Service Coverage Areas (Keep Address Hidden)' : '7. Definir 5+ Zonas de Cobertura (Dirección Oculta al Público)',
+            desc: isEn ? 'Registered service radius within 2 driving hours without home address pin' : 'Zonas de cobertura en radio de 2 horas sin pin de casa o apartamento',
+          }
+        : {
+            id: 'step_qa',
+            title: isEn ? '7. Seed Official Preventive Q&A in Google Business' : '7. Publicar Preguntas y Respuestas Preventivas Oficiales (Q&A)',
+            desc: isEn ? 'Anticipates customer queries and matches conversational search queries' : 'Anticipa dudas de clientes y gana búsquedas conversacionales',
+          },
+      {
+        id: 'step_posts',
+        title: isEn ? '8. Publish Week 1 Google Post Booster with CTA Button' : '8. Publicar Post Booster de Semana 1 con Botón de Contacto',
+        desc: isEn ? 'Signals active algorithmic freshness to Google Maps index' : 'Envía señal de frescura activa al algoritmo de Google Maps',
+      },
+      {
+        id: 'step_prestigia',
+        title: isEn ? '9. ⚡ Final Step: Prestigia Shield & Smart NFC Hardware Activation' : '9. ⚡ Paso Final: Blindaje con Prestigia y Activación de Dispositivos NFC',
+        desc: isEn
+          ? 'Connect listing to Prestigia Portal for 1-3★ review protection, 5★ review velocity, and on-site NFC chips'
+          : 'Vincular ficha al Portal Prestigia para filtrar reseñas de 1 a 3★, acelerar 5★ y activar chips NFC',
+        isHero: true,
+      },
+    ];
+  }, [isEn, businessModel]);
+
+  const completedChecklistCount = checklistItems.filter((item) => checkedSteps[item.id]).length;
+  const checklistProgressPercent = Math.round((completedChecklistCount / checklistItems.length) * 100);
+
   const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [isLoadingDossiers, setIsLoadingDossiers] = useState(false);
   const [dossierSearch, setDossierSearch] = useState('');
@@ -1591,18 +1723,24 @@ export default function LocalStudioPage() {
       {/* Main Workspace Body */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6 print:max-w-none print:p-0 print:m-0 print:space-y-2">
         {/* PRINT-ONLY CORPORATE DOSSIER HEADER */}
-        <div className="hidden print:flex items-center justify-between pb-2 border-b-2 border-slate-800 text-[10px] text-slate-600 font-bold uppercase tracking-wider mb-3">
-          <div className="flex items-center gap-2">
-            <span className="font-black text-slate-950 text-xs">PRESTIGIA LOCAL STUDIO</span>
-            <span>•</span>
-            <span className="text-amber-700">
+        <div className="hidden print:flex items-center justify-between pb-3 border-b-2 border-slate-800 text-[10px] text-slate-700 font-bold uppercase tracking-wider mb-4">
+          <div className="flex items-center gap-3">
+            {customLogoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={customLogoUrl} alt="Logo" className="max-h-12 max-w-[160px] object-contain rounded" />
+            ) : (
+              <span className="font-black text-slate-950 text-sm tracking-tight">PRESTIGIA LOCAL STUDIO</span>
+            )}
+            <span className="text-slate-400">•</span>
+            <span className="text-amber-700 font-extrabold text-xs">
               {isEn ? 'MASTER TOP 3 LOCAL RANKING DOSSIER' : 'EXPEDIENTE MAESTRO DE POSICIONAMIENTO LOCAL TOP 3'}
             </span>
           </div>
-          <div>
-            <span>
-              {isEn ? 'ASSIGNED CONSULTANT' : 'CONSULTOR ASIGNADO'}: {currentUser?.name || (isEn ? 'Prestigia LatAm & USA' : 'Prestigia LatAm')} • WHATSAPP: {currentUser?.phone || '+57 305 831 4049'}
+          <div className="text-right">
+            <span className="block">
+              {isEn ? 'ASSIGNED CONSULTANT' : 'CONSULTOR ASIGNADO'}: {currentUser?.name || (isEn ? 'Prestigia LatAm & USA' : 'Prestigia LatAm')}
             </span>
+            <span className="text-slate-500 font-mono">WHATSAPP: {currentUser?.phone || '+57 305 831 4049'}</span>
           </div>
         </div>
 
@@ -1853,6 +1991,28 @@ export default function LocalStudioPage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
+                        {/* White-Label Logo Uploader */}
+                        <div className="flex items-center gap-1">
+                          <label
+                            title={isEn ? 'Upload client/agency logo for white-label PDF' : 'Subir logo del cliente o agencia para PDF marca blanca'}
+                            className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border border-slate-700"
+                          >
+                            <Upload className="w-3.5 h-3.5 text-amber-400" />
+                            <span>{customLogoUrl ? (isEn ? 'Logo ✓' : 'Logo ✓') : (isEn ? 'Add Logo' : 'Logo Marca Blanca')}</span>
+                            <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+                          </label>
+                          {customLogoUrl && (
+                            <button
+                              type="button"
+                              onClick={handleRemoveLogo}
+                              title={isEn ? 'Remove custom logo' : 'Quitar logo personalizado'}
+                              className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 transition cursor-pointer"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+
                         <button
                           type="button"
                           onClick={handleSaveDossier}
@@ -2284,6 +2444,126 @@ export default function LocalStudioPage() {
                       </div>
                     )}
 
+                    {/* 11. Checklist Interactivo de Implementación (Progreso de 0% a 100%) */}
+                    <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 space-y-4 print-card-box">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800/80">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-950 px-2.5 py-0.5 rounded-full border border-amber-500/40">
+                              {isEn ? 'Implementation Roadmap' : 'Hoja de Ruta de Implementación'}
+                            </span>
+                            <span className="text-[10px] font-mono text-slate-400">
+                              {completedChecklistCount} / {checklistItems.length} {isEn ? 'Completed' : 'Completados'}
+                            </span>
+                          </div>
+                          <h3 className="text-sm font-black text-white mt-1">
+                            {isEn ? '11. Step-by-Step Google Maps Optimization Checklist' : '11. Checklist Interactivo de Implementación en Google'}
+                          </h3>
+                        </div>
+
+                        {/* Percentage Badge */}
+                        <div className="flex items-center gap-2 self-start sm:self-auto">
+                          <span
+                            className={`text-xs font-black px-3 py-1 rounded-xl border ${
+                              checklistProgressPercent === 100
+                                ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40'
+                                : checklistProgressPercent >= 60
+                                ? 'bg-amber-950 text-amber-300 border-amber-500/40'
+                                : 'bg-slate-800 text-slate-300 border-slate-700'
+                            }`}
+                          >
+                            {checklistProgressPercent}% {isEn ? 'Done' : 'Listo'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="space-y-1.5">
+                        <div className="w-full bg-slate-950 rounded-full h-2.5 p-0.5 border border-slate-800 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              checklistProgressPercent === 100
+                                ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
+                                : checklistProgressPercent >= 60
+                                ? 'bg-gradient-to-r from-amber-500 to-emerald-500'
+                                : 'bg-gradient-to-r from-rose-500 to-amber-500'
+                            }`}
+                            style={{ width: `${checklistProgressPercent}%` }}
+                          />
+                        </div>
+                        {checklistProgressPercent === 100 && (
+                          <p className="text-[11px] font-bold text-emerald-400 flex items-center gap-1.5 animate-in fade-in duration-300">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>
+                              {isEn
+                                ? '🎉 Listing 100% optimized to conquer Google Maps Top 3!'
+                                : '🎉 ¡Ficha 100% optimizada para dominar el Top 3 de Google Maps!'}
+                            </span>
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Checklist Items */}
+                      <div className="space-y-2 text-xs">
+                        {checklistItems.map((item) => {
+                          const isDone = !!checkedSteps[item.id];
+                          const isHero = item.isHero;
+                          return (
+                            <div
+                              key={item.id}
+                              onClick={() => toggleChecklistStep(item.id)}
+                              className={`p-3 rounded-xl border transition cursor-pointer flex items-start gap-3 ${
+                                isHero
+                                  ? isDone
+                                    ? 'bg-indigo-950/40 border-indigo-500/50 text-white'
+                                    : 'bg-gradient-to-r from-amber-950/20 via-slate-950 to-indigo-950/30 border-amber-500/40 hover:border-amber-400/70 text-slate-200'
+                                  : isDone
+                                  ? 'bg-slate-950/60 border-emerald-500/30 text-slate-300'
+                                  : 'bg-slate-950 border-slate-800/80 hover:border-slate-700 text-slate-200'
+                              }`}
+                            >
+                              <button
+                                type="button"
+                                className={`w-5 h-5 rounded-lg border flex items-center justify-center shrink-0 mt-0.5 transition cursor-pointer ${
+                                  isDone
+                                    ? 'bg-emerald-500 border-emerald-400 text-slate-950'
+                                    : isHero
+                                    ? 'border-amber-400/60 bg-amber-950/30 text-transparent'
+                                    : 'border-slate-700 bg-slate-900 text-transparent hover:border-slate-500'
+                                }`}
+                              >
+                                <Check className="w-3.5 h-3.5 stroke-[3]" />
+                              </button>
+
+                              <div className="space-y-0.5 flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <span
+                                    className={`font-bold text-xs ${
+                                      isDone
+                                        ? 'line-through text-slate-400'
+                                        : isHero
+                                        ? 'text-amber-300 font-black'
+                                        : 'text-white'
+                                    }`}
+                                  >
+                                    {item.title}
+                                  </span>
+                                  {isHero && (
+                                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/30 shrink-0">
+                                      Prestigia Core
+                                    </span>
+                                  )}
+                                </div>
+                                <p className={`text-[11px] leading-snug ${isDone ? 'text-slate-500' : 'text-slate-400'}`}>
+                                  {item.desc}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
                     {/* Advisor Sign-off Box */}
                     <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs print:border-t print:border-slate-300">
                       <div>
@@ -2469,6 +2749,28 @@ export default function LocalStudioPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 print:hidden">
+                        {/* White-Label Logo Uploader */}
+                        <div className="flex items-center gap-1">
+                          <label
+                            title={isEn ? 'Upload client/agency logo for white-label PDF' : 'Subir logo del cliente o agencia para PDF marca blanca'}
+                            className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border border-slate-700"
+                          >
+                            <Upload className="w-3.5 h-3.5 text-amber-400" />
+                            <span>{customLogoUrl ? (isEn ? 'Logo ✓' : 'Logo ✓') : (isEn ? 'Add Logo' : 'Logo Marca Blanca')}</span>
+                            <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+                          </label>
+                          {customLogoUrl && (
+                            <button
+                              type="button"
+                              onClick={handleRemoveLogo}
+                              title={isEn ? 'Remove custom logo' : 'Quitar logo personalizado'}
+                              className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 transition cursor-pointer"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+
                         <button
                           type="button"
                           onClick={handleSaveDossier}
