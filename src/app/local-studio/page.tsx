@@ -17,8 +17,6 @@ import {
   Users,
   Camera,
   Video,
-  FileText,
-  SlidersHorizontal,
   ArrowRight,
   TrendingUp,
   RefreshCw,
@@ -27,15 +25,11 @@ import {
   MessageSquare,
   Lock,
   ChevronRight,
-  UserCheck,
   Building2,
   Trash2,
   Save,
-  Info,
   HelpCircle,
-  Clock,
   Layers,
-  Award,
   ExternalLink,
   Check,
   Download,
@@ -897,11 +891,9 @@ export default function LocalStudioPage() {
   // Generator Result State
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedData, setGeneratedData] = useState<BlueprintData | null>(null);
-  const [activeEngine, setActiveEngine] = useState<string>('');
 
   // 4 Elite Local SEO Power Tools State
   const [toolsActiveTab, setToolsActiveTab] = useState<'geogrid' | 'roicalc' | 'geotag' | 'citations'>('geogrid');
-  const [geoGridKeyword, setGeoGridKeyword] = useState('Restaurante');
   const [geoGridRadius, setGeoGridRadius] = useState<'1km' | '3km' | '5km'>('3km');
   const [roiAverageTicket, setRoiAverageTicket] = useState<number>(65);
   const [roiCurrentRank, setRoiCurrentRank] = useState<number>(8);
@@ -1153,7 +1145,6 @@ export default function LocalStudioPage() {
 
       if (resData.success && resData.data) {
         setGeneratedData(resData.data);
-        setActiveEngine(resData.engine || 'Prestigia AI');
         showToast('✨ ¡Arquitectura Top 3 generada y registrada en Cartera!');
 
         // AUTO-SAVE to database so every generation is permanently audited
@@ -1376,7 +1367,7 @@ export default function LocalStudioPage() {
     setNetworkAdvisorFilter(advisor.id);
     setActiveTab('network');
     setNetworkSubView('monitor');
-    showToast(`📂 Visualizando cuentas de ${advisor.name}`);
+    showToast(isEn ? `📂 Viewing dossiers for ${advisor.name}` : `📂 Visualizando cuentas de ${advisor.name}`);
   };
 
   // Load a dossier from list into workspace
@@ -4333,11 +4324,7 @@ export default function LocalStudioPage() {
 
                           <button
                             type="button"
-                            onClick={() => {
-                              setNetworkAdvisorFilter(adv.id);
-                              setNetworkSubView('monitor');
-                              showToast(isEn ? `Filtering dossiers for ${adv.name}` : `Filtrando cuentas de ${adv.name}`);
-                            }}
+                            onClick={() => handleViewAdvisorDossiers(adv)}
                             className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-white font-black text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-md active:scale-98"
                           >
                             <span>{isEn ? 'View Dossiers in Monitor' : 'Ver Expedientes en Monitor'}</span>
@@ -4358,13 +4345,22 @@ export default function LocalStudioPage() {
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 print:hidden animate-in fade-in duration-200">
           <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative text-center space-y-4">
             {currentUser && (
-              <button
-                type="button"
-                onClick={() => setShowAuthModal(false)}
-                className="absolute top-4 right-4 text-slate-500 hover:text-white text-xs font-bold px-2 py-1 rounded-lg hover:bg-slate-800 transition cursor-pointer"
-              >
-                {tAuth.close}
-              </button>
+              <div className="flex items-center justify-between pb-1 border-b border-slate-800">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="text-xs text-rose-400 hover:text-rose-300 font-bold transition cursor-pointer"
+                >
+                  {isEn ? 'Log out' : 'Cerrar Sesión'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAuthModal(false)}
+                  className="text-slate-500 hover:text-white text-xs font-bold px-2 py-1 rounded-lg hover:bg-slate-800 transition cursor-pointer"
+                >
+                  {tAuth.close}
+                </button>
+              </div>
             )}
 
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center mx-auto shadow-xl">
