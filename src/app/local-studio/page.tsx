@@ -103,6 +103,28 @@ interface BlueprintData {
   preventiveFaqs: PreventiveFaqItem[];
   verificationGuide: VerificationGuideData;
   whatsappOnboardingMessage: string;
+  businessModel?: 'storefront' | 'service_area';
+  hidePhysicalAddress?: boolean;
+  suggestedServiceAreas?: string[];
+  nfcPocketReviewGuide?: {
+    title: string;
+    steps: string[];
+    samplePitch: string;
+  };
+  reviewVelocityPlan?: {
+    currentReviews: number;
+    targetTop3Reviews: number;
+    neededReviews: number;
+    reviewsPerWeek: number;
+    weeksToTop3: number;
+  };
+  monthlyPostsBooster?: {
+    week: number;
+    type: string;
+    title: string;
+    body: string;
+    callToAction: string;
+  }[];
   // Audit mode additions
   healthScore?: number;
   criticalGaps?: string[];
@@ -285,6 +307,8 @@ export default function LocalStudioPage() {
   const [existingRating, setExistingRating] = useState<number>(4.2);
   const [existingReviews, setExistingReviews] = useState<number>(38);
   const [lang, setLang] = useState<'es' | 'en'>('es');
+  const [businessModel, setBusinessModel] = useState<'storefront' | 'service_area'>('storefront');
+  const [serviceAreas, setServiceAreas] = useState('');
 
   // Generator Result State
   const [isGenerating, setIsGenerating] = useState(false);
@@ -391,6 +415,8 @@ export default function LocalStudioPage() {
         existingRating,
         existingReviews,
         lang,
+        businessModel,
+        serviceAreas: serviceAreas.trim(),
       };
 
       const res = await fetch('/api/local-studio/generate', {
@@ -833,6 +859,38 @@ export default function LocalStudioPage() {
             </button>
           )}
 
+          {/* Bilingual Language Switcher */}
+          <div className="flex items-center rounded-xl bg-slate-900 border border-slate-800 p-0.5 text-[11px] font-black print:hidden">
+            <button
+              type="button"
+              onClick={() => {
+                setLang('es');
+                showToast('Idioma cambiado a Español 🇨🇴');
+              }}
+              className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                lang === 'es'
+                  ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              🇨🇴 ES
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setLang('en');
+                showToast('Language switched to English 🇺🇸');
+              }}
+              className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                lang === 'en'
+                  ? 'bg-indigo-600 text-white shadow-md font-black'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              🇺🇸 EN
+            </button>
+          </div>
+
           {generatedData && (
             <button
               type="button"
@@ -840,7 +898,7 @@ export default function LocalStudioPage() {
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black transition shadow-md shadow-amber-500/10 cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Descargar PDF</span>
+              <span>{lang === 'en' ? 'Download PDF' : 'Descargar PDF'}</span>
             </button>
           )}
         </div>
@@ -981,19 +1039,77 @@ export default function LocalStudioPage() {
                 </div>
 
                 <div className="space-y-3 text-xs">
+                  {/* Business Model Selector */}
                   <div>
-                    <label className="block font-bold text-slate-300 mb-1">Nombre Comercial del Negocio *</label>
+                    <label className="block font-bold text-slate-300 mb-1.5">
+                      {lang === 'en' ? 'Operating Model *' : 'Modelo Operativo del Negocio *'}
+                    </label>
+                    <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-slate-950 border border-slate-800">
+                      <button
+                        type="button"
+                        onClick={() => setBusinessModel('storefront')}
+                        className={`py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 cursor-pointer text-[11px] ${
+                          businessModel === 'storefront'
+                            ? 'bg-emerald-500 text-slate-950 font-black shadow-md shadow-emerald-500/20'
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <span>🏬 Local Físico</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setBusinessModel('service_area')}
+                        className={`py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 cursor-pointer text-[11px] ${
+                          businessModel === 'service_area'
+                            ? 'bg-indigo-600 text-white font-black shadow-md shadow-indigo-600/30'
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <span>💼 Independiente / A Domicilio</span>
+                      </button>
+                    </div>
+
+                    {businessModel === 'service_area' && (
+                      <div className="mt-2 p-2.5 rounded-xl bg-indigo-950/60 border border-indigo-500/40 text-[10.5px] text-indigo-200 leading-relaxed space-y-1">
+                        <div className="flex items-center gap-1.5 font-black text-indigo-300">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                          <span>{lang === 'en' ? 'SAB Protection Active (Service Area Business)' : 'Blindaje Anti-Suspensión Activo (SAB)'}</span>
+                        </div>
+                        <p>
+                          {lang === 'en'
+                            ? 'Google prohibits publishing home/apartment addresses. Physical address will remain hidden to customers, and Google will rank the business across your target service coverage areas.'
+                            : 'Google prohíbe publicar direcciones residenciales. La dirección física se mantendrá oculta y Google posicionará el perfil en las zonas o barrios de cobertura que indiques.'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">
+                      {lang === 'en' ? 'Business or Specialist Name *' : 'Nombre Comercial o del Especialista *'}
+                    </label>
                     <input
                       type="text"
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
-                      placeholder="Ej: La Parrilla de Andrés"
+                      placeholder={
+                        businessModel === 'service_area'
+                          ? lang === 'en'
+                            ? 'e.g. Apex Mobile Detailing or Dr. Sarah Johnson'
+                            : 'Ej: Plomería & Destapes Express o Dra. Camila Gómez'
+                          : lang === 'en'
+                          ? 'e.g. Bella Italia Bistro'
+                          : 'Ej: La Parrilla de Andrés'
+                      }
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-300 mb-1">Nicho / Sector Comercial *</label>
+                    <label className="block font-bold text-slate-300 mb-1">
+                      {lang === 'en' ? 'Industry / Commercial Sector *' : 'Nicho / Sector Comercial *'}
+                    </label>
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
@@ -1009,26 +1125,57 @@ export default function LocalStudioPage() {
 
                   <div className="grid grid-cols-2 gap-2.5">
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">Ciudad *</label>
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {lang === 'en' ? 'City / Metro Area *' : 'Ciudad o Sede Principal *'}
+                      </label>
                       <input
                         type="text"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        placeholder="Ej: Bogotá"
+                        placeholder={lang === 'en' ? 'e.g. Miami, FL' : 'Ej: Bogotá'}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
                       />
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">Barrio o Zona</label>
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {businessModel === 'service_area'
+                          ? lang === 'en'
+                            ? 'Main Target Borough / Zip'
+                            : 'Barrio o Base Central'
+                          : lang === 'en'
+                          ? 'Neighborhood / Zone'
+                          : 'Barrio o Zona'}
+                      </label>
                       <input
                         type="text"
                         value={neighborhood}
                         onChange={(e) => setNeighborhood(e.target.value)}
-                        placeholder="Ej: Chapinero"
+                        placeholder={lang === 'en' ? 'e.g. Brickell / 33131' : 'Ej: Chapinero'}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
                       />
                     </div>
                   </div>
+
+                  {businessModel === 'service_area' && (
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {lang === 'en'
+                          ? 'Service Coverage Areas / Target Neighborhoods'
+                          : 'Zonas o Barrios de Cobertura a Domicilio'}
+                      </label>
+                      <input
+                        type="text"
+                        value={serviceAreas}
+                        onChange={(e) => setServiceAreas(e.target.value)}
+                        placeholder={
+                          lang === 'en'
+                            ? 'e.g. Downtown, Coral Gables, Doral, South Beach'
+                            : 'Ej: Zona Norte, Chicó, Usaquén, Salitre, Chía'
+                        }
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-indigo-500/40 text-indigo-200 placeholder:text-slate-600 focus:outline-none focus:border-indigo-400 transition"
+                      />
+                    </div>
+                  )}
 
                   <div>
                     <label className="block font-bold text-slate-300 mb-1">3 Platos o Servicios Más Vendidos</label>
@@ -1192,6 +1339,82 @@ export default function LocalStudioPage() {
                         </div>
                       </div>
                     </div>
+
+                    {/* SPECIAL MODULE FOR INDEPENDENTS / SAB (SERVICE AREA BUSINESS) */}
+                    {(generatedData.businessModel === 'service_area' ||
+                      (generatedData.suggestedServiceAreas && generatedData.suggestedServiceAreas.length > 0)) && (
+                      <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-950/40 to-slate-900 border-2 border-indigo-500/40 space-y-4 print-card-box">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Globe className="w-4 h-4 text-indigo-400" />
+                            <h3 className="text-sm font-black text-white">
+                              {lang === 'en'
+                                ? 'Service Area Business Configuration (SAB)'
+                                : 'Configuración de Áreas de Cobertura (Profesional Independiente / SAB)'}
+                            </h3>
+                          </div>
+                          <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-500/40">
+                            🛡️ {lang === 'en' ? 'Address Hidden to Public' : 'Dirección Oculta al Público'}
+                          </span>
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-slate-950 border border-indigo-500/30 text-xs space-y-2">
+                          <span className="text-[10px] font-black uppercase tracking-wider text-indigo-300 block">
+                            {lang === 'en'
+                              ? 'Target Coverage Areas to Register in Google Maps:'
+                              : 'Zonas y Barrios de Cobertura para Registrar en Google Maps:'}
+                          </span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {(generatedData.suggestedServiceAreas || [
+                              `${city} Norte`,
+                              `${city} Centro`,
+                              `${city} Occidente`,
+                              `Área Metropolitana de ${city}`,
+                            ]).map((area, i) => (
+                              <span
+                                key={i}
+                                className="px-2.5 py-1 rounded-lg bg-indigo-950 text-indigo-200 border border-indigo-500/30 font-bold text-[11px]"
+                              >
+                                📍 {area}
+                              </span>
+                            ))}
+                          </div>
+                          <p className="text-[10px] text-slate-400 mt-1">
+                            {lang === 'en'
+                              ? 'Google allows up to 20 service areas within a 2-hour driving radius. Never enter a residential address with a map pin.'
+                              : 'Google permite hasta 20 zonas de atención dentro de un radio de 2 horas. Nunca pongas la dirección de tu casa/apartamento como local físico abierto.'}
+                          </p>
+                        </div>
+
+                        {/* Pocket NFC Review Protocol for Independents */}
+                        {generatedData.nfcPocketReviewGuide && (
+                          <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2 text-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="font-black text-amber-300 text-[11px] flex items-center gap-1.5">
+                                💳 {generatedData.nfcPocketReviewGuide.title}
+                              </span>
+                              <span className="text-[9px] font-mono text-slate-500">Prestigia Pocket Protocol</span>
+                            </div>
+
+                            <ul className="space-y-1 text-slate-300 text-[11px]">
+                              {generatedData.nfcPocketReviewGuide.steps.map((st, i) => (
+                                <li key={i} className="flex items-start gap-2">
+                                  <span className="text-amber-400 font-black">✓</span>
+                                  <span>{st}</span>
+                                </li>
+                              ))}
+                            </ul>
+
+                            <div className="p-2.5 rounded-lg bg-slate-900 border border-amber-500/30 text-[10.5px] italic text-amber-200">
+                              <span className="font-bold not-italic text-slate-400 block mb-0.5">
+                                {lang === 'en' ? 'Script to say to the client on-site:' : 'Frase exacta para decirle al cliente al terminar el trabajo:'}
+                              </span>
+                              {generatedData.nfcPocketReviewGuide.samplePitch}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* 2. Título Estratégico */}
                     <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2 print-card-box">
@@ -1366,6 +1589,115 @@ export default function LocalStudioPage() {
                         {generatedData.whatsappOnboardingMessage}
                       </div>
                     </div>
+
+                    {/* 9. Plan de Velocidad de Reseñas para Top 3 (Review Velocity) */}
+                    {generatedData.reviewVelocityPlan && (
+                      <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3 print-card-box">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-emerald-400" />
+                            <h3 className="text-sm font-black text-white">
+                              {lang === 'en'
+                                ? '9. Google Review Velocity Plan to Reach Top 3'
+                                : '9. Plan de Aceleración de Reseñas para Alcanzar el Top 3'}
+                            </h3>
+                          </div>
+                          <span className="text-[10px] font-black uppercase text-emerald-300 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-500/40">
+                            Algoritmo Top 3
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center text-xs">
+                          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                            <span className="text-[10px] text-slate-400 uppercase font-bold block mb-0.5">
+                              {lang === 'en' ? 'Current Reviews' : 'Reseñas Actuales'}
+                            </span>
+                            <strong className="text-base font-black text-white">
+                              {generatedData.reviewVelocityPlan.currentReviews} ★
+                            </strong>
+                          </div>
+
+                          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                            <span className="text-[10px] text-slate-400 uppercase font-bold block mb-0.5">
+                              {lang === 'en' ? 'Top 3 Competitor Benchmark' : 'Meta del Top 3'}
+                            </span>
+                            <strong className="text-base font-black text-amber-400">
+                              {generatedData.reviewVelocityPlan.targetTop3Reviews}+
+                            </strong>
+                          </div>
+
+                          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                            <span className="text-[10px] text-slate-400 uppercase font-bold block mb-0.5">
+                              {lang === 'en' ? 'Pace per Week' : 'Ritmo Recomendado'}
+                            </span>
+                            <strong className="text-base font-black text-emerald-400">
+                              +{generatedData.reviewVelocityPlan.reviewsPerWeek} / sem
+                            </strong>
+                          </div>
+
+                          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                            <span className="text-[10px] text-slate-400 uppercase font-bold block mb-0.5">
+                              {lang === 'en' ? 'Time to Top 3' : 'Tiempo al Top 3'}
+                            </span>
+                            <strong className="text-base font-black text-purple-300">
+                              {generatedData.reviewVelocityPlan.weeksToTop3} semanas
+                            </strong>
+                          </div>
+                        </div>
+                        <p className="text-[11px] text-slate-400">
+                          {lang === 'en'
+                            ? 'Google values review velocity and fresh sentiment more than total static review count. Capturing 8 fresh reviews weekly pushes listings above older inactive competitors.'
+                            : 'El algoritmo de Google premia la frescura y velocidad semanal por encima de números estáticos antiguos. Mantener 8 reseñas nuevas por semana supera a competidores con años de antigüedad en menos de 90 días.'}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 10. Booster de 30 Días de Publicaciones de Google (Google Posts) */}
+                    {generatedData.monthlyPostsBooster && generatedData.monthlyPostsBooster.length > 0 && (
+                      <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3 print-card-box">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-purple-400" />
+                            <h3 className="text-sm font-black text-white">
+                              {lang === 'en'
+                                ? '10. 30-Day Google Business Post Calendar (Weekly Boosters)'
+                                : '10. Calendario de Publicaciones de 30 Días (Google Posts)'}
+                            </h3>
+                          </div>
+                          <span className="text-[10px] font-black uppercase text-purple-300 bg-purple-950 px-2.5 py-0.5 rounded-full border border-purple-500/40">
+                            4 Semanas Listas
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                          {generatedData.monthlyPostsBooster.map((post, i) => (
+                            <div key={i} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2 flex flex-col justify-between">
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-500/30">
+                                    Semana {post.week} • {post.type}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => copyToClipboard(`${post.title}\n\n${post.body}`, `Post Semana ${post.week}`)}
+                                    className="text-[10px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer print:hidden"
+                                  >
+                                    <Copy className="w-3 h-3" />
+                                    <span>Copiar</span>
+                                  </button>
+                                </div>
+                                <h4 className="font-black text-white text-xs">{post.title}</h4>
+                                <p className="text-[11px] text-slate-300 leading-snug">{post.body}</p>
+                              </div>
+                              <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                                <span>Botón CTA:</span>
+                                <span className="font-bold text-emerald-400">{post.callToAction}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Advisor Sign-off Box */}
                     <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs print:border-t print:border-slate-300">
@@ -1943,10 +2275,12 @@ export default function LocalStudioPage() {
               <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-xs">3</span>
-                  <h3 className="font-bold text-white text-sm">Ubicación y Área de Atención</h3>
+                  <h3 className="font-bold text-white text-sm">Ubicación y Modelo de Negocio</h3>
                 </div>
                 <p className="text-slate-300 text-[11px] leading-relaxed">
-                  Marca que <strong>"Sí tienes local físico"</strong> para que te deje poner la dirección. Ajusta el pin rojo exactamente sobre la entrada del establecimiento en el mapa satelital.
+                  <strong>• Si es Local Físico:</strong> Marca <em>"Sí tienes local abierto al público"</em> y ajusta el pin rojo sobre la entrada.
+                  <br />
+                  <strong className="text-amber-300">• Si es Profesional Independiente (SAB):</strong> Marca <em>"No, presto servicios en la ubicación del cliente"</em>. Esto <strong>oculta tu dirección de casa</strong> para evitar suspensiones de Google, y luego agregas las <strong>Zonas de Cobertura</strong> que te dio la herramienta.
                 </p>
               </div>
 
@@ -1957,7 +2291,11 @@ export default function LocalStudioPage() {
                   <h3 className="font-bold text-white text-sm">Video de Verificación</h3>
                 </div>
                 <p className="text-slate-300 text-[11px] leading-relaxed">
-                  Cuando Google pida verificación por video, sigue la guía de 3 tomas: 1) Fachada y calle, 2) Llaves abriendo puerta, 3) Datáfono/Caja registradora. ¡Listo en 60 segundos!
+                  Google exige un video de 60s sin cortes:
+                  <br />
+                  <strong>• Para Locales:</strong> 1) Calle y fachada, 2) Llaves abriendo puerta, 3) Caja registradora y datáfono.
+                  <br />
+                  <strong className="text-indigo-300">• Para Independientes:</strong> 1) Herramientas o computador con software abierto, 2) RUT o documento fiscal y tarjetas, 3) Vehículo de trabajo o bodega. ¡Aprobación rápida en 1 intento!
                 </p>
               </div>
 

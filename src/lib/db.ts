@@ -68,6 +68,7 @@ export interface StudioDossier {
   neighborhood?: string;
   googleUrl?: string;
   mode: 'create' | 'audit';
+  businessModel?: 'storefront' | 'service_area';
   status: 'draft' | 'presented' | 'closed';
   data: any;
   createdAt: string;
