@@ -155,7 +155,7 @@ interface StudioDossierRecord {
   updatedAt: string;
 }
 
-const CATEGORY_OPTIONS = [
+const CATEGORY_OPTIONS_ES = [
   'Restaurante / Gastronomía / Gastrobar',
   'Cafetería / Panadería / Pastelería',
   'Salud / Clínica Médica / Consultorio',
@@ -169,6 +169,168 @@ const CATEGORY_OPTIONS = [
   'Hotelería / Hospedaje / Turismo',
   'Educación / Academia / Cursos',
 ];
+
+const CATEGORY_OPTIONS_EN = [
+  'Restaurant / Dining / Gastrobar',
+  'Cafe / Bakery / Pastry Shop',
+  'Medical Clinic / Healthcare / Practice',
+  'Dental Clinic / Cosmetic Dentistry',
+  'Beauty Salon / Spa / Barber Shop',
+  'Automotive / Mechanic Shop / Detailing',
+  'Fitness Center / Gym / Personal Training',
+  'Professional Services / Legal / Accounting',
+  'Retail / Fashion Boutique / Store',
+  'Veterinary Clinic / Pet Care',
+  'Hospitality / Hotel / Tourism',
+  'Education / Academy / Training Courses',
+];
+
+const CATEGORY_OPTIONS = CATEGORY_OPTIONS_ES;
+
+const UI_TEXT = {
+  es: {
+    tagline: 'Suite de Creación & Optimización Google Maps',
+    loginProfile: 'Ingresar Perfil',
+    switchProfile: 'Cambiar',
+    downloadPdf: 'Descargar PDF',
+    tabCreate: '🏗️ Crear Ficha Ganadora (Desde Cero)',
+    tabAudit: '🔬 Auditar & Optimizar Ficha Existente',
+    tabTools: '⚡ Armas Top 3 (Geo-Grid & ROI)',
+    tabDossiers: '📁 Mis Clientes (Luisma)',
+    tabGuide: '📖 Guía Dónde Dar Clic en Google',
+    tabPitch: '🗣️ Guion Comercial para Asesores',
+    tabNetwork: '🏢 Red de Asesores & Agencias B2B',
+    mod1Badge: 'Módulo 1: Para Negocios sin Google Maps',
+    mod1Title: 'Constructor de Ficha Ganadora (Arquitectura Top 3)',
+    mod1Desc: 'Ingresa los datos básicos del negocio. La inteligencia artificial de Prestigia generará el expediente técnico exacto (categorías secretas, título optimizado, copy de 745 caracteres, catálogo y guía de verificación) para configurar la ficha en Google en menos de 10 minutos.',
+    mod1Time: 'Tiempo estimado de montaje',
+    mod1TimeVal: '< 10 Minutos',
+    formHeader1: '1. Datos Básicos del Cliente',
+    opModel: 'Modelo Operativo del Negocio *',
+    storefront: '🏬 Local Físico',
+    serviceArea: '💼 Independiente / A Domicilio',
+    sabNoticeTitle: 'Blindaje Anti-Suspensión Activo (SAB)',
+    sabNoticeDesc: 'Google prohíbe publicar direcciones residenciales. La dirección física se mantendrá oculta y Google posicionará el perfil en las zonas o barrios de cobertura que indiques.',
+    bizName: 'Nombre Comercial o del Especialista *',
+    bizNamePlaceholder: 'Ej: La Parrilla de Andrés o Dr. Carlos Gómez',
+    sector: 'Nicho / Sector Comercial *',
+    city: 'Ciudad o Sede Principal *',
+    cityPlaceholder: 'Ej: Bogotá',
+    neighborhood: 'Barrio o Zona',
+    neighborhoodPlaceholder: 'Ej: Chapinero',
+    coverageAreas: 'Zonas o Barrios de Cobertura a Domicilio',
+    coveragePlaceholder: 'Ej: Zona Norte, Chicó, Usaquén, Salitre, Chía',
+    specialties: '3 Platos o Servicios Más Vendidos',
+    specialtiesPlaceholder: 'Ej: Hamburguesas artesanales, costillas BBQ, cócteles',
+    phone: 'WhatsApp Comercial de Atención',
+    phonePlaceholder: 'Ej: +57 300 123 4567',
+    btnGenerate: 'Generar Configuración Ganadora en 1-Clic',
+    btnGenerating: 'Generando Arquitectura Top 3 con IA...',
+    btnCopyWhatsapp: 'Copiar Kit de Solicitud de Fotos y Video',
+    readyTitle: 'Listo para Generar el Perfil Ganador',
+    readyDesc: 'Ingresa el nombre del negocio a la izquierda y presiona el botón para generar las categorías maestras, título anti-suspensión, descripción persuasiva y checklist fotográfico.',
+    consultingAi: 'Consultando Algoritmo de Google Maps',
+    consultingAiDesc: 'Analizando taxonomía oficial de categorías, palabras clave de compra local y redactando descripción comercial de 745 caracteres...',
+    saveDossier: 'Guardar en Cartera',
+    mod2Badge: 'Módulo 2: Para Negocios que Ya Tienen Google Maps pero no venden',
+    mod2Title: 'Auditoría Forense de Brechas & Upgrade al Top 3',
+    mod2Desc: 'Descubre con exactitud por qué los 3 líderes de su zona están acaparando a todos los clientes y genera la hoja de ruta técnica para destronarlos en 90 días con el ecosistema Prestigia.',
+    mod2Target: 'Objetivo de Ascenso',
+    mod2TargetVal: 'Conquista Top 3',
+    auditFormHeader: 'Ficha Actual a Diagnosticar',
+    auditBizName: 'Nombre Comercial de la Ficha *',
+    auditBizNamePlaceholder: 'Ej: La Suiza Parrilla',
+    googleUrl: 'Enlace de Google Maps (Opcional)',
+    googleUrlPlaceholder: 'https://maps.google.com/?cid=...',
+    currentRating: 'Calificación Actual ★',
+    publicReviews: 'Opiniones Públicas',
+    auditCityPlaceholder: 'Ej: Medellín o Bogotá',
+    auditNeighborhoodPlaceholder: 'Ej: El Poblado o Usaquén',
+    btnAudit: 'Escanear Brechas & Generar Hoja de Ruta',
+    btnAuditing: 'Analizando Brechas frente al Top 3...',
+    healthScore: 'Puntaje de Salud SEO Local',
+    vulnerableBadge: 'Ficha Vulnerable (-45% visibilidad)',
+    save: 'Guardar',
+    printPdf: 'Imprimir PDF',
+    criticalGapsTitle: 'Brechas Críticas Detectadas en la Ficha',
+    competitorBenchmarkTitle: 'Análisis Frente a los 3 Líderes del Top 3 en',
+    roadmapTitle: 'Hoja de Ruta de Ascenso al Top 3 (5 Pasos)',
+    stepLabel: 'Paso',
+    optimizedCopyTitle: 'Textos Optimizados Listos para Pegar en Google',
+    copyNewDesc: 'Copiar Nueva Descripción',
+  },
+  en: {
+    tagline: 'Google Maps Creation & Top 3 Optimization Suite',
+    loginProfile: 'Log In Profile',
+    switchProfile: 'Switch',
+    downloadPdf: 'Download PDF',
+    tabCreate: '🏗️ Build Winning Listing (From Scratch)',
+    tabAudit: '🔬 Audit & Upgrade Existing Listing',
+    tabTools: '⚡ Top 3 Weapons (Geo-Grid & ROI)',
+    tabDossiers: '📁 My Clients (Luisma)',
+    tabGuide: '📖 Step-by-Step Google Click Guide',
+    tabPitch: '🗣️ Sales Pitch & Objection Scripts',
+    tabNetwork: '🏢 Sales Advisors & Agency Network',
+    mod1Badge: 'Module 1: For Businesses Without Google Maps',
+    mod1Title: 'Winning Listing Builder (Top 3 Architecture)',
+    mod1Desc: 'Enter the basic business details. Prestigia AI will generate the exact technical blueprint (secret categories, optimized title, 745-char copy, catalog, and verification guide) to set up on Google in under 10 minutes.',
+    mod1Time: 'Estimated Setup Time',
+    mod1TimeVal: '< 10 Minutes',
+    formHeader1: '1. Basic Client Information',
+    opModel: 'Operating Business Model *',
+    storefront: '🏬 Physical Storefront',
+    serviceArea: '💼 Independent / Service Area',
+    sabNoticeTitle: 'SAB Anti-Suspension Protection Active',
+    sabNoticeDesc: 'Google strictly prohibits publishing residential addresses. The physical address will remain completely hidden to clients, ranking your profile across your target service areas.',
+    bizName: 'Business or Specialist Name *',
+    bizNamePlaceholder: 'e.g. Apex Detailing or Dr. Sarah Johnson',
+    sector: 'Industry / Business Niche *',
+    city: 'City or Main Metro Area *',
+    cityPlaceholder: 'e.g. Miami, FL',
+    neighborhood: 'Neighborhood / District',
+    neighborhoodPlaceholder: 'e.g. Brickell / 33131',
+    coverageAreas: 'Target Service Coverage Areas / Neighborhoods',
+    coveragePlaceholder: 'e.g. Brickell, Downtown, Coral Gables, South Beach',
+    specialties: 'Top 3 Best-Selling Products or Services',
+    specialtiesPlaceholder: 'e.g. Cosmetic Dentistry, Teeth Whitening, Veneers',
+    phone: 'Commercial Phone / WhatsApp',
+    phonePlaceholder: 'e.g. +1 305 123 4567',
+    btnGenerate: 'Generate Winning Setup in 1-Click',
+    btnGenerating: 'Generating Top 3 Architecture with AI...',
+    btnCopyWhatsapp: 'Copy Photo & Video Request Message',
+    readyTitle: 'Ready to Build Winning Profile',
+    readyDesc: 'Enter the business name on the left and click the button to generate master categories, anti-suspension title, persuasive copy, and photo checklist.',
+    consultingAi: 'Querying Google Maps Algorithm',
+    consultingAiDesc: 'Analyzing official category taxonomy, local buyer intent keywords, and drafting 745-character SEO commercial copy...',
+    saveDossier: 'Save to Portfolio',
+    mod2Badge: 'Module 2: For Businesses on Google Maps Not Getting Sales',
+    mod2Title: 'Forensic Gap Audit & Top 3 Upgrade',
+    mod2Desc: 'Discover exactly why the top 3 competitors in your area are capturing all clients, and generate the 90-day technical roadmap to overtake them with Prestigia.',
+    mod2Target: 'Ranking Goal',
+    mod2TargetVal: 'Conquering Top 3',
+    auditFormHeader: 'Current Profile to Audit',
+    auditBizName: 'Business Listing Name *',
+    auditBizNamePlaceholder: 'e.g. Miami Smile Center',
+    googleUrl: 'Google Maps Link (Optional)',
+    googleUrlPlaceholder: 'https://maps.google.com/?cid=...',
+    currentRating: 'Current Rating ★',
+    publicReviews: 'Public Reviews',
+    auditCityPlaceholder: 'e.g. Miami, FL or Austin, TX',
+    auditNeighborhoodPlaceholder: 'e.g. Brickell or Downtown',
+    btnAudit: 'Scan Gaps & Generate Action Roadmap',
+    btnAuditing: 'Analyzing Gaps Against Top 3 Leaders...',
+    healthScore: 'Local SEO Health Score',
+    vulnerableBadge: 'Vulnerable Profile (-45% visibility)',
+    save: 'Save',
+    printPdf: 'Print PDF',
+    criticalGapsTitle: 'Critical Gaps Detected in Profile',
+    competitorBenchmarkTitle: 'Top 3 Competitor Benchmark in',
+    roadmapTitle: 'Roadmap to Top 3 (5 Steps)',
+    stepLabel: 'Step',
+    optimizedCopyTitle: 'Optimized Copy Ready to Paste into Google',
+    copyNewDesc: 'Copy New Description',
+  },
+};
 
 export default function LocalStudioPage() {
   // -------------------------------------------------------------
@@ -313,6 +475,22 @@ export default function LocalStudioPage() {
   const [lang, setLang] = useState<'es' | 'en'>('es');
   const [businessModel, setBusinessModel] = useState<'storefront' | 'service_area'>('storefront');
   const [serviceAreas, setServiceAreas] = useState('');
+
+  const t = UI_TEXT[lang] || UI_TEXT.es;
+  const categoryOptions = lang === 'en' ? CATEGORY_OPTIONS_EN : CATEGORY_OPTIONS_ES;
+
+  const handleToggleLang = (newLang: 'es' | 'en') => {
+    setLang(newLang);
+    const fromOptions = newLang === 'en' ? CATEGORY_OPTIONS_ES : CATEGORY_OPTIONS_EN;
+    const toOptions = newLang === 'en' ? CATEGORY_OPTIONS_EN : CATEGORY_OPTIONS_ES;
+    const idx = fromOptions.indexOf(category);
+    if (idx !== -1 && toOptions[idx]) {
+      setCategory(toOptions[idx]);
+    } else if (!toOptions.includes(category)) {
+      setCategory(toOptions[0]);
+    }
+    showToast(newLang === 'en' ? '🇺🇸 Language switched to English' : '🇨🇴 Idioma cambiado a Español');
+  };
 
   // Generator Result State
   const [isGenerating, setIsGenerating] = useState(false);
@@ -818,7 +996,7 @@ export default function LocalStudioPage() {
           </div>
           <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-950/80 border border-indigo-500/40 text-indigo-300 text-[11px] font-bold">
             <Sparkles className="w-3 h-3 text-amber-400" />
-            <span>Suite de Creación & Optimización Google Maps</span>
+            <span>{t.tagline}</span>
           </span>
         </div>
 
@@ -847,7 +1025,7 @@ export default function LocalStudioPage() {
                         : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
                     }`}
                   >
-                    {currentUser.role === 'admin' ? 'DIRECTOR' : 'ASESOR'}
+                    {currentUser.role === 'admin' ? (lang === 'en' ? 'DIRECTOR' : 'DIRECTOR') : (lang === 'en' ? 'ADVISOR' : 'ASESOR')}
                   </span>
                 </div>
                 <span className="text-[9px] text-slate-400 font-mono">{currentUser.phone}</span>
@@ -858,7 +1036,7 @@ export default function LocalStudioPage() {
                 title="Cambiar de perfil (Director / Asesor)"
                 className="ml-2 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer text-[10px] font-bold"
               >
-                Cambiar
+                {t.switchProfile}
               </button>
             </div>
           ) : (
@@ -868,7 +1046,7 @@ export default function LocalStudioPage() {
               className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
             >
               <Lock className="w-3.5 h-3.5" />
-              <span>Ingresar Perfil</span>
+              <span>{t.loginProfile}</span>
             </button>
           )}
 
@@ -876,10 +1054,7 @@ export default function LocalStudioPage() {
           <div className="flex items-center rounded-xl bg-slate-900 border border-slate-800 p-0.5 text-[11px] font-black print:hidden">
             <button
               type="button"
-              onClick={() => {
-                setLang('es');
-                showToast('Idioma cambiado a Español 🇨🇴');
-              }}
+              onClick={() => handleToggleLang('es')}
               className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
                 lang === 'es'
                   ? 'bg-amber-500 text-slate-950 shadow-md font-black'
@@ -890,10 +1065,7 @@ export default function LocalStudioPage() {
             </button>
             <button
               type="button"
-              onClick={() => {
-                setLang('en');
-                showToast('Language switched to English 🇺🇸');
-              }}
+              onClick={() => handleToggleLang('en')}
               className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
                 lang === 'en'
                   ? 'bg-indigo-600 text-white shadow-md font-black'
@@ -911,7 +1083,7 @@ export default function LocalStudioPage() {
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black transition shadow-md shadow-amber-500/10 cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>{lang === 'en' ? 'Download PDF' : 'Descargar PDF'}</span>
+              <span>{t.downloadPdf}</span>
             </button>
           )}
         </div>
@@ -930,7 +1102,7 @@ export default function LocalStudioPage() {
             }`}
           >
             <Building2 className="w-3.5 h-3.5" />
-            <span>🏗️ Crear Ficha Ganadora (Desde Cero)</span>
+            <span>{t.tabCreate}</span>
           </button>
 
           <button
@@ -943,7 +1115,7 @@ export default function LocalStudioPage() {
             }`}
           >
             <Search className="w-3.5 h-3.5" />
-            <span>🔬 Auditar & Optimizar Ficha Existente</span>
+            <span>{t.tabAudit}</span>
           </button>
 
           <button
@@ -956,7 +1128,7 @@ export default function LocalStudioPage() {
             }`}
           >
             <Zap className="w-3.5 h-3.5 text-amber-400" />
-            <span>⚡ Armas Top 3 (Geo-Grid & ROI)</span>
+            <span>{t.tabTools}</span>
           </button>
 
           <button
@@ -969,7 +1141,7 @@ export default function LocalStudioPage() {
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>📁 Mis Clientes (Luisma)</span>
+            <span>{t.tabDossiers}</span>
           </button>
 
           <button
@@ -982,7 +1154,7 @@ export default function LocalStudioPage() {
             }`}
           >
             <HelpCircle className="w-3.5 h-3.5" />
-            <span>📖 Guía Dónde Dar Clic en Google</span>
+            <span>{t.tabGuide}</span>
           </button>
 
           <button
@@ -995,7 +1167,7 @@ export default function LocalStudioPage() {
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
-            <span>🗣️ Guion Comercial para Asesores</span>
+            <span>{t.tabPitch}</span>
           </button>
 
           {currentUser?.role === 'admin' && (
@@ -1009,7 +1181,7 @@ export default function LocalStudioPage() {
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>🏢 Red de Asesores & Agencias B2B</span>
+              <span>{t.tabNetwork}</span>
             </button>
           )}
         </div>
@@ -1039,18 +1211,18 @@ export default function LocalStudioPage() {
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-950 border border-emerald-500/40 text-emerald-300">
-                    Módulo 1: Para Negocios sin Google Maps
+                    {t.mod1Badge}
                   </span>
                   <h1 className="text-xl sm:text-2xl font-black text-white">
-                    Constructor de Ficha Ganadora (Arquitectura Top 3)
+                    {t.mod1Title}
                   </h1>
                   <p className="text-xs text-slate-300 max-w-2xl">
-                    Ingresa los datos básicos del negocio. La inteligencia artificial de Prestigia generará el expediente técnico exacto (categorías secretas, título optimizado, copy de 745 caracteres, catálogo y guía de verificación) para que tú o tu asesor configuren la ficha en Google en menos de 10 minutos.
+                    {t.mod1Desc}
                   </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <span className="text-[10px] text-slate-400 block font-mono">Tiempo estimado de montaje</span>
-                  <span className="text-lg font-black text-emerald-400">&lt; 10 Minutos</span>
+                  <span className="text-[10px] text-slate-400 block font-mono">{t.mod1Time}</span>
+                  <span className="text-lg font-black text-emerald-400">{t.mod1TimeVal}</span>
                 </div>
               </div>
             </div>
@@ -1061,14 +1233,14 @@ export default function LocalStudioPage() {
               <div className="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl print:hidden">
                 <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
                   <Building2 className="w-4 h-4 text-emerald-400" />
-                  <h2 className="text-sm font-black text-white">1. Datos Básicos del Cliente</h2>
+                  <h2 className="text-sm font-black text-white">{t.formHeader1}</h2>
                 </div>
 
                 <div className="space-y-3 text-xs">
                   {/* Business Model Selector */}
                   <div>
                     <label className="block font-bold text-slate-300 mb-1.5">
-                      {lang === 'en' ? 'Operating Model *' : 'Modelo Operativo del Negocio *'}
+                      {t.opModel}
                     </label>
                     <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-slate-950 border border-slate-800">
                       <button
@@ -1080,7 +1252,7 @@ export default function LocalStudioPage() {
                             : 'text-slate-400 hover:text-white'
                         }`}
                       >
-                        <span>🏬 Local Físico</span>
+                        <span>{t.storefront}</span>
                       </button>
 
                       <button
@@ -1092,7 +1264,7 @@ export default function LocalStudioPage() {
                             : 'text-slate-400 hover:text-white'
                         }`}
                       >
-                        <span>💼 Independiente / A Domicilio</span>
+                        <span>{t.serviceArea}</span>
                       </button>
                     </div>
 
@@ -1100,48 +1272,36 @@ export default function LocalStudioPage() {
                       <div className="mt-2 p-2.5 rounded-xl bg-indigo-950/60 border border-indigo-500/40 text-[10.5px] text-indigo-200 leading-relaxed space-y-1">
                         <div className="flex items-center gap-1.5 font-black text-indigo-300">
                           <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                          <span>{lang === 'en' ? 'SAB Protection Active (Service Area Business)' : 'Blindaje Anti-Suspensión Activo (SAB)'}</span>
+                          <span>{t.sabNoticeTitle}</span>
                         </div>
-                        <p>
-                          {lang === 'en'
-                            ? 'Google prohibits publishing home/apartment addresses. Physical address will remain hidden to customers, and Google will rank the business across your target service coverage areas.'
-                            : 'Google prohíbe publicar direcciones residenciales. La dirección física se mantendrá oculta y Google posicionará el perfil en las zonas o barrios de cobertura que indiques.'}
-                        </p>
+                        <p>{t.sabNoticeDesc}</p>
                       </div>
                     )}
                   </div>
 
                   <div>
                     <label className="block font-bold text-slate-300 mb-1">
-                      {lang === 'en' ? 'Business or Specialist Name *' : 'Nombre Comercial o del Especialista *'}
+                      {t.bizName}
                     </label>
                     <input
                       type="text"
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
-                      placeholder={
-                        businessModel === 'service_area'
-                          ? lang === 'en'
-                            ? 'e.g. Apex Mobile Detailing or Dr. Sarah Johnson'
-                            : 'Ej: Plomería & Destapes Express o Dra. Camila Gómez'
-                          : lang === 'en'
-                          ? 'e.g. Bella Italia Bistro'
-                          : 'Ej: La Parrilla de Andrés'
-                      }
+                      placeholder={t.bizNamePlaceholder}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
                     />
                   </div>
 
                   <div>
                     <label className="block font-bold text-slate-300 mb-1">
-                      {lang === 'en' ? 'Industry / Commercial Sector *' : 'Nicho / Sector Comercial *'}
+                      {t.sector}
                     </label>
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-emerald-400 transition"
                     >
-                      {CATEGORY_OPTIONS.map((c) => (
+                      {categoryOptions.map((c) => (
                         <option key={c} value={c}>
                           {c}
                         </option>
@@ -1152,31 +1312,25 @@ export default function LocalStudioPage() {
                   <div className="grid grid-cols-2 gap-2.5">
                     <div>
                       <label className="block font-bold text-slate-300 mb-1">
-                        {lang === 'en' ? 'City / Metro Area *' : 'Ciudad o Sede Principal *'}
+                        {t.city}
                       </label>
                       <input
                         type="text"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        placeholder={lang === 'en' ? 'e.g. Miami, FL' : 'Ej: Bogotá'}
+                        placeholder={t.cityPlaceholder}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
                       />
                     </div>
                     <div>
                       <label className="block font-bold text-slate-300 mb-1">
-                        {businessModel === 'service_area'
-                          ? lang === 'en'
-                            ? 'Main Target Borough / Zip'
-                            : 'Barrio o Base Central'
-                          : lang === 'en'
-                          ? 'Neighborhood / Zone'
-                          : 'Barrio o Zona'}
+                        {t.neighborhood}
                       </label>
                       <input
                         type="text"
                         value={neighborhood}
                         onChange={(e) => setNeighborhood(e.target.value)}
-                        placeholder={lang === 'en' ? 'e.g. Brickell / 33131' : 'Ej: Chapinero'}
+                        placeholder={t.neighborhoodPlaceholder}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
                       />
                     </div>
@@ -1185,42 +1339,36 @@ export default function LocalStudioPage() {
                   {businessModel === 'service_area' && (
                     <div>
                       <label className="block font-bold text-slate-300 mb-1">
-                        {lang === 'en'
-                          ? 'Service Coverage Areas / Target Neighborhoods'
-                          : 'Zonas o Barrios de Cobertura a Domicilio'}
+                        {t.coverageAreas}
                       </label>
                       <input
                         type="text"
                         value={serviceAreas}
                         onChange={(e) => setServiceAreas(e.target.value)}
-                        placeholder={
-                          lang === 'en'
-                            ? 'e.g. Downtown, Coral Gables, Doral, South Beach'
-                            : 'Ej: Zona Norte, Chicó, Usaquén, Salitre, Chía'
-                        }
+                        placeholder={t.coveragePlaceholder}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-indigo-500/40 text-indigo-200 placeholder:text-slate-600 focus:outline-none focus:border-indigo-400 transition"
                       />
                     </div>
                   )}
 
                   <div>
-                    <label className="block font-bold text-slate-300 mb-1">3 Platos o Servicios Más Vendidos</label>
+                    <label className="block font-bold text-slate-300 mb-1">{t.specialties}</label>
                     <input
                       type="text"
                       value={specialties}
                       onChange={(e) => setSpecialties(e.target.value)}
-                      placeholder="Ej: Hamburguesas artesanales, costillas BBQ, cócteles"
+                      placeholder={t.specialtiesPlaceholder}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-300 mb-1">WhatsApp Comercial de Atención</label>
+                    <label className="block font-bold text-slate-300 mb-1">{t.phone}</label>
                     <input
                       type="text"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      placeholder="Ej: +57 300 123 4567"
+                      placeholder={t.phonePlaceholder}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
                     />
                   </div>
@@ -1235,12 +1383,12 @@ export default function LocalStudioPage() {
                   {isGenerating ? (
                     <>
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Generando Arquitectura Top 3 con IA...</span>
+                      <span>{t.btnGenerating}</span>
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4 fill-slate-950" />
-                      <span>Generar Configuración Ganadora en 1-Clic</span>
+                      <span>{t.btnGenerate}</span>
                     </>
                   )}
                 </button>
@@ -1258,7 +1406,7 @@ export default function LocalStudioPage() {
                     className="w-full py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-emerald-500/30 text-emerald-300 font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
-                    <span>Copiar Kit de Solicitud de Fotos y Video</span>
+                    <span>{t.btnCopyWhatsapp}</span>
                   </button>
                 )}
               </div>
@@ -1270,9 +1418,9 @@ export default function LocalStudioPage() {
                     <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
                       <Sparkles className="w-6 h-6 text-amber-400" />
                     </div>
-                    <h3 className="text-base font-bold text-white">Listo para Generar el Perfil Ganador</h3>
+                    <h3 className="text-base font-bold text-white">{t.readyTitle}</h3>
                     <p className="text-xs text-slate-400 max-w-md mx-auto">
-                      Ingresa el nombre del negocio a la izquierda y presiona el botón para generar las categorías maestras, título anti-suspensión, descripción persuasiva y checklist fotográfico.
+                      {t.readyDesc}
                     </p>
                   </div>
                 )}
@@ -1281,9 +1429,9 @@ export default function LocalStudioPage() {
                   <div className="p-12 rounded-3xl bg-slate-900/80 border border-emerald-500/30 text-center space-y-4">
                     <RefreshCw className="w-8 h-8 text-emerald-400 animate-spin mx-auto" />
                     <div>
-                      <h3 className="text-base font-black text-white">Consultando Algoritmo de Google Maps</h3>
+                      <h3 className="text-base font-black text-white">{t.consultingAi}</h3>
                       <p className="text-xs text-slate-400 mt-1">
-                        Analizando taxonomía oficial de categorías, palabras clave de compra local y redactando descripción comercial de 745 caracteres...
+                        {t.consultingAiDesc}
                       </p>
                     </div>
                   </div>
@@ -1753,18 +1901,18 @@ export default function LocalStudioPage() {
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
-                    Módulo 2: Para Negocios que Ya Tienen Google Maps pero no venden
+                    {t.mod2Badge}
                   </span>
                   <h1 className="text-xl sm:text-2xl font-black text-white">
-                    Auditoría Forense de Brechas & Upgrade al Top 3
+                    {t.mod2Title}
                   </h1>
                   <p className="text-xs text-slate-300 max-w-2xl">
-                    Descubre con exactitud por qué los 3 líderes de su zona están acaparando a todos los clientes y genera la hoja de ruta técnica para destronarlos en 90 días con el ecosistema Prestigia.
+                    {t.mod2Desc}
                   </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <span className="text-[10px] text-slate-400 block font-mono">Objetivo de Ascenso</span>
-                  <span className="text-lg font-black text-amber-400">Conquista Top 3</span>
+                  <span className="text-[10px] text-slate-400 block font-mono">{t.mod2Target}</span>
+                  <span className="text-lg font-black text-amber-400">{t.mod2TargetVal}</span>
                 </div>
               </div>
             </div>
@@ -1774,35 +1922,35 @@ export default function LocalStudioPage() {
               <div className="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl print:hidden">
                 <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
                   <Search className="w-4 h-4 text-amber-400" />
-                  <h2 className="text-sm font-black text-white">Ficha Actual a Diagnosticar</h2>
+                  <h2 className="text-sm font-black text-white">{t.auditFormHeader}</h2>
                 </div>
 
                 <div className="space-y-3 text-xs">
                   <div>
-                    <label className="block font-bold text-slate-300 mb-1">Nombre Comercial de la Ficha *</label>
+                    <label className="block font-bold text-slate-300 mb-1">{t.auditBizName}</label>
                     <input
                       type="text"
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
-                      placeholder="Ej: La Suiza Parrilla"
+                      placeholder={t.auditBizNamePlaceholder}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-300 mb-1">Enlace de Google Maps (Opcional)</label>
+                    <label className="block font-bold text-slate-300 mb-1">{t.googleUrl}</label>
                     <input
                       type="text"
                       value={googleUrl}
                       onChange={(e) => setGoogleUrl(e.target.value)}
-                      placeholder="https://maps.google.com/?cid=..."
+                      placeholder={t.googleUrlPlaceholder}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-2.5">
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">Calificación Actual ★</label>
+                      <label className="block font-bold text-slate-300 mb-1">{t.currentRating}</label>
                       <input
                         type="number"
                         step="0.1"
@@ -1814,7 +1962,7 @@ export default function LocalStudioPage() {
                       />
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">Opiniones Públicas</label>
+                      <label className="block font-bold text-slate-300 mb-1">{t.publicReviews}</label>
                       <input
                         type="number"
                         min="0"
@@ -1827,35 +1975,35 @@ export default function LocalStudioPage() {
 
                   <div className="grid grid-cols-2 gap-2.5">
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">Ciudad *</label>
+                      <label className="block font-bold text-slate-300 mb-1">{t.city}</label>
                       <input
                         type="text"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        placeholder="Ej: Medellín"
+                        placeholder={t.auditCityPlaceholder}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition"
                       />
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">Barrio o Zona</label>
+                      <label className="block font-bold text-slate-300 mb-1">{t.neighborhood}</label>
                       <input
                         type="text"
                         value={neighborhood}
                         onChange={(e) => setNeighborhood(e.target.value)}
-                        placeholder="Ej: El Poblado"
+                        placeholder={t.auditNeighborhoodPlaceholder}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-300 mb-1">Sector *</label>
+                    <label className="block font-bold text-slate-300 mb-1">{t.sector}</label>
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition"
                     >
-                      {CATEGORY_OPTIONS.map((c) => (
+                      {categoryOptions.map((c: string) => (
                         <option key={c} value={c}>
                           {c}
                         </option>
@@ -1873,12 +2021,12 @@ export default function LocalStudioPage() {
                   {isGenerating ? (
                     <>
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Analizando Brechas frente al Top 3...</span>
+                      <span>{t.btnAuditing}</span>
                     </>
                   ) : (
                     <>
                       <Search className="w-4 h-4" />
-                      <span>Escanear Brechas & Generar Hoja de Ruta</span>
+                      <span>{t.btnAudit}</span>
                     </>
                   )}
                 </button>
@@ -1891,11 +2039,11 @@ export default function LocalStudioPage() {
                     {/* Score Bar */}
                     <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between print-card-box">
                       <div className="space-y-1">
-                        <span className="text-[10px] uppercase font-bold text-slate-400">Puntaje de Salud SEO Local</span>
+                        <span className="text-[10px] uppercase font-bold text-slate-400">{t.healthScore}</span>
                         <div className="flex items-baseline gap-2">
                           <span className="text-3xl font-black text-amber-400">{generatedData.healthScore} / 100</span>
                           <span className="text-xs text-rose-400 font-bold bg-rose-950 px-2 py-0.5 rounded border border-rose-500/30">
-                            Ficha Vulnerable (-45% visibilidad)
+                            {t.vulnerableBadge}
                           </span>
                         </div>
                       </div>
@@ -1906,7 +2054,7 @@ export default function LocalStudioPage() {
                           className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
                         >
                           <Save className="w-3.5 h-3.5 text-amber-400" />
-                          <span>Guardar</span>
+                          <span>{t.save}</span>
                         </button>
                         <button
                           type="button"
@@ -1914,7 +2062,7 @@ export default function LocalStudioPage() {
                           className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition flex items-center gap-1.5 cursor-pointer"
                         >
                           <Printer className="w-3.5 h-3.5" />
-                          <span>Imprimir PDF</span>
+                          <span>{t.printPdf}</span>
                         </button>
                       </div>
                     </div>
@@ -1923,7 +2071,7 @@ export default function LocalStudioPage() {
                     <div className="p-5 rounded-2xl bg-slate-900 border border-rose-500/40 space-y-3 print-card-box">
                       <div className="flex items-center gap-2 text-rose-400">
                         <AlertTriangle className="w-4 h-4" />
-                        <h3 className="text-sm font-black text-white">Brechas Críticas Detectadas en la Ficha</h3>
+                        <h3 className="text-sm font-black text-white">{t.criticalGapsTitle}</h3>
                       </div>
                       <div className="space-y-1.5 text-xs">
                         {generatedData.criticalGaps?.map((gap, i) => (
@@ -1939,7 +2087,7 @@ export default function LocalStudioPage() {
                     <div className="p-5 rounded-2xl bg-slate-900 border border-indigo-500/40 space-y-2 print-card-box">
                       <div className="flex items-center gap-2 text-indigo-400">
                         <TrendingUp className="w-4 h-4" />
-                        <h3 className="text-sm font-black text-white">Análisis Frente a los 3 Líderes del Top 3 en {city}</h3>
+                        <h3 className="text-sm font-black text-white">{t.competitorBenchmarkTitle} {city}</h3>
                       </div>
                       <p className="text-xs text-slate-300 leading-relaxed">
                         {generatedData.topCompetitorInsights}
@@ -1950,13 +2098,13 @@ export default function LocalStudioPage() {
                     <div className="p-5 rounded-2xl bg-slate-900 border border-emerald-500/40 space-y-3 print-card-box">
                       <div className="flex items-center gap-2 text-emerald-400">
                         <CheckCircle2 className="w-4 h-4" />
-                        <h3 className="text-sm font-black text-white">Hoja de Ruta de Ascenso al Top 3 (5 Pasos)</h3>
+                        <h3 className="text-sm font-black text-white">{t.roadmapTitle}</h3>
                       </div>
                       <div className="space-y-2 text-xs">
                         {generatedData.actionRoadmap?.map((item, i) => (
                           <div key={i} className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
                             <div className="flex items-center justify-between">
-                              <span className="font-bold text-white text-xs">Paso {item.step}: {item.title}</span>
+                              <span className="font-bold text-white text-xs">{t.stepLabel} {item.step}: {item.title}</span>
                               <span
                                 className={`text-[9px] font-black px-2 py-0.5 rounded ${
                                   item.impact === 'CRÍTICO'
@@ -1978,14 +2126,14 @@ export default function LocalStudioPage() {
                     {/* Copyable Optimized Assets */}
                     <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3 print-card-box">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-black text-white">Textos Optimizados Listos para Pegar en Google</h3>
+                        <h3 className="text-sm font-black text-white">{t.optimizedCopyTitle}</h3>
                         <button
                           type="button"
                           onClick={() => copyToClipboard(generatedData.commercialDescription, 'Descripción')}
                           className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer print:hidden"
                         >
                           <Copy className="w-3.5 h-3.5" />
-                          <span>Copiar Nueva Descripción</span>
+                          <span>{t.copyNewDesc}</span>
                         </button>
                       </div>
                       <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
@@ -2009,18 +2157,18 @@ export default function LocalStudioPage() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
-                    Arsenal de Cierre de Alto Valor • Estilo BrightLocal & Local Falcon
+                    {lang === 'en' ? 'High-Value Conversion Arsenal • BrightLocal & Local Falcon Style' : 'Arsenal de Cierre de Alto Valor • Estilo BrightLocal & Local Falcon'}
                   </span>
                   <h1 className="text-xl sm:text-2xl font-black text-white">
-                    4 Armas de Dominio Local & Cierre Comercial
+                    {lang === 'en' ? '4 Local Dominance & Commercial Closing Weapons' : '4 Armas de Dominio Local & Cierre Comercial'}
                   </h1>
                   <p className="text-xs text-slate-300 max-w-2xl">
-                    Herramientas de venta visual y optimización forense para demostrarle al cliente cuánto dinero está perdiendo hoy y cómo Prestigia lo posiciona en la cima.
+                    {lang === 'en' ? 'Visual sales and forensic optimization tools showing clients how much revenue they are losing today and how Prestigia positions them at the top.' : 'Herramientas de venta visual y optimización forense para demostrarle al cliente cuánto dinero está perdiendo hoy y cómo Prestigia lo posiciona en la cima.'}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-emerald-400 font-bold bg-emerald-950/80 border border-emerald-500/30 px-3 py-1.5 rounded-xl">
-                    ⚡ Algoritmo 2026 Activo
+                    {lang === 'en' ? '⚡ 2026 Algorithm Active' : '⚡ Algoritmo 2026 Activo'}
                   </span>
                 </div>
               </div>
@@ -2038,7 +2186,7 @@ export default function LocalStudioPage() {
                 }`}
               >
                 <Crosshair className="w-3.5 h-3.5" />
-                <span>1. Simulador Geo-Grid 3x3</span>
+                <span>{lang === 'en' ? '1. 3x3 Geo-Grid Heatmap' : '1. Simulador Geo-Grid 3x3'}</span>
               </button>
 
               <button
@@ -2051,7 +2199,7 @@ export default function LocalStudioPage() {
                 }`}
               >
                 <Calculator className="w-3.5 h-3.5" />
-                <span>2. Calculadora de Pérdida Financiera (ROI)</span>
+                <span>{lang === 'en' ? '2. Financial Loss Calculator (ROI)' : '2. Calculadora de Pérdida Financiera (ROI)'}</span>
               </button>
 
               <button
@@ -2064,7 +2212,7 @@ export default function LocalStudioPage() {
                 }`}
               >
                 <Compass className="w-3.5 h-3.5" />
-                <span>3. Inyector de Geo-Tagging EXIF</span>
+                <span>{lang === 'en' ? '3. EXIF Geo-Tagging Injector' : '3. Inyector de Geo-Tagging EXIF'}</span>
               </button>
 
               <button
@@ -2077,7 +2225,7 @@ export default function LocalStudioPage() {
                 }`}
               >
                 <FileCheck className="w-3.5 h-3.5" />
-                <span>4. Hub de Citaciones USA & LatAm</span>
+                <span>{lang === 'en' ? '4. Citations Directory (USA/LatAm)' : '4. Hub de Citaciones USA & LatAm'}</span>
               </button>
             </div>
 
