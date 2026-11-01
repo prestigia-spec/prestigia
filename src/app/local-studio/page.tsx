@@ -285,7 +285,7 @@ export default function LocalStudioPage() {
   const [isLoadingDossiers, setIsLoadingDossiers] = useState(false);
   const [dossierSearch, setDossierSearch] = useState('');
   const [dossierModeFilter, setDossierModeFilter] = useState<'all' | 'create' | 'audit'>('all');
-  const [dossierAdvisorFilter, setDossierAdvisorFilter] = useState<string>('all');
+  const [dossierAdvisorFilter, setDossierAdvisorFilter] = useState<string>('mine');
 
   // Advisors List (for Admin tab)
   const [advisorsList, setAdvisorsList] = useState<StudioAdvisorUser[]>([]);
@@ -475,8 +475,18 @@ export default function LocalStudioPage() {
     return savedDossiers.filter((d) => {
       // Filter by mode
       if (dossierModeFilter !== 'all' && d.mode !== dossierModeFilter) return false;
+
       // Filter by advisor
-      if (dossierAdvisorFilter !== 'all' && d.advisorId !== dossierAdvisorFilter) return false;
+      if (dossierAdvisorFilter === 'mine') {
+        const isMine =
+          d.advisorId === 'adv-brayan' ||
+          d.advisorName.toLowerCase().includes('brayan') ||
+          d.advisorName.toLowerCase().includes('director');
+        if (!isMine) return false;
+      } else if (dossierAdvisorFilter !== 'all') {
+        if (d.advisorId !== dossierAdvisorFilter) return false;
+      }
+
       // Filter by search text
       if (dossierSearch.trim()) {
         const q = dossierSearch.toLowerCase();
@@ -491,6 +501,13 @@ export default function LocalStudioPage() {
       return true;
     });
   }, [savedDossiers, dossierSearch, dossierModeFilter, dossierAdvisorFilter]);
+
+  // Jump from Advisor management tab directly to that advisor's dossiers
+  const handleViewAdvisorDossiers = (advisor: StudioAdvisorUser) => {
+    setDossierAdvisorFilter(advisor.id);
+    setActiveTab('dossiers');
+    showToast(`📂 Visualizando cuentas gestionadas por ${advisor.name}`);
+  };
 
   // Load a dossier from list into workspace
   const handleLoadDossier = (dossier: StudioDossierRecord) => {
@@ -1579,59 +1596,118 @@ export default function LocalStudioPage() {
               </div>
             </div>
 
+            {/* Active Advisor Filter Banner (when coming from advisors tab) */}
+            {dossierAdvisorFilter !== 'mine' && dossierAdvisorFilter !== 'all' && (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-950/90 to-slate-900 border border-indigo-500/50 flex flex-wrap items-center justify-between gap-3 shadow-lg animate-in fade-in">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-md">
+                    💼
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black uppercase text-indigo-400 tracking-wider">
+                      Cuentas y Auditorías del Asesor Comercial:
+                    </span>
+                    <h3 className="text-sm font-black text-white">
+                      {advisorsList.find((a) => a.id === dossierAdvisorFilter)?.name || 'Asesor'}
+                    </h3>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setDossierAdvisorFilter('mine')}
+                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer flex items-center gap-1.5 shadow-md shadow-amber-500/10 active:scale-98"
+                >
+                  <span>⭐ Volver a Mis Clientes (Brayan)</span>
+                </button>
+              </div>
+            )}
+
             {/* Filter Pills */}
-            <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-slate-400 text-[11px] font-bold">Cartera:</span>
+                <button
+                  type="button"
+                  onClick={() => setDossierAdvisorFilter('mine')}
+                  className={`px-3.5 py-1.5 rounded-xl font-black transition cursor-pointer flex items-center gap-1.5 shadow-sm ${
+                    dossierAdvisorFilter === 'mine'
+                      ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                      : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                  }`}
+                >
+                  <span>⭐ Mis Clientes (Brayan)</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                      dossierAdvisorFilter === 'mine' ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-slate-400'
+                    }`}
+                  >
+                    {
+                      savedDossiers.filter(
+                        (d) =>
+                          d.advisorId === 'adv-brayan' ||
+                          d.advisorName.toLowerCase().includes('brayan') ||
+                          d.advisorName.toLowerCase().includes('director')
+                      ).length
+                    }
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setDossierAdvisorFilter('all')}
+                  className={`px-3.5 py-1.5 rounded-xl font-black transition cursor-pointer flex items-center gap-1.5 shadow-sm ${
+                    dossierAdvisorFilter === 'all'
+                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                      : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                  }`}
+                >
+                  <span>🌐 Todo el Equipo</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                      dossierAdvisorFilter === 'all' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'
+                    }`}
+                  >
+                    {savedDossiers.length}
+                  </span>
+                </button>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-slate-400 text-[11px] font-bold">Tipo:</span>
                 <button
                   type="button"
                   onClick={() => setDossierModeFilter('all')}
-                  className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer ${
                     dossierModeFilter === 'all'
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                      ? 'bg-slate-800 text-white'
+                      : 'text-slate-500 hover:text-slate-300'
                   }`}
                 >
-                  Todos ({savedDossiers.length})
+                  Todos
                 </button>
                 <button
                   type="button"
                   onClick={() => setDossierModeFilter('create')}
-                  className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer ${
                     dossierModeFilter === 'create'
-                      ? 'bg-emerald-500 text-slate-950 font-black'
-                      : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                      ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                      : 'text-slate-500 hover:text-slate-300'
                   }`}
                 >
-                  🏗️ Fichas Nuevas ({savedDossiers.filter((d) => d.mode === 'create').length})
+                  🏗️ Fichas Nuevas
                 </button>
                 <button
                   type="button"
                   onClick={() => setDossierModeFilter('audit')}
-                  className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer ${
                     dossierModeFilter === 'audit'
-                      ? 'bg-amber-500 text-slate-950 font-black'
-                      : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                      ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                      : 'text-slate-500 hover:text-slate-300'
                   }`}
                 >
-                  🔬 Auditorías ({savedDossiers.filter((d) => d.mode === 'audit').length})
+                  🔬 Auditorías Top 3
                 </button>
               </div>
-
-              {currentUser?.role === 'admin' && (
-                <div className="flex items-center gap-2">
-                  <span className="text-slate-400 text-[11px] font-bold">Asesor:</span>
-                  <select
-                    value={dossierAdvisorFilter}
-                    onChange={(e) => setDossierAdvisorFilter(e.target.value)}
-                    className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400"
-                  >
-                    <option value="all">Todos los Asesores</option>
-                    <option value="adv-brayan">Brayan • Director General</option>
-                    <option value="adv-luisma">Luisma • Consultor Senior</option>
-                  </select>
-                </div>
-              )}
             </div>
 
             {/* List / Grid of Dossiers */}
@@ -2023,36 +2099,78 @@ export default function LocalStudioPage() {
               </form>
 
               {/* Advisors List */}
-              <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-3 shadow-xl">
-                <h3 className="font-black text-white text-sm pb-2 border-b border-slate-800">
-                  Asesores Comerciales Activos ({advisorsList.length})
-                </h3>
+              <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                  <div>
+                    <h3 className="font-black text-white text-sm">
+                      Asesores Comerciales Activos ({advisorsList.filter((a) => a.id !== 'adv-admin').length})
+                    </h3>
+                    <p className="text-[11px] text-slate-400">
+                      Toca cualquier asesor para ver sus cuentas creadas y auditorías en tiempo real
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-bold text-amber-400 bg-amber-950/60 border border-amber-500/30 px-2 py-0.5 rounded-full">
+                    ⚡ Clickeable
+                  </span>
+                </div>
 
-                <div className="space-y-2 text-xs">
-                  {advisorsList.map((adv) => (
-                    <div
-                      key={adv.id}
-                      className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between"
-                    >
-                      <div className="space-y-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-white text-sm">{adv.name}</span>
-                          <span
-                            className={`text-[9px] font-black px-1.5 py-0.5 rounded ${
-                              adv.role === 'admin'
-                                ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                                : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
-                            }`}
-                          >
-                            {adv.role === 'admin' ? 'ADMIN' : 'ASESOR'}
-                          </span>
+                <div className="space-y-2.5 text-xs">
+                  {advisorsList
+                    .filter((adv) => adv.id !== 'adv-admin')
+                    .map((adv) => {
+                      const advisorDossiers = savedDossiers.filter((d) => d.advisorId === adv.id);
+                      const createsCount = advisorDossiers.filter((d) => d.mode === 'create').length;
+                      const auditsCount = advisorDossiers.filter((d) => d.mode === 'audit').length;
+
+                      return (
+                        <div
+                          key={adv.id}
+                          onClick={() => handleViewAdvisorDossiers(adv)}
+                          className="p-4 rounded-2xl bg-slate-950 border border-slate-800/90 hover:border-amber-400/60 hover:bg-slate-900/80 transition-all duration-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 cursor-pointer group shadow-sm hover:shadow-amber-500/5 active:scale-[0.99]"
+                        >
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-black text-white text-sm group-hover:text-amber-300 transition">
+                                {adv.name}
+                              </span>
+                              <span
+                                className={`text-[9px] font-black px-1.5 py-0.5 rounded ${
+                                  adv.role === 'admin'
+                                    ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                    : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
+                                }`}
+                              >
+                                {adv.role === 'admin' ? 'FOUNDER' : 'ASESOR'}
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
+                              <span>
+                                Usuario: <strong className="text-slate-300">{adv.username}</strong>
+                              </span>
+                              <span>•</span>
+                              <span>
+                                Teléfono: <strong className="text-slate-300">{adv.phone}</strong>
+                              </span>
+                            </div>
+                            <div className="pt-0.5">
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-900 text-slate-300 border border-slate-800 font-bold">
+                                📁 {advisorDossiers.length} cuenta{advisorDossiers.length === 1 ? '' : 's'} ({createsCount} nuevas, {auditsCount} auditorías)
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 self-end sm:self-center">
+                            <button
+                              type="button"
+                              className="px-3.5 py-2 rounded-xl bg-slate-900 group-hover:bg-amber-500 group-hover:text-slate-950 text-amber-400 font-bold text-xs border border-amber-500/30 transition flex items-center gap-1.5 shadow-sm"
+                            >
+                              <span>Ver Cuentas</span>
+                              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" />
+                            </button>
+                          </div>
                         </div>
-                        <span className="text-[11px] text-slate-400 block">
-                          Usuario: <strong className="text-slate-300">{adv.username}</strong> • Teléfono: {adv.phone}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                      );
+                    })}
                 </div>
               </div>
             </div>

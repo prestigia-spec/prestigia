@@ -19,16 +19,6 @@
       "createdAt": "2026-01-01T00:00:00.000Z"
     },
     {
-      "id": "adv-admin",
-      "name": "Director General Prestigia",
-      "username": "admin",
-      "password": "admin",
-      "phone": "+573058314049",
-      "role": "admin",
-      "active": true,
-      "createdAt": "2026-01-01T00:00:00.000Z"
-    },
-    {
       "id": "adv-luisma",
       "name": "Luisma • Consultor Senior",
       "username": "luisma",
@@ -40,6 +30,86 @@
     }
   ],
   "studioDossiers": [
+    {
+      "id": "dos-brayan-audit-01",
+      "advisorId": "adv-brayan",
+      "advisorName": "Brayan • Director General & Founder",
+      "advisorPhone": "+573058314049",
+      "clientName": "Restaurante & Grill Leña y Carbón",
+      "category": "Restaurante / Gastronomía",
+      "city": "Bogotá",
+      "neighborhood": "Zona T",
+      "googleUrl": "https://maps.google.com/?cid=5566778899",
+      "mode": "audit",
+      "status": "closed",
+      "createdAt": "2026-10-28T18:26:02.608Z",
+      "updatedAt": "2026-10-28T18:26:02.610Z",
+      "data": {
+        "healthScore": 56,
+        "criticalGaps": [
+          "Perfil con nombre penalizado por Google ('Leña y Carbón EL MEJOR GRILL') en riesgo de suspensión.",
+          "Sin menú de cortes premium ni fotos de parrilla en alta resolución.",
+          "Solo 22 opiniones en el último año, perdiendo visibilidad frente a competidores con más de 300 reseñas."
+        ],
+        "actionRoadmap": [
+          {
+            "step": 1,
+            "title": "Limpieza de Título Anti-Suspensión",
+            "impact": "Blindaje Google",
+            "action": "Ajustar nombre a 'Leña y Carbón | Parrilla & Steakhouse'"
+          },
+          {
+            "step": 2,
+            "title": "Inyección de Menú y Precios",
+            "impact": "+30% Clics",
+            "action": "Publicar cortes Angus y acompañamientos"
+          },
+          {
+            "step": 3,
+            "title": "Activación Código QR Prestigia",
+            "impact": "+40 Reseñas/Mes",
+            "action": "Capturar comensales de fin de semana"
+          }
+        ],
+        "optimizedTitle": "Leña y Carbón | Parrilla & Steakhouse Bogotá",
+        "primaryCategory": "Parrilla",
+        "secondaryCategories": [
+          "Restaurante de carne",
+          "Restaurante colombiano",
+          "Bar de cócteles"
+        ],
+        "commercialDescription": "Leña y Carbón te ofrece los mejores cortes a la parrilla en la Zona T de Bogotá. Carnes maduradas al carbón vegetal, acompañamientos tradicionales y coctelería de autor. ¡Reserva tu mesa!",
+        "serviceCatalog": [
+          {
+            "name": "Bife de Chorizo Madurado 400g",
+            "description": "Corte Angus madurado 28 días con chimichurri rústico.",
+            "tag": "Plato Insignia"
+          }
+        ],
+        "photoChecklist": [
+          {
+            "item": "Parrilla encendida con cortes",
+            "count": 3,
+            "tip": "Capturar el fuego y sellado de la carne.",
+            "filenameExample": "parrilla-cortes-angus-zona-t-bogota.jpg"
+          }
+        ],
+        "preventiveFaqs": [
+          {
+            "question": "¿Tienen opciones de reserva para grupos?",
+            "answer": "Sí, disponemos de salón VIP para eventos privados."
+          }
+        ],
+        "verificationGuide": {
+          "title": "Verificación en Restaurante",
+          "overview": "Video de 60s mostrando fachada, parrilla y datáfono.",
+          "cameraTake1": "0-15s: Entrada exterior y aviso.",
+          "cameraTake2": "15-40s: Salón y parrilla.",
+          "cameraTake3": "40-60s: Terminal de pago en caja."
+        },
+        "whatsappOnboardingMessage": "Estimado equipo de Leña y Carbón, expediente de auditoría listo para optimizar su perfil al Top 3."
+      }
+    },
     {
       "id": "dos-trattoria-01",
       "advisorId": "adv-luisma",
