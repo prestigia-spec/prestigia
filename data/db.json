@@ -15,6 +15,9 @@
       "password": "admin",
       "phone": "+573058314049",
       "role": "admin",
+      "accountType": "founder",
+      "country": "Colombia",
+      "city": "Bogotá",
       "active": true,
       "createdAt": "2026-01-01T00:00:00.000Z"
     },
@@ -25,8 +28,39 @@
       "password": "1234",
       "phone": "+573058314049",
       "role": "advisor",
+      "accountType": "internal_advisor",
+      "country": "Colombia",
+      "city": "Bogotá",
       "active": true,
       "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "adv-carlos",
+      "name": "Carlos Mendoza • Asesor Comercial",
+      "username": "carlos",
+      "password": "1234",
+      "phone": "+573104567890",
+      "role": "advisor",
+      "accountType": "internal_advisor",
+      "country": "Colombia",
+      "city": "Medellín",
+      "active": true,
+      "createdAt": "2026-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "agency-impulso",
+      "name": "Agencia Impulso Digital 360",
+      "username": "impulsodigital",
+      "password": "1234",
+      "phone": "+525512345678",
+      "role": "advisor",
+      "accountType": "partner_agency",
+      "country": "México",
+      "city": "Ciudad de México",
+      "monthlyFeeUsd": 79,
+      "licenseStatus": "active",
+      "active": true,
+      "createdAt": "2026-02-01T00:00:00.000Z"
     }
   ],
   "studioDossiers": [
@@ -108,7 +142,9 @@
           "cameraTake3": "40-60s: Terminal de pago en caja."
         },
         "whatsappOnboardingMessage": "Estimado equipo de Leña y Carbón, expediente de auditoría listo para optimizar su perfil al Top 3."
-      }
+      },
+      "country": "Colombia",
+      "advisorType": "founder"
     },
     {
       "id": "dos-trattoria-01",
@@ -258,7 +294,9 @@
           ]
         },
         "whatsappOnboardingMessage": "Estimado equipo de La Trattoria del Parque, un gusto saludarles. Desde Prestigia ya estructuramos la arquitectura estratégica de su perfil de Google Maps para posicionar su restaurante en el Top 3 de la zona del Parque de la 93.\n\nPara completar la configuración técnica y verificación oficial ante Google, necesitamos que nos envíen por este medio los siguientes materiales:\n\n1. Video de verificación de 60 segundos continuos (mostrando calle, fachada, llave abriendo la puerta y datáfono en caja).\n2. 12 a 15 fotos en alta resolución (fachada completa, platos insignia, horno de leña y cava de vinos).\n3. Horarios exactos de atención (lunes a domingo y festivos).\n4. Número oficial de WhatsApp para reservas.\n\nQuedamos muy atentos para poner a volar su posicionamiento esta misma semana. ¡Un saludo cordial!"
-      }
+      },
+      "country": "Colombia",
+      "advisorType": "internal_advisor"
     },
     {
       "id": "dos-sonrisas-02",
@@ -348,7 +386,9 @@
           "cameraTake3": "40-60s: En la recepción muestra el software de agenda médica en el computador y el datáfono de cobro con la razón social."
         },
         "whatsappOnboardingMessage": "Apreciado Dr. de Clínica Dental Sonrisas, un gusto saludarle. En Prestigia ya tenemos listo su expediente para crear la ficha ganadora de su consultorio en el Top 3 de Google Maps para El Poblado, Medellín.\n\nPara iniciar la indexación requerimos:\n1. 10 a 12 fotos nítidas de la clínica, recepción y equipos.\n2. Video continuo de 60 segundos según el guion adjunto.\n3. Registro médico o NIT para la verificación de salud.\n\n¡Quedamos atentos para activar su flujo de pacientes privados!"
-      }
+      },
+      "country": "Colombia",
+      "advisorType": "internal_advisor"
     },
     {
       "id": "dos-autospa-03",
@@ -422,6 +462,76 @@
           "cameraTake3": "40-60s: Zona de oficina comercial y mostrador de atención al cliente con facturación."
         },
         "whatsappOnboardingMessage": "Hola equipo AutoSpa Cali, desde Prestigia ya construimos la configuración ganadora para su perfil en Google Maps para adueñarse de las búsquedas de detailing y cerámico en Cali.\n\nPor favor envíennos fotos de sus mejores autos terminados y el video de 60s según la guía adjunta para culminar el registro. ¡A romperla en Google!"
+      },
+      "country": "Colombia",
+      "advisorType": "founder"
+    },
+    {
+      "id": "dos-agency-tacos-01",
+      "advisorId": "agency-impulso",
+      "advisorName": "Agencia Impulso Digital 360",
+      "advisorPhone": "+525512345678",
+      "advisorType": "partner_agency",
+      "country": "México",
+      "clientName": "Taquería El Pastor de Oro",
+      "category": "Restaurante / Gastronomía",
+      "city": "Ciudad de México",
+      "neighborhood": "Polanco",
+      "googleUrl": "https://maps.google.com/?cid=1122334455",
+      "mode": "audit",
+      "status": "presented",
+      "createdAt": "2026-10-31T18:37:30.465Z",
+      "updatedAt": "2026-10-31T18:37:30.467Z",
+      "data": {
+        "healthScore": 50,
+        "criticalGaps": [
+          "Ficha sin subcategorías de tacos al pastor",
+          "Descripción sin menú nocturno"
+        ],
+        "actionRoadmap": [
+          {
+            "step": 1,
+            "title": "Inyección de Categorías",
+            "impact": "+35%",
+            "action": "Añadir taquería mexicana"
+          }
+        ],
+        "optimizedTitle": "Taquería El Pastor de Oro | Tacos al Pastor & Carnitas Polanco",
+        "primaryCategory": "Restaurante mexicano",
+        "secondaryCategories": [
+          "Taquería",
+          "Bar de tacos"
+        ],
+        "commercialDescription": "Los mejores tacos al pastor con receta tradicional en Polanco CDMX. Trompo artesanal al carbón y salsas taqueras.",
+        "serviceCatalog": [
+          {
+            "name": "Tacos al Pastor con Queso",
+            "description": "Carne de trompo adobada con piña y tortilla recién hecha.",
+            "tag": "Especialidad"
+          }
+        ],
+        "photoChecklist": [
+          {
+            "item": "Trompo al pastor encendido",
+            "count": 3,
+            "tip": "Luz cálida",
+            "filenameExample": "trompo-pastor-polanco-cdmx.jpg"
+          }
+        ],
+        "preventiveFaqs": [
+          {
+            "question": "¿Tienen servicio hasta la madrugada?",
+            "answer": "Sí, abiertos hasta las 3:00 AM."
+          }
+        ],
+        "verificationGuide": {
+          "title": "Verificación en Taquería",
+          "overview": "Video continuo de 60s.",
+          "cameraTake1": "Aviso exterior",
+          "cameraTake2": "Trompo y mesas",
+          "cameraTake3": "Terminal bancaria"
+        },
+        "whatsappOnboardingMessage": "Expediente listo para posicionar la taquería en el Top 3 de Polanco."
       }
     }
   ]

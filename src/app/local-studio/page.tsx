@@ -38,6 +38,11 @@ import {
   Award,
   ExternalLink,
   Check,
+  Download,
+  Globe,
+  DollarSign,
+  Filter,
+  Briefcase,
 } from 'lucide-react';
 
 interface StudioAdvisorUser {
@@ -46,6 +51,11 @@ interface StudioAdvisorUser {
   username: string;
   phone: string;
   role: 'admin' | 'advisor';
+  accountType?: 'internal_advisor' | 'partner_agency' | 'founder';
+  country?: string;
+  city?: string;
+  monthlyFeeUsd?: number;
+  licenseStatus?: 'active' | 'pending_payment' | 'suspended';
   active: boolean;
 }
 
@@ -105,6 +115,8 @@ interface StudioDossierRecord {
   advisorId: string;
   advisorName: string;
   advisorPhone?: string;
+  advisorType?: 'internal_advisor' | 'partner_agency' | 'founder';
+  country?: string;
   clientName: string;
   category: string;
   city: string;
@@ -144,7 +156,7 @@ export default function LocalStudioPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Active Workspace Tab
-  const [activeTab, setActiveTab] = useState<'create' | 'audit' | 'dossiers' | 'guide' | 'pitch' | 'advisors'>('create');
+  const [activeTab, setActiveTab] = useState<'create' | 'audit' | 'dossiers' | 'guide' | 'pitch' | 'advisors' | 'network'>('create');
 
   // Toast Notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -285,14 +297,27 @@ export default function LocalStudioPage() {
   const [isLoadingDossiers, setIsLoadingDossiers] = useState(false);
   const [dossierSearch, setDossierSearch] = useState('');
   const [dossierModeFilter, setDossierModeFilter] = useState<'all' | 'create' | 'audit'>('all');
-  const [dossierAdvisorFilter, setDossierAdvisorFilter] = useState<string>('mine');
 
-  // Advisors List (for Admin tab)
+  // Network (Advisors & Agencies B2B) State
+  const [networkSubView, setNetworkSubView] = useState<'monitor' | 'register' | 'directory'>('monitor');
+  const [networkSearch, setNetworkSearch] = useState('');
+  const [networkAdvisorFilter, setNetworkAdvisorFilter] = useState('all');
+  const [networkTypeFilter, setNetworkTypeFilter] = useState<'all' | 'internal_advisor' | 'partner_agency'>('all');
+  const [networkCountryFilter, setNetworkCountryFilter] = useState('all');
+  const [networkCityFilter, setNetworkCityFilter] = useState('all');
+  const [networkModeFilter, setNetworkModeFilter] = useState<'all' | 'create' | 'audit'>('all');
+
+  // Advisors & Agencies List (for Admin tab)
   const [advisorsList, setAdvisorsList] = useState<StudioAdvisorUser[]>([]);
+  const [newAccountType, setNewAccountType] = useState<'internal_advisor' | 'partner_agency'>('internal_advisor');
   const [newAdvisorName, setNewAdvisorName] = useState('');
   const [newAdvisorUser, setNewAdvisorUser] = useState('');
   const [newAdvisorPass, setNewAdvisorPass] = useState('');
   const [newAdvisorPhone, setNewAdvisorPhone] = useState('+57');
+  const [newAdvisorCountry, setNewAdvisorCountry] = useState('Colombia');
+  const [newAdvisorCity, setNewAdvisorCity] = useState('Bogotá');
+  const [newAdvisorMonthlyFee, setNewAdvisorMonthlyFee] = useState<number>(49);
+  const [newAdvisorLicenseStatus, setNewAdvisorLicenseStatus] = useState<'active' | 'pending_payment'>('active');
   const [adminMasterKey, setAdminMasterKey] = useState('admin');
   const [isSavingAdvisor, setIsSavingAdvisor] = useState(false);
 
@@ -470,43 +495,139 @@ export default function LocalStudioPage() {
     }
   };
 
-  // Filtered dossiers with multi-criteria filtering
-  const filteredDossiers = useMemo(() => {
-    return savedDossiers.filter((d) => {
-      // Filter by mode
-      if (dossierModeFilter !== 'all' && d.mode !== dossierModeFilter) return false;
-
-      // Filter by advisor
-      if (dossierAdvisorFilter === 'mine') {
-        const isMine =
+  // 100% PRIVATE DOSSIERS: ONLY Brayan's personal clients (Never mixed with team)
+  const myDossiers = useMemo(() => {
+    return savedDossiers
+      .filter(
+        (d) =>
           d.advisorId === 'adv-brayan' ||
           d.advisorName.toLowerCase().includes('brayan') ||
-          d.advisorName.toLowerCase().includes('director');
-        if (!isMine) return false;
-      } else if (dossierAdvisorFilter !== 'all') {
-        if (d.advisorId !== dossierAdvisorFilter) return false;
-      }
+          d.advisorName.toLowerCase().includes('director')
+      )
+      .filter((d) => {
+        if (dossierModeFilter !== 'all' && d.mode !== dossierModeFilter) return false;
+        if (dossierSearch.trim()) {
+          const q = dossierSearch.toLowerCase();
+          const match =
+            d.clientName.toLowerCase().includes(q) ||
+            d.city.toLowerCase().includes(q) ||
+            d.category.toLowerCase().includes(q) ||
+            (d.neighborhood && d.neighborhood.toLowerCase().includes(q));
+          if (!match) return false;
+        }
+        return true;
+      });
+  }, [savedDossiers, dossierSearch, dossierModeFilter]);
 
-      // Filter by search text
-      if (dossierSearch.trim()) {
-        const q = dossierSearch.toLowerCase();
-        const match =
-          d.clientName.toLowerCase().includes(q) ||
-          d.city.toLowerCase().includes(q) ||
-          d.category.toLowerCase().includes(q) ||
-          d.advisorName.toLowerCase().includes(q) ||
-          (d.neighborhood && d.neighborhood.toLowerCase().includes(q));
-        if (!match) return false;
-      }
-      return true;
+  // NETWORK DOSSIERS: All team advisors and licensed B2B partner agencies
+  const networkFilteredDossiers = useMemo(() => {
+    return savedDossiers
+      .filter((d) => d.advisorId !== 'adv-brayan') // Exclude Brayan's private records
+      .filter((d) => {
+        if (networkAdvisorFilter !== 'all' && d.advisorId !== networkAdvisorFilter) return false;
+        if (networkModeFilter !== 'all' && d.mode !== networkModeFilter) return false;
+        if (networkCountryFilter !== 'all' && (d.country || 'Colombia') !== networkCountryFilter) return false;
+        if (networkCityFilter !== 'all' && d.city.toLowerCase() !== networkCityFilter.toLowerCase()) return false;
+        if (networkTypeFilter !== 'all') {
+          if (networkTypeFilter === 'partner_agency' && d.advisorType !== 'partner_agency') return false;
+          if (networkTypeFilter === 'internal_advisor' && d.advisorType === 'partner_agency') return false;
+        }
+        if (networkSearch.trim()) {
+          const q = networkSearch.toLowerCase();
+          const match =
+            d.clientName.toLowerCase().includes(q) ||
+            d.advisorName.toLowerCase().includes(q) ||
+            d.city.toLowerCase().includes(q) ||
+            d.category.toLowerCase().includes(q) ||
+            (d.country && d.country.toLowerCase().includes(q));
+          if (!match) return false;
+        }
+        return true;
+      });
+  }, [
+    savedDossiers,
+    networkAdvisorFilter,
+    networkModeFilter,
+    networkCountryFilter,
+    networkCityFilter,
+    networkTypeFilter,
+    networkSearch,
+  ]);
+
+  // Distinct countries available in network
+  const availableCountries = useMemo(() => {
+    const set = new Set<string>();
+    savedDossiers.forEach((d) => {
+      if (d.country) set.add(d.country);
     });
-  }, [savedDossiers, dossierSearch, dossierModeFilter, dossierAdvisorFilter]);
+    advisorsList.forEach((a) => {
+      if (a.country) set.add(a.country);
+    });
+    set.add('Colombia');
+    set.add('México');
+    return Array.from(set);
+  }, [savedDossiers, advisorsList]);
 
-  // Jump from Advisor management tab directly to that advisor's dossiers
+  // Distinct cities available in network
+  const availableCities = useMemo(() => {
+    const set = new Set<string>();
+    savedDossiers.forEach((d) => {
+      if (d.city) set.add(d.city);
+    });
+    advisorsList.forEach((a) => {
+      if (a.city) set.add(a.city);
+    });
+    return Array.from(set);
+  }, [savedDossiers, advisorsList]);
+
+  // Download Network Performance Report in CSV
+  const downloadNetworkCsvReport = () => {
+    const headers = [
+      'Fecha',
+      'Asesor o Agencia',
+      'Tipo de Cuenta',
+      'Pais',
+      'Ciudad',
+      'Cliente Auditado',
+      'Categoria',
+      'Modalidad',
+      'Score Salud Google',
+      'WhatsApp Contacto',
+    ];
+
+    const rows = networkFilteredDossiers.map((d) => [
+      `"${new Date(d.createdAt).toLocaleDateString()}"`,
+      `"${(d.advisorName || '').replace(/"/g, '""')}"`,
+      d.advisorType === 'partner_agency' ? 'Agencia Partner (Licencia Mensual)' : 'Asesor Comercial Interno',
+      `"${d.country || 'Colombia'}"`,
+      `"${d.city || ''}"`,
+      `"${(d.clientName || '').replace(/"/g, '""')}"`,
+      `"${(d.category || '').replace(/"/g, '""')}"`,
+      d.mode === 'create' ? 'Ficha Nueva Desde Cero' : 'Auditoria Forense Top 3',
+      d.data?.healthScore !== undefined ? `"${d.data.healthScore}/100"` : '"N/A"',
+      `"${d.advisorPhone || ''}"`,
+    ]);
+
+    const csvContent =
+      'data:text/csv;charset=utf-8,\uFEFF' +
+      [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `reporte_seguimiento_red_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('📥 ¡Reporte de seguimiento de red descargado en CSV con éxito!');
+  };
+
+  // Jump from Advisor management tab directly to that advisor's dossiers in the network tab
   const handleViewAdvisorDossiers = (advisor: StudioAdvisorUser) => {
-    setDossierAdvisorFilter(advisor.id);
-    setActiveTab('dossiers');
-    showToast(`📂 Visualizando cuentas gestionadas por ${advisor.name}`);
+    setNetworkAdvisorFilter(advisor.id);
+    setActiveTab('network');
+    setNetworkSubView('monitor');
+    showToast(`📂 Visualizando cuentas de ${advisor.name}`);
   };
 
   // Load a dossier from list into workspace
@@ -532,7 +653,7 @@ export default function LocalStudioPage() {
     } catch {}
   };
 
-  // Save new advisor
+  // Save new advisor or licensed agency partner
   const handleCreateAdvisor = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAdvisorName || !newAdvisorUser || !newAdvisorPass) {
@@ -551,6 +672,11 @@ export default function LocalStudioPage() {
           password: newAdvisorPass,
           phone: newAdvisorPhone,
           role: 'advisor',
+          accountType: newAccountType,
+          country: newAdvisorCountry,
+          city: newAdvisorCity,
+          monthlyFeeUsd: newAccountType === 'partner_agency' ? Number(newAdvisorMonthlyFee) : 0,
+          licenseStatus: newAdvisorLicenseStatus,
           active: true,
           masterKey: adminMasterKey,
         }),
@@ -558,16 +684,21 @@ export default function LocalStudioPage() {
 
       const resData = await res.json();
       if (resData.success) {
-        showToast(`¡Asesor ${newAdvisorName} creado con éxito!`);
+        showToast(
+          newAccountType === 'partner_agency'
+            ? `🏢 ¡Agencia Partner ${newAdvisorName} registrada y licenciada con éxito!`
+            : `💼 ¡Asesor Comercial ${newAdvisorName} creado con éxito!`
+        );
         setNewAdvisorName('');
         setNewAdvisorUser('');
         setNewAdvisorPass('');
         fetchAdvisors();
+        setNetworkSubView('directory');
       } else {
         showToast('⚠️ Error: ' + (resData.error || 'No autorizado'));
       }
     } catch (err) {
-      showToast('⚠️ Error al crear asesor');
+      showToast('⚠️ Error al registrar cuenta');
     } finally {
       setIsSavingAdvisor(false);
     }
@@ -750,12 +881,12 @@ export default function LocalStudioPage() {
             onClick={() => setActiveTab('dossiers')}
             className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'dossiers'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                 : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>📁 Clientes Guardados</span>
+            <span>📁 Mis Clientes (Brayan)</span>
           </button>
 
           <button
@@ -787,15 +918,15 @@ export default function LocalStudioPage() {
           {currentUser?.role === 'admin' && (
             <button
               type="button"
-              onClick={() => setActiveTab('advisors')}
+              onClick={() => setActiveTab('network')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                activeTab === 'advisors'
-                  ? 'bg-amber-400 text-slate-950 shadow-md font-black'
-                  : 'bg-slate-950 text-amber-400 hover:text-white border border-amber-500/30'
+                activeTab === 'network' || activeTab === 'advisors'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-black'
+                  : 'bg-slate-950 text-indigo-400 hover:text-white border border-indigo-500/30'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>👥 Gestión de Asesores</span>
+              <span>🏢 Red de Asesores & Agencias B2B</span>
             </button>
           )}
         </div>
@@ -1512,7 +1643,7 @@ export default function LocalStudioPage() {
         )}
 
         {/* =============================================================
-            TAB 3: CARTERA DE CLIENTES GUARDADOS (AUDITORÍA & REGISTROS)
+            TAB 3: MIS CLIENTES GUARDADOS (EXCLUSIVO CUENTA PRINCIPAL BRAYAN)
             ============================================================= */}
         {activeTab === 'dossiers' && (
           <div className="space-y-6 print:hidden">
@@ -1520,18 +1651,16 @@ export default function LocalStudioPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-950 border border-indigo-500/40 text-indigo-300">
-                    Historial de Operaciones
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
+                    ⭐ Cartera Personal Privada
                   </span>
-                  <span className="text-xs text-slate-500">• Base de Datos en Tiempo Real</span>
+                  <span className="text-xs text-slate-500">• Brayan (Cuenta Principal)</span>
                 </div>
                 <h1 className="text-xl sm:text-2xl font-black text-white mt-1">
-                  Expedientes & Cartera de Clientes Auditados
+                  Mis Clientes & Auditorías Privadas
                 </h1>
                 <p className="text-xs text-slate-400">
-                  {currentUser?.role === 'admin'
-                    ? 'Monitorea en tiempo real todas las fichas y auditorías creadas por ti y tus asesores comerciales.'
-                    : `Expedientes creados y gestionados por ${currentUser?.name}.`}
+                  Expedientes creados y auditados personalmente por ti. Tus clientes están 100% aislados y protegidos de la red comercial.
                 </p>
               </div>
 
@@ -1540,7 +1669,7 @@ export default function LocalStudioPage() {
                   type="text"
                   value={dossierSearch}
                   onChange={(e) => setDossierSearch(e.target.value)}
-                  placeholder="Buscar por cliente, asesor o ciudad..."
+                  placeholder="Buscar en mis clientes..."
                   className="w-full pl-9 pr-3 py-2.5 rounded-2xl bg-slate-950 border border-slate-700 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition"
                 />
                 <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
@@ -1550,12 +1679,12 @@ export default function LocalStudioPage() {
             {/* Executive KPI Summary Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
               <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
                   <Layers className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-400 block">Total Expedientes</span>
-                  <strong className="text-xl font-black text-white">{savedDossiers.length}</strong>
+                  <span className="text-[11px] text-slate-400 block">Mis Expedientes</span>
+                  <strong className="text-xl font-black text-white">{myDossiers.length}</strong>
                 </div>
               </div>
 
@@ -1566,181 +1695,105 @@ export default function LocalStudioPage() {
                 <div>
                   <span className="text-[11px] text-slate-400 block">Fichas Desde Cero</span>
                   <strong className="text-xl font-black text-emerald-400">
-                    {savedDossiers.filter((d) => d.mode === 'create').length}
+                    {myDossiers.filter((d) => d.mode === 'create').length}
                   </strong>
                 </div>
               </div>
 
               <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-600/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0">
                   <Search className="w-5 h-5" />
                 </div>
                 <div>
                   <span className="text-[11px] text-slate-400 block">Auditorías Top 3</span>
-                  <strong className="text-xl font-black text-amber-400">
-                    {savedDossiers.filter((d) => d.mode === 'audit').length}
+                  <strong className="text-xl font-black text-indigo-300">
+                    {myDossiers.filter((d) => d.mode === 'audit').length}
                   </strong>
                 </div>
               </div>
 
               <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/40 flex items-center justify-center text-purple-400 shrink-0">
-                  <Users className="w-5 h-5" />
+                <div className="w-10 h-10 rounded-xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                  <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-400 block">Asesores Activos</span>
-                  <strong className="text-xl font-black text-purple-300">
-                    {new Set(savedDossiers.map((d) => d.advisorName)).size}
-                  </strong>
+                  <span className="text-[11px] text-slate-400 block">Privacidad</span>
+                  <strong className="text-xs font-black text-emerald-400 uppercase">100% Blindado</strong>
                 </div>
               </div>
             </div>
 
-            {/* Active Advisor Filter Banner (when coming from advisors tab) */}
-            {dossierAdvisorFilter !== 'mine' && dossierAdvisorFilter !== 'all' && (
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-950/90 to-slate-900 border border-indigo-500/50 flex flex-wrap items-center justify-between gap-3 shadow-lg animate-in fade-in">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-md">
-                    💼
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-black uppercase text-indigo-400 tracking-wider">
-                      Cuentas y Auditorías del Asesor Comercial:
-                    </span>
-                    <h3 className="text-sm font-black text-white">
-                      {advisorsList.find((a) => a.id === dossierAdvisorFilter)?.name || 'Asesor'}
-                    </h3>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setDossierAdvisorFilter('mine')}
-                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer flex items-center gap-1.5 shadow-md shadow-amber-500/10 active:scale-98"
-                >
-                  <span>⭐ Volver a Mis Clientes (Brayan)</span>
-                </button>
-              </div>
-            )}
-
-            {/* Filter Pills */}
-            <div className="flex flex-wrap items-center justify-between gap-3 text-xs bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-slate-400 text-[11px] font-bold">Cartera:</span>
-                <button
-                  type="button"
-                  onClick={() => setDossierAdvisorFilter('mine')}
-                  className={`px-3.5 py-1.5 rounded-xl font-black transition cursor-pointer flex items-center gap-1.5 shadow-sm ${
-                    dossierAdvisorFilter === 'mine'
-                      ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                      : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-                  }`}
-                >
-                  <span>⭐ Mis Clientes (Brayan)</span>
-                  <span
-                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                      dossierAdvisorFilter === 'mine' ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-slate-400'
-                    }`}
-                  >
-                    {
-                      savedDossiers.filter(
-                        (d) =>
-                          d.advisorId === 'adv-brayan' ||
-                          d.advisorName.toLowerCase().includes('brayan') ||
-                          d.advisorName.toLowerCase().includes('director')
-                      ).length
-                    }
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setDossierAdvisorFilter('all')}
-                  className={`px-3.5 py-1.5 rounded-xl font-black transition cursor-pointer flex items-center gap-1.5 shadow-sm ${
-                    dossierAdvisorFilter === 'all'
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                      : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-                  }`}
-                >
-                  <span>🌐 Todo el Equipo</span>
-                  <span
-                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                      dossierAdvisorFilter === 'all' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'
-                    }`}
-                  >
-                    {savedDossiers.length}
-                  </span>
-                </button>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-slate-400 text-[11px] font-bold">Tipo:</span>
+            {/* Filter Pills (Clean, personal mode filters only) */}
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 text-[11px] font-bold">Filtrar por:</span>
                 <button
                   type="button"
                   onClick={() => setDossierModeFilter('all')}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
                     dossierModeFilter === 'all'
-                      ? 'bg-slate-800 text-white'
-                      : 'text-slate-500 hover:text-slate-300'
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
+                      : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
                   }`}
                 >
-                  Todos
+                  Todos ({myDossiers.length})
                 </button>
                 <button
                   type="button"
                   onClick={() => setDossierModeFilter('create')}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
                     dossierModeFilter === 'create'
-                      ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
-                      : 'text-slate-500 hover:text-slate-300'
+                      ? 'bg-emerald-500 text-slate-950 font-black'
+                      : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
                   }`}
                 >
-                  🏗️ Fichas Nuevas
+                  🏗️ Fichas Nuevas ({myDossiers.filter((d) => d.mode === 'create').length})
                 </button>
                 <button
                   type="button"
                   onClick={() => setDossierModeFilter('audit')}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
                     dossierModeFilter === 'audit'
-                      ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                      : 'text-slate-500 hover:text-slate-300'
+                      ? 'bg-indigo-600 text-white font-black'
+                      : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
                   }`}
                 >
-                  🔬 Auditorías Top 3
+                  🔬 Auditorías Top 3 ({myDossiers.filter((d) => d.mode === 'audit').length})
                 </button>
               </div>
+
+              <span className="text-[11px] text-slate-400 font-medium">
+                Mostrando únicamente clientes de la cuenta principal
+              </span>
             </div>
 
-            {/* List / Grid of Dossiers */}
+            {/* List / Grid of My Dossiers */}
             {isLoadingDossiers ? (
               <div className="text-center py-16 text-slate-400 text-xs space-y-2">
-                <RefreshCw className="w-6 h-6 animate-spin mx-auto text-indigo-400" />
-                <p>Cargando cartera de clientes en tiempo real...</p>
+                <RefreshCw className="w-6 h-6 animate-spin mx-auto text-amber-400" />
+                <p>Cargando tu cartera personal...</p>
               </div>
-            ) : filteredDossiers.length === 0 ? (
+            ) : myDossiers.length === 0 ? (
               <div className="text-center py-16 p-8 rounded-3xl bg-slate-900/40 border border-slate-800 space-y-3">
                 <Layers className="w-10 h-10 text-slate-600 mx-auto" />
-                <h3 className="text-base font-bold text-white">No se encontraron expedientes con los filtros aplicados</h3>
+                <h3 className="text-base font-bold text-white">No tienes clientes guardados en tu cuenta personal</h3>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Prueba cambiando los filtros de búsqueda o genera un nuevo análisis en los módulos de Ficha o Auditoría.
+                  Genera una nueva ficha desde cero o una auditoría en los módulos principales para registrar tu primer cliente.
                 </p>
                 <button
                   type="button"
-                  onClick={() => {
-                    setDossierSearch('');
-                    setDossierModeFilter('all');
-                    setDossierAdvisorFilter('all');
-                  }}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition cursor-pointer"
+                  onClick={() => setActiveTab('create')}
+                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition cursor-pointer shadow-md"
                 >
-                  Restablecer Filtros
+                  🏗️ Crear Primera Ficha Ganadora
                 </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredDossiers.map((d) => (
+                {myDossiers.map((d) => (
                   <div
                     key={d.id}
-                    className="p-5 rounded-3xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition flex flex-col justify-between space-y-4 shadow-lg hover:shadow-indigo-500/5 group"
+                    className="p-5 rounded-3xl bg-slate-900 border border-slate-800 hover:border-amber-400/60 transition flex flex-col justify-between space-y-4 shadow-lg group"
                   >
                     <div className="space-y-2">
                       <div className="flex items-center justify-between gap-2">
@@ -1778,7 +1831,7 @@ export default function LocalStudioPage() {
                         <p className="text-xs text-slate-400">
                           📍 {d.city} {d.neighborhood ? `• ${d.neighborhood}` : ''}
                         </p>
-                        <span className="text-[11px] text-indigo-400 font-bold block mt-1">{d.category}</span>
+                        <span className="text-[11px] text-amber-400 font-bold block mt-1">{d.category}</span>
                       </div>
 
                       {d.data?.criticalGaps && d.data.criticalGaps.length > 0 && (
@@ -1790,9 +1843,8 @@ export default function LocalStudioPage() {
 
                     <div className="pt-3 border-t border-slate-800/80 space-y-2.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                          {d.advisorName}
+                        <span className="text-[11px] font-bold text-amber-200 flex items-center gap-1.5">
+                          👑 Brayan (Cuenta Principal)
                         </span>
                         <span className="text-[10px] text-slate-500 font-mono">{d.advisorPhone}</span>
                       </div>
@@ -1801,7 +1853,7 @@ export default function LocalStudioPage() {
                         <button
                           type="button"
                           onClick={() => handleLoadDossier(d)}
-                          className="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20 active:scale-98"
+                          className="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/10 active:scale-98"
                         >
                           <span>👁️ Cargar y Ver</span>
                         </button>
@@ -2009,114 +2061,568 @@ export default function LocalStudioPage() {
         )}
 
         {/* =============================================================
-            TAB 6: GESTIÓN DE ASESORES (SOLO DUEÑO / ADMIN)
+            TAB 6 / 4: RED DE ASESORES & AGENCIAS B2B (EXCLUSIVO DUEÑO / MASTER)
             ============================================================= */}
-        {activeTab === 'advisors' && currentUser?.role === 'admin' && (
+        {(activeTab === 'advisors' || activeTab === 'network') && currentUser?.role === 'admin' && (
           <div className="space-y-6 print:hidden">
-            <div className="bg-gradient-to-r from-amber-500/10 via-slate-900 to-slate-900 border border-amber-500/40 rounded-3xl p-5 sm:p-6 shadow-xl">
-              <div className="space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
-                  Panel de Dueño / Director Comercial
-                </span>
-                <h1 className="text-xl sm:text-2xl font-black text-white">
-                  Equipo de Ventas & Asesores de Prestigia
-                </h1>
-                <p className="text-xs text-slate-300">
-                  Crea accesos individuales para tus vendedores. Cada vendedor tiene su propio usuario y sus PDFs saldrán firmados con su nombre y WhatsApp.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Form Create Advisor */}
-              <form onSubmit={handleCreateAdvisor} className="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-3.5 text-xs shadow-xl">
-                <h3 className="font-black text-white text-sm pb-2 border-b border-slate-800">
-                  + Registrar Nuevo Asesor Comercial
-                </h3>
-
-                <div>
-                  <label className="block font-bold text-slate-300 mb-1">Nombre Completo del Asesor *</label>
-                  <input
-                    type="text"
-                    value={newAdvisorName}
-                    onChange={(e) => setNewAdvisorName(e.target.value)}
-                    placeholder="Ej: Carlos Gómez"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-300 mb-1">Usuario de Acceso *</label>
-                  <input
-                    type="text"
-                    value={newAdvisorUser}
-                    onChange={(e) => setNewAdvisorUser(e.target.value)}
-                    placeholder="Ej: carlos"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white lowercase"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-300 mb-1">Contraseña *</label>
-                  <input
-                    type="text"
-                    value={newAdvisorPass}
-                    onChange={(e) => setNewAdvisorPass(e.target.value)}
-                    placeholder="Ej: ventas123"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-300 mb-1">WhatsApp del Asesor (Para PDFs)</label>
-                  <input
-                    type="text"
-                    value={newAdvisorPhone}
-                    onChange={(e) => setNewAdvisorPhone(e.target.value)}
-                    placeholder="+573001234567"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-300 mb-1">Clave Maestra de Dueño *</label>
-                  <input
-                    type="password"
-                    value={adminMasterKey}
-                    onChange={(e) => setAdminMasterKey(e.target.value)}
-                    placeholder="admin"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-amber-500/40 text-amber-300 font-mono"
-                  />
+            {/* Header */}
+            <div className="bg-gradient-to-r from-amber-500/10 via-slate-900 to-indigo-950/40 border border-amber-500/40 rounded-3xl p-5 sm:p-6 shadow-xl">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
+                      👑 Panel Ejecutivo Master • Red Comercial & Monetización B2B
+                    </span>
+                    <span className="text-xs text-slate-500">• Licenciamiento & Equipos</span>
+                  </div>
+                  <h1 className="text-xl sm:text-2xl font-black text-white mt-1">
+                    Red de Asesores Comerciales & Agencias Partners
+                  </h1>
+                  <p className="text-xs text-slate-300 max-w-3xl">
+                    Crea accesos individuales para tus vendedores a comisión o vende licencias de software mensual a agencias aliadas para que prospecten y auditen negocios locales en cualquier país o ciudad.
+                  </p>
                 </div>
 
                 <button
-                  type="submit"
-                  disabled={isSavingAdvisor}
-                  className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg active:scale-98"
+                  type="button"
+                  onClick={downloadNetworkCsvReport}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs transition cursor-pointer flex items-center gap-2 shadow-lg shadow-emerald-500/20 shrink-0 active:scale-98"
                 >
-                  {isSavingAdvisor ? 'Guardando Asesor...' : '+ Crear Asesor Comercial'}
+                  <Download className="w-4 h-4" />
+                  <span>📥 Descargar Reporte CSV</span>
                 </button>
-              </form>
+              </div>
+            </div>
 
-              {/* Advisors List */}
-              <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                  <div>
-                    <h3 className="font-black text-white text-sm">
-                      Asesores Comerciales Activos ({advisorsList.filter((a) => a.id !== 'adv-admin').length})
-                    </h3>
-                    <p className="text-[11px] text-slate-400">
-                      Toca cualquier asesor para ver sus cuentas creadas y auditorías en tiempo real
-                    </p>
+            {/* Monetization & Network KPI Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0">
+                  <Briefcase className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-slate-400 block">Asesores Internos</span>
+                  <strong className="text-xl font-black text-white">
+                    {advisorsList.filter((a) => a.accountType !== 'partner_agency' && a.id !== 'adv-brayan' && a.id !== 'adv-admin').length}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/40 flex items-center justify-center text-purple-400 shrink-0">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-slate-400 block">Agencias Licenciadas</span>
+                  <strong className="text-xl font-black text-purple-300">
+                    {advisorsList.filter((a) => a.accountType === 'partner_agency').length}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-600/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-slate-400 block">Cuentas de la Red</span>
+                  <strong className="text-xl font-black text-amber-400">{networkFilteredDossiers.length}</strong>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                  <DollarSign className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-slate-400 block">Ingreso Licencias (MRR)</span>
+                  <strong className="text-xl font-black text-emerald-400">
+                    ${advisorsList
+                      .filter((a) => a.accountType === 'partner_agency' && a.licenseStatus === 'active')
+                      .reduce((sum, a) => sum + (a.monthlyFeeUsd || 0), 0)}{' '}
+                    <span className="text-xs font-bold text-slate-400">USD/mes</span>
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Sub-view Switcher Tabs */}
+            <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-3">
+              <button
+                type="button"
+                onClick={() => setNetworkSubView('monitor')}
+                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                  networkSubView === 'monitor'
+                    ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                <Search className="w-3.5 h-3.5" />
+                <span>📊 Monitor de Cuentas Prospectadas ({networkFilteredDossiers.length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setNetworkSubView('register')}
+                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                  networkSubView === 'register'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>➕ Registrar Asesor o Licenciar Agencia</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setNetworkSubView('directory')}
+                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                  networkSubView === 'directory'
+                    ? 'bg-purple-600 text-white shadow-md'
+                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                <Globe className="w-3.5 h-3.5" />
+                <span>
+                  👥 Directorio de Cuentas Activas (
+                  {advisorsList.filter((a) => a.id !== 'adv-admin' && a.id !== 'adv-brayan').length})
+                </span>
+              </button>
+            </div>
+
+            {/* SUB-VIEW 1: MONITOR DE PROSPECCIÓN & AUDITORÍAS CON FILTROS AVANZADOS */}
+            {networkSubView === 'monitor' && (
+              <div className="space-y-4">
+                {/* Advanced Multi-Criteria Filter Bar */}
+                <div className="p-4 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
+                  <div className="flex items-center gap-2 text-slate-300 font-bold">
+                    <Filter className="w-4 h-4 text-amber-400" />
+                    <span>Filtros de Auditoría y Seguimiento de Red:</span>
                   </div>
-                  <span className="text-[10px] font-bold text-amber-400 bg-amber-950/60 border border-amber-500/30 px-2 py-0.5 rounded-full">
-                    ⚡ Clickeable
-                  </span>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5">
+                    {/* Filter Advisor */}
+                    <div>
+                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">
+                        Asesor / Agencia
+                      </label>
+                      <select
+                        value={networkAdvisorFilter}
+                        onChange={(e) => setNetworkAdvisorFilter(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                      >
+                        <option value="all">Todos los Miembros</option>
+                        {advisorsList
+                          .filter((a) => a.id !== 'adv-admin' && a.id !== 'adv-brayan')
+                          .map((adv) => (
+                            <option key={adv.id} value={adv.id}>
+                              {adv.name} ({adv.accountType === 'partner_agency' ? 'Agencia' : 'Asesor'})
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+
+                    {/* Filter Account Type */}
+                    <div>
+                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">
+                        Tipo de Cuenta
+                      </label>
+                      <select
+                        value={networkTypeFilter}
+                        onChange={(e) => setNetworkTypeFilter(e.target.value as any)}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                      >
+                        <option value="all">Todos los Tipos</option>
+                        <option value="internal_advisor">💼 Asesores Internos</option>
+                        <option value="partner_agency">🏢 Agencias Partners (B2B)</option>
+                      </select>
+                    </div>
+
+                    {/* Filter Country */}
+                    <div>
+                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">País</label>
+                      <select
+                        value={networkCountryFilter}
+                        onChange={(e) => setNetworkCountryFilter(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                      >
+                        <option value="all">Todos los Países</option>
+                        {availableCountries.map((c) => (
+                          <option key={c} value={c}>
+                            {c === 'Colombia' ? '🇨🇴 Colombia' : c === 'México' ? '🇲🇽 México' : c}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Filter City */}
+                    <div>
+                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">Ciudad</label>
+                      <select
+                        value={networkCityFilter}
+                        onChange={(e) => setNetworkCityFilter(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                      >
+                        <option value="all">Todas las Ciudades</option>
+                        {availableCities.map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Filter Mode */}
+                    <div>
+                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">Modalidad</label>
+                      <select
+                        value={networkModeFilter}
+                        onChange={(e) => setNetworkModeFilter(e.target.value as any)}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                      >
+                        <option value="all">Todas las Modalidades</option>
+                        <option value="create">🏗️ Fichas Nuevas</option>
+                        <option value="audit">🔬 Auditorías Top 3</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Search Input and Reset Button */}
+                  <div className="flex flex-col sm:flex-row items-center gap-2 pt-1 border-t border-slate-800/80">
+                    <div className="flex-1 w-full relative">
+                      <input
+                        type="text"
+                        value={networkSearch}
+                        onChange={(e) => setNetworkSearch(e.target.value)}
+                        placeholder="Buscar por cliente, categoría o palabras clave..."
+                        className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                      />
+                      <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNetworkAdvisorFilter('all');
+                        setNetworkTypeFilter('all');
+                        setNetworkCountryFilter('all');
+                        setNetworkCityFilter('all');
+                        setNetworkModeFilter('all');
+                        setNetworkSearch('');
+                      }}
+                      className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs transition cursor-pointer shrink-0"
+                    >
+                      Restablecer Filtros
+                    </button>
+                  </div>
                 </div>
 
-                <div className="space-y-2.5 text-xs">
+                {/* Dossiers Grid */}
+                {networkFilteredDossiers.length === 0 ? (
+                  <div className="text-center py-16 p-8 rounded-3xl bg-slate-900/40 border border-slate-800 space-y-3">
+                    <Layers className="w-10 h-10 text-slate-600 mx-auto" />
+                    <h3 className="text-base font-bold text-white">No hay expedientes con los filtros seleccionados</h3>
+                    <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                      Intenta modificando los filtros de asesor, país o ciudad.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {networkFilteredDossiers.map((d) => (
+                      <div
+                        key={d.id}
+                        className="p-5 rounded-3xl bg-slate-900 border border-slate-800 hover:border-indigo-500/50 transition flex flex-col justify-between space-y-4 shadow-lg group"
+                      >
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <span
+                              className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                                d.mode === 'create'
+                                  ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                                  : 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                              }`}
+                            >
+                              {d.mode === 'create' ? '🏗️ Ficha Nueva' : '🔬 Auditoría Top 3'}
+                            </span>
+
+                            <span
+                              className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                                d.advisorType === 'partner_agency'
+                                  ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
+                                  : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
+                              }`}
+                            >
+                              {d.advisorType === 'partner_agency' ? '🏢 Agencia Partner' : '💼 Asesor Interno'}
+                            </span>
+
+                            <span className="text-[10px] text-slate-500 font-mono ml-auto">
+                              {new Date(d.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+
+                          <div>
+                            <h4 className="text-base font-black text-white group-hover:text-amber-300 transition">
+                              {d.clientName}
+                            </h4>
+                            <p className="text-xs text-slate-400">
+                              📍 {d.city}, {d.country || 'Colombia'} {d.neighborhood ? `• ${d.neighborhood}` : ''}
+                            </p>
+                            <span className="text-[11px] text-indigo-400 font-bold block mt-1">{d.category}</span>
+                          </div>
+
+                          {d.data?.healthScore !== undefined && (
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                                  d.data.healthScore < 50
+                                    ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                                    : 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                                }`}
+                              >
+                                Score: {d.data.healthScore}/100
+                              </span>
+                              <span className="text-[10px] text-slate-500">
+                                {d.data.healthScore < 50 ? 'Oportunidad de Venta Alta' : 'Perfil Optimizado'}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="pt-3 border-t border-slate-800/80 space-y-2.5">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full bg-indigo-400" />
+                              {d.advisorName}
+                            </span>
+                            <span className="text-[10px] text-slate-500 font-mono">{d.advisorPhone}</span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleLoadDossier(d)}
+                              className="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20 active:scale-98"
+                            >
+                              <span>👁️ Cargar y Ver</span>
+                            </button>
+
+                            {d.data?.whatsappOnboardingMessage && (
+                              <a
+                                href={`https://wa.me/?text=${encodeURIComponent(d.data.whatsappOnboardingMessage)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Enviar Kit por WhatsApp"
+                                className="p-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 transition cursor-pointer"
+                              >
+                                <MessageSquare className="w-4 h-4" />
+                              </a>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteDossier(d.id)}
+                              title="Eliminar Expediente"
+                              className="p-2 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-950/30 transition cursor-pointer"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* SUB-VIEW 2: FORMULARIO DE REGISTRO (ASESOR INTERNO VS AGENCIA PARTNER) */}
+            {networkSubView === 'register' && (
+              <div className="max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl">
+                <div>
+                  <h3 className="text-lg font-black text-white">Registrar Nueva Cuenta en la Red</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Elige si vas a registrar un vendedor de tu equipo propio o una agencia aliada con cuota mensual.
+                  </p>
+                </div>
+
+                {/* Account Type Toggle */}
+                <div className="grid grid-cols-2 gap-3 p-1 rounded-2xl bg-slate-950 border border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setNewAccountType('internal_advisor')}
+                    className={`py-3 px-4 rounded-xl text-xs font-black transition cursor-pointer flex items-center justify-center gap-2 ${
+                      newAccountType === 'internal_advisor'
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Briefcase className="w-4 h-4" />
+                    <span>💼 Asesor Comercial Propio</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setNewAccountType('partner_agency')}
+                    className={`py-3 px-4 rounded-xl text-xs font-black transition cursor-pointer flex items-center justify-center gap-2 ${
+                      newAccountType === 'partner_agency'
+                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Building2 className="w-4 h-4" />
+                    <span>🏢 Agencia Partner (Licencia)</span>
+                  </button>
+                </div>
+
+                <form onSubmit={handleCreateAdvisor} className="space-y-4 text-xs">
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">
+                      {newAccountType === 'partner_agency'
+                        ? 'Razón Social o Nombre de la Agencia *'
+                        : 'Nombre Completo del Asesor *'}
+                    </label>
+                    <input
+                      type="text"
+                      value={newAdvisorName}
+                      onChange={(e) => setNewAdvisorName(e.target.value)}
+                      placeholder={
+                        newAccountType === 'partner_agency'
+                          ? 'Ej: Agencia Digital Rocket 360'
+                          : 'Ej: Carlos Gómez'
+                      }
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">País Sede *</label>
+                      <input
+                        type="text"
+                        value={newAdvisorCountry}
+                        onChange={(e) => setNewAdvisorCountry(e.target.value)}
+                        placeholder="Colombia, México, España..."
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">Ciudad Sede *</label>
+                      <input
+                        type="text"
+                        value={newAdvisorCity}
+                        onChange={(e) => setNewAdvisorCity(e.target.value)}
+                        placeholder="Bogotá, Medellín, CDMX..."
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">Usuario de Acceso *</label>
+                      <input
+                        type="text"
+                        value={newAdvisorUser}
+                        onChange={(e) => setNewAdvisorUser(e.target.value)}
+                        placeholder="ej: carlos o rocketagency"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white lowercase focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">Contraseña *</label>
+                      <input
+                        type="text"
+                        value={newAdvisorPass}
+                        onChange={(e) => setNewAdvisorPass(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">
+                      WhatsApp de Contacto (Para firmar expedientes)
+                    </label>
+                    <input
+                      type="text"
+                      value={newAdvisorPhone}
+                      onChange={(e) => setNewAdvisorPhone(e.target.value)}
+                      placeholder="+573001234567 o +52..."
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  {/* Agency-only License monetization settings */}
+                  {newAccountType === 'partner_agency' && (
+                    <div className="p-4 rounded-2xl bg-purple-950/40 border border-purple-500/40 space-y-3">
+                      <div className="flex items-center gap-2 text-purple-300 font-black">
+                        <DollarSign className="w-4 h-4" />
+                        <span>Configuración de Licencia Mensual B2B:</span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block font-bold text-slate-300 mb-1">Cuota Mensual Pactada (USD)</label>
+                          <input
+                            type="number"
+                            value={newAdvisorMonthlyFee}
+                            onChange={(e) => setNewAdvisorMonthlyFee(Number(e.target.value))}
+                            placeholder="49"
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-purple-500/50 text-purple-200 font-bold focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block font-bold text-slate-300 mb-1">Estado de Licencia</label>
+                          <select
+                            value={newAdvisorLicenseStatus}
+                            onChange={(e) => setNewAdvisorLicenseStatus(e.target.value as any)}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-purple-500/50 text-white focus:outline-none"
+                          >
+                            <option value="active">✅ Activa y al día</option>
+                            <option value="pending_payment">⏳ Pendiente de Pago</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">Clave Maestra de Dueño (Brayan) *</label>
+                    <input
+                      type="password"
+                      value={adminMasterKey}
+                      onChange={(e) => setAdminMasterKey(e.target.value)}
+                      placeholder="admin"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-amber-500/40 text-amber-300 font-mono focus:outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSavingAdvisor}
+                    className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg active:scale-98"
+                  >
+                    {isSavingAdvisor
+                      ? 'Registrando...'
+                      : newAccountType === 'partner_agency'
+                      ? '🚀 Activar Licencia de Agencia Partner'
+                      : '+ Crear Asesor Comercial'}
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* SUB-VIEW 3: DIRECTORIO DE ASESORES & AGENCIAS CON RENDIMIENTO */}
+            {networkSubView === 'directory' && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
                   {advisorsList
-                    .filter((adv) => adv.id !== 'adv-admin')
+                    .filter((adv) => adv.id !== 'adv-admin' && adv.id !== 'adv-brayan')
                     .map((adv) => {
                       const advisorDossiers = savedDossiers.filter((d) => d.advisorId === adv.id);
                       const createsCount = advisorDossiers.filter((d) => d.mode === 'create').length;
@@ -2125,55 +2631,74 @@ export default function LocalStudioPage() {
                       return (
                         <div
                           key={adv.id}
-                          onClick={() => handleViewAdvisorDossiers(adv)}
-                          className="p-4 rounded-2xl bg-slate-950 border border-slate-800/90 hover:border-amber-400/60 hover:bg-slate-900/80 transition-all duration-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 cursor-pointer group shadow-sm hover:shadow-amber-500/5 active:scale-[0.99]"
+                          className="p-5 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-4 shadow-lg hover:border-amber-400/50 transition group"
                         >
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-black text-white text-sm group-hover:text-amber-300 transition">
-                                {adv.name}
-                              </span>
+                          <div className="space-y-2.5">
+                            <div className="flex items-center justify-between">
                               <span
-                                className={`text-[9px] font-black px-1.5 py-0.5 rounded ${
-                                  adv.role === 'admin'
-                                    ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                                  adv.accountType === 'partner_agency'
+                                    ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
                                     : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
                                 }`}
                               >
-                                {adv.role === 'admin' ? 'FOUNDER' : 'ASESOR'}
+                                {adv.accountType === 'partner_agency' ? '🏢 Agencia Partner' : '💼 Asesor Interno'}
                               </span>
+
+                              {adv.accountType === 'partner_agency' && (
+                                <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                                  ${adv.monthlyFeeUsd || 49} USD/mes
+                                </span>
+                              )}
                             </div>
-                            <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
-                              <span>
-                                Usuario: <strong className="text-slate-300">{adv.username}</strong>
-                              </span>
-                              <span>•</span>
-                              <span>
-                                Teléfono: <strong className="text-slate-300">{adv.phone}</strong>
-                              </span>
+
+                            <div>
+                              <h4 className="text-base font-black text-white group-hover:text-amber-300 transition">
+                                {adv.name}
+                              </h4>
+                              <p className="text-xs text-slate-400">
+                                📍 {adv.city || 'Bogotá'}, {adv.country || 'Colombia'}
+                              </p>
+                              <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1">
+                                <span>
+                                  User: <strong className="text-slate-300">{adv.username}</strong>
+                                </span>
+                                <span>•</span>
+                                <span>Tel: {adv.phone}</span>
+                              </div>
                             </div>
-                            <div className="pt-0.5">
-                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-900 text-slate-300 border border-slate-800 font-bold">
-                                📁 {advisorDossiers.length} cuenta{advisorDossiers.length === 1 ? '' : 's'} ({createsCount} nuevas, {auditsCount} auditorías)
+
+                            <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+                              <span className="text-[10px] font-bold text-slate-400 uppercase block">
+                                Cuentas Prospectadas:
                               </span>
+                              <div className="flex items-center justify-between text-xs font-black text-white">
+                                <span>{advisorDossiers.length} Expedientes</span>
+                                <span className="text-[10px] text-slate-400 font-normal">
+                                  ({createsCount} nuevas, {auditsCount} auditorías)
+                                </span>
+                              </div>
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2 self-end sm:self-center">
-                            <button
-                              type="button"
-                              className="px-3.5 py-2 rounded-xl bg-slate-900 group-hover:bg-amber-500 group-hover:text-slate-950 text-amber-400 font-bold text-xs border border-amber-500/30 transition flex items-center gap-1.5 shadow-sm"
-                            >
-                              <span>Ver Cuentas</span>
-                              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" />
-                            </button>
-                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNetworkAdvisorFilter(adv.id);
+                              setNetworkSubView('monitor');
+                              showToast(`Filtrando cuentas de ${adv.name}`);
+                            }}
+                            className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-white font-black text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-md active:scale-98"
+                          >
+                            <span>Ver Expedientes en Monitor</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       );
                     })}
                 </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </main>

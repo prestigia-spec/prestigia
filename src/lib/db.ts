@@ -46,6 +46,11 @@ export interface StudioAdvisor {
   password: string;
   phone: string;
   role: 'admin' | 'advisor';
+  accountType?: 'internal_advisor' | 'partner_agency';
+  country?: string;
+  city?: string;
+  monthlyFeeUsd?: number;
+  licenseStatus?: 'active' | 'pending_payment' | 'suspended';
   active: boolean;
   createdAt: string;
 }
@@ -55,6 +60,8 @@ export interface StudioDossier {
   advisorId: string;
   advisorName: string;
   advisorPhone?: string;
+  advisorType?: 'internal_advisor' | 'partner_agency' | 'founder';
+  country?: string;
   clientName: string;
   category: string;
   city: string;

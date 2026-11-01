@@ -35,12 +35,24 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { id, name, username, password, phone, role = 'advisor', active = true, masterKey } = body;
+    const {
+      id,
+      name,
+      username,
+      password,
+      phone,
+      role = 'advisor',
+      accountType = 'internal_advisor',
+      country = 'Colombia',
+      city = 'Bogotá',
+      monthlyFeeUsd = 0,
+      licenseStatus = 'active',
+      active = true,
+      masterKey,
+    } = body;
 
     // Security check: only master key can create or modify advisors
     if (!masterKey || masterKey.trim() !== 'admin') {
-      // Allow advisor self-update of phone or password if valid id provided
-      // But verify master key for role change or new user creation
       if (!id) {
         return NextResponse.json({ error: 'Autorización requerida de Administrador' }, { status: 403 });
       }
@@ -57,6 +69,11 @@ export async function POST(request: Request) {
       password: password.trim(),
       phone: (phone || '+573058314049').trim(),
       role: role === 'admin' ? 'admin' : 'advisor',
+      accountType: accountType === 'partner_agency' ? 'partner_agency' : 'internal_advisor',
+      country: country.trim() || 'Colombia',
+      city: city.trim() || 'Bogotá',
+      monthlyFeeUsd: Number(monthlyFeeUsd) || 0,
+      licenseStatus: licenseStatus || 'active',
       active: active !== false,
       createdAt: new Date().toISOString(),
     };
