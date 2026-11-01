@@ -39,6 +39,34 @@ export interface EmailDispatchRecord {
   error?: string;
 }
 
+export interface StudioAdvisor {
+  id: string;
+  name: string;
+  username: string;
+  password: string;
+  phone: string;
+  role: 'admin' | 'advisor';
+  active: boolean;
+  createdAt: string;
+}
+
+export interface StudioDossier {
+  id: string;
+  advisorId: string;
+  advisorName: string;
+  advisorPhone?: string;
+  clientName: string;
+  category: string;
+  city: string;
+  neighborhood?: string;
+  googleUrl?: string;
+  mode: 'create' | 'audit';
+  status: 'draft' | 'presented' | 'closed';
+  data: any;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface DatabaseSchema {
   businesses: Business[];
   feedbacks: Feedback[];
@@ -50,6 +78,8 @@ interface DatabaseSchema {
   trafficVisits?: TrafficVisit[];
   emailDispatches?: EmailDispatchRecord[];
   exchangeRates?: ExchangeRatesRecord;
+  studioAdvisors?: StudioAdvisor[];
+  studioDossiers?: StudioDossier[];
 }
 
 export interface ExchangeRatesRecord {
@@ -141,6 +171,31 @@ function ensureDbFile(): DatabaseSchema {
       if (!parsed.campaignParticipants) parsed.campaignParticipants = [];
       if (!parsed.leads) parsed.leads = [];
       if (!parsed.trafficVisits) parsed.trafficVisits = [];
+      if (!parsed.studioDossiers) parsed.studioDossiers = [];
+      if (!parsed.studioAdvisors || parsed.studioAdvisors.length === 0) {
+        parsed.studioAdvisors = [
+          {
+            id: 'adv-admin',
+            name: 'Director General Prestigia',
+            username: 'admin',
+            password: 'admin',
+            phone: '+573058314049',
+            role: 'admin',
+            active: true,
+            createdAt: '2026-01-01T00:00:00.000Z',
+          },
+          {
+            id: 'adv-luisma',
+            name: 'Luisma • Consultor Senior',
+            username: 'luisma',
+            password: '1234',
+            phone: '+573058314049',
+            role: 'advisor',
+            active: true,
+            createdAt: '2026-01-01T00:00:00.000Z',
+          },
+        ];
+      }
       memoryDb = parsed;
       return memoryDb!;
     } catch (err) {
@@ -1107,4 +1162,89 @@ export async function updateBranchGoogleTokens(
     writeDbFile(db);
   }
   return updated;
+}
+
+// =========================================================================
+// PRESTIGIA LOCAL STUDIO: ADVISORS & DOSSIERS STORAGE
+// =========================================================================
+
+export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
+  const db = ensureDbFile();
+  if (!db.studioAdvisors || db.studioAdvisors.length === 0) {
+    db.studioAdvisors = [
+      {
+        id: 'adv-admin',
+        name: 'Director General Prestigia',
+        username: 'admin',
+        password: 'admin',
+        phone: '+573058314049',
+        role: 'admin',
+        active: true,
+        createdAt: '2026-01-01T00:00:00.000Z',
+      },
+      {
+        id: 'adv-luisma',
+        name: 'Luisma • Consultor Senior',
+        username: 'luisma',
+        password: '1234',
+        phone: '+573058314049',
+        role: 'advisor',
+        active: true,
+        createdAt: '2026-01-01T00:00:00.000Z',
+      },
+    ];
+    writeDbFile(db);
+  }
+  return db.studioAdvisors;
+}
+
+export async function saveStudioAdvisor(advisor: StudioAdvisor): Promise<void> {
+  const db = ensureDbFile();
+  if (!db.studioAdvisors) db.studioAdvisors = [];
+  const idx = db.studioAdvisors.findIndex(
+    (a) => a.id === advisor.id || a.username.toLowerCase() === advisor.username.toLowerCase()
+  );
+  if (idx >= 0) {
+    db.studioAdvisors[idx] = { ...db.studioAdvisors[idx], ...advisor };
+  } else {
+    db.studioAdvisors.push(advisor);
+  }
+  writeDbFile(db);
+}
+
+export async function deleteStudioAdvisor(advisorId: string): Promise<boolean> {
+  const db = ensureDbFile();
+  if (!db.studioAdvisors) return false;
+  // Never delete master admin
+  const target = db.studioAdvisors.find((a) => a.id === advisorId);
+  if (target?.role === 'admin' || target?.username === 'admin') return false;
+  db.studioAdvisors = db.studioAdvisors.filter((a) => a.id !== advisorId);
+  writeDbFile(db);
+  return true;
+}
+
+export async function getAllStudioDossiers(): Promise<StudioDossier[]> {
+  const db = ensureDbFile();
+  if (!db.studioDossiers) db.studioDossiers = [];
+  return db.studioDossiers;
+}
+
+export async function saveStudioDossier(dossier: StudioDossier): Promise<void> {
+  const db = ensureDbFile();
+  if (!db.studioDossiers) db.studioDossiers = [];
+  const idx = db.studioDossiers.findIndex((d) => d.id === dossier.id);
+  if (idx >= 0) {
+    db.studioDossiers[idx] = { ...dossier, updatedAt: new Date().toISOString() };
+  } else {
+    db.studioDossiers.unshift(dossier);
+  }
+  writeDbFile(db);
+}
+
+export async function deleteStudioDossier(dossierId: string): Promise<boolean> {
+  const db = ensureDbFile();
+  if (!db.studioDossiers) return false;
+  db.studioDossiers = db.studioDossiers.filter((d) => d.id !== dossierId);
+  writeDbFile(db);
+  return true;
 }
