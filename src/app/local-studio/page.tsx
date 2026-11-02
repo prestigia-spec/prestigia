@@ -47,6 +47,7 @@ import {
   ShieldAlert,
   Unlock,
   Clock,
+  LogOut,
 } from 'lucide-react';
 
 interface StudioAdvisorUser {
@@ -192,6 +193,7 @@ const UI_TEXT = {
     tagline: 'Suite de Creación & Optimización Google Maps',
     loginProfile: 'Ingresar Perfil',
     switchProfile: 'Cambiar',
+    logoutBtn: 'Salir',
     downloadPdf: 'Descargar PDF',
     tabCreate: '🏗️ 1. Crear Ficha (Desde Cero)',
     tabAudit: '🔬 2. Auditar & Optimizar Ficha',
@@ -264,6 +266,7 @@ const UI_TEXT = {
     tagline: 'Google Maps Creation & Top 3 Optimization Suite',
     loginProfile: 'Log In Profile',
     switchProfile: 'Switch',
+    logoutBtn: 'Log out',
     downloadPdf: 'Download PDF',
     tabCreate: '🏗️ 1. Build New Listing (From Scratch)',
     tabAudit: '🔬 2. Audit & Upgrade Existing Listing',
@@ -820,6 +823,13 @@ export default function LocalStudioPage() {
   // Check persisted session
   useEffect(() => {
     try {
+      const isLoggedOut = localStorage.getItem('prestigia_studio_logged_out');
+      if (isLoggedOut === 'true') {
+        setCurrentUser(null);
+        setShowAuthModal(true);
+        return;
+      }
+
       const stored = localStorage.getItem('prestigia_studio_advisor');
       if (stored) {
         const parsed = JSON.parse(stored);
@@ -870,6 +880,7 @@ export default function LocalStudioPage() {
       setCurrentUser(founderUser);
       localStorage.setItem('prestigia_studio_advisor', JSON.stringify(founderUser));
       localStorage.setItem('prestigia_studio_advisor_explicit', 'true');
+      localStorage.removeItem('prestigia_studio_logged_out');
       setShowAuthModal(false);
       showToast('👑 Perfil activo: Luisma • Director General & Founder');
     } else {
@@ -884,6 +895,7 @@ export default function LocalStudioPage() {
       setCurrentUser(advisorUser);
       localStorage.setItem('prestigia_studio_advisor', JSON.stringify(advisorUser));
       localStorage.setItem('prestigia_studio_advisor_explicit', 'true');
+      localStorage.removeItem('prestigia_studio_logged_out');
       setShowAuthModal(false);
       showToast('💼 Perfil activo: Carlos • Consultor Comercial');
     }
@@ -903,6 +915,7 @@ export default function LocalStudioPage() {
         setCurrentUser(data.advisor);
         localStorage.setItem('prestigia_studio_advisor', JSON.stringify(data.advisor));
         localStorage.setItem('prestigia_studio_advisor_explicit', 'true');
+        localStorage.removeItem('prestigia_studio_logged_out');
         setShowAuthModal(false);
         showToast(`¡Bienvenido, ${data.advisor.name}!`);
       } else {
@@ -918,8 +931,10 @@ export default function LocalStudioPage() {
   const handleLogout = () => {
     localStorage.removeItem('prestigia_studio_advisor');
     localStorage.removeItem('prestigia_studio_advisor_explicit');
+    localStorage.setItem('prestigia_studio_logged_out', 'true');
     setCurrentUser(null);
     setShowAuthModal(true);
+    showToast(isEn ? '👋 Session closed successfully' : '👋 Sesión cerrada exitosamente');
   };
 
   // -------------------------------------------------------------
@@ -1645,6 +1660,16 @@ export default function LocalStudioPage() {
                 className="ml-2 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer text-[10px] font-bold"
               >
                 {t.switchProfile}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                title={isEn ? 'Log out of Prestigia Local Studio' : 'Cerrar sesión y salir del sistema'}
+                className="px-2 py-0.5 rounded bg-rose-950/80 hover:bg-rose-900 border border-rose-500/50 text-rose-300 hover:text-white transition cursor-pointer text-[10px] font-black flex items-center gap-1 shadow-sm active:scale-95"
+              >
+                <LogOut className="w-3 h-3 text-rose-400" />
+                <span>{t.logoutBtn}</span>
               </button>
             </div>
           ) : (
@@ -5243,14 +5268,15 @@ export default function LocalStudioPage() {
       {showAuthModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 print:hidden animate-in fade-in duration-200">
           <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative text-center space-y-4">
-            {currentUser && (
+            {currentUser ? (
               <div className="flex items-center justify-between pb-1 border-b border-slate-800">
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="text-xs text-rose-400 hover:text-rose-300 font-bold transition cursor-pointer"
+                  className="text-xs text-rose-400 hover:text-rose-300 font-bold transition cursor-pointer flex items-center gap-1"
                 >
-                  {isEn ? 'Log out' : 'Cerrar Sesión'}
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>{isEn ? 'Log out' : 'Cerrar Sesión'}</span>
                 </button>
                 <button
                   type="button"
@@ -5259,6 +5285,12 @@ export default function LocalStudioPage() {
                 >
                   {tAuth.close}
                 </button>
+              </div>
+            ) : (
+              <div className="pb-1 border-b border-slate-800 text-center">
+                <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider">
+                  {isEn ? '🔒 Access Control • Identification Required' : '🔒 Control de Acceso • Identificación Requerida'}
+                </span>
               </div>
             )}
 
