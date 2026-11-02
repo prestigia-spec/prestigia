@@ -1545,6 +1545,201 @@ export default function LocalStudioPage() {
     }
   };
 
+  // =============================================================
+  // AUTHENTICATION GATE: IF NO USER IS LOGGED IN, RENDER SECURE LOGIN SCREEN
+  // (Prevents any workspace tools or tabs from being exposed in the background)
+  // =============================================================
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white relative overflow-hidden">
+        {/* Subtle Ambient Background Mesh (Clean & Secure) */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -left-40 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 -right-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl" />
+        </div>
+
+        {/* Floating Toast Notification */}
+        {toastMessage && (
+          <div className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-indigo-600 via-indigo-700 to-amber-500 text-white px-5 py-3 rounded-2xl shadow-2xl font-bold text-xs sm:text-sm flex items-center gap-2.5 animate-in slide-in-from-bottom duration-200 border border-white/20">
+            <Sparkles className="w-4 h-4 text-amber-300" />
+            <span>{toastMessage}</span>
+          </div>
+        )}
+
+        {/* Top Header */}
+        <header className="border-b border-slate-800/80 px-4 sm:px-8 py-3.5 flex items-center justify-between relative z-10 backdrop-blur-md bg-slate-950/80">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-indigo-600 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/20">
+              <MapPin className="w-5 h-5 text-slate-950" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs font-black tracking-widest text-white">PRESTIGIA</span>
+              <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">Local Studio • Top 3 Engine</span>
+            </div>
+          </div>
+
+          {/* Bilingual Switcher */}
+          <div className="flex items-center rounded-xl bg-slate-900 border border-slate-800 p-0.5 text-[11px] font-black">
+            <button
+              type="button"
+              onClick={() => handleToggleLang('es')}
+              className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                lang === 'es' ? 'bg-amber-500 text-slate-950 shadow-md font-black' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              🇨🇴 ES
+            </button>
+            <button
+              type="button"
+              onClick={() => handleToggleLang('en')}
+              className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                lang === 'en' ? 'bg-indigo-600 text-white shadow-md font-black' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              🇺🇸 EN
+            </button>
+          </div>
+        </header>
+
+        {/* Centered Login Card */}
+        <div className="flex-1 flex items-center justify-center p-4 sm:p-6 relative z-10">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative text-center space-y-4">
+            <div className="pb-1 border-b border-slate-800 text-center">
+              <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider">
+                {isEn ? '🔒 Access Control • Identification Required' : '🔒 Control de Acceso • Identificación Requerida'}
+              </span>
+            </div>
+
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center mx-auto shadow-xl">
+              <Lock className="w-6 h-6 text-slate-950" />
+            </div>
+
+            <div>
+              <h3 className="text-lg font-black text-white">{tAuth.title}</h3>
+              <p className="text-xs text-slate-400 mt-0.5">{tAuth.subtitle}</p>
+            </div>
+
+            {/* Quick 1-Click Selectors */}
+            <div className="space-y-2 pt-1 text-left">
+              <span className="text-[10px] font-black tracking-wider uppercase text-slate-400 block px-1">
+                {tAuth.quickAccess}
+              </span>
+
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('luisma')}
+                className="w-full p-3 rounded-2xl bg-gradient-to-r from-amber-950/60 to-slate-900 border border-amber-500/50 hover:border-amber-400 flex items-center justify-between text-left transition cursor-pointer group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center text-slate-950 font-black text-base shadow-md group-hover:scale-105 transition">
+                    👑
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-amber-200 text-xs">Luisma • Director General</span>
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-500 text-slate-950">{tAuth.founderRole}</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 block">{tAuth.founderDesc}</span>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-amber-400 group-hover:translate-x-0.5 transition" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('carlos')}
+                className="w-full p-3 rounded-2xl bg-gradient-to-r from-indigo-950/60 to-slate-900 border border-indigo-500/40 hover:border-indigo-400 flex items-center justify-between text-left transition cursor-pointer group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-base shadow-md group-hover:scale-105 transition">
+                    💼
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-indigo-200 text-xs">Carlos • Consultor Comercial</span>
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">{tAuth.advisorRole}</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 block">{tAuth.advisorDesc}</span>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-indigo-400 group-hover:translate-x-0.5 transition" />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 my-2">
+              <div className="flex-1 h-px bg-slate-800" />
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{tAuth.orCredentials}</span>
+              <div className="flex-1 h-px bg-slate-800" />
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-3 text-left text-xs">
+              <div>
+                <label className="block font-bold text-slate-300 mb-1">{tAuth.usernameLabel}</label>
+                <input
+                  type="text"
+                  value={loginUsername}
+                  onChange={(e) => {
+                    setLoginUsername(e.target.value);
+                    if (loginError) setLoginError('');
+                  }}
+                  placeholder={isEn ? 'e.g. carlos or your username' : 'ej: carlos o tu usuario'}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-300 mb-1">{tAuth.passwordLabel}</label>
+                <div className="relative flex items-center">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={loginPassword}
+                    onChange={(e) => {
+                      setLoginPassword(e.target.value);
+                      if (loginError) setLoginError('');
+                    }}
+                    placeholder="••••"
+                    className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 font-mono text-xs tracking-wider"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 text-slate-400 hover:text-amber-400 transition cursor-pointer p-1"
+                    title={showPassword ? (isEn ? 'Hide password' : 'Ocultar contraseña') : (isEn ? 'Show password' : 'Ver contraseña')}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4 text-amber-400" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {loginError && <p className="text-xs text-rose-400 font-bold">{loginError}</p>}
+
+              <button
+                type="submit"
+                disabled={isLoggingIn}
+                className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition cursor-pointer border border-slate-700 active:scale-98"
+              >
+                {isLoggingIn ? tAuth.verifying : tAuth.btnLogin}
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className="border-t border-slate-800/80 py-4 px-4 text-center text-xs text-slate-500 relative z-10">
+          <p>Prestigia Local Studio™ • Google Maps Top 3 Optimization Engine © 2026</p>
+        </footer>
+      </div>
+    );
+  }
+
+  // =============================================================
+  // AUTHENTICATED WORKSPACE (ONLY MOUNTED & RENDERED FOR LOGGED-IN USERS)
+  // =============================================================
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white print:bg-white print:text-slate-900 print:min-h-0 print:p-0 print:m-0">
       {/* Print Stylesheet for Pristine White Corporate Dossiers */}
