@@ -166,9 +166,21 @@ RETURN ONLY A VALID JSON OBJECT WITH THIS STRUCTURE (NO MARKDOWN WRAPPERS, NO EX
           const aiData = await geminiRes.json();
           const candidateText = aiData?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (candidateText) {
-            const parsed = JSON.parse(candidateText.trim());
+            let clean = candidateText.trim();
+            if (clean.startsWith('```')) {
+              clean = clean.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+            }
+            const firstBrace = clean.indexOf('{');
+            const lastBrace = clean.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+              clean = clean.substring(firstBrace, lastBrace + 1);
+            }
+            const parsed = JSON.parse(clean);
             return NextResponse.json({ success: true, engine: 'gemini-1.5-flash', data: parsed });
           }
+        } else {
+          const errBody = await geminiRes.text();
+          console.warn('[LocalStudio AI] Gemini API error:', geminiRes.status, errBody);
         }
       } catch (geminiErr) {
         console.warn('[LocalStudio AI] Gemini fallback activated:', geminiErr);
