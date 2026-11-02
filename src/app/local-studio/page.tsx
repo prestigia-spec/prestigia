@@ -5364,7 +5364,10 @@ export default function LocalStudioPage() {
                 <input
                   type="text"
                   value={loginUsername}
-                  onChange={(e) => setLoginUsername(e.target.value)}
+                  onChange={(e) => {
+                    setLoginUsername(e.target.value);
+                    if (loginError) setLoginError('');
+                  }}
                   placeholder={isEn ? 'e.g. carlos or your username' : 'ej: carlos o tu usuario'}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                 />
@@ -5376,7 +5379,10 @@ export default function LocalStudioPage() {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
+                    onChange={(e) => {
+                      setLoginPassword(e.target.value);
+                      if (loginError) setLoginError('');
+                    }}
                     placeholder="••••"
                     className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 font-mono text-xs tracking-wider"
                   />
