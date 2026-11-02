@@ -560,14 +560,12 @@ const UI_TEXT = {
 const TXT_TOOLS = {
   es: {
     badge: 'Arsenal de Cierre de Alto Valor • Estilo BrightLocal & Local Falcon',
-    title: '5 Armas de Dominio Local & Cierre Comercial',
-    desc: 'Herramientas de venta visual y optimización forense para demostrarle al cliente cuánto dinero está perdiendo hoy y cómo Prestigia lo posiciona en la cima.',
+    title: '3 Armas Top 3 de Cierre Comercial',
+    desc: 'Herramientas de venta visual y espionaje competitivo para demostrarle al cliente cuánto dinero pierde hoy y cómo Prestigia lo posiciona en la cima.',
     activeAlgo: '⚡ Algoritmo 2026 Activo',
     tab1: '1. Simulador Geo-Grid 3x3',
-    tab2: '2. Calculadora de Pérdida Financiera (ROI)',
-    tab3: '3. Inyector de Geo-Tagging EXIF',
-    tab4: '4. Hub de Citaciones USA & LatAm',
-    tab5: '5. Rival Spy (Cara a Cara)',
+    tab2: '2. Balanza Financiera (ROI)',
+    tab3: '3. Rival Spy (Cara a Cara)',
     tab6: '6. Rescate de Ficha (Ownership Claim)',
     rescueTitle: '🛡️ Rescue Radar: Rescate y Reclamación de Ficha Google Maps',
     rescueDesc: 'Protocolo oficial paso a paso para recuperar el control legal de una ficha existente cuando el dueño no tiene acceso, sin perder reseñas, fotos ni antigüedad.',
@@ -603,10 +601,14 @@ const TXT_TOOLS = {
     toolsEmptyScanBtn: 'Activar Armas con Google Maps API',
     toolsEmptyDemoBtn: 'O explorar con datos de demostración interactiva →',
     toolsChangeListing: 'Cambiar Ficha / Limpiar',
-    rivalScannerLabel: 'Escanear Competidor Directo con Google Maps API (1 Clic)',
+    clientScannerLabel: 'Escanear Nuestro Posible Cliente con Google Maps API (1 Clic)',
+    clientScannerPlaceholder: 'Pega enlace de Google Maps o Nombre del Negocio + Ciudad',
+    clientScannerBtn: 'Escanear Cliente con Google',
+    clientScannerScanning: 'Consultando Cliente en Vivo...',
+    rivalScannerLabel: 'Escanear Competidor Más Cercano con Google Maps API (1 Clic)',
     rivalScannerPlaceholder: 'Pega enlace de Google Maps o Nombre del Rival + Ciudad',
     rivalScannerBtn: 'Escanear Rival con Google',
-    rivalScannerScanning: 'Consultando Rival en Vivo...',
+    rivalScannerScanning: 'Consultando Competidor en Vivo...',
     geogridTitle: '🗺️ Simulador de Posición Geo-Grid 3x3 (Local Falcon Style)',
     geogridDesc: 'Demuestra visualmente cómo cae el ranking del cliente a medida que nos alejamos de su ubicación.',
     radiusLabel: 'Radio',
@@ -698,14 +700,12 @@ const TXT_TOOLS = {
   },
   en: {
     badge: 'High-Value Conversion Arsenal • BrightLocal & Local Falcon Style',
-    title: '5 Local Dominance & Commercial Closing Weapons',
-    desc: 'Visual sales and forensic optimization tools showing clients how much revenue they are losing today and how Prestigia positions them at the top.',
+    title: '3 Top 3 Commercial Closing Weapons',
+    desc: 'Visual sales and competitive espionage weapons showing clients how much revenue they lose today and how Prestigia positions them at #1.',
     activeAlgo: '⚡ 2026 Algorithm Active',
     tab1: '1. 3x3 Geo-Grid Heatmap',
-    tab2: '2. Financial Loss Calculator (ROI)',
-    tab3: '3. EXIF Geo-Tagging Injector',
-    tab4: '4. Citations Directory (USA/LatAm)',
-    tab5: '5. Rival Spy (Head-to-Head)',
+    tab2: '2. Financial Balance (ROI)',
+    tab3: '3. Rival Spy (Head-to-Head)',
     tab6: '6. Listing Rescue (Ownership Claim)',
     rescueTitle: '🛡️ Rescue Radar: Google Maps Listing Rescue & Ownership Claim',
     rescueDesc: 'Official step-by-step protocol to recover ownership of an existing listing when the owner has no login access, preserving all reviews, photos, and rank.',
@@ -741,7 +741,11 @@ const TXT_TOOLS = {
     toolsEmptyScanBtn: 'Activate Arsenal with Google Maps API',
     toolsEmptyDemoBtn: 'Or explore with interactive demo data →',
     toolsChangeListing: 'Change Profile / Clear',
-    rivalScannerLabel: 'Scan Real Competitor via Google Maps API (1-Click)',
+    clientScannerLabel: 'Scan Prospective Client via Google Maps API (1-Click)',
+    clientScannerPlaceholder: 'Paste Google Maps link or Client Business Name + City',
+    clientScannerBtn: 'Scan Client with Google',
+    clientScannerScanning: 'Querying Client in Real-time...',
+    rivalScannerLabel: 'Scan Closest Competitor via Google Maps API (1-Click)',
     rivalScannerPlaceholder: 'Paste Google Maps link or Competitor Name + City',
     rivalScannerBtn: 'Scan Competitor with Google',
     rivalScannerScanning: 'Querying Competitor in Real-time...',
@@ -1299,8 +1303,8 @@ export default function LocalStudioPage() {
   const [scannedListing, setScannedListing] = useState<GooglePlaceData | null>(null);
   const [showManualAuditFields, setShowManualAuditFields] = useState(false);
 
-  // 5 Elite Local SEO Power Tools State
-  const [toolsActiveTab, setToolsActiveTab] = useState<'geogrid' | 'roicalc' | 'geotag' | 'citations' | 'rivalspy'>('geogrid');
+  // 3 Elite Local SEO Power Tools State
+  const [toolsActiveTab, setToolsActiveTab] = useState<'geogrid' | 'roicalc' | 'rivalspy'>('geogrid');
   const [toolsSearchQuery, setToolsSearchQuery] = useState('');
   const [isToolsScanning, setIsToolsScanning] = useState(false);
   const [geoGridKeyword, setGeoGridKeyword] = useState('');
@@ -1321,6 +1325,8 @@ export default function LocalStudioPage() {
   const [isRescueScanning, setIsRescueScanning] = useState(false);
 
   // Rival Spy (Head-to-Head Competitor Radar) State
+  const [clientSearchQuery, setClientSearchQuery] = useState('');
+  const [isClientScanning, setIsClientScanning] = useState(false);
   const [rivalSearchQuery, setRivalSearchQuery] = useState('');
   const [isRivalScanning, setIsRivalScanning] = useState(false);
   const [rivalName, setRivalName] = useState('');
@@ -1941,7 +1947,91 @@ export default function LocalStudioPage() {
   };
 
   // -------------------------------------------------------------
-  // 3.1.d 1-CLICK COMPETITOR SCANNER FOR RIVAL SPY (HERRAMIENTA 5)
+  // 3.1.d.1 1-CLICK PROSPECTIVE CLIENT SCANNER FOR RIVAL SPY
+  // -------------------------------------------------------------
+  const handleClientScan = async () => {
+    const rawInput = clientSearchQuery.trim();
+    if (!rawInput) {
+      showToast(
+        isEn
+          ? '⚠️ Please enter prospective client link or name'
+          : '⚠️ Pega el enlace de Google Maps o escribe el nombre del cliente'
+      );
+      return;
+    }
+
+    setIsClientScanning(true);
+    showToast(
+      isEn
+        ? '🔍 Inspecting prospective client on Google Maps...'
+        : '🔍 Escaneando perfil de nuestro posible cliente en Google Maps...'
+    );
+
+    try {
+      const res = await fetch('/api/auditor/google-lookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: rawInput }),
+      });
+      const data = await res.json();
+
+      if (data?.success && data?.data) {
+        const place: GooglePlaceData = data.data;
+        if (place.name) setBusinessName(place.name);
+
+        let parsedCity = city;
+        if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
+          const parts = place.address.split(',').map((p) => p.trim());
+          if (parts.length >= 2) {
+            parsedCity = parts[parts.length - 2] || parsedCity;
+          }
+          if (parsedCity) setCity(parsedCity);
+        }
+
+        if (typeof place.rating === 'number') setExistingRating(place.rating);
+        if (typeof place.reviewsCount === 'number') setExistingReviews(place.reviewsCount);
+
+        const matchedCategory = mapDetectedCategoryToPrestigia(
+          place.category || '',
+          place.detectedCategories || [],
+          isEn
+        );
+        setCategory(matchedCategory);
+        const smartTicket = getAverageTicketByNiche(matchedCategory);
+        setRoiAverageTicket(smartTicket);
+        const smartKw = getDefaultKeywordByNiche(matchedCategory, parsedCity || city, isEn);
+        if (smartKw) setGeoGridKeyword(smartKw);
+
+        showToast(
+          isEn
+            ? `✓ Client Loaded: ${place.name} (${place.rating}★ · ${place.reviewsCount} reviews).`
+            : `✓ Cliente Reconocido: ${place.name} (${place.rating}★ · ${place.reviewsCount} opiniones).`
+        );
+      } else {
+        const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
+        setBusinessName(fallbackName);
+        showToast(
+          isEn
+            ? `✓ Client set to "${fallbackName}"`
+            : `✓ Cliente asignado a "${fallbackName}"`
+        );
+      }
+    } catch (err: any) {
+      console.error('Client scan error:', err);
+      const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
+      setBusinessName(fallbackName);
+      showToast(
+        isEn
+          ? '⚠️ Client lookup error. Name updated.'
+          : '⚠️ Error al escanear cliente. Nombre actualizado.'
+      );
+    } finally {
+      setIsClientScanning(false);
+    }
+  };
+
+  // -------------------------------------------------------------
+  // 3.1.d.2 1-CLICK COMPETITOR SCANNER FOR RIVAL SPY (HERRAMIENTA 3)
   // -------------------------------------------------------------
   const handleRivalScan = async () => {
     const rawInput = rivalSearchQuery.trim();
@@ -5023,32 +5113,6 @@ export default function LocalStudioPage() {
 
               <button
                 type="button"
-                onClick={() => setToolsActiveTab('geotag')}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
-                  toolsActiveTab === 'geotag'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                }`}
-              >
-                <Compass className="w-3.5 h-3.5" />
-                <span>{tTools.tab3}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setToolsActiveTab('citations')}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
-                  toolsActiveTab === 'citations'
-                    ? 'bg-purple-600 text-white shadow-md'
-                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                }`}
-              >
-                <FileCheck className="w-3.5 h-3.5" />
-                <span>{tTools.tab4}</span>
-              </button>
-
-              <button
-                type="button"
                 onClick={() => setToolsActiveTab('rivalspy')}
                 className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
                   toolsActiveTab === 'rivalspy'
@@ -5057,7 +5121,7 @@ export default function LocalStudioPage() {
                 }`}
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span>{tTools.tab5}</span>
+                <span>{tTools.tab3}</span>
               </button>
             </div>
 
@@ -5390,145 +5454,7 @@ export default function LocalStudioPage() {
               </div>
             )}
 
-            {/* TOOL 3: INYECTOR DE GEO-TAGGING EXIF */}
-            {toolsActiveTab === 'geotag' && (
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
-                <div>
-                  <h3 className="text-base font-black text-white flex items-center gap-2">
-                    <Compass className="w-4 h-4 text-indigo-400" />
-                    <span>{tTools.geotagTitle}</span>
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    {tTools.geotagDesc}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">{tTools.photoName}</label>
-                      <input
-                        type="text"
-                        value={geoTagFilename}
-                        onChange={(e) => setGeoTagFilename(e.target.value)}
-                        placeholder={tTools.photoNamePlaceholder}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-indigo-400"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">{tTools.indexingKeywords}</label>
-                      <input
-                        type="text"
-                        value={geoTagKeywords}
-                        onChange={(e) => setGeoTagKeywords(e.target.value)}
-                        placeholder={tTools.indexingKeywordsPlaceholder}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-indigo-400"
-                      />
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const cleanBase = (geoTagFilename.trim() || 'foto-local').toLowerCase().replace(/[^a-z0-9]/g, '-');
-                        const cleanC = (city.trim() || 'ciudad').toLowerCase().replace(/[^a-z0-9]/g, '-');
-                        const result = `${cleanBase}-${cleanC}-top3-prestigia.jpg [IPTC: ${geoTagKeywords || category} • GeoTag: ${city}]`;
-                        setGeoTagResult(result);
-                        showToast(tTools.toastGeotag);
-                      }}
-                      className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black transition cursor-pointer"
-                    >
-                      {tTools.btnGeotag}
-                    </button>
-                  </div>
-
-                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
-                    <span className="text-[10px] font-black uppercase text-indigo-400 block">
-                      {tTools.resultBox}
-                    </span>
-                    <div className="p-3 rounded-xl bg-slate-900 border border-indigo-500/30 font-mono text-[11px] text-amber-300 break-all">
-                      {geoTagResult || `${(businessName || 'negocio').toLowerCase().replace(/[^a-z0-9]/g, '-')}-${city.toLowerCase()}-fachada-geotagged.jpg`}
-                    </div>
-                    <p className="text-[11px] text-slate-400">
-                      {tTools.geotagNote}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TOOL 4: HUB DE CITACIONES LOCALES (USA & LATAM) */}
-            {toolsActiveTab === 'citations' && (
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
-                <div>
-                  <h3 className="text-base font-black text-white flex items-center gap-2">
-                    <FileCheck className="w-4 h-4 text-purple-400" />
-                    <span>{tTools.citationsTitle}</span>
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    {tTools.citationsDesc}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  {/* USA Directoriess */}
-                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-base">🇺🇸</span>
-                      <h4 className="font-black text-white">{tTools.citationsUsa}</h4>
-                    </div>
-                    <ul className="space-y-2 text-[11px] text-slate-300">
-                      {[
-                        { name: 'Apple Maps Connect', authority: 'DA 99', desc: isEn ? 'Essential for iPhone and Siri local queries' : 'Indispensable para usuarios de iPhone y Siri' },
-                        { name: 'Bing Places for Business', authority: 'DA 94', desc: isEn ? 'Native search on Windows and AI copilot agents' : 'Búsquedas nativas en Windows y copilotos de IA' },
-                        { name: 'Yelp for Business', authority: 'DA 94', desc: isEn ? 'Primary review feed read natively by Apple Maps' : 'Principal fuente de reseñas externas leída por Apple' },
-                        { name: 'YellowPages (YP.com)', authority: 'DA 89', desc: isEn ? 'Historic local authority backlink for USA SEO' : 'Autoridad local histórica para SEO en EE.UU.' },
-                        { name: 'Better Business Bureau (BBB)', authority: 'DA 93', desc: isEn ? 'Definitive badge of consumer trust and legitimacy' : 'Sello definitivo de confianza y legitimidad' },
-                      ].map((c, i) => (
-                        <li key={i} className="p-2 rounded-xl bg-slate-900/60 border border-slate-800/80 flex items-center justify-between">
-                          <div>
-                            <strong className="text-white block">{c.name}</strong>
-                            <span className="text-[10px] text-slate-400">{c.desc}</span>
-                          </div>
-                          <span className="text-[9px] font-black text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded">
-                            {c.authority}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* LatAm Directories */}
-                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-base">🇨🇴 🇲🇽</span>
-                      <h4 className="font-black text-white">{tTools.citationsLatam}</h4>
-                    </div>
-                    <ul className="space-y-2 text-[11px] text-slate-300">
-                      {[
-                        { name: 'Waze Ads & Local Pins', authority: 'DA 92', desc: isEn ? '#1 driving navigation app in metropolitan hubs' : 'Navegación automotriz #1 en ciudades latinas' },
-                        { name: 'Páginas Amarillas / Publicar', authority: 'DA 76', desc: isEn ? 'High-domain authority local directory backlink' : 'Backlink local de alto valor de directorio' },
-                        { name: 'Foursquare & Swarm', authority: 'DA 91', desc: isEn ? 'Geo-spatial dataset powering Uber, Twitter, and apps' : 'Base de datos geo-espacial de Uber y Twitter' },
-                        { name: 'Cámara de Comercio / Registro Mercantil', authority: 'DA 85', desc: isEn ? 'Corporate registry proving legal business establishment' : 'Validación de existencia legal formal' },
-                        { name: 'Facebook & Instagram Local Place', authority: 'DA 96', desc: isEn ? 'Social check-in & location tagging for customers' : 'Geolocalización para check-in de clientes' },
-                      ].map((c, i) => (
-                        <li key={i} className="p-2 rounded-xl bg-slate-900/60 border border-slate-800/80 flex items-center justify-between">
-                          <div>
-                            <strong className="text-white block">{c.name}</strong>
-                            <span className="text-[10px] text-slate-400">{c.desc}</span>
-                          </div>
-                          <span className="text-[9px] font-black text-indigo-400 bg-indigo-950 px-2 py-0.5 rounded">
-                            {c.authority}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TOOL 5: RIVAL SPY - RADAR DE ESPIONAJE CARA A CARA */}
+            {/* TOOL 3: RIVAL SPY - RADAR DE ESPIONAJE CARA A CARA */}
             {toolsActiveTab === 'rivalspy' && (
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 animate-in fade-in duration-200">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
@@ -5554,20 +5480,82 @@ export default function LocalStudioPage() {
                         {tTools.spyClientCol}
                       </span>
                       <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30">
-                        {isEn ? 'Your Profile' : 'Tu Ficha'}
+                        {isEn ? 'Your Prospect Profile' : 'Tu Posible Cliente'}
                       </span>
+                    </div>
+
+                    {/* 1-Click Google Maps Prospective Client Scanner */}
+                    <div className="p-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 space-y-1.5">
+                      <label className="block text-[10px] font-bold text-emerald-300 flex items-center justify-between">
+                        <span>{tTools.clientScannerLabel}</span>
+                        {clientSearchQuery && (
+                          <button
+                            type="button"
+                            onClick={() => setClientSearchQuery('')}
+                            className="text-[9px] text-slate-400 hover:text-emerald-400 transition cursor-pointer"
+                          >
+                            {isEn ? 'Clear' : 'Limpiar'}
+                          </button>
+                        )}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={clientSearchQuery}
+                          onChange={(e) => setClientSearchQuery(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !isClientScanning && clientSearchQuery.trim()) {
+                              e.preventDefault();
+                              handleClientScan();
+                            }
+                          }}
+                          placeholder={tTools.clientScannerPlaceholder}
+                          className="w-full pl-2.5 pr-16 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 text-[11px]"
+                        />
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              const text = await navigator.clipboard.readText();
+                              if (text) setClientSearchQuery(text.trim());
+                            } catch {}
+                          }}
+                          className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded-md bg-slate-800 text-[9px] font-bold text-emerald-400 hover:bg-slate-700 transition cursor-pointer"
+                        >
+                          {t.pasteBtn}
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleClientScan}
+                        disabled={isClientScanning || !clientSearchQuery.trim()}
+                        className="w-full py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-[11px] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                      >
+                        {isClientScanning ? (
+                          <>
+                            <RefreshCw className="w-3 h-3 animate-spin" />
+                            <span>{tTools.clientScannerScanning}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Search className="w-3 h-3" />
+                            <span>{tTools.clientScannerBtn}</span>
+                          </>
+                        )}
+                      </button>
                     </div>
 
                     <div className="space-y-2.5">
                       <div>
                         <label className="block text-slate-400 font-bold mb-1">
-                          {isEn ? 'Business Name' : 'Nombre del Negocio'}
+                          {isEn ? 'Client Business Name' : 'Nombre del Posible Cliente'}
                         </label>
                         <input
                           type="text"
-                          value={businessName || 'Tu Negocio'}
+                          value={businessName}
                           onChange={(e) => setBusinessName(e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-bold text-xs focus:outline-none focus:border-emerald-400"
+                          placeholder="ej: La Suiza Parrilla"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-emerald-200 font-bold text-xs focus:outline-none focus:border-emerald-400"
                         />
                       </div>
 
