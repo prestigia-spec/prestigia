@@ -20,6 +20,7 @@ import {
   Video,
   ArrowRight,
   TrendingUp,
+  TrendingDown,
   RefreshCw,
   X,
   Phone,
@@ -619,28 +620,49 @@ const TXT_TOOLS = {
     solutionPrestigia: 'Solución con Prestigia:',
     solutionPrestigiaBody:
       'Con la inyección de subcategorías secundarias, menciones de vecindario en la descripción y 8 reseñas semanales geolocalizadas, extendemos el radio verde a toda la ciudad en 90 días.',
-    roiTitle: 'Calculadora de Pérdida Financiera por estar fuera del Top 3',
-    roiDesc: 'Convierte la posición de Google Maps en dólares exactos perdidos por el cliente cada mes.',
-    avgTicket: 'Ticket Promedio por Cliente (USD)',
-    avgTicketSub: 'Lo que gasta un cliente promedio en su negocio.',
+    roiTitle: 'Balanza Financiera Top 3: Fuga Actual vs. Ganancia con Prestigia',
+    roiDesc: 'Compara con exactitud matemática el dinero que se fuga hoy a los rivales del podio frente a la nueva facturación conquistada al dominar el Top 3.',
+    avgTicket: 'Ticket Promedio por Venta/Servicio (USD)',
+    avgTicketSub: 'Gasto promedio de un cliente en cada consumo o cita.',
+    avgFrequency: 'Frecuencia / Visitas al Año por Cliente',
+    avgFrequencySub: 'Veces que el cliente vuelve a comprar en 12 meses (LTV).',
+    freqOpt1: '1x (Compra única puntual / Servicio esporádico)',
+    freqOpt2: '3x (Salud, estética, automotriz, servicios profesionales)',
+    freqOpt3: '6x (Alta recurrencia / Gastronomía y comercio)',
+    freqOpt4: '12x (Suscripciones o consumo mensual recurrente)',
     currentRank: 'Posición Actual en Google Maps',
-    rankOpt1: 'Puesto #4 (Al borde del Top 3)',
-    rankOpt2: 'Puesto #8 (Segunda vista)',
-    rankOpt3: 'Puesto #15+ (Completamente invisible)',
+    rankOpt1: 'Puesto #4 (Al borde del Top 3 • Pierde 35% de clics)',
+    rankOpt2: 'Puesto #8 (Segunda vista • Pierde 60% de clics)',
+    rankOpt3: 'Puesto #15+ (Invisible • Pierde 85%+ de clics)',
     currentRankSub: 'Lugar donde aparece hoy al buscar su servicio.',
     searches: 'Búsquedas Mensuales Estimadas en Zona',
-    searchesSub: 'Personas buscando este servicio al mes.',
-    leakDetected: 'Fuga de Facturación Detectada',
-    leakHeading: 'Dinero que tu negocio está regalando a la competencia:',
+    searchesSub: 'Personas buscando este servicio al mes en Google.',
+    leakDetected: 'Fuga de Facturación (Sin Prestigia)',
+    leakHeading: 'Dinero que tu negocio regala hoy a los 3 rivales del podio:',
     lostPer30Days: 'perdidos cada 30 días',
     lostCalls: 'Llamadas y Clics Perdidos:',
     searchesPerMonth: 'búsquedas/mes',
     lostClientsLabel: 'Clientes que no entraron:',
-    newClientsPerMonth: 'clientes nuevos/mes',
-    loss12Months: 'Pérdida en 12 Meses:',
-    advisorClose: 'Cierre del Asesor:',
-    advisorCloseBody:
-      '"Prestigia le cuesta una fracción de lo que usted pierde en solo una semana sin estar en el Top 3. Con recuperar tan solo 2 clientes al mes, el servicio se paga solo y todo lo demás es ganancia neta."',
+    newClientsPerMonth: 'clientes perdidos/mes',
+    loss12Months: 'Fuga Anual Directa:',
+    lossLtv12Months: 'Fuga Anual con Fidelización (LTV):',
+    gainDetected: 'Expansión Comercial (Con Prestigia Top 3)',
+    gainHeading: 'Nueva facturación conquistada al ingresar al Top 3:',
+    gainPer30Days: 'facturados cada 30 días',
+    gainCalls: 'Búsquedas y Clics Ganados:',
+    gainClientsLabel: 'Clientes Nuevos Ganados:',
+    gainNewClientsPerMonth: 'clientes nuevos/mes',
+    gain12Months: 'Nueva Facturación Anual:',
+    gainLtv12Months: 'Facturación Anual con Fidelización (LTV):',
+    netImpactBadge: 'IMPACTO COMERCIAL TOTAL (Fuga Detenida + Nueva Facturación)',
+    netImpactTotalAnnual: 'Impacto Económico Total Anual a Favor:',
+    roiEstimateLabel: 'Retorno de Inversión (ROI):',
+    breakEvenLabel: 'Punto de Amortización:',
+    breakEvenText: (clients: number) =>
+      `Con recuperar apenas ${clients} ${clients === 1 ? 'cliente' : 'clientes'} al mes, la inversión en Prestigia queda 100% amortizada. Todo cliente adicional es ganancia neta directa.`,
+    advisorClose: 'Cierre Definitivo del Asesor:',
+    advisorCloseBody: (name: string, monthlyLoss: number, monthlyGain: number, breakEvenClients: number) =>
+      `"Don ${name || 'Cliente'}, no contratar Prestigia no le ahorra dinero: le cuesta $${monthlyLoss.toLocaleString()} USD al mes que hoy van directo a los bolsillos de sus 3 competidores. Al ingresar al Top 3, no solo frena esa hemorragia de dinero sino que suma +$${monthlyGain.toLocaleString()} USD en clientes nuevos cada mes. Con recuperar apenas ${breakEvenClients} ${breakEvenClients === 1 ? 'cliente' : 'clientes'} al mes, Prestigia se paga 100% solo y todo lo demás es ganancia neta directa a su cuenta bancaria."`,
     geotagTitle: 'Inyector y Generador de Geo-Tagging EXIF para Fotos',
     geotagDesc: 'Google lee los metadatos IPTC y coordenadas de las fotos para validar la ubicación real del establecimiento.',
     photoName: 'Nombre Base de la Foto',
@@ -736,28 +758,49 @@ const TXT_TOOLS = {
     solutionPrestigia: 'Solution with Prestigia:',
     solutionPrestigiaBody:
       'With secondary category injection, geo-targeted neighborhood keywords in your commercial copy, and 8 weekly geo-tagged reviews, we expand your top-ranking radius across the entire metro area in 90 days.',
-    roiTitle: 'Financial Loss Calculator for Ranking Outside Top 3',
-    roiDesc: 'Converts Google Maps ranking drops into exact USD revenue lost by the business every month.',
-    avgTicket: 'Average Ticket Value per Customer (USD)',
-    avgTicketSub: 'Average amount spent by a customer at your business.',
+    roiTitle: 'Top 3 Financial Balance: Current Revenue Leak vs. Prestigia Gain',
+    roiDesc: 'Mathematically compares the revenue leaking to podium rivals against the new revenue unlocked by dominating the Google Maps Top 3.',
+    avgTicket: 'Average Ticket Value per Sale/Service (USD)',
+    avgTicketSub: 'Average amount spent by a customer per visit or transaction.',
+    avgFrequency: 'Purchase Frequency / Visits per Year',
+    avgFrequencySub: 'Number of times a customer returns in 12 months (LTV).',
+    freqOpt1: '1x (One-off purchase / Sporadic service)',
+    freqOpt2: '3x (Healthcare, beauty, auto, professional services)',
+    freqOpt3: '6x (High frequency / Dining & retail)',
+    freqOpt4: '12x (Monthly repeat or subscription)',
     currentRank: 'Current Position on Google Maps',
-    rankOpt1: 'Rank #4 (On the verge of Top 3)',
-    rankOpt2: 'Rank #8 (Second view / below the fold)',
-    rankOpt3: 'Rank #15+ (Completely invisible to searchers)',
+    rankOpt1: 'Rank #4 (On the verge of Top 3 • 35% click loss)',
+    rankOpt2: 'Rank #8 (Second view • 60% click loss)',
+    rankOpt3: 'Rank #15+ (Invisible • 85%+ click loss)',
     currentRankSub: 'Where the business ranks today for buyer-intent queries.',
     searches: 'Estimated Monthly Local Searches',
     searchesSub: 'Number of people searching for this service each month.',
-    leakDetected: 'Revenue Leak Detected',
-    leakHeading: 'Money your business is handing directly to competitors:',
+    leakDetected: 'Revenue Leak (Without Prestigia)',
+    leakHeading: 'Money your business is handing directly to the 3 podium competitors:',
     lostPer30Days: 'lost every 30 days',
     lostCalls: 'Lost Calls & Searches:',
     searchesPerMonth: 'searches/mo',
     lostClientsLabel: 'Lost Paying Customers:',
-    newClientsPerMonth: 'new customers/mo',
-    loss12Months: '12-Month Financial Loss:',
+    newClientsPerMonth: 'lost customers/mo',
+    loss12Months: 'Direct 12-Month Loss:',
+    lossLtv12Months: 'Annual Loss with Retention (LTV):',
+    gainDetected: 'Commercial Expansion (With Prestigia Top 3)',
+    gainHeading: 'New revenue captured by dominating the Top 3:',
+    gainPer30Days: 'generated every 30 days',
+    gainCalls: 'Captured Searches & Calls:',
+    gainClientsLabel: 'New Customers Gained:',
+    gainNewClientsPerMonth: 'new customers/mo',
+    gain12Months: 'New 12-Month Revenue:',
+    gainLtv12Months: 'Annual Revenue with Retention (LTV):',
+    netImpactBadge: 'TOTAL COMMERCIAL IMPACT (Halted Leak + New Revenue)',
+    netImpactTotalAnnual: 'Total Net Financial Advantage / Year:',
+    roiEstimateLabel: 'Estimated Return on Investment (ROI):',
+    breakEvenLabel: 'Break-Even Point:',
+    breakEvenText: (clients: number) =>
+      `Recovering just ${clients} paying customer${clients === 1 ? '' : 's'} a month pays for Prestigia completely. Every additional customer is 100% pure profit.`,
     advisorClose: 'Advisor Closing Pitch:',
-    advisorCloseBody:
-      '"Prestigia costs a fraction of what you lose in just one single week outside the Top 3. Recovering just 2 clients a month pays for the entire service, and every other client is pure profit for you."',
+    advisorCloseBody: (name: string, monthlyLoss: number, monthlyGain: number, breakEvenClients: number) =>
+      `"${name || 'Client'}, choosing not to hire Prestigia doesn't save you money—it costs you $${monthlyLoss.toLocaleString()} USD every month going straight to your competitors. By reaching the Top 3, you not only stop that leak but also bring in +$${monthlyGain.toLocaleString()} USD in new revenue each month. Bringing in just ${breakEvenClients} customer${breakEvenClients === 1 ? '' : 's'} a month pays for Prestigia completely, and everything else is pure profit."`,
     geotagTitle: 'EXIF & IPTC Geo-Tagging Photo Generator',
     geotagDesc: 'Google scans IPTC metadata and GPS coordinates embedded in photos to verify authentic physical operations.',
     photoName: 'Base Photo Filename',
@@ -1264,6 +1307,7 @@ export default function LocalStudioPage() {
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [geoGridRadius, setGeoGridRadius] = useState<'1km' | '3km' | '5km'>('3km');
   const [roiAverageTicket, setRoiAverageTicket] = useState<number>(65);
+  const [roiCustomerFrequency, setRoiCustomerFrequency] = useState<number>(3);
   const [roiCurrentRank, setRoiCurrentRank] = useState<number>(8);
   const [roiMonthlySearches, setRoiMonthlySearches] = useState<number>(1200);
   const [geoTagFilename, setGeoTagFilename] = useState('');
@@ -5143,16 +5187,34 @@ export default function LocalStudioPage() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                   <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
                     <label className="block font-bold text-slate-300">{tTools.avgTicket}</label>
-                    <input
-                      type="number"
-                      value={roiAverageTicket}
-                      onChange={(e) => setRoiAverageTicket(Number(e.target.value) || 0)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-emerald-300 font-black text-base focus:outline-none"
-                    />
-                    <span className="text-[10px] text-slate-500">{tTools.avgTicketSub}</span>
+                    <div className="relative">
+                      <span className="absolute left-3 top-2.5 text-emerald-400 font-bold">$</span>
+                      <input
+                        type="number"
+                        value={roiAverageTicket}
+                        onChange={(e) => setRoiAverageTicket(Number(e.target.value) || 0)}
+                        className="w-full pl-7 pr-3 py-2.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-emerald-300 font-black text-base focus:outline-none"
+                      />
+                    </div>
+                    <span className="text-[10px] text-slate-500 block leading-tight">{tTools.avgTicketSub}</span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                    <label className="block font-bold text-slate-300">{tTools.avgFrequency}</label>
+                    <select
+                      value={roiCustomerFrequency}
+                      onChange={(e) => setRoiCustomerFrequency(Number(e.target.value))}
+                      className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-bold text-xs focus:outline-none"
+                    >
+                      <option value="1">{tTools.freqOpt1}</option>
+                      <option value="3">{tTools.freqOpt2}</option>
+                      <option value="6">{tTools.freqOpt3}</option>
+                      <option value="12">{tTools.freqOpt4}</option>
+                    </select>
+                    <span className="text-[10px] text-slate-500 block leading-tight">{tTools.avgFrequencySub}</span>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
@@ -5160,13 +5222,13 @@ export default function LocalStudioPage() {
                     <select
                       value={roiCurrentRank}
                       onChange={(e) => setRoiCurrentRank(Number(e.target.value))}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-black text-base focus:outline-none"
+                      className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-bold text-xs focus:outline-none"
                     >
                       <option value="4">{tTools.rankOpt1}</option>
                       <option value="8">{tTools.rankOpt2}</option>
                       <option value="15">{tTools.rankOpt3}</option>
                     </select>
-                    <span className="text-[10px] text-slate-500">{tTools.currentRankSub}</span>
+                    <span className="text-[10px] text-slate-500 block leading-tight">{tTools.currentRankSub}</span>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
@@ -5177,54 +5239,150 @@ export default function LocalStudioPage() {
                       onChange={(e) => setRoiMonthlySearches(Number(e.target.value) || 0)}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-black text-base focus:outline-none"
                     />
-                    <span className="text-[10px] text-slate-500">{tTools.searchesSub}</span>
+                    <span className="text-[10px] text-slate-500 block leading-tight">{tTools.searchesSub}</span>
                   </div>
                 </div>
 
-                {/* Calculation Output Box */}
+                {/* Calculation Output: Dual-Balance Matrix (Fuga Actual vs Beneficio con Prestigia) */}
                 {(() => {
-                  const lostClicks = Math.round(roiMonthlySearches * (roiCurrentRank > 10 ? 0.28 : roiCurrentRank > 5 ? 0.22 : 0.14));
-                  const lostClients = Math.round(lostClicks * 0.25);
+                  // 1. Pérdida / Fuga sin Prestigia
+                  const lossRate = roiCurrentRank > 10 ? 0.85 : roiCurrentRank > 5 ? 0.60 : 0.35;
+                  const lostClicks = Math.round(roiMonthlySearches * lossRate);
+                  const lostClients = Math.max(1, Math.round(lostClicks * 0.20));
                   const monthlyLoss = lostClients * roiAverageTicket;
                   const yearlyLoss = monthlyLoss * 12;
+                  const yearlyLtvLoss = lostClients * (roiAverageTicket * roiCustomerFrequency) * 12;
+
+                  // 2. Ganancia con Prestigia (Al ingresar al Top 3)
+                  const gainRate = 0.45;
+                  const gainedClicks = Math.round(roiMonthlySearches * gainRate);
+                  const gainedClients = Math.max(1, Math.round(gainedClicks * 0.20));
+                  const monthlyGain = gainedClients * roiAverageTicket;
+                  const yearlyGain = monthlyGain * 12;
+                  const yearlyLtvGain = gainedClients * (roiAverageTicket * roiCustomerFrequency) * 12;
+
+                  // 3. Balance Neto Comercial & Amortización
+                  const totalAnnualAdvantage = yearlyLoss + yearlyGain;
+                  const totalAnnualLtvAdvantage = yearlyLtvLoss + yearlyLtvGain;
+                  const estimatedPrestigiaFee = 200;
+                  const breakEvenClients = Math.max(1, Math.ceil(estimatedPrestigiaFee / (roiAverageTicket || 1)));
 
                   return (
-                    <div className="p-6 rounded-3xl bg-gradient-to-r from-rose-950/60 via-slate-950 to-slate-900 border-2 border-rose-500/50 space-y-4">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div>
-                          <span className="text-[10px] font-black uppercase tracking-wider text-rose-300 bg-rose-950 px-2.5 py-0.5 rounded-full border border-rose-500/40">
-                            {tTools.leakDetected}
-                          </span>
-                          <h4 className="text-lg font-black text-white mt-1">
-                            {tTools.leakHeading}
-                          </h4>
+                    <div className="space-y-4">
+                      {/* 2-Column High Contrast Matrix */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {/* CARD 1: Fuga de Facturación (Rojo) */}
+                        <div className="p-6 rounded-3xl bg-gradient-to-br from-rose-950/70 via-slate-950 to-slate-900 border-2 border-rose-500/50 space-y-4 shadow-xl">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-rose-300 bg-rose-950 px-2.5 py-0.5 rounded-full border border-rose-500/40">
+                                <TrendingDown className="w-3 h-3 text-rose-400" />
+                                {tTools.leakDetected}
+                              </span>
+                              <h4 className="text-sm font-bold text-slate-200 mt-2">
+                                {tTools.leakHeading}
+                              </h4>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-3xl font-black text-rose-400 block tracking-tight">
+                                -${monthlyLoss.toLocaleString()} USD
+                              </span>
+                              <span className="text-[11px] text-slate-400 font-bold block">{tTools.lostPer30Days}</span>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-rose-500/20 text-xs">
+                            <div className="p-3 rounded-xl bg-slate-900/90 border border-rose-900/40">
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.lostCalls}</span>
+                              <strong className="text-sm font-black text-white">~{lostClicks.toLocaleString()} {tTools.searchesPerMonth}</strong>
+                            </div>
+                            <div className="p-3 rounded-xl bg-slate-900/90 border border-rose-900/40">
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.lostClientsLabel}</span>
+                              <strong className="text-sm font-black text-rose-300">~{lostClients.toLocaleString()} {tTools.newClientsPerMonth}</strong>
+                            </div>
+                            <div className="p-3 rounded-xl bg-slate-900/90 border border-rose-900/40 col-span-2 sm:col-span-1">
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.loss12Months}</span>
+                              <strong className="text-sm font-black text-rose-400">-${yearlyLoss.toLocaleString()} USD/{isEn ? 'yr' : 'año'}</strong>
+                            </div>
+                            <div className="p-3 rounded-xl bg-slate-900/90 border border-rose-900/40 col-span-2 sm:col-span-1">
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.lossLtv12Months}</span>
+                              <strong className="text-sm font-black text-rose-300">-${yearlyLtvLoss.toLocaleString()} USD/{isEn ? 'yr' : 'año'}</strong>
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <span className="text-3xl font-black text-rose-400">
-                            ${monthlyLoss.toLocaleString()} USD
-                          </span>
-                          <span className="text-xs text-slate-400 block font-bold">{tTools.lostPer30Days}</span>
+
+                        {/* CARD 2: Expansión Comercial con Prestigia (Verde Esmeralda) */}
+                        <div className="p-6 rounded-3xl bg-gradient-to-br from-emerald-950/70 via-slate-950 to-slate-900 border-2 border-emerald-500/50 space-y-4 shadow-xl">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-300 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-500/40">
+                                <TrendingUp className="w-3 h-3 text-emerald-400" />
+                                {tTools.gainDetected}
+                              </span>
+                              <h4 className="text-sm font-bold text-slate-200 mt-2">
+                                {tTools.gainHeading}
+                              </h4>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-3xl font-black text-emerald-400 block tracking-tight">
+                                +${monthlyGain.toLocaleString()} USD
+                              </span>
+                              <span className="text-[11px] text-slate-400 font-bold block">{tTools.gainPer30Days}</span>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-emerald-500/20 text-xs">
+                            <div className="p-3 rounded-xl bg-slate-900/90 border border-emerald-900/40">
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.gainCalls}</span>
+                              <strong className="text-sm font-black text-white">~{gainedClicks.toLocaleString()} {tTools.searchesPerMonth}</strong>
+                            </div>
+                            <div className="p-3 rounded-xl bg-slate-900/90 border border-emerald-900/40">
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.gainClientsLabel}</span>
+                              <strong className="text-sm font-black text-emerald-300">+{gainedClients.toLocaleString()} {tTools.gainNewClientsPerMonth}</strong>
+                            </div>
+                            <div className="p-3 rounded-xl bg-slate-900/90 border border-emerald-900/40 col-span-2 sm:col-span-1">
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.gain12Months}</span>
+                              <strong className="text-sm font-black text-emerald-400">+${yearlyGain.toLocaleString()} USD/{isEn ? 'yr' : 'año'}</strong>
+                            </div>
+                            <div className="p-3 rounded-xl bg-slate-900/90 border border-emerald-900/40 col-span-2 sm:col-span-1">
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.gainLtv12Months}</span>
+                              <strong className="text-sm font-black text-emerald-300">+${yearlyLtvGain.toLocaleString()} USD/{isEn ? 'yr' : 'año'}</strong>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-800 text-xs">
-                        <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
-                          <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.lostCalls}</span>
-                          <strong className="text-base font-black text-white">~{lostClicks} {tTools.searchesPerMonth}</strong>
+                      {/* BANNER UNIFICADO: Balance Neto Comercial & Cierre del Asesor */}
+                      <div className="p-5 rounded-3xl bg-slate-950 border border-amber-500/40 space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                          <div>
+                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-500/30">
+                              {tTools.netImpactBadge}
+                            </span>
+                            <p className="text-xs text-slate-300 mt-1">
+                              {tTools.breakEvenText(breakEvenClients)}
+                            </p>
+                          </div>
+                          <div className="text-left sm:text-right shrink-0">
+                            <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.netImpactTotalAnnual}</span>
+                            <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-emerald-300 to-cyan-300">
+                              +${totalAnnualAdvantage.toLocaleString()} USD/{isEn ? 'yr' : 'año'}
+                            </span>
+                            {roiCustomerFrequency > 1 && (
+                              <span className="text-[10px] text-slate-400 block font-medium">
+                                (Hasta +${totalAnnualLtvAdvantage.toLocaleString()} USD/año con fidelización LTV)
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
-                          <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.lostClientsLabel}</span>
-                          <strong className="text-base font-black text-amber-400">~{lostClients} {tTools.newClientsPerMonth}</strong>
-                        </div>
-                        <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
-                          <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.loss12Months}</span>
-                          <strong className="text-base font-black text-rose-400">${yearlyLoss.toLocaleString()} USD/{isEn ? 'yr' : 'año'}</strong>
-                        </div>
-                      </div>
 
-                      <div className="p-3 rounded-xl bg-slate-900 border border-amber-500/30 text-xs text-amber-200">
-                        <strong className="text-white block mb-0.5">{tTools.advisorClose}</strong>
-                        {tTools.advisorCloseBody}
+                        <div className="p-3 rounded-2xl bg-slate-900/90 border border-amber-500/20 text-xs text-amber-100/90 leading-relaxed">
+                          <strong className="text-amber-400 block mb-1 font-black flex items-center gap-1.5">
+                            <Sparkles className="w-3.5 h-3.5" />
+                            {tTools.advisorClose}
+                          </strong>
+                          {tTools.advisorCloseBody(businessName, monthlyLoss, monthlyGain, breakEvenClients)}
+                        </div>
                       </div>
                     </div>
                   );
