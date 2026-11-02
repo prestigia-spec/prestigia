@@ -50,7 +50,10 @@ import {
   Unlock,
   Clock,
   LogOut,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
+import type { GooglePlaceData } from '@/app/api/auditor/google-lookup/route';
 
 interface StudioAdvisorUser {
   id: string;
@@ -190,6 +193,136 @@ const CATEGORY_OPTIONS_EN = [
 
 const CATEGORY_OPTIONS = CATEGORY_OPTIONS_ES;
 
+function mapDetectedCategoryToPrestigia(
+  primaryCategory: string,
+  detectedCategories: string[] = [],
+  isEn: boolean = false
+): string {
+  const combined = (primaryCategory + ' ' + (detectedCategories || []).join(' ')).toLowerCase();
+  const options = isEn ? CATEGORY_OPTIONS_EN : CATEGORY_OPTIONS_ES;
+
+  if (
+    combined.includes('restauran') ||
+    combined.includes('bar') ||
+    combined.includes('comida') ||
+    combined.includes('pizza') ||
+    combined.includes('burger') ||
+    combined.includes('hamburg') ||
+    combined.includes('parrilla') ||
+    combined.includes('pasta') ||
+    combined.includes('gastro') ||
+    combined.includes('asador')
+  ) {
+    return options[0];
+  }
+  if (
+    combined.includes('caf') ||
+    combined.includes('panader') ||
+    combined.includes('pasteler') ||
+    combined.includes('bakery') ||
+    combined.includes('coffee')
+  ) {
+    return options[1];
+  }
+  if (
+    combined.includes('odont') ||
+    combined.includes('dental') ||
+    combined.includes('dentist')
+  ) {
+    return options[3];
+  }
+  if (
+    combined.includes('salud') ||
+    combined.includes('medic') ||
+    combined.includes('clinic') ||
+    combined.includes('doctor') ||
+    combined.includes('hospital')
+  ) {
+    return options[2];
+  }
+  if (
+    combined.includes('belleza') ||
+    combined.includes('spa') ||
+    combined.includes('barber') ||
+    combined.includes('estetica') ||
+    combined.includes('salon') ||
+    combined.includes('unas') ||
+    combined.includes('hair')
+  ) {
+    return options[4];
+  }
+  if (
+    combined.includes('auto') ||
+    combined.includes('taller') ||
+    combined.includes('mecanic') ||
+    combined.includes('lavadero') ||
+    combined.includes('detailing') ||
+    combined.includes('car')
+  ) {
+    return options[5];
+  }
+  if (
+    combined.includes('gym') ||
+    combined.includes('gimnasio') ||
+    combined.includes('fitness') ||
+    combined.includes('crossfit') ||
+    combined.includes('entren')
+  ) {
+    return options[6];
+  }
+  if (
+    combined.includes('abogad') ||
+    combined.includes('legal') ||
+    combined.includes('contab') ||
+    combined.includes('consult') ||
+    combined.includes('inmobili') ||
+    combined.includes('real estate')
+  ) {
+    return options[7];
+  }
+  if (
+    combined.includes('tienda') ||
+    combined.includes('retail') ||
+    combined.includes('moda') ||
+    combined.includes('ropa') ||
+    combined.includes('boutique') ||
+    combined.includes('zapater') ||
+    combined.includes('joyer')
+  ) {
+    return options[8];
+  }
+  if (
+    combined.includes('veterinar') ||
+    combined.includes('mascot') ||
+    combined.includes('pet') ||
+    combined.includes('perro') ||
+    combined.includes('gato')
+  ) {
+    return options[9];
+  }
+  if (
+    combined.includes('hotel') ||
+    combined.includes('hospedaj') ||
+    combined.includes('hostal') ||
+    combined.includes('turismo') ||
+    combined.includes('resort')
+  ) {
+    return options[10];
+  }
+  if (
+    combined.includes('escuela') ||
+    combined.includes('colegio') ||
+    combined.includes('academia') ||
+    combined.includes('curso') ||
+    combined.includes('educacion') ||
+    combined.includes('universidad')
+  ) {
+    return options[11];
+  }
+
+  return options[0];
+}
+
 const UI_TEXT = {
   es: {
     tagline: 'Suite de Creación & Optimización Google Maps',
@@ -237,22 +370,34 @@ const UI_TEXT = {
     consultingAi: 'Consultando Algoritmo de Google Maps',
     consultingAiDesc: 'Analizando taxonomía oficial de categorías, palabras clave de compra local y redactando descripción comercial de 745 caracteres...',
     saveDossier: 'Guardar en Cartera',
-    mod2Badge: 'Módulo 2: Para Negocios que Ya Tienen Google Maps pero no venden',
+    mod2Badge: 'Módulo 2: Reconocimiento API de Google & Auditoría Forense',
     mod2Title: 'Auditoría Forense de Brechas & Upgrade al Top 3',
-    mod2Desc: 'Descubre con exactitud por qué los 3 líderes de su zona están acaparando a todos los clientes y genera la hoja de ruta técnica para destronarlos en 90 días con el ecosistema Prestigia.',
+    mod2Desc: 'Solo ingresa la ficha (enlace o nombre de Google Maps). Prestigia reconocerá todos los datos en tiempo real con la API de Google (calificación, reseñas, categoría, dirección) y Gemini ejecutará la auditoría forense al instante.',
     mod2Target: 'Objetivo de Ascenso',
     mod2TargetVal: 'Conquista Top 3',
-    auditFormHeader: 'Ficha Actual a Diagnosticar',
-    auditBizName: 'Nombre Comercial de la Ficha *',
+    auditFormHeader: '1. Reconocimiento de Ficha en Google Maps',
+    auditInputLabel: 'Enlace de Google Maps o Nombre Comercial',
+    auditInputPlaceholder: 'Pega el enlace (maps.app.goo.gl/...) o escribe Nombre Comercial + Ciudad',
+    btnScanAndAudit: 'Reconocer Ficha con API de Google & Auditar en 1-Clic',
+    btnScanningAndAuditing: 'Reconociendo Ficha en Google Maps & Auditando con Gemini...',
+    verifiedListingBadge: 'Ficha Reconocida en Vivo por Google Maps',
+    adjustManuallyLabel: 'Ajustar datos detectados manualmente',
+    adjustManuallyHide: 'Ocultar ajustes manuales',
+    pasteBtn: 'Pegar',
+    auditBizName: 'Nombre Comercial Detectado *',
     auditBizNamePlaceholder: 'Ej: La Suiza Parrilla',
-    googleUrl: 'Enlace de Google Maps (Opcional)',
+    googleUrl: 'Enlace Oficial de Google Maps',
     googleUrlPlaceholder: 'https://maps.google.com/?cid=...',
-    currentRating: 'Calificación Actual ★',
-    publicReviews: 'Opiniones Públicas',
+    currentRating: 'Calificación Detectada ★',
+    publicReviews: 'Opiniones Detectadas',
     auditCityPlaceholder: 'Ej: Medellín o Bogotá',
     auditNeighborhoodPlaceholder: 'Ej: El Poblado o Usaquén',
-    btnAudit: 'Escanear Brechas & Generar Hoja de Ruta',
+    btnAudit: 'Re-escanear Brechas & Generar Hoja de Ruta',
     btnAuditing: 'Analizando Brechas frente al Top 3...',
+    readyAuditTitle: 'Listo para Auditar la Ficha en Google Maps',
+    readyAuditDesc: 'Pega el enlace de Google Maps a la izquierda y presiona el botón. La API de Google extraerá las métricas reales y la IA generará el diagnóstico forense, brechas y hoja de ruta al Top 3.',
+    consultingAuditAi: 'Auditando Ficha con Algoritmo Google Maps & Gemini',
+    consultingAuditDesc: 'Calculando brechas de visibilidad, analizando el Top 3 local de la zona y estructurando la hoja de ruta de 5 pasos...',
     healthScore: 'Puntaje de Salud SEO Local',
     vulnerableBadge: 'Ficha Vulnerable (-45% visibilidad)',
     save: 'Guardar',
@@ -310,22 +455,34 @@ const UI_TEXT = {
     consultingAi: 'Querying Google Maps Algorithm',
     consultingAiDesc: 'Analyzing official category taxonomy, local buyer intent keywords, and drafting 745-character SEO commercial copy...',
     saveDossier: 'Save to Portfolio',
-    mod2Badge: 'Module 2: For Businesses on Google Maps Not Getting Sales',
+    mod2Badge: 'Module 2: Google API Live Recognition & Forensic Audit',
     mod2Title: 'Forensic Gap Audit & Top 3 Upgrade',
-    mod2Desc: 'Discover exactly why the top 3 competitors in your area are capturing all clients, and generate the 90-day technical roadmap to overtake them with Prestigia.',
+    mod2Desc: 'Simply provide the Google Maps listing (URL or business name). Prestigia will recognize all real-time metrics with Google Maps API (rating, reviews, category, address) and Gemini will execute the forensic audit instantly.',
     mod2Target: 'Ranking Goal',
     mod2TargetVal: 'Conquering Top 3',
-    auditFormHeader: 'Current Profile to Audit',
-    auditBizName: 'Business Listing Name *',
+    auditFormHeader: '1. Google Maps Listing Recognition',
+    auditInputLabel: 'Google Maps Link or Business Name',
+    auditInputPlaceholder: 'Paste Google Maps link (maps.app.goo.gl/...) or type Business Name + City',
+    btnScanAndAudit: 'Recognize Listing with Google API & Audit in 1-Click',
+    btnScanningAndAuditing: 'Recognizing Profile & Auditing with Gemini...',
+    verifiedListingBadge: 'Live Verified Google Maps Profile',
+    adjustManuallyLabel: 'Manually adjust detected listing data',
+    adjustManuallyHide: 'Hide manual adjustments',
+    pasteBtn: 'Paste',
+    auditBizName: 'Detected Business Name *',
     auditBizNamePlaceholder: 'e.g. Miami Smile Center',
-    googleUrl: 'Google Maps Link (Optional)',
+    googleUrl: 'Official Google Maps URL',
     googleUrlPlaceholder: 'https://maps.google.com/?cid=...',
-    currentRating: 'Current Rating ★',
-    publicReviews: 'Public Reviews',
+    currentRating: 'Detected Rating ★',
+    publicReviews: 'Detected Reviews',
     auditCityPlaceholder: 'e.g. Miami, FL or Austin, TX',
     auditNeighborhoodPlaceholder: 'e.g. Brickell or Downtown',
-    btnAudit: 'Scan Gaps & Generate Action Roadmap',
+    btnAudit: 'Re-scan Gaps & Generate Action Roadmap',
     btnAuditing: 'Analyzing Gaps Against Top 3 Leaders...',
+    readyAuditTitle: 'Ready to Audit Google Maps Profile',
+    readyAuditDesc: 'Paste the Google Maps link on the left and click the button. Google Maps API will pull live metrics and AI will generate the forensic score, critical gaps, and 5-step roadmap to the Top 3.',
+    consultingAuditAi: 'Auditing Profile with Google Maps Algorithm & Gemini',
+    consultingAuditDesc: 'Calculating visibility gaps, benchmarking against local Top 3 leaders, and structuring the 5-step action roadmap...',
     healthScore: 'Local SEO Health Score',
     vulnerableBadge: 'Vulnerable Profile (-45% visibility)',
     save: 'Save',
@@ -983,6 +1140,12 @@ export default function LocalStudioPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedData, setGeneratedData] = useState<BlueprintData | null>(null);
 
+  // Module 2 Google Maps 1-Click Scanner & Live Audit State
+  const [auditQuery, setAuditQuery] = useState('');
+  const [isScanningListing, setIsScanningListing] = useState(false);
+  const [scannedListing, setScannedListing] = useState<GooglePlaceData | null>(null);
+  const [showManualAuditFields, setShowManualAuditFields] = useState(false);
+
   // 5 Elite Local SEO Power Tools State
   const [toolsActiveTab, setToolsActiveTab] = useState<'geogrid' | 'roicalc' | 'geotag' | 'citations' | 'rivalspy'>('geogrid');
   const [geoGridRadius, setGeoGridRadius] = useState<'1km' | '3km' | '5km'>('3km');
@@ -1211,27 +1374,48 @@ export default function LocalStudioPage() {
   // -------------------------------------------------------------
   // 3. GENERATION ACTION (LIVE GEMINI + HEURISTIC ENGINE)
   // -------------------------------------------------------------
-  const handleGenerate = async (targetMode: 'create' | 'audit') => {
-    if (!businessName.trim()) {
-      showToast('⚠️ Ingresa el nombre comercial del negocio');
+  const handleGenerate = async (
+    targetMode: 'create' | 'audit',
+    overrides?: {
+      businessName?: string;
+      category?: string;
+      city?: string;
+      neighborhood?: string;
+      googleUrl?: string;
+      existingRating?: number;
+      existingReviews?: number;
+      phone?: string;
+    }
+  ) => {
+    const finalBizName = (overrides?.businessName ?? businessName).trim();
+    if (!finalBizName) {
+      showToast(isEn ? '⚠️ Please enter the business name or link' : '⚠️ Ingresa el nombre comercial o enlace del negocio');
       return;
     }
 
     setIsGenerating(true);
     setGeneratedData(null);
 
+    const finalCategory = overrides?.category ?? category;
+    const finalCity = (overrides?.city ?? city).trim() || 'Colombia';
+    const finalNeighborhood = (overrides?.neighborhood ?? neighborhood).trim();
+    const finalPhone = (overrides?.phone ?? phone).trim() || currentUser?.phone || '';
+    const finalGoogleUrl = (overrides?.googleUrl ?? googleUrl).trim();
+    const finalRating = targetMode === 'create' ? 5.0 : (Number(overrides?.existingRating ?? existingRating) || 4.5);
+    const finalReviews = targetMode === 'create' ? 0 : (Number(overrides?.existingReviews ?? existingReviews) || 0);
+
     try {
       const payload = {
         mode: targetMode,
-        businessName: businessName.trim(),
-        category,
-        city: city.trim() || 'Colombia',
-        neighborhood: neighborhood.trim(),
+        businessName: finalBizName,
+        category: finalCategory,
+        city: finalCity,
+        neighborhood: finalNeighborhood,
         specialties: specialties.trim(),
-        phone: phone.trim() || currentUser?.phone || '',
-        googleUrl: googleUrl.trim(),
-        existingRating: targetMode === 'create' ? 5.0 : (Number(existingRating) || 4.5),
-        existingReviews: targetMode === 'create' ? 0 : (Number(existingReviews) || 0),
+        phone: finalPhone,
+        googleUrl: finalGoogleUrl,
+        existingRating: finalRating,
+        existingReviews: finalReviews,
         lang,
         businessModel,
         serviceAreas: serviceAreas.trim(),
@@ -1247,7 +1431,11 @@ export default function LocalStudioPage() {
 
       if (resData.success && resData.data) {
         setGeneratedData(resData.data);
-        showToast('✨ ¡Arquitectura Top 3 generada y registrada en Cartera!');
+        showToast(
+          targetMode === 'audit'
+            ? (isEn ? '✨ Forensic Audit completed with Gemini AI!' : '✨ ¡Auditoría Forense completada con IA Gemini!')
+            : (isEn ? '✨ Winning Top 3 Architecture generated!' : '✨ ¡Arquitectura Top 3 generada y registrada en Cartera!')
+        );
 
         // AUTO-SAVE to database so every generation is permanently audited
         try {
@@ -1255,11 +1443,11 @@ export default function LocalStudioPage() {
             advisorId: currentUser?.id || 'adv-luisma',
             advisorName: currentUser?.name || 'Luisma • Director General',
             advisorPhone: currentUser?.phone || '+573058314049',
-            clientName: businessName.trim(),
-            category,
-            city: city.trim() || 'Colombia',
-            neighborhood: neighborhood.trim(),
-            googleUrl: googleUrl.trim(),
+            clientName: finalBizName,
+            category: finalCategory,
+            city: finalCity,
+            neighborhood: finalNeighborhood,
+            googleUrl: finalGoogleUrl,
             mode: targetMode,
             status: 'draft',
             data: resData.data,
@@ -1279,6 +1467,115 @@ export default function LocalStudioPage() {
       showToast('⚠️ Error de conexión con el motor de IA.');
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  // -------------------------------------------------------------
+  // 3.1. 1-CLICK GOOGLE MAPS API SCANNER & FORENSIC AUDIT
+  // -------------------------------------------------------------
+  const handleScanAndAudit = async () => {
+    const rawInput = auditQuery.trim();
+    if (!rawInput) {
+      showToast(
+        isEn
+          ? '⚠️ Please paste a Google Maps link or enter business name'
+          : '⚠️ Pega el enlace de Google Maps o escribe el nombre del negocio'
+      );
+      return;
+    }
+
+    setIsScanningListing(true);
+    showToast(
+      isEn
+        ? '🔍 Querying Google Maps API in real-time...'
+        : '🔍 Reconociendo ficha con la API de Google Maps en vivo...'
+    );
+
+    try {
+      const res = await fetch('/api/auditor/google-lookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: rawInput }),
+      });
+      const data = await res.json();
+
+      if (data?.success && data?.data) {
+        const place: GooglePlaceData = data.data;
+        setScannedListing(place);
+
+        const extractedName = place.name || rawInput;
+        setBusinessName(extractedName);
+        if (typeof place.rating === 'number') setExistingRating(place.rating);
+        if (typeof place.reviewsCount === 'number') setExistingReviews(place.reviewsCount);
+        if (place.googleMapsUrl) setGoogleUrl(place.googleMapsUrl);
+        if (place.phone) setPhone(place.phone);
+
+        // Address parsing for city and neighborhood
+        let parsedCity = city;
+        let parsedNeighborhood = neighborhood;
+        if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
+          const parts = place.address.split(',').map((p) => p.trim());
+          if (parts.length >= 3) {
+            parsedNeighborhood = parts[parts.length - 3] || parsedNeighborhood;
+            parsedCity = parts[parts.length - 2] || parsedCity;
+          } else if (parts.length >= 2) {
+            parsedCity = parts[parts.length - 2] || parsedCity;
+          }
+          if (parsedCity) setCity(parsedCity);
+          if (parsedNeighborhood) setNeighborhood(parsedNeighborhood);
+        }
+
+        // Category mapping
+        const matchedCategory = mapDetectedCategoryToPrestigia(
+          place.category || '',
+          place.detectedCategories || [],
+          isEn
+        );
+        setCategory(matchedCategory);
+
+        showToast(
+          isEn
+            ? `✓ Listing Recognized: ${extractedName} (${place.rating}★ · ${place.reviewsCount} reviews). Launching AI audit...`
+            : `✓ Ficha Reconocida: ${extractedName} (${place.rating}★ · ${place.reviewsCount} opiniones). Ejecutando auditoría IA...`
+        );
+
+        // Immediately trigger the full AI Audit Generation!
+        await handleGenerate('audit', {
+          businessName: extractedName,
+          category: matchedCategory,
+          city: parsedCity,
+          neighborhood: parsedNeighborhood,
+          googleUrl: place.googleMapsUrl || rawInput,
+          existingRating: place.rating,
+          existingReviews: place.reviewsCount,
+          phone: place.phone || phone,
+        });
+      } else {
+        // Fallback: If live lookup fails or returns error, use raw query as name and audit anyway
+        const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
+        setBusinessName(fallbackName);
+        if (rawInput.startsWith('http')) setGoogleUrl(rawInput);
+        showToast(
+          isEn
+            ? '⚡ Auditing with detected profile data...'
+            : '⚡ Auditando con los datos detectados...'
+        );
+        await handleGenerate('audit', {
+          businessName: fallbackName,
+          googleUrl: rawInput.startsWith('http') ? rawInput : '',
+        });
+      }
+    } catch (err: any) {
+      console.error('Scan error:', err);
+      const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
+      setBusinessName(fallbackName);
+      if (rawInput.startsWith('http')) setGoogleUrl(rawInput);
+      await handleGenerate('audit', {
+        businessName: fallbackName,
+        googleUrl: rawInput.startsWith('http') ? rawInput : '',
+      });
+    } finally {
+      setIsScanningListing(false);
     }
   };
 
@@ -2939,7 +3236,7 @@ export default function LocalStudioPage() {
         )}
 
         {/* =============================================================
-            TAB 2: AUDITAR FICHA EXISTENTE & UPGRADE AL TOP 3
+            TAB 2: AUDITAR FICHA EXISTENTE & UPGRADE AL TOP 3 (1-CLIC GOOGLE API)
             ============================================================= */}
         {activeTab === 'audit' && (
           <div className="space-y-6">
@@ -2965,117 +3262,280 @@ export default function LocalStudioPage() {
 
             {/* Input & Form */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column: 1-Click Google Maps Scanner */}
               <div className="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl print:hidden">
                 <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
                   <Search className="w-4 h-4 text-amber-400" />
                   <h2 className="text-sm font-black text-white">{t.auditFormHeader}</h2>
                 </div>
 
-                <div className="space-y-3 text-xs">
+                {/* Single Google Maps Input Box */}
+                <div className="space-y-3">
                   <div>
-                    <label className="block font-bold text-slate-300 mb-1">{t.auditBizName}</label>
-                    <input
-                      type="text"
-                      value={businessName}
-                      onChange={(e) => setBusinessName(e.target.value)}
-                      placeholder={t.auditBizNamePlaceholder}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition"
-                    />
-                  </div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <Globe className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{t.auditInputLabel}</span>
+                      </span>
+                      {auditQuery && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAuditQuery('');
+                            setScannedListing(null);
+                          }}
+                          className="text-[10px] text-slate-400 hover:text-rose-400 transition cursor-pointer"
+                        >
+                          {isEn ? 'Clear' : 'Limpiar'}
+                        </button>
+                      )}
+                    </label>
 
-                  <div>
-                    <label className="block font-bold text-slate-300 mb-1">{t.googleUrl}</label>
-                    <input
-                      type="text"
-                      value={googleUrl}
-                      onChange={(e) => setGoogleUrl(e.target.value)}
-                      placeholder={t.googleUrlPlaceholder}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">{t.currentRating}</label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        min="1"
-                        max="5"
-                        value={existingRating}
-                        onChange={(e) => setExistingRating(Number(e.target.value))}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition font-bold"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">{t.publicReviews}</label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={existingReviews}
-                        onChange={(e) => setExistingReviews(Number(e.target.value))}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition font-bold"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">{t.city}</label>
+                    <div className="relative">
                       <input
                         type="text"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        placeholder={t.auditCityPlaceholder}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition"
+                        value={auditQuery}
+                        onChange={(e) => setAuditQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !isScanningListing && !isGenerating && auditQuery.trim()) {
+                            e.preventDefault();
+                            handleScanAndAudit();
+                          }
+                        }}
+                        placeholder={t.auditInputPlaceholder}
+                        className="w-full pl-3.5 pr-20 py-3 rounded-xl bg-slate-950 border border-amber-500/40 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-xs transition font-medium"
                       />
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            const text = await navigator.clipboard.readText();
+                            if (text) setAuditQuery(text.trim());
+                          } catch {
+                            // clipboard read not permitted by browser
+                          }
+                        }}
+                        title={isEn ? 'Paste from clipboard' : 'Pegar del portapapeles'}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-amber-400 transition cursor-pointer"
+                      >
+                        {t.pasteBtn}
+                      </button>
                     </div>
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">{t.neighborhood}</label>
-                      <input
-                        type="text"
-                        value={neighborhood}
-                        onChange={(e) => setNeighborhood(e.target.value)}
-                        placeholder={t.auditNeighborhoodPlaceholder}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition"
-                      />
-                    </div>
+
+                    <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+                      {isEn
+                        ? '💡 Supports short links (maps.app.goo.gl/...), full Google Maps URLs, or "Business Name + City".'
+                        : '💡 Soporta enlaces cortos (maps.app.goo.gl/...), enlaces web largos o "Nombre Comercial + Ciudad".'}
+                    </p>
                   </div>
 
-                  <div>
-                    <label className="block font-bold text-slate-300 mb-1">{t.sector}</label>
-                    <select
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition"
-                    >
-                      {categoryOptions.map((c: string) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  {/* Primary 1-Click Scan & Audit Button */}
+                  <button
+                    type="button"
+                    onClick={handleScanAndAudit}
+                    disabled={isScanningListing || isGenerating || !auditQuery.trim()}
+                    className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98"
+                  >
+                    {isScanningListing || isGenerating ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>{t.btnScanningAndAuditing}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-4 h-4 fill-slate-950" />
+                        <span>{t.btnScanAndAudit}</span>
+                      </>
+                    )}
+                  </button>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => handleGenerate('audit')}
-                  disabled={isGenerating || !businessName.trim()}
-                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98"
-                >
-                  {isGenerating ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>{t.btnAuditing}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Search className="w-4 h-4" />
-                      <span>{t.btnAudit}</span>
-                    </>
+                {/* Scanned Listing Profile Card (If recognized) */}
+                {scannedListing && (
+                  <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-emerald-500/40 space-y-2.5 animate-in fade-in duration-300">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        <span>{t.verifiedListingBadge}</span>
+                      </span>
+                      {scannedListing.googleMapsUrl && (
+                        <a
+                          href={scannedListing.googleMapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                        >
+                          <span>Maps</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+
+                    <div>
+                      <h4 className="text-sm font-black text-white leading-tight">
+                        {scannedListing.name}
+                      </h4>
+                      {scannedListing.address && (
+                        <p className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3 h-3 text-amber-400 shrink-0" />
+                          <span className="truncate">{scannedListing.address}</span>
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 pt-1">
+                      <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-center">
+                        <span className="text-[9px] uppercase font-bold text-slate-400 block">Rating</span>
+                        <span className="text-xs font-black text-amber-400">★ {scannedListing.rating}</span>
+                      </div>
+                      <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-center">
+                        <span className="text-[9px] uppercase font-bold text-slate-400 block">{isEn ? 'Reviews' : 'Reseñas'}</span>
+                        <span className="text-xs font-black text-white">{scannedListing.reviewsCount}</span>
+                      </div>
+                      <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-center">
+                        <span className="text-[9px] uppercase font-bold text-slate-400 block">{isEn ? 'Niche' : 'Nicho'}</span>
+                        <span className="text-[10px] font-black text-teal-300 truncate block">
+                          {scannedListing.category || 'General'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {(scannedListing.phone || scannedListing.website) && (
+                      <div className="flex items-center gap-3 text-[11px] text-slate-400 pt-1 border-t border-slate-800/80">
+                        {scannedListing.phone && (
+                          <span className="flex items-center gap-1 text-slate-300 truncate">
+                            <Phone className="w-3 h-3 text-emerald-400 shrink-0" />
+                            <span>{scannedListing.phone}</span>
+                          </span>
+                        )}
+                        {scannedListing.website && (
+                          <span className="flex items-center gap-1 text-slate-300 truncate">
+                            <Globe className="w-3 h-3 text-indigo-400 shrink-0" />
+                            <span>{scannedListing.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Optional Collapsible Manual Tweaks Accordion */}
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowManualAuditFields(!showManualAuditFields)}
+                    className="w-full py-2 px-3 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-[11px] font-bold text-slate-400 hover:text-white transition flex items-center justify-between cursor-pointer"
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <span>⚙️</span>
+                      <span>{showManualAuditFields ? t.adjustManuallyHide : t.adjustManuallyLabel}</span>
+                    </span>
+                    {showManualAuditFields ? (
+                      <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                    )}
+                  </button>
+
+                  {showManualAuditFields && (
+                    <div className="mt-3 p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 text-xs animate-in fade-in duration-200">
+                      <div>
+                        <label className="block font-bold text-slate-300 mb-1">{t.auditBizName}</label>
+                        <input
+                          type="text"
+                          value={businessName}
+                          onChange={(e) => setBusinessName(e.target.value)}
+                          placeholder={t.auditBizNamePlaceholder}
+                          className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-300 mb-1">{t.googleUrl}</label>
+                        <input
+                          type="text"
+                          value={googleUrl}
+                          onChange={(e) => setGoogleUrl(e.target.value)}
+                          placeholder={t.googleUrlPlaceholder}
+                          className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block font-bold text-slate-300 mb-1">{t.currentRating}</label>
+                          <input
+                            type="number"
+                            step="0.1"
+                            min="1"
+                            max="5"
+                            value={existingRating}
+                            onChange={(e) => setExistingRating(Number(e.target.value))}
+                            className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition font-bold"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-bold text-slate-300 mb-1">{t.publicReviews}</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={existingReviews}
+                            onChange={(e) => setExistingReviews(Number(e.target.value))}
+                            className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition font-bold"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block font-bold text-slate-300 mb-1">{t.city}</label>
+                          <input
+                            type="text"
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                            placeholder={t.auditCityPlaceholder}
+                            className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-bold text-slate-300 mb-1">{t.neighborhood}</label>
+                          <input
+                            type="text"
+                            value={neighborhood}
+                            onChange={(e) => setNeighborhood(e.target.value)}
+                            placeholder={t.auditNeighborhoodPlaceholder}
+                            className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-300 mb-1">{t.sector}</label>
+                        <select
+                          value={category}
+                          onChange={(e) => setCategory(e.target.value)}
+                          className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition"
+                        >
+                          {categoryOptions.map((c: string) => (
+                            <option key={c} value={c}>
+                              {c}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleGenerate('audit')}
+                        disabled={isGenerating || !businessName.trim()}
+                        className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                      >
+                        <Search className="w-3.5 h-3.5" />
+                        <span>{t.btnAudit}</span>
+                      </button>
+                    </div>
                   )}
-                </button>
+                </div>
 
                 {/* Commercial Strategy: Setup Fee & 100% Annual Plan Waiver */}
                 <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-900 to-orange-500/10 border border-amber-500/30 space-y-3">
@@ -3116,9 +3576,60 @@ export default function LocalStudioPage() {
                 </div>
               </div>
 
-              {/* Right: Audit Diagnostic Output */}
+              {/* Right Column: Audit Diagnostic Output */}
               <div className="lg:col-span-7 space-y-4">
-                {generatedData?.healthScore && (
+                {/* State 1: Scanning & Auditing with Gemini */}
+                {(isScanningListing || isGenerating) && (
+                  <div className="p-8 sm:p-12 rounded-3xl bg-slate-900/80 border border-amber-500/30 text-center space-y-4 animate-pulse">
+                    <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+                      <RefreshCw className="w-7 h-7 animate-spin text-amber-400" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-base font-bold text-white">
+                        {t.consultingAuditAi}
+                      </h3>
+                      <p className="text-xs text-slate-400 max-w-md mx-auto">
+                        {t.consultingAuditDesc}
+                      </p>
+                    </div>
+                    <div className="flex justify-center gap-2 pt-2">
+                      <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                      <span className="w-2 h-2 rounded-full bg-amber-400" />
+                      <span className="w-2 h-2 rounded-full bg-amber-400" />
+                    </div>
+                  </div>
+                )}
+
+                {/* State 2: Ready to Audit (Empty State) */}
+                {!generatedData?.healthScore && !isScanningListing && !isGenerating && (
+                  <div className="p-8 sm:p-12 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-4">
+                    <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+                      <Search className="w-7 h-7 text-amber-400" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <h3 className="text-base font-bold text-white">
+                        {t.readyAuditTitle}
+                      </h3>
+                      <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                        {t.readyAuditDesc}
+                      </p>
+                    </div>
+                    <div className="pt-2 flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-400">
+                      <span className="px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700/60">
+                        ⚡ Reconocimiento en Vivo
+                      </span>
+                      <span className="px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700/60">
+                        ★ Calificación Real & Reseñas
+                      </span>
+                      <span className="px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700/60">
+                        🎯 Brechas frente al Top 3
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* State 3: Generated Forensic Audit Results */}
+                {generatedData?.healthScore && !isScanningListing && !isGenerating && (
                   <div className="space-y-4 animate-in fade-in duration-300">
                     {/* Score Bar */}
                     <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between print-card-box">
