@@ -21,6 +21,8 @@ import {
   ArrowRight,
   TrendingUp,
   TrendingDown,
+  Trophy,
+  Flame,
   RefreshCw,
   X,
   Phone,
@@ -675,9 +677,15 @@ const TXT_TOOLS = {
     spyMove1: 'Acelerador de Reseñas 5★ con Dispositivos NFC Prestigia (+8 reseñas semanales para quebrar su ventaja)',
     spyMove2: 'Inyección de 5 Subcategorías Secundarias que el rival no tiene registradas',
     spyMove3: 'Booster de 30 Días de Google Posts & Geo-Tagging para superar su frescura algorítmica',
-    spyPitchBox: 'Argumento de Cierre para el Asesor Comercial:',
-    spyPitchText: (client: string, rival: string, weeks: number) =>
-      `"Mire ${client || 'Don Cliente'}, ${rival || 'su competidor'} no ofrece mejor servicio que usted; simplemente tiene ${weeks} semanas de ventaja algorítmica en volumen de reseñas. Al activar Prestigia y nuestros dispositivos inteligentes NFC, su velocidad semanal superará a la de ellos en un 300% y en menos de 90 días Google lo colocará a usted de #1."`,
+    spyPitchBox: 'Argumento de Cierre Agresivo para el Asesor Comercial:',
+    spyPitchText: (client: string, rival: string, weeks: number, clientReviews: number, rivalReviews: number) => {
+      if (clientReviews >= rivalReviews) {
+        return `"Don ${client || 'Cliente'}, mire esta radiografía forense. Su negocio tiene ${clientReviews.toLocaleString()} reseñas y ${rival || 'su competidor'} apenas ${rivalReviews}, pero ellos están en el puesto #1 del Top 3 llevándose a sus clientes. ¿Por qué? Porque para el algoritmo 2026 de Google sus reseñas son del pasado: su ficha hoy está dormida (+1 reseña/semana) mientras el rival tiene actividad constante. Con las tarjetas Prestigia Smart NFC en sus mesas/mostrador, inyectamos +8 reseñas semanales frescas con palabras clave de compra, duplicamos sus fotos y en menos de 30 días recuperamos el puesto #1 que por historia le pertenece a usted."`;
+      }
+      const gap = Math.max(1, rivalReviews - clientReviews);
+      const years = Math.max(1, Math.round((gap / 52) * 10) / 10);
+      return `"Mire ${client || 'Don Cliente'}, ${rival || 'su competidor'} le lleva ${gap} reseñas de ventaja. A su ritmo orgánico actual de +1 reseña por semana, tardaría ${years} AÑOS en alcanzarlos mientras ellos se quedan con el 70% de las llamadas y ventas locales. Al activar Prestigia y nuestros dispositivos inteligentes NFC, aceleramos su velocidad a +8 reseñas 5★ semanales y destronamos a su rival en solo ${weeks} semanas."`;
+    },
     spyBtnCopyPitch: 'Copiar Argumento de Cierre',
   },
   en: {
@@ -797,9 +805,15 @@ const TXT_TOOLS = {
     spyMove1: '5★ Review Velocity Accelerator with Prestigia Smart NFC Devices (+8 weekly reviews to eliminate their lead)',
     spyMove2: 'Secondary Category Injection capturing 5 high-intent keywords missing from competitor profile',
     spyMove3: '30-Day Google Posts Booster & Geo-Tagging to outpace competitor freshness signals',
-    spyPitchBox: 'Advisor Closing Pitch Script:',
-    spyPitchText: (client: string, rival: string, weeks: number) =>
-      `"Take a look ${client || 'Client'}, ${rival || 'your competitor'} does not offer better quality than you; they simply have a ${weeks}-week algorithmic head-start in review volume. Once we activate Prestigia and our Smart NFC devices, your weekly velocity will beat theirs by 300% and Google will push you to #1 in under 90 days."`,
+    spyPitchBox: 'Aggressive Advisor Closing Pitch Script:',
+    spyPitchText: (client: string, rival: string, weeks: number, clientReviews: number, rivalReviews: number) => {
+      if (clientReviews >= rivalReviews) {
+        return `"${client || 'Client'}, look at this diagnostic data. You have ${clientReviews.toLocaleString()} reviews and ${rival || 'your rival'} has only ${rivalReviews}, yet they are ranking #1 in Google's Top 3 taking your customers. Why? Because Google's 2026 algorithm penalizes dormant profiles: your profile receives only +1 review/week while your competitor has fresh momentum. With Prestigia Smart NFC devices at your counter, we inject +8 weekly 5★ reviews with targeted keywords, double your photo gallery, and within 30 days reclaim the #1 spot that rightfully belongs to you."`;
+      }
+      const gap = Math.max(1, rivalReviews - clientReviews);
+      const years = Math.max(1, Math.round((gap / 52) * 10) / 10);
+      return `"${client || 'Client'}, ${rival || 'your competitor'} has a ${gap}-review lead. At your current organic pace of +1 review/week, it would take you ${years} YEARS to catch them while they take 70% of the local customers. By activating Prestigia and our Smart NFC devices, we accelerate your velocity to +8 weekly 5★ reviews and dethrone your competitor in just ${weeks} weeks."`;
+    },
     spyBtnCopyPitch: 'Copy Closing Pitch',
   },
 };
@@ -5590,65 +5604,234 @@ export default function LocalStudioPage() {
 
                 {/* Head-to-Head Comparison & Algorithm Metrics */}
                 {(() => {
-                  const reviewGap = Math.max(0, rivalReviews - (existingReviews || 0));
-                  const netVelocity = Math.max(1, 8 - rivalWeeklyPace);
-                  const weeksToSurpass = Math.max(3, Math.ceil(reviewGap / netVelocity));
+                  const clientReviews = existingReviews || 0;
+                  const isClientHigherInReviews = clientReviews >= rivalReviews;
+                  const absReviewGap = Math.abs(rivalReviews - clientReviews);
+                  const photoGap = Math.max(0, rivalPhotos - 14);
+                  const clientWeekly = 1;
+                  const rivalWeekly = rivalWeeklyPace || 3;
+                  const prestigiaWeekly = 8;
+                  const netWeeklyAdvantage = Math.max(1, prestigiaWeekly - rivalWeekly);
+                  const weeksToSurpass = isClientHigherInReviews
+                    ? 4
+                    : Math.max(3, Math.ceil(absReviewGap / netWeeklyAdvantage));
+                  const organicYearsToOvertake = Math.max(1, Math.round((absReviewGap / 52) * 10) / 10);
 
                   return (
                     <div className="space-y-4">
-                      {/* Metric Comparison Cards */}
+                      {/* 1. AGGRESSIVE DIAGNOSTIC BANNER */}
+                      {isClientHigherInReviews ? (
+                        <div className="p-5 rounded-3xl bg-gradient-to-r from-amber-950/70 via-slate-950 to-slate-900 border-2 border-amber-500/60 space-y-3 shadow-xl">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-amber-500/20">
+                            <div className="flex items-center gap-2">
+                              <span className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400">
+                                <AlertTriangle className="w-4 h-4 text-amber-400" />
+                              </span>
+                              <span className="text-[10px] font-black uppercase tracking-wider text-amber-300 bg-amber-950 px-2.5 py-0.5 rounded-full border border-amber-500/40">
+                                {isEn ? '⚠️ 2026 ALGORITHMIC PARADOX DETECTED' : '🚨 PARADOJA ALGORÍTMICA DE GOOGLE 2026 DETECTADA'}
+                              </span>
+                            </div>
+                            <span className="text-xs font-bold text-amber-300">
+                              {isEn ? 'Rival dominates Top 3 with FEWER reviews' : `El rival domina el Top 3 teniendo ${Math.max(2, Math.round(clientReviews / Math.max(1, rivalReviews)))}x MENOS reseñas`}
+                            </span>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <h4 className="text-base font-black text-white">
+                              {isEn 
+                                ? `You have ${clientReviews.toLocaleString()} reviews vs. ${rivalReviews} from ${rivalName || 'your rival'}, yet they are taking your Top 3 clients.` 
+                                : `Tienes ${clientReviews.toLocaleString()} reseñas vs. ${rivalReviews} de ${rivalName || 'tu rival'}, y aun así ellos se quedan con los clientes del Top 3.`}
+                            </h4>
+                            <p className="text-xs text-slate-300 leading-relaxed">
+                              {isEn
+                                ? `Why does this happen? Google's 2026 local algorithm penalizes stagnant listings. Your ${clientReviews.toLocaleString()} reviews are historical, but today your profile receives only +1 review/week. Meanwhile, ${rivalName || 'your competitor'} has active weekly momentum (+${rivalWeekly}/wk) and +${photoGap} more photos. To Google's AI, your business is asleep.`
+                                : `¿Por qué ocurre esto? El Algoritmo 2026 de Google castiga fichas dormidas. Tus ${clientReviews.toLocaleString()} reseñas son del pasado, pero hoy tu ficha recibe apenas +1 reseña/semana. Tu rival mantiene actividad constante (+${rivalWeekly}/sem) y te supera en fotos (+${photoGap} fotos). Para la IA de Google, tu negocio está estancado.`}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-5 rounded-3xl bg-gradient-to-r from-rose-950/70 via-slate-950 to-slate-900 border-2 border-rose-500/60 space-y-3 shadow-xl">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-rose-500/20">
+                            <div className="flex items-center gap-2">
+                              <span className="p-1.5 rounded-lg bg-rose-500/20 text-rose-400">
+                                <Flame className="w-4 h-4 text-rose-400" />
+                              </span>
+                              <span className="text-[10px] font-black uppercase tracking-wider text-rose-300 bg-rose-950 px-2.5 py-0.5 rounded-full border border-rose-500/40">
+                                {isEn ? '⚔️ CRITICAL COMPETITIVE THREAT' : '⚔️ ALERTA DE AMENAZA COMPETITIVA DIRECTA'}
+                              </span>
+                            </div>
+                            <span className="text-xs font-bold text-rose-300">
+                              {isEn ? `Rival leads by +${absReviewGap.toLocaleString()} reviews` : `El rival te supera por +${absReviewGap.toLocaleString()} reseñas`}
+                            </span>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <h4 className="text-base font-black text-white">
+                              {isEn
+                                ? `${rivalName || 'Your Competitor'} leads by +${absReviewGap.toLocaleString()} reviews and captures 70% of local searches.`
+                                : `${rivalName || 'Tu Competidor'} te lleva +${absReviewGap.toLocaleString()} reseñas de ventaja y acapara el 70% de las llamadas de la zona.`}
+                            </h4>
+                            <p className="text-xs text-slate-300 leading-relaxed">
+                              {isEn
+                                ? `At your current organic pace of +1 review/week, it would take you ${organicYearsToOvertake} YEARS to catch them. With Prestigia Smart NFC (+8/wk), you break their lead and dethrone them in just ${weeksToSurpass} weeks.`
+                                : `A tu velocidad orgánica actual de +1 reseña/semana, tardarías ${organicYearsToOvertake} AÑOS en alcanzarlos por tu cuenta. Con Prestigia Smart NFC (+8/sem), quiebras su ventaja y los destronas en solo ${weeksToSurpass} semanas.`}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 2. FOUR HIGH-IMPACT METRIC CARDS */}
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
-                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
+                        <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800">
                           <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
-                            {isEn ? 'Review Gap' : 'Brecha de Reseñas'}
+                            {isClientHigherInReviews ? (isEn ? 'Historical Lead' : 'Ventaja Histórica') : (isEn ? 'Review Gap' : 'Brecha de Reseñas')}
                           </span>
-                          <strong className="text-xl font-black text-rose-400">
-                            +{reviewGap}
+                          <strong className={`text-xl font-black ${isClientHigherInReviews ? 'text-amber-400' : 'text-rose-400'}`}>
+                            {isClientHigherInReviews ? `+${absReviewGap.toLocaleString()}` : `-${absReviewGap.toLocaleString()}`}
                           </strong>
                           <span className="text-[10px] text-slate-500 block mt-0.5">
-                            {isEn ? 'in favor of rival' : 'a favor del rival'}
+                            {isClientHigherInReviews ? (isEn ? 'wasted without velocity' : 'desperdiciada sin velocidad') : (isEn ? 'in favor of rival' : 'a favor del rival')}
                           </span>
                         </div>
 
-                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
+                        <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800">
                           <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
-                            {isEn ? 'Pace Advantage' : 'Ventaja con Prestigia'}
+                            {isEn ? 'Current Organic Pace' : 'Velocidad Sin Prestigia'}
+                          </span>
+                          <strong className="text-xl font-black text-rose-400">
+                            +1 / sem
+                          </strong>
+                          <span className="text-[10px] text-slate-500 block mt-0.5">
+                            {isEn ? `vs +${rivalWeekly} rival pace` : `vs +${rivalWeekly} del rival (en riesgo)`}
+                          </span>
+                        </div>
+
+                        <div className="p-3.5 rounded-2xl bg-slate-950 border border-emerald-500/40 bg-emerald-950/20">
+                          <span className="text-[10px] text-emerald-400 uppercase font-bold block mb-1">
+                            {isEn ? 'Prestigia NFC Pace' : 'Velocidad con Prestigia'}
                           </span>
                           <strong className="text-xl font-black text-emerald-400">
                             +8 / sem
                           </strong>
-                          <span className="text-[10px] text-slate-500 block mt-0.5">
-                            {isEn ? `vs +${rivalWeeklyPace} rival pace` : `vs +${rivalWeeklyPace} del rival`}
+                          <span className="text-[10px] text-emerald-300/80 block mt-0.5">
+                            {isEn ? '+800% acceleration' : '+800% aceleración algorítmica'}
                           </span>
                         </div>
 
-                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
-                          <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
-                            {isEn ? 'Time to Overtake' : 'Tiempo para Destronar'}
+                        <div className="p-3.5 rounded-2xl bg-slate-950 border border-amber-500/40 bg-amber-950/20">
+                          <span className="text-[10px] text-amber-400 uppercase font-bold block mb-1">
+                            {isClientHigherInReviews ? (isEn ? 'Time to Reclaim #1' : 'Tiempo para Recuperar #1') : (isEn ? 'Time to Dethrone' : 'Tiempo para Destronar')}
                           </span>
                           <strong className="text-xl font-black text-amber-400">
                             {weeksToSurpass} {isEn ? 'weeks' : 'semanas'}
                           </strong>
-                          <span className="text-[10px] text-slate-500 block mt-0.5">
-                            ~{Math.ceil(weeksToSurpass / 4)} {isEn ? 'months' : 'meses'}
-                          </span>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
-                          <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
-                            {isEn ? 'Photo Gap' : 'Déficit Visual'}
-                          </span>
-                          <strong className="text-xl font-black text-indigo-400">
-                            +{Math.max(0, rivalPhotos - 14)}
-                          </strong>
-                          <span className="text-[10px] text-slate-500 block mt-0.5">
-                            {isEn ? 'photos needed' : 'fotos a cargar'}
+                          <span className="text-[10px] text-amber-300/80 block mt-0.5">
+                            {isClientHigherInReviews 
+                              ? (isEn ? 'freshness reactivation' : 'reactivación de frescura') 
+                              : (isEn ? `vs ${organicYearsToOvertake} yrs organic` : `vs ${organicYearsToOvertake} años orgánicos`)}
                           </span>
                         </div>
                       </div>
 
-                      {/* Tactical Attack Plan */}
-                      <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/40 space-y-3">
+                      {/* 3. HEAD-TO-HEAD BATTLE MATRIX (5 CRITICAL FACTORS) */}
+                      <div className="p-5 rounded-3xl bg-slate-950 border border-slate-800 space-y-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                          <div className="flex items-center gap-2">
+                            <Trophy className="w-4 h-4 text-amber-400" />
+                            <h4 className="font-black text-white text-sm">
+                              {isEn ? 'Head-to-Head Algorithmic Battle Matrix' : 'Matriz de Combate Algorítmico: Cara a Cara'}
+                            </h4>
+                          </div>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase">
+                            {isEn ? 'Google Maps 2026 Factors' : 'Factores Clave Google Maps 2026'}
+                          </span>
+                        </div>
+
+                        <div className="space-y-2 text-xs">
+                          {/* Factor 1: Velocidad Semanal */}
+                          <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-2.5 items-center">
+                            <div>
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">1. Velocidad & Frescura</span>
+                              <strong className="text-white text-xs">Impacto en el Algoritmo</strong>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
+                              <span className="text-[10px] text-rose-400 block font-bold">Tu Negocio Hoy:</span>
+                              <span className="text-slate-300 font-medium">+1 reseña/semana (Dormida)</span>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
+                              <span className="text-[10px] text-emerald-400 block font-bold">Con Prestigia NFC:</span>
+                              <span className="text-emerald-300 font-bold">+8 a +12 reseñas 5★/sem</span>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
+                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || 'Tu Rival'}:</span>
+                              <span className="text-slate-300">+{rivalWeekly} reseñas/sem</span>
+                            </div>
+                          </div>
+
+                          {/* Factor 2: Galería de Fotos */}
+                          <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-2.5 items-center">
+                            <div>
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">2. Arsenal Visual (Fotos)</span>
+                              <strong className="text-white text-xs">Confianza & Google Lens</strong>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
+                              <span className="text-[10px] text-rose-400 block font-bold">Tu Negocio Hoy:</span>
+                              <span className="text-slate-300 font-medium">14 fotos (Déficit crítico)</span>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
+                              <span className="text-[10px] text-emerald-400 block font-bold">Con Prestigia:</span>
+                              <span className="text-emerald-300 font-bold">50+ fotos geolocalizadas</span>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
+                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || 'Tu Rival'}:</span>
+                              <span className="text-slate-300">{rivalPhotos} fotos</span>
+                            </div>
+                          </div>
+
+                          {/* Factor 3: Palabras Clave en Reseñas */}
+                          <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-2.5 items-center">
+                            <div>
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">3. Palabras Clave SEO</span>
+                              <strong className="text-white text-xs">Indexación por Términos</strong>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
+                              <span className="text-[10px] text-rose-400 block font-bold">Tu Negocio Hoy:</span>
+                              <span className="text-slate-300 font-medium">Genéricas ("rico", "bueno")</span>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
+                              <span className="text-[10px] text-emerald-400 block font-bold">Con Prestigia:</span>
+                              <span className="text-emerald-300 font-bold">Guiadas con palabras de compra</span>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
+                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || 'Tu Rival'}:</span>
+                              <span className="text-slate-300">Orgánicas sin guiar</span>
+                            </div>
+                          </div>
+
+                          {/* Factor 4: Filtro de Reseñas Negativas */}
+                          <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-2.5 items-center">
+                            <div>
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">4. Blindaje de Reputación</span>
+                              <strong className="text-white text-xs">Filtro Anti-Negativas</strong>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
+                              <span className="text-[10px] text-rose-400 block font-bold">Tu Negocio Hoy:</span>
+                              <span className="text-slate-300 font-medium">Van directo a Google Maps</span>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
+                              <span className="text-[10px] text-emerald-400 block font-bold">Con Prestigia:</span>
+                              <span className="text-emerald-300 font-bold">Desvío privado a WhatsApp</span>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
+                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || 'Tu Rival'}:</span>
+                              <span className="text-slate-300">Sin protección de reseñas</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 4. TACTICAL ATTACK PLAN */}
+                      <div className="p-5 rounded-3xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/40 space-y-3">
                         <div className="flex items-center gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                           <h4 className="font-black text-white text-sm">
@@ -5658,41 +5841,48 @@ export default function LocalStudioPage() {
                         <div className="space-y-2 text-xs">
                           <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-2.5">
                             <span className="font-black text-emerald-400">1.</span>
-                            <span className="text-slate-300">{tTools.spyMove1}</span>
+                            <span className="text-slate-300">
+                              <strong>Activación de Dispositivos Smart NFC en Punto de Venta:</strong> Inyectamos de +8 a +12 reseñas 5★ por semana directamente desde mesas y mostradores para quebrar la ventaja del competidor.
+                            </span>
                           </div>
                           <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-2.5">
                             <span className="font-black text-amber-400">2.</span>
-                            <span className="text-slate-300">{tTools.spyMove2}</span>
+                            <span className="text-slate-300">
+                              <strong>Carga de 35+ Fotos Geolocalizadas con Atributos:</strong> Anulamos el déficit visual subiendo platos, instalaciones y servicios optimizados para Google Lens.
+                            </span>
                           </div>
                           <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-2.5">
                             <span className="font-black text-indigo-400">3.</span>
-                            <span className="text-slate-300">{tTools.spyMove3}</span>
+                            <span className="text-slate-300">
+                              <strong>Blindaje Anti-Reseñas Negativas & Respuestas con IA:</strong> Filtramos clientes insatisfechos a soporte interno y respondemos todas las opiniones con IA en menos de 2 horas para sellar el podio #1.
+                            </span>
                           </div>
                         </div>
                       </div>
 
-                      {/* Advisor Closing Pitch */}
-                      <div className="p-5 rounded-2xl bg-slate-950 border border-amber-500/40 space-y-2.5">
+                      {/* 5. AGGRESSIVE ADVISOR CLOSING PITCH */}
+                      <div className="p-5 rounded-3xl bg-slate-950 border-2 border-amber-500/50 space-y-3 shadow-xl">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider">
+                          <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
+                            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                             {tTools.spyPitchBox}
                           </span>
                           <button
                             type="button"
                             onClick={() =>
                               copyToClipboard(
-                                tTools.spyPitchText(businessName, rivalName, weeksToSurpass),
+                                tTools.spyPitchText(businessName, rivalName, weeksToSurpass, clientReviews, rivalReviews),
                                 isEn ? 'Closing Pitch' : 'Argumento de Cierre'
                               )
                             }
-                            className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer"
+                            className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-500/30 transition"
                           >
                             <Copy className="w-3.5 h-3.5" />
                             <span>{tTools.spyBtnCopyPitch}</span>
                           </button>
                         </div>
-                        <p className="text-xs text-slate-300 italic leading-relaxed">
-                          {tTools.spyPitchText(businessName, rivalName, weeksToSurpass)}
+                        <p className="text-xs text-amber-100/90 italic leading-relaxed bg-slate-900/80 p-3.5 rounded-2xl border border-amber-500/20">
+                          {tTools.spyPitchText(businessName, rivalName, weeksToSurpass, clientReviews, rivalReviews)}
                         </p>
                       </div>
                     </div>
