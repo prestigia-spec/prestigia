@@ -1802,8 +1802,10 @@ export default function LocalStudioPage() {
         </div>
       )}
 
-      {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-8 py-3 flex flex-wrap items-center justify-between gap-3 print:hidden">
+      {/* Unified Sticky Header & Workspace Navigation Tabs (Fija al Scroll) */}
+      <div className="sticky top-0 z-40 print:hidden bg-slate-950/95 backdrop-blur-md border-b border-slate-800 shadow-2xl">
+        {/* Top Header */}
+        <header className="px-4 sm:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/70">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 select-none">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-indigo-600 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/20">
@@ -1917,10 +1919,10 @@ export default function LocalStudioPage() {
             </button>
           )}
         </div>
-      </header>
+        </header>
 
-      {/* Main Workspace Navigation Switcher */}
-      <nav className="bg-slate-900/80 border-b border-slate-800/80 px-4 sm:px-8 py-2 overflow-x-auto print:hidden">
+        {/* Main Workspace Navigation Switcher (Franja Fija de Pestañas) */}
+        <nav className="bg-slate-900/90 px-4 sm:px-8 py-2 overflow-x-auto">
         <div className="max-w-7xl mx-auto flex items-center gap-2 min-w-max">
           <button
             type="button"
@@ -2029,6 +2031,7 @@ export default function LocalStudioPage() {
           )}
         </div>
       </nav>
+      </div>
 
       {/* Main Workspace Body */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6 print:max-w-none print:p-0 print:m-0 print:space-y-2">
