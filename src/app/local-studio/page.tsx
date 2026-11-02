@@ -323,6 +323,66 @@ function mapDetectedCategoryToPrestigia(
   return options[0];
 }
 
+function getAverageTicketByNiche(categoryOrName: string): number {
+  const c = categoryOrName.toLowerCase();
+  if (c.includes('médic') || c.includes('medic') || c.includes('salud') || c.includes('doctor') || c.includes('hospital')) return 180;
+  if (c.includes('odont') || c.includes('dental') || c.includes('dentist')) return 250;
+  if (c.includes('estétic') || c.includes('spa') || c.includes('dermatolog')) return 95;
+  if (c.includes('veterinar') || c.includes('pet') || c.includes('mascota')) return 80;
+  if (c.includes('evento') || c.includes('banquet') || c.includes('boda') || c.includes('wedding')) return 850;
+  if (c.includes('taller') || c.includes('mecánic') || c.includes('automot') || c.includes('auto')) return 160;
+  if (c.includes('peluquer') || c.includes('barber') || c.includes('belleza') || c.includes('salon')) return 35;
+  if (c.includes('gimnasio') || c.includes('gym') || c.includes('fitness') || c.includes('crossfit')) return 55;
+  if (c.includes('legal') || c.includes('abogad') || c.includes('consultor') || c.includes('contad') || c.includes('b2b')) return 350;
+  if (c.includes('hotel') || c.includes('hospedaje') || c.includes('resort')) return 150;
+  if (c.includes('tienda') || c.includes('retail') || c.includes('boutique') || c.includes('comercio')) return 45;
+  if (c.includes('caf') || c.includes('panader') || c.includes('bakery') || c.includes('coffee')) return 15;
+  // Standard restaurant / gastronomy
+  return 30;
+}
+
+function getDefaultKeywordByNiche(cat: string, cityName?: string, isEn: boolean = false): string {
+  const c = cat.toLowerCase();
+  const cty = cityName ? (isEn ? ` in ${cityName}` : ` en ${cityName}`) : '';
+  if (c.includes('odont') || c.includes('dental') || c.includes('dentist')) {
+    return isEn ? `Dental Clinic / Dentist${cty}` : `Clínica Dental / Odontología${cty}`;
+  }
+  if (c.includes('médic') || c.includes('medic') || c.includes('salud') || c.includes('doctor')) {
+    return isEn ? `Medical Clinic / Doctor${cty}` : `Clínica Médica / Consulta Especializada${cty}`;
+  }
+  if (c.includes('veterinar') || c.includes('pet') || c.includes('mascota')) {
+    return isEn ? `Veterinary Clinic / Pet Care${cty}` : `Clínica Veterinaria / Urgencias Mascotas${cty}`;
+  }
+  if (c.includes('evento') || c.includes('banquet') || c.includes('boda')) {
+    return isEn ? `Event Hall / Banquets${cty}` : `Salón de Eventos / Banquetes${cty}`;
+  }
+  if (c.includes('taller') || c.includes('mecánic') || c.includes('automot')) {
+    return isEn ? `Auto Repair / Mechanic Workshop${cty}` : `Taller Mecánico / Taller Automotriz${cty}`;
+  }
+  if (c.includes('peluquer') || c.includes('barber') || c.includes('belleza') || c.includes('salon')) {
+    return isEn ? `Hair Salon / Barbershop${cty}` : `Peluquería / Barbería / Salón de Belleza${cty}`;
+  }
+  if (c.includes('estétic') || c.includes('spa')) {
+    return isEn ? `Medical Spa / Aesthetics${cty}` : `Centro de Estética / Spa${cty}`;
+  }
+  if (c.includes('gimnasio') || c.includes('gym') || c.includes('fitness')) {
+    return isEn ? `Gym / Fitness Center${cty}` : `Gimnasio / Centro Fitness${cty}`;
+  }
+  if (c.includes('legal') || c.includes('abogad') || c.includes('b2b')) {
+    return isEn ? `Law Firm / Professional Services${cty}` : `Bufete de Abogados / Asesoría Legal${cty}`;
+  }
+  if (c.includes('hotel') || c.includes('hospedaje')) {
+    return isEn ? `Boutique Hotel / Accommodation${cty}` : `Hotel / Alojamiento${cty}`;
+  }
+  if (c.includes('caf') || c.includes('panader')) {
+    return isEn ? `Coffee Shop / Bakery${cty}` : `Cafetería / Panadería Especializada${cty}`;
+  }
+  if (c.includes('tienda') || c.includes('retail')) {
+    return isEn ? `Boutique / Retail Store${cty}` : `Tienda / Comercio Local${cty}`;
+  }
+  return isEn ? `Restaurante / Gastronomía${cty}` : `Restaurante / Gastronomía${cty}`;
+}
+
 const UI_TEXT = {
   es: {
     tagline: 'Suite de Creación & Optimización Google Maps',
@@ -529,6 +589,18 @@ const TXT_TOOLS = {
     rescueWhatsappScriptTitle: 'Guion de WhatsApp para Explicar el Rescate al Cliente',
     rescueDocsTitle: 'Checklist de Evidencias de Titularidad Probatoria',
     rescuePricingTitle: 'Propuesta de Honorarios por Rescate (Setup Fee)',
+    toolsScannerLabel: 'Reconocer Ficha con Google Maps API (Armas de Cierre)',
+    toolsScannerPlaceholder: 'Pega enlace de Google Maps (maps.app.goo.gl/...) o Nombre + Ciudad',
+    toolsScannerBtn: 'Reconocer Ficha',
+    toolsScannerScanning: 'Consultando Google Maps en Vivo...',
+    toolsSyncBanner: 'Ficha activa en sesión:',
+    toolsSyncBtn: 'Cargar en Armas de Cierre',
+    toolsDetectedBadge: 'Ficha Vinculada a las Armas de Cierre',
+    toolsKeywordPlaceholder: 'Palabra clave a simular (ej: Clínica Dental en Bogotá)',
+    rivalScannerLabel: 'Escanear Competidor Directo con Google Maps API (1 Clic)',
+    rivalScannerPlaceholder: 'Pega enlace de Google Maps o Nombre del Rival + Ciudad',
+    rivalScannerBtn: 'Escanear Rival con Google',
+    rivalScannerScanning: 'Consultando Rival en Vivo...',
     geogridTitle: '🗺️ Simulador de Posición Geo-Grid 3x3 (Local Falcon Style)',
     geogridDesc: 'Demuestra visualmente cómo cae el ranking del cliente a medida que nos alejamos de su ubicación.',
     radiusLabel: 'Radio',
@@ -537,8 +609,8 @@ const TXT_TOOLS = {
     legendTop3: 'Puesto 1 al 3 (Se llevan el 84% de llamadas)',
     legendDropped: 'Puesto 4+ (Invisibles)',
     diagAdvisor: 'Diagnóstico para el Asesor:',
-    diagAdvisorBody: (name: string, rad: string) =>
-      `"Don ${name || 'Cliente'}, cuando usted busca parado en su propio local aparece de #1. Pero cuando una persona busca a solo ${rad} de distancia en su mismo barrio, su negocio cae al puesto #8 o #14. Toda esa clientela se la están llevando sus 3 competidores más cercanos."`,
+    diagAdvisorBody: (name: string, rad: string, kw?: string) =>
+      `"Don ${name || 'Cliente'}, cuando usted busca parado en su propio local aparece de #1${kw ? ` para '${kw}'` : ''}. Pero cuando una persona busca a solo ${rad} de distancia en su mismo barrio, su negocio cae al puesto #8 o #14. Toda esa clientela se la están llevando sus 3 competidores más cercanos."`,
     solutionPrestigia: 'Solución con Prestigia:',
     solutionPrestigiaBody:
       'Con la inyección de subcategorías secundarias, menciones de vecindario en la descripción y 8 reseñas semanales geolocalizadas, extendemos el radio verde a toda la ciudad en 90 días.',
@@ -629,6 +701,18 @@ const TXT_TOOLS = {
     rescueWhatsappScriptTitle: 'WhatsApp Client Advisory Script (Copy & Send)',
     rescueDocsTitle: 'Ownership Proof & Legal Evidence Checklist',
     rescuePricingTitle: 'Rescue Fee Recommendation (Setup Fee)',
+    toolsScannerLabel: 'Recognize Profile via Google Maps API (Sales Arsenal)',
+    toolsScannerPlaceholder: 'Paste Google Maps link (maps.app.goo.gl/...) or Business Name + City',
+    toolsScannerBtn: 'Recognize Profile with Google',
+    toolsScannerScanning: 'Querying Google Maps in Real-time...',
+    toolsSyncBanner: 'Active profile in session:',
+    toolsSyncBtn: 'Load in Sales Arsenal',
+    toolsDetectedBadge: 'Profile Recognized on Google Maps',
+    toolsKeywordPlaceholder: 'Simulated target keyword (e.g. Dental Clinic in Miami)',
+    rivalScannerLabel: 'Scan Real Competitor via Google Maps API (1-Click)',
+    rivalScannerPlaceholder: 'Paste Google Maps link or Competitor Name + City',
+    rivalScannerBtn: 'Scan Competitor with Google',
+    rivalScannerScanning: 'Querying Competitor in Real-time...',
     geogridTitle: '🗺️ 3x3 Geo-Grid Position Heatmap (Local Falcon Style)',
     geogridDesc: 'Visually demonstrates how the client’s ranking drops as distance increases from their location.',
     radiusLabel: 'Radius',
@@ -637,8 +721,8 @@ const TXT_TOOLS = {
     legendTop3: 'Ranks #1 to #3 (Captures 84% of calls & visits)',
     legendDropped: 'Rank #4+ (Completely Invisible)',
     diagAdvisor: 'Sales Advisor Script:',
-    diagAdvisorBody: (name: string, rad: string) =>
-      `"${name || 'Client'}, when you search standing inside your storefront, you appear #1. But when someone searches just ${rad} away in your same neighborhood, your business drops to rank #8 or #14. All those ready-to-buy customers are going straight to your 3 closest competitors."`,
+    diagAdvisorBody: (name: string, rad: string, kw?: string) =>
+      `"${name || 'Client'}, when you search standing inside your storefront, you appear #1${kw ? ` for '${kw}'` : ''}. But when someone searches just ${rad} away in your same neighborhood, your business drops to rank #8 or #14. All those ready-to-buy customers are going straight to your 3 closest competitors."`,
     solutionPrestigia: 'Solution with Prestigia:',
     solutionPrestigiaBody:
       'With secondary category injection, geo-targeted neighborhood keywords in your commercial copy, and 8 weekly geo-tagged reviews, we expand your top-ranking radius across the entire metro area in 90 days.',
@@ -1164,6 +1248,9 @@ export default function LocalStudioPage() {
 
   // 5 Elite Local SEO Power Tools State
   const [toolsActiveTab, setToolsActiveTab] = useState<'geogrid' | 'roicalc' | 'geotag' | 'citations' | 'rivalspy'>('geogrid');
+  const [toolsSearchQuery, setToolsSearchQuery] = useState('');
+  const [isToolsScanning, setIsToolsScanning] = useState(false);
+  const [geoGridKeyword, setGeoGridKeyword] = useState('');
   const [geoGridRadius, setGeoGridRadius] = useState<'1km' | '3km' | '5km'>('3km');
   const [roiAverageTicket, setRoiAverageTicket] = useState<number>(65);
   const [roiCurrentRank, setRoiCurrentRank] = useState<number>(8);
@@ -1179,11 +1266,13 @@ export default function LocalStudioPage() {
   const [isRescueScanning, setIsRescueScanning] = useState(false);
 
   // Rival Spy (Head-to-Head Competitor Radar) State
-  const [rivalName, setRivalName] = useState('Competidor Líder');
+  const [rivalSearchQuery, setRivalSearchQuery] = useState('');
+  const [isRivalScanning, setIsRivalScanning] = useState(false);
+  const [rivalName, setRivalName] = useState('');
   const [rivalRating, setRivalRating] = useState<number>(4.8);
-  const [rivalReviews, setRivalReviews] = useState<number>(185);
+  const [rivalReviews, setRivalReviews] = useState<number>(120);
   const [rivalWeeklyPace, setRivalWeeklyPace] = useState<number>(3);
-  const [rivalPhotos, setRivalPhotos] = useState<number>(65);
+  const [rivalPhotos, setRivalPhotos] = useState<number>(45);
 
   // White-label Custom Logo State
   const [customLogoUrl, setCustomLogoUrl] = useState<string>('');
@@ -1689,6 +1778,172 @@ export default function LocalStudioPage() {
       );
     } finally {
       setIsRescueScanning(false);
+    }
+  };
+
+  // -------------------------------------------------------------
+  // 3.1.c 1-CLICK GOOGLE MAPS API SCANNER FOR SALES ARSENAL (TAB 4)
+  // -------------------------------------------------------------
+  const handleToolsScan = async (queryInput?: string) => {
+    const rawInput = (typeof queryInput === 'string' ? queryInput : toolsSearchQuery).trim();
+    if (!rawInput) {
+      showToast(
+        isEn
+          ? '⚠️ Please paste a Google Maps link or enter business name'
+          : '⚠️ Pega el enlace de Google Maps o escribe el nombre del negocio'
+      );
+      return;
+    }
+
+    setIsToolsScanning(true);
+    showToast(
+      isEn
+        ? '🔍 Querying Google Maps API for sales arsenal...'
+        : '🔍 Reconociendo ficha con Google Maps para las herramientas de venta...'
+    );
+
+    try {
+      const res = await fetch('/api/auditor/google-lookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: rawInput }),
+      });
+      const data = await res.json();
+
+      if (data?.success && data?.data) {
+        const place: GooglePlaceData = data.data;
+        setScannedListing(place);
+
+        const extractedName = place.name || rawInput;
+        setBusinessName(extractedName);
+        if (typeof place.rating === 'number') setExistingRating(place.rating);
+        if (typeof place.reviewsCount === 'number') setExistingReviews(place.reviewsCount);
+        if (place.googleMapsUrl) setGoogleUrl(place.googleMapsUrl);
+        if (place.phone) setPhone(place.phone);
+
+        // Address parsing
+        let parsedCity = city;
+        let parsedNeighborhood = neighborhood;
+        if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
+          const parts = place.address.split(',').map((p) => p.trim());
+          if (parts.length >= 3) {
+            parsedNeighborhood = parts[parts.length - 3] || parsedNeighborhood;
+            parsedCity = parts[parts.length - 2] || parsedCity;
+          } else if (parts.length >= 2) {
+            parsedCity = parts[parts.length - 2] || parsedCity;
+          }
+          if (parsedCity) setCity(parsedCity);
+          if (parsedNeighborhood) setNeighborhood(parsedNeighborhood);
+        }
+
+        const matchedCategory = mapDetectedCategoryToPrestigia(
+          place.category || '',
+          place.detectedCategories || [],
+          isEn
+        );
+        setCategory(matchedCategory);
+
+        // Niche-based smart adaptations
+        const smartTicket = getAverageTicketByNiche(matchedCategory);
+        setRoiAverageTicket(smartTicket);
+
+        const smartKw = getDefaultKeywordByNiche(matchedCategory, parsedCity, isEn);
+        setGeoGridKeyword(smartKw);
+
+        // GeoTag photo name pre-fill
+        setGeoTagFilename(`${extractedName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-fachada`);
+        setGeoTagKeywords(`${matchedCategory}, ${parsedCity || ''}, Top 3 Google Maps`);
+
+        showToast(
+          isEn
+            ? `✓ Profile Connected: ${extractedName} (${matchedCategory}). Sales tools configured!`
+            : `✓ Ficha Conectada: ${extractedName} (${matchedCategory}). ¡Armas de venta configuradas!`
+        );
+      } else {
+        const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
+        setBusinessName(fallbackName);
+        if (rawInput.startsWith('http')) setGoogleUrl(rawInput);
+        setGeoGridKeyword(getDefaultKeywordByNiche(category, city, isEn));
+        showToast(
+          isEn
+            ? `✓ Connected to "${fallbackName}"`
+            : `✓ Conectado a "${fallbackName}"`
+        );
+      }
+    } catch (err: any) {
+      console.error('Tools scan error:', err);
+      const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
+      setBusinessName(fallbackName);
+      if (rawInput.startsWith('http')) setGoogleUrl(rawInput);
+      showToast(
+        isEn
+          ? '⚠️ Lookup failed. Profile name set manually.'
+          : '⚠️ Error al consultar Google Maps. Nombre asignado manualmente.'
+      );
+    } finally {
+      setIsToolsScanning(false);
+    }
+  };
+
+  // -------------------------------------------------------------
+  // 3.1.d 1-CLICK COMPETITOR SCANNER FOR RIVAL SPY (HERRAMIENTA 5)
+  // -------------------------------------------------------------
+  const handleRivalScan = async () => {
+    const rawInput = rivalSearchQuery.trim();
+    if (!rawInput) {
+      showToast(
+        isEn
+          ? '⚠️ Please enter competitor link or name'
+          : '⚠️ Pega el enlace de Google Maps o escribe el nombre del rival'
+      );
+      return;
+    }
+
+    setIsRivalScanning(true);
+    showToast(
+      isEn
+        ? '🔍 Inspecting competitor listing on Google Maps...'
+        : '🔍 Escaneando perfil del competidor en Google Maps en tiempo real...'
+    );
+
+    try {
+      const res = await fetch('/api/auditor/google-lookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: rawInput }),
+      });
+      const data = await res.json();
+
+      if (data?.success && data?.data) {
+        const place: GooglePlaceData = data.data;
+        setRivalName(place.name || rawInput);
+        if (typeof place.rating === 'number') setRivalRating(place.rating);
+        if (typeof place.reviewsCount === 'number') setRivalReviews(place.reviewsCount);
+        showToast(
+          isEn
+            ? `✓ Competitor Scanned: ${place.name} (${place.rating}★ · ${place.reviewsCount} reviews). Head-to-Head calculated!`
+            : `✓ Competidor Reconocido: ${place.name} (${place.rating}★ · ${place.reviewsCount} opiniones). ¡Batalla cara a cara calculada!`
+        );
+      } else {
+        const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
+        setRivalName(fallbackName);
+        showToast(
+          isEn
+            ? `✓ Competitor set to "${fallbackName}"`
+            : `✓ Competidor asignado a "${fallbackName}"`
+        );
+      }
+    } catch (err: any) {
+      console.error('Rival scan error:', err);
+      const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
+      setRivalName(fallbackName);
+      showToast(
+        isEn
+          ? '⚠️ Competitor lookup error. Name updated.'
+          : '⚠️ Error al escanear competidor. Nombre actualizado.'
+      );
+    } finally {
+      setIsRivalScanning(false);
     }
   };
 
@@ -4544,6 +4799,122 @@ export default function LocalStudioPage() {
               </div>
             </div>
 
+            {/* 1-Click Google Maps Scanner for Sales Arsenal */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-3 shadow-xl">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <Search className="w-4 h-4 text-amber-400" />
+                  <h2 className="text-xs sm:text-sm font-black text-white">{tTools.toolsScannerLabel}</h2>
+                </div>
+
+                {/* Session sync pill if businessName or scannedListing is already set */}
+                {!scannedListing && businessName && (
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs">
+                    <span className="text-[10px] text-amber-400 font-bold">{tTools.toolsSyncBanner}</span>
+                    <strong className="text-white text-xs truncate max-w-xs">{businessName} {city ? `(${city})` : ''}</strong>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = businessName + (city ? ' ' + city : '');
+                        setToolsSearchQuery(target);
+                        handleToolsScan(target);
+                      }}
+                      className="px-2 py-0.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] transition cursor-pointer"
+                    >
+                      {tTools.toolsSyncBtn}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Scanned Listing Card (If active) */}
+              {scannedListing && (
+                <div className="p-3.5 rounded-2xl bg-slate-950 border border-emerald-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        <span>{tTools.toolsDetectedBadge}</span>
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">{category}</span>
+                    </div>
+                    <h3 className="font-black text-white text-sm">{scannedListing.name}</h3>
+                    {scannedListing.address && (
+                      <p className="text-[11px] text-slate-400 truncate">{scannedListing.address}</p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="text-right text-[11px] font-mono">
+                      <span className="text-amber-400 font-black text-sm">★ {scannedListing.rating?.toFixed(1) || '0.0'}</span>
+                      <span className="text-slate-400 block">{scannedListing.reviewsCount || 0} {isEn ? 'reviews' : 'reseñas'}</span>
+                    </div>
+                    {scannedListing.googleMapsUrl && (
+                      <a
+                        href={scannedListing.googleMapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold transition flex items-center gap-1 border border-slate-700 cursor-pointer"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Google Maps</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Input row */}
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={toolsSearchQuery}
+                    onChange={(e) => setToolsSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !isToolsScanning && toolsSearchQuery.trim()) {
+                        e.preventDefault();
+                        handleToolsScan();
+                      }
+                    }}
+                    placeholder={tTools.toolsScannerPlaceholder}
+                    className="w-full pl-3.5 pr-20 py-2.5 rounded-xl bg-slate-950 border border-amber-500/30 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 text-xs transition font-medium"
+                  />
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        const text = await navigator.clipboard.readText();
+                        if (text) setToolsSearchQuery(text.trim());
+                      } catch {}
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-amber-400 transition cursor-pointer"
+                  >
+                    {t.pasteBtn}
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleToolsScan()}
+                  disabled={isToolsScanning || !toolsSearchQuery.trim()}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer shrink-0 active:scale-98"
+                >
+                  {isToolsScanning ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>{tTools.toolsScannerScanning}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-3.5 h-3.5 fill-slate-950" />
+                      <span>{tTools.toolsScannerBtn}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
             {/* Sub-tools Navigation */}
             <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-3">
               <button
@@ -4646,9 +5017,20 @@ export default function LocalStudioPage() {
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                   {/* Left: Interactive 3x3 Geo-Grid Heatmap */}
                   <div className="md:col-span-7 bg-slate-950 p-6 rounded-3xl border border-slate-800 relative">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center justify-between">
-                      <span>{tTools.satMap} ({city || (isEn ? 'Your City' : 'Tu Ciudad')})</span>
-                      <span className="text-amber-400">{tTools.keyword} "{category.split('/')[0].trim()}"</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-800 text-xs">
+                      <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+                        {tTools.satMap} ({city || (isEn ? 'Your City' : 'Tu Ciudad')})
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-amber-400 font-bold text-[10px] shrink-0">{tTools.keyword}</span>
+                        <input
+                          type="text"
+                          value={geoGridKeyword !== '' ? geoGridKeyword : getDefaultKeywordByNiche(category, city, isEn)}
+                          onChange={(e) => setGeoGridKeyword(e.target.value)}
+                          placeholder={tTools.toolsKeywordPlaceholder}
+                          className="px-2.5 py-1 rounded-lg bg-slate-900 border border-amber-500/40 text-amber-300 font-black text-xs focus:outline-none focus:border-amber-400 w-52 sm:w-64"
+                        />
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-3.5 max-w-sm mx-auto aspect-square">
@@ -4693,7 +5075,11 @@ export default function LocalStudioPage() {
                         {tTools.diagAdvisor}
                       </span>
                       <p className="text-slate-200 leading-relaxed text-xs">
-                        {tTools.diagAdvisorBody(businessName, geoGridRadius)}
+                        {tTools.diagAdvisorBody(
+                          businessName,
+                          geoGridRadius,
+                          geoGridKeyword !== '' ? geoGridKeyword : getDefaultKeywordByNiche(category, city, isEn)
+                        )}
                       </p>
                     </div>
 
@@ -5054,6 +5440,67 @@ export default function LocalStudioPage() {
                       <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/30">
                         {isEn ? 'Current #1 in Maps' : 'Actual #1 en Maps'}
                       </span>
+                    </div>
+
+                    {/* 1-Click Google Maps Competitor Scanner */}
+                    <div className="p-2.5 rounded-xl bg-slate-900 border border-rose-500/30 space-y-1.5">
+                      <label className="block text-[10px] font-bold text-rose-300 flex items-center justify-between">
+                        <span>{tTools.rivalScannerLabel}</span>
+                        {rivalSearchQuery && (
+                          <button
+                            type="button"
+                            onClick={() => setRivalSearchQuery('')}
+                            className="text-[9px] text-slate-400 hover:text-rose-400 transition cursor-pointer"
+                          >
+                            {isEn ? 'Clear' : 'Limpiar'}
+                          </button>
+                        )}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={rivalSearchQuery}
+                          onChange={(e) => setRivalSearchQuery(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !isRivalScanning && rivalSearchQuery.trim()) {
+                              e.preventDefault();
+                              handleRivalScan();
+                            }
+                          }}
+                          placeholder={tTools.rivalScannerPlaceholder}
+                          className="w-full pl-2.5 pr-16 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 text-[11px]"
+                        />
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              const text = await navigator.clipboard.readText();
+                              if (text) setRivalSearchQuery(text.trim());
+                            } catch {}
+                          }}
+                          className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded-md bg-slate-800 text-[9px] font-bold text-rose-400 hover:bg-slate-700 transition cursor-pointer"
+                        >
+                          {t.pasteBtn}
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRivalScan}
+                        disabled={isRivalScanning || !rivalSearchQuery.trim()}
+                        className="w-full py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white font-bold text-[11px] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                      >
+                        {isRivalScanning ? (
+                          <>
+                            <RefreshCw className="w-3 h-3 animate-spin" />
+                            <span>{tTools.rivalScannerScanning}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Search className="w-3 h-3" />
+                            <span>{tTools.rivalScannerBtn}</span>
+                          </>
+                        )}
+                      </button>
                     </div>
 
                     <div className="space-y-2.5">
