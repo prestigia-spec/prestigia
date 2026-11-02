@@ -216,7 +216,7 @@ export default function PublicLandingPage() {
               className="w-10 h-10 rounded-2xl flex items-center justify-center text-slate-950 font-black text-lg shadow-md"
               style={{ backgroundColor: primaryColor }}
             >
-              {pageData.businessName.charAt(0)}
+              {pageData.businessName?.charAt(0) || 'P'}
             </div>
             <div>
               <h1 className="font-black text-sm sm:text-base text-white tracking-tight leading-tight">
@@ -360,32 +360,34 @@ export default function PublicLandingPage() {
             </div>
 
             {/* Current Active Review Card */}
-            <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800/80 space-y-2.5 animate-in fade-in duration-300">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-black text-slate-200">
-                    {pageData.reviews[reviewIdx].author.charAt(0)}
-                  </div>
-                  <div>
-                    <strong className="text-white text-xs block">
-                      {pageData.reviews[reviewIdx].author}
-                    </strong>
-                    <div className="flex items-center gap-0.5 text-amber-400">
-                      {[...Array(pageData.reviews[reviewIdx].rating || 5)].map((_, r) => (
-                        <Star key={r} className="w-3 h-3 fill-amber-400" />
-                      ))}
+            {pageData.reviews[reviewIdx] && (
+              <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800/80 space-y-2.5 animate-in fade-in duration-300">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-black text-slate-200">
+                      {pageData.reviews[reviewIdx]?.author?.charAt(0) || 'U'}
+                    </div>
+                    <div>
+                      <strong className="text-white text-xs block">
+                        {pageData.reviews[reviewIdx]?.author || 'Cliente Verificado'}
+                      </strong>
+                      <div className="flex items-center gap-0.5 text-amber-400">
+                        {[...Array(pageData.reviews[reviewIdx]?.rating || 5)].map((_, r) => (
+                          <Star key={r} className="w-3 h-3 fill-amber-400" />
+                        ))}
+                      </div>
                     </div>
                   </div>
+                  <span className="text-[10px] text-slate-500 font-mono">
+                    {pageData.reviews[reviewIdx]?.date || 'Verificado'}
+                  </span>
                 </div>
-                <span className="text-[10px] text-slate-500 font-mono">
-                  {pageData.reviews[reviewIdx].date}
-                </span>
-              </div>
 
-              <p className="text-xs text-slate-300 leading-relaxed italic">
-                &ldquo;{pageData.reviews[reviewIdx].text}&rdquo;
-              </p>
-            </div>
+                <p className="text-xs text-slate-300 leading-relaxed italic">
+                  &ldquo;{pageData.reviews[reviewIdx]?.text || ''}&rdquo;
+                </p>
+              </div>
+            )}
 
             {/* Carousel navigation indicators */}
             <div className="flex items-center justify-center gap-1.5 pt-1">

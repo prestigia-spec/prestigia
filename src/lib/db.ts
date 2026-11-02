@@ -1455,19 +1455,190 @@ export async function deleteStudioDossier(dossierId: string): Promise<boolean> {
   return true;
 }
 
+export const SEED_STUDIO_LANDING_PAGES: StudioLandingPage[] = [
+  {
+    id: 'lp-sonrisas-01',
+    slug: 'clinica-dental-sonrisas',
+    advisorId: 'adv-luisma',
+    advisorName: 'Luisma • Director General',
+    advisorPhone: '+573058314049',
+    businessName: 'Clínica Dental Estética Sonrisas',
+    category: 'Odontología & Estética Dental',
+    city: 'Medellín • El Poblado',
+    phone: '+573058314049',
+    whatsappMessage: 'Hola Clínica Sonrisas, vi su página web oficial y deseo agendar una valoración odontológica con escaneo 3D.',
+    status: 'active',
+    theme: {
+      primaryColor: '#059669',
+      accentColor: '#10B981',
+      bgColor: '#030712',
+      template: 'medical_clean',
+    },
+    headline: 'La Sonrisa que Siempre Soñaste en Medellín',
+    subheadline: 'Especialistas en Diseño de Sonrisa 3D, Ortodoncia Invisible e Implantes sin dolor. Tecnología digital avanzada en El Poblado.',
+    callToAction: 'Agendar Valoración 3D por WhatsApp',
+    offerBadge: '⚡ OFERTA EXCLUSIVA HOY: 40% OFF en Escaneo 3D y Diagnóstico',
+    offerCountdownHours: 4,
+    services: [
+      {
+        name: 'Diseño de Sonrisa Digital 3D',
+        description: 'Carillas cerámicas y resina de alta estética con simulación digital previa para visualizar tu resultado antes de iniciar.',
+        price: 'Desde $180 USD',
+        tag: 'Más Solicitado',
+      },
+      {
+        name: 'Ortodoncia Invisible (Alineadores)',
+        description: 'Dientes alineados sin alambres ni brackets visibles. Cómodos, removibles y prácticamente imperceptibles.',
+        price: 'Financiación 0%',
+        tag: 'Alta Tecnología',
+      },
+      {
+        name: 'Blanqueamiento Láser Clínico',
+        description: 'Aclara hasta 4 tonos en una sola sesión de 45 minutos con tecnología fría que no causa sensibilidad.',
+        price: 'Promoción $89 USD',
+        tag: 'Sesión Única',
+      },
+      {
+        name: 'Implantes Dentales Guiados por Computador',
+        description: 'Recupera tus dientes fijos con microcirugía guiada en 3D, máxima precisión y recuperación rápida.',
+        price: 'Valoración Gratuita',
+        tag: 'Cirugía Avanzada',
+      },
+    ],
+    reviews: [
+      {
+        author: 'Carolina Restrepo V.',
+        rating: 5,
+        text: '¡La mejor experiencia odontológica de mi vida! El diseño de sonrisa quedó 100% natural y la atención del equipo en El Poblado es insuperable. Totalmente recomendados.',
+        date: 'Hace 3 días',
+      },
+      {
+        author: 'Juan Felipe Echeverry',
+        rating: 5,
+        text: 'Inicié el tratamiento de alineadores invisibles hace 4 meses y el cambio es impresionante. No se notan para nada y no tuve dolor. Instalaciones 5 estrellas.',
+        date: 'Hace 1 semana',
+      },
+      {
+        author: 'Mariana Gómez S.',
+        rating: 5,
+        text: 'Me hice el blanqueamiento láser y quedé fascinada con los resultados en menos de una hora. Cero sensibilidad. La puntualidad y la limpieza son de 10.',
+        date: 'Hace 2 semanas',
+      },
+    ],
+    testimonials: [
+      {
+        name: 'Dra. Valentina Morales',
+        role: 'Paciente VIP • Medellín',
+        quote: 'Prestigia y Clínica Sonrisas superaron todas mis expectativas. Recomiendo a ojos cerrados a todo su equipo médico.',
+      },
+      {
+        name: 'Carlos Mario Henao',
+        role: 'Empresario • Medellín',
+        quote: 'Excelente tecnología digital. El escaneo 3D me mostró exactamente cómo quedaría mi sonrisa antes de empezar.',
+      },
+    ],
+    features: {
+      showLiveOpen: true,
+      showUrgencyBanner: true,
+      showFomoPopups: true,
+      showReviewCarousel: true,
+      showWazeButton: true,
+      showPrestigiaBadge: true,
+    },
+    address: 'Calle 10A # 36-24, El Poblado, Medellín, Antioquia',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'lp-autospa-02',
+    slug: 'autospa-detailing-cali',
+    advisorId: 'adv-luisma',
+    advisorName: 'Luisma • Director General',
+    advisorPhone: '+573058314049',
+    businessName: 'AutoSpa Premium Detailing & Cerámico',
+    category: 'Estética Automotriz & Detailing',
+    city: 'Cali • Granada',
+    phone: '+573058314049',
+    whatsappMessage: 'Hola AutoSpa Cali, vi su página web y deseo agendar un tratamiento cerámico 9H con cupón de descuento.',
+    status: 'active',
+    theme: {
+      primaryColor: '#D97706',
+      accentColor: '#F59E0B',
+      bgColor: '#030712',
+      template: 'executive_dark',
+    },
+    headline: 'El Brillo Espejo y Protección Cerámica 9H que tu Auto Merece',
+    subheadline: 'Corrección de pintura en 3 pasos, recubrimiento cerámico garantizado por 5 años y detailing de interiores a vapor en Cali.',
+    callToAction: 'Reservar Cupo Cerámico por WhatsApp',
+    offerBadge: '🔥 CUPOS LIMITADOS: 25% OFF en Cerámico 9H + Lavado de Motor Gratis',
+    offerCountdownHours: 3,
+    services: [
+      {
+        name: 'Recubrimiento Cerámico 9H (5 Años)',
+        description: 'Protección hidrofóbica extrema contra rayos UV, lluvia ácida y rayones superficiales con acabado espejo.',
+        price: 'Desde $190 USD',
+        tag: 'Servicio Estrella',
+      },
+      {
+        name: 'Corrección de Pintura en 3 Pasos',
+        description: 'Eliminación del 95% de micro-rayones (swirls), marcas de agua y hologramas devolviendo la profundidad del color.',
+        price: 'Cotización Inmediata',
+        tag: 'Alta Precisión',
+      },
+      {
+        name: 'Detailing Interior a Vapor & Desinfección',
+        description: 'Limpieza profunda de tapicería de cuero o tela, techos y alfombras con extracción y eliminación de olores al 99.9%.',
+        price: '$65 USD',
+        tag: 'Higiene Total',
+      },
+    ],
+    reviews: [
+      {
+        author: 'Andrés Camilo P.',
+        rating: 5,
+        text: 'Le aplicaron cerámico 9H a mi camioneta y quedó mejor que recién salida de concesionario. El agua resbala sola. 100% recomendados en Granada.',
+        date: 'Hace 4 días',
+      },
+      {
+        author: 'Guillermo Henao',
+        rating: 5,
+        text: 'Excelente servicio y puntualidad. El detailing interior dejó la tapicería de cuero como nueva y el olor a nuevo volvió. Gran trabajo.',
+        date: 'Hace 2 semanas',
+      },
+    ],
+    testimonials: [
+      {
+        name: 'Santiago Arango',
+        role: 'Cliente Frecuente BMW',
+        quote: 'El mejor taller de detailing en Cali. Cuidan cada milímetro de la pintura con la máxima dedicación.',
+      },
+    ],
+    features: {
+      showLiveOpen: true,
+      showUrgencyBanner: true,
+      showFomoPopups: true,
+      showReviewCarousel: true,
+      showWazeButton: true,
+      showPrestigiaBadge: true,
+    },
+    address: 'Av. 9 Norte # 14N-32, Barrio Granada, Cali, Valle',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
 export async function getAllStudioLandingPages(): Promise<StudioLandingPage[]> {
   const db = ensureDbFile();
-  if (!db.studioLandingPages) {
-    db.studioLandingPages = [];
+  if (!db.studioLandingPages || db.studioLandingPages.length === 0) {
+    db.studioLandingPages = SEED_STUDIO_LANDING_PAGES;
     writeDbFile(db);
   }
   return db.studioLandingPages;
 }
 
 export async function getStudioLandingPageBySlug(slug: string): Promise<StudioLandingPage | null> {
-  const db = ensureDbFile();
-  if (!db.studioLandingPages) return null;
-  const match = db.studioLandingPages.find((p) => p.slug.toLowerCase() === slug.toLowerCase());
+  const pages = await getAllStudioLandingPages();
+  const match = pages.find((p) => p.slug.toLowerCase() === slug.toLowerCase());
   return match || null;
 }
 
