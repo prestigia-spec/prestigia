@@ -1852,24 +1852,6 @@ export default function LocalStudioPage() {
                 </div>
                 <span className="text-[9px] text-slate-400 font-mono">{currentUser.phone}</span>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowAuthModal(true)}
-                title={isEn ? 'Switch profile (Director / Advisor)' : 'Cambiar de perfil (Director / Asesor)'}
-                className="ml-2 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer text-[10px] font-bold"
-              >
-                {t.switchProfile}
-              </button>
-
-              <button
-                type="button"
-                onClick={handleLogout}
-                title={isEn ? 'Log out of Prestigia Local Studio' : 'Cerrar sesión y salir del sistema'}
-                className="px-2 py-0.5 rounded bg-rose-950/80 hover:bg-rose-900 border border-rose-500/50 text-rose-300 hover:text-white transition cursor-pointer text-[10px] font-black flex items-center gap-1 shadow-sm active:scale-95"
-              >
-                <LogOut className="w-3 h-3 text-rose-400" />
-                <span>{t.logoutBtn}</span>
-              </button>
             </div>
           ) : (
             <button
@@ -1907,6 +1889,19 @@ export default function LocalStudioPage() {
               🇺🇸 EN
             </button>
           </div>
+
+          {/* Salir Button Solo en la Esquina Superior Derecha */}
+          {currentUser && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              title={isEn ? 'Log out of Prestigia Local Studio' : 'Cerrar sesión y salir del sistema'}
+              className="px-3 py-1.5 rounded-xl bg-rose-950/80 hover:bg-rose-900 border border-rose-500/50 text-rose-300 hover:text-white transition cursor-pointer text-xs font-black flex items-center gap-1.5 shadow-md active:scale-95 print:hidden"
+            >
+              <LogOut className="w-3.5 h-3.5 text-rose-400" />
+              <span>{t.logoutBtn}</span>
+            </button>
+          )}
 
           {generatedData && (
             <button
