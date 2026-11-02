@@ -665,20 +665,6 @@ const TXT_TOOLS = {
     advisorClose: 'Cierre Definitivo del Asesor:',
     advisorCloseBody: (name: string, monthlyLoss: number, monthlyGain: number, breakEvenClients: number) =>
       `"Don ${name || 'Cliente'}, no contratar Prestigia no le ahorra dinero: le cuesta $${monthlyLoss.toLocaleString()} USD al mes que hoy van directo a los bolsillos de sus 3 competidores. Al ingresar al Top 3, no solo frena esa hemorragia de dinero sino que suma +$${monthlyGain.toLocaleString()} USD en clientes nuevos cada mes. Con recuperar apenas ${breakEvenClients} ${breakEvenClients === 1 ? 'cliente' : 'clientes'} al mes, Prestigia se paga 100% solo y todo lo demás es ganancia neta directa a su cuenta bancaria."`,
-    geotagTitle: 'Inyector y Generador de Geo-Tagging EXIF para Fotos',
-    geotagDesc: 'Google lee los metadatos IPTC y coordenadas de las fotos para validar la ubicación real del establecimiento.',
-    photoName: 'Nombre Base de la Foto',
-    photoNamePlaceholder: 'ej: fachada-principal o plato-insignia',
-    indexingKeywords: 'Palabras Clave de Indexación',
-    indexingKeywordsPlaceholder: 'ej: mejor restaurante, comida gourmet, centro',
-    btnGeotag: 'Generar Nomenclatura & Etiquetas EXIF',
-    toastGeotag: 'Metadatos EXIF generados',
-    resultBox: 'Resultado para Renombrar Antes de Subir a Google:',
-    geotagNote: 'Subir fotos con nombres geolocalizados y metadatos IPTC acelera en un 40% la indexación visual en Google Lens y Google Maps.',
-    citationsTitle: 'Hub de Citaciones y Autoridad NAP (Name, Address, Phone)',
-    citationsDesc: 'Directorio oficial para verificar la consistencia de los datos del cliente en internet y blindar su autoridad frente al algoritmo.',
-    citationsUsa: 'Directorio Top de Citaciones EE.UU.',
-    citationsLatam: 'Directorio Top de Citaciones LatAm',
     spyTitle: '🥊 Rival Spy: Radar de Espionaje Cara a Cara',
     spyDesc: 'Compara a tu cliente frente a su competidor #1 en Google Maps y genera la radiografía exacta para destronarlo en el Top 3.',
     spyClientCol: 'Tu Negocio (Cliente)',
@@ -805,20 +791,6 @@ const TXT_TOOLS = {
     advisorClose: 'Advisor Closing Pitch:',
     advisorCloseBody: (name: string, monthlyLoss: number, monthlyGain: number, breakEvenClients: number) =>
       `"${name || 'Client'}, choosing not to hire Prestigia doesn't save you money—it costs you $${monthlyLoss.toLocaleString()} USD every month going straight to your competitors. By reaching the Top 3, you not only stop that leak but also bring in +$${monthlyGain.toLocaleString()} USD in new revenue each month. Bringing in just ${breakEvenClients} customer${breakEvenClients === 1 ? '' : 's'} a month pays for Prestigia completely, and everything else is pure profit."`,
-    geotagTitle: 'EXIF & IPTC Geo-Tagging Photo Generator',
-    geotagDesc: 'Google scans IPTC metadata and GPS coordinates embedded in photos to verify authentic physical operations.',
-    photoName: 'Base Photo Filename',
-    photoNamePlaceholder: 'e.g. main-storefront or signature-dish',
-    indexingKeywords: 'Target SEO Indexing Keywords',
-    indexingKeywordsPlaceholder: 'e.g. best cosmetic dentist, dental implants, downtown',
-    btnGeotag: 'Generate SEO Filename & EXIF Tags',
-    toastGeotag: 'EXIF metadata tags generated',
-    resultBox: 'SEO Filename to Rename Before Uploading to Google:',
-    geotagNote: 'Uploading photos with geo-tagged names and IPTC keywords speeds up visual indexing in Google Lens and Maps by 40%.',
-    citationsTitle: 'NAP Authority & Citations Hub (Name, Address, Phone)',
-    citationsDesc: 'Official directory to verify client business data consistency across the web and build algorithm trust.',
-    citationsUsa: 'Top USA Business Citations Directory',
-    citationsLatam: 'Top LatAm Business Citations Directory',
     spyTitle: '🥊 Rival Spy: Head-to-Head Competitor Radar',
     spyDesc: 'Compare your client directly against their #1 Google Maps competitor and generate the exact blueprint to dethrone them in the Top 3.',
     spyClientCol: 'Your Business (Client)',
@@ -1314,9 +1286,6 @@ export default function LocalStudioPage() {
   const [roiCustomerFrequency, setRoiCustomerFrequency] = useState<number>(3);
   const [roiCurrentRank, setRoiCurrentRank] = useState<number>(8);
   const [roiMonthlySearches, setRoiMonthlySearches] = useState<number>(1200);
-  const [geoTagFilename, setGeoTagFilename] = useState('');
-  const [geoTagKeywords, setGeoTagKeywords] = useState('');
-  const [geoTagResult, setGeoTagResult] = useState<string | null>(null);
 
   // Rescue Radar (Ownership Claim Engine) State
   const [rescueScenario, setRescueScenario] = useState<'orphan' | 'third_party' | 'rejected'>('third_party');
@@ -1910,10 +1879,6 @@ export default function LocalStudioPage() {
 
         const smartKw = getDefaultKeywordByNiche(matchedCategory, parsedCity, isEn);
         setGeoGridKeyword(smartKw);
-
-        // GeoTag photo name pre-fill
-        setGeoTagFilename(`${extractedName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-fachada`);
-        setGeoTagKeywords(`${matchedCategory}, ${parsedCity || ''}, Top 3 Google Maps`);
 
         showToast(
           isEn
