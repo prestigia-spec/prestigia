@@ -197,6 +197,488 @@ RETURN ONLY A VALID JSON OBJECT WITH THIS STRUCTURE (NO MARKDOWN WRAPPERS, NO EX
   }
 }
 
+function detectTaxonomyAndContent(params: {
+  category: string;
+  specialties: string;
+  businessName: string;
+  isEn: boolean;
+  locationTag: string;
+  phone: string;
+  city: string;
+  neighborhood: string;
+}) {
+  const combined = `${params.category} ${params.specialties} ${params.businessName}`.toLowerCase();
+  const isEn = params.isEn;
+
+  // 1. GASTRONOMÍA / RESTAURANTES
+  if (
+    combined.includes('restauran') ||
+    combined.includes('gastro') ||
+    combined.includes('comida') ||
+    combined.includes('alimento') ||
+    combined.includes('pasta') ||
+    combined.includes('lasa') ||
+    combined.includes('pizza') ||
+    combined.includes('burger') ||
+    combined.includes('hamburgues') ||
+    combined.includes('carne') ||
+    combined.includes('parrilla') ||
+    combined.includes('sushi') ||
+    combined.includes('cafe') ||
+    combined.includes('café') ||
+    combined.includes('bar')
+  ) {
+    // 1A. Pastas / Italiano / Lasaña
+    if (
+      combined.includes('pasta') ||
+      combined.includes('lasa') ||
+      combined.includes('ital') ||
+      combined.includes('spoleto') ||
+      combined.includes('trattoria') ||
+      combined.includes('ravioli') ||
+      combined.includes('espaguet') ||
+      combined.includes('risotto')
+    ) {
+      return {
+        primaryCategory: isEn ? 'Italian Restaurant' : 'Restaurante italiano',
+        secondaryCategories: isEn
+          ? ['Pasta Shop', 'Pizza Restaurant', 'Mediterranean Restaurant', 'Takeout Restaurant', 'Meal Delivery']
+          : ['Restaurante de pastas', 'Pizzería', 'Restaurante mediterráneo', 'Comida para llevar', 'Entrega a domicilio'],
+        catalog: [
+          {
+            name: isEn ? 'Artisanal Fresh Pasta' : 'Pastas Frescas Artesanales',
+            description: isEn ? 'Handmade al dente pasta served with rich traditional Italian sauces.' : 'Elaboradas al momento con recetas tradicionales italianas y salsas frescas.',
+            tag: isEn ? 'Italian Restaurant' : 'Restaurante italiano'
+          },
+          {
+            name: isEn ? 'Oven-Baked Lasagna' : 'Lasañas Especiales al Horno',
+            description: isEn ? 'Generous layers of slow-baked lasagna topped with melted golden cheese.' : 'Capas generosas de pasta artesanal horneadas con queso gratinado y recetas exclusivas.',
+            tag: isEn ? 'Signature Dish' : 'Especialidad de la Casa'
+          },
+          {
+            name: isEn ? 'Mediterranean Antipasti & Wine' : 'Antipastos & Selección de Vinos',
+            description: isEn ? 'Curated starters, fresh salads, and beverage pairings for your table.' : 'Entradas mediterráneas, ensaladas frescas y maridaje perfecto para tu velada.',
+            tag: isEn ? 'Starters' : 'Entradas & Bebidas'
+          },
+          {
+            name: isEn ? 'Executive Lunch & Family Dinners' : 'Menú Ejecutivo & Cenas Familiares',
+            description: isEn ? 'Special combinations designed for daily lunch or cozy evening celebrations.' : 'Combinaciones completas ideales para almuerzos entre semana o cenas especiales.',
+            tag: isEn ? 'Menus' : 'Planes & Grupos'
+          }
+        ]
+      };
+    }
+
+    // 1B. Pizza
+    if (combined.includes('pizza') || combined.includes('pizzer')) {
+      return {
+        primaryCategory: isEn ? 'Pizza Restaurant' : 'Pizzería',
+        secondaryCategories: isEn
+          ? ['Italian Restaurant', 'Fast Food Restaurant', 'Takeout Restaurant', 'Meal Delivery', 'Family Style Restaurant']
+          : ['Restaurante italiano', 'Comida rápida', 'Comida para llevar', 'Entrega a domicilio', 'Restaurante familiar'],
+        catalog: [
+          {
+            name: isEn ? 'Artisanal Crust Pizzas' : 'Pizzas Artesanales a la Piedra',
+            description: isEn ? 'Crispy, stone-baked thin crust pizza with premium toppings and real mozzarella.' : 'Masa madurada horneada a la piedra con queso mozzarella seleccionado e ingredientes frescos.',
+            tag: isEn ? 'Pizza Restaurant' : 'Pizzería'
+          },
+          {
+            name: isEn ? 'Stuffed Crust & Specialty Pizzas' : 'Pizzas Especiales & Bordes Rellenos',
+            description: isEn ? 'Signature chef recipes with stuffed cheese crust and premium toppings.' : 'Recetas de la casa con bordes de queso derretido y combinaciones gourmet exclusivas.',
+            tag: isEn ? 'Signature' : 'Especialidades'
+          },
+          {
+            name: isEn ? 'Combos & Family Packs' : 'Combos Familiares & Bebidas',
+            description: isEn ? 'Great value party combos including large pizzas, sides, and refreshing drinks.' : 'Paquetes completos con pizzas grandes, acompañamientos y bebidas para compartir.',
+            tag: isEn ? 'Combos' : 'Combos & Promociones'
+          },
+          {
+            name: isEn ? 'Express Home Delivery' : 'Servicio a Domicilio Express',
+            description: isEn ? 'Hot, fresh pizza delivered right to your doorstep in minutes.' : 'Entrega rápida a domicilio garantizando temperatura perfecta y empaque sellado.',
+            tag: isEn ? 'Delivery' : 'Domicilios'
+          }
+        ]
+      };
+    }
+
+    // 1C. Carnes / Parrilla / Asados / BBQ
+    if (combined.includes('carne') || combined.includes('parrilla') || combined.includes('asado') || combined.includes('steak') || combined.includes('bbq')) {
+      return {
+        primaryCategory: isEn ? 'Steak House' : 'Restaurante de carnes',
+        secondaryCategories: isEn
+          ? ['Bar & Grill', 'Barbecue Restaurant', 'Family Style Restaurant', 'Takeout Restaurant', 'Catering Food Service']
+          : ['Parrilla', 'Restaurante de barbacoa', 'Restaurante familiar', 'Bar y parrilla', 'Asador'],
+        catalog: [
+          {
+            name: isEn ? 'Prime Cut Steaks' : 'Cortes de Carne Madurados',
+            description: isEn ? 'Selected prime cuts grilled to perfection over natural charcoal.' : 'Cortes premium asados al carbón con el término exacto de cocción y sazón artesanal.',
+            tag: isEn ? 'Steak House' : 'Carnes & Parrilla'
+          },
+          {
+            name: isEn ? 'Mixed Charcoal Platter' : 'Parrilladas Mixtas para Compartir',
+            description: isEn ? 'Generous platters with assorted beef, pork, artisan chorizo, and sides.' : 'Generosa combinación de cortes de res, cerdo, chorizos artesanales y guarniciones.',
+            tag: isEn ? 'Platters' : 'Para Compartir'
+          },
+          {
+            name: isEn ? 'Signature Burgers & Ribs' : 'Costillas BBQ & Hamburguesas a la Brasa',
+            description: isEn ? 'Fall-off-the-bone smoked ribs and artisanal flame-grilled burgers.' : 'Costillas tiernas bañadas en salsa BBQ de la casa y hamburguesas con carne madurada.',
+            tag: isEn ? 'Favorites' : 'Especiales'
+          },
+          {
+            name: isEn ? 'Celebrations & Group Events' : 'Eventos Especiales & Reservas',
+            description: isEn ? 'Spacious reservations and special meat menus for birthday and corporate events.' : 'Atención preferencial y menús diseñados para cumpleaños y almuerzos empresariales.',
+            tag: isEn ? 'Events' : 'Eventos'
+          }
+        ]
+      };
+    }
+
+    // 1D. Hamburguesas / Fast Food
+    if (combined.includes('hamburgues') || combined.includes('burger')) {
+      return {
+        primaryCategory: isEn ? 'Hamburger Restaurant' : 'Restaurante de hamburguesas',
+        secondaryCategories: isEn
+          ? ['Fast Food Restaurant', 'American Restaurant', 'Takeout Restaurant', 'Meal Delivery', 'Family Style Restaurant']
+          : ['Comida rápida', 'Restaurante de comida americana', 'Comida para llevar', 'Entrega a domicilio', 'Restaurante familiar'],
+        catalog: [
+          {
+            name: isEn ? 'Artisanal Brioche Burgers' : 'Hamburguesas Artesanales en Pan Brioche',
+            description: isEn ? '100% premium beef smashed or grilled with double melted cheese.' : 'Carne 100% de res a la parrilla con doble queso fundido y pan brioche horneado a diario.',
+            tag: isEn ? 'Burgers' : 'Hamburguesas'
+          },
+          {
+            name: isEn ? 'Loaded Crispy Fries' : 'Papas Rústicas Cargadas',
+            description: isEn ? 'Golden crispy fries topped with cheddar sauce, crispy bacon, and jalapeños.' : 'Papas crujientes con salsa de queso cheddar fundido, tocineta crocante y aderezos.',
+            tag: isEn ? 'Sides' : 'Acompañamientos'
+          },
+          {
+            name: isEn ? 'Thick Shakes & Beverages' : 'Malteadas Artesanales & Bebidas',
+            description: isEn ? 'Creamy handcrafted milkshakes and refreshing drinks.' : 'Malteadas cremosas de sabores clásicos y bebidas frías para acompañar tu combo.',
+            tag: isEn ? 'Drinks' : 'Bebidas'
+          },
+          {
+            name: isEn ? 'Express Fast Delivery' : 'Envíos Rápidos a Domicilio',
+            description: isEn ? 'Fast, hot packaging delivery to enjoy at home or office.' : 'Empaque térmico especial para que tus hamburguesas lleguen calientes y crocantes.',
+            tag: isEn ? 'Delivery' : 'Domicilios'
+          }
+        ]
+      };
+    }
+
+    // 1E. Café / Pastelería
+    if (combined.includes('cafe') || combined.includes('café') || combined.includes('coffee') || combined.includes('panader') || combined.includes('pasteler')) {
+      return {
+        primaryCategory: isEn ? 'Coffee Shop' : 'Cafetería',
+        secondaryCategories: isEn
+          ? ['Bakery', 'Breakfast Restaurant', 'Espresso Bar', 'Brunch Restaurant', 'Pastry Shop']
+          : ['Pastelería', 'Panadería', 'Café de especialidad', 'Restaurante de desayunos', 'Brunch'],
+        catalog: [
+          {
+            name: isEn ? 'Specialty Origin Coffee' : 'Café de Especialidad de Origen',
+            description: isEn ? 'Freshly ground local origin beans prepared with precision espresso methods.' : 'Granos de origen seleccionados preparados en espresso, filtrados y métodos artesanales.',
+            tag: isEn ? 'Coffee' : 'Cafetería'
+          },
+          {
+            name: isEn ? 'Fresh Baked Pastries' : 'Panadería & Repostería del Día',
+            description: isEn ? 'Daily fresh croissants, artisan pastries, cakes, and sweet treats.' : 'Croissants de mantequilla, panes artesanales recién salidos del horno y tortas de la casa.',
+            tag: isEn ? 'Bakery' : 'Panadería'
+          },
+          {
+            name: isEn ? 'All-Day Breakfast & Brunch' : 'Desayunos Sorpresa & Brunch',
+            description: isEn ? 'Hearty brunch plates with fresh eggs, artisan sourdough, and fresh fruits.' : 'Opciones completas de desayuno con huevos al gusto, tostadas y jugos naturales.',
+            tag: isEn ? 'Brunch' : 'Desayunos & Brunch'
+          },
+          {
+            name: isEn ? 'Cozy Atmosphere & Meetings' : 'Espacio Cómodo & Wi-Fi de Alta Velocidad',
+            description: isEn ? 'Relaxing atmosphere with comfortable seating and fast connection for work or study.' : 'Ambiente tranquilo con buena iluminación y tomas eléctricas ideal para trabajar o charlar.',
+            tag: isEn ? 'Space' : 'Experiencia'
+          }
+        ]
+      };
+    }
+
+    // 1F. Sushi / Asiático
+    if (combined.includes('sushi') || combined.includes('japon') || combined.includes('asiat') || combined.includes('ramen') || combined.includes('wok')) {
+      return {
+        primaryCategory: isEn ? 'Japanese Restaurant' : 'Restaurante japonés',
+        secondaryCategories: isEn
+          ? ['Sushi Restaurant', 'Asian Restaurant', 'Ramen Restaurant', 'Takeout Restaurant', 'Meal Delivery']
+          : ['Restaurante de sushi', 'Restaurante asiático', 'Comida para llevar', 'Entrega a domicilio', 'Restaurante de ramen'],
+        catalog: [
+          {
+            name: isEn ? 'Signature Sushi Rolls' : 'Rollos de Sushi Especiales',
+            description: isEn ? 'Fresh salmon, tuna, avocado, and tempura rolls crafted with precision.' : 'Rollos preparados con salmón fresco, atún, aguacate y técnicas de alta cocina japonesa.',
+            tag: isEn ? 'Sushi' : 'Sushi Especial'
+          },
+          {
+            name: isEn ? 'Wok & Traditional Ramen' : 'Platos Wok & Ramen Tradicional',
+            description: isEn ? 'Rich broths, artisanal noodles, wok stir-fries, and fragrant gyozas.' : 'Caldos lentos con fideos artesanales, salteados al wok y gyozas crocantes.',
+            tag: isEn ? 'Hot Dishes' : 'Platos Calientes'
+          },
+          {
+            name: isEn ? 'Sushi Boats & Party Platters' : 'Barcos & Bandejas para Compartir',
+            description: isEn ? 'Large sushi selections presented for celebrations and group dining.' : 'Bandejas y barcos variados con 30 a 50 bocados para celebraciones especiales.',
+            tag: isEn ? 'Platters' : 'Para Compartir'
+          },
+          {
+            name: isEn ? 'Protected Delivery Packs' : 'Empaques Seguros para Domicilios',
+            description: isEn ? 'Temperature-controlled containers ensuring fresh sushi right to your table.' : 'Empaque hermético que preserva la frescura, salsa de soya y palillos incluidos.',
+            tag: isEn ? 'Delivery' : 'Domicilios'
+          }
+        ]
+      };
+    }
+
+    // 1G. Restaurante General (Sin bar y parrilla arbitrario)
+    return {
+      primaryCategory: isEn ? 'Restaurant' : 'Restaurante',
+      secondaryCategories: isEn
+        ? ['Family Style Restaurant', 'Lunch Restaurant', 'Takeout Restaurant', 'Meal Delivery', 'Local Cuisine Restaurant']
+        : ['Restaurante familiar', 'Restaurante para almorzar', 'Comida para llevar', 'Entrega a domicilio', 'Restaurante de cocina local'],
+      catalog: [
+        {
+          name: isEn ? 'Signature Chef Specialties' : 'Platos de Autor & Especialidad de la Casa',
+          description: isEn ? 'Our most celebrated recipes crafted with seasonal fresh ingredients.' : 'Recetas insignia elaboradas a diario con los más frescos ingredientes locales.',
+          tag: isEn ? 'Specialties' : 'Especialidades'
+        },
+        {
+          name: isEn ? 'Daily Executive Lunch' : 'Almuerzos Ejecutivos Completos',
+          description: isEn ? 'Balanced daily menus with entrée, main dish, beverage, and dessert.' : 'Menú balanceado con entrada, plato fuerte, bebida y postre con atención rápida.',
+          tag: isEn ? 'Daily Menu' : 'Menú del Día'
+        },
+        {
+          name: isEn ? 'Family & Group Gatherings' : 'Atención para Familias & Grupos',
+          description: isEn ? 'Comfortable dining setups and reserved seating for friends and corporate meetings.' : 'Mesas amplias y atención personalizada para reuniones de trabajo o eventos familiares.',
+          tag: isEn ? 'Groups' : 'Grupos & Reservas'
+        },
+        {
+          name: isEn ? 'Fast Takeout & Home Delivery' : 'Servicio para Llevar & Domicilios',
+          description: isEn ? 'Easy phone or WhatsApp ordering with fast packaging and prompt local delivery.' : 'Pide con anticipación para recoger o solicita tu domicilio directo por WhatsApp.',
+          tag: isEn ? 'Service' : 'Domicilios & Para Llevar'
+        }
+      ]
+    };
+  }
+
+  // 2. SALUD / ODONTOLOGÍA
+  if (combined.includes('médic') || combined.includes('salud') || combined.includes('odontol') || combined.includes('dent') || combined.includes('dient') || combined.includes('estétic')) {
+    if (combined.includes('odontol') || combined.includes('dent') || combined.includes('dient') || combined.includes('sonrisa') || combined.includes('ortodoncia') || combined.includes('implante')) {
+      return {
+        primaryCategory: isEn ? 'Dental Clinic' : 'Clínica dental',
+        secondaryCategories: isEn
+          ? ['Dentist', 'Orthodontist', 'Cosmetic Dentist', 'Dental Implants Periodontist', 'Emergency Dental Service']
+          : ['Dentista', 'Ortodoncista', 'Clínica de periodoncia', 'Diseño de sonrisa', 'Servicio dental de urgencia'],
+        catalog: [
+          {
+            name: isEn ? 'Comprehensive Dental Checkup' : 'Valoración Odontológica Integral',
+            description: isEn ? 'Complete diagnostic exam with high-resolution digital imaging.' : 'Diagnóstico digital completo con radiografías y plan de tratamiento personalizado.',
+            tag: isEn ? 'Diagnosis' : 'Diagnóstico'
+          },
+          {
+            name: isEn ? 'Smile Design & Teeth Whitening' : 'Diseño de Sonrisa & Blanqueamiento',
+            description: isEn ? 'Minimally invasive cosmetic enhancements and professional whitening.' : 'Carillas de alta estética y blanqueamiento dental clínico seguro y duradero.',
+            tag: isEn ? 'Aesthetics' : 'Estética Dental'
+          },
+          {
+            name: isEn ? 'Modern Invisible Orthodontics' : 'Ortodoncia Invisible & Brackets',
+            description: isEn ? 'Clear aligners and advanced braces for comfortable teeth alignment.' : 'Alineadores invisibles y ortodoncia moderna para niños y adultos.',
+            tag: isEn ? 'Orthodontics' : 'Ortodoncia'
+          },
+          {
+            name: isEn ? 'Dental Implants & Rehabilitation' : 'Implantes Dentales & Rehabilitación Oral',
+            description: isEn ? 'Titanium biocompatible implants restoring full biting strength and aesthetics.' : 'Recuperación de piezas dentales con implantes de titanio biocompatibles y coronas cerámicas.',
+            tag: isEn ? 'Implants' : 'Implantes & Cirugía'
+          }
+        ]
+      };
+    }
+    return {
+      primaryCategory: isEn ? 'Medical Clinic' : 'Clínica médica',
+      secondaryCategories: isEn
+        ? ['Doctor', 'Medical Center', 'Specialized Clinic', 'Health Consultant', 'Family Practice Physician']
+        : ['Centro médico', 'Médico especialista', 'Consultorio médico', 'Centro de salud y bienestar', 'Clínica especializada'],
+      catalog: [
+        {
+          name: isEn ? 'Specialized Medical Consultation' : 'Consulta Médica Especializada',
+          description: isEn ? 'Personalized medical evaluation and diagnostics with certified doctors.' : 'Atención médica cercana y personalizada con especialistas certificados.',
+          tag: isEn ? 'Consultation' : 'Consulta Médica'
+        },
+        {
+          name: isEn ? 'Preventive Health Checkup' : 'Exámenes Preventivos & Chequeos',
+          description: isEn ? 'Comprehensive health screenings and lab reviews for optimal wellbeing.' : 'Evaluaciones completas para detección temprana y cuidado de tu salud.',
+          tag: isEn ? 'Prevention' : 'Prevención'
+        },
+        {
+          name: isEn ? 'Treatment & Chronic Care' : 'Tratamientos & Seguimiento Continuo',
+          description: isEn ? 'Tailored clinical therapies with regular digital health monitoring.' : 'Planes de tratamiento guiados con citas de control y soporte continuo.',
+          tag: isEn ? 'Therapy' : 'Tratamientos'
+        },
+        {
+          name: isEn ? 'Priority Telehealth & WhatsApp Care' : 'Atención Prioritaria & Canales Digitales',
+          description: isEn ? 'Direct appointment scheduling and medical guidance via WhatsApp.' : 'Agendamiento ágil de citas y atención preferencial sin largas esperas.',
+          tag: isEn ? 'Service' : 'Atención al Paciente'
+        }
+      ]
+    };
+  }
+
+  // 3. TALLER MECÁNICO / AUTOMOTRIZ
+  if (combined.includes('auto') || combined.includes('taller') || combined.includes('mecánic') || combined.includes('frenos') || combined.includes('vehícul')) {
+    return {
+      primaryCategory: isEn ? 'Auto Repair Shop' : 'Taller mecánico',
+      secondaryCategories: isEn
+        ? ['Brake Shop', 'Oil Change Service', 'Car Inspection Station', 'Mechanic', 'Auto Electrical Service']
+        : ['Taller de automóviles', 'Servicio de cambio de aceite', 'Taller de frenos', 'Mecánico', 'Diagnóstico automotriz'],
+      catalog: [
+        {
+          name: isEn ? 'Computerized Vehicle Diagnostics' : 'Diagnóstico Computarizado & Escáner',
+          description: isEn ? 'High-tech scanner reading all engine, transmission, and sensor codes.' : 'Escaneo electrónico avanzado de motor, transmisión y sensores con reporte detallado.',
+          tag: isEn ? 'Diagnostics' : 'Diagnóstico'
+        },
+        {
+          name: isEn ? 'Brake & Suspension Overhaul' : 'Mantenimiento de Frenos & Suspensión',
+          description: isEn ? 'Pad replacement, rotor resurfacing, shocks, and precision alignment.' : 'Cambio de pastillas, rectificación de discos, amortiguadores y alineación 3D.',
+          tag: isEn ? 'Safety' : 'Frenos & Suspensión'
+        },
+        {
+          name: isEn ? 'Oil & Filter Preventive Service' : 'Cambio de Aceite & Filtros Originales',
+          description: isEn ? 'Premium synthetic motor oils and certified filters extending engine life.' : 'Aceites sintéticos certificados y filtros originales para máxima protección del motor.',
+          tag: isEn ? 'Maintenance' : 'Mantenimiento'
+        },
+        {
+          name: isEn ? 'Pre-Purchase Vehicle Inspection' : 'Peritaje & Revisión Técnico-Mecánica',
+          description: isEn ? 'Exhaustive 80-point vehicle inspection before buying or road trips.' : 'Revisión preventiva de 80 puntos antes de viajes o compra de vehículos usados.',
+          tag: isEn ? 'Inspection' : 'Peritaje'
+        }
+      ]
+    };
+  }
+
+  // 4. BELLEZA / BARBERÍA / PELUQUERÍA
+  if (combined.includes('belleza') || combined.includes('peluquer') || combined.includes('barber') || combined.includes('uñas') || combined.includes('spa')) {
+    if (combined.includes('barber')) {
+      return {
+        primaryCategory: isEn ? 'Barber Shop' : 'Barbería',
+        secondaryCategories: isEn
+          ? ['Hair Salon', 'Beauty Salon', 'Stylist', 'Skin Care Clinic', 'Cosmetics Store']
+          : ['Peluquería', 'Salón de belleza', 'Estilista', 'Cuidado de la piel', 'Tienda de cosméticos'],
+        catalog: [
+          {
+            name: isEn ? 'Classic & Fade Haircuts' : 'Cortes Clásicos & Degradados Modernos',
+            description: isEn ? 'Precision scissor and clipper fades tailored to your face structure.' : 'Degradados impecables, fades y cortes clásicos adaptados a tu estilo personal.',
+            tag: isEn ? 'Haircut' : 'Corte de Cabello'
+          },
+          {
+            name: isEn ? 'Hot Towel Beard Grooming' : 'Perfilado de Barba & Ritual Toalla Caliente',
+            description: isEn ? 'Beard sculpting with straight razor edge, essential oils, and hot towel relaxation.' : 'Afeitado tradicional a navaja, aceites hidratantes y toalla caliente relajante.',
+            tag: isEn ? 'Beard' : 'Barba & Afeitado'
+          },
+          {
+            name: isEn ? 'Hair Treatment & Color' : 'Tratamientos Capilares & Pigmentación',
+            description: isEn ? 'Gray blending, scalp therapy, and nourishing treatments for healthy hair.' : 'Matización de canas, exfoliación de cuero cabelludo y nutrición profunda.',
+            tag: isEn ? 'Treatments' : 'Tratamientos'
+          },
+          {
+            name: isEn ? 'VIP Grooming Experience' : 'Combo VIP Completo (Corte + Barba + Mascarilla)',
+            description: isEn ? 'Complete executive styling package including cut, beard trim, and cleansing facial mask.' : 'Paquete integral con corte, arreglo de barba, mascarilla facial negra y bebida de cortesía.',
+            tag: isEn ? 'VIP' : 'Combos VIP'
+          }
+        ]
+      };
+    }
+    return {
+      primaryCategory: isEn ? 'Beauty Salon' : 'Salón de belleza',
+      secondaryCategories: isEn
+        ? ['Hair Salon', 'Nail Salon', 'Spa', 'Esthetician', 'Cosmetics Store']
+        : ['Peluquería', 'Salón de manicura', 'Centro de estética', 'Spa y bienestar', 'Estilista'],
+      catalog: [
+        {
+          name: isEn ? 'Balayage & Advanced Hair Color' : 'Balayage, Mechas & Colorimetría Avanzada',
+          description: isEn ? 'Customized lightening and tone correction protecting your hair health.' : 'Aclarados profesionales, matices luminosos y tinturas de alta duración sin maltratar el cabello.',
+          tag: isEn ? 'Color' : 'Colorimetría'
+        },
+        {
+          name: isEn ? 'Russian Manicure & Pedicure Spa' : 'Manicura Rusa & Pedicura Spa',
+          description: isEn ? 'Long-lasting gel polish, acrylics, and hydrating foot massage.' : 'Esmaltado semipermanente, uñas en acrílico y exfoliación spa hidratante.',
+          tag: isEn ? 'Nails' : 'Uñas & Manicura'
+        },
+        {
+          name: isEn ? 'Keratin & Deep Hair Repair' : 'Alisados Progresivos & Keratina Orgánica',
+          description: isEn ? 'Frizz-free silk finish with organic botanical keratin treatments.' : 'Cabello liso, suave y con brillo espejo gracias a fórmulas orgánicas libres de formol.',
+          tag: isEn ? 'Hair Repair' : 'Alisados & Hidratación'
+        },
+        {
+          name: isEn ? 'Bridal & Event Makeup' : 'Peinados & Maquillaje Profesional para Eventos',
+          description: isEn ? 'Long-lasting photographic makeup and elegant updos for weddings and galas.' : 'Maquillaje de alta definición y peinados de fiesta para novias, grados y eventos.',
+          tag: isEn ? 'Events' : 'Maquillaje & Peinados'
+        }
+      ]
+    };
+  }
+
+  // 5. SERVICIOS PROFESIONALES / LEGAL / B2B
+  if (combined.includes('abog') || combined.includes('legal') || combined.includes('juríd')) {
+    return {
+      primaryCategory: isEn ? 'Law Firm' : 'Bufete de abogados',
+      secondaryCategories: isEn
+        ? ['Lawyer', 'Legal Services', 'Corporate Office', 'Business Management Consultant', 'Real Estate Attorney']
+        : ['Abogado', 'Servicios legales', 'Asesoría jurídica', 'Consultoría legal', 'Abogado laboralista'],
+      catalog: [
+        {
+          name: isEn ? 'Initial Legal Evaluation' : 'Consulta & Diagnóstico Jurídico Estratégico',
+          description: isEn ? 'Exhaustive review of your case, risks, and winning legal strategy.' : 'Análisis detallado de tu situación legal, riesgos y ruta jurídica más conveniente.',
+          tag: isEn ? 'Consultation' : 'Asesoría'
+        },
+        {
+          name: isEn ? 'Contract Drafting & Review' : 'Elaboración & Blindaje de Contratos',
+          description: isEn ? 'Drafting solid commercial, labor, and real estate agreements.' : 'Redacción de contratos comerciales, laborales y acuerdos de confidencialidad blindados.',
+          tag: isEn ? 'Contracts' : 'Contratos'
+        },
+        {
+          name: isEn ? 'Corporate & Business Compliance' : 'Defensa Judicial & Litigios',
+          description: isEn ? 'Dedicated court representation protecting your rights and financial assets.' : 'Representación ante juzgados y entidades estatales con estricto seguimiento procesal.',
+          tag: isEn ? 'Litigation' : 'Defensa Legal'
+        },
+        {
+          name: isEn ? 'Corporate Legal Advisory' : 'Asesoría Legal Continua para Empresas',
+          description: isEn ? 'Monthly retainer legal counsel for growing companies and entrepreneurs.' : 'Acompañamiento jurídico permanente para empresas, prevención de multas y demandas.',
+          tag: isEn ? 'Corporate' : 'Empresas'
+        }
+      ]
+    };
+  }
+
+  // DEFAULT GENERAL
+  return {
+    primaryCategory: isEn ? 'Commercial Service' : 'Servicios Comerciales & Profesionales',
+    secondaryCategories: isEn
+      ? ['Business Management Consultant', 'Corporate Office', 'Specialty Store', 'Service Establishment', 'Local Service']
+      : ['Oficina corporativa', 'Comercio local', 'Servicios especializados', 'Asesoría profesional', 'Establecimiento de atención'],
+    catalog: [
+      {
+        name: isEn ? 'Flagship Service' : 'Servicio Especializado Insignia',
+        description: isEn ? `Our top requested solution tailored to ${params.businessName} clients.` : `Nuestra solución más solicitada y reconocida en ${params.businessName}.`,
+        tag: isEn ? 'Flagship' : 'Servicio Principal'
+      },
+      {
+        name: isEn ? 'Personalized Consultation' : 'Atención Personalizada & Cotizaciones',
+        description: isEn ? 'Fast, clear estimates with direct guidance tailored to your project.' : 'Presupuestos claros y asesoría directa adaptada exactamente a lo que necesitas.',
+        tag: isEn ? 'Consultation' : 'Atención Personalizada'
+      },
+      {
+        name: isEn ? 'Comprehensive Project Execution' : 'Garantía & Soporte Posventa',
+        description: isEn ? 'End-to-end dedicated service ensuring complete customer satisfaction.' : 'Acompañamiento paso a paso garantizando máxima calidad y satisfacción total.',
+        tag: isEn ? 'Guarantee' : 'Calidad Garantizada'
+      },
+      {
+        name: isEn ? 'Priority Booking & Fast Response' : 'Atención Prioritaria por WhatsApp',
+        description: isEn ? 'Immediate answers and direct scheduling via our official line.' : 'Canal directo para resolver tus dudas de inmediato y agendar tu atención.',
+        tag: isEn ? 'Direct Line' : 'Contacto Directo'
+      }
+    ]
+  };
+}
+
 function buildFallbackBlueprint(params: {
   mode: 'create' | 'audit';
   businessName: string;
@@ -229,65 +711,30 @@ function buildFallbackBlueprint(params: {
   const isSAB = businessModel === 'service_area';
   const locationTag = neighborhood ? `${neighborhood}, ${city}` : city;
 
-  // Determine category taxonomy
-  let primaryCategory = 'Restaurante';
-  let secondaryCategories = ['Restaurante familiar', 'Bar y parrilla', 'Comida para llevar', 'Entrega a domicilio', 'Restaurante para almorzar'];
-  let defaultSpecialties = specialties || 'Platos gourmet, parrilla y cócteles de autor';
+  // Semantic category and catalog detection
+  const taxonomy = detectTaxonomyAndContent({
+    category,
+    specialties,
+    businessName,
+    isEn,
+    locationTag,
+    phone,
+    city,
+    neighborhood,
+  });
 
-  if (category.toLowerCase().includes('médic') || category.toLowerCase().includes('salud') || category.toLowerCase().includes('odontol') || category.toLowerCase().includes('estétic')) {
-    primaryCategory = isEn ? 'Medical Clinic' : 'Clínica médica';
-    secondaryCategories = isEn
-      ? ['Doctor', 'Medical Center', 'Specialized Clinic', 'Health Consultant', 'Family Practice Physician']
-      : ['Centro médico', 'Médico especialista', 'Consultorio médico', 'Centro de salud y bienestar', 'Clínica especializada'];
-  } else if (category.toLowerCase().includes('auto') || category.toLowerCase().includes('taller') || category.toLowerCase().includes('mecánic')) {
-    primaryCategory = isEn ? 'Auto Repair Shop' : 'Taller mecánico';
-    secondaryCategories = isEn
-      ? ['Brake Shop', 'Oil Change Service', 'Car Inspection Station', 'Mechanic', 'Auto Electrical Service']
-      : ['Taller de automóviles', 'Servicio de cambio de aceite', 'Taller de frenos', 'Mecánico', 'Diagnóstico automotriz'];
-  } else if (category.toLowerCase().includes('belleza') || category.toLowerCase().includes('peluquer') || category.toLowerCase().includes('barber')) {
-    primaryCategory = isEn ? 'Beauty Salon' : 'Salón de belleza';
-    secondaryCategories = isEn
-      ? ['Hair Salon', 'Barber Shop', 'Nail Salon', 'Spa', 'Cosmetics Store']
-      : ['Peluquería', 'Barbería', 'Salón de manicura', 'Centro de estética', 'Spa y bienestar'];
-  } else if (category.toLowerCase().includes('retail') || category.toLowerCase().includes('tienda') || category.toLowerCase().includes('comercio')) {
-    primaryCategory = isEn ? 'Store' : 'Tienda de artículos generales';
-    secondaryCategories = isEn
-      ? ['Shopping Mall', 'Boutique', 'Gift Shop', 'Discount Store', 'Specialty Store']
-      : ['Boutique', 'Tienda especializada', 'Comercio local', 'Tienda de regalos', 'Centro de compras'];
-  } else if (category.toLowerCase().includes('b2b') || category.toLowerCase().includes('profesional') || category.toLowerCase().includes('legal')) {
-    primaryCategory = isEn ? 'Consulting Agency' : 'Consultoría y Servicios Profesionales';
-    secondaryCategories = isEn
-      ? ['Business Management Consultant', 'Corporate Office', 'Legal Services', 'Marketing Agency', 'Financial Consultant']
-      : ['Oficina de consultoría', 'Asesoría empresarial', 'Servicios legales y corporativos', 'Consultor financiero', 'Agencia de servicios'];
-  }
+  const primaryCategory = taxonomy.primaryCategory;
+  const secondaryCategories = taxonomy.secondaryCategories;
+  const serviceCatalog = taxonomy.catalog;
+
+  const rawSpecialties = specialties.trim() || (isEn ? 'signature specialties and top-tier services' : 'platos y especialidades gastronómicas selectas');
 
   const optimizedTitle = `${businessName} | ${primaryCategory} en ${locationTag}`;
-  const commercialDescription = isEn
-    ? `Welcome to ${businessName}, your premier destination for ${primaryCategory.toLowerCase()} in ${locationTag}. We pride ourselves on delivering outstanding quality, friendly service, and exceptional value. Specializing in ${defaultSpecialties}. Conveniently located in ${city} with easy access and dedicated customer attention. Visit us today or contact us via WhatsApp at ${phone || 'our direct line'} for bookings, menus, and personalized inquiries.`
-    : `Bienvenido a ${businessName}, el referente líder en ${primaryCategory.toLowerCase()} en ${locationTag}. Nos distinguimos por ofrecer la más alta calidad, atención cálida y una experiencia memorable para nuestros clientes. Especialistas en ${defaultSpecialties}. Ubicados estratégicamente en ${city} con cómodas instalaciones y servicio preferencial. ¡Visítanos hoy mismo o contáctanos por WhatsApp al ${phone || 'nuestra línea directa'} para reservas y consultas!`;
 
-  const serviceCatalog = [
-    {
-      name: isEn ? 'Signature Service / Flagship Product' : 'Servicio Estrella / Producto Insignia',
-      description: isEn ? `Our most requested specialty at ${businessName} crafted with premium standards.` : `Nuestra especialidad más aclamada en ${businessName} elaborada con los más altos estándares.`,
-      tag: primaryCategory,
-    },
-    {
-      name: isEn ? 'Express VIP Experience' : 'Experiencia VIP / Atención Personalizada',
-      description: isEn ? 'Dedicated assistance designed for clients seeking priority and top-tier service.' : 'Atención prioritaria y dedicada para clientes que buscan rapidez y máxima excelencia.',
-      tag: 'Especial',
-    },
-    {
-      name: isEn ? 'Corporate / Group Booking' : 'Planes para Grupos & Celebraciones',
-      description: isEn ? 'Tailored packages for corporate meetings, families, and special occasions.' : 'Paquetes adaptados para reuniones de trabajo, familias y ocasiones especiales.',
-      tag: 'Grupos',
-    },
-    {
-      name: isEn ? 'Complimentary Consultation / Tasting' : 'Asesoría / Degustación de Cortesía',
-      description: isEn ? 'Discover why we are rated among the best options in the area.' : 'Descubre por qué somos una de las opciones mejor valoradas de toda la zona.',
-      tag: 'Bienvenida',
-    },
-  ];
+  // Rich, high-impact commercial description (640-730 characters, Google GBP max: 750)
+  const commercialDescription = isEn
+    ? `Welcome to ${businessName}, the premier destination in ${locationTag} for authentic ${rawSpecialties}. We take pride in delivering outstanding quality, welcoming hospitality, and a memorable experience for every customer. Prepared with fresh, premium ingredients and time-honored techniques, our offerings stand out for flavor and craftsmanship. Whether you are looking for dine-in comfort, convenient takeaway, or prompt local delivery across ${city}, our dedicated team is at your service from Monday through Sunday. Visit us today in ${locationTag} or write directly via WhatsApp to ${phone || 'our customer care line'} for reservations, catering, and orders!`
+    : `Bienvenido a ${businessName}, el referente gastronómico en ${locationTag} especializado en auténticas ${rawSpecialties}. Nos apasiona ofrecer la más alta calidad culinaria, servicio cálido y una experiencia memorable para compartir en familia o con amigos. Preparamos cada receta con ingredientes frescos seleccionados y técnicas tradicionales que garantizan el mejor sabor en cada plato. Contamos con cómodas instalaciones para consumo en el local, pedidos para llevar y servicio a domicilio rápido en ${neighborhood ? neighborhood + ' y zonas aledañas en ' : ''}${city}. ¡Visítanos hoy mismo en ${locationTag} o contáctanos por WhatsApp al ${phone || 'nuestro número de atención'} para reservas y pedidos!`;
 
   const photoChecklist = [
     {
@@ -427,13 +874,15 @@ function buildFallbackBlueprint(params: {
       : `"¡Ha sido un placer atenderte hoy! ¿Me ayudarías acercando tu teléfono a esta tarjeta para calificar nuestro servicio en Google? Como profesional independiente, tu recomendación me ayuda muchísimo."`,
   };
 
-  const targetTop3Reviews = Math.max(120, (existingReviews || 0) + 80);
-  const neededReviews = Math.max(0, targetTop3Reviews - (existingReviews || 0));
+  const isCreate = mode === 'create';
+  const effectiveReviews = isCreate ? 0 : (existingReviews || 0);
+  const targetTop3Reviews = isCreate ? 100 : Math.max(120, effectiveReviews + 80);
+  const neededReviews = Math.max(0, targetTop3Reviews - effectiveReviews);
   const reviewsPerWeek = 8;
-  const weeksToTop3 = Math.ceil(neededReviews / reviewsPerWeek) || 10;
+  const weeksToTop3 = Math.ceil(neededReviews / reviewsPerWeek) || (isCreate ? 13 : 10);
 
   const reviewVelocityPlan = {
-    currentReviews: existingReviews || 0,
+    currentReviews: effectiveReviews,
     targetTop3Reviews,
     neededReviews,
     reviewsPerWeek,
@@ -446,8 +895,8 @@ function buildFallbackBlueprint(params: {
       type: isEn ? 'Star Offering' : 'Servicio Estrella',
       title: isEn ? `Looking for top-tier ${primaryCategory} in ${city}?` : `¿Buscando el mejor servicio de ${primaryCategory} en ${city}?`,
       body: isEn
-        ? `At ${businessName}, we specialize in ${defaultSpecialties}. Verified experience, prompt attention, and unmatched quality. Message us today!`
-        : `En ${businessName} te garantizamos la mejor atención en ${defaultSpecialties}. Calidad certificada y puntualidad. ¡Escríbenos hoy mismo!`,
+        ? `At ${businessName}, we specialize in ${rawSpecialties}. Verified experience, prompt attention, and unmatched quality. Message us today!`
+        : `En ${businessName} te garantizamos la mejor atención en ${rawSpecialties}. Calidad certificada y puntualidad. ¡Escríbenos hoy mismo!`,
       callToAction: isEn ? 'Contact Us / Call Now' : 'Contactar / Llamar Ahora',
     },
     {
@@ -505,47 +954,46 @@ function buildFallbackBlueprint(params: {
     monthlyPostsBooster,
     ...(mode === 'audit'
       ? {
-          healthScore: 56,
+          healthScore: 54,
           criticalGaps: [
-            isEn ? 'Missing 5 critical secondary categories in Google Maps' : 'Faltan 5 subcategorías secundarias obligatorias en Google Maps',
-            isEn ? 'Commercial description is short and lacks local high-intent keywords' : 'Descripción corta y sin palabras clave de compra local',
-            isEn ? 'Zero cataloged products or services in Google profile tabs' : 'Cero productos o servicios cargados en las pestañas oficiales',
-            isEn ? 'Over 65% of reviews remain unanswered without official response' : 'Más del 65% de reseñas no tienen respuesta oficial de gerencia',
-            isEn ? 'Low photo volume compared to local Top 3 competitors' : 'Volumen de fotos insuficiente frente a los 3 líderes de la zona',
+            isEn ? 'Incomplete Google secondary categories capping search reach.' : 'Falta de subcategorías secundarias oficiales en Google Maps limitando alcance.',
+            isEn ? 'Under-optimized description lacking core local transaction keywords.' : 'Descripción desaprovechada sin palabras clave locales de alta conversión.',
+            isEn ? 'Review velocity below regional Top 3 competitors.' : 'Velocidad de reseñas semanales por debajo del promedio del Top 3 de la zona.',
+            isEn ? 'Absence of geotagged weekly Google Posts.' : 'Sin publicaciones semanales activas con llamadas a la acción directas.',
           ],
           topCompetitorInsights: isEn
-            ? `The top 3 leaders in ${city} average 4.7★ with 410+ reviews and 120+ photos. They leverage 6 secondary categories that capture 70% of nearby searches. Applying our Prestigia upgrade roadmap closes this gap within 90 days.`
-            : `Los 3 líderes del sector en ${city} promedian 4.7★ con 410+ opiniones y más de 120 fotos. Utilizan 6 subcategorías secundarias que acaparan el 70% de las búsquedas en la zona. Aplicando la hoja de ruta Prestigia cerramos esta brecha en 90 días.`,
+            ? `Leading competitors in ${city} capture 65% of organic calls by maintaining 8+ fresh reviews monthly and optimized category tags.`
+            : `Los líderes del Top 3 en ${city} capturan el 65% de llamadas y visitas manteniendo al menos 8 reseñas frescas mensuales y categorías exhaustivas.`,
           actionRoadmap: [
             {
               step: 1,
-              title: isEn ? 'Category Taxonomy Injection' : 'Inyección de Categorías Secundarias',
+              title: isEn ? 'Update GBP Primary & Secondary Categories' : 'Actualizar Categoría Primaria y 5 Secundarias Oficiales',
               impact: 'CRÍTICO',
-              action: isEn ? `Add the 5 secondary categories identified above immediately in Google Business Profile.` : `Agregar de inmediato las 5 subcategorías identificadas arriba en el panel de Google.`,
+              action: isEn ? 'Add exact Google categories to trigger algorithmic relevance.' : 'Configurar de inmediato las categorías sugeridas en el panel de Google.',
             },
             {
               step: 2,
-              title: isEn ? 'Keyword-Optimized Description' : 'Actualización de Descripción Comercial',
+              title: isEn ? 'Inject High-Intent Commercial Description' : 'Cargar la Nueva Descripción de Alto Impacto',
               impact: 'ALTO',
-              action: isEn ? 'Replace existing description with the 745-character SEO copy generated above.' : 'Reemplazar la descripción actual por el texto comercial de 745 caracteres con palabras clave.',
+              action: isEn ? 'Paste the 700-character copy with direct WhatsApp CTA.' : 'Copiar y pegar el texto optimizado en la ficha de Google Business.',
             },
             {
               step: 3,
-              title: isEn ? 'Service Catalog Setup' : 'Carga de Catálogo de Servicios',
+              title: isEn ? 'Deploy On-Site NFC Pocket Review Cards' : 'Activar Protocolo de Reseñas NFC & WhatsApp',
               impact: 'ALTO',
-              action: isEn ? 'Publish the 4 structured offerings in Google Products/Services tab.' : 'Publicar los 4 servicios/productos estructurados en la pestaña de Productos de Google.',
+              action: isEn ? 'Target minimum 8 fresh reviews weekly.' : 'Capturar al menos 8 reseñas 5★ por semana para activar el algoritmo de frescura.',
             },
             {
               step: 4,
-              title: isEn ? 'Q&A Preventive Seeding' : 'Publicación de Preguntas Frecuentes (Q&A)',
+              title: isEn ? 'Upload Geotagged Photo Batch' : 'Subir Lote de Fotos con Nombres SEO',
               impact: 'MEDIO',
-              action: isEn ? 'Post the 5 preventive Q&As to boost algorithmic search indexation.' : 'Publicar las 5 preguntas y respuestas oficiales para que Google indexe más términos de búsqueda.',
+              action: isEn ? 'Publish facade, product, and staff photos.' : 'Cargar las fotos del checklist con nombres de archivo optimizados.',
             },
             {
               step: 5,
-              title: isEn ? 'Prestigia 5★ Review Acceleration' : 'Activación del Blindaje Prestigia en Mesa',
-              impact: 'CRÍTICO',
-              action: isEn ? 'Deploy table QR codes to filter complaints privately and capture +40 fresh 5★ reviews/mo.' : 'Desplegar el código QR en mesa para contener quejas en privado y capturar +40 reseñas 5★ al mes.',
+              title: isEn ? 'Schedule Weekly Google Business Posts' : 'Publicar 1 Novedad Semanal en Google',
+              impact: 'MEDIO',
+              action: isEn ? 'Keep listing fresh and active in Google feed.' : 'Publicar semanalmente los posts generados con botón de contacto.',
             },
           ],
         }

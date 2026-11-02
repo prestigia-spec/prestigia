@@ -951,7 +951,7 @@ export default function LocalStudioPage() {
   const [phone, setPhone] = useState('');
   const [googleUrl, setGoogleUrl] = useState('');
   const [existingRating, setExistingRating] = useState<number>(4.2);
-  const [existingReviews, setExistingReviews] = useState<number>(38);
+  const [existingReviews, setExistingReviews] = useState<number>(0);
   const [lang, setLang] = useState<'es' | 'en'>('es');
   const [businessModel, setBusinessModel] = useState<'storefront' | 'service_area'>('storefront');
   const [serviceAreas, setServiceAreas] = useState('');
@@ -1230,8 +1230,8 @@ export default function LocalStudioPage() {
         specialties: specialties.trim(),
         phone: phone.trim() || currentUser?.phone || '',
         googleUrl: googleUrl.trim(),
-        existingRating,
-        existingReviews,
+        existingRating: targetMode === 'create' ? 5.0 : (Number(existingRating) || 4.5),
+        existingReviews: targetMode === 'create' ? 0 : (Number(existingReviews) || 0),
         lang,
         businessModel,
         serviceAreas: serviceAreas.trim(),
@@ -2701,7 +2701,9 @@ export default function LocalStudioPage() {
                               {lang === 'en' ? 'Current Reviews' : 'Reseñas Actuales'}
                             </span>
                             <strong className="text-base font-black text-white">
-                              {generatedData.reviewVelocityPlan.currentReviews} ★
+                              {generatedData.reviewVelocityPlan.currentReviews === 0
+                                ? (isEn ? '0 ★ (New Listing)' : '0 ★ (Ficha Nueva)')
+                                : `${generatedData.reviewVelocityPlan.currentReviews} ★`}
                             </strong>
                           </div>
 
