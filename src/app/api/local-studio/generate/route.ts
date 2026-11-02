@@ -70,12 +70,12 @@ BUSINESS SPECIFICATIONS:
 - Official Phone / WhatsApp: "${cleanPhone || 'Direct line'}"
 - Existing Rating & Reviews (if audit): ${existingRating}★ (${existingReviews} reviews)
 
-CRITICAL QUALITY RULES:
-1. "primaryCategory": The exact official Google Business Profile primary category (highest search intent).
-2. "secondaryCategories": Exactly 5 to 7 official Google secondary categories to capture long-tail and alternative searches.
-3. "optimizedTitle": Strategic title following formula: "[Brand Name] | [Core Specialty] [City/Area]".
-4. "commercialDescription": High-converting text between 680 and 745 characters (Google limit: 750). Contains top 8 purchase intent keywords and direct call to action.
-5. "serviceCatalog": Array of 4 to 6 structured star services/products with commercial name, 15-word benefit description, and category tag.
+CRITICAL QUALITY RULES (FACTUAL & RELEVANT - NO INVENTED INFO - NO FILLER):
+1. "primaryCategory": The exact official Google Business Profile primary category matching the business and specialties.
+2. "secondaryCategories": Exactly 4 to 5 official Google secondary categories strictly relevant to the business. NEVER include unrelated categories (e.g. do NOT include 'Bar and grill' for a pasta restaurant).
+3. "optimizedTitle": Strategic title following formula: "[Brand Name] | [Core Category/Specialty] en [City/Area]".
+4. "commercialDescription": Factual, clear, professional overview describing the business, exact specialties provided, service formats (dine-in, takeout, delivery), and direct WhatsApp contact. ABSOLUTELY NO generic marketing fluff, NO pompous claims (e.g. do not invent 'referente', 'el mejor', 'apasionados'), NO unverified assumptions (e.g. do NOT invent wine, valet parking, or services not specified).
+5. "serviceCatalog": Array derived STRICTLY from the user's provided specialties/products. DO NOT invent fictitious products or services.
 6. "photoChecklist": Array of 5 required photo types with geotagged SEO recommended filenames. ${isSAB ? 'For independents/SAB: Focus on professional equipment, tools, work vehicle, laptop/workspace, and smiling specialist.' : 'For storefronts: Focus on facade, illuminated sign, interior, star dishes/products, and team.'}
 7. "preventiveFaqs": Exactly 5 strategic Q&As addressing common customer objections.
 8. "verificationGuide": Foolproof 60-90 second continuous video verification guide. ${isSAB ? 'CRITICAL FOR INDEPENDENTS/SAB: Google does NOT accept an empty house. Must detail Take 1 (Professional tools, branded materials, active work equipment), Take 2 (Official tax/business registration matching address privately, utility bill, physical business cards), Take 3 (Branded work vehicle with tools or dedicated workspace).' : 'For storefronts: Take 1 (Street sign and exterior facade), Take 2 (Unlocking front door with keys), Take 3 (Cash register, POS terminal, POS software).'}
@@ -197,20 +197,16 @@ RETURN ONLY A VALID JSON OBJECT WITH THIS STRUCTURE (NO MARKDOWN WRAPPERS, NO EX
   }
 }
 
-function detectTaxonomyAndContent(params: {
+function detectTaxonomy(params: {
   category: string;
   specialties: string;
   businessName: string;
   isEn: boolean;
-  locationTag: string;
-  phone: string;
-  city: string;
-  neighborhood: string;
 }) {
   const combined = `${params.category} ${params.specialties} ${params.businessName}`.toLowerCase();
   const isEn = params.isEn;
 
-  // 1. GASTRONOMÍA / RESTAURANTES
+  // 1. GASTRONOMÍA
   if (
     combined.includes('restauran') ||
     combined.includes('gastro') ||
@@ -242,30 +238,8 @@ function detectTaxonomyAndContent(params: {
       return {
         primaryCategory: isEn ? 'Italian Restaurant' : 'Restaurante italiano',
         secondaryCategories: isEn
-          ? ['Pasta Shop', 'Pizza Restaurant', 'Mediterranean Restaurant', 'Takeout Restaurant', 'Meal Delivery']
-          : ['Restaurante de pastas', 'Pizzería', 'Restaurante mediterráneo', 'Comida para llevar', 'Entrega a domicilio'],
-        catalog: [
-          {
-            name: isEn ? 'Artisanal Fresh Pasta' : 'Pastas Frescas Artesanales',
-            description: isEn ? 'Handmade al dente pasta served with rich traditional Italian sauces.' : 'Elaboradas al momento con recetas tradicionales italianas y salsas frescas.',
-            tag: isEn ? 'Italian Restaurant' : 'Restaurante italiano'
-          },
-          {
-            name: isEn ? 'Oven-Baked Lasagna' : 'Lasañas Especiales al Horno',
-            description: isEn ? 'Generous layers of slow-baked lasagna topped with melted golden cheese.' : 'Capas generosas de pasta artesanal horneadas con queso gratinado y recetas exclusivas.',
-            tag: isEn ? 'Signature Dish' : 'Especialidad de la Casa'
-          },
-          {
-            name: isEn ? 'Mediterranean Antipasti & Wine' : 'Antipastos & Selección de Vinos',
-            description: isEn ? 'Curated starters, fresh salads, and beverage pairings for your table.' : 'Entradas mediterráneas, ensaladas frescas y maridaje perfecto para tu velada.',
-            tag: isEn ? 'Starters' : 'Entradas & Bebidas'
-          },
-          {
-            name: isEn ? 'Executive Lunch & Family Dinners' : 'Menú Ejecutivo & Cenas Familiares',
-            description: isEn ? 'Special combinations designed for daily lunch or cozy evening celebrations.' : 'Combinaciones completas ideales para almuerzos entre semana o cenas especiales.',
-            tag: isEn ? 'Menus' : 'Planes & Grupos'
-          }
-        ]
+          ? ['Pasta Shop', 'Takeout Restaurant', 'Meal Delivery', 'Family Style Restaurant', 'Lunch Restaurant']
+          : ['Restaurante de pastas', 'Comida para llevar', 'Entrega a domicilio', 'Restaurante familiar', 'Restaurante para almorzar'],
       };
     }
 
@@ -274,30 +248,8 @@ function detectTaxonomyAndContent(params: {
       return {
         primaryCategory: isEn ? 'Pizza Restaurant' : 'Pizzería',
         secondaryCategories: isEn
-          ? ['Italian Restaurant', 'Fast Food Restaurant', 'Takeout Restaurant', 'Meal Delivery', 'Family Style Restaurant']
-          : ['Restaurante italiano', 'Comida rápida', 'Comida para llevar', 'Entrega a domicilio', 'Restaurante familiar'],
-        catalog: [
-          {
-            name: isEn ? 'Artisanal Crust Pizzas' : 'Pizzas Artesanales a la Piedra',
-            description: isEn ? 'Crispy, stone-baked thin crust pizza with premium toppings and real mozzarella.' : 'Masa madurada horneada a la piedra con queso mozzarella seleccionado e ingredientes frescos.',
-            tag: isEn ? 'Pizza Restaurant' : 'Pizzería'
-          },
-          {
-            name: isEn ? 'Stuffed Crust & Specialty Pizzas' : 'Pizzas Especiales & Bordes Rellenos',
-            description: isEn ? 'Signature chef recipes with stuffed cheese crust and premium toppings.' : 'Recetas de la casa con bordes de queso derretido y combinaciones gourmet exclusivas.',
-            tag: isEn ? 'Signature' : 'Especialidades'
-          },
-          {
-            name: isEn ? 'Combos & Family Packs' : 'Combos Familiares & Bebidas',
-            description: isEn ? 'Great value party combos including large pizzas, sides, and refreshing drinks.' : 'Paquetes completos con pizzas grandes, acompañamientos y bebidas para compartir.',
-            tag: isEn ? 'Combos' : 'Combos & Promociones'
-          },
-          {
-            name: isEn ? 'Express Home Delivery' : 'Servicio a Domicilio Express',
-            description: isEn ? 'Hot, fresh pizza delivered right to your doorstep in minutes.' : 'Entrega rápida a domicilio garantizando temperatura perfecta y empaque sellado.',
-            tag: isEn ? 'Delivery' : 'Domicilios'
-          }
-        ]
+          ? ['Takeout Restaurant', 'Meal Delivery', 'Italian Restaurant', 'Fast Food Restaurant', 'Family Style Restaurant']
+          : ['Comida para llevar', 'Entrega a domicilio', 'Restaurante italiano', 'Comida rápida', 'Restaurante familiar'],
       };
     }
 
@@ -306,157 +258,47 @@ function detectTaxonomyAndContent(params: {
       return {
         primaryCategory: isEn ? 'Steak House' : 'Restaurante de carnes',
         secondaryCategories: isEn
-          ? ['Bar & Grill', 'Barbecue Restaurant', 'Family Style Restaurant', 'Takeout Restaurant', 'Catering Food Service']
-          : ['Parrilla', 'Restaurante de barbacoa', 'Restaurante familiar', 'Bar y parrilla', 'Asador'],
-        catalog: [
-          {
-            name: isEn ? 'Prime Cut Steaks' : 'Cortes de Carne Madurados',
-            description: isEn ? 'Selected prime cuts grilled to perfection over natural charcoal.' : 'Cortes premium asados al carbón con el término exacto de cocción y sazón artesanal.',
-            tag: isEn ? 'Steak House' : 'Carnes & Parrilla'
-          },
-          {
-            name: isEn ? 'Mixed Charcoal Platter' : 'Parrilladas Mixtas para Compartir',
-            description: isEn ? 'Generous platters with assorted beef, pork, artisan chorizo, and sides.' : 'Generosa combinación de cortes de res, cerdo, chorizos artesanales y guarniciones.',
-            tag: isEn ? 'Platters' : 'Para Compartir'
-          },
-          {
-            name: isEn ? 'Signature Burgers & Ribs' : 'Costillas BBQ & Hamburguesas a la Brasa',
-            description: isEn ? 'Fall-off-the-bone smoked ribs and artisanal flame-grilled burgers.' : 'Costillas tiernas bañadas en salsa BBQ de la casa y hamburguesas con carne madurada.',
-            tag: isEn ? 'Favorites' : 'Especiales'
-          },
-          {
-            name: isEn ? 'Celebrations & Group Events' : 'Eventos Especiales & Reservas',
-            description: isEn ? 'Spacious reservations and special meat menus for birthday and corporate events.' : 'Atención preferencial y menús diseñados para cumpleaños y almuerzos empresariales.',
-            tag: isEn ? 'Events' : 'Eventos'
-          }
-        ]
+          ? ['Barbecue Restaurant', 'Grill', 'Family Style Restaurant', 'Takeout Restaurant', 'Meal Delivery']
+          : ['Parrilla', 'Restaurante de barbacoa', 'Restaurante familiar', 'Comida para llevar', 'Entrega a domicilio'],
       };
     }
 
-    // 1D. Hamburguesas / Fast Food
+    // 1D. Hamburguesas / Comida Rápida
     if (combined.includes('hamburgues') || combined.includes('burger')) {
       return {
         primaryCategory: isEn ? 'Hamburger Restaurant' : 'Restaurante de hamburguesas',
         secondaryCategories: isEn
           ? ['Fast Food Restaurant', 'American Restaurant', 'Takeout Restaurant', 'Meal Delivery', 'Family Style Restaurant']
           : ['Comida rápida', 'Restaurante de comida americana', 'Comida para llevar', 'Entrega a domicilio', 'Restaurante familiar'],
-        catalog: [
-          {
-            name: isEn ? 'Artisanal Brioche Burgers' : 'Hamburguesas Artesanales en Pan Brioche',
-            description: isEn ? '100% premium beef smashed or grilled with double melted cheese.' : 'Carne 100% de res a la parrilla con doble queso fundido y pan brioche horneado a diario.',
-            tag: isEn ? 'Burgers' : 'Hamburguesas'
-          },
-          {
-            name: isEn ? 'Loaded Crispy Fries' : 'Papas Rústicas Cargadas',
-            description: isEn ? 'Golden crispy fries topped with cheddar sauce, crispy bacon, and jalapeños.' : 'Papas crujientes con salsa de queso cheddar fundido, tocineta crocante y aderezos.',
-            tag: isEn ? 'Sides' : 'Acompañamientos'
-          },
-          {
-            name: isEn ? 'Thick Shakes & Beverages' : 'Malteadas Artesanales & Bebidas',
-            description: isEn ? 'Creamy handcrafted milkshakes and refreshing drinks.' : 'Malteadas cremosas de sabores clásicos y bebidas frías para acompañar tu combo.',
-            tag: isEn ? 'Drinks' : 'Bebidas'
-          },
-          {
-            name: isEn ? 'Express Fast Delivery' : 'Envíos Rápidos a Domicilio',
-            description: isEn ? 'Fast, hot packaging delivery to enjoy at home or office.' : 'Empaque térmico especial para que tus hamburguesas lleguen calientes y crocantes.',
-            tag: isEn ? 'Delivery' : 'Domicilios'
-          }
-        ]
       };
     }
 
-    // 1E. Café / Pastelería
+    // 1E. Café / Cafetería / Panadería
     if (combined.includes('cafe') || combined.includes('café') || combined.includes('coffee') || combined.includes('panader') || combined.includes('pasteler')) {
       return {
         primaryCategory: isEn ? 'Coffee Shop' : 'Cafetería',
         secondaryCategories: isEn
-          ? ['Bakery', 'Breakfast Restaurant', 'Espresso Bar', 'Brunch Restaurant', 'Pastry Shop']
-          : ['Pastelería', 'Panadería', 'Café de especialidad', 'Restaurante de desayunos', 'Brunch'],
-        catalog: [
-          {
-            name: isEn ? 'Specialty Origin Coffee' : 'Café de Especialidad de Origen',
-            description: isEn ? 'Freshly ground local origin beans prepared with precision espresso methods.' : 'Granos de origen seleccionados preparados en espresso, filtrados y métodos artesanales.',
-            tag: isEn ? 'Coffee' : 'Cafetería'
-          },
-          {
-            name: isEn ? 'Fresh Baked Pastries' : 'Panadería & Repostería del Día',
-            description: isEn ? 'Daily fresh croissants, artisan pastries, cakes, and sweet treats.' : 'Croissants de mantequilla, panes artesanales recién salidos del horno y tortas de la casa.',
-            tag: isEn ? 'Bakery' : 'Panadería'
-          },
-          {
-            name: isEn ? 'All-Day Breakfast & Brunch' : 'Desayunos Sorpresa & Brunch',
-            description: isEn ? 'Hearty brunch plates with fresh eggs, artisan sourdough, and fresh fruits.' : 'Opciones completas de desayuno con huevos al gusto, tostadas y jugos naturales.',
-            tag: isEn ? 'Brunch' : 'Desayunos & Brunch'
-          },
-          {
-            name: isEn ? 'Cozy Atmosphere & Meetings' : 'Espacio Cómodo & Wi-Fi de Alta Velocidad',
-            description: isEn ? 'Relaxing atmosphere with comfortable seating and fast connection for work or study.' : 'Ambiente tranquilo con buena iluminación y tomas eléctricas ideal para trabajar o charlar.',
-            tag: isEn ? 'Space' : 'Experiencia'
-          }
-        ]
+          ? ['Bakery', 'Breakfast Restaurant', 'Espresso Bar', 'Takeout Restaurant', 'Pastry Shop']
+          : ['Pastelería', 'Panadería', 'Café de especialidad', 'Restaurante de desayunos', 'Comida para llevar'],
       };
     }
 
-    // 1F. Sushi / Asiático
+    // 1F. Sushi / Japonés
     if (combined.includes('sushi') || combined.includes('japon') || combined.includes('asiat') || combined.includes('ramen') || combined.includes('wok')) {
       return {
         primaryCategory: isEn ? 'Japanese Restaurant' : 'Restaurante japonés',
         secondaryCategories: isEn
-          ? ['Sushi Restaurant', 'Asian Restaurant', 'Ramen Restaurant', 'Takeout Restaurant', 'Meal Delivery']
+          ? ['Sushi Restaurant', 'Asian Restaurant', 'Takeout Restaurant', 'Meal Delivery', 'Ramen Restaurant']
           : ['Restaurante de sushi', 'Restaurante asiático', 'Comida para llevar', 'Entrega a domicilio', 'Restaurante de ramen'],
-        catalog: [
-          {
-            name: isEn ? 'Signature Sushi Rolls' : 'Rollos de Sushi Especiales',
-            description: isEn ? 'Fresh salmon, tuna, avocado, and tempura rolls crafted with precision.' : 'Rollos preparados con salmón fresco, atún, aguacate y técnicas de alta cocina japonesa.',
-            tag: isEn ? 'Sushi' : 'Sushi Especial'
-          },
-          {
-            name: isEn ? 'Wok & Traditional Ramen' : 'Platos Wok & Ramen Tradicional',
-            description: isEn ? 'Rich broths, artisanal noodles, wok stir-fries, and fragrant gyozas.' : 'Caldos lentos con fideos artesanales, salteados al wok y gyozas crocantes.',
-            tag: isEn ? 'Hot Dishes' : 'Platos Calientes'
-          },
-          {
-            name: isEn ? 'Sushi Boats & Party Platters' : 'Barcos & Bandejas para Compartir',
-            description: isEn ? 'Large sushi selections presented for celebrations and group dining.' : 'Bandejas y barcos variados con 30 a 50 bocados para celebraciones especiales.',
-            tag: isEn ? 'Platters' : 'Para Compartir'
-          },
-          {
-            name: isEn ? 'Protected Delivery Packs' : 'Empaques Seguros para Domicilios',
-            description: isEn ? 'Temperature-controlled containers ensuring fresh sushi right to your table.' : 'Empaque hermético que preserva la frescura, salsa de soya y palillos incluidos.',
-            tag: isEn ? 'Delivery' : 'Domicilios'
-          }
-        ]
       };
     }
 
-    // 1G. Restaurante General (Sin bar y parrilla arbitrario)
+    // 1G. Restaurante General (Sin categorías no solicitadas)
     return {
       primaryCategory: isEn ? 'Restaurant' : 'Restaurante',
       secondaryCategories: isEn
         ? ['Family Style Restaurant', 'Lunch Restaurant', 'Takeout Restaurant', 'Meal Delivery', 'Local Cuisine Restaurant']
         : ['Restaurante familiar', 'Restaurante para almorzar', 'Comida para llevar', 'Entrega a domicilio', 'Restaurante de cocina local'],
-      catalog: [
-        {
-          name: isEn ? 'Signature Chef Specialties' : 'Platos de Autor & Especialidad de la Casa',
-          description: isEn ? 'Our most celebrated recipes crafted with seasonal fresh ingredients.' : 'Recetas insignia elaboradas a diario con los más frescos ingredientes locales.',
-          tag: isEn ? 'Specialties' : 'Especialidades'
-        },
-        {
-          name: isEn ? 'Daily Executive Lunch' : 'Almuerzos Ejecutivos Completos',
-          description: isEn ? 'Balanced daily menus with entrée, main dish, beverage, and dessert.' : 'Menú balanceado con entrada, plato fuerte, bebida y postre con atención rápida.',
-          tag: isEn ? 'Daily Menu' : 'Menú del Día'
-        },
-        {
-          name: isEn ? 'Family & Group Gatherings' : 'Atención para Familias & Grupos',
-          description: isEn ? 'Comfortable dining setups and reserved seating for friends and corporate meetings.' : 'Mesas amplias y atención personalizada para reuniones de trabajo o eventos familiares.',
-          tag: isEn ? 'Groups' : 'Grupos & Reservas'
-        },
-        {
-          name: isEn ? 'Fast Takeout & Home Delivery' : 'Servicio para Llevar & Domicilios',
-          description: isEn ? 'Easy phone or WhatsApp ordering with fast packaging and prompt local delivery.' : 'Pide con anticipación para recoger o solicita tu domicilio directo por WhatsApp.',
-          tag: isEn ? 'Service' : 'Domicilios & Para Llevar'
-        }
-      ]
     };
   }
 
@@ -466,30 +308,8 @@ function detectTaxonomyAndContent(params: {
       return {
         primaryCategory: isEn ? 'Dental Clinic' : 'Clínica dental',
         secondaryCategories: isEn
-          ? ['Dentist', 'Orthodontist', 'Cosmetic Dentist', 'Dental Implants Periodontist', 'Emergency Dental Service']
-          : ['Dentista', 'Ortodoncista', 'Clínica de periodoncia', 'Diseño de sonrisa', 'Servicio dental de urgencia'],
-        catalog: [
-          {
-            name: isEn ? 'Comprehensive Dental Checkup' : 'Valoración Odontológica Integral',
-            description: isEn ? 'Complete diagnostic exam with high-resolution digital imaging.' : 'Diagnóstico digital completo con radiografías y plan de tratamiento personalizado.',
-            tag: isEn ? 'Diagnosis' : 'Diagnóstico'
-          },
-          {
-            name: isEn ? 'Smile Design & Teeth Whitening' : 'Diseño de Sonrisa & Blanqueamiento',
-            description: isEn ? 'Minimally invasive cosmetic enhancements and professional whitening.' : 'Carillas de alta estética y blanqueamiento dental clínico seguro y duradero.',
-            tag: isEn ? 'Aesthetics' : 'Estética Dental'
-          },
-          {
-            name: isEn ? 'Modern Invisible Orthodontics' : 'Ortodoncia Invisible & Brackets',
-            description: isEn ? 'Clear aligners and advanced braces for comfortable teeth alignment.' : 'Alineadores invisibles y ortodoncia moderna para niños y adultos.',
-            tag: isEn ? 'Orthodontics' : 'Ortodoncia'
-          },
-          {
-            name: isEn ? 'Dental Implants & Rehabilitation' : 'Implantes Dentales & Rehabilitación Oral',
-            description: isEn ? 'Titanium biocompatible implants restoring full biting strength and aesthetics.' : 'Recuperación de piezas dentales con implantes de titanio biocompatibles y coronas cerámicas.',
-            tag: isEn ? 'Implants' : 'Implantes & Cirugía'
-          }
-        ]
+          ? ['Dentist', 'Orthodontist', 'Emergency Dental Service', 'Cosmetic Dentist', 'Dental Laboratory']
+          : ['Dentista', 'Ortodoncista', 'Servicio dental de urgencia', 'Centro odontológico', 'Clínica especializada'],
       };
     }
     return {
@@ -497,28 +317,6 @@ function detectTaxonomyAndContent(params: {
       secondaryCategories: isEn
         ? ['Doctor', 'Medical Center', 'Specialized Clinic', 'Health Consultant', 'Family Practice Physician']
         : ['Centro médico', 'Médico especialista', 'Consultorio médico', 'Centro de salud y bienestar', 'Clínica especializada'],
-      catalog: [
-        {
-          name: isEn ? 'Specialized Medical Consultation' : 'Consulta Médica Especializada',
-          description: isEn ? 'Personalized medical evaluation and diagnostics with certified doctors.' : 'Atención médica cercana y personalizada con especialistas certificados.',
-          tag: isEn ? 'Consultation' : 'Consulta Médica'
-        },
-        {
-          name: isEn ? 'Preventive Health Checkup' : 'Exámenes Preventivos & Chequeos',
-          description: isEn ? 'Comprehensive health screenings and lab reviews for optimal wellbeing.' : 'Evaluaciones completas para detección temprana y cuidado de tu salud.',
-          tag: isEn ? 'Prevention' : 'Prevención'
-        },
-        {
-          name: isEn ? 'Treatment & Chronic Care' : 'Tratamientos & Seguimiento Continuo',
-          description: isEn ? 'Tailored clinical therapies with regular digital health monitoring.' : 'Planes de tratamiento guiados con citas de control y soporte continuo.',
-          tag: isEn ? 'Therapy' : 'Tratamientos'
-        },
-        {
-          name: isEn ? 'Priority Telehealth & WhatsApp Care' : 'Atención Prioritaria & Canales Digitales',
-          description: isEn ? 'Direct appointment scheduling and medical guidance via WhatsApp.' : 'Agendamiento ágil de citas y atención preferencial sin largas esperas.',
-          tag: isEn ? 'Service' : 'Atención al Paciente'
-        }
-      ]
     };
   }
 
@@ -529,28 +327,6 @@ function detectTaxonomyAndContent(params: {
       secondaryCategories: isEn
         ? ['Brake Shop', 'Oil Change Service', 'Car Inspection Station', 'Mechanic', 'Auto Electrical Service']
         : ['Taller de automóviles', 'Servicio de cambio de aceite', 'Taller de frenos', 'Mecánico', 'Diagnóstico automotriz'],
-      catalog: [
-        {
-          name: isEn ? 'Computerized Vehicle Diagnostics' : 'Diagnóstico Computarizado & Escáner',
-          description: isEn ? 'High-tech scanner reading all engine, transmission, and sensor codes.' : 'Escaneo electrónico avanzado de motor, transmisión y sensores con reporte detallado.',
-          tag: isEn ? 'Diagnostics' : 'Diagnóstico'
-        },
-        {
-          name: isEn ? 'Brake & Suspension Overhaul' : 'Mantenimiento de Frenos & Suspensión',
-          description: isEn ? 'Pad replacement, rotor resurfacing, shocks, and precision alignment.' : 'Cambio de pastillas, rectificación de discos, amortiguadores y alineación 3D.',
-          tag: isEn ? 'Safety' : 'Frenos & Suspensión'
-        },
-        {
-          name: isEn ? 'Oil & Filter Preventive Service' : 'Cambio de Aceite & Filtros Originales',
-          description: isEn ? 'Premium synthetic motor oils and certified filters extending engine life.' : 'Aceites sintéticos certificados y filtros originales para máxima protección del motor.',
-          tag: isEn ? 'Maintenance' : 'Mantenimiento'
-        },
-        {
-          name: isEn ? 'Pre-Purchase Vehicle Inspection' : 'Peritaje & Revisión Técnico-Mecánica',
-          description: isEn ? 'Exhaustive 80-point vehicle inspection before buying or road trips.' : 'Revisión preventiva de 80 puntos antes de viajes o compra de vehículos usados.',
-          tag: isEn ? 'Inspection' : 'Peritaje'
-        }
-      ]
     };
   }
 
@@ -562,28 +338,6 @@ function detectTaxonomyAndContent(params: {
         secondaryCategories: isEn
           ? ['Hair Salon', 'Beauty Salon', 'Stylist', 'Skin Care Clinic', 'Cosmetics Store']
           : ['Peluquería', 'Salón de belleza', 'Estilista', 'Cuidado de la piel', 'Tienda de cosméticos'],
-        catalog: [
-          {
-            name: isEn ? 'Classic & Fade Haircuts' : 'Cortes Clásicos & Degradados Modernos',
-            description: isEn ? 'Precision scissor and clipper fades tailored to your face structure.' : 'Degradados impecables, fades y cortes clásicos adaptados a tu estilo personal.',
-            tag: isEn ? 'Haircut' : 'Corte de Cabello'
-          },
-          {
-            name: isEn ? 'Hot Towel Beard Grooming' : 'Perfilado de Barba & Ritual Toalla Caliente',
-            description: isEn ? 'Beard sculpting with straight razor edge, essential oils, and hot towel relaxation.' : 'Afeitado tradicional a navaja, aceites hidratantes y toalla caliente relajante.',
-            tag: isEn ? 'Beard' : 'Barba & Afeitado'
-          },
-          {
-            name: isEn ? 'Hair Treatment & Color' : 'Tratamientos Capilares & Pigmentación',
-            description: isEn ? 'Gray blending, scalp therapy, and nourishing treatments for healthy hair.' : 'Matización de canas, exfoliación de cuero cabelludo y nutrición profunda.',
-            tag: isEn ? 'Treatments' : 'Tratamientos'
-          },
-          {
-            name: isEn ? 'VIP Grooming Experience' : 'Combo VIP Completo (Corte + Barba + Mascarilla)',
-            description: isEn ? 'Complete executive styling package including cut, beard trim, and cleansing facial mask.' : 'Paquete integral con corte, arreglo de barba, mascarilla facial negra y bebida de cortesía.',
-            tag: isEn ? 'VIP' : 'Combos VIP'
-          }
-        ]
       };
     }
     return {
@@ -591,28 +345,6 @@ function detectTaxonomyAndContent(params: {
       secondaryCategories: isEn
         ? ['Hair Salon', 'Nail Salon', 'Spa', 'Esthetician', 'Cosmetics Store']
         : ['Peluquería', 'Salón de manicura', 'Centro de estética', 'Spa y bienestar', 'Estilista'],
-      catalog: [
-        {
-          name: isEn ? 'Balayage & Advanced Hair Color' : 'Balayage, Mechas & Colorimetría Avanzada',
-          description: isEn ? 'Customized lightening and tone correction protecting your hair health.' : 'Aclarados profesionales, matices luminosos y tinturas de alta duración sin maltratar el cabello.',
-          tag: isEn ? 'Color' : 'Colorimetría'
-        },
-        {
-          name: isEn ? 'Russian Manicure & Pedicure Spa' : 'Manicura Rusa & Pedicura Spa',
-          description: isEn ? 'Long-lasting gel polish, acrylics, and hydrating foot massage.' : 'Esmaltado semipermanente, uñas en acrílico y exfoliación spa hidratante.',
-          tag: isEn ? 'Nails' : 'Uñas & Manicura'
-        },
-        {
-          name: isEn ? 'Keratin & Deep Hair Repair' : 'Alisados Progresivos & Keratina Orgánica',
-          description: isEn ? 'Frizz-free silk finish with organic botanical keratin treatments.' : 'Cabello liso, suave y con brillo espejo gracias a fórmulas orgánicas libres de formol.',
-          tag: isEn ? 'Hair Repair' : 'Alisados & Hidratación'
-        },
-        {
-          name: isEn ? 'Bridal & Event Makeup' : 'Peinados & Maquillaje Profesional para Eventos',
-          description: isEn ? 'Long-lasting photographic makeup and elegant updos for weddings and galas.' : 'Maquillaje de alta definición y peinados de fiesta para novias, grados y eventos.',
-          tag: isEn ? 'Events' : 'Maquillaje & Peinados'
-        }
-      ]
     };
   }
 
@@ -623,28 +355,6 @@ function detectTaxonomyAndContent(params: {
       secondaryCategories: isEn
         ? ['Lawyer', 'Legal Services', 'Corporate Office', 'Business Management Consultant', 'Real Estate Attorney']
         : ['Abogado', 'Servicios legales', 'Asesoría jurídica', 'Consultoría legal', 'Abogado laboralista'],
-      catalog: [
-        {
-          name: isEn ? 'Initial Legal Evaluation' : 'Consulta & Diagnóstico Jurídico Estratégico',
-          description: isEn ? 'Exhaustive review of your case, risks, and winning legal strategy.' : 'Análisis detallado de tu situación legal, riesgos y ruta jurídica más conveniente.',
-          tag: isEn ? 'Consultation' : 'Asesoría'
-        },
-        {
-          name: isEn ? 'Contract Drafting & Review' : 'Elaboración & Blindaje de Contratos',
-          description: isEn ? 'Drafting solid commercial, labor, and real estate agreements.' : 'Redacción de contratos comerciales, laborales y acuerdos de confidencialidad blindados.',
-          tag: isEn ? 'Contracts' : 'Contratos'
-        },
-        {
-          name: isEn ? 'Corporate & Business Compliance' : 'Defensa Judicial & Litigios',
-          description: isEn ? 'Dedicated court representation protecting your rights and financial assets.' : 'Representación ante juzgados y entidades estatales con estricto seguimiento procesal.',
-          tag: isEn ? 'Litigation' : 'Defensa Legal'
-        },
-        {
-          name: isEn ? 'Corporate Legal Advisory' : 'Asesoría Legal Continua para Empresas',
-          description: isEn ? 'Monthly retainer legal counsel for growing companies and entrepreneurs.' : 'Acompañamiento jurídico permanente para empresas, prevención de multas y demandas.',
-          tag: isEn ? 'Corporate' : 'Empresas'
-        }
-      ]
     };
   }
 
@@ -654,29 +364,46 @@ function detectTaxonomyAndContent(params: {
     secondaryCategories: isEn
       ? ['Business Management Consultant', 'Corporate Office', 'Specialty Store', 'Service Establishment', 'Local Service']
       : ['Oficina corporativa', 'Comercio local', 'Servicios especializados', 'Asesoría profesional', 'Establecimiento de atención'],
-    catalog: [
-      {
-        name: isEn ? 'Flagship Service' : 'Servicio Especializado Insignia',
-        description: isEn ? `Our top requested solution tailored to ${params.businessName} clients.` : `Nuestra solución más solicitada y reconocida en ${params.businessName}.`,
-        tag: isEn ? 'Flagship' : 'Servicio Principal'
-      },
-      {
-        name: isEn ? 'Personalized Consultation' : 'Atención Personalizada & Cotizaciones',
-        description: isEn ? 'Fast, clear estimates with direct guidance tailored to your project.' : 'Presupuestos claros y asesoría directa adaptada exactamente a lo que necesitas.',
-        tag: isEn ? 'Consultation' : 'Atención Personalizada'
-      },
-      {
-        name: isEn ? 'Comprehensive Project Execution' : 'Garantía & Soporte Posventa',
-        description: isEn ? 'End-to-end dedicated service ensuring complete customer satisfaction.' : 'Acompañamiento paso a paso garantizando máxima calidad y satisfacción total.',
-        tag: isEn ? 'Guarantee' : 'Calidad Garantizada'
-      },
-      {
-        name: isEn ? 'Priority Booking & Fast Response' : 'Atención Prioritaria por WhatsApp',
-        description: isEn ? 'Immediate answers and direct scheduling via our official line.' : 'Canal directo para resolver tus dudas de inmediato y agendar tu atención.',
-        tag: isEn ? 'Direct Line' : 'Contacto Directo'
-      }
-    ]
   };
+}
+
+function buildTruthfulServiceCatalog(specialties: string, primaryCategory: string, isEn: boolean) {
+  if (!specialties || !specialties.trim()) {
+    return [
+      {
+        name: primaryCategory,
+        description: isEn ? `Official ${primaryCategory} services.` : `Servicios oficiales de ${primaryCategory}.`,
+        tag: primaryCategory,
+      }
+    ];
+  }
+
+  // Split user specialties by commas, ' y ', ' and ', ';', or '/'
+  const rawItems = specialties
+    .split(/[,;/]|s+ys+|s+ands+/i)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  if (rawItems.length === 0) {
+    return [
+      {
+        name: primaryCategory,
+        description: isEn ? `Official ${primaryCategory} services.` : `Servicios oficiales de ${primaryCategory}.`,
+        tag: primaryCategory,
+      }
+    ];
+  }
+
+  return rawItems.map(item => {
+    const capitalized = item.charAt(0).toUpperCase() + item.slice(1);
+    return {
+      name: capitalized,
+      description: isEn
+        ? `Preparation and service of ${item.toLowerCase()} based on current availability.`
+        : `Preparación y servicio de ${item.toLowerCase()} según disponibilidad y solicitud directa.`,
+      tag: primaryCategory,
+    };
+  });
 }
 
 function buildFallbackBlueprint(params: {
@@ -711,167 +438,168 @@ function buildFallbackBlueprint(params: {
   const isSAB = businessModel === 'service_area';
   const locationTag = neighborhood ? `${neighborhood}, ${city}` : city;
 
-  // Semantic category and catalog detection
-  const taxonomy = detectTaxonomyAndContent({
+  // Strict, truthful taxonomy
+  const taxonomy = detectTaxonomy({
     category,
     specialties,
     businessName,
     isEn,
-    locationTag,
-    phone,
-    city,
-    neighborhood,
   });
 
   const primaryCategory = taxonomy.primaryCategory;
   const secondaryCategories = taxonomy.secondaryCategories;
-  const serviceCatalog = taxonomy.catalog;
 
-  const rawSpecialties = specialties.trim() || (isEn ? 'signature specialties and top-tier services' : 'platos y especialidades gastronómicas selectas');
+  // Service catalog constructed strictly from provided specialties without invented offerings
+  const serviceCatalog = buildTruthfulServiceCatalog(specialties, primaryCategory, isEn);
+
+  const cleanSpecialties = specialties.trim();
+  const rawSpecialties = cleanSpecialties || (isEn ? 'our main specialty items' : 'nuestros productos y servicios principales');
+
+  const serviceChannels = isSAB
+    ? (isEn ? 'service directly at the client location and home delivery' : 'atención a domicilio y cobertura en la zona')
+    : (isEn ? 'dine-in service, takeout orders, and local delivery' : 'atención en el local, pedidos para llevar y servicio a domicilio');
 
   const optimizedTitle = `${businessName} | ${primaryCategory} en ${locationTag}`;
 
-  // Rich, high-impact commercial description (640-730 characters, Google GBP max: 750)
+  // Factual, truthful commercial description without invented claims or empty marketing filler
   const commercialDescription = isEn
-    ? `Welcome to ${businessName}, the premier destination in ${locationTag} for authentic ${rawSpecialties}. We take pride in delivering outstanding quality, welcoming hospitality, and a memorable experience for every customer. Prepared with fresh, premium ingredients and time-honored techniques, our offerings stand out for flavor and craftsmanship. Whether you are looking for dine-in comfort, convenient takeaway, or prompt local delivery across ${city}, our dedicated team is at your service from Monday through Sunday. Visit us today in ${locationTag} or write directly via WhatsApp to ${phone || 'our customer care line'} for reservations, catering, and orders!`
-    : `Bienvenido a ${businessName}, el referente gastronómico en ${locationTag} especializado en auténticas ${rawSpecialties}. Nos apasiona ofrecer la más alta calidad culinaria, servicio cálido y una experiencia memorable para compartir en familia o con amigos. Preparamos cada receta con ingredientes frescos seleccionados y técnicas tradicionales que garantizan el mejor sabor en cada plato. Contamos con cómodas instalaciones para consumo en el local, pedidos para llevar y servicio a domicilio rápido en ${neighborhood ? neighborhood + ' y zonas aledañas en ' : ''}${city}. ¡Visítanos hoy mismo en ${locationTag} o contáctanos por WhatsApp al ${phone || 'nuestro número de atención'} para reservas y pedidos!`;
+    ? `${businessName} is a ${primaryCategory.toLowerCase()} located in ${locationTag}, specialized in ${rawSpecialties}. We provide ${serviceChannels} across ${city}. For menu details, orders, and inquiries, contact us directly via WhatsApp at ${phone || 'our direct customer line'}.`
+    : `${businessName} es un ${primaryCategory.toLowerCase()} ubicado en ${locationTag}, especializado en ${rawSpecialties}. Ofrecemos ${serviceChannels} en ${city}. Para consultar disponibilidad, realizar pedidos o solicitar información, comunícate directamente por WhatsApp al ${phone || 'nuestro número de atención'}.`;
 
   const photoChecklist = [
     {
       item: isEn ? 'Daytime Exterior Facade' : 'Fachada Exterior de Día',
       count: 2,
-      tip: isEn ? 'Shows the main sign, street number, and entrance clearly with natural light.' : 'Muestra el letrero comercial principal, el número de la calle y el acceso con luz natural.',
+      tip: isEn ? 'Clear photo of the business entrance and permanent commercial sign in natural light.' : 'Foto clara del acceso al negocio y letrero comercial visible con luz natural.',
       filenameExample: `${businessName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${city.toLowerCase()}-fachada-exterior.jpg`,
     },
     {
-      item: isEn ? 'Nighttime Illuminated Facade' : 'Fachada de Noche con Iluminación',
+      item: isEn ? 'Nighttime Facade with Signage' : 'Fachada con Letrero Iluminado',
       count: 1,
-      tip: isEn ? 'Highlights the lit signage and warm exterior ambiance.' : 'Destaca el letrero iluminado y el ambiente cálido nocturno para clientes que buscan cenar o visitar tarde.',
+      tip: isEn ? 'Photo showing illuminated sign during evening operating hours.' : 'Foto mostrando el letrero iluminado durante el horario nocturno de atención.',
       filenameExample: `${businessName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${city.toLowerCase()}-fachada-noche.jpg`,
     },
     {
-      item: isEn ? 'Customer Area / Dining / Interior' : 'Área de Clientes / Salón Interior',
+      item: isEn ? 'Customer Service Area' : 'Área de Clientes / Local Comercial',
+      count: 3,
+      tip: isEn ? 'Well-lit photos of the clean customer seating or reception area.' : 'Fotos iluminadas del área de atención al público o salón limpio.',
+      filenameExample: `${businessName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${city.toLowerCase()}-area-clientes.jpg`,
+    },
+    {
+      item: isEn ? 'Star Products / Specialties' : 'Productos / Especialidades Principales',
       count: 4,
-      tip: isEn ? 'Clean, well-lit shots of seating, reception, or service stations.' : 'Tomas amplias y bien iluminadas de las mesas, recepción o instalaciones limpias.',
-      filenameExample: `${businessName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${city.toLowerCase()}-salon-interior.jpg`,
+      tip: isEn ? `Close-up photos of ${rawSpecialties}.` : `Fotos de cerca mostrando la presentación real de ${rawSpecialties}.`,
+      filenameExample: `${businessName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${city.toLowerCase()}-especialidad.jpg`,
     },
     {
-      item: isEn ? 'Star Products / Dishes' : 'Productos / Platos Estrella',
-      count: 6,
-      tip: isEn ? 'Close-up, appetizing/detailed pictures of top offerings.' : 'Fotos de cerca con buena luz mostrando la calidad y presentación de tus productos más vendidos.',
-      filenameExample: `${businessName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${city.toLowerCase()}-producto-estrella.jpg`,
-    },
-    {
-      item: isEn ? 'Team in Uniform / Hospitality' : 'Equipo de Trabajo Sonriendo',
-      count: 2,
-      tip: isEn ? 'Google awards significant organic boost to profiles showcasing real human faces.' : 'Google premia con gran impulso orgánico a los perfiles que muestran rostros humanos reales atendiendo.',
-      filenameExample: `${businessName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${city.toLowerCase()}-equipo-atencion.jpg`,
+      item: isEn ? 'Working Team' : 'Equipo de Trabajo en Operación',
+      count: 1,
+      tip: isEn ? 'Photo of the team at the work station.' : 'Foto del equipo en su lugar de trabajo para humanizar la ficha.',
+      filenameExample: `${businessName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${city.toLowerCase()}-equipo.jpg`,
     },
   ];
 
   const preventiveFaqs = [
     {
-      question: isEn ? `What are the official operating hours of ${businessName}?` : `¿Cuáles son los horarios de atención de ${businessName}?`,
+      question: isEn ? `What are the operating hours of ${businessName}?` : `¿Cuáles son los horarios de atención de ${businessName}?`,
       answer: isEn
-        ? `We operate throughout the week. Check our updated Google Maps schedule above or write to us directly via WhatsApp at ${phone || 'our contact number'} for holiday hours.`
-        : `Atendemos de lunes a domingo. Consulta nuestros horarios oficiales actualizados en esta misma ficha de Google o escríbenos directamente al WhatsApp ${phone || 'de atención'} para confirmar disponibilidad en festivos.`,
+        ? `Operating hours are kept updated directly on this Google profile. You may also message us on WhatsApp at ${phone || 'our line'} to confirm holiday hours.`
+        : `Nuestros horarios se mantienen actualizados directamente en esta ficha de Google. También puedes consultarnos por WhatsApp al ${phone || 'número de atención'} para festivos.`,
     },
     {
       question: isEn ? 'What payment methods do you accept?' : '¿Qué medios de pago reciben?',
       answer: isEn
-        ? 'We accept cash, all debit and credit cards (Visa, Mastercard, Amex), and verified mobile electronic transfers.'
-        : 'Recibimos efectivo, todas las tarjetas débito y crédito (Visa, Mastercard, American Express) y transferencias móviles inmediatas (Nequi, Daviplata, transferencias bancarias).',
+        ? 'We accept cash, debit and credit cards, and verified local electronic transfers.'
+        : 'Recibimos efectivo, tarjetas de débito y crédito, y transferencias electrónicas verificadas.',
     },
     {
-      question: isEn ? 'Do you have parking or valet service available?' : '¿Cuentan con parqueadero para clientes?',
+      question: isEn ? 'How can I place an order or make a reservation?' : '¿Cómo puedo hacer un pedido o reservar?',
       answer: isEn
-        ? 'Yes, there is convenient parking access directly adjacent to our location for our guests.'
-        : 'Sí, contamos con zonas de parqueo y convenios cercanos para la total comodidad y seguridad de nuestros visitantes.',
+        ? `You can contact us directly via WhatsApp at ${phone || 'our direct line'} for fast booking and orders.`
+        : `Puedes comunicarte directamente por WhatsApp al ${phone || 'nuestro número directo'} para coordinar pedidos o reservas con rapidez.`,
     },
     {
-      question: isEn ? 'Is it necessary to make a prior reservation?' : '¿Es necesario hacer reserva previa para visitarlos?',
+      question: isEn ? 'Do you offer takeaway or delivery options?' : '¿Manejan pedidos para llevar o domicilios?',
       answer: isEn
-        ? `Walk-ins are always warmly welcomed! For groups of 4 or more, we recommend reserving via WhatsApp at ${phone || 'our line'} to ensure priority seating.`
-        : `¡Siempre son bienvenidos sin reserva! Para grupos o fechas especiales, recomendamos reservar con anticipación por WhatsApp al ${phone || 'nuestra línea'} para garantizar la mejor ubicación.`,
+        ? `Yes, we handle takeaway orders and local delivery across ${city}. Contact us on WhatsApp to order.`
+        : `Sí, gestionamos pedidos para llevar y entregas a domicilio en la zona de ${city}. Escríbenos para solicitar tu pedido.`,
     },
     {
-      question: isEn ? 'Do you offer home delivery or takeaway?' : '¿Manejan servicio a domicilio o para llevar?',
+      question: isEn ? 'Where are you located?' : '¿Dónde están ubicados?',
       answer: isEn
-        ? 'Yes! You can order directly for takeout or fast local delivery right to your door.'
-        : '¡Sí! Puedes solicitar tus pedidos para llevar o pedir a domicilio directamente a través de nuestro WhatsApp oficial con entrega rápida en la zona.',
+        ? `We are located in ${locationTag}. Contact us via WhatsApp if you need exact arrival directions.`
+        : `Estamos ubicados en ${locationTag}. Escríbenos al WhatsApp si necesitas indicaciones para llegar.`,
     },
   ];
 
   const verificationGuide = isSAB
     ? {
         title: isEn
-          ? 'Guaranteed Verification Video for Independent Pros (SAB)'
-          : 'Guía Blindada de Verificación para Independientes y Servicios a Domicilio',
+          ? 'Video Verification Guide for Service Area Businesses (SAB)'
+          : 'Guía de Verificación por Video para Servicios a Domicilio (SAB)',
         overview: isEn
-          ? 'Since you do not have a public customer sign or store on the street, Google verifies your active operations through this 60s continuous video:'
-          : 'Al no tener letrero exterior con horario en la calle, Google verifica que eres un profesional activo mediante este video continuo de 60 segundos sin cortes:',
+          ? 'Google requires a continuous 60s video proving professional activity without public signage:'
+          : 'Google solicita un video continuo de 60 segundos sin cortes que demuestre tu actividad profesional:',
         cameraTake1: isEn
-          ? 'Take 1 (Tools & Gear, 20s): Film your professional equipment, tools, work laptop with specialized software/calendar open, or specialized instruments.'
-          : 'Toma 1 (Herramientas y Equipo, 20s): Graba tus herramientas de trabajo, maletín profesional, computador con software de gestión/agenda abierta o instrumentos de servicio.',
+          ? 'Take 1 (Tools & Gear, 20s): Film your work tools, equipment, or service materials.'
+          : 'Toma 1 (Herramientas y Equipo, 20s): Graba tus herramientas de trabajo, equipos o materiales de servicio.',
         cameraTake2: isEn
-          ? 'Take 2 (Official Documents, 20s): Film your official tax registration (RUT / Tax ID / LLC), recent utility bill with your registered address, and physical business cards.'
-          : 'Toma 2 (Documentos y Legalidad, 20s): Graba de cerca tu registro tributario o mercantil (RUT / RFC / Licencia profesional), factura de servicio a tu nombre y tarjetas de presentación.',
+          ? 'Take 2 (Official Registration, 20s): Film your tax ID/RUT registration and utility bill showing your registered address.'
+          : 'Toma 2 (Registro Oficial, 20s): Graba tu registro tributario/RUT y factura de servicios donde conste la dirección registrada.',
         cameraTake3: isEn
-          ? 'Take 3 (Work Space or Vehicle, 20s): Film your dedicated workspace/inventory area or your work vehicle (inside tools/branded magnet if applicable).'
-          : 'Toma 3 (Espacio de Trabajo o Vehículo, 20s): Graba tu estación de trabajo dedicada, bodega de materiales o tu vehículo de trabajo con las herramientas adentro.',
+          ? 'Take 3 (Work Space or Vehicle, 20s): Film your dedicated preparation area or work vehicle.'
+          : 'Toma 3 (Espacio de Trabajo o Vehículo, 20s): Graba tu área de trabajo o vehículo de servicio con herramientas.',
         documents: [
-          isEn ? 'Tax ID / Business Registration (RUT / RFC / LLC certificate) matching owner name.' : 'RUT / Registro Tributario o Licencia Profesional oficial.',
-          isEn ? 'Utility bill or bank statement showing your registered address.' : 'Factura de servicios o extracto bancario con la dirección registrada para verificar posesión.',
-          isEn ? 'Recent client contracts, printed invoices or branded marketing materials.' : 'Tarjetas de presentación físicas o facturas recientes emitidas a clientes.',
+          isEn ? 'Tax ID / Business Registration certificate.' : 'RUT / Registro Tributario o Licencia comercial oficial.',
+          isEn ? 'Recent utility bill with registered address.' : 'Factura de servicios reciente con la dirección registrada.',
         ],
       }
     : {
-        title: isEn ? 'Foolproof Video Verification Guide in 1 Attempt' : 'Guía Blindada de Verificación por Video en 1 Intento',
+        title: isEn ? 'Continuous Video Verification Guide for Physical Storefront' : 'Guía de Verificación por Video Continuo para Local Físico',
         overview: isEn
-          ? 'Google Maps requires an unedited continuous 60 to 90-second smartphone video to approve your listing. Follow these 3 camera takes in order:'
-          : 'Google Maps exige un video continuo de 60 a 90 segundos grabado con celular sin cortes ni pausas para aprobar la ficha. Sigue exactamente estas 3 tomas seguidas:',
+          ? 'Google Maps requires a 60-second continuous smartphone video without edits or pauses:'
+          : 'Google Maps exige un video continuo de 60 segundos grabado con celular sin cortes ni pausas:',
         cameraTake1: isEn
-          ? 'Take 1 (Exterior, 20s): Start outside on the street. Film the street signs, nearby commercial context, and zoom in on your official permanent business sign.'
-          : 'Toma 1 (Exterior, 20s): Comienza en la calle. Graba la placa de la dirección, los locales vecinos y enfoca con claridad el letrero comercial permanente de tu negocio.',
+          ? 'Take 1 (Exterior, 20s): Start outside on the street. Show street name and zoom in on your permanent business sign.'
+          : 'Toma 1 (Exterior, 20s): Comienza en la calle. Muestra la placa de dirección y enfoca el letrero comercial permanente del local.',
         cameraTake2: isEn
-          ? 'Take 2 (Access, 15s): Film your hands unlocking the front door with physical keys or opening the main entrance to prove legal possession.'
-          : 'Toma 2 (Acceso, 15s): Graba tus manos abriendo la puerta principal con las llaves físicas o abriendo la reja (esto le demuestra a Google que tienes posesión legal del local).',
+          ? 'Take 2 (Access, 15s): Film your hands unlocking the front door with physical keys to prove legal possession.'
+          : 'Toma 2 (Acceso, 15s): Graba tus manos abriendo la puerta principal con las llaves físicas para demostrar posesión legal.',
         cameraTake3: isEn
-          ? 'Take 3 (Operation & Staff Only, 30s): Walk inside to employee-only zones. Show the cash register, card terminal/POS, computer screen with billing/invoicing software, and equipment.'
-          : 'Toma 3 (Interior y Operación, 30s): Camina adentro hacia la caja, datáfono, computador con el software de facturación abierto y herramientas de trabajo a las que solo el personal tiene acceso.',
+          ? 'Take 3 (Interior & Operations, 25s): Show the cash register, POS terminal, staff area, and work equipment.'
+          : 'Toma 3 (Interior y Operación, 25s): Muestra la caja registradora, datáfono, área de atención y herramientas de trabajo.',
         documents: [
-          isEn ? 'Official utility bill (water/electricity/internet) under the business name and address.' : 'Factura reciente de servicios públicos (agua, luz o internet) a nombre del negocio y con la dirección exacta.',
-          isEn ? 'Tax ID / Business registration certificate (RUT, NIT or Chamber of Commerce).' : 'Certificado de registro mercantil o tributario (RUT, NIT o Cámara de Comercio).',
+          isEn ? 'Recent utility bill matching the exact business address.' : 'Factura reciente de servicios públicos con la dirección exacta del local.',
+          isEn ? 'Commercial registration or tax document (RUT / NIT).' : 'Registro mercantil o tributario oficial (RUT, NIT o Cámara de Comercio).',
         ],
       };
 
   const suggestedServiceAreas = isSAB
     ? [
-        `${city} Centro & Zona Comercial`,
-        `${city} Norte / Zonas Residenciales VIP`,
-        `${city} Sur / Sectores Consolidados`,
-        `${city} Occidente / Zonas Industriales y Empresariales`,
-        `Comunas y Barrios de Alta Demanda en ${city}`,
-        `Municipios Aledaños del Área Metropolitana de ${city}`,
+        `${city} Centro`,
+        `${city} Norte`,
+        `${city} Sur`,
+        `${city} Occidente`,
+        `Área Metropolitana de ${city}`,
       ]
     : [];
 
   const nfcPocketReviewGuide = {
-    title: isEn ? 'On-Site Pocket NFC & WhatsApp Review Protocol' : 'Protocolo Portátil de Reseñas: Tarjeta NFC de Bolsillo + WhatsApp',
+    title: isEn ? 'On-Site NFC & Direct WhatsApp Review Process' : 'Protocolo de Reseñas: Tarjeta NFC de Bolsillo + WhatsApp',
     steps: [
       isEn
-        ? 'Carry a Prestigia pocket NFC card or keychain in your work bag on every client visit.'
-        : 'Lleva siempre contigo tu tarjeta NFC Prestigia de bolsillo o llavero inteligente en cada cita.',
+        ? 'Present the Prestigia pocket NFC card or QR code to the satisfied customer upon completing the service.'
+        : 'Presenta la tarjeta NFC Prestigia o código QR al cliente satisfecho al concluir la atención.',
       isEn
-        ? 'Upon completing the job, ask the satisfied client: "Could you tap this with your phone to leave a quick 5★ review?"'
-        : 'Al terminar el servicio y con el cliente satisfecho: "Por favor acerca tu teléfono a esta tarjeta para dejarnos tu calificación de 5 estrellas en 10 segundos."',
+        ? 'Ask the customer to tap their smartphone to access the Google review screen directly.'
+        : 'Pide al cliente que acerque su teléfono para abrir directamente la pantalla de calificación en Google.',
       isEn
-        ? 'If their NFC is disabled, immediately share your dedicated WhatsApp review link with pre-drafted positive text.'
-        : 'Si el cliente no tiene NFC, envíale de inmediato por WhatsApp el enlace directo de reseña con un texto de agradecimiento pre-redactado.',
+        ? 'If NFC is unavailable, share the direct review link via WhatsApp.'
+        : 'Si el cliente no tiene NFC, envíale de inmediato el enlace directo por WhatsApp.',
     ],
     samplePitch: isEn
-      ? `"It was a pleasure serving you today! Could you take 10 seconds to tap this card and share your 5★ feedback on Google? It helps an independent professional tremendously!"`
-      : `"¡Ha sido un placer atenderte hoy! ¿Me ayudarías acercando tu teléfono a esta tarjeta para calificar nuestro servicio en Google? Como profesional independiente, tu recomendación me ayuda muchísimo."`,
+      ? `"Thank you for visiting ${businessName}! Could you take a moment to leave your review on Google? It helps our local team significantly."`
+      : `"¡Gracias por visitar ${businessName}! ¿Podrías dejarnos tu reseña en Google acercando tu teléfono a esta tarjeta? Nos ayuda mucho a seguir mejorando."`,
   };
 
   const isCreate = mode === 'create';
@@ -892,49 +620,49 @@ function buildFallbackBlueprint(params: {
   const monthlyPostsBooster = [
     {
       week: 1,
-      type: isEn ? 'Star Offering' : 'Servicio Estrella',
-      title: isEn ? `Looking for top-tier ${primaryCategory} in ${city}?` : `¿Buscando el mejor servicio de ${primaryCategory} en ${city}?`,
+      type: isEn ? 'Featured Item' : 'Especialidad',
+      title: isEn ? `Specialties at ${businessName}` : `Especialidades en ${businessName}`,
       body: isEn
-        ? `At ${businessName}, we specialize in ${rawSpecialties}. Verified experience, prompt attention, and unmatched quality. Message us today!`
-        : `En ${businessName} te garantizamos la mejor atención en ${rawSpecialties}. Calidad certificada y puntualidad. ¡Escríbenos hoy mismo!`,
-      callToAction: isEn ? 'Contact Us / Call Now' : 'Contactar / Llamar Ahora',
+        ? `Discover our ${rawSpecialties} in ${locationTag}. Dine-in and delivery available.`
+        : `Descubre nuestras ${rawSpecialties} en ${locationTag}. Atención en el local y domicilios disponibles.`,
+      callToAction: isEn ? 'Call Now' : 'Contactar / Llamar',
     },
     {
       week: 2,
-      type: isEn ? 'Customer Problem Solved' : 'Caso de Éxito',
-      title: isEn ? 'Guaranteed Results & Fast Turnaround' : 'Solución Rápida con Garantía de Satisfacción',
+      type: isEn ? 'Service Channels' : 'Canales de Atención',
+      title: isEn ? `Takeout and Delivery in ${city}` : `Pedidos para Llevar y Domicilios en ${city}`,
       body: isEn
-        ? `Don't risk your investment with amateurs. See why clients in ${city} trust ${businessName} for all their needs.`
-        : `No pongas en riesgo tu tiempo con improvisados. Descubre por qué nuestros clientes en ${city} nos recomiendan al 100%.`,
-      callToAction: isEn ? 'Book Appointment' : 'Reservar Cita',
+        ? `Order ${rawSpecialties} directly to your home or office via WhatsApp.`
+        : `Solicita tus ${rawSpecialties} directamente a domicilio o para llevar por WhatsApp.`,
+      callToAction: isEn ? 'Order via WhatsApp' : 'Pedir por WhatsApp',
     },
     {
       week: 3,
-      type: isEn ? 'Trust & Certification' : 'Confianza & Autoridad',
-      title: isEn ? `Why Choose ${businessName}?` : `¿Por qué elegir a ${businessName}?`,
+      type: isEn ? 'Customer Attention' : 'Atención al Cliente',
+      title: isEn ? `Visit us in ${locationTag}` : `Visítanos en ${locationTag}`,
       body: isEn
-        ? `We operate with total transparency, upfront quotes, and 5-star verified customer satisfaction across ${city}.`
-        : `Trabajamos con total transparencia, presupuestos claros y la máxima satisfacción de nuestros clientes en toda la ciudad.`,
-      callToAction: isEn ? 'Learn More' : 'Más Información',
+        ? `We are open during our official weekly schedule. We look forward to serving you.`
+        : `Atendemos en nuestros horarios habituales. Será un gusto atenderte.`,
+      callToAction: isEn ? 'More Info' : 'Más Información',
     },
     {
       week: 4,
-      type: isEn ? 'Limited Priority Booking' : 'Oferta de Temporada',
-      title: isEn ? 'Schedule Your Consultation This Week' : 'Agenda tu Consulta o Servicio Esta Semana',
+      type: isEn ? 'Direct Contact' : 'Contacto Directo',
+      title: isEn ? `Questions or Orders at ${businessName}` : `Consultas y Pedidos en ${businessName}`,
       body: isEn
-        ? `Limited spots available for personalized attention this month. Tap below to speak directly with our team.`
-        : `Cupos limitados para atención prioritaria esta semana. Toca el botón para hablar directamente con nosotros por WhatsApp.`,
-      callToAction: isEn ? 'Call Now' : 'Llamar / Escribir al WhatsApp',
+        ? `Reach out directly via WhatsApp for quick answers regarding our menu and availability.`
+        : `Escríbenos directamente por WhatsApp para resolver dudas sobre el menú y disponibilidad.`,
+      callToAction: isEn ? 'WhatsApp' : 'Escribir al WhatsApp',
     },
   ];
 
   const whatsappOnboardingMessage = isSAB
     ? isEn
-      ? `Hello ${businessName}! 👋\n\nTo build and configure your official winning profile on Google Maps as an Independent Professional and position you in the Local Top 3, we just need you to send us this material:\n\n📸 *1. PHOTOS (Horizontal, clear natural lighting):*\n- 3 Photos of your professional tools, equipment or work vehicle\n- 2 Photos of your dedicated workspace, inventory, or laptop with active work\n- 1 Photo of you smiling in professional work attire\n- High-resolution square logo\n\n🎥 *2. CONTINUOUS 60s VERIFICATION VIDEO (No cuts):*\n- Filming your work tools/instruments\n- Filming your official tax ID/registration (LLC/EIN/RUT) and business cards\n- Filming your dedicated workspace or vehicle\n\n📋 *3. OPERATING DATA:*\n- Top service specialties\n- Coverage zones/cities you travel to\n- Accepted payment methods\n- Gmail address for ownership\n\nOur Prestigia team handles all technical categories and Google SAB optimization! 🚀`
-      : `¡Hola ${businessName}! 👋\n\nPara construir y configurar la ficha oficial de tu actividad como Profesional Independiente / Servicios a Domicilio en el Top 3 de Google Maps, únicamente requerimos que nos envíes este material:\n\n📸 *1. FOTOS (Horizontales y con buena luz):*\n- 3 Fotos de tus herramientas de trabajo, equipos o vehículo de servicio\n- 2 Fotos de tu espacio de trabajo, bodega o computador de gestión\n- 1 Foto tuya sonriendo con vestimenta profesional\n- Logo cuadrado en buena calidad\n\n🎥 *2. VIDEO DE VERIFICACIÓN DE 60 SEGUNDOS (Continuo sin cortes):*\n- Grabando tus herramientas o equipo de servicio\n- Grabando tu RUT / Registro tributario y tarjetas de presentación\n- Grabando tu vehículo de trabajo o área de preparación\n\n📋 *3. DATOS OPERATIVOS:*\n- Lista de servicios o especialidades\n- Zonas y barrios de cobertura donde te desplazas\n- Medios de pago recibidos\n- Correo de Gmail donde deseas la propiedad de la ficha\n\n¡Del montaje técnico, zonas de cobertura y blindaje anti-suspensión nos encargamos nosotros con el equipo de Prestigia! 🚀`
+      ? `Hello ${businessName}! 👋\n\nTo complete your Google Maps profile setup as an Independent / Service Area Professional, please provide the following details:\n\n📸 *1. PHOTOS (Clear lighting):*\n- 3 Photos of your tools, equipment, or service vehicle\n- 2 Photos of your dedicated workspace or materials\n- 1 Photo of you in professional attire\n- Official logo\n\n🎥 *2. CONTINUOUS 60s VERIFICATION VIDEO:*\n- Recording your equipment/tools\n- Recording your tax document (RUT/LLC) and business card\n- Recording your workspace or service vehicle\n\n📋 *3. OPERATING DATA:*\n- Specialties list\n- Target service areas\n- Payment methods\n- Official Gmail account\n\nWe will configure your Google Business Profile with verified local SEO categories! 🚀`
+      : `¡Hola ${businessName}! 👋\n\nPara configurar la ficha oficial de tu actividad como Profesional Independiente / Servicios a Domicilio en Google Maps, requerimos los siguientes datos:\n\n📸 *1. FOTOS (Con buena luz):*\n- 3 Fotos de tus herramientas, equipos o vehículo de trabajo\n- 2 Fotos de tu espacio de trabajo o materiales\n- 1 Foto tuya con vestimenta laboral\n- Logo en buena resolución\n\n🎥 *2. VIDEO CONTINUO DE 60 SEGUNDOS:*\n- Grabando tus herramientas o equipo de servicio\n- Grabando tu RUT / registro tributario con dirección\n- Grabando tu espacio de trabajo o vehículo\n\n📋 *3. DATOS OPERATIVOS:*\n- Lista de especialidades\n- Zonas de cobertura\n- Medios de pago aceptados\n- Correo Gmail donde deseas la propiedad de la ficha\n\n¡Nos encargamos de toda la configuración técnica en Google Maps! 🚀`
     : isEn
-    ? `Hello ${businessName}! 👋\n\nTo build and configure your official winning profile on Google Maps and position you in the Local Top 3, we just need you to send us this material:\n\n📸 *1. PHOTOS (Horizontal, clear light):*\n- 2 Exterior facade photos (day and illuminated night)\n- 3 Interior customer area photos\n- 4 to 6 photos of your star products or dishes\n- 1 photo of your smiling team\n- High-resolution square logo\n\n🎥 *2. CONTINUOUS 60s VERIFICATION VIDEO (No cuts):*\n- Filming the street and your facade sign\n- Opening the front door with your keys\n- Filming the register/POS and billing screen\n\n📋 *3. OPERATING DATA:*\n- Menu / price list\n- Exact hours (Mon-Sun & Holidays)\n- Accepted payment methods\n- Gmail address where you want profile ownership\n\nOur Prestigia team will handle all technical categories and SEO architecture! 🚀`
-    : `¡Hola ${businessName}! 👋\n\nPara construir y configurar la ficha oficial de tu negocio con la arquitectura ganadora del Top 3 de Google Maps, únicamente requerimos que nos envíes este material:\n\n📸 *1. FOTOS (Horizontales y con buena luz):*\n- 2 Fotos de fachada exterior (de día y de noche con letrero iluminado)\n- 3 Fotos del salón o área de clientes limpia\n- 4 a 6 Fotos de tus productos o platos estrella\n- 1 Foto del equipo de atención sonriendo\n- Logo cuadrado en buena calidad\n\n🎥 *2. VIDEO DE VERIFICACIÓN DE 60 SEGUNDOS (Continuo sin cortes):*\n- Grabando la calle y el letrero de la fachada\n- Abriendo la puerta con las llaves\n- Grabando la caja registradora, datáfono y computador con facturación\n\n📋 *3. DATOS OPERATIVOS:*\n- Menú o catálogo de precios\n- Horarios exactos de Lunes a Domingo y Festivos\n- Medios de pago recibidos\n- Correo de Gmail donde deseas la propiedad de la ficha\n\n¡Del montaje técnico, palabras clave y categorías nos encargamos nosotros con el equipo de Prestigia! 🚀`;
+    ? `Hello ${businessName}! 👋\n\nTo complete your official Google Business Profile setup on Google Maps, please provide the following materials:\n\n📸 *1. PHOTOS (Clear lighting):*\n- 2 Exterior facade photos (daytime and evening with illuminated sign)\n- 3 Interior customer area photos\n- 4 Photos of your main specialties or products\n- 1 Photo of your working team\n- Official logo\n\n🎥 *2. CONTINUOUS 60s VERIFICATION VIDEO:*\n- Recording the street and exterior permanent sign\n- Opening the front door with keys\n- Recording the register, POS, and interior operation\n\n📋 *3. OPERATING DATA:*\n- Operating hours\n- Accepted payment methods\n- Gmail address for profile ownership\n\nWe will configure your Google Business Profile with verified local SEO categories! 🚀`
+    : `¡Hola ${businessName}! 👋\n\nPara configurar la ficha oficial de tu negocio en Google Maps con la arquitectura verificada, requerimos los siguientes materiales:\n\n📸 *1. FOTOS (Con buena luz):*\n- 2 Fotos de fachada exterior (de día y de noche con letrero iluminado)\n- 3 Fotos del local o área de clientes limpia\n- 4 Fotos de tus especialidades o productos principales\n- 1 Foto del equipo de atención\n- Logo en buena resolución\n\n🎥 *2. VIDEO CONTINUO DE 60 SEGUNDOS:*\n- Grabando la calle y el letrero comercial de la fachada\n- Abriendo la puerta con las llaves\n- Grabando la caja registradora, datáfono e instalaciones\n\n📋 *3. DATOS OPERATIVOS:*\n- Horarios exactos de atención\n- Medios de pago aceptados\n- Correo de Gmail donde deseas la propiedad de la ficha\n\n¡Nos encargamos de toda la configuración técnica y categorías en Google Maps! 🚀`;
 
   return {
     businessModel,
@@ -967,15 +695,15 @@ function buildFallbackBlueprint(params: {
           actionRoadmap: [
             {
               step: 1,
-              title: isEn ? 'Update GBP Primary & Secondary Categories' : 'Actualizar Categoría Primaria y 5 Secundarias Oficiales',
+              title: isEn ? 'Update GBP Primary & Secondary Categories' : 'Actualizar Categoría Primaria y 4-5 Secundarias Oficiales',
               impact: 'CRÍTICO',
               action: isEn ? 'Add exact Google categories to trigger algorithmic relevance.' : 'Configurar de inmediato las categorías sugeridas en el panel de Google.',
             },
             {
               step: 2,
-              title: isEn ? 'Inject High-Intent Commercial Description' : 'Cargar la Nueva Descripción de Alto Impacto',
+              title: isEn ? 'Inject Factual Commercial Description' : 'Cargar la Nueva Descripción Concisa y Factual',
               impact: 'ALTO',
-              action: isEn ? 'Paste the 700-character copy with direct WhatsApp CTA.' : 'Copiar y pegar el texto optimizado en la ficha de Google Business.',
+              action: isEn ? 'Paste the factual description with direct WhatsApp contact.' : 'Copiar y pegar el texto en la ficha de Google Business.',
             },
             {
               step: 3,
@@ -985,9 +713,9 @@ function buildFallbackBlueprint(params: {
             },
             {
               step: 4,
-              title: isEn ? 'Upload Geotagged Photo Batch' : 'Subir Lote de Fotos con Nombres SEO',
+              title: isEn ? 'Upload Photo Batch' : 'Subir Lote de Fotos Reales',
               impact: 'MEDIO',
-              action: isEn ? 'Publish facade, product, and staff photos.' : 'Cargar las fotos del checklist con nombres de archivo optimizados.',
+              action: isEn ? 'Publish facade, product, and staff photos.' : 'Cargar las fotos del checklist con nombres de archivo claros.',
             },
             {
               step: 5,
