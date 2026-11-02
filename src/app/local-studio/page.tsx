@@ -1118,7 +1118,7 @@ export default function LocalStudioPage() {
   // -------------------------------------------------------------
   const [businessName, setBusinessName] = useState('');
   const [category, setCategory] = useState(CATEGORY_OPTIONS[0]);
-  const [city, setCity] = useState('Bogotá');
+  const [city, setCity] = useState('');
   const [neighborhood, setNeighborhood] = useState('');
   const [specialties, setSpecialties] = useState('');
   const [phone, setPhone] = useState('');
@@ -1174,7 +1174,7 @@ export default function LocalStudioPage() {
 
   // Rescue Radar (Ownership Claim Engine) State
   const [rescueScenario, setRescueScenario] = useState<'orphan' | 'third_party' | 'rejected'>('third_party');
-  const [rescueMaskedEmail, setRescueMaskedEmail] = useState('c•••••@gmail.com');
+  const [rescueMaskedEmail, setRescueMaskedEmail] = useState('');
   const [rescueSearchQuery, setRescueSearchQuery] = useState('');
   const [isRescueScanning, setIsRescueScanning] = useState(false);
 
@@ -4134,7 +4134,7 @@ export default function LocalStudioPage() {
                         type="text"
                         value={rescueMaskedEmail}
                         onChange={(e) => setRescueMaskedEmail(e.target.value)}
-                        placeholder="c•••••@gmail.com"
+                        placeholder={isEn ? 'e.g. c•••••@gmail.com' : 'Ej: c•••••@gmail.com'}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 transition"
                       />
                       <span className="text-[10px] text-slate-400 mt-1 block">
@@ -4472,12 +4472,23 @@ export default function LocalStudioPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        const scriptText =
-                          rescueScenario === 'orphan'
-                            ? `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. En Prestigia podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?`
+                        const emailSnippet = rescueMaskedEmail.trim()
+                          ? `(${rescueMaskedEmail.trim()})`
+                          : isEn
+                          ? '(an external unauthorized email)'
+                          : '(un correo externo no autorizado)';
+
+                        const scriptText = isEn
+                          ? rescueScenario === 'orphan'
+                            ? `Hello ${businessName || 'Business Owner'}, this is the Prestigia team. We audited your Google Maps presence and discovered a critical vulnerability: your business listing exists but is currently 'Unclaimed / Orphan'. Any third party or competitor can suggest edits or claim ownership. At Prestigia, we can process your official ownership claim today and secure full legal control without altering your existing reviews or SEO ranking. Shall we start your protection protocol?`
                             : rescueScenario === 'third_party'
-                            ? `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo (${rescueMaskedEmail || 'c•••••@gmail.com'}) y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?`
-                            : `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?`;
+                            ? `Hello ${businessName || 'Business Owner'}, this is the Prestigia team. Upon auditing your business on Google Maps, we noticed your official listing is linked to an external email ${emailSnippet} and you lack Primary Owner access. Do not worry: creating a new listing is NOT necessary (doing so causes duplicate listing penalties). We execute Google's Official 72-Hour Legal Ownership Protocol to request ownership and transfer complete control directly to your personal account within a week, preserving all reviews and photos. Shall we initiate the protocol today?`
+                            : `Hello ${businessName || 'Business Owner'}, this is the Prestigia team. If a previous agency or ex-employee refused to transfer your Google Maps profile, Google's official policies protect your legitimate ownership. We submit an evidentiary appeal dossier with your corporate tax documentation and storefront evidence so Google Support revokes the third party and restores complete ownership to you. Would you like us to draft the official appeal?`
+                          : rescueScenario === 'orphan'
+                          ? `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. En Prestigia podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?`
+                          : rescueScenario === 'third_party'
+                          ? `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${emailSnippet} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?`
+                          : `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?`;
                         copyToClipboard(scriptText, isEn ? 'WhatsApp Script' : 'Guion de WhatsApp');
                       }}
                       className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold transition flex items-center gap-1.5 cursor-pointer border border-amber-500/40"
@@ -4491,7 +4502,7 @@ export default function LocalStudioPage() {
                     {rescueScenario === 'orphan'
                       ? `"Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. En Prestigia podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?"`
                       : rescueScenario === 'third_party'
-                      ? `"Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo (${rescueMaskedEmail || 'c•••••@gmail.com'}) y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?"`
+                      ? `"Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${rescueMaskedEmail.trim() ? `(${rescueMaskedEmail.trim()})` : '(un correo externo no autorizado)'} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?"`
                       : `"Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?"`}
                   </p>
                 </div>
