@@ -123,6 +123,22 @@ export interface StudioLandingPage {
     showWazeButton: boolean;
     showPrestigiaBadge: boolean;
   };
+  heroImage?: string;
+  beforeAfter?: {
+    beforeUrl: string;
+    afterUrl: string;
+    title?: string;
+    labelBefore?: string;
+    labelAfter?: string;
+  };
+  faqs?: Array<{
+    question: string;
+    answer: string;
+  }>;
+  statHighlights?: Array<{
+    value: string;
+    label: string;
+  }>;
   address?: string;
   createdAt: string;
   updatedAt: string;
@@ -1545,6 +1561,38 @@ export const SEED_STUDIO_LANDING_PAGES: StudioLandingPage[] = [
       showWazeButton: true,
       showPrestigiaBadge: true,
     },
+    heroImage: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1200&q=80',
+    beforeAfter: {
+      beforeUrl: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=1000&q=80',
+      afterUrl: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=1000&q=80',
+      title: 'Caso Clínico: Carillas Cerámicas & Diseño de Sonrisa 3D',
+      labelBefore: 'Antes: Desalineación y Tono Opaco',
+      labelAfter: 'Después: Sonrisa Natural y Armónica',
+    },
+    statHighlights: [
+      { value: '4.9 ★', label: 'Google Maps' },
+      { value: '+1,850', label: 'Pacientes Satisfechos' },
+      { value: '100%', label: 'Tecnología Sin Dolor' },
+      { value: '12 Años', label: 'Trayectoria Clínica' },
+    ],
+    faqs: [
+      {
+        question: '¿La valoración inicial y el escaneo 3D tienen algún costo?',
+        answer: 'Durante esta semana la consulta de valoración con escaneo intraoral 3D está 100% bonificada al reservar tu turno por WhatsApp.',
+      },
+      {
+        question: '¿Los tratamientos de diseño o implantes duelen?',
+        answer: 'Absolutamente no. Empleamos tecnología de anestesia digital computarizada sin jeringa y microcirugía guiada en 3D para una experiencia placentera y libre de molestias.',
+      },
+      {
+        question: '¿Tienen opciones de financiación o facilidades de pago?',
+        answer: 'Sí, disponemos de planes de financiación directa sin intereses, cuotas mensuales y recibimos todas las tarjetas de crédito y transferencias bancarias.',
+      },
+      {
+        question: '¿Cuentan con parqueadero en la clínica?',
+        answer: 'Sí, contamos con bahía privada y parqueadero subterráneo con vigilancia las 24 horas para todos nuestros pacientes en El Poblado.',
+      },
+    ],
     address: 'Calle 10A # 36-24, El Poblado, Medellín, Antioquia',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -1621,6 +1669,30 @@ export const SEED_STUDIO_LANDING_PAGES: StudioLandingPage[] = [
       showWazeButton: true,
       showPrestigiaBadge: true,
     },
+    heroImage: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80',
+    beforeAfter: {
+      beforeUrl: 'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=1000&q=80',
+      afterUrl: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1000&q=80',
+      title: 'Corrección de Pintura en 3 Pasos + Sellado Nanocerámico 9H',
+      labelBefore: 'Antes: Pintura Opaca y Swirls',
+      labelAfter: 'Después: Brillo Espejo Wet Look',
+    },
+    statHighlights: [
+      { value: '5.0 ★', label: 'Google Maps' },
+      { value: '9H Real', label: 'Dureza Nanocerámica' },
+      { value: '5 Años', label: 'Garantía Escrita' },
+      { value: '+920', label: 'Vehículos Tratados' },
+    ],
+    faqs: [
+      {
+        question: '¿Cuánto tiempo dura la aplicación del cerámico 9H?',
+        answer: 'El proceso toma entre 24 y 36 horas en cabina hermética climatizada para asegurar el secado y curado molecular con lámparas infrarrojas.',
+      },
+      {
+        question: '¿Cómo mantengo el recubrimiento cerámico?',
+        answer: 'Entregamos un kit de mantenimiento de champú pH neutro y un sellador express. El lavado toma la mitad de tiempo ya que la suciedad resbala sola.',
+      },
+    ],
     address: 'Av. 9 Norte # 14N-32, Barrio Granada, Cali, Valle',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

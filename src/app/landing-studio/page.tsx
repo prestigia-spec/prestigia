@@ -28,6 +28,7 @@ import {
   Trash2,
   Building2,
   Check,
+  Flame,
 } from 'lucide-react';
 import type { StudioLandingPage, StudioAdvisor } from '@/lib/db';
 
@@ -947,21 +948,20 @@ export default function LandingStudioPage() {
                   <div className="text-left text-xs pb-12 select-none relative">
                     {/* Urgency bar */}
                     {showUrgencyBanner && (
-                      <div
-                        className="py-1.5 px-3 text-center text-[10px] font-black text-slate-950 flex items-center justify-center gap-1"
-                        style={{ background: `linear-gradient(to right, ${primaryColor}, #F59E0B)` }}
-                      >
-                        <Zap className="w-3 h-3 fill-slate-950" />
+                      <div className="py-2 px-3 text-center text-[10px] font-bold text-white flex items-center justify-center gap-1.5 backdrop-blur-md bg-slate-950/90 border-b border-white/10">
+                        <Flame className="w-3 h-3 text-amber-400" />
                         <span className="truncate">{offerBadge}</span>
                       </div>
                     )}
 
                     {/* Brand header */}
-                    <div className="p-4 border-b border-slate-800/80 flex items-center justify-between backdrop-blur-md bg-slate-950/40">
+                    <div className="p-3.5 border-b border-white/10 flex items-center justify-between backdrop-blur-md bg-slate-950/60">
                       <div className="flex items-center gap-2">
                         <div
-                          className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-950 font-black text-sm shadow"
-                          style={{ backgroundColor: primaryColor }}
+                          className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-950 font-black text-sm shadow ring-1 ring-white/20"
+                          style={{
+                            background: `linear-gradient(135deg, ${primaryColor}, ${accentColor})`,
+                          }}
                         >
                           {businessName.charAt(0)}
                         </div>
@@ -974,7 +974,7 @@ export default function LandingStudioPage() {
                       </div>
 
                       {showLiveOpen && (
-                        <span className="text-[9px] font-bold text-emerald-400 flex items-center gap-1 bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                        <span className="text-[9px] font-bold text-emerald-300 flex items-center gap-1 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/30">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                           <span>Abierto</span>
                         </span>
@@ -983,23 +983,25 @@ export default function LandingStudioPage() {
 
                     {/* Hero */}
                     <div className="p-5 text-center space-y-3">
-                      <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-[10px] text-amber-400 font-bold">
+                      <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] text-amber-400 font-bold">
                         <Star className="w-3 h-3 fill-amber-400" />
-                        <span>4.9 ★★★★★ en Google Maps</span>
+                        <span>4.9 / 5.0 en Google Maps</span>
                       </div>
 
                       <h3 className="text-lg sm:text-xl font-black text-white leading-tight">
                         {headline}
                       </h3>
 
-                      <p className="text-[11px] text-slate-300 leading-relaxed">
+                      <p className="text-[11px] text-slate-300 leading-relaxed font-normal">
                         {subheadline}
                       </p>
 
                       <div className="pt-1">
                         <div
-                          className="w-full py-3 rounded-xl font-black text-xs text-slate-950 flex items-center justify-center gap-2 shadow-lg"
-                          style={{ backgroundColor: accentColor }}
+                          className="w-full py-3 rounded-xl font-black text-xs text-slate-950 flex items-center justify-center gap-2 shadow-xl ring-2 ring-white/10"
+                          style={{
+                            background: `linear-gradient(135deg, ${accentColor}, #25D366)`,
+                          }}
                         >
                           <MessageSquare className="w-4 h-4 fill-slate-950" />
                           <span>{callToAction}</span>
@@ -1007,19 +1009,42 @@ export default function LandingStudioPage() {
                       </div>
                     </div>
 
+                    {/* Interactive Before/After Mini Preview */}
+                    <div className="mx-4 p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
+                      <div className="flex items-center justify-between text-[10px] font-bold text-white">
+                        <span className="flex items-center gap-1 text-emerald-400">
+                          <Sparkles className="w-3 h-3" />
+                          <span>Resultados Reales</span>
+                        </span>
+                        <span className="text-slate-400">Antes / Después</span>
+                      </div>
+                      <div className="h-24 rounded-xl overflow-hidden relative border border-white/10">
+                        <img
+                          src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=600&q=80"
+                          alt="Demo Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent flex items-end p-2">
+                          <span className="text-[9px] font-bold text-emerald-300 bg-slate-950/80 px-2 py-0.5 rounded">
+                            ✨ Caso Clínico Verificado
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Services */}
                     <div className="p-4 space-y-2">
-                      <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider block">
+                      <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider block">
                         Servicios Destacados
                       </span>
                       <div className="space-y-2">
                         {services.map((s, i) => (
-                          <div key={i} className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
+                          <div key={i} className="p-3 rounded-xl bg-slate-900/60 border border-white/10 space-y-1 hover:border-emerald-500/40 transition">
                             <div className="flex items-center justify-between">
                               <strong className="text-white text-xs">{s.name}</strong>
                               <span className="text-[10px] font-bold text-emerald-400">{s.price}</span>
                             </div>
-                            <p className="text-[10px] text-slate-400 leading-snug">{s.description}</p>
+                            <p className="text-[10px] text-slate-300 leading-snug">{s.description}</p>
                           </div>
                         ))}
                       </div>
@@ -1027,31 +1052,31 @@ export default function LandingStudioPage() {
 
                     {/* Review Snippet */}
                     {showReviewCarousel && (
-                      <div className="mx-4 p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
+                      <div className="mx-4 p-3.5 rounded-2xl bg-slate-900/80 border border-white/10 space-y-1.5">
                         <div className="flex items-center justify-between text-[10px]">
                           <span className="font-bold text-white flex items-center gap-1">
                             <span className="text-amber-400">★★★★★</span>
-                            <span>María C. R.</span>
+                            <span>Carolina R.</span>
                           </span>
-                          <span className="text-slate-500">Google Verified</span>
+                          <span className="text-emerald-400 font-bold">Google Verificado</span>
                         </div>
                         <p className="text-[10px] text-slate-300 italic">
-                          &ldquo;Atención 10/10, resolvieron mi consulta por WhatsApp al instante.&rdquo;
+                          &ldquo;Atención de primer nivel, tecnología 3D y agendamiento inmediato por WhatsApp.&rdquo;
                         </p>
                       </div>
                     )}
 
                     {/* Footer Authority Badge */}
                     {showPrestigiaBadge && (
-                      <div className="text-center pt-4 text-[9px] text-slate-500 flex items-center justify-center gap-1">
-                        <ShieldCheck className="w-3 h-3 text-amber-400" />
+                      <div className="text-center pt-4 text-[9px] text-slate-400 flex items-center justify-center gap-1">
+                        <ShieldCheck className="w-3 h-3 text-emerald-400" />
                         <span>Verificado y Alojado por Prestigia Engine © 2026</span>
                       </div>
                     )}
 
                     {/* Floating WhatsApp Preview Button */}
                     <div className="absolute bottom-3 right-3">
-                      <div className="w-10 h-10 rounded-xl bg-[#25D366] text-slate-950 flex items-center justify-center shadow-lg">
+                      <div className="w-11 h-11 rounded-2xl bg-[#25D366] text-slate-950 flex items-center justify-center shadow-2xl ring-2 ring-white/20">
                         <MessageSquare className="w-5 h-5 fill-slate-950" />
                       </div>
                     </div>
