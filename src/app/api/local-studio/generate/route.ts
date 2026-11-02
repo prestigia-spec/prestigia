@@ -48,6 +48,12 @@ export async function POST(request: Request) {
     const isEn = lang === 'en';
     const isSAB = businessModel === 'service_area';
 
+    const effectiveReviews = mode === 'create' ? 0 : (Number(existingReviews) || 0);
+    const targetTop3Reviews = mode === 'create' ? 100 : Math.max(120, effectiveReviews + 80);
+    const neededReviews = Math.max(0, targetTop3Reviews - effectiveReviews);
+    const reviewsPerWeek = 8;
+    const weeksToTop3 = Math.ceil(neededReviews / reviewsPerWeek) || (mode === 'create' ? 13 : 10);
+
     // -------------------------------------------------------------
     // 1. LIVE GEMINI 1.5 FLASH ENGINE
     // -------------------------------------------------------------
@@ -83,7 +89,7 @@ CRITICAL QUALITY RULES (FACTUAL & RELEVANT - NO INVENTED INFO - NO FILLER):
 10. "suggestedServiceAreas": ${isSAB ? 'Array of 8 to 10 affluent target neighborhoods, zip codes, or sub-cities where the independent professional should register service coverage in Google Maps without showing home address.' : '[]'}
 11. "hidePhysicalAddress": ${isSAB ? true : false}
 12. "nfcPocketReviewGuide": Protocol for collecting instant 5-star Google reviews on-site (using pocket NFC cards or immediate post-service WhatsApp dispatch).
-13. "reviewVelocityPlan": Object with currentReviews (${existingReviews || 0}), targetTop3Reviews, neededReviews, recommended pace reviewsPerWeek, and estimated weeksToTop3.
+13. "reviewVelocityPlan": Object with currentReviews (${effectiveReviews}), targetTop3Reviews (${targetTop3Reviews}), neededReviews (${neededReviews}), recommended pace reviewsPerWeek (8), and estimated weeksToTop3 (${weeksToTop3}).
 14. "monthlyPostsBooster": Array of 4 weekly Google Business Profile posts (Week 1: Flagship Service, Week 2: Problem & Solution, Week 3: Trust/Certification/Behind the Scenes, Week 4: Limited Booking Offer) with title, body, and CTA button.
 ${mode === 'audit' ? `15. For Audit Mode: "healthScore" (40-68), "criticalGaps" (4-5 gaps), "topCompetitorInsights" (concise 90-day win strategy), and "actionRoadmap" (5 prioritized steps with impact: CRÍTICO/ALTO/MEDIO).` : ''}
 
@@ -120,11 +126,11 @@ RETURN ONLY A VALID JSON OBJECT WITH THIS STRUCTURE (NO MARKDOWN WRAPPERS, NO EX
     "samplePitch": "..."
   },
   "reviewVelocityPlan": {
-    "currentReviews": ${existingReviews || 0},
-    "targetTop3Reviews": 180,
-    "neededReviews": 180,
-    "reviewsPerWeek": 8,
-    "weeksToTop3": 22
+    "currentReviews": ${effectiveReviews},
+    "targetTop3Reviews": ${targetTop3Reviews},
+    "neededReviews": ${neededReviews},
+    "reviewsPerWeek": ${reviewsPerWeek},
+    "weeksToTop3": ${weeksToTop3}
   },
   "monthlyPostsBooster": [
     { "week": 1, "type": "Destacado", "title": "...", "body": "...", "callToAction": "..." },
