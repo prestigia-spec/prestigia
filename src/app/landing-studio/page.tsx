@@ -313,15 +313,6 @@ export default function LandingStudioPage() {
           </div>
 
           <div className="flex items-center gap-2.5">
-            {/* Link to Sister Tools */}
-            <Link
-              href="/local-studio"
-              className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-bold transition hidden md:flex items-center gap-1.5"
-            >
-              <Building2 className="w-3.5 h-3.5 text-amber-400" />
-              <span>Local Studio (Maps)</span>
-            </Link>
-
             {/* Language Switcher */}
             <div className="flex items-center rounded-xl bg-slate-900 border border-slate-800 p-0.5 text-[11px] font-black">
               <button
