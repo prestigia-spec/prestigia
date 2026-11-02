@@ -27,9 +27,9 @@ export async function POST(request: Request) {
     const {
       id,
       advisorId = 'adv-luisma',
-      advisorName = 'Luisma • Consultor',
+      advisorName = 'Luisma • Director General & Founder',
       advisorPhone = '+573058314049',
-      advisorType = 'internal_advisor',
+      advisorType = 'founder',
       country = 'Colombia',
       clientName,
       category = 'Restaurante / Gastronomía',
@@ -38,29 +38,45 @@ export async function POST(request: Request) {
       googleUrl = '',
       mode = 'create',
       status = 'draft',
+      closingStatus = 'lead_draft',
+      setupFeeChargedUsd = 0,
+      monthlyPlanUsd = 0,
+      prestigiaPlan = 'none',
+      paymentMethod = '',
+      closingNotes = '',
       data,
+      createdAt,
     } = body;
 
     if (!clientName || !clientName.trim()) {
       return NextResponse.json({ error: 'El nombre del cliente es obligatorio' }, { status: 400 });
     }
 
+    const allDossiers = await getAllStudioDossiers();
+    const existing = id ? allDossiers.find((d) => d.id === id) : null;
+
     const dossierObj: StudioDossier = {
       id: id || `dos-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
-      advisorId,
-      advisorName,
-      advisorPhone,
-      advisorType,
-      country: country?.trim() || 'Colombia',
+      advisorId: existing?.advisorId || advisorId,
+      advisorName: existing?.advisorName || advisorName,
+      advisorPhone: existing?.advisorPhone || advisorPhone,
+      advisorType: existing?.advisorType || advisorType,
+      country: country?.trim() || existing?.country || 'Colombia',
       clientName: clientName.trim(),
-      category,
+      category: category || existing?.category || 'Restaurante / Gastronomía',
       city: city.trim(),
-      neighborhood: neighborhood?.trim() || '',
-      googleUrl: googleUrl?.trim() || '',
-      mode,
-      status,
-      data: data || {},
-      createdAt: new Date().toISOString(),
+      neighborhood: neighborhood !== undefined ? neighborhood?.trim() : (existing?.neighborhood || ''),
+      googleUrl: googleUrl !== undefined ? googleUrl?.trim() : (existing?.googleUrl || ''),
+      mode: (mode as any) || existing?.mode || 'create',
+      status: (status as any) || existing?.status || 'draft',
+      closingStatus: (closingStatus as any) || existing?.closingStatus || 'lead_draft',
+      setupFeeChargedUsd: setupFeeChargedUsd !== undefined ? Number(setupFeeChargedUsd) : (existing?.setupFeeChargedUsd || 0),
+      monthlyPlanUsd: monthlyPlanUsd !== undefined ? Number(monthlyPlanUsd) : (existing?.monthlyPlanUsd || 0),
+      prestigiaPlan: (prestigiaPlan as any) || existing?.prestigiaPlan || 'none',
+      paymentMethod: paymentMethod || existing?.paymentMethod || '',
+      closingNotes: closingNotes || existing?.closingNotes || '',
+      data: data || existing?.data || {},
+      createdAt: existing?.createdAt || createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 

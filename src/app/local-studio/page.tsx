@@ -55,6 +55,10 @@ import {
   LogOut,
   ChevronDown,
   ChevronUp,
+  Edit3,
+  Sliders,
+  RotateCcw,
+  CheckCheck,
 } from 'lucide-react';
 import type { GooglePlaceData } from '@/app/api/auditor/google-lookup/route';
 
@@ -157,8 +161,15 @@ interface StudioDossierRecord {
   city: string;
   neighborhood?: string;
   googleUrl?: string;
-  mode: 'create' | 'audit';
+  mode: 'create' | 'audit' | 'rescue';
+  businessModel?: 'storefront' | 'service_area';
   status: 'draft' | 'presented' | 'closed';
+  closingStatus?: 'prestigia_subscriber' | 'setup_paid' | 'proposal_sent' | 'negotiating' | 'lead_draft';
+  setupFeeChargedUsd?: number;
+  monthlyPlanUsd?: number;
+  prestigiaPlan?: 'standard' | 'elite' | 'enterprise' | 'none';
+  paymentMethod?: string;
+  closingNotes?: string;
   data: BlueprintData;
   createdAt: string;
   updatedAt: string;
@@ -823,57 +834,97 @@ const TXT_DOSSIERS = {
     privateBadge: '⭐ Cartera Personal Privada',
     accountOwner: '• Luisma (Cuenta Principal)',
     title: 'Mis Clientes & Auditorías Privadas',
-    desc: 'Expedientes creados y auditados personalmente por ti. Tus clientes están 100% aislados y protegidos de la red comercial.',
-    searchPlaceholder: 'Buscar en mis clientes...',
+    desc: 'Expedientes creados, auditados y rescatados personalmente por ti. Métricas de cobro, suscripciones activas y 100% aislados de la red.',
+    searchPlaceholder: 'Buscar por cliente, categoría, ciudad...',
     kpiDossiers: 'Mis Expedientes',
     kpiCreated: 'Fichas Desde Cero',
     kpiAudited: 'Auditorías Top 3',
+    kpiRescued: 'Fichas Rescatadas',
+    kpiRevenue: 'Total Facturado Setup',
+    kpiMrr: 'MRR Prestigia',
     kpiPrivacy: 'Privacidad',
     kpiPrivacyVal: '100% Blindado',
-    filterBy: 'Filtrar por:',
+    filterBy: 'Servicio:',
     filterAll: 'Todos',
     filterCreate: '🏗️ Fichas Nuevas',
     filterAudit: '🔬 Auditorías Top 3',
-    showingNotice: 'Mostrando únicamente clientes de la cuenta principal',
+    filterRescue: '🛡️ Rescates 72h',
+    filterCountry: 'País:',
+    filterCity: 'Ciudad:',
+    filterNeighborhood: 'Barrio / Localidad:',
+    filterClosing: 'Estado de Cierre:',
+    filterAllCountries: 'Todos los Países',
+    filterAllCities: 'Todas las Ciudades',
+    filterAllNeighborhoods: 'Todas las Localidades',
+    filterAllClosing: 'Todos los Cierres',
+    showingNotice: 'Cartera personal blindada de Luisma',
     loading: 'Cargando tu cartera personal...',
-    emptyTitle: 'No tienes clientes guardados en tu cuenta personal',
-    emptyDesc: 'Genera una nueva ficha desde cero o una auditoría en los módulos principales para registrar tu primer cliente.',
+    emptyTitle: 'No se encontraron clientes con los filtros seleccionados',
+    emptyDesc: 'Intenta limpiar los filtros o genera un nuevo expediente en los módulos superiores.',
     btnCreateFirst: '🏗️ Crear Primera Ficha Ganadora',
-    badgeCreate: '🏗️ Ficha Nueva',
+    badgeCreate: '🏗️ Ficha Creada',
     badgeAudit: '🔬 Auditoría Top 3',
+    badgeRescue: '🛡️ Ficha Rescatada',
     ownerBadge: '👑 Luisma (Cuenta Principal)',
     btnLoadView: '👁️ Cargar y Ver',
     sendWhatsappKit: 'Enviar Kit por WhatsApp',
     deleteDossier: 'Eliminar Expediente',
     confirmDelete: '¿Eliminar este expediente de forma definitiva?',
+    statusPrestigiaSubscriber: '💎 Prestigia ($199/m • Setup $0)',
+    statusSetupPaid: '💵 Setup Cobrado',
+    statusProposalSent: '⏳ Propuesta Enviada',
+    statusNegotiating: '🤝 En Negociación',
+    statusLeadDraft: '📝 Prospección',
+    btnManageClosing: '⚙️ Cierre & Cobro',
+    pricingBenchmarkNotice: 'Precios Reales: Creación $150-$250 | Auditoría $200-$350 | Rescate $250-$450 USD | Prestigia $149-$199/mes',
   },
   en: {
     privateBadge: '⭐ Private Client Portfolio',
     accountOwner: '• Luisma (Main Account)',
     title: 'My Clients & Private Audits',
-    desc: 'Dossiers created and audited personally by you. Your clients are 100% isolated and protected from the advisor sales network.',
-    searchPlaceholder: 'Search in my clients...',
+    desc: 'Dossiers created, audited and rescued personally by you. Revenue tracking, active subscriptions and 100% isolated.',
+    searchPlaceholder: 'Search by client, category, city...',
     kpiDossiers: 'My Dossiers',
     kpiCreated: 'Built From Scratch',
     kpiAudited: 'Top 3 Audits',
+    kpiRescued: 'Rescued Listings',
+    kpiRevenue: 'Total Setup Revenue',
+    kpiMrr: 'Prestigia MRR',
     kpiPrivacy: 'Privacy',
     kpiPrivacyVal: '100% Shielded',
-    filterBy: 'Filter by:',
+    filterBy: 'Service:',
     filterAll: 'All',
     filterCreate: '🏗️ New Listings',
     filterAudit: '🔬 Top 3 Audits',
-    showingNotice: 'Displaying exclusively main account clients',
+    filterRescue: '🛡️ 72h Rescues',
+    filterCountry: 'Country:',
+    filterCity: 'City:',
+    filterNeighborhood: 'Neighborhood:',
+    filterClosing: 'Closing Status:',
+    filterAllCountries: 'All Countries',
+    filterAllCities: 'All Cities',
+    filterAllNeighborhoods: 'All Localities',
+    filterAllClosing: 'All Closings',
+    showingNotice: 'Luisma private shielded portfolio',
     loading: 'Loading your private portfolio...',
-    emptyTitle: 'No clients saved in your private account yet',
-    emptyDesc: 'Build a new listing from scratch or run an audit in the main modules to save your first client dossier.',
+    emptyTitle: 'No clients found matching the selected filters',
+    emptyDesc: 'Try resetting the filters or generate a new dossier in the modules above.',
     btnCreateFirst: '🏗️ Build First Winning Listing',
-    badgeCreate: '🏗️ New Listing',
+    badgeCreate: '🏗️ Built Listing',
     badgeAudit: '🔬 Top 3 Audit',
+    badgeRescue: '🛡️ Rescued Listing',
     ownerBadge: '👑 Luisma (Main Account)',
     btnLoadView: '👁️ Load & View',
     sendWhatsappKit: 'Send Kit via WhatsApp',
     deleteDossier: 'Delete Dossier',
     confirmDelete: 'Are you sure you want to permanently delete this dossier?',
+    statusPrestigiaSubscriber: '💎 Prestigia ($199/mo • Setup $0)',
+    statusSetupPaid: '💵 Setup Paid',
+    statusProposalSent: '⏳ Proposal Sent',
+    statusNegotiating: '🤝 In Negotiation',
+    statusLeadDraft: '📝 Lead / Draft',
+    btnManageClosing: '⚙️ Closing & Monetization',
+    pricingBenchmarkNotice: 'Real Benchmarks: Setup $150-$250 | Audit $200-$350 | Rescue $250-$450 USD | Prestigia $149-$199/mo',
   },
 };
 
@@ -1441,7 +1492,19 @@ export default function LocalStudioPage() {
   const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [isLoadingDossiers, setIsLoadingDossiers] = useState(false);
   const [dossierSearch, setDossierSearch] = useState('');
-  const [dossierModeFilter, setDossierModeFilter] = useState<'all' | 'create' | 'audit'>('all');
+  const [dossierModeFilter, setDossierModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue'>('all');
+  const [dossierCountryFilter, setDossierCountryFilter] = useState<string>('all');
+  const [dossierCityFilter, setDossierCityFilter] = useState<string>('all');
+  const [dossierNeighborhoodFilter, setDossierNeighborhoodFilter] = useState<string>('all');
+  const [dossierClosingFilter, setDossierClosingFilter] = useState<string>('all');
+  const [editingDossierClosing, setEditingDossierClosing] = useState<StudioDossierRecord | null>(null);
+  const [closingFormMode, setClosingFormMode] = useState<'create' | 'audit' | 'rescue'>('audit');
+  const [closingFormStatus, setClosingFormStatus] = useState<'prestigia_subscriber' | 'setup_paid' | 'proposal_sent' | 'negotiating' | 'lead_draft'>('prestigia_subscriber');
+  const [closingFormSetupFee, setClosingFormSetupFee] = useState<number>(0);
+  const [closingFormMonthlyPlan, setClosingFormMonthlyPlan] = useState<number>(199);
+  const [closingFormPaymentMethod, setClosingFormPaymentMethod] = useState<string>('');
+  const [closingFormNotes, setClosingFormNotes] = useState<string>('');
+  const [isSavingClosing, setIsSavingClosing] = useState(false);
 
   // Network (Advisors & Agencies B2B) State
   const [networkSubView, setNetworkSubView] = useState<'monitor' | 'register' | 'directory'>('monitor');
@@ -2033,28 +2096,92 @@ export default function LocalStudioPage() {
   };
 
   // 100% PRIVATE DOSSIERS: ONLY Luisma's personal clients (Never mixed with team)
+  const luismaBaseDossiers = useMemo(() => {
+    return savedDossiers.filter(
+      (d) =>
+        d.advisorId === 'adv-luisma' ||
+        d.advisorName.toLowerCase().includes('luisma') ||
+        d.advisorName.toLowerCase().includes('director')
+    );
+  }, [savedDossiers]);
+
+  // Dynamic filter values from Luisma's portfolio
+  const dossierAvailableCountries = useMemo(() => {
+    const set = new Set<string>();
+    luismaBaseDossiers.forEach((d) => {
+      set.add(d.country || 'Colombia');
+    });
+    return Array.from(set).sort();
+  }, [luismaBaseDossiers]);
+
+  const dossierAvailableCities = useMemo(() => {
+    const set = new Set<string>();
+    luismaBaseDossiers.forEach((d) => {
+      if (dossierCountryFilter !== 'all' && (d.country || 'Colombia') !== dossierCountryFilter) return;
+      if (d.city) set.add(d.city);
+    });
+    return Array.from(set).sort();
+  }, [luismaBaseDossiers, dossierCountryFilter]);
+
+  const dossierAvailableNeighborhoods = useMemo(() => {
+    const set = new Set<string>();
+    luismaBaseDossiers.forEach((d) => {
+      if (dossierCountryFilter !== 'all' && (d.country || 'Colombia') !== dossierCountryFilter) return;
+      if (dossierCityFilter !== 'all' && d.city.toLowerCase() !== dossierCityFilter.toLowerCase()) return;
+      if (d.neighborhood) set.add(d.neighborhood);
+    });
+    return Array.from(set).sort();
+  }, [luismaBaseDossiers, dossierCountryFilter, dossierCityFilter]);
+
+  // Executive portfolio KPI stats (unaffected by active filter view)
+  const totalLuismaSetupRevenue = useMemo(() => {
+    return luismaBaseDossiers.reduce((acc, d) => acc + (d.setupFeeChargedUsd || 0), 0);
+  }, [luismaBaseDossiers]);
+
+  const totalLuismaMrr = useMemo(() => {
+    return luismaBaseDossiers.reduce((acc, d) => acc + (d.monthlyPlanUsd || 0), 0);
+  }, [luismaBaseDossiers]);
+
+  const prestigiaSubscribersCount = useMemo(() => {
+    return luismaBaseDossiers.filter((d) => d.closingStatus === 'prestigia_subscriber').length;
+  }, [luismaBaseDossiers]);
+
+  // Active filtered view of dossiers for UI presentation
   const myDossiers = useMemo(() => {
-    return savedDossiers
-      .filter(
-        (d) =>
-          d.advisorId === 'adv-luisma' ||
-          d.advisorName.toLowerCase().includes('luisma') ||
-          d.advisorName.toLowerCase().includes('director')
+    return luismaBaseDossiers.filter((d) => {
+      if (dossierModeFilter !== 'all' && d.mode !== dossierModeFilter) return false;
+      if (dossierCountryFilter !== 'all' && (d.country || 'Colombia') !== dossierCountryFilter) return false;
+      if (dossierCityFilter !== 'all' && d.city.toLowerCase() !== dossierCityFilter.toLowerCase()) return false;
+      if (
+        dossierNeighborhoodFilter !== 'all' &&
+        (!d.neighborhood || d.neighborhood.toLowerCase() !== dossierNeighborhoodFilter.toLowerCase())
       )
-      .filter((d) => {
-        if (dossierModeFilter !== 'all' && d.mode !== dossierModeFilter) return false;
-        if (dossierSearch.trim()) {
-          const q = dossierSearch.toLowerCase();
-          const match =
-            d.clientName.toLowerCase().includes(q) ||
-            d.city.toLowerCase().includes(q) ||
-            d.category.toLowerCase().includes(q) ||
-            (d.neighborhood && d.neighborhood.toLowerCase().includes(q));
-          if (!match) return false;
-        }
-        return true;
-      });
-  }, [savedDossiers, dossierSearch, dossierModeFilter]);
+        return false;
+      if (dossierClosingFilter !== 'all') {
+        const cStatus = d.closingStatus || 'lead_draft';
+        if (cStatus !== dossierClosingFilter) return false;
+      }
+      if (dossierSearch.trim()) {
+        const q = dossierSearch.toLowerCase();
+        const match =
+          d.clientName.toLowerCase().includes(q) ||
+          d.city.toLowerCase().includes(q) ||
+          d.category.toLowerCase().includes(q) ||
+          (d.country && d.country.toLowerCase().includes(q)) ||
+          (d.neighborhood && d.neighborhood.toLowerCase().includes(q));
+        if (!match) return false;
+      }
+      return true;
+    });
+  }, [
+    luismaBaseDossiers,
+    dossierModeFilter,
+    dossierCountryFilter,
+    dossierCityFilter,
+    dossierNeighborhoodFilter,
+    dossierClosingFilter,
+    dossierSearch,
+  ]);
 
   // NETWORK DOSSIERS: All team advisors and licensed B2B partner agencies
   const networkFilteredDossiers = useMemo(() => {
@@ -2188,6 +2315,73 @@ export default function LocalStudioPage() {
         fetchDossiers();
       }
     } catch {}
+  };
+
+  const handleOpenEditClosing = (dossier: StudioDossierRecord) => {
+    setEditingDossierClosing(dossier);
+    setClosingFormMode(dossier.mode || 'audit');
+    setClosingFormStatus(dossier.closingStatus || 'lead_draft');
+    setClosingFormSetupFee(
+      dossier.setupFeeChargedUsd !== undefined
+        ? dossier.setupFeeChargedUsd
+        : dossier.closingStatus === 'prestigia_subscriber'
+        ? 0
+        : 250
+    );
+    setClosingFormMonthlyPlan(
+      dossier.monthlyPlanUsd !== undefined
+        ? dossier.monthlyPlanUsd
+        : dossier.closingStatus === 'prestigia_subscriber'
+        ? 199
+        : 0
+    );
+    setClosingFormPaymentMethod(dossier.paymentMethod || '');
+    setClosingFormNotes(dossier.closingNotes || '');
+  };
+
+  const handleSaveDossierClosing = async () => {
+    if (!editingDossierClosing) return;
+    setIsSavingClosing(true);
+    try {
+      const payload = {
+        id: editingDossierClosing.id,
+        clientName: editingDossierClosing.clientName,
+        category: editingDossierClosing.category,
+        city: editingDossierClosing.city,
+        neighborhood: editingDossierClosing.neighborhood,
+        country: editingDossierClosing.country || 'Colombia',
+        mode: closingFormMode,
+        closingStatus: closingFormStatus,
+        setupFeeChargedUsd: Number(closingFormSetupFee) || 0,
+        monthlyPlanUsd: Number(closingFormMonthlyPlan) || 0,
+        prestigiaPlan: (closingFormMonthlyPlan >= 199 ? 'elite' : closingFormMonthlyPlan > 0 ? 'standard' : 'none') as 'standard' | 'elite' | 'enterprise' | 'none',
+        paymentMethod: closingFormPaymentMethod,
+        closingNotes: closingFormNotes,
+      };
+
+      const res = await fetch('/api/local-studio/dossiers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        showToast('¡Estado de cierre y cobro actualizado con éxito! 💰');
+        setSavedDossiers((prev) =>
+          prev.map((d) =>
+            d.id === editingDossierClosing.id ? { ...d, ...payload, updatedAt: new Date().toISOString() } : d
+          )
+        );
+        setEditingDossierClosing(null);
+      } else {
+        showToast('Error al actualizar el cierre');
+      }
+    } catch (e) {
+      console.error(e);
+      showToast('Error de red al actualizar cierre');
+    } finally {
+      setIsSavingClosing(false);
+    }
   };
 
   // Save new advisor or licensed agency partner
@@ -5925,95 +6119,269 @@ export default function LocalStudioPage() {
               </div>
             </div>
 
-            {/* Executive KPI Summary Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
-                  <Layers className="w-5 h-5" />
+            {/* Strategic Pricing Benchmark Reference Callout */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-950/40 via-slate-900 to-indigo-950/40 border border-amber-500/30 text-xs text-slate-300 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-lg">
+              <div className="flex items-start gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 shrink-0 mt-0.5">
+                  <DollarSign className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-400 block">{tDossiers.kpiDossiers}</span>
-                  <strong className="text-xl font-black text-white">{myDossiers.length}</strong>
+                  <span className="font-black text-amber-300 text-xs uppercase tracking-wide block">
+                    {isEn ? 'Official Agency Pricing Benchmarks & Prestigia Closing Strategy' : 'Baremos Reales de Mercado de Agencias & Estrategia de Cierre Prestigia'}
+                  </span>
+                  <p className="text-[11px] text-slate-300 mt-0.5">
+                    <strong>Creación:</strong> $150–$250 USD (3–5h) • <strong>Auditoría Top 3:</strong> $200–$350 USD (4–6h) • <strong>Rescate 72h:</strong> $250–$450 USD (5–8h) • <strong>Suscripción Prestigia:</strong> $149–$199 USD/mes.
+                  </p>
+                </div>
+              </div>
+              <div className="shrink-0">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-[11px] font-black text-emerald-300">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>{isEn ? 'Strategy: Setup $0 Waived with Prestigia Plan' : 'Estrategia: Setup $0 Bonificado con Plan Prestigia'}</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Executive KPI Summary Cards (Real totals computed over all Luisma base clients) */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
+              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                  <Layers className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 block font-medium">{tDossiers.kpiDossiers}</span>
+                  <strong className="text-lg font-black text-white">{luismaBaseDossiers.length}</strong>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
-                  <Building2 className="w-5 h-5" />
+              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
+                <div className="w-9 h-9 rounded-xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Building2 className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-400 block">{tDossiers.kpiCreated}</span>
-                  <strong className="text-xl font-black text-emerald-400">
-                    {myDossiers.filter((d) => d.mode === 'create').length}
+                  <span className="text-[10px] text-slate-400 block font-medium">{tDossiers.kpiCreated}</span>
+                  <strong className="text-lg font-black text-emerald-400">
+                    {luismaBaseDossiers.filter((d) => d.mode === 'create').length}
                   </strong>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0">
-                  <Search className="w-5 h-5" />
+              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
+                <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0">
+                  <Search className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-400 block">{tDossiers.kpiAudited}</span>
-                  <strong className="text-xl font-black text-indigo-300">
-                    {myDossiers.filter((d) => d.mode === 'audit').length}
+                  <span className="text-[10px] text-slate-400 block font-medium">{tDossiers.kpiAudited}</span>
+                  <strong className="text-lg font-black text-indigo-300">
+                    {luismaBaseDossiers.filter((d) => d.mode === 'audit').length}
                   </strong>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
-                  <ShieldCheck className="w-5 h-5" />
+              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
+                <div className="w-9 h-9 rounded-xl bg-amber-600/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                  <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-slate-400 block">{tDossiers.kpiPrivacy}</span>
-                  <strong className="text-xs font-black text-emerald-400 uppercase">{tDossiers.kpiPrivacyVal}</strong>
+                  <span className="text-[10px] text-slate-400 block font-medium">{tDossiers.kpiRescued}</span>
+                  <strong className="text-lg font-black text-amber-300">
+                    {luismaBaseDossiers.filter((d) => d.mode === 'rescue').length}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 block font-medium">{tDossiers.kpiMrr}</span>
+                  <strong className="text-lg font-black text-emerald-300">
+                    ${totalLuismaMrr}<span className="text-[10px] font-normal text-slate-400">/mes</span>
+                  </strong>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
+                <div className="w-9 h-9 rounded-xl bg-cyan-600/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shrink-0">
+                  <DollarSign className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 block font-medium">{tDossiers.kpiRevenue}</span>
+                  <strong className="text-lg font-black text-cyan-300">
+                    ${totalLuismaSetupRevenue}
+                  </strong>
                 </div>
               </div>
             </div>
 
-            {/* Filter Pills (Clean, personal mode filters only) */}
-            <div className="flex flex-wrap items-center justify-between gap-3 text-xs bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
-              <div className="flex items-center gap-2">
-                <span className="text-slate-400 text-[11px] font-bold">{tDossiers.filterBy}</span>
-                <button
-                  type="button"
-                  onClick={() => setDossierModeFilter('all')}
-                  className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
-                    dossierModeFilter === 'all'
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
-                      : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-                  }`}
-                >
-                  {tDossiers.filterAll} ({myDossiers.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDossierModeFilter('create')}
-                  className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
-                    dossierModeFilter === 'create'
-                      ? 'bg-emerald-500 text-slate-950 font-black'
-                      : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-                  }`}
-                >
-                  {tDossiers.filterCreate} ({myDossiers.filter((d) => d.mode === 'create').length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDossierModeFilter('audit')}
-                  className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
-                    dossierModeFilter === 'audit'
-                      ? 'bg-indigo-600 text-white font-black'
-                      : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-                  }`}
-                >
-                  {tDossiers.filterAudit} ({myDossiers.filter((d) => d.mode === 'audit').length})
-                </button>
+            {/* Multi-Level Search & Filters Bar (País, Ciudad, Localidad/Barrio, Cierre Comercial) */}
+            <div className="space-y-3 bg-slate-900/70 p-4 rounded-3xl border border-slate-800 shadow-md">
+              <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+                {/* Service Mode Pills */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-slate-400 text-[11px] font-bold">{tDossiers.filterBy}</span>
+                  <button
+                    type="button"
+                    onClick={() => setDossierModeFilter('all')}
+                    className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                      dossierModeFilter === 'all'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
+                        : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                    }`}
+                  >
+                    {tDossiers.filterAll} ({luismaBaseDossiers.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDossierModeFilter('create')}
+                    className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                      dossierModeFilter === 'create'
+                        ? 'bg-emerald-500 text-slate-950 font-black'
+                        : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                    }`}
+                  >
+                    {tDossiers.filterCreate} ({luismaBaseDossiers.filter((d) => d.mode === 'create').length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDossierModeFilter('audit')}
+                    className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                      dossierModeFilter === 'audit'
+                        ? 'bg-indigo-600 text-white font-black'
+                        : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                    }`}
+                  >
+                    {tDossiers.filterAudit} ({luismaBaseDossiers.filter((d) => d.mode === 'audit').length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDossierModeFilter('rescue')}
+                    className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                      dossierModeFilter === 'rescue'
+                        ? 'bg-amber-600 text-white font-black'
+                        : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                    }`}
+                  >
+                    {tDossiers.filterRescue} ({luismaBaseDossiers.filter((d) => d.mode === 'rescue').length})
+                  </button>
+                </div>
+
+                {/* Filter Active indicator & Reset button */}
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-slate-400 font-medium">
+                    Mostrando <strong>{myDossiers.length}</strong> de <strong>{luismaBaseDossiers.length}</strong> clientes
+                  </span>
+                  {(dossierSearch ||
+                    dossierModeFilter !== 'all' ||
+                    dossierCountryFilter !== 'all' ||
+                    dossierCityFilter !== 'all' ||
+                    dossierNeighborhoodFilter !== 'all' ||
+                    dossierClosingFilter !== 'all') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDossierSearch('');
+                        setDossierModeFilter('all');
+                        setDossierCountryFilter('all');
+                        setDossierCityFilter('all');
+                        setDossierNeighborhoodFilter('all');
+                        setDossierClosingFilter('all');
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-rose-950/60 hover:bg-rose-900 border border-rose-500/40 text-rose-300 text-[11px] font-bold transition flex items-center gap-1 cursor-pointer"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      <span>Limpiar Filtros</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
-              <span className="text-[11px] text-slate-400 font-medium">
-                {tDossiers.showingNotice}
-              </span>
+              {/* Location & Commercial Closing Dropdowns */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-2 border-t border-slate-800 text-xs">
+                {/* País Selector */}
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                    {tDossiers.filterCountry}
+                  </label>
+                  <select
+                    value={dossierCountryFilter}
+                    onChange={(e) => {
+                      setDossierCountryFilter(e.target.value);
+                      setDossierCityFilter('all');
+                      setDossierNeighborhoodFilter('all');
+                    }}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                  >
+                    <option value="all">{tDossiers.filterAllCountries}</option>
+                    {dossierAvailableCountries.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Ciudad Selector */}
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                    {tDossiers.filterCity}
+                  </label>
+                  <select
+                    value={dossierCityFilter}
+                    onChange={(e) => {
+                      setDossierCityFilter(e.target.value);
+                      setDossierNeighborhoodFilter('all');
+                    }}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                  >
+                    <option value="all">{tDossiers.filterAllCities}</option>
+                    {dossierAvailableCities.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Localidad / Barrio Selector */}
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                    {tDossiers.filterNeighborhood}
+                  </label>
+                  <select
+                    value={dossierNeighborhoodFilter}
+                    onChange={(e) => setDossierNeighborhoodFilter(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                  >
+                    <option value="all">{tDossiers.filterAllNeighborhoods}</option>
+                    {dossierAvailableNeighborhoods.map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Estado de Cierre / Monetización Selector */}
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                    {tDossiers.filterClosing}
+                  </label>
+                  <select
+                    value={dossierClosingFilter}
+                    onChange={(e) => setDossierClosingFilter(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                  >
+                    <option value="all">{tDossiers.filterAllClosing}</option>
+                    <option value="prestigia_subscriber">{tDossiers.statusPrestigiaSubscriber}</option>
+                    <option value="setup_paid">{tDossiers.statusSetupPaid}</option>
+                    <option value="proposal_sent">{tDossiers.statusProposalSent}</option>
+                    <option value="negotiating">{tDossiers.statusNegotiating}</option>
+                    <option value="lead_draft">{tDossiers.statusLeadDraft}</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
             {/* List / Grid of My Dossiers */}
@@ -6031,10 +6399,17 @@ export default function LocalStudioPage() {
                 </p>
                 <button
                   type="button"
-                  onClick={() => setActiveTab('create')}
+                  onClick={() => {
+                    setDossierSearch('');
+                    setDossierModeFilter('all');
+                    setDossierCountryFilter('all');
+                    setDossierCityFilter('all');
+                    setDossierNeighborhoodFilter('all');
+                    setDossierClosingFilter('all');
+                  }}
                   className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition cursor-pointer shadow-md"
                 >
-                  {tDossiers.btnCreateFirst}
+                  Restablecer Todos los Filtros
                 </button>
               </div>
             ) : (
@@ -6044,16 +6419,23 @@ export default function LocalStudioPage() {
                     key={d.id}
                     className="p-5 rounded-3xl bg-slate-900 border border-slate-800 hover:border-amber-400/60 transition flex flex-col justify-between space-y-4 shadow-lg group"
                   >
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between gap-2">
+                    <div className="space-y-3">
+                      {/* Top Badges: Service Mode, HealthScore & Country */}
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
                         <span
-                          className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                          className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
                             d.mode === 'create'
                               ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
-                              : 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                              : d.mode === 'rescue'
+                              ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                              : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
                           }`}
                         >
-                          {d.mode === 'create' ? tDossiers.badgeCreate : tDossiers.badgeAudit}
+                          {d.mode === 'create'
+                            ? tDossiers.badgeCreate
+                            : d.mode === 'rescue'
+                            ? tDossiers.badgeRescue
+                            : tDossiers.badgeAudit}
                         </span>
 
                         {d.data?.healthScore !== undefined && (
@@ -6069,20 +6451,99 @@ export default function LocalStudioPage() {
                         )}
 
                         <span className="text-[10px] text-slate-500 font-mono ml-auto">
-                          {new Date(d.createdAt).toLocaleDateString()}
+                          📍 {d.country || 'Colombia'} • {new Date(d.createdAt).toLocaleDateString()}
                         </span>
                       </div>
 
+                      {/* Client Info */}
                       <div>
                         <h4 className="text-base font-black text-white group-hover:text-amber-300 transition">
                           {d.clientName}
                         </h4>
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-slate-400 mt-0.5">
                           📍 {d.city} {d.neighborhood ? `• ${d.neighborhood}` : ''}
                         </p>
                         <span className="text-[11px] text-amber-400 font-bold block mt-1">{d.category}</span>
                       </div>
 
+                      {/* Commercial Closing & Monetization Box */}
+                      <div className="pt-2">
+                        {d.closingStatus === 'prestigia_subscriber' ? (
+                          <div className="p-3 rounded-2xl bg-gradient-to-r from-emerald-950/70 via-slate-950 to-slate-950 border border-emerald-500/40 space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black text-emerald-300 uppercase tracking-wide flex items-center gap-1">
+                                <Sparkles className="w-3 h-3 text-emerald-400" />
+                                Suscripción Prestigia Activa
+                              </span>
+                              <strong className="text-xs font-black text-emerald-400">
+                                ${d.monthlyPlanUsd || 199} USD/mes
+                              </strong>
+                            </div>
+                            <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1 border-t border-emerald-500/20">
+                              <span className="text-slate-400">Setup Técnico:</span>
+                              <span className="font-bold text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                                $0 USD (100% Bonificado)
+                              </span>
+                            </div>
+                          </div>
+                        ) : d.closingStatus === 'setup_paid' ? (
+                          <div className="p-3 rounded-2xl bg-gradient-to-r from-cyan-950/70 via-slate-950 to-slate-950 border border-cyan-500/40 space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black text-cyan-300 uppercase tracking-wide flex items-center gap-1">
+                                <DollarSign className="w-3 h-3 text-cyan-400" />
+                                Setup Técnico Cobrado
+                              </span>
+                              <strong className="text-xs font-black text-cyan-300">
+                                ${d.setupFeeChargedUsd || 250} USD
+                              </strong>
+                            </div>
+                            <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1 border-t border-cyan-500/20">
+                              <span className="text-slate-400">Plan Mensual:</span>
+                              <span className="text-slate-400 italic">Sin suscripción (Venta Única)</span>
+                            </div>
+                          </div>
+                        ) : d.closingStatus === 'proposal_sent' ? (
+                          <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-950/60 via-slate-950 to-slate-950 border border-amber-500/30 space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black text-amber-300 uppercase tracking-wide flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-amber-400" />
+                                Propuesta Comercial Enviada
+                              </span>
+                              <span className="text-[11px] font-black text-amber-300">
+                                Setup: ${d.setupFeeChargedUsd || 250} USD
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1 border-t border-amber-500/20">
+                              <span className="text-slate-400">Opción Prestigia:</span>
+                              <span className="text-emerald-300 font-bold">${d.monthlyPlanUsd || 199}/mes (Setup $0)</span>
+                            </div>
+                          </div>
+                        ) : d.closingStatus === 'negotiating' ? (
+                          <div className="p-3 rounded-2xl bg-purple-950/50 border border-purple-500/30 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black text-purple-300 uppercase tracking-wide">
+                                🤝 En Negociación de Cierre
+                              </span>
+                              <span className="text-[11px] font-bold text-slate-300">
+                                Setup: ${d.setupFeeChargedUsd || 250} USD
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="p-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+                            <span>📝 Prospección / Ficha en Estudio</span>
+                            <span className="text-slate-500">Sin propuesta cerrada</span>
+                          </div>
+                        )}
+
+                        {d.closingNotes && (
+                          <p className="text-[10px] text-slate-400 italic bg-slate-950/60 p-2 rounded-xl border border-slate-800/80 mt-1.5 line-clamp-2">
+                            "{d.closingNotes}"
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Critical gap note if present */}
                       {d.data?.criticalGaps && d.data.criticalGaps.length > 0 && (
                         <p className="text-[11px] text-slate-400 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80 line-clamp-2">
                           ⚠️ {d.data.criticalGaps[0]}
@@ -6090,6 +6551,7 @@ export default function LocalStudioPage() {
                       )}
                     </div>
 
+                    {/* Card Actions Footer */}
                     <div className="pt-3 border-t border-slate-800/80 space-y-2.5">
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-[11px] font-bold text-amber-200 flex items-center gap-1.5">
@@ -6105,6 +6567,16 @@ export default function LocalStudioPage() {
                           className="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/10 active:scale-98"
                         >
                           <span>{tDossiers.btnLoadView}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditClosing(d)}
+                          title="Gestionar Cierre Comercial y Cobro"
+                          className="py-2 px-3 rounded-xl bg-slate-950 hover:bg-slate-800 text-amber-300 border border-slate-700 hover:border-amber-400 font-bold text-xs transition cursor-pointer flex items-center gap-1 shadow-sm"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                          <span>Cobro</span>
                         </button>
 
                         {d.data?.whatsappOnboardingMessage && (
@@ -6131,6 +6603,228 @@ export default function LocalStudioPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Modal for Commercial Closing & Monetization Management */}
+            {editingDossierClosing && (
+              <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+                <div className="w-full max-w-xl bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
+                        Control de Monetización & Cierre
+                      </span>
+                      <h3 className="text-lg font-black text-white mt-1">
+                        {editingDossierClosing.clientName}
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        📍 {editingDossierClosing.city} {editingDossierClosing.neighborhood ? `• ${editingDossierClosing.neighborhood}` : ''}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setEditingDossierClosing(null)}
+                      className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* 1-Click Fast Presets */}
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">
+                      Plantillas Rápidas de Cierre:
+                    </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setClosingFormStatus('prestigia_subscriber');
+                          setClosingFormSetupFee(0);
+                          setClosingFormMonthlyPlan(199);
+                          setClosingFormPaymentMethod('Suscripción Prestigia • Setup $0 Bonificado');
+                        }}
+                        className="p-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold text-left transition cursor-pointer"
+                      >
+                        💎 Prestigia $199/m
+                        <span className="block text-[9px] text-emerald-400/80 font-normal">Setup $0 Bonificado</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setClosingFormStatus('setup_paid');
+                          setClosingFormSetupFee(250);
+                          setClosingFormMonthlyPlan(0);
+                          setClosingFormPaymentMethod('Transferencia Bancaria');
+                        }}
+                        className="p-2 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 text-[11px] font-bold text-left transition cursor-pointer"
+                      >
+                        💵 Setup Solo $250
+                        <span className="block text-[9px] text-cyan-400/80 font-normal">Pago Único (Sin MRR)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setClosingFormMode('rescue');
+                          setClosingFormStatus('setup_paid');
+                          setClosingFormSetupFee(350);
+                          setClosingFormPaymentMethod('Transferencia / Pasarela');
+                        }}
+                        className="p-2 rounded-xl bg-amber-950/80 hover:bg-amber-900 border border-amber-500/40 text-amber-300 text-[11px] font-bold text-left transition cursor-pointer"
+                      >
+                        🛡️ Rescate 72h $350
+                        <span className="block text-[9px] text-amber-400/80 font-normal">Recuperación Legal</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Form fields */}
+                  <div className="space-y-3.5 text-xs">
+                    {/* Service Type */}
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">
+                        Tipo de Servicio Técnico Realizado:
+                      </label>
+                      <select
+                        value={closingFormMode}
+                        onChange={(e) => setClosingFormMode(e.target.value as any)}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                      >
+                        <option value="create">🏗️ Ficha Creada Desde Cero (Benchmark: $150 – $250 USD)</option>
+                        <option value="audit">🔬 Auditoría Forense & Optimización Top 3 (Benchmark: $200 – $350 USD)</option>
+                        <option value="rescue">🛡️ Rescate de Ficha Secuestrada / Reclamación 72h (Benchmark: $250 – $450 USD)</option>
+                      </select>
+                    </div>
+
+                    {/* Closing Status */}
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">
+                        Estado de Negociación y Cierre:
+                      </label>
+                      <select
+                        value={closingFormStatus}
+                        onChange={(e) => {
+                          const val = e.target.value as any;
+                          setClosingFormStatus(val);
+                          if (val === 'prestigia_subscriber') {
+                            setClosingFormSetupFee(0);
+                            if (closingFormMonthlyPlan === 0) setClosingFormMonthlyPlan(199);
+                          }
+                        }}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                      >
+                        <option value="prestigia_subscriber">💎 Suscriptor Prestigia Activo (Setup $0 USD 100% Bonificado)</option>
+                        <option value="setup_paid">💵 Setup Técnico Cobrado (Pago único por trabajo técnico)</option>
+                        <option value="proposal_sent">⏳ Propuesta Enviada (En seguimiento comercial)</option>
+                        <option value="negotiating">🤝 En Negociación Activa</option>
+                        <option value="lead_draft">📝 Prospección / Ficha en Estudio</option>
+                      </select>
+                    </div>
+
+                    {/* Monetary Inputs Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-slate-300 font-bold mb-1">
+                          Valor Cobrado de Setup (USD):
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            min="0"
+                            step="10"
+                            value={closingFormSetupFee}
+                            onChange={(e) => setClosingFormSetupFee(Number(e.target.value))}
+                            className="w-full pl-8 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-bold text-xs focus:outline-none focus:border-amber-400 transition"
+                          />
+                          <DollarSign className="w-4 h-4 text-slate-500 absolute left-2.5 top-2.5" />
+                        </div>
+                        <span className="text-[10px] text-slate-500 mt-0.5 block">
+                          Si adquirió Prestigia, coloca $0 (Setup bonificado).
+                        </span>
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-bold mb-1">
+                          Plan Mensual Prestigia (USD/mes):
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            min="0"
+                            step="10"
+                            value={closingFormMonthlyPlan}
+                            onChange={(e) => setClosingFormMonthlyPlan(Number(e.target.value))}
+                            className="w-full pl-8 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-bold text-xs focus:outline-none focus:border-amber-400 transition"
+                          />
+                          <DollarSign className="w-4 h-4 text-slate-500 absolute left-2.5 top-2.5" />
+                        </div>
+                        <span className="text-[10px] text-slate-500 mt-0.5 block">
+                          $199/mes Plan Élite • $149/mes Estándar • $0 si solo fue setup.
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Payment Method */}
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">
+                        Método de Pago / Detalle de Cobro:
+                      </label>
+                      <input
+                        type="text"
+                        value={closingFormPaymentMethod}
+                        onChange={(e) => setClosingFormPaymentMethod(e.target.value)}
+                        placeholder="Ej: Stripe Recurrente, Transferencia Bancaria, Datáfono..."
+                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                      />
+                    </div>
+
+                    {/* Closing Notes */}
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">
+                        Bitácora & Notas de Negociación:
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={closingFormNotes}
+                        onChange={(e) => setClosingFormNotes(e.target.value)}
+                        placeholder="Registra acuerdos, fecha de entrega de tarjetas NFC, objeciones resueltas..."
+                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => setEditingDossierClosing(null)}
+                      className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isSavingClosing}
+                      onClick={handleSaveDossierClosing}
+                      className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-98 disabled:opacity-50"
+                    >
+                      {isSavingClosing ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          <span>Guardando...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-4 h-4" />
+                          <span>Guardar Cierre Comercial</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>

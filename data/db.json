@@ -56,6 +56,8 @@
       "advisorId": "adv-luisma",
       "advisorName": "Luisma • Director General & Founder",
       "advisorPhone": "+573058314049",
+      "advisorType": "founder",
+      "country": "Colombia",
       "clientName": "Restaurante & Grill Leña y Carbón",
       "category": "Restaurante / Gastronomía",
       "city": "Bogotá",
@@ -63,8 +65,14 @@
       "googleUrl": "https://maps.google.com/?cid=5566778899",
       "mode": "audit",
       "status": "closed",
+      "closingStatus": "prestigia_subscriber",
+      "setupFeeChargedUsd": 0,
+      "monthlyPlanUsd": 199,
+      "prestigiaPlan": "elite",
+      "paymentMethod": "Suscripción Prestigia • Setup  Bonificado",
+      "closingNotes": "Contrató Plan Élite Prestigia (/mes). Auditoría y optimización Top 3 valorada en  USD bonificada al 100%.",
       "createdAt": "2026-10-28T18:26:02.608Z",
-      "updatedAt": "2026-10-28T18:26:02.610Z",
+      "updatedAt": "2026-11-02T21:25:50.443Z",
       "data": {
         "healthScore": 56,
         "criticalGaps": [
@@ -129,15 +137,15 @@
           "cameraTake3": "40-60s: Terminal de pago en caja."
         },
         "whatsappOnboardingMessage": "Estimado equipo de Leña y Carbón, expediente de auditoría listo para optimizar su perfil al Top 3."
-      },
-      "country": "Colombia",
-      "advisorType": "founder"
+      }
     },
     {
       "id": "dos-trattoria-01",
       "advisorId": "adv-luisma",
       "advisorName": "Luisma • Consultor Senior",
       "advisorPhone": "+573058314049",
+      "advisorType": "founder",
+      "country": "Colombia",
       "clientName": "La Trattoria del Parque",
       "category": "Restaurante / Gastronomía",
       "city": "Bogotá",
@@ -145,8 +153,14 @@
       "googleUrl": "https://maps.google.com/?cid=1029384756",
       "mode": "audit",
       "status": "presented",
+      "closingStatus": "proposal_sent",
+      "setupFeeChargedUsd": 250,
+      "monthlyPlanUsd": 199,
+      "prestigiaPlan": "elite",
+      "paymentMethod": "Pendiente de Aprobación",
+      "closingNotes": "Propuesta enviada con balanza ROI. Decidiendo entre cobro de setup  USD o membresía Prestigia con setup bonificado.",
       "createdAt": "2026-10-30T18:15:35.134Z",
-      "updatedAt": "2026-10-30T18:15:35.135Z",
+      "updatedAt": "2026-11-02T21:25:50.445Z",
       "data": {
         "healthScore": 48,
         "criticalGaps": [
@@ -281,15 +295,15 @@
           ]
         },
         "whatsappOnboardingMessage": "Estimado equipo de La Trattoria del Parque, un gusto saludarles. Desde Prestigia ya estructuramos la arquitectura estratégica de su perfil de Google Maps para posicionar su restaurante en el Top 3 de la zona del Parque de la 93.\n\nPara completar la configuración técnica y verificación oficial ante Google, necesitamos que nos envíen por este medio los siguientes materiales:\n\n1. Video de verificación de 60 segundos continuos (mostrando calle, fachada, llave abriendo la puerta y datáfono en caja).\n2. 12 a 15 fotos en alta resolución (fachada completa, platos insignia, horno de leña y cava de vinos).\n3. Horarios exactos de atención (lunes a domingo y festivos).\n4. Número oficial de WhatsApp para reservas.\n\nQuedamos muy atentos para poner a volar su posicionamiento esta misma semana. ¡Un saludo cordial!"
-      },
-      "country": "Colombia",
-      "advisorType": "internal_advisor"
+      }
     },
     {
       "id": "dos-sonrisas-02",
       "advisorId": "adv-luisma",
       "advisorName": "Luisma • Consultor Senior",
       "advisorPhone": "+573058314049",
+      "advisorType": "founder",
+      "country": "Colombia",
       "clientName": "Clínica Dental Estética Sonrisas",
       "category": "Salud / Odontología / Médica",
       "city": "Medellín",
@@ -297,8 +311,14 @@
       "googleUrl": "",
       "mode": "create",
       "status": "closed",
-      "createdAt": "2026-10-31T18:15:35.135Z",
-      "updatedAt": "2026-10-31T18:15:35.135Z",
+      "closingStatus": "prestigia_subscriber",
+      "setupFeeChargedUsd": 0,
+      "monthlyPlanUsd": 199,
+      "prestigiaPlan": "elite",
+      "paymentMethod": "Stripe Recurrente",
+      "closingNotes": "Contrató Plan Élite Prestigia. Ficha creada desde cero con protocolo de video médico. Setup  USD bonificado.",
+      "createdAt": "2026-10-31T12:00:00.000Z",
+      "updatedAt": "2026-11-02T21:25:50.445Z",
       "data": {
         "optimizedTitle": "Clínica Dental Estética Sonrisas | Odontología & Diseño de Sonrisa",
         "primaryCategory": "Clínica dental",
@@ -373,24 +393,30 @@
           "cameraTake3": "40-60s: En la recepción muestra el software de agenda médica en el computador y el datáfono de cobro con la razón social."
         },
         "whatsappOnboardingMessage": "Apreciado Dr. de Clínica Dental Sonrisas, un gusto saludarle. En Prestigia ya tenemos listo su expediente para crear la ficha ganadora de su consultorio en el Top 3 de Google Maps para El Poblado, Medellín.\n\nPara iniciar la indexación requerimos:\n1. 10 a 12 fotos nítidas de la clínica, recepción y equipos.\n2. Video continuo de 60 segundos según el guion adjunto.\n3. Registro médico o NIT para la verificación de salud.\n\n¡Quedamos atentos para activar su flujo de pacientes privados!"
-      },
-      "country": "Colombia",
-      "advisorType": "internal_advisor"
+      }
     },
     {
       "id": "dos-autospa-03",
       "advisorId": "adv-luisma",
       "advisorName": "Luisma • Director General & Founder",
       "advisorPhone": "+573058314049",
+      "advisorType": "founder",
+      "country": "Colombia",
       "clientName": "AutoSpa Premium Detailing & Cerámico",
-      "category": "Taller / Automotriz",
+      "category": "Automotriz / Taller Mecánico / Lavadero",
       "city": "Cali",
       "neighborhood": "Granada",
       "googleUrl": "https://maps.google.com/?cid=987654321",
       "mode": "create",
       "status": "closed",
-      "createdAt": "2026-10-29T18:15:35.135Z",
-      "updatedAt": "2026-10-29T18:15:35.135Z",
+      "closingStatus": "setup_paid",
+      "setupFeeChargedUsd": 200,
+      "monthlyPlanUsd": 0,
+      "prestigiaPlan": "none",
+      "paymentMethod": "Transferencia Bancaria",
+      "closingNotes": "Pagó únicamente el setup técnico de creación ( USD). Ficha verificada. En seguimiento para incorporar tarjetas NFC.",
+      "createdAt": "2026-10-29T10:00:00.000Z",
+      "updatedAt": "2026-11-02T21:25:50.445Z",
       "data": {
         "optimizedTitle": "AutoSpa Premium Detailing | Corrección de Pintura & Recubrimiento Cerámico",
         "primaryCategory": "Servicio de lavado y detallado de automóviles",
@@ -449,9 +475,65 @@
           "cameraTake3": "40-60s: Zona de oficina comercial y mostrador de atención al cliente con facturación."
         },
         "whatsappOnboardingMessage": "Hola equipo AutoSpa Cali, desde Prestigia ya construimos la configuración ganadora para su perfil en Google Maps para adueñarse de las búsquedas de detailing y cerámico en Cali.\n\nPor favor envíennos fotos de sus mejores autos terminados y el video de 60s según la guía adjunta para culminar el registro. ¡A romperla en Google!"
-      },
+      }
+    },
+    {
+      "id": "dos-cerrajeria-04",
+      "advisorId": "adv-luisma",
+      "advisorName": "Luisma • Director General & Founder",
+      "advisorPhone": "+573058314049",
+      "advisorType": "founder",
       "country": "Colombia",
-      "advisorType": "founder"
+      "clientName": "Cerrajería & Seguridad Alto Prado 24H",
+      "category": "Servicios Profesionales / B2B / Legal / Contable",
+      "city": "Barranquilla",
+      "neighborhood": "Alto Prado",
+      "googleUrl": "https://maps.google.com/?cid=4433221100",
+      "mode": "rescue",
+      "status": "closed",
+      "closingStatus": "setup_paid",
+      "setupFeeChargedUsd": 350,
+      "monthlyPlanUsd": 149,
+      "prestigiaPlan": "standard",
+      "paymentMethod": "Transferencia + Prestigia Mensual",
+      "closingNotes": "Ficha secuestrada por ex-empleado. Reclamada con expediente legal en 72h. Cobro por rescate  USD + suscripción de /mes.",
+      "createdAt": "2026-10-27T09:30:00.000Z",
+      "updatedAt": "2026-11-02T21:25:50.445Z",
+      "data": {
+        "healthScore": 72,
+        "criticalGaps": [
+          "Ficha previamente secuestrada sin acceso al correo corporativo principal.",
+          "Número de teléfono desactualizado que redirigía llamadas a un tercero."
+        ],
+        "actionRoadmap": [
+          {
+            "step": 1,
+            "title": "Radicación de Traspaso de Propiedad 72h",
+            "impact": "Recuperación Titularidad",
+            "action": "Expediente probatorio enviado a Google Trust & Safety."
+          },
+          {
+            "step": 2,
+            "title": "Actualización Inmediata de Teléfono y Horario 24/7",
+            "impact": "+50% Llamadas Directas",
+            "action": "Configurar línea de WhatsApp directa."
+          }
+        ],
+        "optimizedTitle": "Cerrajería & Seguridad Alto Prado 24H | Apertura Urgente Barranquilla",
+        "primaryCategory": "Cerrajería",
+        "secondaryCategories": [
+          "Servicio de seguridad",
+          "Apertura de cerraduras de autos"
+        ],
+        "commercialDescription": "Cerrajería de urgencia 24 horas en Alto Prado y norte de Barranquilla. Apertura de puertas, autos, cajas fuertes y duplicado de llaves con chip.",
+        "serviceCatalog": [
+          {
+            "name": "Apertura de Puertas Residenciales de Urgencia",
+            "description": "Servicio en menos de 20 minutos sin dañar la cerradura.",
+            "tag": "Servicio Urgente"
+          }
+        ]
+      }
     },
     {
       "id": "dos-agency-tacos-01",
@@ -467,8 +549,14 @@
       "googleUrl": "https://maps.google.com/?cid=1122334455",
       "mode": "audit",
       "status": "presented",
+      "closingStatus": "proposal_sent",
+      "setupFeeChargedUsd": 250,
+      "monthlyPlanUsd": 199,
+      "prestigiaPlan": "elite",
+      "paymentMethod": "En Negociación",
+      "closingNotes": "Agencia partner gestionando cierre con franquicia.",
       "createdAt": "2026-10-31T18:37:30.465Z",
-      "updatedAt": "2026-10-31T18:37:30.467Z",
+      "updatedAt": "2026-11-02T21:25:50.445Z",
       "data": {
         "healthScore": 50,
         "criticalGaps": [
@@ -621,10 +709,22 @@
         "labelAfter": "Después: Sonrisa Natural y Armónica"
       },
       "statHighlights": [
-        { "value": "4.9 ★", "label": "Google Maps" },
-        { "value": "+1,850", "label": "Pacientes Satisfechos" },
-        { "value": "100%", "label": "Tecnología Sin Dolor" },
-        { "value": "12 Años", "label": "Trayectoria Clínica" }
+        {
+          "value": "4.9 ★",
+          "label": "Google Maps"
+        },
+        {
+          "value": "+1,850",
+          "label": "Pacientes Satisfechos"
+        },
+        {
+          "value": "100%",
+          "label": "Tecnología Sin Dolor"
+        },
+        {
+          "value": "12 Años",
+          "label": "Trayectoria Clínica"
+        }
       ],
       "faqs": [
         {
@@ -729,10 +829,22 @@
         "labelAfter": "Después: Brillo Espejo Wet Look"
       },
       "statHighlights": [
-        { "value": "5.0 ★", "label": "Google Maps" },
-        { "value": "9H Real", "label": "Dureza Nanocerámica" },
-        { "value": "5 Años", "label": "Garantía Escrita" },
-        { "value": "+920", "label": "Vehículos Tratados" }
+        {
+          "value": "5.0 ★",
+          "label": "Google Maps"
+        },
+        {
+          "value": "9H Real",
+          "label": "Dureza Nanocerámica"
+        },
+        {
+          "value": "5 Años",
+          "label": "Garantía Escrita"
+        },
+        {
+          "value": "+920",
+          "label": "Vehículos Tratados"
+        }
       ],
       "faqs": [
         {

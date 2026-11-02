@@ -70,6 +70,13 @@ export interface StudioDossier {
   mode: 'create' | 'audit' | 'rescue';
   businessModel?: 'storefront' | 'service_area';
   status: 'draft' | 'presented' | 'closed';
+  // Commercial closing & monetization
+  closingStatus?: 'prestigia_subscriber' | 'setup_paid' | 'proposal_sent' | 'negotiating' | 'lead_draft';
+  setupFeeChargedUsd?: number;
+  monthlyPlanUsd?: number;
+  prestigiaPlan?: 'standard' | 'elite' | 'enterprise' | 'none';
+  paymentMethod?: string;
+  closingNotes?: string;
   data: any;
   createdAt: string;
   updatedAt: string;
