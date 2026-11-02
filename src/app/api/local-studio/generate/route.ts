@@ -146,41 +146,48 @@ RETURN ONLY A VALID JSON OBJECT WITH THIS STRUCTURE (NO MARKDOWN WRAPPERS, NO EX
   ]` : ''}
 }`;
 
-        const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: {
-                temperature: 0.3,
-                maxOutputTokens: 2500,
-                responseMimeType: 'application/json',
-              },
-            }),
-          }
-        );
+        const candidateModels = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.5-flash-lite'];
+        for (const modelName of candidateModels) {
+          try {
+            const geminiRes = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiKey}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  contents: [{ parts: [{ text: prompt }] }],
+                  generationConfig: {
+                    temperature: 0.2,
+                    maxOutputTokens: 2500,
+                    responseMimeType: 'application/json',
+                  },
+                }),
+              }
+            );
 
-        if (geminiRes.ok) {
-          const aiData = await geminiRes.json();
-          const candidateText = aiData?.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (candidateText) {
-            let clean = candidateText.trim();
-            if (clean.startsWith('```')) {
-              clean = clean.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+            if (geminiRes.ok) {
+              const aiData = await geminiRes.json();
+              const candidateText = aiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (candidateText) {
+                let clean = candidateText.trim();
+                if (clean.startsWith('```')) {
+                  clean = clean.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+                }
+                const firstBrace = clean.indexOf('{');
+                const lastBrace = clean.lastIndexOf('}');
+                if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                  clean = clean.substring(firstBrace, lastBrace + 1);
+                }
+                const parsed = JSON.parse(clean);
+                return NextResponse.json({ success: true, engine: modelName, data: parsed });
+              }
+            } else {
+              const errBody = await geminiRes.text();
+              console.warn(`[LocalStudio AI] ${modelName} returned status:`, geminiRes.status, errBody);
             }
-            const firstBrace = clean.indexOf('{');
-            const lastBrace = clean.lastIndexOf('}');
-            if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-              clean = clean.substring(firstBrace, lastBrace + 1);
-            }
-            const parsed = JSON.parse(clean);
-            return NextResponse.json({ success: true, engine: 'gemini-1.5-flash', data: parsed });
+          } catch (modelErr) {
+            console.warn(`[LocalStudio AI] Error trying model ${modelName}:`, modelErr);
           }
-        } else {
-          const errBody = await geminiRes.text();
-          console.warn('[LocalStudio AI] Gemini API error:', geminiRes.status, errBody);
         }
       } catch (geminiErr) {
         console.warn('[LocalStudio AI] Gemini fallback activated:', geminiErr);

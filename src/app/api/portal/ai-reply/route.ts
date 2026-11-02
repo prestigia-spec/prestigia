@@ -71,34 +71,50 @@ Responde ÚNICAMENTE un arreglo JSON con exactamente 3 opciones:
   }
 ]`;
 
-        const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: systemPrompt }] }],
-              generationConfig: {
-                temperature: 0.7,
-                maxOutputTokens: 600,
-                responseMimeType: 'application/json',
-              },
-            }),
-          }
-        );
+        const candidateModels = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.5-flash-lite'];
+        for (const modelName of candidateModels) {
+          try {
+            const geminiRes = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiKey}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  contents: [{ parts: [{ text: systemPrompt }] }],
+                  generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 600,
+                    responseMimeType: 'application/json',
+                  },
+                }),
+              }
+            );
 
-        if (geminiRes.ok) {
-          const geminiData = await geminiRes.json();
-          const rawOutput = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (rawOutput) {
-            const parsed = JSON.parse(rawOutput);
-            if (Array.isArray(parsed) && parsed.length >= 3) {
-              return NextResponse.json({
-                success: true,
-                options: parsed,
-                provider: 'Google Gemini 1.5 Flash (Official Live)',
-              });
+            if (geminiRes.ok) {
+              const geminiData = await geminiRes.json();
+              const rawOutput = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (rawOutput) {
+                let clean = rawOutput.trim();
+                if (clean.startsWith('```')) {
+                  clean = clean.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+                }
+                const firstBracket = clean.indexOf('[');
+                const lastBracket = clean.lastIndexOf(']');
+                if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
+                  clean = clean.substring(firstBracket, lastBracket + 1);
+                }
+                const parsed = JSON.parse(clean);
+                if (Array.isArray(parsed) && parsed.length >= 3) {
+                  return NextResponse.json({
+                    success: true,
+                    options: parsed,
+                    provider: `Google Gemini (${modelName})`,
+                  });
+                }
+              }
             }
+          } catch (modelErr) {
+            console.warn(`[AI-Reply] Model ${modelName} error:`, modelErr);
           }
         }
       } catch (geminiErr) {
