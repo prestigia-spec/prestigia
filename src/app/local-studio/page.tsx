@@ -1385,6 +1385,7 @@ export default function LocalStudioPage() {
       existingRating?: number;
       existingReviews?: number;
       phone?: string;
+      reviewHighlights?: string[];
     }
   ) => {
     const finalBizName = (overrides?.businessName ?? businessName).trim();
@@ -1419,6 +1420,7 @@ export default function LocalStudioPage() {
         lang,
         businessModel,
         serviceAreas: serviceAreas.trim(),
+        reviewHighlights: overrides?.reviewHighlights || scannedListing?.reviewHighlights || [],
       };
 
       const res = await fetch('/api/local-studio/generate', {
@@ -1549,6 +1551,7 @@ export default function LocalStudioPage() {
           existingRating: place.rating,
           existingReviews: place.reviewsCount,
           phone: place.phone || phone,
+          reviewHighlights: place.reviewHighlights || [],
         });
       } else {
         // Fallback: If live lookup fails or returns error, use raw query as name and audit anyway

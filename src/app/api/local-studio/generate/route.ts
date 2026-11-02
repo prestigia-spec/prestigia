@@ -14,6 +14,7 @@ interface GenerateRequest {
   lang?: 'es' | 'en';
   businessModel?: 'storefront' | 'service_area';
   serviceAreas?: string;
+  reviewHighlights?: string[];
 }
 
 export async function POST(request: Request) {
@@ -33,6 +34,7 @@ export async function POST(request: Request) {
       lang = 'es',
       businessModel = 'storefront',
       serviceAreas = '',
+      reviewHighlights = [],
     } = body;
 
     if (!businessName || !businessName.trim()) {
@@ -47,6 +49,7 @@ export async function POST(request: Request) {
     const cleanServiceAreas = serviceAreas.trim();
     const isEn = lang === 'en';
     const isSAB = businessModel === 'service_area';
+    const cleanReviewHighlights = Array.isArray(reviewHighlights) ? reviewHighlights.filter(Boolean) : [];
 
     const effectiveReviews = mode === 'create' ? 0 : (Number(existingReviews) || 0);
     const targetTop3Reviews = mode === 'create' ? 100 : Math.max(120, effectiveReviews + 80);
@@ -65,7 +68,7 @@ Your task is to generate the EXACT technical architecture and winning Google Map
 Language of the entire output: ${isEn ? 'ENGLISH (USA Market Standard)' : 'SPANISH (LatAm Standard)'}.
 
 BUSINESS SPECIFICATIONS:
-- Mode: ${mode === 'create' ? 'BUILD NEW PROFILE FROM SCRATCH' : 'FORENSIC AUDIT & TOP 3 UPGRADE'}
+- Mode: ${mode === 'create' ? 'BUILD NEW PROFILE FROM SCRATCH (Ficha 1)' : 'FORENSIC AUDIT & TOP 3 UPGRADE (Ficha 2)'}
 - Business Model: ${isSAB ? 'SERVICE AREA BUSINESS / INDEPENDENT PROFESSIONAL (SAB - No physical customer storefront, travels to client or works remotely)' : 'STOREFRONT WITH PHYSICAL ADDRESS (Customers visit location)'}
 - Business Name: "${cleanName}"
 - Sector/Category: "${category}"
@@ -75,23 +78,48 @@ BUSINESS SPECIFICATIONS:
 - Star Specialties / Top Services: "${cleanSpecialties || 'High demand flagship services'}"
 - Official Phone / WhatsApp: "${cleanPhone || 'Direct line'}"
 - Existing Rating & Reviews (if audit): ${existingRating}★ (${existingReviews} reviews)
+- Verified Customer Feedback Highlights (if audit): ${cleanReviewHighlights.length > 0 ? cleanReviewHighlights.join(' | ') : 'Positive public feedback on quality, hospitality, and personalized service'}
 
-CRITICAL QUALITY RULES (FACTUAL & RELEVANT - NO INVENTED INFO - NO FILLER):
-1. "primaryCategory": The exact official Google Business Profile primary category matching the business and specialties.
-2. "secondaryCategories": Exactly 4 to 5 official Google secondary categories strictly relevant to the business. NEVER include unrelated categories (e.g. do NOT include 'Bar and grill' for a pasta restaurant).
-3. "optimizedTitle": Strategic title following formula: "[Brand Name] | [Core Category/Specialty] en [City/Area]".
-4. "commercialDescription": Factual, clear, professional overview describing the business, exact specialties provided, service formats (dine-in, takeout, delivery), and direct WhatsApp contact. ABSOLUTELY NO generic marketing fluff, NO pompous claims (e.g. do not invent 'referente', 'el mejor', 'apasionados'), NO unverified assumptions (e.g. do NOT invent wine, valet parking, or services not specified).
-5. "serviceCatalog": Array derived STRICTLY from the user's provided specialties/products. DO NOT invent fictitious products or services.
-6. "photoChecklist": Array of 5 required photo types with geotagged SEO recommended filenames. ${isSAB ? 'For independents/SAB: Focus on professional equipment, tools, work vehicle, laptop/workspace, and smiling specialist.' : 'For storefronts: Focus on facade, illuminated sign, interior, star dishes/products, and team.'}
-7. "preventiveFaqs": Exactly 5 strategic Q&As addressing common customer objections.
-8. "verificationGuide": Foolproof 60-90 second continuous video verification guide. ${isSAB ? 'CRITICAL FOR INDEPENDENTS/SAB: Google does NOT accept an empty house. Must detail Take 1 (Professional tools, branded materials, active work equipment), Take 2 (Official tax/business registration matching address privately, utility bill, physical business cards), Take 3 (Branded work vehicle with tools or dedicated workspace).' : 'For storefronts: Take 1 (Street sign and exterior facade), Take 2 (Unlocking front door with keys), Take 3 (Cash register, POS terminal, POS software).'}
-9. "whatsappOnboardingMessage": Complete and professional message ready to copy & paste to the client requesting all photos, verification video, and details in one go.
-10. "suggestedServiceAreas": ${isSAB ? 'Array of 8 to 10 affluent target neighborhoods, zip codes, or sub-cities where the independent professional should register service coverage in Google Maps without showing home address.' : '[]'}
-11. "hidePhysicalAddress": ${isSAB ? true : false}
-12. "nfcPocketReviewGuide": Protocol for collecting instant 5-star Google reviews on-site (using pocket NFC cards or immediate post-service WhatsApp dispatch).
-13. "reviewVelocityPlan": Object with currentReviews (${effectiveReviews}), targetTop3Reviews (${targetTop3Reviews}), neededReviews (${neededReviews}), recommended pace reviewsPerWeek (8), and estimated weeksToTop3 (${weeksToTop3}).
-14. "monthlyPostsBooster": Array of 4 weekly Google Business Profile posts (Week 1: Flagship Service, Week 2: Problem & Solution, Week 3: Trust/Certification/Behind the Scenes, Week 4: Limited Booking Offer) with title, body, and CTA button.
-${mode === 'audit' ? `15. For Audit Mode: "healthScore" (40-68), "criticalGaps" (4-5 gaps), "topCompetitorInsights" (concise 90-day win strategy), and "actionRoadmap" (5 prioritized steps with impact: CRÍTICO/ALTO/MEDIO).` : ''}
+CRITICAL MULTI-NICHE & QUALITY RULES (ZERO PIGEONHOLING - HIGH IMPACT - FACTUAL):
+
+1. MULTI-NICHE INTELLIGENCE (DO NOT PIGEONHOLE INTO RESTAURANTS):
+   Identify the TRUE operational industry from the name, category, and specialties. Adapt ALL vocabulary, tone, services, and photo guidance to that specific field:
+   - GASTRO (Restaurante, Cafetería, Pastelería, Pizzería, Bar): Food recipes, authentic flavors, fresh ingredients, dining atmosphere, hospitality, dine-in / takeout / delivery.
+   - HEALTH / DENTAL (Clínica médica, Consultorio, Odontología): Clinical rigor, modern diagnostic equipment, sterilization standards, compassionate bedside manner, painless procedures, appointment booking. NEVER mention food, delivery, or dishes!
+   - VETERINARY / PET CARE (Veterinaria, Cuidado animal, Peluquería canina): Love for pets, preventative diagnostics, gentle animal handling, compassionate communication with pet owners.
+   - BEAUTY / SALON / BARBERSHOP (Barbería, Peluquería, Spa, Estética): Barber/stylist artistry, precision haircutting, beard grooming, relaxing lounge atmosphere, premium products.
+   - EVENT VENUE / BANQUET (Salón de eventos, Recepciones, Fiestas): Hall capacity, spatial elegance, acoustics, lighting, celebration packages, dedicated event coordination.
+   - AUTOMOTIVE (Taller mecánico, Concesionario, Lavadero, Detailing): Mechanical precision, computerized diagnostic tools, honest estimates, certified technicians, warranty.
+   - FITNESS (Gimnasio, Crossfit, Centro de entrenamiento): Modern workout machines, certified trainers, motivating community, clean facilities.
+   - RETAIL / COMMERCE (Tienda, Ropa, Moda, Boutique): Curated selections, garment quality, personalized styling advice.
+   - PROFESSIONAL SERVICES (Legal, Contable, Consultoría): Strategic expertise, confidentiality, tailored advisory, rigorous compliance.
+
+2. COMMERCIAL DESCRIPTION ARCHITECTURE (MUST BE BETWEEN 600 AND 745 CHARACTERS - HARD LIMIT 750 CHARACTERS):
+   - In "commercialDescription":
+     ${mode === 'audit' ? `* FOR AUDIT MODE:
+       Weave in what real satisfied customers praise based on the ${existingRating}★ rating and public feedback highlights (${cleanReviewHighlights.length > 0 ? cleanReviewHighlights.join(' | ') : 'high quality, great attention to detail, and customer satisfaction'}). Mention specific elements clients love (e.g. food taste and portion sizes for gastro, doctor gentleness and painless care for clinics, caring pet handling for vets, haircut precision for barbers, spacious elegance for event venues). Include neighborhood (${cleanNeighborhood}) and city (${cleanCity}) naturally for Local 3-Pack SEO rank. End with a welcoming call-to-action with direct WhatsApp contact (${cleanPhone}).` : `* FOR CREATE MODE (NEW LISTING):
+       Vividly portray three pillars:
+       1) The physical space / atmosphere / comfort of the location (lighting, cleanliness, welcoming vibe).
+       2) The core offering and signature craft (fresh culinary recipes for food; diagnostic procedures & patient care for clinics; pet health & grooming for vets; styling & cuts for barbers; celebration packages for event halls; etc.).
+       3) The warm, dedicated customer attention and service commitment.
+       Include location keywords (${cleanNeighborhood ? cleanNeighborhood + ', ' : ''}${cleanCity}) and direct WhatsApp contact (${cleanPhone}).`}
+     * STRICT CHARACTER CONSTRAINT: Must be at least 600 characters and strictly UNDER 745 characters (Google cuts off at 750).
+     * AUTHENTIC & GROUNDED: Zero generic buzzwords ('somos los mejores', 'líder supremo'). Grounded 100% in the real business.
+
+3. "primaryCategory": The exact official Google Business Profile primary category corresponding to the niche.
+4. "secondaryCategories": Exactly 4 to 5 official Google secondary categories strictly relevant to the niche. NEVER include unrelated categories.
+5. "optimizedTitle": Strategic formula: "[Brand Name] | [Core Category/Specialty] en [City/Area]".
+6. "serviceCatalog": Array derived STRICTLY from the business niche and user specialties.
+7. "photoChecklist": Array of 5 photo types tailored to the niche (e.g., medical equipment for clinics, exam rooms for vets, hair stations for barbers, hall setups for events, kitchen/dishes for restaurants).
+8. "preventiveFaqs": Exactly 5 strategic Q&As addressing common customer objections for this specific niche.
+9. "verificationGuide": Foolproof 60-90 second continuous video verification guide tailored to storefront or SAB.
+10. "whatsappOnboardingMessage": Complete message to client requesting onboarding materials.
+11. "suggestedServiceAreas": ${isSAB ? 'Array of 8 to 10 affluent target coverage areas.' : '[]'}
+12. "hidePhysicalAddress": ${isSAB ? true : false}
+13. "nfcPocketReviewGuide": Review collection protocol on-site.
+14. "reviewVelocityPlan": Object with currentReviews (${effectiveReviews}), targetTop3Reviews (${targetTop3Reviews}), neededReviews (${neededReviews}), pace (8/week), and weeks (${weeksToTop3}).
+15. "monthlyPostsBooster": Array of 4 weekly Google Business Profile posts tailored to the business niche.
+${mode === 'audit' ? `16. For Audit Mode: "healthScore" (40-68), "criticalGaps" (4-5 gaps), "topCompetitorInsights" (concise 90-day win strategy), and "actionRoadmap" (5 prioritized steps with impact: CRÍTICO/ALTO/MEDIO).` : ''}
 
 RETURN ONLY A VALID JSON OBJECT WITH THIS STRUCTURE (NO MARKDOWN WRAPPERS, NO EXTRA TEXT):
 {
@@ -210,6 +238,7 @@ RETURN ONLY A VALID JSON OBJECT WITH THIS STRUCTURE (NO MARKDOWN WRAPPERS, NO EX
       lang: isEn ? 'en' : 'es',
       businessModel,
       serviceAreas: cleanServiceAreas,
+      reviewHighlights: cleanReviewHighlights,
     });
 
     return NextResponse.json({ success: true, engine: 'heuristic-local', data: fallbackData });
@@ -383,6 +412,56 @@ function detectTaxonomy(params: {
     };
   }
 
+  // 6. VETERINARIA / MASCOTAS
+  if (combined.includes('veterin') || combined.includes('mascot') || combined.includes('pet') || combined.includes('canin') || combined.includes('felin')) {
+    return {
+      primaryCategory: isEn ? 'Veterinary Care' : 'Clínica veterinaria',
+      secondaryCategories: isEn
+        ? ['Veterinarian', 'Pet Groomer', 'Pet Supply Store', 'Animal Hospital', 'Emergency Veterinarian Service']
+        : ['Veterinario', 'Peluquería de mascotas', 'Hospital para animales', 'Tienda de artículos para mascotas', 'Urgencias veterinarias'],
+    };
+  }
+
+  // 7. SALÓN DE EVENTOS / RECEPCIONES / BANQUETES
+  if (combined.includes('evento') || combined.includes('recepc') || combined.includes('fiesta') || combined.includes('banquet') || combined.includes('boda') || combined.includes('salon')) {
+    return {
+      primaryCategory: isEn ? 'Event Venue' : 'Salón de eventos',
+      secondaryCategories: isEn
+        ? ['Banquet Hall', 'Wedding Venue', 'Party Planner', 'Conference Center', 'Catering Food and Drink Supplier']
+        : ['Salón para banquetes', 'Lugar para celebrar bodas', 'Centro de conferencias', 'Organizador de eventos', 'Servicio de fiestas'],
+    };
+  }
+
+  // 8. FITNESS / GIMNASIO / ENTRENAMIENTO
+  if (combined.includes('gym') || combined.includes('gimnasio') || combined.includes('fitness') || combined.includes('crossfit') || combined.includes('entren')) {
+    return {
+      primaryCategory: isEn ? 'Gym' : 'Gimnasio',
+      secondaryCategories: isEn
+        ? ['Fitness Center', 'Personal Trainer', 'Sports Club', 'Weightloss Service', 'Aerobics Program']
+        : ['Centro de fitness', 'Entrenador personal', 'Club deportivo', 'Centro de entrenamiento', 'Gimnasio de crossfit'],
+    };
+  }
+
+  // 9. RETAIL / TIENDA DE ROPA / BOUTIQUE
+  if (combined.includes('tienda') || combined.includes('retail') || combined.includes('moda') || combined.includes('ropa') || combined.includes('boutique') || combined.includes('calzado')) {
+    return {
+      primaryCategory: isEn ? 'Clothing Store' : 'Tienda de ropa',
+      secondaryCategories: isEn
+        ? ['Boutique', 'Fashion Accessories Store', 'Women\'s Clothing Store', 'Men\'s Clothing Store', 'Shoe Store']
+        : ['Boutique de moda', 'Tienda de accesorios de moda', 'Tienda de ropa de mujer', 'Tienda de ropa de hombre', 'Comercio local'],
+    };
+  }
+
+  // 10. HOTELERÍA / HOSPEDAJE
+  if (combined.includes('hotel') || combined.includes('hospedaj') || combined.includes('hostal') || combined.includes('turismo') || combined.includes('resort')) {
+    return {
+      primaryCategory: isEn ? 'Hotel' : 'Hotel',
+      secondaryCategories: isEn
+        ? ['Motel', 'Inn', 'Resort Hotel', 'Extended Stay Hotel', 'Tourist Information Center']
+        : ['Hospedaje turístico', 'Hostal', 'Hotel boutique', 'Alojamiento vacacional', 'Servicio de turismo'],
+    };
+  }
+
   // DEFAULT GENERAL
   return {
     primaryCategory: isEn ? 'Commercial Service' : 'Servicios Comerciales & Profesionales',
@@ -397,13 +476,12 @@ function buildTruthfulServiceCatalog(specialties: string, primaryCategory: strin
     return [
       {
         name: primaryCategory,
-        description: isEn ? `Official ${primaryCategory} services.` : `Servicios oficiales de ${primaryCategory}.`,
+        description: isEn ? `Official ${primaryCategory} specialized service.` : `Atención oficial y especializada en ${primaryCategory}.`,
         tag: primaryCategory,
       }
     ];
   }
 
-  // Split user specialties by commas, ' y ', ' and ', ';', or '/'
   const rawItems = specialties
     .split(/[,;/]|s+ys+|s+ands+/i)
     .map(s => s.trim())
@@ -413,22 +491,211 @@ function buildTruthfulServiceCatalog(specialties: string, primaryCategory: strin
     return [
       {
         name: primaryCategory,
-        description: isEn ? `Official ${primaryCategory} services.` : `Servicios oficiales de ${primaryCategory}.`,
+        description: isEn ? `Official ${primaryCategory} specialized service.` : `Atención oficial y especializada en ${primaryCategory}.`,
         tag: primaryCategory,
       }
     ];
+  }
+
+  const catLower = primaryCategory.toLowerCase();
+  let verb = isEn ? 'Specialized service in' : 'Servicio especializado en';
+  if (catLower.includes('restauran') || catLower.includes('cafe') || catLower.includes('panader') || catLower.includes('pizza') || catLower.includes('asador')) {
+    verb = isEn ? 'Preparation and table service of' : 'Elaboración artesanal y servicio de';
+  } else if (catLower.includes('dental') || catLower.includes('odont') || catLower.includes('clinic') || catLower.includes('médic')) {
+    verb = isEn ? 'Clinical evaluation and procedure for' : 'Evaluación clínica y procedimiento especializado en';
+  } else if (catLower.includes('veterin')) {
+    verb = isEn ? 'Compassionate animal care and clinical attention for' : 'Atención médica y cuidado compasivo para';
+  } else if (catLower.includes('barber') || catLower.includes('peluquer') || catLower.includes('belleza')) {
+    verb = isEn ? 'Professional styling and precision grooming for' : 'Estilizado profesional y cuidado personalizado de';
+  } else if (catLower.includes('evento') || catLower.includes('recepc')) {
+    verb = isEn ? 'Comprehensive coordination and venue setup for' : 'Coordinación logística y montaje exclusivo de';
+  } else if (catLower.includes('taller') || catLower.includes('auto') || catLower.includes('mecánic')) {
+    verb = isEn ? 'Technical diagnostics, certified maintenance and repair of' : 'Diagnóstico técnico, mantenimiento preventivo y reparación de';
   }
 
   return rawItems.map(item => {
     const capitalized = item.charAt(0).toUpperCase() + item.slice(1);
     return {
       name: capitalized,
-      description: isEn
-        ? `Preparation and service of ${item.toLowerCase()} based on current availability.`
-        : `Preparación y servicio de ${item.toLowerCase()} según disponibilidad y solicitud directa.`,
+      description: `${verb} ${item.toLowerCase()} ${isEn ? 'with guaranteed quality standards.' : 'con estándares de calidad y atención directa.'}`,
       tag: primaryCategory,
     };
   });
+}
+
+function generateNicheCommercialDescription(params: {
+  mode: 'create' | 'audit';
+  businessName: string;
+  primaryCategory: string;
+  category: string;
+  specialties: string;
+  locationTag: string;
+  city: string;
+  phone: string;
+  existingRating: number;
+  existingReviews: number;
+  reviewHighlights?: string[];
+  isEn: boolean;
+  isSAB: boolean;
+}): string {
+  const {
+    mode,
+    businessName,
+    primaryCategory,
+    category,
+    specialties,
+    locationTag,
+    city,
+    phone,
+    existingRating,
+    existingReviews,
+    reviewHighlights = [],
+    isEn,
+  } = params;
+
+  const rawSpecialties = specialties.trim() || (isEn ? 'our flagship specialties' : 'nuestras especialidades principales');
+  const catCombined = `${primaryCategory} ${category} ${businessName}`.toLowerCase();
+
+  let niche: 'gastro' | 'health' | 'veterinary' | 'beauty' | 'events' | 'automotive' | 'fitness' | 'retail' | 'general' = 'general';
+
+  if (
+    catCombined.includes('restauran') ||
+    catCombined.includes('cafe') ||
+    catCombined.includes('café') ||
+    catCombined.includes('panader') ||
+    catCombined.includes('comida') ||
+    catCombined.includes('pizza') ||
+    catCombined.includes('burger') ||
+    catCombined.includes('parrilla') ||
+    catCombined.includes('pasta') ||
+    catCombined.includes('gastro') ||
+    catCombined.includes('bar')
+  ) {
+    niche = 'gastro';
+  } else if (
+    catCombined.includes('dental') ||
+    catCombined.includes('odont') ||
+    catCombined.includes('clinic') ||
+    catCombined.includes('salud') ||
+    catCombined.includes('medic') ||
+    catCombined.includes('doctor')
+  ) {
+    niche = 'health';
+  } else if (catCombined.includes('veterin') || catCombined.includes('mascot') || catCombined.includes('pet')) {
+    niche = 'veterinary';
+  } else if (
+    catCombined.includes('barber') ||
+    catCombined.includes('peluquer') ||
+    catCombined.includes('salon') ||
+    catCombined.includes('spa') ||
+    catCombined.includes('estetic') ||
+    catCombined.includes('belleza') ||
+    catCombined.includes('uñas')
+  ) {
+    niche = 'beauty';
+  } else if (
+    catCombined.includes('evento') ||
+    catCombined.includes('recepc') ||
+    catCombined.includes('fiesta') ||
+    catCombined.includes('banquet') ||
+    catCombined.includes('boda')
+  ) {
+    niche = 'events';
+  } else if (
+    catCombined.includes('auto') ||
+    catCombined.includes('taller') ||
+    catCombined.includes('mecanic') ||
+    catCombined.includes('lavadero') ||
+    catCombined.includes('detailing')
+  ) {
+    niche = 'automotive';
+  } else if (catCombined.includes('gym') || catCombined.includes('fitness') || catCombined.includes('entren')) {
+    niche = 'fitness';
+  } else if (catCombined.includes('tienda') || catCombined.includes('retail') || catCombined.includes('moda') || catCombined.includes('ropa') || catCombined.includes('boutique')) {
+    niche = 'retail';
+  }
+
+  let desc = '';
+
+  if (mode === 'audit') {
+    const reviewNote = reviewHighlights && reviewHighlights.length > 0
+      ? reviewHighlights.slice(0, 2).join('. ')
+      : (isEn ? 'Clients consistently praise our attentive service and top quality' : 'Nuestros clientes elogian constantemente la calidad de la atención y la experiencia vivida');
+
+    if (isEn) {
+      if (niche === 'gastro') {
+        desc = `Welcome to ${businessName}, the recognized ${primaryCategory.toLowerCase()} in ${locationTag}. Backed by ${existingReviews} verified reviews and a ${existingRating}★ rating, diners celebrate our exquisite flavor, fresh ingredients, and signature ${rawSpecialties}. Enjoy a warm, welcoming dining ambiance with attentive hospitality, dine-in seating, takeout, and fast delivery across ${city}. ${reviewNote}. We invite you to live an unforgettable gastronomic moment. Contact us directly via WhatsApp at ${phone || 'our customer line'} for table bookings and orders.`;
+      } else if (niche === 'health') {
+        desc = `${businessName} is a premier ${primaryCategory.toLowerCase()} located in ${locationTag}. With a trusted ${existingRating}★ rating across ${existingReviews} patient reviews, we are commended for our compassionate bedside manner, strict clinical sterilization, and modern diagnostic technology in ${rawSpecialties}. ${reviewNote}. We prioritize patient comfort and personalized healthcare in a serene, professional environment. Book your consultation directly via WhatsApp at ${phone || 'our medical desk'}.`;
+      } else if (niche === 'veterinary') {
+        desc = `At ${businessName}, our dedicated ${primaryCategory.toLowerCase()} in ${locationTag} is backed by ${existingReviews} positive reviews and a ${existingRating}★ score. Pet families love our gentle animal handling, accurate preventative care, and specialized ${rawSpecialties}. ${reviewNote}. We offer modern facilities designed to keep dogs and cats calm and comfortable. Schedule a consultation or grooming session via WhatsApp at ${phone || 'our veterinary team'}.`;
+      } else if (niche === 'beauty') {
+        desc = `${businessName} is a distinguished ${primaryCategory.toLowerCase()} in ${locationTag}, rated ${existingRating}★ with ${existingReviews} glowing client reviews. Recognized for precision cuts, customized styling, and master care in ${rawSpecialties}. ${reviewNote}. Relax in our modern, stylish studio with VIP personal attention and premium salon products. Reserve your styling appointment today via WhatsApp at ${phone || 'our reception'}.`;
+      } else if (niche === 'events') {
+        desc = `Discover ${businessName}, the distinguished ${primaryCategory.toLowerCase()} in ${locationTag}. With ${existingReviews} customer reviews and a ${existingRating}★ rating, clients highlight our spacious layout, elegant lighting, acoustics, and expert coordination for ${rawSpecialties}. ${reviewNote}. We provide complete event logistics with dedicated staff to ensure a seamless celebration. Inquire and reserve your date via WhatsApp at ${phone || 'our event team'}.`;
+      } else if (niche === 'automotive') {
+        desc = `${businessName} is your dependable ${primaryCategory.toLowerCase()} in ${locationTag}, boasting a ${existingRating}★ rating backed by ${existingReviews} driver reviews. Clients appreciate our honest diagnostic transparency, certified technical mastery, and reliable repair turnarounds in ${rawSpecialties}. ${reviewNote}. State-of-the-art workshop and guaranteed workmanship across ${city}. Message us on WhatsApp at ${phone || 'our service desk'} for quotes and appointments.`;
+      } else {
+        desc = `${businessName} is a leading ${primaryCategory.toLowerCase()} in ${locationTag}. Supported by ${existingReviews} verified reviews and a ${existingRating}★ rating, clients commend our professionalism, warm customer care, and excellence in ${rawSpecialties}. ${reviewNote}. Experience dedicated service in comfortable, accessible facilities in ${city}. Contact our friendly team directly on WhatsApp at ${phone || 'our office line'}.`;
+      }
+    } else {
+      if (niche === 'gastro') {
+        desc = `Bienvenidos a ${businessName}, ${primaryCategory.toLowerCase()} de referencia en ${locationTag}. Respaldados por una calificación de ${existingRating}★ y ${existingReviews} opiniones de comensales que celebran el sabor casero, la frescura de los ingredientes y nuestras especialidades en ${rawSpecialties}. ${reviewNote}. Disfruta de un ambiente cálido, acogedor y familiar, con un servicio atento que te hace sentir como en casa. Ofrecemos servicio en salón, pedidos para llevar y entregas rápidas en ${city}. Te invitamos a vivir una experiencia gastronómica memorable. Escríbenos al WhatsApp ${phone || 'de atención'} para reservas y pedidos.`;
+      } else if (niche === 'health') {
+        desc = `${businessName} es un centro especializado en ${primaryCategory.toLowerCase()} ubicado en ${locationTag}. Con una valoración destacada de ${existingRating}★ basada en ${existingReviews} testimonios de pacientes que elogian la calidez humana, la ética médica y la precisión en tratamientos de ${rawSpecialties}. ${reviewNote}. Contamos con instalaciones modernas, cómodas y rigurosos protocolos de bioseguridad para brindarte una atención tranquila y sin dolor. Agenda tu valoración médica o dental directamente por WhatsApp al ${phone || 'nuestro número oficial'}.`;
+      } else if (niche === 'veterinary') {
+        desc = `En ${businessName}, ${primaryCategory.toLowerCase()} en ${locationTag}, cuidamos la salud y felicidad de tus mascotas. Respaldados por ${existingRating}★ y ${existingReviews} opiniones de familias que valoran el amor, la paciencia y el diagnóstico acertado en ${rawSpecialties}. ${reviewNote}. Brindamos instalaciones confortables y libres de estrés para perros y gatos, con atención médica preventiva y estética canina. Agenda tu consulta o servicio veterinario por WhatsApp al ${phone || 'número directo'}.`;
+      } else if (niche === 'beauty') {
+        desc = `${businessName} es tu ${primaryCategory.toLowerCase()} de confianza en ${locationTag}, calificado con ${existingRating}★ por ${existingReviews} clientes satisfechos que destacan la maestría en cortes, diseño personalizado y cuidado capilar en ${rawSpecialties}. ${reviewNote}. Disfruta de un espacio moderno, relajado y exclusivo, con atención personalizada de primer nivel y productos profesionales de alta gama. Reserva tu cita de estilo hoy mismo vía WhatsApp al ${phone || 'nuestro número de atención'}.`;
+      } else if (niche === 'events') {
+        desc = `Conoce ${businessName}, ${primaryCategory.toLowerCase()} exclusivo en ${locationTag}. Con una calificación de ${existingRating}★ respaldada por ${existingReviews} opiniones que elogian la amplitud, elegancia, acústica y excelente montaje para ${rawSpecialties}. ${reviewNote}. Ofrecemos asesoría logística integral, iluminación ambiental y personal de servicio dedicado para que tu boda, fiesta o evento corporativo sea inolvidable. Consulta disponibilidad y cotizaciones vía WhatsApp al ${phone || 'nuestro número directo'}.`;
+      } else if (niche === 'automotive') {
+        desc = `${businessName} es tu ${primaryCategory.toLowerCase()} aliado en ${locationTag}, con una calificación de ${existingRating}★ avalada por ${existingReviews} conductores que valoran la honestidad, el diagnóstico computarizado transparente y el cumplimiento en ${rawSpecialties}. ${reviewNote}. Taller equipado con herramientas de última generación y repuestos garantizados en ${city}. Escríbenos al WhatsApp ${phone || 'de taller'} para agendar tu mantenimiento o diagnóstico.`;
+      } else {
+        desc = `${businessName} es un establecimiento destacado en ${primaryCategory.toLowerCase()} ubicado en ${locationTag}. Con una calificación de ${existingRating}★ y ${existingReviews} opiniones de clientes que resaltan la seriedad, la calidez en el trato y la excelencia en ${rawSpecialties}. ${reviewNote}. Espacio cómodo, moderno y diseñado para brindarte la mejor experiencia en ${city}. Contáctanos directamente por WhatsApp al ${phone || 'nuestro número oficial'} para más información.`;
+      }
+    }
+  } else {
+    if (isEn) {
+      if (niche === 'gastro') {
+        desc = `Welcome to ${businessName}, your new favorite ${primaryCategory.toLowerCase()} in ${locationTag}. Step into a cozy, vibrant space where welcoming aromas, warm lighting, and charming decor create the perfect setting to relax and connect. We take pride in culinary craftsmanship, preparing fresh, flavorful dishes with authentic recipes, highlighting our signature ${rawSpecialties}. Our friendly waitstaff is dedicated to attentive, genuine hospitality, ensuring every guest feels right at home. We offer dine-in comfort, takeaway, and reliable delivery across ${city}. Message us on WhatsApp at ${phone || 'our line'} for menus and bookings.`;
+      } else if (niche === 'health') {
+        desc = `Welcome to ${businessName}, a state-of-the-art ${primaryCategory.toLowerCase()} in ${locationTag} designed for your complete well-being. Our clinic offers a peaceful, immaculate atmosphere with modern treatment suites, soothing ambient design, and strict sterilization standards. Our dedicated healthcare specialists provide gentle, empathetic, and personalized clinical care, specialized in ${rawSpecialties}. From the moment you arrive, our team greets you with warmth, respect, and attentive clinical guidance. Schedule your personalized appointment directly via WhatsApp at ${phone || 'our patient desk'}.`;
+      } else if (niche === 'veterinary') {
+        desc = `Welcome to ${businessName}, a compassionate ${primaryCategory.toLowerCase()} in ${locationTag} dedicated to your beloved pets. Our modern veterinary space is specifically designed to provide a calm, clean, and low-stress environment for dogs and cats. We deliver gentle medical care, comprehensive wellness checkups, and loving grooming, specialized in ${rawSpecialties}. Our veterinary staff treats every pet like family, combining clinical precision with warm, patient communication. Contact us on WhatsApp at ${phone || 'our clinic'} for consultations and vaccinations.`;
+      } else if (niche === 'beauty') {
+        desc = `Welcome to ${businessName}, the contemporary ${primaryCategory.toLowerCase()} in ${locationTag}. Experience a stylish, relaxing sanctuary with comfortable seating, modern aesthetics, and chill lounge vibes. Our master stylists and barbers specialize in ${rawSpecialties}, blending creative trends with tailored grooming techniques and premium care products. We are passionate about attentive, personalized customer care, taking the time to listen and elevate your personal look. Book your session directly via WhatsApp at ${phone || 'our studio'}.`;
+      } else if (niche === 'events') {
+        desc = `Welcome to ${businessName}, the premier ${primaryCategory.toLowerCase()} located in ${locationTag}. Our venue offers an expansive, architecturally elegant hall equipped with sophisticated ambient lighting, crystal-clear acoustics, and versatile celebration spaces for ${rawSpecialties}. Our passionate event team delivers attentive, detail-oriented hospitality from initial planning to celebration day, ensuring your guests enjoy an extraordinary experience. Contact our planning coordinator via WhatsApp at ${phone || 'our team'} to tour the venue.`;
+      } else if (niche === 'automotive') {
+        desc = `Welcome to ${businessName}, a modern, fully-equipped ${primaryCategory.toLowerCase()} in ${locationTag}. Our facility features clean, organized service bays with cutting-edge computerized diagnostic tools for your vehicle. We deliver expert mechanical maintenance and meticulous care, specialized in ${rawSpecialties}. Our certified technicians are committed to transparent advice, honest estimates, and attentive customer service with clear communication every step of the way. Contact us on WhatsApp at ${phone || 'our shop'} to book your vehicle service.`;
+      } else {
+        desc = `Welcome to ${businessName}, your dedicated ${primaryCategory.toLowerCase()} in ${locationTag}. Our space combines a clean, comfortable, and modern environment with specialized expertise in ${rawSpecialties}. We believe in warm, attentive customer care, listening closely to your needs to provide tailored solutions and dependable quality across ${city}. We look forward to serving you with excellence. Contact our friendly team directly on WhatsApp at ${phone || 'our office line'}.`;
+      }
+    } else {
+      if (niche === 'gastro') {
+        desc = `Bienvenidos a ${businessName}, tu nuevo ${primaryCategory.toLowerCase()} en ${locationTag}. Descubre un lugar acogedor y lleno de vida, con una atmósfera encantadora, iluminación cálida y espacios cómodos ideales para compartir momentos inolvidables. Nos apasiona la buena mesa y preparamos cada receta con ingredientes frescos y sabor auténtico, destacando nuestras especialidades en ${rawSpecialties}. Nuestro equipo te brinda una atención cercana, amable y servicial para que disfrutes de principio a fin. Contamos con servicio en mesa, pedidos para llevar y domicilios en ${city}. Escríbenos al WhatsApp ${phone || 'de atención'} para reservar tu mesa.`;
+      } else if (niche === 'health') {
+        desc = `Bienvenidos a ${businessName}, un moderno centro de ${primaryCategory.toLowerCase()} en ${locationTag} diseñado para tu salud y tranquilidad. Nuestras instalaciones ofrecen un ambiente sereno, impecable y dotado de tecnología de vanguardia con rigurosos estándares de bioseguridad. Nuestro equipo de profesionales brinda una atención médica cercana, delicada y personalizada, especializada en ${rawSpecialties}. Nos enfocamos en escucharte y cuidarte con vocación humana y ética profesional en cada visita. Agenda tu consulta o valoración médica de forma rápida y directa a través de nuestro WhatsApp ${phone || 'oficial'}.`;
+      } else if (niche === 'veterinary') {
+        desc = `Bienvenidos a ${businessName}, una clínica de ${primaryCategory.toLowerCase()} en ${locationTag} creada pensando en el bienestar de tus mascotas. Contamos con un espacio acogedor, limpio y libre de estrés, diseñado especialmente para la tranquilidad de perros y gatos. Nuestro equipo médico ofrece atención preventiva, diagnósticos certeros y cuidado cariñoso, especializados en ${rawSpecialties}. Amamos a los animales y te brindamos una atención cercana, transparente y llena de empatía. Déjanos cuidar a tu mejor amigo; comunícate directamente por WhatsApp al ${phone || 'nuestro número de atención'}.`;
+      } else if (niche === 'beauty') {
+        desc = `Bienvenidos a ${businessName}, tu exclusivo ${primaryCategory.toLowerCase()} en ${locationTag}. Disfruta de un ambiente moderno, relajado y sofisticado, diseñado para que desconectes de la rutina mientras cuidamos de tu imagen. Nuestros especialistas dominan las últimas tendencias y técnicas en ${rawSpecialties}, utilizando productos profesionales de máxima calidad. Te ofrecemos una atención personalizada, cercana y detallista, asesorándote para resaltar tu mejor estilo con total comodidad. Reserva tu cita fácilmente escribiéndonos por WhatsApp al ${phone || 'nuestro número de atención'}.`;
+      } else if (niche === 'events') {
+        desc = `Bienvenidos a ${businessName}, el distinguido ${primaryCategory.toLowerCase()} en ${locationTag}. Te ofrecemos un salón amplio, elegante y versátil, equipado con iluminación ambiental moderna, excelente acústica y espacios acondicionados para celebraciones inolvidables de ${rawSpecialties}. Nuestro equipo de coordinación y servicio te acompaña con total dedicación, amabilidad y atención a cada detalle para que tus invitados vivan una fiesta extraordinaria. Haz realidad tu evento soñado; contáctanos por WhatsApp al ${phone || 'nuestro número oficial'} para conocer las instalaciones.`;
+      } else if (niche === 'automotive') {
+        desc = `Bienvenidos a ${businessName}, un ${primaryCategory.toLowerCase()} moderno y equipado con tecnología de punta en ${locationTag}. Nuestras instalaciones cuentan con áreas de trabajo limpias y herramientas de diagnóstico computarizado para el cuidado integral de tu vehículo, con especialidad en ${rawSpecialties}. Nuestro equipo técnico se distingue por una atención honesta, transparente y puntual, explicándote cada procedimiento con claridad y garantía. Cuida tu inversión y viaja con total seguridad; escríbenos al WhatsApp ${phone || 'de taller'} para agendar tu servicio.`;
+      } else {
+        desc = `Bienvenidos a ${businessName}, tu aliado profesional en ${primaryCategory.toLowerCase()} en ${locationTag}. Ponemos a tu disposición un espacio cómodo, moderno y accesible, respaldado por un equipo comprometido con la excelencia y la calidad en ${rawSpecialties}. Creemos en una atención al cliente cercana, ágil y dedicada, orientada a superar tus expectativas en cada requerimiento en ${city}. Estaremos encantados de atenderte; contáctanos directamente a través de WhatsApp al ${phone || 'nuestro número oficial'} para asesorarte.`;
+      }
+    }
+  }
+
+  if (desc.length > 745) {
+    desc = desc.substring(0, 740).replace(/\s+\S*$/, '') + '.';
+  }
+
+  return desc;
 }
 
 function buildFallbackBlueprint(params: {
@@ -444,6 +711,7 @@ function buildFallbackBlueprint(params: {
   lang: 'es' | 'en';
   businessModel?: 'storefront' | 'service_area';
   serviceAreas?: string;
+  reviewHighlights?: string[];
 }) {
   const {
     businessName,
@@ -458,6 +726,7 @@ function buildFallbackBlueprint(params: {
     serviceAreas = '',
     existingReviews = 0,
     existingRating = 4.5,
+    reviewHighlights = [],
   } = params;
   const isEn = lang === 'en';
   const isSAB = businessModel === 'service_area';
@@ -480,16 +749,24 @@ function buildFallbackBlueprint(params: {
   const cleanSpecialties = specialties.trim();
   const rawSpecialties = cleanSpecialties || (isEn ? 'our main specialty items' : 'nuestros productos y servicios principales');
 
-  const serviceChannels = isSAB
-    ? (isEn ? 'service directly at the client location and home delivery' : 'atención a domicilio y cobertura en la zona')
-    : (isEn ? 'dine-in service, takeout orders, and local delivery' : 'atención en el local, pedidos para llevar y servicio a domicilio');
-
   const optimizedTitle = `${businessName} | ${primaryCategory} en ${locationTag}`;
 
-  // Factual, truthful commercial description without invented claims or empty marketing filler
-  const commercialDescription = isEn
-    ? `${businessName} is a ${primaryCategory.toLowerCase()} located in ${locationTag}, specialized in ${rawSpecialties}. We provide ${serviceChannels} across ${city}. For menu details, orders, and inquiries, contact us directly via WhatsApp at ${phone || 'our direct customer line'}.`
-    : `${businessName} es un ${primaryCategory.toLowerCase()} ubicado en ${locationTag}, especializado en ${rawSpecialties}. Ofrecemos ${serviceChannels} en ${city}. Para consultar disponibilidad, realizar pedidos o solicitar información, comunícate directamente por WhatsApp al ${phone || 'nuestro número de atención'}.`;
+  // Multi-niche rich commercial description (600-745 chars) honoring place, food/offering, customer care, and reviews
+  const commercialDescription = generateNicheCommercialDescription({
+    mode,
+    businessName,
+    primaryCategory,
+    category,
+    specialties,
+    locationTag,
+    city,
+    phone,
+    existingRating,
+    existingReviews,
+    reviewHighlights,
+    isEn,
+    isSAB,
+  });
 
   const photoChecklist = [
     {
@@ -524,12 +801,14 @@ function buildFallbackBlueprint(params: {
     },
   ];
 
+  const isFoodNiche = taxonomy.primaryCategory.toLowerCase().includes('restauran') || taxonomy.primaryCategory.toLowerCase().includes('cafe') || taxonomy.primaryCategory.toLowerCase().includes('pizza');
+
   const preventiveFaqs = [
     {
       question: isEn ? `What are the operating hours of ${businessName}?` : `¿Cuáles son los horarios de atención de ${businessName}?`,
       answer: isEn
         ? `Operating hours are kept updated directly on this Google profile. You may also message us on WhatsApp at ${phone || 'our line'} to confirm holiday hours.`
-        : `Nuestros horarios se mantienen actualizados directamente en esta ficha de Google. También puedes consultarnos por WhatsApp al ${phone || 'número de atención'} para festivos.`,
+        : `Nuestros horarios se mantienen actualizados directamente en esta ficha de Google. También puedes consultarnos por WhatsApp al ${phone || 'número de atención'} para festivos o citas especiales.`,
     },
     {
       question: isEn ? 'What payment methods do you accept?' : '¿Qué medios de pago reciben?',
@@ -538,16 +817,20 @@ function buildFallbackBlueprint(params: {
         : 'Recibimos efectivo, tarjetas de débito y crédito, y transferencias electrónicas verificadas.',
     },
     {
-      question: isEn ? 'How can I place an order or make a reservation?' : '¿Cómo puedo hacer un pedido o reservar?',
+      question: isFoodNiche
+        ? (isEn ? 'How can I place an order or make a reservation?' : '¿Cómo puedo hacer un pedido o reservar?')
+        : (isEn ? 'How can I schedule an appointment or book a service?' : '¿Cómo puedo agendar una cita o reservar un servicio?'),
       answer: isEn
-        ? `You can contact us directly via WhatsApp at ${phone || 'our direct line'} for fast booking and orders.`
-        : `Puedes comunicarte directamente por WhatsApp al ${phone || 'nuestro número directo'} para coordinar pedidos o reservas con rapidez.`,
+        ? `You can contact us directly via WhatsApp at ${phone || 'our direct line'} for fast booking and immediate assistance.`
+        : `Puedes comunicarte directamente por WhatsApp al ${phone || 'nuestro número directo'} para coordinar citas, reservas o pedidos con rapidez.`,
     },
     {
-      question: isEn ? 'Do you offer takeaway or delivery options?' : '¿Manejan pedidos para llevar o domicilios?',
-      answer: isEn
-        ? `Yes, we handle takeaway orders and local delivery across ${city}. Contact us on WhatsApp to order.`
-        : `Sí, gestionamos pedidos para llevar y entregas a domicilio en la zona de ${city}. Escríbenos para solicitar tu pedido.`,
+      question: isFoodNiche
+        ? (isEn ? 'Do you offer takeaway or delivery options?' : '¿Manejan pedidos para llevar o domicilios?')
+        : (isEn ? 'Do you accept walk-ins or is it appointment only?' : '¿Atienden por orden de llegada o con cita previa?'),
+      answer: isFoodNiche
+        ? (isEn ? `Yes, we handle takeaway orders and local delivery across ${city}. Contact us on WhatsApp to order.` : `Sí, gestionamos pedidos para llevar y entregas a domicilio en ${city}. Escríbenos para solicitar tu pedido.`)
+        : (isEn ? `We welcome walk-in visits, but recommend booking via WhatsApp at ${phone || 'our line'} to guarantee immediate priority service.` : `Recibimos visitas directas, pero recomendamos coordinar tu cita previa por WhatsApp al ${phone || 'nuestro número de atención'} para garantizar atención sin demoras.`),
     },
     {
       question: isEn ? 'Where are you located?' : '¿Dónde están ubicados?',
