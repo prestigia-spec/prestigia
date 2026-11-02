@@ -601,10 +601,6 @@ const TXT_TOOLS = {
     toolsEmptyScanBtn: 'Activar Armas con Google Maps API',
     toolsEmptyDemoBtn: 'O explorar con datos de demostración interactiva →',
     toolsChangeListing: 'Cambiar Ficha / Limpiar',
-    clientScannerLabel: 'Escanear Nuestro Posible Cliente con Google Maps API (1 Clic)',
-    clientScannerPlaceholder: 'Pega enlace de Google Maps o Nombre del Negocio + Ciudad',
-    clientScannerBtn: 'Escanear Cliente con Google',
-    clientScannerScanning: 'Consultando Cliente en Vivo...',
     rivalScannerLabel: 'Escanear Competidor Más Cercano con Google Maps API (1 Clic)',
     rivalScannerPlaceholder: 'Pega enlace de Google Maps o Nombre del Rival + Ciudad',
     rivalScannerBtn: 'Escanear Rival con Google',
@@ -727,10 +723,6 @@ const TXT_TOOLS = {
     toolsEmptyScanBtn: 'Activate Arsenal with Google Maps API',
     toolsEmptyDemoBtn: 'Or explore with interactive demo data →',
     toolsChangeListing: 'Change Profile / Clear',
-    clientScannerLabel: 'Scan Prospective Client via Google Maps API (1-Click)',
-    clientScannerPlaceholder: 'Paste Google Maps link or Client Business Name + City',
-    clientScannerBtn: 'Scan Client with Google',
-    clientScannerScanning: 'Querying Client in Real-time...',
     rivalScannerLabel: 'Scan Closest Competitor via Google Maps API (1-Click)',
     rivalScannerPlaceholder: 'Paste Google Maps link or Competitor Name + City',
     rivalScannerBtn: 'Scan Competitor with Google',
@@ -1294,8 +1286,6 @@ export default function LocalStudioPage() {
   const [isRescueScanning, setIsRescueScanning] = useState(false);
 
   // Rival Spy (Head-to-Head Competitor Radar) State
-  const [clientSearchQuery, setClientSearchQuery] = useState('');
-  const [isClientScanning, setIsClientScanning] = useState(false);
   const [rivalSearchQuery, setRivalSearchQuery] = useState('');
   const [isRivalScanning, setIsRivalScanning] = useState(false);
   const [rivalName, setRivalName] = useState('');
@@ -1912,91 +1902,7 @@ export default function LocalStudioPage() {
   };
 
   // -------------------------------------------------------------
-  // 3.1.d.1 1-CLICK PROSPECTIVE CLIENT SCANNER FOR RIVAL SPY
-  // -------------------------------------------------------------
-  const handleClientScan = async () => {
-    const rawInput = clientSearchQuery.trim();
-    if (!rawInput) {
-      showToast(
-        isEn
-          ? '⚠️ Please enter prospective client link or name'
-          : '⚠️ Pega el enlace de Google Maps o escribe el nombre del cliente'
-      );
-      return;
-    }
-
-    setIsClientScanning(true);
-    showToast(
-      isEn
-        ? '🔍 Inspecting prospective client on Google Maps...'
-        : '🔍 Escaneando perfil de nuestro posible cliente en Google Maps...'
-    );
-
-    try {
-      const res = await fetch('/api/auditor/google-lookup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: rawInput }),
-      });
-      const data = await res.json();
-
-      if (data?.success && data?.data) {
-        const place: GooglePlaceData = data.data;
-        if (place.name) setBusinessName(place.name);
-
-        let parsedCity = city;
-        if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
-          const parts = place.address.split(',').map((p) => p.trim());
-          if (parts.length >= 2) {
-            parsedCity = parts[parts.length - 2] || parsedCity;
-          }
-          if (parsedCity) setCity(parsedCity);
-        }
-
-        if (typeof place.rating === 'number') setExistingRating(place.rating);
-        if (typeof place.reviewsCount === 'number') setExistingReviews(place.reviewsCount);
-
-        const matchedCategory = mapDetectedCategoryToPrestigia(
-          place.category || '',
-          place.detectedCategories || [],
-          isEn
-        );
-        setCategory(matchedCategory);
-        const smartTicket = getAverageTicketByNiche(matchedCategory);
-        setRoiAverageTicket(smartTicket);
-        const smartKw = getDefaultKeywordByNiche(matchedCategory, parsedCity || city, isEn);
-        if (smartKw) setGeoGridKeyword(smartKw);
-
-        showToast(
-          isEn
-            ? `✓ Client Loaded: ${place.name} (${place.rating}★ · ${place.reviewsCount} reviews).`
-            : `✓ Cliente Reconocido: ${place.name} (${place.rating}★ · ${place.reviewsCount} opiniones).`
-        );
-      } else {
-        const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
-        setBusinessName(fallbackName);
-        showToast(
-          isEn
-            ? `✓ Client set to "${fallbackName}"`
-            : `✓ Cliente asignado a "${fallbackName}"`
-        );
-      }
-    } catch (err: any) {
-      console.error('Client scan error:', err);
-      const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
-      setBusinessName(fallbackName);
-      showToast(
-        isEn
-          ? '⚠️ Client lookup error. Name updated.'
-          : '⚠️ Error al escanear cliente. Nombre actualizado.'
-      );
-    } finally {
-      setIsClientScanning(false);
-    }
-  };
-
-  // -------------------------------------------------------------
-  // 3.1.d.2 1-CLICK COMPETITOR SCANNER FOR RIVAL SPY (HERRAMIENTA 3)
+  // 3.1.d 1-CLICK COMPETITOR SCANNER FOR RIVAL SPY (HERRAMIENTA 3)
   // -------------------------------------------------------------
   const handleRivalScan = async () => {
     const rawInput = rivalSearchQuery.trim();
@@ -5438,76 +5344,33 @@ export default function LocalStudioPage() {
 
                 {/* Dual Business Setup (Client vs Competitor) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                  {/* Left: Your Client */}
+                  {/* Left: Your Client (Bloqueado & Sincronizado de Ficha Activa) */}
                   <div className="p-5 rounded-2xl bg-slate-950 border border-emerald-500/40 space-y-3 relative overflow-hidden">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">
-                        {tTools.spyClientCol}
-                      </span>
-                      <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30">
-                        {isEn ? 'Your Prospect Profile' : 'Tu Posible Cliente'}
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">
+                          {tTools.spyClientCol}
+                        </span>
+                      </div>
+                      <span className="inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/30">
+                        <Lock className="w-2.5 h-2.5 text-emerald-400" />
+                        <span>{isEn ? 'Verified Listing (Locked)' : 'Ficha Verificada (Bloqueada)'}</span>
                       </span>
                     </div>
 
-                    {/* 1-Click Google Maps Prospective Client Scanner */}
-                    <div className="p-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 space-y-1.5">
-                      <label className="block text-[10px] font-bold text-emerald-300 flex items-center justify-between">
-                        <span>{tTools.clientScannerLabel}</span>
-                        {clientSearchQuery && (
-                          <button
-                            type="button"
-                            onClick={() => setClientSearchQuery('')}
-                            className="text-[9px] text-slate-400 hover:text-emerald-400 transition cursor-pointer"
-                          >
-                            {isEn ? 'Clear' : 'Limpiar'}
-                          </button>
-                        )}
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          value={clientSearchQuery}
-                          onChange={(e) => setClientSearchQuery(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !isClientScanning && clientSearchQuery.trim()) {
-                              e.preventDefault();
-                              handleClientScan();
-                            }
-                          }}
-                          placeholder={tTools.clientScannerPlaceholder}
-                          className="w-full pl-2.5 pr-16 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 text-[11px]"
-                        />
-                        <button
-                          type="button"
-                          onClick={async () => {
-                            try {
-                              const text = await navigator.clipboard.readText();
-                              if (text) setClientSearchQuery(text.trim());
-                            } catch {}
-                          }}
-                          className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded-md bg-slate-800 text-[9px] font-bold text-emerald-400 hover:bg-slate-700 transition cursor-pointer"
-                        >
-                          {t.pasteBtn}
-                        </button>
+                    {/* Auto-synced Listing Status Banner */}
+                    <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center gap-2.5 text-xs">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-900/60 border border-emerald-500/40 flex items-center justify-center shrink-0">
+                        <ShieldCheck className="w-4 h-4 text-emerald-400" />
                       </div>
-                      <button
-                        type="button"
-                        onClick={handleClientScan}
-                        disabled={isClientScanning || !clientSearchQuery.trim()}
-                        className="w-full py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-[11px] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
-                      >
-                        {isClientScanning ? (
-                          <>
-                            <RefreshCw className="w-3 h-3 animate-spin" />
-                            <span>{tTools.clientScannerScanning}</span>
-                          </>
-                        ) : (
-                          <>
-                            <Search className="w-3 h-3" />
-                            <span>{tTools.clientScannerBtn}</span>
-                          </>
-                        )}
-                      </button>
+                      <div className="min-w-0 flex-1">
+                        <strong className="text-white text-[11px] block truncate">
+                          {businessName || (isEn ? 'Active Client Profile' : 'Ficha Activa del Cliente')}
+                        </strong>
+                        <span className="text-[10px] text-emerald-300/80 block">
+                          {city ? `${city} • ` : ''}{isEn ? 'Data auto-synced from Google Maps' : 'Datos sincronizados de Google Maps'}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="space-y-2.5">
@@ -5515,13 +5378,15 @@ export default function LocalStudioPage() {
                         <label className="block text-slate-400 font-bold mb-1">
                           {isEn ? 'Client Business Name' : 'Nombre del Posible Cliente'}
                         </label>
-                        <input
-                          type="text"
-                          value={businessName}
-                          onChange={(e) => setBusinessName(e.target.value)}
-                          placeholder="ej: La Suiza Parrilla"
-                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-emerald-200 font-bold text-xs focus:outline-none focus:border-emerald-400"
-                        />
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={businessName}
+                            readOnly
+                            className="w-full pl-3 pr-8 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-emerald-300 font-bold text-xs cursor-not-allowed select-none focus:outline-none"
+                          />
+                          <Lock className="w-3.5 h-3.5 text-emerald-500/60 absolute right-3 top-1/2 -translate-y-1/2" />
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-2">
@@ -5529,27 +5394,29 @@ export default function LocalStudioPage() {
                           <label className="block text-slate-400 font-bold mb-1">
                             {tTools.spyMetricRating}
                           </label>
-                          <input
-                            type="number"
-                            step="0.1"
-                            min="1"
-                            max="5"
-                            value={existingRating}
-                            onChange={(e) => setExistingRating(Number(e.target.value))}
-                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-amber-300 font-black text-xs focus:outline-none focus:border-emerald-400"
-                          />
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={`${existingRating} ★`}
+                              readOnly
+                              className="w-full pl-3 pr-8 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-amber-300 font-black text-xs cursor-not-allowed select-none focus:outline-none"
+                            />
+                            <Lock className="w-3.5 h-3.5 text-emerald-500/60 absolute right-3 top-1/2 -translate-y-1/2" />
+                          </div>
                         </div>
                         <div>
                           <label className="block text-slate-400 font-bold mb-1">
                             {tTools.spyMetricReviews}
                           </label>
-                          <input
-                            type="number"
-                            min="0"
-                            value={existingReviews}
-                            onChange={(e) => setExistingReviews(Number(e.target.value))}
-                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-black text-xs focus:outline-none focus:border-emerald-400"
-                          />
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={`${existingReviews.toLocaleString()} ${isEn ? 'reviews' : 'opiniones'}`}
+                              readOnly
+                              className="w-full pl-3 pr-8 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-white font-black text-xs cursor-not-allowed select-none focus:outline-none"
+                            />
+                            <Lock className="w-3.5 h-3.5 text-emerald-500/60 absolute right-3 top-1/2 -translate-y-1/2" />
+                          </div>
                         </div>
                       </div>
 
@@ -5558,7 +5425,7 @@ export default function LocalStudioPage() {
                           <label className="block text-slate-400 font-bold mb-1">
                             {tTools.spyMetricWeekly}
                           </label>
-                          <div className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 font-bold text-xs flex items-center justify-between">
+                          <div className="px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300 font-bold text-xs flex items-center justify-between">
                             <span>+1 / sem</span>
                             <span className="text-[9px] text-slate-500 font-normal">{isEn ? 'Organic' : 'Orgánico'}</span>
                           </div>
@@ -5567,7 +5434,7 @@ export default function LocalStudioPage() {
                           <label className="block text-slate-400 font-bold mb-1">
                             {tTools.spyMetricPhotos}
                           </label>
-                          <div className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 font-bold text-xs flex items-center justify-between">
+                          <div className="px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300 font-bold text-xs flex items-center justify-between">
                             <span>14 {isEn ? 'photos' : 'fotos'}</span>
                             <span className="text-[9px] text-slate-500 font-normal">{isEn ? 'Current' : 'Actuales'}</span>
                           </div>
