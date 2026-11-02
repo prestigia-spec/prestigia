@@ -514,7 +514,7 @@ const TXT_TOOLS = {
     scenario1Title: 'Caso 1: Ficha Huérfana / "Reclamar esta empresa" (Sin Dueño Reclamado)',
     scenario1Subtitle: 'Aparece "¿Eres el propietario?" o "Reclamar esta empresa". Creada por la comunidad o bots de Google. Nadie tiene el control legal.',
     scenario2Title: 'Caso 2: Ficha Reclamada por Tercero (Ex-agencia o Ex-empleado)',
-    scenario2Subtitle: 'Sale "Gestionada por c•••••@gmail.com". Activación del Protocolo Oficial de 72 Horas de Google.',
+    scenario2Subtitle: 'Google indica "Esta empresa ya está gestionada por otro usuario". Activación del Protocolo Oficial de 72 Horas de Google.',
     scenario3Title: 'Caso 3: Solicitud Rechazada por Tercero de Mala Fe (Apelación Legal)',
     scenario3Subtitle: 'El tercero rechazó la entrega. Activación de Expediente Probatorio ante el Soporte Técnico de Google.',
     rescueBtnDirectClaim: 'Abrir Google Business Profile para Reclamar',
@@ -614,7 +614,7 @@ const TXT_TOOLS = {
     scenario1Title: 'Case 1: Orphan Listing / "Claim this business" (Unclaimed Profile)',
     scenario1Subtitle: 'Displays "Own this business?" or "Claim this business". Created by Google Maps community or automated bots. No verified owner.',
     scenario2Title: 'Case 2: Claimed by Third Party (Ex-agency or Ex-employee)',
-    scenario2Subtitle: 'Displays "Managed by c•••••@gmail.com". Activates Google 72-Hour Legal Transfer Protocol.',
+    scenario2Subtitle: 'Google displays "This business is already managed by another user". Activates Google 72-Hour Legal Transfer Protocol.',
     scenario3Title: 'Case 3: Request Rejected by Third Party in Bad Faith (Legal Appeal)',
     scenario3Subtitle: 'Third party rejected the transfer. Activates Evidentiary Appeal with Google Support Team.',
     rescueBtnDirectClaim: 'Open Google Business Profile to Claim',
@@ -4134,7 +4134,7 @@ export default function LocalStudioPage() {
                         type="text"
                         value={rescueMaskedEmail}
                         onChange={(e) => setRescueMaskedEmail(e.target.value)}
-                        placeholder={isEn ? 'e.g. c•••••@gmail.com' : 'Ej: c•••••@gmail.com'}
+                        placeholder={isEn ? 'e.g. Masked email shown by Google' : 'Ej: Correo que muestre Google al solicitar acceso'}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 transition"
                       />
                       <span className="text-[10px] text-slate-400 mt-1 block">
@@ -4184,7 +4184,13 @@ export default function LocalStudioPage() {
                           </span>
                         </div>
                         <strong className="text-white text-xs block leading-snug">{tTools.scenario2Title}</strong>
-                        <p className="text-[11px] text-slate-400 leading-relaxed">{tTools.scenario2Subtitle}</p>
+                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                          {rescueMaskedEmail.trim()
+                            ? (isEn
+                                ? `Managed by "${rescueMaskedEmail.trim()}". Activates Google 72-Hour Legal Transfer Protocol.`
+                                : `Gestionada por "${rescueMaskedEmail.trim()}". Activación del Protocolo Oficial de 72 Horas de Google.`)
+                            : tTools.scenario2Subtitle}
+                        </p>
                       </button>
 
                       {/* Case 3: Rejected */}
