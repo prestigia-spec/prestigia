@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { PrestigiaIcon } from '@/components/PrestigiaIcon';
 import {
   Sparkles,
   Layers,
@@ -298,9 +299,7 @@ export default function LandingStudioPage() {
               href="/landing-studio"
               className="flex items-center gap-2.5 font-black text-lg tracking-tight text-white hover:opacity-90 transition"
             >
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-indigo-600 to-amber-500 flex items-center justify-center text-slate-950 shadow-md">
-                <Globe className="w-5 h-5 text-white" />
-              </div>
+              <PrestigiaIcon className="w-8 h-8 drop-shadow-md shrink-0" />
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
                   <span className="text-white">PRESTIGIA</span>

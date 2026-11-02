@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { PrestigiaIcon } from '@/components/PrestigiaIcon';
 import {
   MapPin,
   Sparkles,
@@ -1570,9 +1571,7 @@ export default function LocalStudioPage() {
         {/* Top Header */}
         <header className="border-b border-slate-800/80 px-4 sm:px-8 py-3.5 flex items-center justify-between relative z-10 backdrop-blur-md bg-slate-950/80">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-indigo-600 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/20">
-              <MapPin className="w-5 h-5 text-slate-950" />
-            </div>
+            <PrestigiaIcon className="w-8 h-8 drop-shadow-md shrink-0" />
             <div className="flex flex-col">
               <span className="text-xs font-black tracking-widest text-white">PRESTIGIA</span>
               <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">Local Studio • Top 3 Engine</span>
@@ -1808,9 +1807,7 @@ export default function LocalStudioPage() {
         <header className="px-4 sm:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/70">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 select-none">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-indigo-600 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/20">
-              <MapPin className="w-5 h-5 text-slate-950" />
-            </div>
+            <PrestigiaIcon className="w-8 h-8 drop-shadow-md shrink-0" />
             <div className="flex flex-col">
               <span className="text-xs font-black tracking-widest text-white">PRESTIGIA</span>
               <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">Local Studio • Top 3 Engine</span>
