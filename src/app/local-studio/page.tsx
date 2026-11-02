@@ -597,6 +597,11 @@ const TXT_TOOLS = {
     toolsSyncBtn: 'Cargar en Armas de Cierre',
     toolsDetectedBadge: 'Ficha Vinculada a las Armas de Cierre',
     toolsKeywordPlaceholder: 'Palabra clave a simular (ej: Clínica Dental en Bogotá)',
+    toolsEmptyTitle: 'Vincula una Ficha de Google Maps para Activar las Armas de Venta',
+    toolsEmptyDesc: 'Pega el enlace de Google Maps o escribe el nombre del negocio y su ciudad para cargar su posición satelital real, calcular la pérdida de facturación exacta y activar la batalla de espionaje contra sus rivales.',
+    toolsEmptyScanBtn: 'Activar Armas con Google Maps API',
+    toolsEmptyDemoBtn: 'O explorar con datos de demostración interactiva →',
+    toolsChangeListing: 'Cambiar Ficha / Limpiar',
     rivalScannerLabel: 'Escanear Competidor Directo con Google Maps API (1 Clic)',
     rivalScannerPlaceholder: 'Pega enlace de Google Maps o Nombre del Rival + Ciudad',
     rivalScannerBtn: 'Escanear Rival con Google',
@@ -709,6 +714,11 @@ const TXT_TOOLS = {
     toolsSyncBtn: 'Load in Sales Arsenal',
     toolsDetectedBadge: 'Profile Recognized on Google Maps',
     toolsKeywordPlaceholder: 'Simulated target keyword (e.g. Dental Clinic in Miami)',
+    toolsEmptyTitle: 'Connect a Google Maps Profile to Activate Sales Arsenal',
+    toolsEmptyDesc: 'Paste a Google Maps link or enter business name and city to load real satellite positions, calculate exact revenue leakage, and spy on local competitors.',
+    toolsEmptyScanBtn: 'Activate Arsenal with Google Maps API',
+    toolsEmptyDemoBtn: 'Or explore with interactive demo data →',
+    toolsChangeListing: 'Change Profile / Clear',
     rivalScannerLabel: 'Scan Real Competitor via Google Maps API (1-Click)',
     rivalScannerPlaceholder: 'Paste Google Maps link or Competitor Name + City',
     rivalScannerBtn: 'Scan Competitor with Google',
@@ -1251,6 +1261,7 @@ export default function LocalStudioPage() {
   const [toolsSearchQuery, setToolsSearchQuery] = useState('');
   const [isToolsScanning, setIsToolsScanning] = useState(false);
   const [geoGridKeyword, setGeoGridKeyword] = useState('');
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const [geoGridRadius, setGeoGridRadius] = useState<'1km' | '3km' | '5km'>('3km');
   const [roiAverageTicket, setRoiAverageTicket] = useState<number>(65);
   const [roiCurrentRank, setRoiCurrentRank] = useState<number>(8);
@@ -4799,124 +4810,147 @@ export default function LocalStudioPage() {
               </div>
             </div>
 
-            {/* 1-Click Google Maps Scanner for Sales Arsenal */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-3 shadow-xl">
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <Search className="w-4 h-4 text-amber-400" />
-                  <h2 className="text-xs sm:text-sm font-black text-white">{tTools.toolsScannerLabel}</h2>
+            {/* If no listing is loaded or active, show the Activation Screen */}
+            {!Boolean(businessName.trim() || scannedListing || isDemoMode) ? (
+              <div className="p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-center space-y-6 shadow-2xl">
+                <div className="w-16 h-16 rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400 shadow-lg">
+                  <Crosshair className="w-8 h-8" />
                 </div>
 
-                {/* Session sync pill if businessName or scannedListing is already set */}
-                {!scannedListing && businessName && (
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs">
-                    <span className="text-[10px] text-amber-400 font-bold">{tTools.toolsSyncBanner}</span>
-                    <strong className="text-white text-xs truncate max-w-xs">{businessName} {city ? `(${city})` : ''}</strong>
+                <div className="max-w-xl mx-auto space-y-2">
+                  <h3 className="text-xl sm:text-2xl font-black text-white">
+                    {tTools.toolsEmptyTitle}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                    {tTools.toolsEmptyDesc}
+                  </p>
+                </div>
+
+                {/* Central 1-Click Search Input */}
+                <div className="max-w-lg mx-auto space-y-3">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={toolsSearchQuery}
+                      onChange={(e) => setToolsSearchQuery(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !isToolsScanning && toolsSearchQuery.trim()) {
+                          e.preventDefault();
+                          handleToolsScan();
+                        }
+                      }}
+                      placeholder={tTools.toolsScannerPlaceholder}
+                      className="w-full pl-4 pr-20 py-3.5 rounded-2xl bg-slate-950 border border-amber-500/40 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 text-xs sm:text-sm transition font-medium"
+                    />
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          const text = await navigator.clipboard.readText();
+                          if (text) setToolsSearchQuery(text.trim());
+                        } catch {}
+                      }}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-amber-400 transition cursor-pointer"
+                    >
+                      {t.pasteBtn}
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleToolsScan()}
+                    disabled={isToolsScanning || !toolsSearchQuery.trim()}
+                    className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98"
+                  >
+                    {isToolsScanning ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>{tTools.toolsScannerScanning}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-4 h-4 fill-slate-950" />
+                        <span>{tTools.toolsEmptyScanBtn}</span>
+                      </>
+                    )}
+                  </button>
+
+                  <div className="pt-2">
                     <button
                       type="button"
                       onClick={() => {
-                        const target = businessName + (city ? ' ' + city : '');
-                        setToolsSearchQuery(target);
-                        handleToolsScan(target);
+                        setIsDemoMode(true);
+                        setBusinessName('Negocio de Ejemplo');
+                        setCity('Bogotá');
+                        setGeoGridKeyword(getDefaultKeywordByNiche(category, 'Bogotá', isEn));
                       }}
-                      className="px-2 py-0.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] transition cursor-pointer"
+                      className="text-xs text-slate-500 hover:text-amber-400 transition cursor-pointer underline underline-offset-4"
                     >
-                      {tTools.toolsSyncBtn}
+                      {tTools.toolsEmptyDemoBtn}
                     </button>
                   </div>
-                )}
+                </div>
               </div>
-
-              {/* Scanned Listing Card (If active) */}
-              {scannedListing && (
-                <div className="p-3.5 rounded-2xl bg-slate-950 border border-emerald-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                        <span>{tTools.toolsDetectedBadge}</span>
-                      </span>
-                      <span className="text-[10px] font-mono text-slate-400">{category}</span>
+            ) : (
+              <>
+                {/* Active Listing Profile Card & Controls */}
+                <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-3 shadow-xl">
+                  <div className="p-3.5 rounded-2xl bg-slate-950 border border-emerald-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                          <span>{tTools.toolsDetectedBadge}</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-slate-400">{category}</span>
+                        {isDemoMode && (
+                          <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/30">
+                            {isEn ? 'Demo Mode' : 'Modo Demostración'}
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="font-black text-white text-sm">{businessName || scannedListing?.name}</h3>
+                      {(scannedListing?.address || city) && (
+                        <p className="text-[11px] text-slate-400 truncate">{scannedListing?.address || city}</p>
+                      )}
                     </div>
-                    <h3 className="font-black text-white text-sm">{scannedListing.name}</h3>
-                    {scannedListing.address && (
-                      <p className="text-[11px] text-slate-400 truncate">{scannedListing.address}</p>
-                    )}
-                  </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="text-right text-[11px] font-mono">
-                      <span className="text-amber-400 font-black text-sm">★ {scannedListing.rating?.toFixed(1) || '0.0'}</span>
-                      <span className="text-slate-400 block">{scannedListing.reviewsCount || 0} {isEn ? 'reviews' : 'reseñas'}</span>
-                    </div>
-                    {scannedListing.googleMapsUrl && (
-                      <a
-                        href={scannedListing.googleMapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold transition flex items-center gap-1 border border-slate-700 cursor-pointer"
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="text-right text-[11px] font-mono">
+                        <span className="text-amber-400 font-black text-sm">★ {scannedListing?.rating?.toFixed(1) || existingRating.toFixed(1)}</span>
+                        <span className="text-slate-400 block">{scannedListing?.reviewsCount || existingReviews} {isEn ? 'reviews' : 'reseñas'}</span>
+                      </div>
+                      {scannedListing?.googleMapsUrl && (
+                        <a
+                          href={scannedListing.googleMapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold transition flex items-center gap-1 border border-slate-700 cursor-pointer"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          <span>Google Maps</span>
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setBusinessName('');
+                          setCity('');
+                          setScannedListing(null);
+                          setIsDemoMode(false);
+                          setToolsSearchQuery('');
+                          setGeoGridKeyword('');
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-bold transition border border-rose-500/30 cursor-pointer"
                       >
-                        <ExternalLink className="w-3 h-3" />
-                        <span>Google Maps</span>
-                      </a>
-                    )}
+                        {tTools.toolsChangeListing}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              )}
 
-              {/* Input row */}
-              <div className="flex flex-col sm:flex-row gap-2">
-                <div className="relative flex-1">
-                  <input
-                    type="text"
-                    value={toolsSearchQuery}
-                    onChange={(e) => setToolsSearchQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !isToolsScanning && toolsSearchQuery.trim()) {
-                        e.preventDefault();
-                        handleToolsScan();
-                      }
-                    }}
-                    placeholder={tTools.toolsScannerPlaceholder}
-                    className="w-full pl-3.5 pr-20 py-2.5 rounded-xl bg-slate-950 border border-amber-500/30 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 text-xs transition font-medium"
-                  />
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      try {
-                        const text = await navigator.clipboard.readText();
-                        if (text) setToolsSearchQuery(text.trim());
-                      } catch {}
-                    }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-amber-400 transition cursor-pointer"
-                  >
-                    {t.pasteBtn}
-                  </button>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => handleToolsScan()}
-                  disabled={isToolsScanning || !toolsSearchQuery.trim()}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer shrink-0 active:scale-98"
-                >
-                  {isToolsScanning ? (
-                    <>
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      <span>{tTools.toolsScannerScanning}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="w-3.5 h-3.5 fill-slate-950" />
-                      <span>{tTools.toolsScannerBtn}</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Sub-tools Navigation */}
-            <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-3">
+                {/* Sub-tools Navigation */}
+                <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-3">
               <button
                 type="button"
                 onClick={() => setToolsActiveTab('geogrid')}
@@ -5688,6 +5722,8 @@ export default function LocalStudioPage() {
                 })()}
               </div>
             )}
+            </>
+          )}
           </div>
         )}
         {activeTab === 'dossiers' && (
