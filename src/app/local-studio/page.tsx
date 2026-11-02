@@ -518,6 +518,14 @@ const TXT_TOOLS = {
     scenario3Title: 'Caso 3: Solicitud Rechazada por Tercero de Mala Fe (Apelación Legal)',
     scenario3Subtitle: 'El tercero rechazó la entrega. Activación de Expediente Probatorio ante el Soporte Técnico de Google.',
     rescueBtnDirectClaim: 'Abrir Google Business Profile para Reclamar',
+    rescueSearchLabel: 'Reconocer Ficha con Google Maps API (1 Clic)',
+    rescueSearchPlaceholder: 'Pega enlace de Google Maps (maps.app.goo.gl/...) o Nombre + Ciudad',
+    rescueBtnScan: 'Reconocer Ficha con Google API',
+    rescueBtnScanning: 'Consultando Google Maps API en Vivo...',
+    rescueSyncBanner: 'Ficha detectada en sesión:',
+    rescueSyncBtn: 'Cargar en Rescate',
+    rescueDetectedBadge: 'Ficha Existente Detectada en Google Maps',
+    rescueClaimViaMaps: 'Abrir Ficha en Google Maps para Reclamar',
     rescueWhatsappScriptTitle: 'Guion de WhatsApp para Explicar el Rescate al Cliente',
     rescueDocsTitle: 'Checklist de Evidencias de Titularidad Probatoria',
     rescuePricingTitle: 'Propuesta de Honorarios por Rescate (Setup Fee)',
@@ -610,6 +618,14 @@ const TXT_TOOLS = {
     scenario3Title: 'Case 3: Request Rejected by Third Party in Bad Faith (Legal Appeal)',
     scenario3Subtitle: 'Third party rejected the transfer. Activates Evidentiary Appeal with Google Support Team.',
     rescueBtnDirectClaim: 'Open Google Business Profile to Claim',
+    rescueSearchLabel: 'Recognize Profile via Google Maps API (1-Click)',
+    rescueSearchPlaceholder: 'Paste Google Maps link (maps.app.goo.gl/...) or Business Name + City',
+    rescueBtnScan: 'Recognize Profile via Google API',
+    rescueBtnScanning: 'Querying Google Maps API in Real-time...',
+    rescueSyncBanner: 'Session profile detected:',
+    rescueSyncBtn: 'Load in Rescue',
+    rescueDetectedBadge: 'Existing Listing Verified on Google Maps',
+    rescueClaimViaMaps: 'Open Listing on Google Maps to Claim',
     rescueWhatsappScriptTitle: 'WhatsApp Client Advisory Script (Copy & Send)',
     rescueDocsTitle: 'Ownership Proof & Legal Evidence Checklist',
     rescuePricingTitle: 'Rescue Fee Recommendation (Setup Fee)',
@@ -1159,6 +1175,8 @@ export default function LocalStudioPage() {
   // Rescue Radar (Ownership Claim Engine) State
   const [rescueScenario, setRescueScenario] = useState<'orphan' | 'third_party' | 'rejected'>('third_party');
   const [rescueMaskedEmail, setRescueMaskedEmail] = useState('c•••••@gmail.com');
+  const [rescueSearchQuery, setRescueSearchQuery] = useState('');
+  const [isRescueScanning, setIsRescueScanning] = useState(false);
 
   // Rival Spy (Head-to-Head Competitor Radar) State
   const [rivalName, setRivalName] = useState('Competidor Líder');
@@ -1579,6 +1597,98 @@ export default function LocalStudioPage() {
       });
     } finally {
       setIsScanningListing(false);
+    }
+  };
+
+  // -------------------------------------------------------------
+  // 3.1.b 1-CLICK GOOGLE MAPS API SCANNER FOR RESCUE & OWNERSHIP CLAIM
+  // -------------------------------------------------------------
+  const handleRescueScan = async (queryInput?: string) => {
+    const rawInput = (typeof queryInput === 'string' ? queryInput : rescueSearchQuery).trim();
+    if (!rawInput) {
+      showToast(
+        isEn
+          ? '⚠️ Please paste a Google Maps link or enter business name'
+          : '⚠️ Pega el enlace de Google Maps o escribe el nombre del negocio'
+      );
+      return;
+    }
+
+    setIsRescueScanning(true);
+    showToast(
+      isEn
+        ? '🔍 Querying Google Maps API in real-time...'
+        : '🔍 Reconociendo ficha con la API de Google Maps en vivo...'
+    );
+
+    try {
+      const res = await fetch('/api/auditor/google-lookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: rawInput }),
+      });
+      const data = await res.json();
+
+      if (data?.success && data?.data) {
+        const place: GooglePlaceData = data.data;
+        setScannedListing(place);
+
+        const extractedName = place.name || rawInput;
+        setBusinessName(extractedName);
+        if (typeof place.rating === 'number') setExistingRating(place.rating);
+        if (typeof place.reviewsCount === 'number') setExistingReviews(place.reviewsCount);
+        if (place.googleMapsUrl) setGoogleUrl(place.googleMapsUrl);
+        if (place.phone) setPhone(place.phone);
+
+        // Address parsing for city and neighborhood
+        let parsedCity = city;
+        let parsedNeighborhood = neighborhood;
+        if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
+          const parts = place.address.split(',').map((p) => p.trim());
+          if (parts.length >= 3) {
+            parsedNeighborhood = parts[parts.length - 3] || parsedNeighborhood;
+            parsedCity = parts[parts.length - 2] || parsedCity;
+          } else if (parts.length >= 2) {
+            parsedCity = parts[parts.length - 2] || parsedCity;
+          }
+          if (parsedCity) setCity(parsedCity);
+          if (parsedNeighborhood) setNeighborhood(parsedNeighborhood);
+        }
+
+        const matchedCategory = mapDetectedCategoryToPrestigia(
+          place.category || '',
+          place.detectedCategories || [],
+          isEn
+        );
+        setCategory(matchedCategory);
+
+        showToast(
+          isEn
+            ? `✓ Listing Recognized: ${extractedName} (${place.rating}★ · ${place.reviewsCount} reviews). Rescue protocol ready!`
+            : `✓ Ficha Reconocida: ${extractedName} (${place.rating}★ · ${place.reviewsCount} opiniones). ¡Protocolo de rescate listo!`
+        );
+      } else {
+        const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
+        setBusinessName(fallbackName);
+        if (rawInput.startsWith('http')) setGoogleUrl(rawInput);
+        showToast(
+          isEn
+            ? `✓ Listing set to "${fallbackName}". Rescue protocol ready!`
+            : `✓ Ficha asignada a "${fallbackName}". ¡Protocolo de rescate listo!`
+        );
+      }
+    } catch (err: any) {
+      console.error('Rescue scan error:', err);
+      const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
+      setBusinessName(fallbackName);
+      if (rawInput.startsWith('http')) setGoogleUrl(rawInput);
+      showToast(
+        isEn
+          ? '⚠️ Connection error. Profile name set manually.'
+          : '⚠️ Error de conexión. Nombre de ficha asignado.'
+      );
+    } finally {
+      setIsRescueScanning(false);
     }
   };
 
@@ -3859,8 +3969,138 @@ export default function LocalStudioPage() {
               <div className="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl print:hidden">
                 <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
                   <KeyRound className="w-4 h-4 text-rose-400" />
-                  <h2 className="text-sm font-black text-white">{isEn ? '1. Business & Rescue Diagnosis' : '1. Diagnóstico de Titularidad & Datos'}</h2>
+                  <h2 className="text-sm font-black text-white">{isEn ? '1. Listing Recognition & Diagnosis' : '1. Reconocimiento de Ficha & Diagnóstico'}</h2>
                 </div>
+
+                {/* 1-Click Google Maps Scanner for Rescue */}
+                <div className="p-3.5 rounded-2xl bg-slate-950 border border-rose-500/30 space-y-2.5">
+                  <label className="block text-xs font-bold text-rose-300 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Globe className="w-3.5 h-3.5 text-rose-400" />
+                      <span>{tTools.rescueSearchLabel}</span>
+                    </span>
+                    {rescueSearchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setRescueSearchQuery('')}
+                        className="text-[10px] text-slate-400 hover:text-rose-400 transition cursor-pointer"
+                      >
+                        {isEn ? 'Clear' : 'Limpiar'}
+                      </button>
+                    )}
+                  </label>
+
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={rescueSearchQuery}
+                      onChange={(e) => setRescueSearchQuery(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !isRescueScanning && rescueSearchQuery.trim()) {
+                          e.preventDefault();
+                          handleRescueScan();
+                        }
+                      }}
+                      placeholder={tTools.rescueSearchPlaceholder}
+                      className="w-full pl-3.5 pr-20 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400 text-xs transition font-medium"
+                    />
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          const text = await navigator.clipboard.readText();
+                          if (text) setRescueSearchQuery(text.trim());
+                        } catch {}
+                      }}
+                      title={isEn ? 'Paste from clipboard' : 'Pegar del portapapeles'}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-rose-400 transition cursor-pointer"
+                    >
+                      {t.pasteBtn}
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleRescueScan()}
+                    disabled={isRescueScanning || !rescueSearchQuery.trim()}
+                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 disabled:opacity-50 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-98"
+                  >
+                    {isRescueScanning ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>{tTools.rescueBtnScanning}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-3.5 h-3.5 fill-white" />
+                        <span>{tTools.rescueBtnScan}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Session profile detected sync pill */}
+                {!scannedListing && businessName && (
+                  <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between text-xs animate-in fade-in">
+                    <div className="truncate mr-2">
+                      <span className="text-[10px] text-amber-400 block font-bold">{tTools.rescueSyncBanner}</span>
+                      <span className="text-white font-bold text-xs truncate block">{businessName} {city ? `(${city})` : ''}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = businessName + (city ? ' ' + city : '');
+                        setRescueSearchQuery(target);
+                        handleRescueScan(target);
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[10px] shrink-0 transition cursor-pointer"
+                    >
+                      {tTools.rescueSyncBtn}
+                    </button>
+                  </div>
+                )}
+
+                {/* Verified Listing Card (Recognized from Google) */}
+                {scannedListing && (
+                  <div className="p-3.5 rounded-2xl bg-slate-950/90 border border-emerald-500/40 space-y-2 animate-in fade-in">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        <span>{tTools.rescueDetectedBadge}</span>
+                      </span>
+                      {scannedListing.googleMapsUrl && (
+                        <a
+                          href={scannedListing.googleMapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                        >
+                          <span>Google Maps</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+
+                    <div>
+                      <h4 className="font-black text-white text-xs">{scannedListing.name}</h4>
+                      {scannedListing.address && (
+                        <p className="text-[10px] text-slate-400 truncate">{scannedListing.address}</p>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-300 font-mono">
+                      <span className="text-amber-400 font-bold">★ {scannedListing.rating?.toFixed(1) || '0.0'}</span>
+                      <span>·</span>
+                      <span>{scannedListing.reviewsCount || 0} {isEn ? 'reviews' : 'reseñas'}</span>
+                      {scannedListing.phone && (
+                        <>
+                          <span>·</span>
+                          <span className="text-slate-400">{scannedListing.phone}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-3 text-xs">
                   <div>
@@ -4129,7 +4369,7 @@ export default function LocalStudioPage() {
                   )}
 
                   {/* Direct Link to Google Business Profile Claim Tool */}
-                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                  <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
                     <div>
                       <strong className="text-white block text-xs">
                         {isEn ? 'Direct Official Google Business Profile Entry:' : 'Acceso Directo Oficial a Google Business Profile:'}
@@ -4141,15 +4381,28 @@ export default function LocalStudioPage() {
                       </span>
                     </div>
 
-                    <a
-                      href="https://business.google.com/create"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-lg shadow-amber-500/20 shrink-0 cursor-pointer"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>{tTools.rescueBtnDirectClaim}</span>
-                    </a>
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      {(scannedListing?.googleMapsUrl || googleUrl) && (
+                        <a
+                          href={scannedListing?.googleMapsUrl || googleUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition flex items-center gap-1.5 border border-slate-700 cursor-pointer"
+                        >
+                          <Globe className="w-3.5 h-3.5 text-rose-400" />
+                          <span>{tTools.rescueClaimViaMaps}</span>
+                        </a>
+                      )}
+                      <a
+                        href="https://business.google.com/create"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-lg shadow-amber-500/20 cursor-pointer"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>{tTools.rescueBtnDirectClaim}</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
 
