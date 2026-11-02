@@ -2870,32 +2870,6 @@ export default function LocalStudioPage() {
             <span>{t.tabDossiers}</span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab('guide')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-              activeTab === 'guide'
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-            }`}
-          >
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span>{t.tabGuide}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('pitch')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-              activeTab === 'pitch'
-                ? 'bg-rose-600 text-white shadow-md'
-                : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-            }`}
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>{t.tabPitch}</span>
-          </button>
-
           {currentUser?.role === 'admin' && (
             <button
               type="button"
@@ -3824,6 +3798,199 @@ export default function LocalStudioPage() {
                 )}
               </div>
             </div>
+
+            {/* =========================================================
+                INTEGRATED: GUÍA PASO A PASO DÓNDE DAR CLIC (CREACIÓN)
+                ========================================================= */}
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl print:hidden">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-950 border border-emerald-500/40 text-emerald-300">
+                    {isEn ? 'Technical Walkthrough • Case 1: Built From Scratch' : 'Paso a Paso Técnico • Caso 1: Creación Desde Cero'}
+                  </span>
+                  <h3 className="text-lg font-black text-white flex items-center gap-2">
+                    <HelpCircle className="w-5 h-5 text-emerald-400" />
+                    <span>{isEn ? 'Where to Click on Google to Create a New Listing' : 'Guía Paso a Paso: Dónde dar Clic en Google para Crear la Ficha'}</span>
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    {isEn
+                      ? 'Follow these 6 steps in Google Business to publish and verify the new profile without technical errors.'
+                      : 'Sigue estos 6 pasos exactos en Google Business para registrar y verificar el nuevo perfil sin fallas técnicas.'}
+                  </p>
+                </div>
+                <a
+                  href="https://business.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-emerald-600/20 cursor-pointer shrink-0"
+                >
+                  <span>{isEn ? 'Open Google Business' : 'Abrir Google Business'}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+
+              {/* 6 Step Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">1</span>
+                    <strong className="text-white text-xs">Abrir e Iniciar Sesión</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Entra a <strong>business.google.com</strong>. Inicia sesión con el correo Gmail oficial del negocio (o el tuyo temporalmente para luego transferirlo).
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">2</span>
+                    <strong className="text-white text-xs">Nombre & Categoría Oficial</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Pega el <strong>Título Optimizado</strong> generado arriba. En "Categoría empresarial", escribe la <strong>Categoría Principal</strong> y elígela del menú oficial de Google.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">3</span>
+                    <strong className="text-white text-xs">Local Físico vs Domicilio (SAB)</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    • <strong>Local comercial:</strong> Marca "Sí tienes local abierto al público" y fija el pin en la puerta.<br/>
+                    • <strong>A domicilio / independiente:</strong> Marca "No, presto servicios en la ubicación del cliente" para ocultar la dirección de casa y evitar suspensiones.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">4</span>
+                    <strong className="text-white text-xs">Teléfono & Sitio Web Oficial</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Ingresa la línea de WhatsApp o PBX de atención al cliente. En sitio web, coloca la web del negocio o el link de su landing page generada en Prestigia.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">5</span>
+                    <strong className="text-white text-xs">Video de Verificación de 60s</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Graba continuo sin cortes con el móvil:<br/>
+                    <strong>0-15s:</strong> Calle y aviso exterior • <strong>15-40s:</strong> Abrir puerta con llave física e interior • <strong>40-60s:</strong> Datáfono en caja y RUT / documento fiscal.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">6</span>
+                    <strong className="text-white text-xs">Carga del Catálogo Inicial</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Una vez enviada la verificación, ve a "Editar servicios" y carga los 6 servicios y 15 fotografías generadas en este expediente para activar el algoritmo.
+                  </p>
+                </div>
+              </div>
+
+              {/* Anti-Suspension Rules */}
+              <div className="p-4 rounded-2xl bg-slate-950 border border-rose-500/30 text-xs text-slate-300 space-y-2">
+                <span className="font-bold text-rose-400 flex items-center gap-1.5 text-xs uppercase tracking-wide">
+                  <AlertTriangle className="w-4 h-4 text-rose-400" />
+                  Semáforo Anti-Suspensión Inmediata (Reglas Críticas de Google 2026)
+                </span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px]">
+                  <p className="text-rose-300/90 bg-rose-950/40 p-2.5 rounded-xl border border-rose-500/20">
+                    🔴 <strong>Prohibido editar nombre o categoría en los primeros 14 días:</strong> Cualquier cambio en datos sensibles durante el periodo de revisión activa una suspensión automática por sospecha de spam.
+                  </p>
+                  <p className="text-emerald-300/90 bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-500/20">
+                    🟢 <strong>Acelerador seguro:</strong> Cargar fotos desde el móvil en la misma red Wi-Fi o coordenadas GPS del local valida la autenticidad física de la empresa ante Google AI.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* =========================================================
+                INTEGRATED: GUIÓN COMERCIAL DE CIERRE (CREACIÓN)
+                ========================================================= */}
+            <div className="bg-slate-950 border-2 border-emerald-500/50 rounded-3xl p-6 sm:p-7 space-y-5 shadow-2xl print:hidden">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-950 border border-emerald-500/40 text-emerald-300">
+                    {isEn ? 'Sales Playbook • Case 1: New Listing Closing Pitch' : 'Guión Comercial & Cierre • Caso 1: Venta de Creación de Ficha'}
+                  </span>
+                  <h3 className="text-lg font-black text-white flex items-center gap-2">
+                    <MessageSquare className="w-5 h-5 text-emerald-400" />
+                    <span>{isEn ? 'High-Conversion Sales Script: Creating from Scratch' : 'Guión Comercial Especializado para Negocios sin Ficha en Google'}</span>
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    {isEn
+                      ? 'Tactical pitch and objection handling to close listing setup fees or convert directly into monthly Prestigia plans.'
+                      : 'Speech táctico y manejo de objeciones para cobrar el setup técnico o cerrar la membresía mensual de Prestigia con setup bonificado.'}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const script = `Hola ${businessName || 'Emprendedor'}, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de ${category || 'su sector'} en ${city || 'su ciudad'} y notamos una situación crítica: su negocio sencillamente NO existe en Google Maps. Hoy en día, el 70% de las personas que van a comprar o contratar un servicio eligen entre los 3 primeros perfiles que aparecen en el mapa. Cada día que pasa sin ficha, son decenas de clientes que terminan comprándole a su competencia más cercana. En Prestigia no solo creamos y verificamos su ficha oficial ante Google sin riesgo de suspensión, sino que le instalamos la arquitectura para posicionarlo en el Top 3 y le entregamos tarjetas Smart NFC para capturar reseñas 5 estrellas en su local. El trabajo técnico de creación tiene un costo único de $200 USD, pero si activa hoy el Plan Mensual Prestigia ($149 a $199 USD/mes), le bonificamos el 100% del setup técnico ($0 USD) y le entregamos la ficha lista para facturar. ¿Agendamos la grabación del video de 60 segundos hoy mismo?`;
+                    copyToClipboard(script, 'Guión de Venta de Creación');
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer shrink-0 active:scale-98"
+                >
+                  <Copy className="w-4 h-4" />
+                  <span>Copiar Guión de Creación</span>
+                </button>
+              </div>
+
+              {/* Pitch Display Card */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-500/30 text-xs text-slate-200 leading-relaxed italic space-y-2">
+                <span className="font-bold text-emerald-300 not-italic block text-xs">
+                  🎙️ Speech de Prospección & Apertura (Llamada, Visita o WhatsApp):
+                </span>
+                <p>
+                  "Hola <strong>{businessName || 'Emprendedor'}</strong>, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de <strong>{category || 'su sector'}</strong> en <strong>{city || 'su ciudad'}</strong> y notamos una situación crítica: su negocio sencillamente <strong>NO existe en Google Maps</strong>. Hoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha son decenas de ventas que le regala a su competencia. Nosotros creamos y verificamos su perfil oficial ante Google con arquitectura Top 3, y le entregamos tarjetas Smart NFC para disparar sus reseñas 5★ desde la primera semana."
+                </p>
+              </div>
+
+              {/* Objections & Closing Offer Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
+                  <strong className="text-amber-300 block text-xs">
+                    ⚠️ Objeción: "¿Por qué pagarles si crear una ficha en Google es gratis?"
+                  </strong>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    <strong>Respuesta Asesor:</strong> "Google es gratis, pero el 80% de los negocios son suspendidos en el video de verificación o quedan sepultados en la página 4 sin recibir una sola llamada. Con Prestigia no paga por la ficha, paga por la <strong>arquitectura técnica que evita suspensiones, optimiza categorías y posiciona en el Top 3</strong> para que la ficha facture clientes reales desde el primer mes."
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
+                  <strong className="text-amber-300 block text-xs">
+                    ⚠️ Objeción: "No tengo tiempo para ocuparme de fotos ni trámites."
+                  </strong>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    <strong>Respuesta Asesor:</strong> "Esa es la ventaja de nuestro servicio llave en mano: solo necesitamos 60 segundos de video que grabamos juntos desde su local y nosotros nos encargamos del 100% de la radicación, redacción SEO y verificación con Google."
+                  </p>
+                </div>
+              </div>
+
+              {/* Closing Hook Box */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-900 border border-emerald-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                <div>
+                  <span className="font-black text-emerald-300 uppercase tracking-wide block text-xs">
+                    🎁 El Gancho de Cierre Prestigia ($0 Setup):
+                  </span>
+                  <p className="text-slate-300 text-[11px] mt-0.5">
+                    "La creación técnica cuesta <strong>$200 USD</strong>. Pero si contratas hoy el <strong>Plan Mensual Prestigia ($149 a $199 USD/mes)</strong>, te bonificamos el 100% del setup técnico (<strong>$0 USD</strong>) y te incluimos las tarjetas Smart NFC."
+                  </p>
+                </div>
+                <span className="shrink-0 px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-black text-xs">
+                  Cierre 100% Efectivo
+                </span>
+              </div>
+            </div>
+
           </div>
         )}
 
@@ -4412,6 +4579,181 @@ export default function LocalStudioPage() {
                 )}
               </div>
             </div>
+
+            {/* =========================================================
+                INTEGRATED: GUÍA PASO A PASO DÓNDE DAR CLIC (AUDITORÍA TOP 3)
+                ========================================================= */}
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl print:hidden">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
+                    {isEn ? 'Technical Walkthrough • Case 2: Top 3 Listing Upgrade' : 'Paso a Paso Técnico • Caso 2: Auditoría Forense & Optimización Top 3'}
+                  </span>
+                  <h3 className="text-lg font-black text-white flex items-center gap-2">
+                    <HelpCircle className="w-5 h-5 text-amber-400" />
+                    <span>{isEn ? 'Where to Click on Google to Optimize an Existing Listing' : 'Guía Paso a Paso: Dónde dar Clic en Google para Optimizar la Ficha'}</span>
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    {isEn
+                      ? 'Step-by-step instructions in Google Business Profile to inject the optimized blueprint and scale rankings.'
+                      : 'Instrucciones paso a paso dentro del panel de Google Business para inyectar las mejoras del Blueprint y escalar al podio.'}
+                  </p>
+                </div>
+                <a
+                  href="https://business.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer shrink-0"
+                >
+                  <span>{isEn ? 'Open Google Business' : 'Abrir Google Business'}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+
+              {/* 6 Steps Grid for Audit / Optimization */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">1</span>
+                    <strong className="text-white text-xs">Acceder a "Editar Perfil"</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Entra a <strong>business.google.com</strong> o busca el nombre de tu negocio en Google. Haz clic en el botón circular <strong>"Editar perfil"</strong>.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">2</span>
+                    <strong className="text-white text-xs">Ajustar Título Despenalizado</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    En "Información de la empresa", reemplaza títulos con mayúsculas spam por el <strong>Título Optimizado</strong> sugerido, evitando penalizaciones de visibilidad.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">3</span>
+                    <strong className="text-white text-xs">Inyectar Categorías Secundarias</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Haz clic en "Categoría de la empresa" → <strong>"+ Agregar otra categoría"</strong>. Añade las 3-5 subcategorías del Blueprint para aumentar un +35% de impresiones.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">4</span>
+                    <strong className="text-white text-xs">Cargar Menú / Catálogo de Servicios</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    En el menú principal de Google, haz clic en <strong>"Editar servicios"</strong> o "Editar menú". Sube los platos o servicios clave con descripciones persuasivas y precios reales.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">5</span>
+                    <strong className="text-white text-xs">Subir Fotografías Geonombradas</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Haz clic en <strong>"Agregar foto"</strong>. Sube fotos de alta resolución con nombres SEO locales (ej: <em>clinica-dental-sonrisas-medellin.jpg</em>) en Fachada e Interior.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">6</span>
+                    <strong className="text-white text-xs">Sembrar Preguntas Oficiales (Q&A)</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Desde Google Maps en el perfil público, ve a "Preguntas y respuestas", formula las preguntas preventivas (parqueadero, reservas, precios) y respóndelas de inmediato como propietario.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* =========================================================
+                INTEGRATED: GUIÓN COMERCIAL DE CIERRE (AUDITORÍA TOP 3)
+                ========================================================= */}
+            <div className="bg-slate-950 border-2 border-amber-500/50 rounded-3xl p-6 sm:p-7 space-y-5 shadow-2xl print:hidden">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
+                    {isEn ? 'Sales Playbook • Case 2: Top 3 Audit Closing Pitch' : 'Guión Comercial & Cierre • Caso 2: Venta de Auditoría & Optimización Top 3'}
+                  </span>
+                  <h3 className="text-lg font-black text-white flex items-center gap-2">
+                    <MessageSquare className="w-5 h-5 text-amber-400" />
+                    <span>{isEn ? 'High-Impact Audit Closing Script & Objection Matrix' : 'Speech Demoledor de Auditoría: Fuga de Clientes vs Beneficio Prestigia'}</span>
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    {isEn
+                      ? 'Expose algorithmic gaps and present the dual-balance ROI to close the $200-$350 USD setup or activate monthly recurring plans.'
+                      : 'Evidencia las fallas algorítmicas frente al competidor líder y usa la balanza ROI para cerrar el setup de $250 USD o la suscripción Prestigia.'}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const script = `Hola ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos minuciosamente su perfil de Google Maps en ${city || 'su ciudad'} y descubrimos la razón exacta por la cual no está apareciendo en los primeros 3 lugares: su ficha tiene 3 fugas algorítmicas críticas (carece de categorías secundarias de búsqueda transaccional, su catálogo de servicios no tiene precios y su flujo de opiniones está estancado). Nuestros cálculos muestran que está perdiendo aproximadamente entre $1,000 y $3,000 USD mensuales en clientes que se van con sus competidores del Top 3. En Prestigia reestructuramos el 100% de su perfil y le instalamos nuestros dispositivos Smart NFC en mesa para inyectar reseñas 5 estrellas semanales y superar a sus rivales. La reingeniería y auditoría técnica cuesta $250 USD en el mercado, pero si activa hoy el Plan Mensual Prestigia ($199 USD/mes), nosotros absorbemos el 100% del setup técnico ($0 USD bonificado). ¿Le gustaría ver la comparativa directa frente a su competidor más fuerte?`;
+                    copyToClipboard(script, 'Guión de Venta de Auditoría');
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer shrink-0 active:scale-98"
+                >
+                  <Copy className="w-4 h-4" />
+                  <span>Copiar Guión de Auditoría</span>
+                </button>
+              </div>
+
+              {/* Pitch Display Card */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 text-xs text-slate-200 leading-relaxed italic space-y-2">
+                <span className="font-bold text-amber-300 not-italic block text-xs">
+                  🎙️ Speech de Cierre de Auditoría Forense:
+                </span>
+                <p>
+                  "Hola <strong>{businessName || 'propietario'}</strong>, le saluda el equipo de Prestigia. Auditamos su ficha en <strong>{city || 'su zona'}</strong> y detectamos por qué no está en el Top 3: su perfil tiene <strong>3 fallas algorítmicas graves</strong> que le están costando clientes todos los días. Sus competidores líderes tienen flujo activo semanal y catálogo completo, mientras que su ficha pierde el 68% de las búsquedas por falta de categorías secundarias. Hemos estructurado el plan técnico para desbancar a los líderes e instalar el sistema Smart NFC de Prestigia."
+                </p>
+              </div>
+
+              {/* Objections & Closing Offer Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
+                  <strong className="text-amber-300 block text-xs">
+                    ⚠️ Objeción: "Yo ya tengo más reseñas que mi competidor, ¿para qué optimizar?"
+                  </strong>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    <strong>Respuesta Asesor:</strong> "Ese es el error más costoso: en 2026, el algoritmo de Google premia la <strong>velocidad y frescura reciente</strong>, no el volumen estancado de hace un año. Si su competidor suma 10 reseñas este mes y usted 1, Google lo enviará a la segunda página. Prestigia mantiene su flujo semanal activo de 5★ permanentemente."
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
+                  <strong className="text-amber-300 block text-xs">
+                    ⚠️ Objeción: "¿Me garantizan estar en el puesto #1 exacto?"
+                  </strong>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    <strong>Respuesta Asesor:</strong> "Google no le pertenece a ninguna agencia en el mundo. Lo que sí garantizamos es la arquitectura SEO exacta que exige Google y la tecnología Smart NFC en mostrador para quebrar la ventaja de sus rivales y adueñarse de los 3 lugares que se llevan el 70% de las ventas."
+                  </p>
+                </div>
+              </div>
+
+              {/* Closing Hook Box */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-950/80 via-slate-900 to-slate-900 border border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                <div>
+                  <span className="font-black text-amber-300 uppercase tracking-wide block text-xs">
+                    🎁 El Gancho de Cierre Prestigia ($0 Setup):
+                  </span>
+                  <p className="text-slate-300 text-[11px] mt-0.5">
+                    "La auditoría forense y reestructuración cuesta <strong>$250 USD</strong>. Pero si contratas hoy el <strong>Plan Mensual Prestigia ($199 USD/mes)</strong>, el setup técnico te queda en <strong>$0 USD (100% bonificado)</strong> y te entregamos los dispositivos Smart NFC."
+                  </p>
+                </div>
+                <span className="shrink-0 px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black text-xs">
+                  Cierre Dual ROI
+                </span>
+              </div>
+            </div>
+
           </div>
         )}
 
@@ -4993,6 +5335,181 @@ export default function LocalStudioPage() {
                 </div>
               </div>
             </div>
+
+            {/* =========================================================
+                INTEGRATED: GUÍA PASO A PASO DÓNDE DAR CLIC (RESCATE 72H)
+                ========================================================= */}
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl print:hidden">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300">
+                    {isEn ? 'Technical Walkthrough • Case 3: Listing Rescue & Appeal' : 'Paso a Paso Técnico • Caso 3: Rescate de Ficha Secuestrada o Huérfana'}
+                  </span>
+                  <h3 className="text-lg font-black text-white flex items-center gap-2">
+                    <ShieldAlert className="w-5 h-5 text-rose-400" />
+                    <span>{isEn ? 'Where to Click on Google to Reclaim or Appeal Listing Ownership' : 'Guía Paso a Paso: Dónde dar Clic en Google para Reclamar o Apelar Titularidad'}</span>
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    {isEn
+                      ? 'Legal 72-hour protocol to revoke third parties and submit evidentiary dossiers to Google Trust & Safety.'
+                      : 'Protocolo legal de 72 horas para revocar a terceros y radicar el expediente probatorio ante Google Trust & Safety.'}
+                  </p>
+                </div>
+                <a
+                  href="https://support.google.com/business/workflow/12825603"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg shadow-rose-600/20 cursor-pointer shrink-0"
+                >
+                  <span>{isEn ? 'Google Appeal Tool' : 'Herramienta de Apelación Google'}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+
+              {/* 6 Steps Grid for Rescue */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">1</span>
+                    <strong className="text-white text-xs">Localizar Ficha en Maps</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Abre el navegador en modo incógnito. Busca el nombre comercial exacto del negocio en Google Maps y abre el perfil público.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">2</span>
+                    <strong className="text-white text-xs">Clic en "Reclamar Empresa"</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Debajo de la dirección, haz clic en el enlace azul: <strong>"¿Eres el propietario de esta empresa?"</strong> o <strong>"Reclamar este negocio"</strong>.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">3</span>
+                    <strong className="text-white text-xs">Clic en "Solicitar Acceso"</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Si Google muestra que la ficha pertenece a un correo externo (ej: <em>c*****@gmail.com</em>), haz clic en el botón azul <strong>"Solicitar acceso"</strong> (Request Access).
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">4</span>
+                    <strong className="text-white text-xs">Nivel "Propietario" & Plazo 72h</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Elige nivel <strong>"Propietario"</strong>. Google notifica al secuestrador dándole <strong>3 días (72 horas)</strong> obligatorios. Si no responde, Google libera la verificación directa para ti.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">5</span>
+                    <strong className="text-white text-xs">Apelación Formal si Rechazan</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Si el secuestrador rechaza o el perfil está suspendido, ingresa a la <strong>Herramienta Oficial de Apelaciones</strong> y abre un caso formal de restitución.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">6</span>
+                    <strong className="text-white text-xs">Carga de Expediente Probatorio</strong>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    Adjunta los 4 documentos oficiales: RUT / Tax ID, factura de energía reciente, foto de fachada y datáfono en caja ante Google Trust & Safety para revocar al secuestrador.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* =========================================================
+                INTEGRATED: GUIÓN COMERCIAL DE CIERRE (RESCATE 72H)
+                ========================================================= */}
+            <div className="bg-slate-950 border-2 border-rose-500/50 rounded-3xl p-6 sm:p-7 space-y-5 shadow-2xl print:hidden">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300">
+                    {isEn ? 'Sales Playbook • Case 3: Listing Rescue Closing Pitch' : 'Guión Comercial & Cierre • Caso 3: Venta de Rescate & Recuperación 72h'}
+                  </span>
+                  <h3 className="text-lg font-black text-white flex items-center gap-2">
+                    <MessageSquare className="w-5 h-5 text-rose-400" />
+                    <span>{isEn ? 'High-Urgency Crisis Rescue Closing Script' : 'Speech de Crisis & Urgencia Extrema: Rescate de Titularidad Google'}</span>
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    {isEn
+                      ? 'Prevent clients from creating duplicate listings and close the $250-$450 USD rescue fee or bundle with Prestigia plans.'
+                      : 'Evita que el cliente cree fichas duplicadas sancionables y cierra el servicio de rescate ($350 USD) o bonifícalo con el Plan Prestigia.'}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const script = `Hola ${businessName || 'propietario'}, le saluda el equipo de Prestigia con una alerta prioritaria de su negocio en Google Maps. Detectamos que su ficha oficial se encuentra actualmente secuestrada por un tercero / suspendida por Google. Los clientes que buscan su negocio en ${city || 'su ciudad'} están llamando a números que no le pertenecen o no pueden encontrar su dirección. Por favor NO cometa el grave error de crear una ficha nueva: Google la suspenderá por duplicidad y usted perderá todas sus reseñas, fotos y años de antigüedad comercial. En Prestigia somos especialistas certificados en rescates de titularidad y ejecutamos el Protocolo Oficial de 72 Horas de Google para radicar el expediente probatorio y devolverle el control legal absoluto de su perfil. El trámite legal de rescate tiene un costo de $350 USD, pero si activa hoy el Plan Prestigia ($199 USD/mes), nosotros absorbemos el 100% del costo legal de rescate ($0 USD bonificado) y blindamos su ficha para que nunca nadie vuelva a quitársela. ¿Nos autoriza a radicar la solicitud de titularidad hoy mismo?`;
+                    copyToClipboard(script, 'Guión de Rescate de Ficha');
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg shadow-rose-600/20 cursor-pointer shrink-0 active:scale-98"
+                >
+                  <Copy className="w-4 h-4" />
+                  <span>Copiar Guión de Rescate</span>
+                </button>
+              </div>
+
+              {/* Pitch Display Card */}
+              <div className="p-4 rounded-2xl bg-slate-900 border border-rose-500/30 text-xs text-slate-200 leading-relaxed italic space-y-2">
+                <span className="font-bold text-rose-300 not-italic block text-xs">
+                  🎙️ Speech de Urgencia & Rescate de Titularidad:
+                </span>
+                <p>
+                  "Hola <strong>{businessName || 'propietario'}</strong>, le saluda el equipo de Prestigia con una alerta urgente. Su ficha en Google Maps está actualmente <strong>secuestrada por un tercero / suspendida</strong>. Clientes que buscan su negocio están llamando a números ajenos. <strong>NO cree una ficha nueva</strong>: Google la sancionará por duplicidad y perderá todas sus reseñas. Nosotros ejecutamos el protocolo legal de 72h con Google Trust & Safety para restituirle la titularidad legítima."
+                </p>
+              </div>
+
+              {/* Objections & Closing Offer Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
+                  <strong className="text-amber-300 block text-xs">
+                    ⚠️ Objeción: "Una agencia anterior o ex-empleado me pide dinero para entregármela."
+                  </strong>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    <strong>Respuesta Asesor:</strong> "No les pague un solo centavo. Las directrices de Google sancionan penalmente la extorsión de perfiles comerciales. Con nuestro expediente legal (RUT, facturas de servicios y datáfono), Google revoca al tercero de inmediato y le transfiere la titularidad a usted sin depender de ellos."
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
+                  <strong className="text-amber-300 block text-xs">
+                    ⚠️ Objeción: "¿Cuánto tiempo demora y qué garantías tengo?"
+                  </strong>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    <strong>Respuesta Asesor:</strong> "El protocolo de 72 horas de Google da un plazo perentorio de 3 días hábiles. Si no responden, el botón de verificación se libera inmediatamente. Más del 95% de los rescates probatorios con documentación legal se resuelven con éxito en menos de una semana."
+                  </p>
+                </div>
+              </div>
+
+              {/* Closing Hook Box */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-950/80 via-slate-900 to-slate-900 border border-rose-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                <div>
+                  <span className="font-black text-rose-300 uppercase tracking-wide block text-xs">
+                    🎁 El Gancho de Cierre Prestigia ($0 Setup):
+                  </span>
+                  <p className="text-slate-300 text-[11px] mt-0.5">
+                    "La gestión y radicación legal de rescate cuesta <strong>$350 USD</strong>. Pero si contratas hoy el <strong>Plan Mensual Prestigia ($199 USD/mes)</strong>, nosotros asumimos el 100% del costo legal (<strong>$0 USD bonificado</strong>) y blindamos tu ficha."
+                  </p>
+                </div>
+                <span className="shrink-0 px-3 py-1.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-black text-xs">
+                  Rescate 100% Legal
+                </span>
+              </div>
+            </div>
+
           </div>
         )}
 
@@ -6830,186 +7347,6 @@ export default function LocalStudioPage() {
           </div>
         )}
 
-        {/* =============================================================
-            TAB 4: GUÍA DÓNDE DAR CLIC EN GOOGLE (TUTORIAL PARA DUMMIES)
-            ============================================================= */}
-        {activeTab === 'guide' && (
-          <div className="space-y-6 print:hidden">
-            <div className="bg-gradient-to-r from-purple-950/40 via-slate-900 to-slate-900 border border-purple-500/40 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-purple-950 border border-purple-500/40 text-purple-300">
-                    {tGuide.badge}
-                  </span>
-                  <h1 className="text-xl sm:text-2xl font-black text-white">
-                    {tGuide.title}
-                  </h1>
-                  <p className="text-xs text-slate-300 max-w-2xl">
-                    {tGuide.desc}
-                  </p>
-                </div>
-                <a
-                  href="https://business.google.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg cursor-pointer shrink-0"
-                >
-                  <span>{tGuide.btnOpenGoogle}</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-              {/* Paso 1 */}
-              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-xs">1</span>
-                  <h3 className="font-bold text-white text-sm">{tGuide.step1Title}</h3>
-                </div>
-                <p className="text-slate-300 text-[11px] leading-relaxed">
-                  {tGuide.step1Body}
-                </p>
-              </div>
-
-              {/* Paso 2 */}
-              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-xs">2</span>
-                  <h3 className="font-bold text-white text-sm">{tGuide.step2Title}</h3>
-                </div>
-                <p className="text-slate-300 text-[11px] leading-relaxed">
-                  {tGuide.step2Body}
-                </p>
-              </div>
-
-              {/* Paso 3 */}
-              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-xs">3</span>
-                  <h3 className="font-bold text-white text-sm">{tGuide.step3Title}</h3>
-                </div>
-                <p className="text-slate-300 text-[11px] leading-relaxed">
-                  {tGuide.step3BodyStore}
-                  <br />
-                  <span className="text-amber-300 font-semibold">{tGuide.step3BodySab}</span>
-                </p>
-              </div>
-
-              {/* Paso 4 */}
-              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-xs">4</span>
-                  <h3 className="font-bold text-white text-sm">{tGuide.step4Title}</h3>
-                </div>
-                <p className="text-slate-300 text-[11px] leading-relaxed">
-                  {tGuide.step4BodyStore}
-                  <br />
-                  <span className="text-indigo-300 font-semibold">{tGuide.step4BodySab}</span>
-                </p>
-              </div>
-
-              {/* Paso 5 */}
-              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-xs">5</span>
-                  <h3 className="font-bold text-white text-sm">{tGuide.step5Title}</h3>
-                </div>
-                <p className="text-slate-300 text-[11px] leading-relaxed">
-                  {tGuide.step5Body}
-                </p>
-              </div>
-
-              {/* Paso 6 */}
-              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-xs">6</span>
-                  <h3 className="font-bold text-white text-sm">{tGuide.step6Title}</h3>
-                </div>
-                <p className="text-slate-300 text-[11px] leading-relaxed">
-                  {tGuide.step6Body}
-                </p>
-              </div>
-            </div>
-
-            {/* Anti-Suspension Rules */}
-            <div className="p-6 rounded-3xl bg-slate-900 border-2 border-amber-500/40 space-y-3">
-              <div className="flex items-center gap-2 text-amber-400">
-                <AlertTriangle className="w-5 h-5" />
-                <h3 className="text-base font-black text-white">{tGuide.trafficLightTitle}</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div className="p-3.5 rounded-xl bg-slate-950 border border-rose-500/30 text-rose-300 space-y-1">
-                  <strong className="text-rose-400 block text-xs">{tGuide.dangerTitle}</strong>
-                  <p className="text-[11px] text-slate-300">{tGuide.danger1}</p>
-                  <p className="text-[11px] text-slate-300">{tGuide.danger2}</p>
-                  <p className="text-[11px] text-slate-300">{tGuide.danger3}</p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-slate-950 border border-emerald-500/30 text-emerald-300 space-y-1">
-                  <strong className="text-emerald-400 block text-xs">{tGuide.safeTitle}</strong>
-                  <p className="text-[11px] text-slate-300">{tGuide.safe1}</p>
-                  <p className="text-[11px] text-slate-300">{tGuide.safe2}</p>
-                  <p className="text-[11px] text-slate-300">{tGuide.safe3}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* =============================================================
-            TAB 5: GUION COMERCIAL PARA ASESORES (OBJECIONES Y CIERRE)
-            ============================================================= */}
-        {activeTab === 'pitch' && (
-          <div className="space-y-6 print:hidden">
-            <div className="bg-gradient-to-r from-rose-950/40 via-slate-900 to-slate-900 border border-rose-500/40 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
-              <div className="space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300">
-                  {tPitch.badge}
-                </span>
-                <h1 className="text-xl sm:text-2xl font-black text-white">
-                  {tPitch.title}
-                </h1>
-                <p className="text-xs text-slate-300 max-w-2xl">
-                  {tPitch.desc}
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-3.5 text-xs">
-              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-                <strong className="text-amber-300 block text-sm">
-                  {tPitch.q1}
-                </strong>
-                <p className="text-slate-300 text-xs leading-relaxed">
-                  <em>{isEn ? 'Advisor Script:' : 'Respuesta del Asesor:'}</em> {tPitch.a1}
-                </p>
-              </div>
-
-              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-                <strong className="text-amber-300 block text-sm">
-                  {tPitch.q2}
-                </strong>
-                <p className="text-slate-300 text-xs leading-relaxed">
-                  <em>{isEn ? 'Advisor Script:' : 'Respuesta del Asesor:'}</em> {tPitch.a2}
-                </p>
-              </div>
-
-              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-                <strong className="text-amber-300 block text-sm">
-                  {tPitch.q3}
-                </strong>
-                <p className="text-slate-300 text-xs leading-relaxed">
-                  <em>{isEn ? 'Advisor Script:' : 'Respuesta del Asesor:'}</em> {tPitch.a3}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* =============================================================
-            TAB 6 / 4: RED DE ASESORES & AGENCIAS B2B (EXCLUSIVO DUEÑO / MASTER)
-            ============================================================= */}
         {(activeTab === 'advisors' || activeTab === 'network') && currentUser?.role === 'admin' && (
           <div className="space-y-6 print:hidden">
             {/* Header */}
