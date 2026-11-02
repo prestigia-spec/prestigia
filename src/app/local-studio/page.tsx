@@ -43,6 +43,7 @@ import {
   FileCheck,
   Upload,
   Eye,
+  EyeOff,
   KeyRound,
   ShieldAlert,
   Unlock,
@@ -804,6 +805,7 @@ export default function LocalStudioPage() {
   const [currentUser, setCurrentUser] = useState<StudioAdvisorUser | null>(null);
   const [loginUsername, setLoginUsername] = useState('luisma');
   const [loginPassword, setLoginPassword] = useState('1234');
+  const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -5370,13 +5372,27 @@ export default function LocalStudioPage() {
 
               <div>
                 <label className="block font-bold text-slate-300 mb-1">{tAuth.passwordLabel}</label>
-                <input
-                  type="password"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="••••"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
-                />
+                <div className="relative flex items-center">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    placeholder="••••"
+                    className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 font-mono text-xs tracking-wider"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 text-slate-400 hover:text-amber-400 transition cursor-pointer p-1"
+                    title={showPassword ? (isEn ? 'Hide password' : 'Ocultar contraseña') : (isEn ? 'Show password' : 'Ver contraseña')}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4 text-amber-400" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               {loginError && <p className="text-xs text-rose-400 font-bold">{loginError}</p>}
