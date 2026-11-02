@@ -193,13 +193,14 @@ const UI_TEXT = {
     loginProfile: 'Ingresar Perfil',
     switchProfile: 'Cambiar',
     downloadPdf: 'Descargar PDF',
-    tabCreate: '🏗️ Crear Ficha Ganadora (Desde Cero)',
-    tabAudit: '🔬 Auditar & Optimizar Ficha Existente',
-    tabTools: '⚡ Armas Top 3 (Geo-Grid & ROI)',
-    tabDossiers: '📁 Mis Clientes (Luisma)',
-    tabGuide: '📖 Guía Dónde Dar Clic en Google',
-    tabPitch: '🗣️ Guion Comercial para Asesores',
-    tabNetwork: '🏢 Red de Asesores & Agencias B2B',
+    tabCreate: '🏗️ 1. Crear Ficha (Desde Cero)',
+    tabAudit: '🔬 2. Auditar & Optimizar Ficha',
+    tabRescue: '🛡️ 3. Rescatar Ficha Secuestrada',
+    tabTools: '⚡ 4. Armas Top 3 (Geo-Grid & ROI)',
+    tabDossiers: '📁 5. Mis Clientes (Luisma)',
+    tabGuide: '📖 6. Guía Dónde Dar Clic en Google',
+    tabPitch: '🗣️ 7. Guion Comercial para Asesores',
+    tabNetwork: '🏢 8. Red de Asesores & Agencias B2B',
     mod1Badge: 'Módulo 1: Para Negocios sin Google Maps',
     mod1Title: 'Constructor de Ficha Ganadora (Arquitectura Top 3)',
     mod1Desc: 'Ingresa los datos básicos del negocio. La inteligencia artificial de Prestigia generará el expediente técnico exacto (categorías secretas, título optimizado, copy de 745 caracteres, catálogo y guía de verificación) para configurar la ficha en Google en menos de 10 minutos.',
@@ -264,13 +265,14 @@ const UI_TEXT = {
     loginProfile: 'Log In Profile',
     switchProfile: 'Switch',
     downloadPdf: 'Download PDF',
-    tabCreate: '🏗️ Build Winning Listing (From Scratch)',
-    tabAudit: '🔬 Audit & Upgrade Existing Listing',
-    tabTools: '⚡ Top 3 Weapons (Geo-Grid & ROI)',
-    tabDossiers: '📁 My Clients (Luisma)',
-    tabGuide: '📖 Step-by-Step Google Click Guide',
-    tabPitch: '🗣️ Sales Pitch & Objection Scripts',
-    tabNetwork: '🏢 Sales Advisors & Agency Network',
+    tabCreate: '🏗️ 1. Build New Listing (From Scratch)',
+    tabAudit: '🔬 2. Audit & Upgrade Existing Listing',
+    tabRescue: '🛡️ 3. Rescue & Claim Profile',
+    tabTools: '⚡ 4. Top 3 Weapons (Geo-Grid & ROI)',
+    tabDossiers: '📁 5. My Clients (Luisma)',
+    tabGuide: '📖 6. Step-by-Step Google Click Guide',
+    tabPitch: '🗣️ 7. Sales Pitch & Objection Scripts',
+    tabNetwork: '🏢 8. Sales Advisors & Agency Network',
     mod1Badge: 'Module 1: For Businesses Without Google Maps',
     mod1Title: 'Winning Listing Builder (Top 3 Architecture)',
     mod1Desc: 'Enter the basic business details. Prestigia AI will generate the exact technical blueprint (secret categories, optimized title, 745-char copy, catalog, and verification guide) to set up on Google in under 10 minutes.',
@@ -335,7 +337,7 @@ const UI_TEXT = {
 const TXT_TOOLS = {
   es: {
     badge: 'Arsenal de Cierre de Alto Valor • Estilo BrightLocal & Local Falcon',
-    title: '6 Armas de Dominio Local & Cierre Comercial',
+    title: '5 Armas de Dominio Local & Cierre Comercial',
     desc: 'Herramientas de venta visual y optimización forense para demostrarle al cliente cuánto dinero está perdiendo hoy y cómo Prestigia lo posiciona en la cima.',
     activeAlgo: '⚡ Algoritmo 2026 Activo',
     tab1: '1. Simulador Geo-Grid 3x3',
@@ -427,7 +429,7 @@ const TXT_TOOLS = {
   },
   en: {
     badge: 'High-Value Conversion Arsenal • BrightLocal & Local Falcon Style',
-    title: '6 Local Dominance & Commercial Closing Weapons',
+    title: '5 Local Dominance & Commercial Closing Weapons',
     desc: 'Visual sales and forensic optimization tools showing clients how much revenue they are losing today and how Prestigia positions them at the top.',
     activeAlgo: '⚡ 2026 Algorithm Active',
     tab1: '1. 3x3 Geo-Grid Heatmap',
@@ -804,7 +806,7 @@ export default function LocalStudioPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Active Workspace Tab
-  const [activeTab, setActiveTab] = useState<'create' | 'audit' | 'tools' | 'dossiers' | 'guide' | 'pitch' | 'advisors' | 'network'>('create');
+  const [activeTab, setActiveTab] = useState<'create' | 'audit' | 'rescue' | 'tools' | 'dossiers' | 'guide' | 'pitch' | 'advisors' | 'network'>('create');
 
   // Toast Notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -963,8 +965,8 @@ export default function LocalStudioPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedData, setGeneratedData] = useState<BlueprintData | null>(null);
 
-  // 6 Elite Local SEO Power Tools State
-  const [toolsActiveTab, setToolsActiveTab] = useState<'geogrid' | 'roicalc' | 'geotag' | 'citations' | 'rivalspy' | 'rescue'>('geogrid');
+  // 5 Elite Local SEO Power Tools State
+  const [toolsActiveTab, setToolsActiveTab] = useState<'geogrid' | 'roicalc' | 'geotag' | 'citations' | 'rivalspy'>('geogrid');
   const [geoGridRadius, setGeoGridRadius] = useState<'1km' | '3km' | '5km'>('3km');
   const [roiAverageTicket, setRoiAverageTicket] = useState<number>(65);
   const [roiCurrentRank, setRoiCurrentRank] = useState<number>(8);
@@ -1279,7 +1281,7 @@ export default function LocalStudioPage() {
         city: city.trim(),
         neighborhood: neighborhood.trim(),
         googleUrl: googleUrl.trim(),
-        mode: activeTab === 'audit' ? 'audit' : 'create',
+        mode: activeTab === 'audit' ? 'audit' : activeTab === 'rescue' ? 'rescue' : 'create',
         status: 'draft',
         data: generatedData,
       };
@@ -1726,6 +1728,19 @@ export default function LocalStudioPage() {
 
           <button
             type="button"
+            onClick={() => setActiveTab('rescue')}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition flex items-center gap-2 cursor-pointer ${
+              activeTab === 'rescue'
+                ? 'bg-gradient-to-r from-rose-500 to-amber-500 text-slate-950 shadow-md shadow-rose-500/20'
+                : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+            }`}
+          >
+            <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
+            <span>{t.tabRescue}</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setActiveTab('tools')}
             className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'tools'
@@ -2025,6 +2040,44 @@ export default function LocalStudioPage() {
                     <span>{t.btnCopyWhatsapp}</span>
                   </button>
                 )}
+
+                {/* Commercial Strategy: Setup Fee & 100% Annual Plan Waiver */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-slate-900 to-teal-500/10 border border-emerald-500/30 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <DollarSign className="w-4 h-4 text-emerald-400" />
+                      <span className="text-[10px] font-black uppercase text-emerald-400">
+                        {isEn ? 'Advisor Monetization Strategy' : 'Estrategia Comercial de Cierre'}
+                      </span>
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                      $150 - $250 USD
+                    </span>
+                  </div>
+                  <div>
+                    <strong className="text-white text-xs block mb-1">
+                      {isEn ? 'Setup Fee + 100% Waiver Closing Hook' : 'Setup Fee de Creación + Gancho 100% Bonificado'}
+                    </strong>
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      {isEn
+                        ? 'Charge a $150–$250 USD Setup Fee for initial Google Maps architecture, or waive it 100% ($0 USD) as an irresistible closing hook when the client subscribes to the full annual Prestigia NFC review plan.'
+                        : 'Cobra un Setup Fee de $150 a $250 USD por la arquitectura de creación, o bonifícalo al 100% ($0 USD) como gancho de cierre si el cliente adquiere el Plan Anual Prestigia (Tarjetas inteligentes NFC + Captura de reseñas 5★).'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const scriptText = isEn
+                        ? `Hello ${businessName || 'Business Owner'}, our initial Setup Fee to build, verify, and architect your Google Maps profile for Top 3 rankings is $150 USD. However, if you subscribe today to our full Prestigia Annual Plan (Smart NFC devices + 5★ Review Accelerator), we WAIVE 100% of the setup fee ($0 creation cost). Shall we reserve your slot and launch this week?`
+                        : `Hola estimado/a ${businessName || 'propietario'}, para crear, verificar y estructurar su ficha en Google Maps con arquitectura de posicionamiento Top 3, nuestros honorarios de configuración inicial son de $150 USD. Sin embargo, si adquiere hoy nuestro Plan Anual Prestigia (Tarjetas Inteligentes NFC + Sistema de Reseñas 5★), le BONIFICAMOS el 100% del Setup Fee ($0 costo de creación). ¿Le reservo el cupo y coordinamos la verificación esta semana?`;
+                      copyToClipboard(scriptText, isEn ? 'Setup Fee Proposal' : 'Propuesta de Setup Fee');
+                    }}
+                    className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>{isEn ? 'Copy Annual Plan Closing Script (WhatsApp)' : 'Copiar Propuesta Comercial de Cierre (WhatsApp)'}</span>
+                  </button>
+                </div>
               </div>
 
               {/* Right Column: Output Blueprint (7 cols) */}
@@ -2804,6 +2857,44 @@ export default function LocalStudioPage() {
                     </>
                   )}
                 </button>
+
+                {/* Commercial Strategy: Setup Fee & 100% Annual Plan Waiver */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-900 to-orange-500/10 border border-amber-500/30 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <DollarSign className="w-4 h-4 text-amber-400" />
+                      <span className="text-[10px] font-black uppercase text-amber-400">
+                        {isEn ? 'Advisor Monetization Strategy' : 'Estrategia Comercial de Cierre'}
+                      </span>
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-amber-950 text-amber-300 border border-amber-500/40">
+                      $150 - $250 USD
+                    </span>
+                  </div>
+                  <div>
+                    <strong className="text-white text-xs block mb-1">
+                      {isEn ? 'Audit & Upgrade Setup Fee + 100% Waiver' : 'Setup Fee de Auditoría & Gancho 100% Bonificado'}
+                    </strong>
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      {isEn
+                        ? 'Charge a $150–$250 USD Setup Fee for forensic listing overhaul and Top 3 upgrade, or waive it 100% ($0 USD) as an irresistible hook when the client signs up for the annual Prestigia NFC review plan.'
+                        : 'Cobra un Setup Fee de $150 a $250 USD por la auditoría forense y optimización profunda al Top 3, o bonifícalo al 100% ($0 USD) como gancho de cierre si el cliente adquiere el Plan Anual Prestigia (Tarjetas inteligentes NFC + Captura de reseñas 5★).'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const scriptText = isEn
+                        ? `Hello ${businessName || 'Business Owner'}, after performing our forensic audit on your Google Maps listing, we identified critical gaps keeping you outside the Top 3. Our deep optimization Setup Fee is regularly $150 USD. However, if you activate our Prestigia Annual Plan (Smart NFC devices + 5★ Review System), we WAIVE 100% of the optimization fee ($0 USD). Shall we lock in this waiver and elevate your listing this week?`
+                        : `Hola estimado/a ${businessName || 'propietario'}, tras auditar su negocio en Google Maps detectamos fallas críticas que le hacen perder clientes frente a la competencia. Nuestro Setup Fee por la optimización forense al Top 3 es de $150 USD. Sin embargo, si adquiere hoy nuestro Plan Anual Prestigia (Tarjetas Inteligentes NFC + Sistema de Reseñas 5★), le BONIFICAMOS el 100% de la optimización ($0 USD). ¿Le gustaría aprovechar esta bonificación y activar su plan anual?`;
+                      copyToClipboard(scriptText, isEn ? 'Audit Proposal' : 'Propuesta de Auditoría');
+                    }}
+                    className="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>{isEn ? 'Copy Annual Plan Closing Script (WhatsApp)' : 'Copiar Propuesta Comercial de Cierre (WhatsApp)'}</span>
+                  </button>
+                </div>
               </div>
 
               {/* Right: Audit Diagnostic Output */}
@@ -2944,6 +3035,427 @@ export default function LocalStudioPage() {
         )}
 
         {/* =============================================================
+            TAB 3: RESCATE DE FICHA SECUESTRADA / HUÉRFANA (CLAIM & OWNERSHIP ENGINE)
+            ============================================================= */}
+        {activeTab === 'rescue' && (
+          <div className="space-y-6">
+            {/* Header intro */}
+            <div className="bg-gradient-to-r from-rose-950/40 via-slate-900 to-amber-950/20 border border-rose-500/40 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden print:hidden">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300">
+                    {isEn ? '🛡️ Module 3 • Listing Ownership Recovery & Claim' : '🛡️ Módulo 3 • Rescate & Reclamación de Titularidad Google Maps'}
+                  </span>
+                  <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+                    <ShieldAlert className="w-6 h-6 text-rose-400" />
+                    <span>{tTools.rescueTitle}</span>
+                  </h1>
+                  <p className="text-xs text-slate-300 max-w-2xl">
+                    {tTools.rescueDesc}
+                  </p>
+                </div>
+                <div className="text-right shrink-0">
+                  <span className="text-[10px] text-slate-400 block font-mono">{isEn ? 'Official Timeline' : 'Tiempo de Trámite'}</span>
+                  <span className="text-lg font-black text-amber-400">{isEn ? '72-Hour Protocol' : 'Regla de 72 Horas'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Rescue Workspace Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column: Diagnostics & Parameters (5 cols) */}
+              <div className="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl print:hidden">
+                <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
+                  <KeyRound className="w-4 h-4 text-rose-400" />
+                  <h2 className="text-sm font-black text-white">{isEn ? '1. Business & Rescue Diagnosis' : '1. Diagnóstico de Titularidad & Datos'}</h2>
+                </div>
+
+                <div className="space-y-3 text-xs">
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">{isEn ? 'Business Name on Google Maps *' : 'Nombre de la Ficha en Google Maps *'}</label>
+                    <input
+                      type="text"
+                      value={businessName}
+                      onChange={(e) => setBusinessName(e.target.value)}
+                      placeholder={isEn ? 'e.g. Apex Dental Center' : 'Ej: Clínica Dental Sanitas'}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 transition"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">{isEn ? 'City / Location *' : 'Ciudad / Ubicación *'}</label>
+                    <input
+                      type="text"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder={isEn ? 'e.g. Miami, FL' : 'Ej: Bogotá o Medellín'}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 transition"
+                    />
+                  </div>
+
+                  {rescueScenario === 'third_party' && (
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {isEn ? 'Masked Owner Email Displayed on Google' : 'Correo Enmascarado que Muestra Google'}
+                      </label>
+                      <input
+                        type="text"
+                        value={rescueMaskedEmail}
+                        onChange={(e) => setRescueMaskedEmail(e.target.value)}
+                        placeholder="c•••••@gmail.com"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 transition"
+                      />
+                      <span className="text-[10px] text-slate-400 mt-1 block">
+                        {isEn ? 'Shown when attempting to claim: "Managed by ..."' : 'Aparece al intentar reclamar: "Esta empresa está gestionada por..."'}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Scenario Selector */}
+                  <div className="pt-2">
+                    <label className="block font-bold text-slate-300 mb-2">{tTools.rescueScenarioLabel}</label>
+                    <div className="space-y-2">
+                      {/* Case 1: Orphan */}
+                      <button
+                        type="button"
+                        onClick={() => setRescueScenario('orphan')}
+                        className={`w-full p-3.5 rounded-2xl text-left border transition cursor-pointer flex flex-col space-y-1 ${
+                          rescueScenario === 'orphan'
+                            ? 'bg-amber-500/10 border-amber-500 text-white shadow-lg ring-1 ring-amber-500/30'
+                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between pb-0.5">
+                          <span className="text-[10px] font-black uppercase text-amber-400">{isEn ? 'Case 1' : 'Caso 1'}</span>
+                          <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/40">
+                            {isEn ? 'Unclaimed / Orphan' : 'Sin Dueño Reclamado'}
+                          </span>
+                        </div>
+                        <strong className="text-white text-xs block leading-snug">{tTools.scenario1Title}</strong>
+                        <p className="text-[11px] text-slate-400 leading-relaxed">{tTools.scenario1Subtitle}</p>
+                      </button>
+
+                      {/* Case 2: Third Party */}
+                      <button
+                        type="button"
+                        onClick={() => setRescueScenario('third_party')}
+                        className={`w-full p-3.5 rounded-2xl text-left border transition cursor-pointer flex flex-col space-y-1 ${
+                          rescueScenario === 'third_party'
+                            ? 'bg-indigo-500/10 border-indigo-500 text-white shadow-lg ring-1 ring-indigo-500/30'
+                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between pb-0.5">
+                          <span className="text-[10px] font-black uppercase text-indigo-400">{isEn ? 'Case 2' : 'Caso 2'}</span>
+                          <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
+                            {isEn ? '72-Hour Rule' : 'Regla de 72h'}
+                          </span>
+                        </div>
+                        <strong className="text-white text-xs block leading-snug">{tTools.scenario2Title}</strong>
+                        <p className="text-[11px] text-slate-400 leading-relaxed">{tTools.scenario2Subtitle}</p>
+                      </button>
+
+                      {/* Case 3: Rejected */}
+                      <button
+                        type="button"
+                        onClick={() => setRescueScenario('rejected')}
+                        className={`w-full p-3.5 rounded-2xl text-left border transition cursor-pointer flex flex-col space-y-1 ${
+                          rescueScenario === 'rejected'
+                            ? 'bg-rose-500/10 border-rose-500 text-white shadow-lg ring-1 ring-rose-500/30'
+                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between pb-0.5">
+                          <span className="text-[10px] font-black uppercase text-rose-400">{isEn ? 'Case 3' : 'Caso 3'}</span>
+                          <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/40">
+                            {isEn ? 'Legal Appeal' : 'Apelación Legal'}
+                          </span>
+                        </div>
+                        <strong className="text-white text-xs block leading-snug">{tTools.scenario3Title}</strong>
+                        <p className="text-[11px] text-slate-400 leading-relaxed">{tTools.scenario3Subtitle}</p>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Commercial Strategy: Setup Fee & 100% Annual Plan Waiver */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-slate-900 to-teal-500/10 border border-emerald-500/30 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <DollarSign className="w-4 h-4 text-emerald-400" />
+                      <span className="text-[10px] font-black uppercase text-emerald-400">
+                        {isEn ? 'Advisor Monetization Strategy' : 'Estrategia Comercial de Cierre'}
+                      </span>
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                      $150 - $250 USD
+                    </span>
+                  </div>
+                  <div>
+                    <strong className="text-white text-xs block mb-1">
+                      {isEn ? 'Rescue Setup Fee + 100% Waiver Closing Hook' : 'Setup Fee de Rescate + Gancho 100% Bonificado'}
+                    </strong>
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      {isEn
+                        ? 'Charge a $150–$250 USD Setup Fee for legal listing rescue and ownership transfer, or waive it 100% ($0 USD) as an irresistible hook when the client purchases an annual Prestigia NFC review plan.'
+                        : 'Cobra un Setup Fee de $150 a $250 USD por rescatar y transferir la titularidad legal, o bonifícalo al 100% ($0 USD) como gancho de cierre si el cliente adquiere el Plan Anual Prestigia (Tarjetas inteligentes NFC + Captura de reseñas 5★).'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const scriptText = isEn
+                        ? `Hello ${businessName || 'Business Owner'}, our legal ownership recovery Setup Fee to reclaim and transfer your Google Maps profile to your direct account is $150 USD. However, if you subscribe today to our full Prestigia Annual Plan (Smart NFC devices + 5★ Review Accelerator), we WAIVE 100% of the rescue fee ($0 cost). You get your listing back completely free and your reputation secured all year round. Shall we start the protocol today?`
+                        : `Hola estimado/a ${businessName || 'propietario'}, para recuperar la titularidad legal de su ficha en Google Maps y transferir el control total a su cuenta oficial mediante el protocolo de Google, nuestros honorarios de gestión son de $150 USD. Sin embargo, si adquiere hoy nuestro Plan Anual Prestigia (Tarjetas Inteligentes NFC + Sistema de Reseñas 5★), le BONIFICAMOS el 100% del rescate ($0 USD). Recupera su ficha gratis y blindamos su reputación todo el año. ¿Iniciamos el protocolo hoy?`;
+                      copyToClipboard(scriptText, isEn ? 'Rescue Proposal' : 'Propuesta de Rescate');
+                    }}
+                    className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>{isEn ? 'Copy Annual Plan Closing Script (WhatsApp)' : 'Copiar Propuesta Comercial de Cierre (WhatsApp)'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Column: Interactive Protocol & Evidentiary Dossier (7 cols) */}
+              <div className="lg:col-span-7 space-y-4">
+                {/* Protocol Roadmap Card */}
+                <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-5 text-xs shadow-xl">
+                  {rescueScenario === 'orphan' && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                          <Unlock className="w-4 h-4 text-amber-400" />
+                          <span>{isEn ? 'Action Plan for Unclaimed Orphan Listing' : 'Plan de Acción Inmediato para Ficha Huérfana'}</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">
+                          {isEn ? '⚡ 5-Minute Resolution' : '⚡ Resolución Inmediata'}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                          <span className="font-black text-amber-400 block text-xs">Paso 1: Abrir Enlace Oficial</span>
+                          <p className="text-[11px] text-slate-300">
+                            {isEn
+                              ? 'Search the business on Google Maps and click "Own this business?" or enter Google Business Profile.'
+                              : 'Buscar el negocio en Google Maps y dar clic en "¿Eres el propietario?" o entrar a Google Business Profile.'}
+                          </p>
+                        </div>
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                          <span className="font-black text-amber-400 block text-xs">Paso 2: Elegir Verificación</span>
+                          <p className="text-[11px] text-slate-300">
+                            {isEn
+                              ? 'Select verification by automated call or SMS directly to the business phone line.'
+                              : 'Seleccionar la verificación por llamada automatizada o SMS al teléfono del establecimiento.'}
+                          </p>
+                        </div>
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                          <span className="font-black text-emerald-400 block text-xs">Paso 3: Blindar Titularidad</span>
+                          <p className="text-[11px] text-slate-300">
+                            {isEn
+                              ? 'Enter the 6-digit code. The listing is immediately transferred to the legitimate owner.'
+                              : 'Digitar el código de 6 dígitos. La ficha pasa de inmediato a ser del dueño, asegurando reseñas y fotos.'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {rescueScenario === 'third_party' && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <span className="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
+                          <Clock className="w-4 h-4 text-indigo-400" />
+                          <span>{isEn ? 'Official 72-Hour Legal Ownership Transfer Protocol' : 'Protocolo Oficial de Transferencia Legal de 72 Horas'}</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-indigo-300 bg-indigo-950/80 px-2 py-0.5 rounded border border-indigo-500/30">
+                          {isEn ? '⏳ 3 Business Days' : '⏳ 3 Días Hábiles'}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                          <span className="font-black text-indigo-400 block text-xs">Día 1: Radicación</span>
+                          <p className="text-[11px] text-slate-300">
+                            {isEn
+                              ? 'Enter business.google.com/create, search the listing, click "Request Access", and choose Owner role.'
+                              : 'Entrar a business.google.com/create, buscar la ficha y dar clic en "Solicitar Acceso" como Propietario.'}
+                          </p>
+                        </div>
+                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                          <span className="font-black text-indigo-400 block text-xs">Días 1-3: Espera</span>
+                          <p className="text-[11px] text-slate-300">
+                            {isEn
+                              ? 'Google emails the third party. They have exactly 72 hours to accept or transfer.'
+                              : 'Google notifica al correo anterior con un plazo improrrogable de 72 horas para responder o transferir.'}
+                          </p>
+                        </div>
+                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                          <span className="font-black text-amber-400 block text-xs">Día 4: Desbloqueo</span>
+                          <p className="text-[11px] text-slate-300">
+                            {isEn
+                              ? 'If third party does not reply within 72h, Google unlocks the "Claim & Verify" button for the client.'
+                              : 'Si el tercero no responde en 3 días, Google da por abandonada la ficha y desbloquea el reclamo al cliente.'}
+                          </p>
+                        </div>
+                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                          <span className="font-black text-emerald-400 block text-xs">Día 5: Control Total</span>
+                          <p className="text-[11px] text-slate-300">
+                            {isEn
+                              ? 'The owner verifies via SMS, phone call or 60s video and takes 100% legal control.'
+                              : 'El cliente realiza la verificación final por llamada o video de 60s y la ficha queda bajo su control.'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {rescueScenario === 'rejected' && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <span className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+                          <ShieldAlert className="w-4 h-4 text-rose-400" />
+                          <span>{isEn ? 'Evidentiary Legal Appeal Protocol (When Third Party Denies Access)' : 'Protocolo de Apelación Legal Probatoria (Cuando el Tercero Niega el Acceso)'}</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-rose-300 bg-rose-950/80 px-2 py-0.5 rounded border border-rose-500/30">
+                          {isEn ? '⚖️ Google Support Escalation' : '⚖️ Escalamiento Legal con Soporte Google'}
+                        </span>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-rose-950/30 border border-rose-500/30 space-y-2">
+                        <strong className="text-rose-300 block text-xs">
+                          {isEn ? '⚠️ Bad-Faith Third Party Defense:' : '⚠️ Cómo anular la negativa del tercero de mala fe:'}
+                        </strong>
+                        <p className="text-[11px] text-slate-300 leading-relaxed">
+                          {isEn
+                            ? 'Google’s Official Terms of Service clearly state that a marketing agency, contractor, or former employee cannot withhold an official Google Business Profile from the registered business entity. In the rejection email, click "Appeal Decision" and submit the 4 evidentiary documents below. Google will revoke the third party and grant ownership to the client.'
+                            : 'Las políticas oficiales de Google prohíben expresamente que una agencia anterior o un ex-empleado retenga una ficha contra la voluntad del titular comercial. En el correo de rechazo se hace clic en "Apelar Decisión" y se adjuntan las 4 pruebas oficiales. Google revocará al tercero por infracción de políticas.'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Direct Link to Google Business Profile Claim Tool */}
+                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                    <div>
+                      <strong className="text-white block text-xs">
+                        {isEn ? 'Direct Official Google Business Profile Entry:' : 'Acceso Directo Oficial a Google Business Profile:'}
+                      </strong>
+                      <span className="text-[11px] text-slate-400">
+                        {isEn
+                          ? 'Starts the ownership claim flow directly on Google’s secure servers.'
+                          : 'Inicia el flujo de reclamación de propiedad directamente en los servidores de Google.'}
+                      </span>
+                    </div>
+
+                    <a
+                      href="https://business.google.com/create"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-lg shadow-amber-500/20 shrink-0 cursor-pointer"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>{tTools.rescueBtnDirectClaim}</span>
+                    </a>
+                  </div>
+                </div>
+
+                {/* Evidentiary Checklist */}
+                <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 text-xs shadow-xl">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                    <span className="text-xs font-black text-white flex items-center gap-2">
+                      <FileCheck className="w-4 h-4 text-emerald-400" />
+                      <span>{tTools.rescueDocsTitle}</span>
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      {isEn ? 'Required for Escalation' : 'Requerido para Escalamiento ante Google'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-white block text-xs">1. Documento de Constitución / Registro Tributario</strong>
+                        <p className="text-[11px] text-slate-400 mt-0.5">
+                          RUT (Colombia), RFC / Constancia SAT (México), CIF (España) o EIN / Articles of Incorporation (USA).
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-white block text-xs">2. Factura de Servicios Públicos o Contrato</strong>
+                        <p className="text-[11px] text-slate-400 mt-0.5">
+                          Recibo reciente de energía, agua, gas o internet con el nombre comercial y dirección idéntica a Google Maps.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-white block text-xs">3. Foto Exterior de Fachada con Aviso Visible</strong>
+                        <p className="text-[11px] text-slate-400 mt-0.5">
+                          Fotografía tomada desde la calle mostrando el letrero comercial permanente y el número de nomenclatura.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-white block text-xs">4. Video Continuo de 60 Segundos del Local</strong>
+                        <p className="text-[11px] text-slate-400 mt-0.5">
+                          Grabación continua sin cortes: Fachada exterior (0-15s) → Mostrador de recepción (15-40s) → Software o datáfono (40-60s).
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* WhatsApp Diagnostic Script */}
+                <div className="p-6 rounded-3xl bg-slate-900 border border-amber-500/40 space-y-3 text-xs shadow-xl">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                    <span className="text-xs font-black text-amber-400 flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4" />
+                      <span>{tTools.rescueWhatsappScriptTitle}</span>
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const scriptText =
+                          rescueScenario === 'orphan'
+                            ? `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. En Prestigia podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?`
+                            : rescueScenario === 'third_party'
+                            ? `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo (${rescueMaskedEmail || 'c•••••@gmail.com'}) y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?`
+                            : `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?`;
+                        copyToClipboard(scriptText, isEn ? 'WhatsApp Script' : 'Guion de WhatsApp');
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold transition flex items-center gap-1.5 cursor-pointer border border-amber-500/40"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>{isEn ? 'Copy Script' : 'Copiar Guion'}</span>
+                    </button>
+                  </div>
+
+                  <p className="text-xs text-slate-300 italic leading-relaxed p-4 rounded-xl bg-slate-950 border border-slate-800">
+                    {rescueScenario === 'orphan'
+                      ? `"Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. En Prestigia podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?"`
+                      : rescueScenario === 'third_party'
+                      ? `"Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo (${rescueMaskedEmail || 'c•••••@gmail.com'}) y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?"`
+                      : `"Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?"`}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* =============================================================
             TAB: 4 ARMAS DE ÉLITE LOCAL SEO (GEO-GRID, ROI, GEOTAG, CITAS)
             ============================================================= */}
         {activeTab === 'tools' && (
@@ -3035,19 +3547,6 @@ export default function LocalStudioPage() {
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>{tTools.tab5}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setToolsActiveTab('rescue')}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
-                  toolsActiveTab === 'rescue'
-                    ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                }`}
-              >
-                <KeyRound className="w-3.5 h-3.5" />
-                <span>{tTools.tab6}</span>
               </button>
             </div>
 
@@ -3678,375 +4177,6 @@ export default function LocalStudioPage() {
                     </div>
                   );
                 })()}
-              </div>
-            )}
-
-            {/* TOOL 6: RESCUE RADAR - PROTOCOLO DE RESCATE & RECLAMACIÓN DE FICHA */}
-            {toolsActiveTab === 'rescue' && (
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 animate-in fade-in duration-200">
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-                  <div>
-                    <h3 className="text-base font-black text-white flex items-center gap-2">
-                      <ShieldAlert className="w-5 h-5 text-amber-400" />
-                      <span>{tTools.rescueTitle}</span>
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-0.5 max-w-2xl">
-                      {tTools.rescueDesc}
-                    </p>
-                  </div>
-                  <span className="text-[10px] font-black uppercase text-amber-300 bg-amber-950 px-3 py-1 rounded-full border border-amber-500/40 shrink-0">
-                    {isEn ? '🛡️ Google Ownership Protocol' : '🛡️ Protocolo Oficial Google 2026'}
-                  </span>
-                </div>
-
-                {/* Scenario Selector: 3 Real Cases */}
-                <div className="space-y-3">
-                  <label className="text-xs font-black text-white flex items-center gap-1.5">
-                    <span>{tTools.rescueScenarioLabel}</span>
-                  </label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                    {/* Case 1: Orphan */}
-                    <button
-                      type="button"
-                      onClick={() => setRescueScenario('orphan')}
-                      className={`p-4 rounded-2xl text-left border transition cursor-pointer flex flex-col justify-between space-y-2 ${
-                        rescueScenario === 'orphan'
-                          ? 'bg-amber-500/10 border-amber-500 text-white shadow-lg ring-1 ring-amber-500/30'
-                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-                      }`}
-                    >
-                      <div>
-                        <div className="flex items-center justify-between pb-1">
-                          <span className="text-[10px] font-black uppercase text-amber-400">
-                            {isEn ? 'Case 1' : 'Caso 1'}
-                          </span>
-                          <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/40">
-                            {isEn ? 'Unclaimed' : 'Sin Dueño'}
-                          </span>
-                        </div>
-                        <strong className="text-white text-xs block leading-snug">
-                          {tTools.scenario1Title}
-                        </strong>
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-relaxed">
-                        {tTools.scenario1Subtitle}
-                      </p>
-                    </button>
-
-                    {/* Case 2: Third Party (72h Rule) */}
-                    <button
-                      type="button"
-                      onClick={() => setRescueScenario('third_party')}
-                      className={`p-4 rounded-2xl text-left border transition cursor-pointer flex flex-col justify-between space-y-2 ${
-                        rescueScenario === 'third_party'
-                          ? 'bg-indigo-500/10 border-indigo-500 text-white shadow-lg ring-1 ring-indigo-500/30'
-                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-                      }`}
-                    >
-                      <div>
-                        <div className="flex items-center justify-between pb-1">
-                          <span className="text-[10px] font-black uppercase text-indigo-400">
-                            {isEn ? 'Case 2' : 'Caso 2'}
-                          </span>
-                          <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
-                            {isEn ? '72h Protocol' : 'Regla de 72h'}
-                          </span>
-                        </div>
-                        <strong className="text-white text-xs block leading-snug">
-                          {tTools.scenario2Title}
-                        </strong>
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-relaxed">
-                        {tTools.scenario2Subtitle}
-                      </p>
-                    </button>
-
-                    {/* Case 3: Rejected in Bad Faith */}
-                    <button
-                      type="button"
-                      onClick={() => setRescueScenario('rejected')}
-                      className={`p-4 rounded-2xl text-left border transition cursor-pointer flex flex-col justify-between space-y-2 ${
-                        rescueScenario === 'rejected'
-                          ? 'bg-rose-500/10 border-rose-500 text-white shadow-lg ring-1 ring-rose-500/30'
-                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-                      }`}
-                    >
-                      <div>
-                        <div className="flex items-center justify-between pb-1">
-                          <span className="text-[10px] font-black uppercase text-rose-400">
-                            {isEn ? 'Case 3' : 'Caso 3'}
-                          </span>
-                          <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/40">
-                            {isEn ? 'Legal Appeal' : 'Apelación Legal'}
-                          </span>
-                        </div>
-                        <strong className="text-white text-xs block leading-snug">
-                          {tTools.scenario3Title}
-                        </strong>
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-relaxed">
-                        {tTools.scenario3Subtitle}
-                      </p>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Scenario Detailed Blueprint */}
-                <div className="p-6 rounded-2xl bg-slate-950 border border-slate-800 space-y-5 text-xs">
-                  {/* Step-by-Step Instructions based on chosen scenario */}
-                  {rescueScenario === 'orphan' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-                          <Unlock className="w-4 h-4 text-amber-400" />
-                          <span>{isEn ? 'Action Plan for Unclaimed Orphan Listing' : 'Plan de Acción Inmediato para Ficha Huérfana'}</span>
-                        </span>
-                        <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">
-                          {isEn ? '⚡ 5-Minute Resolution' : '⚡ Resolución en 5 Minutos'}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                          <span className="font-black text-amber-400 block text-xs">Paso 1: Abrir el Enlace Oficial</span>
-                          <p className="text-[11px] text-slate-300">
-                            {isEn
-                              ? 'Search the business in Google Maps and click "Own this business?" or go to Google Business Profile.'
-                              : 'Buscar el negocio en Google Maps y dar clic en "¿Eres el propietario?" o entrar a Google Business Profile.'}
-                          </p>
-                        </div>
-                        <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                          <span className="font-black text-amber-400 block text-xs">Paso 2: Elegir Método Telefónico</span>
-                          <p className="text-[11px] text-slate-300">
-                            {isEn
-                              ? 'Select verification by automated phone call or SMS directly to the landline or mobile of the establishment.'
-                              : 'Seleccionar la verificación por llamada automatizada o SMS al teléfono fijo o celular del local comercial.'}
-                          </p>
-                        </div>
-                        <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                          <span className="font-black text-emerald-400 block text-xs">Paso 3: Blindaje de Titularidad</span>
-                          <p className="text-[11px] text-slate-300">
-                            {isEn
-                              ? 'Enter the 6-digit code. The listing is immediately transferred to the legitimate owner without waiting.'
-                              : 'Digitar el código de 6 dígitos. La ficha pasa de inmediato a ser del dueño, asegurando reseñas y fotos.'}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {rescueScenario === 'third_party' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span className="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
-                          <Clock className="w-4 h-4 text-indigo-400" />
-                          <span>{isEn ? 'Official 72-Hour Legal Ownership Transfer Protocol' : 'Protocolo Oficial de Transferencia Legal de 72 Horas'}</span>
-                        </span>
-                        <span className="text-[10px] font-mono text-indigo-300 bg-indigo-950/80 px-2 py-0.5 rounded border border-indigo-500/30">
-                          {isEn ? '⏳ 3 Business Days' : '⏳ 3 Días Hábiles'}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                          <span className="font-black text-indigo-400 block text-xs">Día 1: Radicar Solicitud</span>
-                          <p className="text-[11px] text-slate-300">
-                            {isEn
-                              ? 'Enter business.google.com/create, search the business and click "Request Access". Select "Owner".'
-                              : 'Entrar a business.google.com/create, buscar la ficha y dar clic en "Solicitar Acceso". Elegir rol de Propietario.'}
-                          </p>
-                        </div>
-                        <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                          <span className="font-black text-indigo-400 block text-xs">Días 1 a 3: Notificación</span>
-                          <p className="text-[11px] text-slate-300">
-                            {isEn
-                              ? 'Google emails the masked owner (c•••••@gmail.com). They have exactly 72 hours to accept or transfer.'
-                              : 'Google notifica al correo anterior con un plazo improrrogable de 72 horas para responder o transferir.'}
-                          </p>
-                        </div>
-                        <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                          <span className="font-black text-amber-400 block text-xs">Día 4: Desbloqueo</span>
-                          <p className="text-[11px] text-slate-300">
-                            {isEn
-                              ? 'If the third party does not reply within 72h, Google unlocks the "Claim & Verify" button for the client.'
-                              : 'Si el tercero no responde en 3 días, Google da por abandonada la ficha y desbloquea el reclamo al cliente.'}
-                          </p>
-                        </div>
-                        <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                          <span className="font-black text-emerald-400 block text-xs">Día 5: Verificación Final</span>
-                          <p className="text-[11px] text-slate-300">
-                            {isEn
-                              ? 'The owner verifies via SMS, phone call or 60s video and takes 100% legal control.'
-                              : 'El cliente realiza la verificación final por llamada o video de 60s y la ficha queda bajo su control.'}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {rescueScenario === 'rejected' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
-                          <ShieldAlert className="w-4 h-4 text-rose-400" />
-                          <span>{isEn ? 'Evidentiary Legal Appeal Protocol (When Third Party Denies Access)' : 'Protocolo de Apelación Legal Probatoria (Cuando el Tercero Niega el Acceso)'}</span>
-                        </span>
-                        <span className="text-[10px] font-mono text-rose-300 bg-rose-950/80 px-2 py-0.5 rounded border border-rose-500/30">
-                          {isEn ? '⚖️ Google Support Escalation' : '⚖️ Escalamiento Legal con Soporte Google'}
-                        </span>
-                      </div>
-
-                      <div className="p-4 rounded-xl bg-rose-950/30 border border-rose-500/30 space-y-2">
-                        <strong className="text-rose-300 block text-xs">
-                          {isEn ? '⚠️ Bad-Faith Third Party Defense:' : '⚠️ Cómo anular la negativa del tercero:'}
-                        </strong>
-                        <p className="text-[11px] text-slate-300 leading-relaxed">
-                          {isEn
-                            ? 'Google’s Terms of Service clearly state that a marketing agency, contractor, or former employee cannot withhold an official Google Business Profile from the registered business entity. In the rejection email, click "Appeal Decision" and submit the 4 documents below. Google will revoke the third party and grant ownership to the client.'
-                            : 'Las políticas oficiales de Google prohíben expresamente que una agencia anterior o un ex-empleado retenga una ficha contra la voluntad del titular comercial. En el correo de rechazo se hace clic en "Apelar Decisión" y se adjuntan las 4 pruebas oficiales. Google revocará al tercero por infracción de políticas.'}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Direct Link to Google Business Profile Claim Tool */}
-                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
-                    <div>
-                      <strong className="text-white block text-xs">
-                        {isEn ? 'Direct Official Google Business Profile Entry:' : 'Acceso Directo Oficial a Google Business Profile:'}
-                      </strong>
-                      <span className="text-[11px] text-slate-400">
-                        {isEn
-                          ? 'Starts the ownership claim flow directly on Google’s secure servers.'
-                          : 'Inicia el flujo de reclamación de propiedad directamente en los servidores de Google.'}
-                      </span>
-                    </div>
-
-                    <a
-                      href="https://business.google.com/create"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-lg shadow-amber-500/20 shrink-0 cursor-pointer"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>{tTools.rescueBtnDirectClaim}</span>
-                    </a>
-                  </div>
-                </div>
-
-                {/* Checklist of Evidentiary Documents */}
-                <div className="p-6 rounded-2xl bg-slate-950 border border-slate-800 space-y-4 text-xs">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                    <span className="text-xs font-black text-white flex items-center gap-2">
-                      <FileCheck className="w-4 h-4 text-emerald-400" />
-                      <span>{tTools.rescueDocsTitle}</span>
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-mono">
-                      {isEn ? 'Required for Escalation' : 'Requerido para Escalamiento'}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-white block text-xs">1. Documento de Constitución / Registro Tributario</strong>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
-                          RUT (Colombia), RFC / Constancia SAT (México), CIF (España) o EIN / Articles of Incorporation (USA).
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-white block text-xs">2. Factura de Servicios Públicos o Contrato</strong>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
-                          Recibo reciente de energía, agua, gas o internet con el nombre comercial y dirección idéntica a Google Maps.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-white block text-xs">3. Foto Exterior de Fachada con Aviso Visible</strong>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
-                          Fotografía tomada desde la calle mostrando el letrero comercial permanente y el número de nomenclatura.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-white block text-xs">4. Video Continuo de 60 Segundos del Local</strong>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
-                          Grabación continua sin cortes: Fachada exterior (0-15s) → Mostrador de recepción (15-40s) → Software o datáfono (40-60s).
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* WhatsApp Sales & Advisory Script for the Client */}
-                <div className="p-6 rounded-2xl bg-slate-950 border border-amber-500/40 space-y-3 text-xs">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                    <span className="text-xs font-black text-amber-400 flex items-center gap-2">
-                      <MessageSquare className="w-4 h-4" />
-                      <span>{tTools.rescueWhatsappScriptTitle}</span>
-                    </span>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const scriptText =
-                          rescueScenario === 'orphan'
-                            ? `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. En Prestigia podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?`
-                            : rescueScenario === 'third_party'
-                            ? `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo (${rescueMaskedEmail || 'c•••••@gmail.com'}) y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?`
-                            : `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?`;
-                        copyToClipboard(scriptText, isEn ? 'WhatsApp Script' : 'Guion de WhatsApp');
-                      }}
-                      className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold transition flex items-center gap-1.5 cursor-pointer border border-amber-500/40"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>{isEn ? 'Copy Script' : 'Copiar Guion'}</span>
-                    </button>
-                  </div>
-
-                  <p className="text-xs text-slate-300 italic leading-relaxed p-4 rounded-xl bg-slate-900 border border-slate-800">
-                    {rescueScenario === 'orphan'
-                      ? `"Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. En Prestigia podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?"`
-                      : rescueScenario === 'third_party'
-                      ? `"Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo (${rescueMaskedEmail || 'c•••••@gmail.com'}) y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?"`
-                      : `"Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?"`}
-                  </p>
-                </div>
-
-                {/* Commercial Pricing Recommendation (Setup Fee) */}
-                <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-slate-900 to-teal-500/10 border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs">
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black uppercase text-emerald-400">
-                      {tTools.rescuePricingTitle}
-                    </span>
-                    <strong className="text-white block text-sm">
-                      {isEn ? 'High-Value Entry Service: $120 to $250 USD' : 'Servicio de Entrada de Alto Valor: $120 a $250 USD'}
-                    </strong>
-                    <p className="text-slate-400 text-[11px] max-w-xl">
-                      {isEn
-                        ? 'Charge a setup fee for recovering and securing the listing, or waive 100% of the rescue fee if the client purchases an annual Prestigia NFC review subscription.'
-                        : 'Puedes cobrar un Setup Fee por rescatar y transferir la ficha, o bonificarlo al 100% como gancho de cierre si el cliente adquiere el paquete anual de tarjetas NFC y reseñas de Prestigia.'}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    <div className="px-4 py-2.5 rounded-xl bg-emerald-950 border border-emerald-500/40 text-emerald-300 font-mono font-black text-sm shadow">
-                      $150 USD Setup
-                    </div>
-                  </div>
-                </div>
               </div>
             )}
           </div>
