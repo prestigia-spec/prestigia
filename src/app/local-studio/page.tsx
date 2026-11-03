@@ -60,6 +60,8 @@ import {
   RotateCcw,
   CheckCheck,
   Plus,
+  User,
+  Mail,
 } from 'lucide-react';
 import type { GooglePlaceData } from '@/app/api/auditor/google-lookup/route';
 
@@ -158,6 +160,11 @@ interface StudioDossierRecord {
   advisorType?: 'internal_advisor' | 'partner_agency' | 'founder';
   country?: string;
   clientName: string;
+  contactName?: string;
+  contactCompany?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  contactRole?: string;
   category: string;
   city: string;
   neighborhood?: string;
@@ -1483,6 +1490,13 @@ export default function LocalStudioPage() {
   const [country, setCountry] = useState<string>('Colombia');
   const [city, setCity] = useState<string>('Bogotá');
   const [neighborhood, setNeighborhood] = useState<string>('');
+  // Client Contratante State (The person/company contracting the service)
+  const [contactName, setContactName] = useState<string>('');
+  const [contactCompany, setContactCompany] = useState<string>('');
+  const [contactPhone, setContactPhone] = useState<string>('');
+  const [contactEmail, setContactEmail] = useState<string>('');
+  const [contactRole, setContactRole] = useState<string>('Dueño / Propietario');
+
   const [customCountries, setCustomCountries] = useState<string[]>([]);
   const [customCitiesByCountry, setCustomCitiesByCountry] = useState<Record<string, string[]>>({});
 
@@ -1820,7 +1834,21 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [networkTypeFilter, setNetworkTypeFilter] = useState<'all' | 'internal_advisor' | 'partner_agency'>('all');
   const [networkCountryFilter, setNetworkCountryFilter] = useState('all');
   const [networkCityFilter, setNetworkCityFilter] = useState('all');
-  const [networkModeFilter, setNetworkModeFilter] = useState<'all' | 'create' | 'audit'>('all');
+  const [networkModeFilter, setNetworkModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue'>('all');
+
+  // Edit Advisor Account Modal State
+  const [editingAdvisor, setEditingAdvisor] = useState<StudioAdvisorUser | null>(null);
+  const [showEditAdvisorModal, setShowEditAdvisorModal] = useState<boolean>(false);
+  const [editAdvisorName, setEditAdvisorName] = useState<string>('');
+  const [editAdvisorUser, setEditAdvisorUser] = useState<string>('');
+  const [editAdvisorPass, setEditAdvisorPass] = useState<string>('');
+  const [editAdvisorPhone, setEditAdvisorPhone] = useState<string>('+57');
+  const [editAdvisorCountry, setEditAdvisorCountry] = useState<string>('Colombia');
+  const [editAdvisorCity, setEditAdvisorCity] = useState<string>('Bogotá');
+  const [editAdvisorAccountType, setEditAdvisorAccountType] = useState<'internal_advisor' | 'partner_agency'>('internal_advisor');
+  const [editAdvisorMonthlyFee, setEditAdvisorMonthlyFee] = useState<number>(49);
+  const [editAdvisorLicenseStatus, setEditAdvisorLicenseStatus] = useState<'active' | 'pending_payment' | 'suspended'>('active');
+  const [isUpdatingAdvisor, setIsUpdatingAdvisor] = useState<boolean>(false);
 
   // Advisors & Agencies List (for Admin tab)
   const [advisorsList, setAdvisorsList] = useState<StudioAdvisorUser[]>([]);
@@ -1865,7 +1893,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     if (activeTab === 'dossiers') {
       fetchDossiers();
     }
-    if (activeTab === 'advisors' && currentUser?.role === 'admin') {
+    if ((activeTab === 'advisors' || activeTab === 'network') && currentUser?.role === 'admin') {
       fetchAdvisors();
     }
   }, [activeTab]);
@@ -2358,6 +2386,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         advisorName: currentUser?.name || 'Luisma • Director General',
         advisorPhone: currentUser?.phone || '+573058314049',
         clientName: businessName.trim(),
+        contactName: contactName.trim(),
+        contactCompany: contactCompany.trim(),
+        contactPhone: contactPhone.trim(),
+        contactEmail: contactEmail.trim(),
+        contactRole: contactRole.trim(),
         category,
         country: country.trim() || 'Colombia',
         city: city.trim(),
@@ -2481,6 +2514,10 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         const q = dossierSearch.toLowerCase();
         const match =
           d.clientName.toLowerCase().includes(q) ||
+          (d.contactName && d.contactName.toLowerCase().includes(q)) ||
+          (d.contactCompany && d.contactCompany.toLowerCase().includes(q)) ||
+          (d.contactPhone && d.contactPhone.toLowerCase().includes(q)) ||
+          (d.contactEmail && d.contactEmail.toLowerCase().includes(q)) ||
           d.city.toLowerCase().includes(q) ||
           d.category.toLowerCase().includes(q) ||
           (d.country && d.country.toLowerCase().includes(q)) ||
@@ -2516,6 +2553,10 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
           const q = networkSearch.toLowerCase();
           const match =
             d.clientName.toLowerCase().includes(q) ||
+            (d.contactName && d.contactName.toLowerCase().includes(q)) ||
+            (d.contactCompany && d.contactCompany.toLowerCase().includes(q)) ||
+            (d.contactPhone && d.contactPhone.toLowerCase().includes(q)) ||
+            (d.contactEmail && d.contactEmail.toLowerCase().includes(q)) ||
             d.advisorName.toLowerCase().includes(q) ||
             d.city.toLowerCase().includes(q) ||
             d.category.toLowerCase().includes(q) ||
@@ -2535,30 +2576,38 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   ]);
 
   // Distinct countries available in network
-  const availableCountries = useMemo(() => {
+  const networkAvailableCountries = useMemo(() => {
     const set = new Set<string>();
     savedDossiers.forEach((d) => {
-      if (d.country) set.add(d.country);
+      set.add(d.country || 'Colombia');
     });
     advisorsList.forEach((a) => {
       if (a.country) set.add(a.country);
     });
-    set.add('Colombia');
-    set.add('México');
-    return Array.from(set);
-  }, [savedDossiers, advisorsList]);
+    allCountriesList.forEach((c) => set.add(c));
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [savedDossiers, advisorsList, allCountriesList]);
 
-  // Distinct cities available in network
-  const availableCities = useMemo(() => {
+  // Distinct cities available in network conditioned strictly to selected country
+  const networkAvailableCities = useMemo(() => {
+    if (networkCountryFilter === 'all') {
+      return [];
+    }
     const set = new Set<string>();
+    const countryCities = getCitiesForCountry(networkCountryFilter);
+    countryCities.forEach((c) => set.add(c));
     savedDossiers.forEach((d) => {
-      if (d.city) set.add(d.city);
+      if ((d.country || 'Colombia') === networkCountryFilter && d.city) set.add(d.city);
     });
     advisorsList.forEach((a) => {
-      if (a.city) set.add(a.city);
+      if ((a.country || 'Colombia') === networkCountryFilter && a.city) set.add(a.city);
     });
-    return Array.from(set);
-  }, [savedDossiers, advisorsList]);
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [savedDossiers, advisorsList, networkCountryFilter, customCitiesByCountry]);
+
+  // Distinct countries and cities fallback for general use
+  const availableCountries = networkAvailableCountries;
+  const availableCities = networkAvailableCities;
 
   // Download Network Performance Report in CSV
   const downloadNetworkCsvReport = () => {
@@ -2568,11 +2617,14 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
       'Tipo de Cuenta',
       'Pais',
       'Ciudad',
-      'Cliente Auditado',
+      'Ficha en Google Maps',
+      'Cliente o Dueño Contratante',
+      'Empresa Contratante',
+      'WhatsApp Cliente',
       'Categoria',
       'Modalidad',
       'Score Salud Google',
-      'WhatsApp Contacto',
+      'Telefono Asesor',
     ];
 
     const rows = networkFilteredDossiers.map((d) => [
@@ -2582,8 +2634,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
       `"${d.country || 'Colombia'}"`,
       `"${d.city || ''}"`,
       `"${(d.clientName || '').replace(/"/g, '""')}"`,
+      `"${(d.contactName || '').replace(/"/g, '""')}"`,
+      `"${(d.contactCompany || '').replace(/"/g, '""')}"`,
+      `"${d.contactPhone || ''}"`,
       `"${(d.category || '').replace(/"/g, '""')}"`,
-      d.mode === 'create' ? 'Ficha Nueva Desde Cero' : 'Auditoria Forense Top 3',
+      d.mode === 'create' ? 'Ficha Nueva Desde Cero' : d.mode === 'rescue' ? 'Rescate de Ficha Google Maps' : 'Auditoria Forense Top 3',
       d.data?.healthScore !== undefined ? `"${d.data.healthScore}/100"` : '"N/A"',
       `"${d.advisorPhone || ''}"`,
     ]);
@@ -2613,13 +2668,18 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   // Load a dossier from list into workspace
   const handleLoadDossier = (dossier: StudioDossierRecord) => {
     setBusinessName(dossier.clientName);
+    setContactName(dossier.contactName || '');
+    setContactCompany(dossier.contactCompany || '');
+    setContactPhone(dossier.contactPhone || '');
+    setContactEmail(dossier.contactEmail || '');
+    setContactRole(dossier.contactRole || 'Dueño / Propietario');
     setCategory(dossier.category);
     if (dossier.country) setCountry(dossier.country);
     setCity(dossier.city);
     setNeighborhood(dossier.neighborhood || '');
     setGoogleUrl(dossier.googleUrl || '');
     setGeneratedData(dossier.data);
-    setActiveTab(dossier.mode === 'audit' ? 'audit' : 'create');
+    setActiveTab(dossier.mode === 'audit' ? 'audit' : dossier.mode === 'rescue' ? 'rescue' : 'create');
     showToast(`Expediente cargado: ${dossier.clientName}`);
   };
 
@@ -2752,6 +2812,97 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
       showToast('⚠️ Error al registrar cuenta');
     } finally {
       setIsSavingAdvisor(false);
+    }
+  };
+
+  // Open modal to modify advisor or agency partner account
+  const handleOpenEditAdvisor = (advisor: StudioAdvisorUser) => {
+    setEditingAdvisor(advisor);
+    setEditAdvisorName(advisor.name || '');
+    setEditAdvisorUser(advisor.username || '');
+    setEditAdvisorPass(''); // Blank means keep unchanged
+    setEditAdvisorPhone(advisor.phone || '+57');
+    setEditAdvisorCountry(advisor.country || 'Colombia');
+    setEditAdvisorCity(advisor.city || 'Bogotá');
+    setEditAdvisorAccountType(advisor.accountType === 'partner_agency' ? 'partner_agency' : 'internal_advisor');
+    setEditAdvisorMonthlyFee(advisor.monthlyFeeUsd || 49);
+    setEditAdvisorLicenseStatus(advisor.licenseStatus || 'active');
+    setShowEditAdvisorModal(true);
+  };
+
+  // Save modified advisor account
+  const handleSaveAdvisorEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingAdvisor) return;
+    if (!editAdvisorName.trim() || !editAdvisorUser.trim()) {
+      showToast('⚠️ Nombre y usuario son obligatorios');
+      return;
+    }
+
+    setIsUpdatingAdvisor(true);
+    try {
+      const payload: any = {
+        id: editingAdvisor.id,
+        name: editAdvisorName.trim(),
+        username: editAdvisorUser.trim().toLowerCase(),
+        phone: editAdvisorPhone.trim(),
+        accountType: editAdvisorAccountType,
+        country: editAdvisorCountry.trim(),
+        city: editAdvisorCity.trim(),
+        monthlyFeeUsd: editAdvisorAccountType === 'partner_agency' ? Number(editAdvisorMonthlyFee) : 0,
+        licenseStatus: editAdvisorLicenseStatus,
+        masterKey: 'admin',
+      };
+      if (editAdvisorPass.trim()) {
+        payload.password = editAdvisorPass.trim();
+      }
+
+      const res = await fetch('/api/local-studio/advisors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const resData = await res.json();
+      if (resData.success) {
+        showToast(isEn ? '✓ Account successfully updated!' : '✓ ¡Cuenta modificada y actualizada con éxito!');
+        setShowEditAdvisorModal(false);
+        setEditingAdvisor(null);
+        fetchAdvisors();
+      } else {
+        showToast('⚠️ Error: ' + (resData.error || 'No se pudo guardar'));
+      }
+    } catch {
+      showToast('⚠️ Error de conexión al actualizar asesor');
+    } finally {
+      setIsUpdatingAdvisor(false);
+    }
+  };
+
+  // Delete advisor account with confirmation
+  const handleDeleteAdvisor = async (advisor: StudioAdvisorUser) => {
+    if (advisor.id === 'adv-luisma' || advisor.id === 'adv-admin') {
+      showToast('⚠️ No se puede eliminar la cuenta de Dirección Principal.');
+      return;
+    }
+    const confirmMsg = isEn
+      ? `Are you sure you want to delete the account "${advisor.name}" (@${advisor.username})? All their dossiers will remain in the database.`
+      : `¿Estás seguro de que deseas eliminar la cuenta de "${advisor.name}" (@${advisor.username})? Sus expedientes se conservarán en el sistema.`;
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      const res = await fetch(`/api/local-studio/advisors?id=${advisor.id}&masterKey=admin`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(isEn ? `✓ Account "${advisor.name}" deleted` : `✓ Cuenta "${advisor.name}" eliminada exitosamente`);
+        fetchAdvisors();
+      } else {
+        showToast(`⚠️ Error: ${data.error || 'No se pudo eliminar'}`);
+      }
+    } catch {
+      showToast('⚠️ Error de conexión al eliminar asesor');
     }
   };
 
@@ -3462,6 +3613,105 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       placeholder={t.phonePlaceholder}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
                     />
+                  </div>
+
+                  {/* Tarjeta de Datos del Cliente / Contratante */}
+                  <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/30 space-y-2.5">
+                    <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
+                      <div className="flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-indigo-400" />
+                        <span className="text-xs font-black text-indigo-300">
+                          {isEn ? '👤 Client / Contractor Info (Who Hires & Pays)' : '👤 Datos del Cliente / Contratante (Quién Solicita y Paga el Servicio)'}
+                        </span>
+                      </div>
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
+                        CRM
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                          {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
+                        </label>
+                        <input
+                          type="text"
+                          value={contactName}
+                          onChange={(e) => setContactName(e.target.value)}
+                          placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
+                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                          {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
+                        </label>
+                        <input
+                          type="text"
+                          value={contactCompany}
+                          onChange={(e) => setContactCompany(e.target.value)}
+                          placeholder={isEn ? 'e.g. Acme Corp / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
+                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                          <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
+                          {contactPhone && (
+                            <a
+                              href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
+                            >
+                              Chat
+                            </a>
+                          )}
+                        </label>
+                        <input
+                          type="tel"
+                          value={contactPhone}
+                          onChange={(e) => setContactPhone(e.target.value)}
+                          placeholder="+57 300 123 4567"
+                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                          {isEn ? 'Email' : 'Correo Electrónico'}
+                        </label>
+                        <input
+                          type="email"
+                          value={contactEmail}
+                          onChange={(e) => setContactEmail(e.target.value)}
+                          placeholder="contacto@empresa.com"
+                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                          {isEn ? 'Role' : 'Cargo / Relación'}
+                        </label>
+                        <select
+                          value={contactRole}
+                          onChange={(e) => setContactRole(e.target.value)}
+                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
+                        >
+                          <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
+                          <option value="Gerente General">{isEn ? '💼 General Manager' : '💼 Gerente General'}</option>
+                          <option value="Director de Marketing">{isEn ? '📈 Marketing Dir.' : '📈 Dir. Marketing'}</option>
+                          <option value="Administrador">{isEn ? '🏢 Branch Admin' : '🏢 Administrador'}</option>
+                          <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
+                          <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -4727,6 +4977,105 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </select>
                       </div>
 
+                      {/* Tarjeta de Datos del Cliente / Contratante */}
+                      <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/30 space-y-2.5">
+                        <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
+                          <div className="flex items-center gap-1.5">
+                            <User className="w-3.5 h-3.5 text-indigo-400" />
+                            <span className="text-xs font-black text-indigo-300">
+                              {isEn ? '👤 Client / Contractor Info (Who Hires & Pays)' : '👤 Datos del Cliente / Contratante (Quién Solicita y Paga el Servicio)'}
+                            </span>
+                          </div>
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
+                            CRM
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                              {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
+                            </label>
+                            <input
+                              type="text"
+                              value={contactName}
+                              onChange={(e) => setContactName(e.target.value)}
+                              placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
+                              className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                              {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
+                            </label>
+                            <input
+                              type="text"
+                              value={contactCompany}
+                              onChange={(e) => setContactCompany(e.target.value)}
+                              placeholder={isEn ? 'e.g. Acme Corp / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
+                              className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                              <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
+                              {contactPhone && (
+                                <a
+                                  href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
+                                >
+                                  Chat
+                                </a>
+                              )}
+                            </label>
+                            <input
+                              type="tel"
+                              value={contactPhone}
+                              onChange={(e) => setContactPhone(e.target.value)}
+                              placeholder="+57 300 123 4567"
+                              className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                              {isEn ? 'Email' : 'Correo Electrónico'}
+                            </label>
+                            <input
+                              type="email"
+                              value={contactEmail}
+                              onChange={(e) => setContactEmail(e.target.value)}
+                              placeholder="contacto@empresa.com"
+                              className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                              {isEn ? 'Role' : 'Cargo / Relación'}
+                            </label>
+                            <select
+                              value={contactRole}
+                              onChange={(e) => setContactRole(e.target.value)}
+                              className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
+                            >
+                              <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
+                              <option value="Gerente General">{isEn ? '💼 General Manager' : '💼 Gerente General'}</option>
+                              <option value="Director de Marketing">{isEn ? '📈 Marketing Dir.' : '📈 Dir. Marketing'}</option>
+                              <option value="Administrador">{isEn ? '🏢 Branch Admin' : '🏢 Administrador'}</option>
+                              <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
+                              <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
                       <button
                         type="button"
                         onClick={() => handleGenerate('audit')}
@@ -5553,6 +5902,105 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         <strong className="text-white text-xs block leading-snug">{tTools.scenario3Title}</strong>
                         <p className="text-[11px] text-slate-400 leading-relaxed">{tTools.scenario3Subtitle}</p>
                       </button>
+                    </div>
+                  </div>
+
+                  {/* Tarjeta de Datos del Cliente / Contratante */}
+                  <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/30 space-y-2.5">
+                    <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
+                      <div className="flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-indigo-400" />
+                        <span className="text-xs font-black text-indigo-300">
+                          {isEn ? '👤 Client / Contractor Info (Who Hires & Pays)' : '👤 Datos del Cliente / Contratante (Quién Solicita y Paga el Servicio)'}
+                        </span>
+                      </div>
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
+                        CRM
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                          {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
+                        </label>
+                        <input
+                          type="text"
+                          value={contactName}
+                          onChange={(e) => setContactName(e.target.value)}
+                          placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
+                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                          {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
+                        </label>
+                        <input
+                          type="text"
+                          value={contactCompany}
+                          onChange={(e) => setContactCompany(e.target.value)}
+                          placeholder={isEn ? 'e.g. Acme Corp / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
+                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                          <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
+                          {contactPhone && (
+                            <a
+                              href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
+                            >
+                              Chat
+                            </a>
+                          )}
+                        </label>
+                        <input
+                          type="tel"
+                          value={contactPhone}
+                          onChange={(e) => setContactPhone(e.target.value)}
+                          placeholder="+57 300 123 4567"
+                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                          {isEn ? 'Email' : 'Correo Electrónico'}
+                        </label>
+                        <input
+                          type="email"
+                          value={contactEmail}
+                          onChange={(e) => setContactEmail(e.target.value)}
+                          placeholder="contacto@empresa.com"
+                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                          {isEn ? 'Role' : 'Cargo / Relación'}
+                        </label>
+                        <select
+                          value={contactRole}
+                          onChange={(e) => setContactRole(e.target.value)}
+                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
+                        >
+                          <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
+                          <option value="Gerente General">{isEn ? '💼 General Manager' : '💼 Gerente General'}</option>
+                          <option value="Director de Marketing">{isEn ? '📈 Marketing Dir.' : '📈 Dir. Marketing'}</option>
+                          <option value="Administrador">{isEn ? '🏢 Branch Admin' : '🏢 Administrador'}</option>
+                          <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
+                          <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -7532,6 +7980,51 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         <span className="text-[11px] text-amber-400 font-bold block mt-1">{d.category}</span>
                       </div>
 
+                      {/* Datos del Cliente / Contratante (Quién Solicita y Paga) */}
+                      {(d.contactName || d.contactCompany || d.contactPhone || d.contactEmail) && (
+                        <div className="p-2.5 rounded-2xl bg-slate-950/90 border border-indigo-500/30 text-[11px] space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-black text-indigo-300 flex items-center gap-1.5">
+                              <User className="w-3.5 h-3.5 text-indigo-400" />
+                              <span>{d.contactName || 'Cliente Contratante'}</span>
+                            </span>
+                            {d.contactRole && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/30">
+                                {d.contactRole}
+                              </span>
+                            )}
+                          </div>
+                          {d.contactCompany && (
+                            <p className="text-[10px] text-slate-400 flex items-center gap-1">
+                              <Building2 className="w-3 h-3 text-slate-500" />
+                              <span>{d.contactCompany}</span>
+                            </p>
+                          )}
+                          <div className="flex items-center gap-2.5 pt-0.5 text-[10px]">
+                            {d.contactPhone && (
+                              <a
+                                href={`https://wa.me/${d.contactPhone.replace(/[^0-9]/g, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1"
+                              >
+                                <Phone className="w-3 h-3" />
+                                <span>{d.contactPhone}</span>
+                              </a>
+                            )}
+                            {d.contactEmail && (
+                              <a
+                                href={`mailto:${d.contactEmail}`}
+                                className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 truncate"
+                              >
+                                <Mail className="w-3 h-3" />
+                                <span className="truncate">{d.contactEmail}</span>
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Commercial Closing & Monetization Box */}
                       <div className="pt-2">
                         {d.closingStatus === 'prestigia_subscriber' ? (
@@ -8167,37 +8660,93 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </select>
                     </div>
 
-                    {/* Filter Country */}
+                    {/* 1º Filter Country con Botón + País */}
                     <div>
-                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">{isEn ? 'Country' : 'País'}</label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] text-amber-400 uppercase font-black flex items-center gap-1">
+                          <Globe className="w-3 h-3 text-amber-400" />
+                          <span>1º {isEn ? 'Country' : 'País'}</span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowAddCountryModal(true)}
+                          className="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[10px] font-bold flex items-center gap-1 border border-amber-500/30 transition cursor-pointer"
+                          title="Registrar nuevo País"
+                        >
+                          <Plus className="w-2.5 h-2.5" />
+                          <span>País</span>
+                        </button>
+                      </div>
                       <select
                         value={networkCountryFilter}
-                        onChange={(e) => setNetworkCountryFilter(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                        onChange={(e) => {
+                          setNetworkCountryFilter(e.target.value);
+                          setNetworkCityFilter('all');
+                        }}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition cursor-pointer"
                       >
-                        <option value="all">{isEn ? 'All Countries' : 'Todos los Países'}</option>
-                        {availableCountries.map((c) => (
-                          <option key={c} value={c}>
-                            {c === 'Colombia' ? '🇨🇴 Colombia' : c === 'México' ? '🇲🇽 México' : c}
-                          </option>
-                        ))}
+                        <option value="all">🌐 Todos los Países ({networkAvailableCountries.length})</option>
+                        {networkAvailableCountries.map((c) => {
+                          const count = savedDossiers.filter((d) => (d.country || 'Colombia') === c && d.advisorId !== 'adv-luisma').length;
+                          return (
+                            <option key={c} value={c}>
+                              {c === 'Colombia' ? '🇨🇴 Colombia' : c === 'Venezuela' ? '🇻🇪 Venezuela' : c === 'México' ? '🇲🇽 México' : c} {count > 0 ? `(${count})` : ''}
+                            </option>
+                          );
+                        })}
                       </select>
                     </div>
 
-                    {/* Filter City */}
+                    {/* 2º Filter City Condicionado Estrictamente al País */}
                     <div>
-                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">{isEn ? 'City' : 'Ciudad'}</label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] text-amber-400 uppercase font-black flex items-center gap-1">
+                          <Building2 className="w-3 h-3 text-amber-400" />
+                          <span>2º {isEn ? 'City' : 'Ciudad'}</span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTargetCountryForNewCity(networkCountryFilter !== 'all' ? networkCountryFilter : country || 'Colombia');
+                            setShowAddCityModal(true);
+                          }}
+                          className="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[10px] font-bold flex items-center gap-1 border border-amber-500/30 transition cursor-pointer"
+                          title="Registrar nueva Ciudad"
+                        >
+                          <Plus className="w-2.5 h-2.5" />
+                          <span>Ciudad</span>
+                        </button>
+                      </div>
                       <select
                         value={networkCityFilter}
+                        disabled={networkCountryFilter === 'all'}
                         onChange={(e) => setNetworkCityFilter(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                        className={`w-full px-3 py-2 rounded-xl text-xs focus:outline-none transition ${
+                          networkCountryFilter === 'all'
+                            ? 'bg-slate-900/60 border border-slate-800/80 text-slate-500 cursor-not-allowed opacity-60'
+                            : 'bg-slate-950 border border-slate-700 text-white focus:border-amber-400 cursor-pointer'
+                        }`}
                       >
-                        <option value="all">{isEn ? 'All Cities' : 'Todas las Ciudades'}</option>
-                        {availableCities.map((city) => (
-                          <option key={city} value={city}>
-                            {city}
-                          </option>
-                        ))}
+                        {networkCountryFilter === 'all' ? (
+                          <option value="all">🔒 Selecciona un país primero</option>
+                        ) : (
+                          <>
+                            <option value="all">🏙️ Todas las Ciudades de {networkCountryFilter} ({networkAvailableCities.length})</option>
+                            {networkAvailableCities.map((city) => {
+                              const count = savedDossiers.filter(
+                                (d) =>
+                                  (d.country || 'Colombia') === networkCountryFilter &&
+                                  d.city.toLowerCase() === city.toLowerCase() &&
+                                  d.advisorId !== 'adv-luisma'
+                              ).length;
+                              return (
+                                <option key={city} value={city}>
+                                  {city} {count > 0 ? `(${count})` : ''}
+                                </option>
+                              );
+                            })}
+                          </>
+                        )}
                       </select>
                     </div>
 
@@ -8207,11 +8756,12 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       <select
                         value={networkModeFilter}
                         onChange={(e) => setNetworkModeFilter(e.target.value as any)}
-                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400"
                       >
                         <option value="all">{isEn ? 'All Modes' : 'Todas las Modalidades'}</option>
                         <option value="create">{isEn ? '🏗️ New Listings' : '🏗️ Fichas Nuevas'}</option>
                         <option value="audit">{isEn ? '🔬 Top 3 Audits' : '🔬 Auditorías Top 3'}</option>
+                        <option value="rescue">{isEn ? '🛡️ Rescue & Claims' : '🛡️ Rescates & Reclamaciones'}</option>
                       </select>
                     </div>
                   </div>
@@ -8268,10 +8818,16 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
                                 d.mode === 'create'
                                   ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                                  : d.mode === 'rescue'
+                                  ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
                                   : 'bg-amber-950 text-amber-300 border border-amber-500/40'
                               }`}
                             >
-                              {d.mode === 'create' ? (isEn ? '🏗️ New Listing' : '🏗️ Ficha Nueva') : (isEn ? '🔬 Top 3 Audit' : '🔬 Auditoría Top 3')}
+                              {d.mode === 'create'
+                                ? (isEn ? '🏗️ New Listing' : '🏗️ Ficha Nueva')
+                                : d.mode === 'rescue'
+                                ? (isEn ? '🛡️ Rescue & Claim' : '🛡️ Rescate de Ficha')
+                                : (isEn ? '🔬 Top 3 Audit' : '🔬 Auditoría Top 3')}
                             </span>
 
                             <span
@@ -8298,6 +8854,51 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             </p>
                             <span className="text-[11px] text-indigo-400 font-bold block mt-1">{d.category}</span>
                           </div>
+
+                          {/* Datos del Cliente / Contratante (Quién Solicita y Paga) */}
+                          {(d.contactName || d.contactCompany || d.contactPhone || d.contactEmail) && (
+                            <div className="p-2.5 rounded-2xl bg-slate-950/90 border border-indigo-500/30 text-[11px] space-y-1">
+                              <div className="flex items-center justify-between">
+                                <span className="font-black text-indigo-300 flex items-center gap-1.5">
+                                  <User className="w-3.5 h-3.5 text-indigo-400" />
+                                  <span>{d.contactName || 'Cliente Contratante'}</span>
+                                </span>
+                                {d.contactRole && (
+                                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/30">
+                                    {d.contactRole}
+                                  </span>
+                                )}
+                              </div>
+                              {d.contactCompany && (
+                                <p className="text-[10px] text-slate-400 flex items-center gap-1">
+                                  <Building2 className="w-3 h-3 text-slate-500" />
+                                  <span>{d.contactCompany}</span>
+                                </p>
+                              )}
+                              <div className="flex items-center gap-2.5 pt-0.5 text-[10px]">
+                                {d.contactPhone && (
+                                  <a
+                                    href={`https://wa.me/${d.contactPhone.replace(/[^0-9]/g, '')}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1"
+                                  >
+                                    <Phone className="w-3 h-3" />
+                                    <span>{d.contactPhone}</span>
+                                  </a>
+                                )}
+                                {d.contactEmail && (
+                                  <a
+                                    href={`mailto:${d.contactEmail}`}
+                                    className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 truncate"
+                                  >
+                                    <Mail className="w-3 h-3" />
+                                    <span className="truncate">{d.contactEmail}</span>
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          )}
 
                           {d.data?.healthScore !== undefined && (
                             <div className="flex items-center gap-2">
@@ -8545,32 +9146,71 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               </div>
             )}
 
-            {/* SUB-VIEW 3: DIRECTORIO DE ASESORES & AGENCIAS CON RENDIMIENTO */}
+            {/* SUB-VIEW 3: DIRECTORIO DE ASESORES & AGENCIAS CON RENDIMIENTO Y GESTIÓN CRUD */}
             {networkSubView === 'directory' && (
               <div className="space-y-4">
+                {/* Header de Gestión de Cuentas */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-3xl bg-slate-900 border border-slate-800">
+                  <div className="space-y-0.5">
+                    <h3 className="text-sm font-black text-white flex items-center gap-2">
+                      <Users className="w-4 h-4 text-purple-400" />
+                      <span>{isEn ? 'Team & Partner Agencies Directory (CRUD)' : 'Directorio & Gestión de Cuentas (Asesores & Agencias B2B)'}</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-400">
+                      {isEn
+                        ? 'Add, edit, or delete accounts. View production breakdown for listings created, audited, and rescued per account.'
+                        : 'Agrega, modifica o elimina cuentas de usuarios. Revisa el desglose exacto de Creaciones, Auditorías y Rescates de cada miembro.'}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setNewAccountType('internal_advisor')}
+                    className="hidden"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setNetworkSubView('register')}
+                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer flex items-center gap-2 shadow-lg shadow-amber-500/20 shrink-0 active:scale-98"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>{isEn ? '+ Register Advisor / License Agency' : '+ Registrar Asesor o Licenciar Agencia'}</span>
+                  </button>
+                </div>
+
+                {/* Grid de Cuentas */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
                   {advisorsList
-                    .filter((adv) => adv.id !== 'adv-admin' && adv.id !== 'adv-luisma')
+                    .filter((adv) => adv.id !== 'adv-admin')
                     .map((adv) => {
+                      const isFounder = adv.id === 'adv-luisma' || adv.accountType === 'founder';
                       const advisorDossiers = savedDossiers.filter((d) => d.advisorId === adv.id);
                       const createsCount = advisorDossiers.filter((d) => d.mode === 'create').length;
                       const auditsCount = advisorDossiers.filter((d) => d.mode === 'audit').length;
+                      const rescuesCount = advisorDossiers.filter((d) => d.mode === 'rescue').length;
 
                       return (
                         <div
                           key={adv.id}
                           className="p-5 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-4 shadow-lg hover:border-amber-400/50 transition group"
                         >
-                          <div className="space-y-2.5">
-                            <div className="flex items-center justify-between">
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between gap-2 flex-wrap">
                               <span
                                 className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
-                                  adv.accountType === 'partner_agency'
+                                  isFounder
+                                    ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                    : adv.accountType === 'partner_agency'
                                     ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
                                     : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
                                 }`}
                               >
-                                {adv.accountType === 'partner_agency' ? (isEn ? '🏢 Partner Agency' : '🏢 Agencia Partner') : (isEn ? '💼 Internal Advisor' : '💼 Asesor Interno')}
+                                {isFounder
+                                  ? (isEn ? '👑 Founder & Director' : '👑 Dirección General')
+                                  : adv.accountType === 'partner_agency'
+                                  ? (isEn ? '🏢 Partner Agency' : '🏢 Agencia Partner B2B')
+                                  : (isEn ? '💼 Internal Advisor' : '💼 Asesor Comercial')}
                               </span>
 
                               {adv.accountType === 'partner_agency' && (
@@ -8578,45 +9218,107 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                                   ${adv.monthlyFeeUsd || 49} {isEn ? 'USD/mo' : 'USD/mes'}
                                 </span>
                               )}
+
+                              <span
+                                className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                                  adv.licenseStatus === 'suspended'
+                                    ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                                    : adv.licenseStatus === 'pending_payment'
+                                    ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                    : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'
+                                }`}
+                              >
+                                {adv.licenseStatus === 'suspended'
+                                  ? (isEn ? 'Suspended' : 'Suspendida')
+                                  : adv.licenseStatus === 'pending_payment'
+                                  ? (isEn ? 'Pending Payment' : 'Pago Pendiente')
+                                  : (isEn ? 'Active' : 'Activa')}
+                              </span>
                             </div>
 
                             <div>
                               <h4 className="text-base font-black text-white group-hover:text-amber-300 transition">
                                 {adv.name}
                               </h4>
-                              <p className="text-xs text-slate-400">
+                              <p className="text-xs text-slate-400 mt-0.5">
                                 📍 {adv.city || 'Bogotá'}, {adv.country || 'Colombia'}
                               </p>
-                              <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1">
-                                <span>
-                                  User: <strong className="text-slate-300">{adv.username}</strong>
-                                </span>
+                              <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400 mt-1.5 font-mono">
+                                <span className="text-slate-300 font-bold">@{adv.username}</span>
                                 <span>•</span>
-                                <span>Tel: {adv.phone}</span>
+                                <span className="text-emerald-400">{adv.phone}</span>
                               </div>
                             </div>
 
-                            <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-                              <span className="text-[10px] font-bold text-slate-400 uppercase block">
-                                {isEn ? 'Prospecting & Audits Record:' : 'Cuentas Prospectadas:'}
-                              </span>
+                            {/* Desglose de Producción: Creaciones, Auditorías y Rescates */}
+                            <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
                               <div className="flex items-center justify-between text-xs font-black text-white">
-                                <span>{advisorDossiers.length} {isEn ? 'Dossiers' : 'Expedientes'}</span>
-                                <span className="text-[10px] text-slate-400 font-normal">
-                                  ({createsCount} {isEn ? 'new' : 'nuevas'}, {auditsCount} {isEn ? 'audits' : 'auditorías'})
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                  {isEn ? 'Production Breakdown:' : 'Producción de Clientes:'}
                                 </span>
+                                <span className="px-2 py-0.5 rounded-full bg-slate-800 text-amber-300 font-mono text-[11px]">
+                                  {advisorDossiers.length} {isEn ? 'Total' : 'Totales'}
+                                </span>
+                              </div>
+
+                              <div className="grid grid-cols-3 gap-1.5 text-center text-[10.5px]">
+                                <div className="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
+                                  <span className="block text-[9px] text-emerald-400 font-bold uppercase truncate">
+                                    {isEn ? '🏗️ Created' : '🏗️ Creación'}
+                                  </span>
+                                  <strong className="text-white font-black text-sm">{createsCount}</strong>
+                                </div>
+
+                                <div className="p-2 rounded-xl bg-amber-950/40 border border-amber-500/30">
+                                  <span className="block text-[9px] text-amber-400 font-bold uppercase truncate">
+                                    {isEn ? '🔬 Audited' : '🔬 Auditoría'}
+                                  </span>
+                                  <strong className="text-white font-black text-sm">{auditsCount}</strong>
+                                </div>
+
+                                <div className="p-2 rounded-xl bg-rose-950/40 border border-rose-500/30">
+                                  <span className="block text-[9px] text-rose-400 font-bold uppercase truncate">
+                                    {isEn ? '🛡️ Rescued' : '🛡️ Rescate'}
+                                  </span>
+                                  <strong className="text-white font-black text-sm">{rescuesCount}</strong>
+                                </div>
                               </div>
                             </div>
                           </div>
 
-                          <button
-                            type="button"
-                            onClick={() => handleViewAdvisorDossiers(adv)}
-                            className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-white font-black text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-md active:scale-98"
-                          >
-                            <span>{isEn ? 'View Dossiers in Monitor' : 'Ver Expedientes en Monitor'}</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </button>
+                          {/* Acciones: Ver en Monitor, Modificar Cuenta y Eliminar */}
+                          <div className="pt-2 border-t border-slate-800/80 space-y-2">
+                            <button
+                              type="button"
+                              onClick={() => handleViewAdvisorDossiers(adv)}
+                              className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-white font-black text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-md active:scale-98"
+                            >
+                              <Search className="w-3.5 h-3.5" />
+                              <span>{isEn ? 'View Dossiers in Monitor' : 'Ver Expedientes en Monitor'}</span>
+                            </button>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEditAdvisor(adv)}
+                                className="flex-1 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/40 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-98"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                                <span>{isEn ? 'Edit Account' : 'Modificar Cuenta'}</span>
+                              </button>
+
+                              {!isFounder && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteAdvisor(adv)}
+                                  className="p-2 rounded-xl bg-rose-950/30 hover:bg-rose-950/70 text-rose-400 hover:text-rose-200 border border-rose-500/30 transition cursor-pointer"
+                                  title={isEn ? 'Delete Account' : 'Eliminar Cuenta'}
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       );
                     })}
@@ -8625,6 +9327,174 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
             )}
           </div>
         )}
+
+      {/* MODAL: MODIFICAR CUENTA DE ASESOR / AGENCIA PARTNER */}
+      {showEditAdvisorModal && editingAdvisor && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 print:hidden animate-in fade-in duration-200">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div>
+                <h3 className="text-base font-black text-white flex items-center gap-2">
+                  <Edit3 className="w-4 h-4 text-amber-400" />
+                  <span>{isEn ? 'Modify Account Details' : 'Modificar Cuenta de Usuario'}</span>
+                </h3>
+                <p className="text-[11px] text-slate-400">
+                  {editingAdvisor.name} (@{editingAdvisor.username})
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowEditAdvisorModal(false);
+                  setEditingAdvisor(null);
+                }}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveAdvisorEdit} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-bold text-slate-300 mb-1">
+                  {editAdvisorAccountType === 'partner_agency'
+                    ? (isEn ? 'Partner Agency Name *' : 'Razón Social o Nombre de la Agencia *')
+                    : (isEn ? 'Advisor Full Name *' : 'Nombre Completo del Asesor *')}
+                </label>
+                <input
+                  type="text"
+                  value={editAdvisorName}
+                  onChange={(e) => setEditAdvisorName(e.target.value)}
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">{isEn ? 'Username *' : 'Usuario de Acceso *'}</label>
+                  <input
+                    type="text"
+                    value={editAdvisorUser}
+                    onChange={(e) => setEditAdvisorUser(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white lowercase focus:outline-none focus:border-amber-400"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">
+                    {isEn ? 'New Password' : 'Nueva Contraseña'}
+                  </label>
+                  <input
+                    type="text"
+                    value={editAdvisorPass}
+                    onChange={(e) => setEditAdvisorPass(e.target.value)}
+                    placeholder={isEn ? '(Leave empty to keep current)' : '(En blanco = mantener actual)'}
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">{isEn ? 'Country' : 'País'}</label>
+                  <input
+                    type="text"
+                    value={editAdvisorCountry}
+                    onChange={(e) => setEditAdvisorCountry(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">{isEn ? 'City' : 'Ciudad'}</label>
+                  <input
+                    type="text"
+                    value={editAdvisorCity}
+                    onChange={(e) => setEditAdvisorCity(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-300 mb-1">{isEn ? 'Phone / WhatsApp' : 'Teléfono / WhatsApp'}</label>
+                <input
+                  type="text"
+                  value={editAdvisorPhone}
+                  onChange={(e) => setEditAdvisorPhone(e.target.value)}
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              {/* Account Type and Status */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">{isEn ? 'Account Type' : 'Tipo de Cuenta'}</label>
+                  <select
+                    value={editAdvisorAccountType}
+                    onChange={(e) => setEditAdvisorAccountType(e.target.value as any)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none"
+                  >
+                    <option value="internal_advisor">{isEn ? '💼 Internal Advisor' : '💼 Asesor Comercial Interno'}</option>
+                    <option value="partner_agency">{isEn ? '🏢 Partner Agency (B2B)' : '🏢 Agencia Partner (Licencia Mensual)'}</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">{isEn ? 'License Status' : 'Estatus de Cuenta'}</label>
+                  <select
+                    value={editAdvisorLicenseStatus}
+                    onChange={(e) => setEditAdvisorLicenseStatus(e.target.value as any)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none"
+                  >
+                    <option value="active">{isEn ? '✅ Active' : '✅ Activa'}</option>
+                    <option value="pending_payment">{isEn ? '⏳ Payment Pending' : '⏳ Pendiente de Pago'}</option>
+                    <option value="suspended">{isEn ? '⛔ Suspended' : '⛔ Suspendida'}</option>
+                  </select>
+                </div>
+              </div>
+
+              {editAdvisorAccountType === 'partner_agency' && (
+                <div>
+                  <label className="block font-bold text-purple-300 mb-1">
+                    {isEn ? 'Monthly Software Fee (USD/mo)' : 'Canon Mensual de Licencia (USD/mes)'}
+                  </label>
+                  <input
+                    type="number"
+                    value={editAdvisorMonthlyFee}
+                    onChange={(e) => setEditAdvisorMonthlyFee(Number(e.target.value))}
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-purple-500/50 text-purple-300 font-bold focus:outline-none"
+                  />
+                </div>
+              )}
+
+              <div className="pt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditAdvisorModal(false);
+                    setEditingAdvisor(null);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer"
+                >
+                  {isEn ? 'Cancel' : 'Cancelar'}
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isUpdatingAdvisor}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg active:scale-98"
+                >
+                  {isUpdatingAdvisor ? (isEn ? 'Saving...' : 'Guardando...') : (isEn ? 'Save Changes' : 'Guardar Cambios')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       </main>
 
       {/* MODAL: LOGIN / SELECTOR DE PERFIL */}

@@ -137,7 +137,12 @@
           "cameraTake3": "40-60s: Terminal de pago en caja."
         },
         "whatsappOnboardingMessage": "Estimado equipo de Leña y Carbón, expediente de auditoría listo para optimizar su perfil al Top 3."
-      }
+      },
+      "contactName": "Martín Silva",
+      "contactCompany": "Inversiones Leña & Carbón S.A.S.",
+      "contactPhone": "+573108901234",
+      "contactEmail": "msilva@lenaycarbon.com",
+      "contactRole": "Dueño / Propietario"
     },
     {
       "id": "dos-trattoria-01",
@@ -295,7 +300,12 @@
           ]
         },
         "whatsappOnboardingMessage": "Estimado equipo de La Trattoria del Parque, un gusto saludarles. Desde Prestigia ya estructuramos la arquitectura estratégica de su perfil de Google Maps para posicionar su restaurante en el Top 3 de la zona del Parque de la 93.\n\nPara completar la configuración técnica y verificación oficial ante Google, necesitamos que nos envíen por este medio los siguientes materiales:\n\n1. Video de verificación de 60 segundos continuos (mostrando calle, fachada, llave abriendo la puerta y datáfono en caja).\n2. 12 a 15 fotos en alta resolución (fachada completa, platos insignia, horno de leña y cava de vinos).\n3. Horarios exactos de atención (lunes a domingo y festivos).\n4. Número oficial de WhatsApp para reservas.\n\nQuedamos muy atentos para poner a volar su posicionamiento esta misma semana. ¡Un saludo cordial!"
-      }
+      },
+      "contactName": "Giuseppe De Luca",
+      "contactCompany": "Trattoria Gourmet SAS",
+      "contactPhone": "+573154567890",
+      "contactEmail": "gerencia@latrattoria.com",
+      "contactRole": "Gerente General"
     },
     {
       "id": "dos-sonrisas-02",
@@ -393,7 +403,12 @@
           "cameraTake3": "40-60s: En la recepción muestra el software de agenda médica en el computador y el datáfono de cobro con la razón social."
         },
         "whatsappOnboardingMessage": "Apreciado Dr. de Clínica Dental Sonrisas, un gusto saludarle. En Prestigia ya tenemos listo su expediente para crear la ficha ganadora de su consultorio en el Top 3 de Google Maps para El Poblado, Medellín.\n\nPara iniciar la indexación requerimos:\n1. 10 a 12 fotos nítidas de la clínica, recepción y equipos.\n2. Video continuo de 60 segundos según el guion adjunto.\n3. Registro médico o NIT para la verificación de salud.\n\n¡Quedamos atentos para activar su flujo de pacientes privados!"
-      }
+      },
+      "contactName": "Dra. Valentina Osorio",
+      "contactCompany": "Clínica Sonrisas Poblado",
+      "contactPhone": "+573007654321",
+      "contactEmail": "dra.osorio@sonrisasmedellin.com",
+      "contactRole": "Directora Médica & Dueña"
     },
     {
       "id": "dos-autospa-03",
@@ -475,7 +490,12 @@
           "cameraTake3": "40-60s: Zona de oficina comercial y mostrador de atención al cliente con facturación."
         },
         "whatsappOnboardingMessage": "Hola equipo AutoSpa Cali, desde Prestigia ya construimos la configuración ganadora para su perfil en Google Maps para adueñarse de las búsquedas de detailing y cerámico en Cali.\n\nPor favor envíennos fotos de sus mejores autos terminados y el video de 60s según la guía adjunta para culminar el registro. ¡A romperla en Google!"
-      }
+      },
+      "contactName": "Julián Echeverry",
+      "contactCompany": "AutoSpa Colombia SAS",
+      "contactPhone": "+573189998877",
+      "contactEmail": "jecheverry@autospa.co",
+      "contactRole": "Propietario"
     },
     {
       "id": "dos-cerrajeria-04",
@@ -533,7 +553,12 @@
             "tag": "Servicio Urgente"
           }
         ]
-      }
+      },
+      "contactName": "Ramón Peñaranda",
+      "contactCompany": "Cerrajería Peñaranda",
+      "contactPhone": "+573012223344",
+      "contactEmail": "ramon@seguridadaltoprado.com",
+      "contactRole": "Dueño / Encargado"
     },
     {
       "id": "dos-agency-tacos-01",
@@ -607,7 +632,12 @@
           "cameraTake3": "Terminal bancaria"
         },
         "whatsappOnboardingMessage": "Expediente listo para posicionar la taquería en el Top 3 de Polanco."
-      }
+      },
+      "contactName": "Don Héctor Morales",
+      "contactCompany": "Taquerías El Pastor de Oro S.A. de C.V.",
+      "contactPhone": "+525544332211",
+      "contactEmail": "hector@pastordeoro.mx",
+      "contactRole": "Fundador & Dueño"
     },
     {
       "id": "dos-ven-01",
@@ -674,7 +704,165 @@
         "competitorBenchmark": []
       },
       "createdAt": "2026-11-03T00:45:17.947Z",
-      "updatedAt": "2026-11-03T00:45:17.949Z"
+      "updatedAt": "2026-11-03T00:45:17.949Z",
+      "contactName": "Alejandro Mendoza",
+      "contactCompany": "Grupo Gastronómico Las Mercedes C.A.",
+      "contactPhone": "+584141234567",
+      "contactEmail": "amendoza@bistrolasmercedes.com",
+      "contactRole": "Director General & Dueño"
+    },
+    {
+      "id": "dos-carlos-crear-01",
+      "advisorId": "adv-carlos",
+      "advisorName": "Carlos Mendoza • Asesor Comercial",
+      "advisorPhone": "+573104567890",
+      "advisorType": "internal_advisor",
+      "country": "Colombia",
+      "city": "Medellín",
+      "neighborhood": "El Poblado",
+      "clientName": "Café & Tostadora Origen Paisa",
+      "category": "Cafetería / Panadería / Pastelería",
+      "mode": "create",
+      "status": "closed",
+      "closingStatus": "prestigia_subscriber",
+      "setupFeeChargedUsd": 0,
+      "monthlyPlanUsd": 199,
+      "prestigiaPlan": "elite",
+      "paymentMethod": "Tarjeta Crédito Mensual",
+      "closingNotes": "Adquirió Plan Élite Prestigia. Ficha creada con arquitectura Top 3 y 5 tarjetas NFC entregadas.",
+      "contactName": "Mateo Restrepo",
+      "contactCompany": "Cafés Especiales de Antioquia SAS",
+      "contactPhone": "+573145678901",
+      "contactEmail": "mateo@origenpaisa.com",
+      "contactRole": "Dueño / Propietario",
+      "data": {
+        "healthScore": 92,
+        "whatsappOnboardingMessage": "Hola Mateo, tu ficha en Google Maps quedó verificada y lista para recibir reseñas."
+      },
+      "createdAt": "2026-02-10T14:20:00.000Z",
+      "updatedAt": "2026-02-10T14:20:00.000Z"
+    },
+    {
+      "id": "dos-carlos-audit-02",
+      "advisorId": "adv-carlos",
+      "advisorName": "Carlos Mendoza • Asesor Comercial",
+      "advisorPhone": "+573104567890",
+      "advisorType": "internal_advisor",
+      "country": "Colombia",
+      "city": "Medellín",
+      "neighborhood": "Laureles",
+      "clientName": "Odontología Especializada Laureles",
+      "category": "Clínica Dental / Odontología",
+      "mode": "audit",
+      "status": "presented",
+      "closingStatus": "proposal_sent",
+      "setupFeeChargedUsd": 250,
+      "monthlyPlanUsd": 199,
+      "prestigiaPlan": "elite",
+      "paymentMethod": "Pendiente de Confirmación",
+      "closingNotes": "Auditoría Top 3 presentada al Dr. Camilo. En espera de aprobación final.",
+      "contactName": "Dr. Camilo Henao",
+      "contactCompany": "Odontología Laureles SAS",
+      "contactPhone": "+573167890123",
+      "contactEmail": "dr.henao@odontolaureles.com",
+      "contactRole": "Director Odontológico & Dueño",
+      "data": {
+        "healthScore": 48,
+        "whatsappOnboardingMessage": "Estimado Dr. Camilo, aquí tiene el resumen forense de su ficha Google."
+      },
+      "createdAt": "2026-02-14T11:00:00.000Z",
+      "updatedAt": "2026-02-14T11:00:00.000Z"
+    },
+    {
+      "id": "dos-carlos-rescue-03",
+      "advisorId": "adv-carlos",
+      "advisorName": "Carlos Mendoza • Asesor Comercial",
+      "advisorPhone": "+573104567890",
+      "advisorType": "internal_advisor",
+      "country": "Colombia",
+      "city": "Bogotá",
+      "neighborhood": "Usaquén",
+      "clientName": "Veterinaria & Pet Grooming Canis",
+      "category": "Veterinaria / Cuidado de Mascotas",
+      "mode": "rescue",
+      "status": "closed",
+      "closingStatus": "setup_paid",
+      "setupFeeChargedUsd": 200,
+      "monthlyPlanUsd": 0,
+      "prestigiaPlan": "none",
+      "paymentMethod": "Transferencia Bancolombia",
+      "closingNotes": "Recuperación de titularidad por protocolo 72h. Ficha rescatada de ex-empleado.",
+      "contactName": "Dra. Andrea Londoño",
+      "contactCompany": "Centro Veterinario Canis SAS",
+      "contactPhone": "+573184561234",
+      "contactEmail": "andrea@veterinariacanis.com",
+      "contactRole": "Dueña & Médico Veterinaria",
+      "data": {
+        "healthScore": 78,
+        "whatsappOnboardingMessage": "Dra. Andrea, titularidad recuperada exitosamente ante Google."
+      },
+      "createdAt": "2026-02-18T16:45:00.000Z",
+      "updatedAt": "2026-02-18T16:45:00.000Z"
+    },
+    {
+      "id": "dos-agency-crear-02",
+      "advisorId": "agency-impulso",
+      "advisorName": "Agencia Impulso Digital 360",
+      "advisorPhone": "+525512345678",
+      "advisorType": "partner_agency",
+      "country": "México",
+      "city": "Ciudad de México",
+      "neighborhood": "Polanco",
+      "clientName": "Boutique Spa & Wellness Reforma",
+      "category": "Spa / Centro de Estética / Belleza",
+      "mode": "create",
+      "status": "closed",
+      "closingStatus": "setup_paid",
+      "setupFeeChargedUsd": 250,
+      "monthlyPlanUsd": 0,
+      "prestigiaPlan": "none",
+      "paymentMethod": "SPEI México",
+      "closingNotes": "Creación y verificación por video de spa premium en Polanco.",
+      "contactName": "Mariana Zepeda",
+      "contactCompany": "Wellness Polanco S.A. de C.V.",
+      "contactPhone": "+525566778899",
+      "contactEmail": "mzepeda@spapolanco.mx",
+      "contactRole": "Gerente General & Socia",
+      "data": {
+        "healthScore": 95
+      },
+      "createdAt": "2026-02-05T10:00:00.000Z",
+      "updatedAt": "2026-02-05T10:00:00.000Z"
+    },
+    {
+      "id": "dos-agency-rescue-03",
+      "advisorId": "agency-impulso",
+      "advisorName": "Agencia Impulso Digital 360",
+      "advisorPhone": "+525512345678",
+      "advisorType": "partner_agency",
+      "country": "México",
+      "city": "Monterrey",
+      "neighborhood": "San Pedro Garza García",
+      "clientName": "Taller Mecánico & Frenos Monterrey",
+      "category": "Taller Mecánico / Automotriz",
+      "mode": "rescue",
+      "status": "closed",
+      "closingStatus": "setup_paid",
+      "setupFeeChargedUsd": 300,
+      "monthlyPlanUsd": 0,
+      "prestigiaPlan": "none",
+      "paymentMethod": "Transferencia BBVA",
+      "closingNotes": "Rescate de ficha huérfana no reclamada. Google código recibido por SMS.",
+      "contactName": "Ing. Roberto Cantú",
+      "contactCompany": "Automotriz Cantú Hermanos",
+      "contactPhone": "+528189012345",
+      "contactEmail": "rcantu@mecanicacantu.mx",
+      "contactRole": "Dueño / Director",
+      "data": {
+        "healthScore": 82
+      },
+      "createdAt": "2026-02-22T09:30:00.000Z",
+      "updatedAt": "2026-02-22T09:30:00.000Z"
     }
   ],
   "studioLandingPages": [

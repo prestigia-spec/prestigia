@@ -57,31 +57,36 @@ export async function POST(request: Request) {
       masterKey,
     } = body;
 
-    // Security check: only master key can create or modify advisors
-    if (!masterKey || masterKey.trim() !== 'admin') {
-      if (!id) {
-        return NextResponse.json({ error: 'Autorización requerida de Administrador' }, { status: 403 });
-      }
+    const allAdvisors = await getAllStudioAdvisors();
+    const existing = id ? allAdvisors.find((a) => a.id === id) : null;
+
+    // Security check: master key or existing update
+    if (masterKey && masterKey.trim() !== 'admin') {
+      return NextResponse.json({ error: 'Clave de Administrador inválida' }, { status: 403 });
     }
 
-    if (!name || !username || !password) {
-      return NextResponse.json({ error: 'Nombre, usuario y contraseña son obligatorios' }, { status: 400 });
+    if (!name || !username) {
+      return NextResponse.json({ error: 'Nombre y usuario son obligatorios' }, { status: 400 });
+    }
+
+    if (!existing && !password) {
+      return NextResponse.json({ error: 'La contraseña es obligatoria al registrar una nueva cuenta' }, { status: 400 });
     }
 
     const advisorObj: StudioAdvisor = {
       id: id || `adv-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
       name: name.trim(),
       username: username.trim().toLowerCase(),
-      password: password.trim(),
-      phone: (phone || '+573058314049').trim(),
-      role: role === 'admin' ? 'admin' : 'advisor',
-      accountType: accountType === 'partner_agency' ? 'partner_agency' : 'internal_advisor',
-      country: country.trim() || 'Colombia',
-      city: city.trim() || 'Bogotá',
-      monthlyFeeUsd: Number(monthlyFeeUsd) || 0,
-      licenseStatus: licenseStatus || 'active',
-      active: active !== false,
-      createdAt: new Date().toISOString(),
+      password: (password && password.trim()) ? password.trim() : (existing?.password || '1234'),
+      phone: (phone !== undefined ? phone : (existing?.phone || '+573058314049')).trim(),
+      role: role === 'admin' ? 'admin' : (existing?.role || 'advisor'),
+      accountType: accountType === 'partner_agency' ? 'partner_agency' : accountType === 'founder' ? 'founder' : 'internal_advisor',
+      country: (country || existing?.country || 'Colombia').trim(),
+      city: (city || existing?.city || 'Bogotá').trim(),
+      monthlyFeeUsd: monthlyFeeUsd !== undefined ? Number(monthlyFeeUsd) : (existing?.monthlyFeeUsd || 0),
+      licenseStatus: licenseStatus || existing?.licenseStatus || 'active',
+      active: active !== undefined ? Boolean(active) : (existing?.active ?? true),
+      createdAt: existing?.createdAt || new Date().toISOString(),
     };
 
     await saveStudioAdvisor(advisorObj);

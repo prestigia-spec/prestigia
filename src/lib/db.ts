@@ -63,6 +63,12 @@ export interface StudioDossier {
   advisorType?: 'internal_advisor' | 'partner_agency' | 'founder';
   country?: string;
   clientName: string;
+  // Contact & Client Contratante details
+  contactName?: string;
+  contactCompany?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  contactRole?: string;
   category: string;
   city: string;
   neighborhood?: string;
