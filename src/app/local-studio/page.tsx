@@ -10734,7 +10734,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         </div>
       )}
 
-      {`/* Footer */`}
+      {/* Footer */}
       <footer className="border-t border-slate-800/80 py-4 px-4 text-center text-xs text-slate-500 print:hidden">
         <p>Prestigia Local Studio™ • Google Maps Top 3 Optimization Engine © 2026</p>
       </footer>
