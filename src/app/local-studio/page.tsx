@@ -80,6 +80,9 @@ interface StudioAdvisorUser {
   monthlyFeeUsd?: number;
   licenseStatus?: 'active' | 'pending_payment' | 'suspended';
   active: boolean;
+  maxCreatesMonthly?: number;
+  maxAuditsMonthly?: number;
+  maxRescuesMonthly?: number;
 }
 
 interface ServiceCatalogItem {
@@ -181,6 +184,8 @@ interface StudioDossierRecord {
   prestigiaPlan?: 'standard' | 'elite' | 'enterprise' | 'none';
   paymentMethod?: string;
   closingNotes?: string;
+  deletedByAdvisor?: boolean;
+  deletedAt?: string;
   data: BlueprintData;
   createdAt: string;
   updatedAt: string;
@@ -1850,6 +1855,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({});
   const [viewingAdvisorWorks, setViewingAdvisorWorks] = useState<StudioAdvisorUser | null>(null);
   const [showRegisterAdvisorModal, setShowRegisterAdvisorModal] = useState<boolean>(false);
+  const [networkTabMode, setNetworkTabMode] = useState<'directory' | 'forensic'>('directory');
 
   // Edit Advisor Account Modal State
   const [editingAdvisor, setEditingAdvisor] = useState<StudioAdvisorUser | null>(null);
@@ -1863,7 +1869,17 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [editAdvisorAccountType, setEditAdvisorAccountType] = useState<'internal_advisor' | 'partner_agency' | 'director' | 'founder'>('internal_advisor');
   const [editAdvisorMonthlyFee, setEditAdvisorMonthlyFee] = useState<number>(79);
   const [editAdvisorLicenseStatus, setEditAdvisorLicenseStatus] = useState<'active' | 'pending_payment' | 'suspended'>('active');
+  const [editAdvisorMaxCreates, setEditAdvisorMaxCreates] = useState<number>(30);
+  const [editAdvisorMaxAudits, setEditAdvisorMaxAudits] = useState<number>(30);
+  const [editAdvisorMaxRescues, setEditAdvisorMaxRescues] = useState<number>(10);
   const [isUpdatingAdvisor, setIsUpdatingAdvisor] = useState<boolean>(false);
+
+  // Live Monthly Quota & Usage Monitor
+  const [monthlyUsage, setMonthlyUsage] = useState<{ creates: number; audits: number; rescues: number }>({
+    creates: 0,
+    audits: 0,
+    rescues: 0,
+  });
 
   // Advisors & Agencies List (for Admin tab)
   const [advisorsList, setAdvisorsList] = useState<StudioAdvisorUser[]>([]);
@@ -1876,6 +1892,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [newAdvisorCity, setNewAdvisorCity] = useState('Bogotá');
   const [newAdvisorMonthlyFee, setNewAdvisorMonthlyFee] = useState<number>(79);
   const [newAdvisorLicenseStatus, setNewAdvisorLicenseStatus] = useState<'active' | 'pending_payment'>('active');
+  const [newAdvisorMaxCreates, setNewAdvisorMaxCreates] = useState<number>(30);
+  const [newAdvisorMaxAudits, setNewAdvisorMaxAudits] = useState<number>(30);
+  const [newAdvisorMaxRescues, setNewAdvisorMaxRescues] = useState<number>(10);
   const [adminMasterKey, setAdminMasterKey] = useState('admin');
   const [isSavingAdvisor, setIsSavingAdvisor] = useState(false);
 
@@ -1884,13 +1903,18 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     setIsLoadingDossiers(true);
     try {
       const isAdmin = currentUser?.role === 'admin' || !currentUser;
-      const url = isAdmin
+      const url = isLuismaMaster
+        ? '/api/local-studio/dossiers?isLuisma=true'
+        : isAdmin
         ? '/api/local-studio/dossiers?isAdmin=true'
         : `/api/local-studio/dossiers?advisorId=${currentUser?.id || 'adv-luisma'}`;
       const res = await fetch(url);
       const resData = await res.json();
       if (resData.success && Array.isArray(resData.dossiers)) {
         setSavedDossiers(resData.dossiers);
+        if (resData.monthlyUsage) {
+          setMonthlyUsage(resData.monthlyUsage);
+        }
       }
     } catch (err) {
       console.warn('Error fetching dossiers:', err);
@@ -1946,6 +1970,20 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     if (!finalBizName) {
       showToast(isEn ? '⚠️ Please enter the business name or link' : '⚠️ Ingresa el nombre comercial o enlace del negocio');
       return;
+    }
+
+    const userMaxCreates = currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30);
+    const userMaxAudits = currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30);
+
+    if (!isLuismaMaster) {
+      if (targetMode === 'create' && monthlyUsage.creates >= userMaxCreates) {
+        showToast(isEn ? `⚠️ Monthly limit of ${userMaxCreates} creations reached. Contact General Directorate.` : `⚠️ Has alcanzado tu cupo mensual de ${userMaxCreates} creaciones. Contacta a Dirección General para ampliar tu plan.`);
+        return;
+      }
+      if (targetMode === 'audit' && monthlyUsage.audits >= userMaxAudits) {
+        showToast(isEn ? `⚠️ Monthly limit of ${userMaxAudits} audits reached. Contact General Directorate.` : `⚠️ Has alcanzado tu cupo mensual de ${userMaxAudits} auditorías. Contacta a Dirección General para ampliar tu plan.`);
+        return;
+      }
     }
 
     setIsGenerating(true);
@@ -2146,6 +2184,12 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
           ? '⚠️ Please paste a Google Maps link or enter business name'
           : '⚠️ Pega el enlace de Google Maps o escribe el nombre del negocio'
       );
+      return;
+    }
+
+    const userMaxRescues = currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10);
+    if (!isLuismaMaster && monthlyUsage.rescues >= userMaxRescues) {
+      showToast(isEn ? `⚠️ Monthly limit of ${userMaxRescues} rescues reached. Contact General Directorate.` : `⚠️ Has alcanzado tu cupo mensual de ${userMaxRescues} rescates. Contacta a Dirección General para ampliar tu plan.`);
       return;
     }
 
@@ -2451,13 +2495,17 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
   // 100% PRIVATE DOSSIERS: ONLY Luisma's personal clients (Never mixed with team)
   const luismaBaseDossiers = useMemo(() => {
+    if (!isLuismaMaster) {
+      return savedDossiers.filter((d) => !d.deletedByAdvisor);
+    }
     return savedDossiers.filter(
       (d) =>
-        d.advisorId === 'adv-luisma' ||
+        (d.advisorId === 'adv-luisma' ||
         d.advisorName.toLowerCase().includes('luisma') ||
-        d.advisorName.toLowerCase().includes('director')
+        d.advisorName.toLowerCase().includes('director')) &&
+        !d.deletedByAdvisor
     );
-  }, [savedDossiers]);
+  }, [savedDossiers, isLuismaMaster]);
 
   // Dynamic filter values from Luisma's portfolio
   const dossierAvailableCountries = useMemo(() => {
@@ -2554,7 +2602,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   // NETWORK DOSSIERS: All team advisors and licensed B2B partner agencies
   const networkFilteredDossiers = useMemo(() => {
     return savedDossiers
-      .filter((d) => d.advisorId !== 'adv-luisma') // Exclude Luisma's private records
+      .filter((d) => d.advisorId !== 'adv-luisma' && !d.deletedByAdvisor) // Exclude Luisma's private records & deleted
       .filter((d) => {
         if (networkAdvisorFilter !== 'all' && d.advisorId !== networkAdvisorFilter) return false;
         if (networkModeFilter !== 'all' && d.mode !== networkModeFilter) return false;
@@ -2589,6 +2637,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     networkTypeFilter,
     networkSearch,
   ]);
+
+  // FORENSIC VAULT: Dossiers soft-deleted by advisors/agencies, preserved for Director General auditing
+  const forensicDeletedDossiers = useMemo(() => {
+    return savedDossiers.filter((d) => d.deletedByAdvisor);
+  }, [savedDossiers]);
 
   // Distinct countries available in network
   const networkAvailableCountries = useMemo(() => {
@@ -2733,12 +2786,28 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     showToast(`Expediente cargado: ${dossier.clientName}`);
   };
 
-  const handleDeleteDossier = async (id: string) => {
-    if (!confirm('¿Seguro que deseas eliminar este expediente?')) return;
+  const handleDeleteDossier = async (id: string, isPermanentPurge?: boolean) => {
+    const msg = isPermanentPurge
+      ? '¿Seguro que deseas purgar DEFINITIVAMENTE este expediente de la base de datos? Esta acción es irreversible.'
+      : '¿Seguro que deseas eliminar este expediente?';
+    if (!confirm(msg)) return;
     try {
-      const res = await fetch(`/api/local-studio/dossiers?id=${id}`, { method: 'DELETE' });
+      const url = isPermanentPurge
+        ? `/api/local-studio/dossiers?id=${id}&purge=true`
+        : `/api/local-studio/dossiers?id=${id}`;
+      const res = await fetch(url, { method: 'DELETE' });
       if (res.ok) {
-        showToast('Expediente eliminado');
+        showToast(isPermanentPurge ? 'Expediente purgado definitivamente' : 'Expediente eliminado');
+        fetchDossiers();
+      }
+    } catch {}
+  };
+
+  const handleRestoreDossier = async (id: string) => {
+    try {
+      const res = await fetch(`/api/local-studio/dossiers?id=${id}&restore=true`, { method: 'DELETE' });
+      if (res.ok) {
+        showToast('✓ ¡Expediente restaurado con éxito a la vista activa!');
         fetchDossiers();
       }
     } catch {}
@@ -2838,6 +2907,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
           city: newAdvisorCity,
           monthlyFeeUsd: Number(newAdvisorMonthlyFee) || 0,
           licenseStatus: newAdvisorLicenseStatus,
+          maxCreatesMonthly: Number(newAdvisorMaxCreates) || (newAccountType === 'partner_agency' ? 60 : newAccountType === 'director' ? 100 : 30),
+          maxAuditsMonthly: Number(newAdvisorMaxAudits) || (newAccountType === 'partner_agency' ? 60 : newAccountType === 'director' ? 100 : 30),
+          maxRescuesMonthly: Number(newAdvisorMaxRescues) || (newAccountType === 'partner_agency' ? 20 : newAccountType === 'director' ? 50 : 10),
           active: true,
           masterKey: adminMasterKey,
         }),
@@ -2887,6 +2959,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     );
     setEditAdvisorMonthlyFee(advisor.monthlyFeeUsd ?? 79);
     setEditAdvisorLicenseStatus(advisor.licenseStatus || 'active');
+    setEditAdvisorMaxCreates(advisor.maxCreatesMonthly ?? (advisor.accountType === 'partner_agency' ? 60 : advisor.accountType === 'director' ? 100 : 30));
+    setEditAdvisorMaxAudits(advisor.maxAuditsMonthly ?? (advisor.accountType === 'partner_agency' ? 60 : advisor.accountType === 'director' ? 100 : 30));
+    setEditAdvisorMaxRescues(advisor.maxRescuesMonthly ?? (advisor.accountType === 'partner_agency' ? 20 : advisor.accountType === 'director' ? 50 : 10));
     setShowEditAdvisorModal(true);
   };
 
@@ -2912,6 +2987,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         city: editAdvisorCity.trim(),
         monthlyFeeUsd: Number(editAdvisorMonthlyFee) || 0,
         licenseStatus: editAdvisorLicenseStatus,
+        maxCreatesMonthly: Number(editAdvisorMaxCreates),
+        maxAuditsMonthly: Number(editAdvisorMaxAudits),
+        maxRescuesMonthly: Number(editAdvisorMaxRescues),
         masterKey: 'admin',
       };
       if (editAdvisorPass.trim()) {
@@ -3503,9 +3581,39 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     {t.mod1Desc}
                   </p>
                 </div>
-                <div className="text-right shrink-0">
-                  <span className="text-[10px] text-slate-400 block font-mono">{t.mod1Time}</span>
-                  <span className="text-lg font-black text-emerald-400">{t.mod1TimeVal}</span>
+                <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 shrink-0">
+                  {/* Credit Counter Badge */}
+                  {isLuismaMaster ? (
+                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                      <Crown className="w-4 h-4 text-amber-400 shrink-0" />
+                      <div className="text-left">
+                        <span className="text-[9px] uppercase font-black tracking-wider text-amber-400/80 block">Créditos IA Mensuales</span>
+                        <strong className="text-xs font-black text-amber-200">👑 ILIMITADO • Master</strong>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={`flex items-center gap-2.5 px-3.5 py-1.5 rounded-2xl border transition ${
+                      monthlyUsage.creates >= (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30))
+                        ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
+                        : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                    }`}>
+                      <Zap className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <div className="text-left">
+                        <span className="text-[9px] uppercase font-black tracking-wider opacity-80 block">Cupo de Creaciones</span>
+                        <div className="text-xs font-black flex items-center gap-1">
+                          <span>{monthlyUsage.creates} / {currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)} Usadas</span>
+                          <span className="text-[10px] font-bold opacity-75">
+                            ({Math.max(0, (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)) - monthlyUsage.creates)} disp.)
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="text-right shrink-0">
+                    <span className="text-[10px] text-slate-400 block font-mono">{t.mod1Time}</span>
+                    <span className="text-lg font-black text-emerald-400">{t.mod1TimeVal}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -3816,10 +3924,17 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   </div>
                 </div>
 
+                {!isLuismaMaster && monthlyUsage.creates >= (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)) && (
+                  <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                    <span>Tope mensual de {currentUser?.maxCreatesMonthly ?? 30} creaciones alcanzado. Contacta a Dirección General.</span>
+                  </div>
+                )}
+
                 <button
                   type="button"
                   onClick={() => handleGenerate('create')}
-                  disabled={isGenerating || !businessName.trim()}
+                  disabled={isGenerating || !businessName.trim() || (!isLuismaMaster && monthlyUsage.creates >= (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))}
                   className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 cursor-pointer active:scale-98"
                 >
                   {isGenerating ? (
@@ -4743,9 +4858,39 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     {t.mod2Desc}
                   </p>
                 </div>
-                <div className="text-right shrink-0">
-                  <span className="text-[10px] text-slate-400 block font-mono">{t.mod2Target}</span>
-                  <span className="text-lg font-black text-amber-400">{t.mod2TargetVal}</span>
+                <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 shrink-0">
+                  {/* Credit Counter Badge */}
+                  {isLuismaMaster ? (
+                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                      <Crown className="w-4 h-4 text-amber-400 shrink-0" />
+                      <div className="text-left">
+                        <span className="text-[9px] uppercase font-black tracking-wider text-amber-400/80 block">Créditos IA Mensuales</span>
+                        <strong className="text-xs font-black text-amber-200">👑 ILIMITADO • Master</strong>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={`flex items-center gap-2.5 px-3.5 py-1.5 rounded-2xl border transition ${
+                      monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30))
+                        ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
+                        : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                    }`}>
+                      <Zap className="w-4 h-4 text-amber-400 shrink-0" />
+                      <div className="text-left">
+                        <span className="text-[9px] uppercase font-black tracking-wider opacity-80 block">Cupo de Auditorías</span>
+                        <div className="text-xs font-black flex items-center gap-1">
+                          <span>{monthlyUsage.audits} / {currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)} Usadas</span>
+                          <span className="text-[10px] font-bold opacity-75">
+                            ({Math.max(0, (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)) - monthlyUsage.audits)} disp.)
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="text-right shrink-0">
+                    <span className="text-[10px] text-slate-400 block font-mono">{t.mod2Target}</span>
+                    <span className="text-lg font-black text-amber-400">{t.mod2TargetVal}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -4820,10 +4965,17 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   </div>
 
                   {/* Primary 1-Click Scan & Audit Button */}
+                  {!isLuismaMaster && monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)) && (
+                    <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                      <span>Tope mensual de {currentUser?.maxAuditsMonthly ?? 30} auditorías alcanzado. Contacta a Dirección General.</span>
+                    </div>
+                  )}
+
                   <button
                     type="button"
                     onClick={handleScanAndAudit}
-                    disabled={isScanningListing || isGenerating || !auditQuery.trim()}
+                    disabled={isScanningListing || isGenerating || !auditQuery.trim() || (!isLuismaMaster && monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))}
                     className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98"
                   >
                     {isScanningListing || isGenerating ? (
@@ -5671,9 +5823,39 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     {tTools.rescueDesc}
                   </p>
                 </div>
-                <div className="text-right shrink-0">
-                  <span className="text-[10px] text-slate-400 block font-mono">{isEn ? 'Official Timeline' : 'Tiempo de Trámite'}</span>
-                  <span className="text-lg font-black text-amber-400">{isEn ? '72-Hour Protocol' : 'Regla de 72 Horas'}</span>
+                <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 shrink-0">
+                  {/* Credit Counter Badge */}
+                  {isLuismaMaster ? (
+                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                      <Crown className="w-4 h-4 text-amber-400 shrink-0" />
+                      <div className="text-left">
+                        <span className="text-[9px] uppercase font-black tracking-wider text-amber-400/80 block">Créditos IA Mensuales</span>
+                        <strong className="text-xs font-black text-amber-200">👑 ILIMITADO • Master</strong>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={`flex items-center gap-2.5 px-3.5 py-1.5 rounded-2xl border transition ${
+                      monthlyUsage.rescues >= (currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10))
+                        ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
+                        : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+                    }`}>
+                      <Zap className="w-4 h-4 text-rose-400 shrink-0" />
+                      <div className="text-left">
+                        <span className="text-[9px] uppercase font-black tracking-wider opacity-80 block">Cupo de Rescates</span>
+                        <div className="text-xs font-black flex items-center gap-1">
+                          <span>{monthlyUsage.rescues} / {currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)} Usadas</span>
+                          <span className="text-[10px] font-bold opacity-75">
+                            ({Math.max(0, (currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)) - monthlyUsage.rescues)} disp.)
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="text-right shrink-0">
+                    <span className="text-[10px] text-slate-400 block font-mono">{isEn ? 'Official Timeline' : 'Tiempo de Trámite'}</span>
+                    <span className="text-lg font-black text-amber-400">{isEn ? '72-Hour Protocol' : 'Regla de 72 Horas'}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -5734,10 +5916,17 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     </button>
                   </div>
 
+                  {!isLuismaMaster && monthlyUsage.rescues >= (currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)) && (
+                    <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                      <span>Tope mensual de {currentUser?.maxRescuesMonthly ?? 10} rescates alcanzado. Contacta a Dirección General.</span>
+                    </div>
+                  )}
+
                   <button
                     type="button"
                     onClick={() => handleRescueScan()}
-                    disabled={isRescueScanning || !rescueSearchQuery.trim()}
+                    disabled={isRescueScanning || !rescueSearchQuery.trim() || (!isLuismaMaster && monthlyUsage.rescues >= (currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)))}
                     className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 disabled:opacity-50 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-98"
                   >
                     {isRescueScanning ? (
@@ -8617,7 +8806,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
             </div>
 
             {/* Monetization & Network KPI Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
               <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0">
                   <Briefcase className="w-5 h-5" />
@@ -8666,9 +8855,61 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   </strong>
                 </div>
               </div>
+
+              <button
+                type="button"
+                onClick={() => setNetworkTabMode(networkTabMode === 'forensic' ? 'directory' : 'forensic')}
+                className={`p-4 rounded-2xl border flex items-center gap-3 transition cursor-pointer text-left ${
+                  networkTabMode === 'forensic'
+                    ? 'bg-rose-950/80 border-rose-500 shadow-lg shadow-rose-500/20'
+                    : 'bg-slate-900 border-slate-800 hover:border-rose-500/50'
+                }`}
+              >
+                <div className="w-10 h-10 rounded-xl bg-rose-600/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0">
+                  <Trash2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-slate-400 block font-bold">Bóveda Forense</span>
+                  <div className="flex items-center gap-1.5">
+                    <strong className="text-xl font-black text-rose-400">{forensicDeletedDossiers.length}</strong>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold">Borradas</span>
+                  </div>
+                </div>
+              </button>
             </div>
 
-            {/* Barra de Filtros Inteligentes de Asesores & Agencias */}
+            {/* Sub-view Switcher: Directorio vs Bóveda Forense */}
+            <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs">
+              <button
+                type="button"
+                onClick={() => setNetworkTabMode('directory')}
+                className={`flex-1 py-2.5 px-4 rounded-xl font-black transition flex items-center justify-center gap-2 cursor-pointer ${
+                  networkTabMode === 'directory'
+                    ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Users className="w-4 h-4" />
+                <span>👥 {isEn ? 'Directory of Advisors & Licensed Agencies' : 'Directorio de Asesores & Agencias Licenciadas'} ({filteredAdvisors.length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setNetworkTabMode('forensic')}
+                className={`flex-1 py-2.5 px-4 rounded-xl font-black transition flex items-center justify-center gap-2 cursor-pointer ${
+                  networkTabMode === 'forensic'
+                    ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md shadow-rose-600/30'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <ShieldAlert className="w-4 h-4 text-rose-400" />
+                <span>🛡️ {isEn ? 'Master Forensic Vault (Auditing of Deleted Files)' : 'Bóveda Forense Master (Historial de Fichas Borradas)'} ({forensicDeletedDossiers.length})</span>
+              </button>
+            </div>
+
+            {networkTabMode === 'directory' && (
+              <div className="space-y-6">
+                {/* Barra de Filtros Inteligentes de Asesores & Agencias */}
             <div className="p-4 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-slate-300 font-bold">
                 <div className="flex items-center gap-2">
@@ -8871,6 +9112,18 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   const rescuesCount = advisorDossiers.filter((d) => d.mode === 'rescue').length;
                   const isRevealed = Boolean(revealedPasswords[adv.id]);
 
+                  const curNow = new Date();
+                  const curY = curNow.getFullYear();
+                  const curM = curNow.getMonth();
+                  const advisorMonthDossiers = advisorDossiers.filter((d) => {
+                    const cd = new Date(d.createdAt);
+                    return cd.getFullYear() === curY && cd.getMonth() === curM;
+                  });
+                  const monthCreates = advisorMonthDossiers.filter((d) => d.mode === 'create').length;
+                  const monthAudits = advisorMonthDossiers.filter((d) => d.mode === 'audit').length;
+                  const monthRescues = advisorMonthDossiers.filter((d) => d.mode === 'rescue').length;
+                  const deletedCountForAdv = advisorDossiers.filter((d) => d.deletedByAdvisor).length;
+
                   return (
                     <div
                       key={adv.id}
@@ -9039,6 +9292,43 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             </div>
                           </div>
                         </div>
+
+                        {/* Monitor de Topes & Consumo de IA este Mes */}
+                        {!isFounder && (
+                          <div className="p-2.5 rounded-xl bg-slate-950/90 border border-slate-800 space-y-1.5 text-[11px]">
+                            <div className="flex items-center justify-between font-bold">
+                              <span className="text-amber-400 flex items-center gap-1 text-[10.5px]">
+                                <Zap className="w-3 h-3 text-amber-400" />
+                                <span>Consumo IA Mes Actual:</span>
+                              </span>
+                              {deletedCountForAdv > 0 && (
+                                <span className="text-[9px] font-bold text-rose-400 bg-rose-950/60 border border-rose-500/30 px-1.5 py-0.5 rounded-full">
+                                  🗑️ {deletedCountForAdv} en Bóveda
+                                </span>
+                              )}
+                            </div>
+                            <div className="grid grid-cols-3 gap-1 pt-1 border-t border-slate-800/60 text-center text-[10px]">
+                              <div className="bg-slate-900/80 py-1 rounded px-1">
+                                <span className="text-slate-400 block text-[8.5px] uppercase font-semibold">Crea</span>
+                                <strong className={`font-mono text-[11px] ${monthCreates >= (adv.maxCreatesMonthly ?? 30) ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                  {monthCreates} / {adv.maxCreatesMonthly ?? (adv.accountType === 'partner_agency' ? 60 : adv.accountType === 'director' ? 100 : 30)}
+                                </strong>
+                              </div>
+                              <div className="bg-slate-900/80 py-1 rounded px-1">
+                                <span className="text-slate-400 block text-[8.5px] uppercase font-semibold">Audita</span>
+                                <strong className={`font-mono text-[11px] ${monthAudits >= (adv.maxAuditsMonthly ?? 30) ? 'text-rose-400' : 'text-amber-400'}`}>
+                                  {monthAudits} / {adv.maxAuditsMonthly ?? (adv.accountType === 'partner_agency' ? 60 : adv.accountType === 'director' ? 100 : 30)}
+                                </strong>
+                              </div>
+                              <div className="bg-slate-900/80 py-1 rounded px-1">
+                                <span className="text-slate-400 block text-[8.5px] uppercase font-semibold">Rescata</span>
+                                <strong className={`font-mono text-[11px] ${monthRescues >= (adv.maxRescuesMonthly ?? 10) ? 'text-rose-400' : 'text-rose-300'}`}>
+                                  {monthRescues} / {adv.maxRescuesMonthly ?? (adv.accountType === 'partner_agency' ? 20 : adv.accountType === 'director' ? 50 : 10)}
+                                </strong>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Botones de Acción: Ver Trabajos, Modificar y Eliminar */}
@@ -9088,6 +9378,120 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
             )}
           </div>
         )}
+
+        {networkTabMode === 'forensic' && (
+          <div className="space-y-4">
+            <div className="p-4 rounded-2xl bg-rose-950/30 border border-rose-500/40 text-xs space-y-1">
+              <div className="flex items-center gap-2 text-rose-300 font-bold">
+                <ShieldCheck className="w-4 h-4 text-rose-400" />
+                <span className="text-sm">Auditoría Forense Exclusiva de Dirección General</span>
+              </div>
+              <p className="text-slate-400 text-xs leading-relaxed">
+                Cuando un asesor o agencia pulsa "Eliminar" en su interfaz, la ficha desaparece de su pantalla pero <strong>se preserva permanentemente en esta bóveda</strong>. Como Fundador y Director General, tienes acceso a todo su trabajo histórico para auditar y prevenir cualquier pérdida de información o manipulación.
+              </p>
+            </div>
+
+            {forensicDeletedDossiers.length === 0 ? (
+              <div className="text-center py-16 p-8 rounded-3xl bg-slate-900/40 border border-slate-800 space-y-3">
+                <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
+                <h3 className="text-base font-bold text-white">
+                  Bóveda Forense Limpia
+                </h3>
+                <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                  No hay expedientes ni auditorías borradas por asesores o agencias. Todo el trabajo se encuentra activo.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                {forensicDeletedDossiers.map((d) => (
+                  <div
+                    key={d.id}
+                    className="p-5 rounded-3xl bg-slate-900 border border-rose-500/40 hover:border-rose-400 transition flex flex-col justify-between space-y-4 shadow-xl"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[9.5px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-rose-950 text-rose-300 border border-rose-500/50 flex items-center gap-1">
+                          <Trash2 className="w-3 h-3 text-rose-400" />
+                          <span>Borrado por Asesor</span>
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {d.deletedAt ? new Date(d.deletedAt).toLocaleString() : new Date(d.updatedAt || d.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="text-[10px] font-bold text-indigo-400 block">
+                          💼 Responsable: {d.advisorName || 'Asesor'} (@{d.advisorId})
+                        </span>
+                        <h4 className="font-black text-white text-base leading-tight mt-1">{d.clientName}</h4>
+                        <p className="text-slate-400 text-xs mt-0.5">
+                          📍 {d.city}, {d.country || 'Colombia'} {d.neighborhood ? `• ${d.neighborhood}` : ''}
+                        </p>
+                        <span className="text-[11px] text-amber-300 font-bold block mt-1">{d.category}</span>
+                      </div>
+
+                      {/* Contacto del Cliente */}
+                      {(d.contactName || d.contactPhone || d.contactEmail) && (
+                        <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-[11px] space-y-1">
+                          <span className="text-slate-400 block text-[9.5px] uppercase font-bold">Contacto Cliente:</span>
+                          <div className="text-white font-bold">{d.contactName || 'No especificado'} {d.contactRole ? `(${d.contactRole})` : ''}</div>
+                          {d.contactPhone && (
+                            <div className="text-emerald-400 font-mono text-[10.5px]">📞 {d.contactPhone}</div>
+                          )}
+                          {d.contactEmail && (
+                            <div className="text-indigo-400 text-[10.5px] truncate">✉️ {d.contactEmail}</div>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[10.5px] flex items-center justify-between">
+                        <span className="text-slate-400">Modalidad:</span>
+                        <span className="font-bold text-amber-300 uppercase">
+                          {d.mode === 'create' ? '🏗️ Creación' : d.mode === 'rescue' ? '🛡️ Rescate' : '🔬 Auditoría'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Botonera de Auditoría Forense */}
+                    <div className="pt-2 border-t border-slate-800/80 space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => handleLoadDossier(d)}
+                        className="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md active:scale-98"
+                      >
+                        <span>👁️ Inspeccionar en Workspace</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleRestoreDossier(d.id)}
+                          className="flex-1 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/40 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-98"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          <span>Restaurar Ficha</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteDossier(d.id, true)}
+                          className="px-3 py-2 rounded-xl bg-rose-600/20 hover:bg-rose-600/40 text-rose-300 border border-rose-500/40 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-98"
+                          title="Purgar definitivamente de la base de datos"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Purgar</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    )}
 
       {/* MODAL: VER TRABAJOS & FICHAS REALIZADAS POR EL ASESOR */}
       {viewingAdvisorWorks && (
@@ -9168,7 +9572,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     {advisorDossiers.map((d) => (
                       <div
                         key={d.id}
-                        className="p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-amber-400/50 transition space-y-3 flex flex-col justify-between"
+                        className={`p-4 rounded-2xl border transition space-y-3 flex flex-col justify-between ${
+                          d.deletedByAdvisor
+                            ? 'bg-rose-950/20 border-rose-500/40 hover:border-rose-400'
+                            : 'bg-slate-950 border-slate-800 hover:border-amber-400/50'
+                        }`}
                       >
                         <div className="space-y-2">
                           <div className="flex items-center justify-between gap-2">
@@ -9244,6 +9652,42 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               </span>
                             </div>
                           )}
+
+                          {/* Forensic Badge if deleted by advisor */}
+                          {d.deletedByAdvisor && (
+                            <div className="p-2.5 rounded-xl bg-rose-950/60 border border-rose-500/50 text-[11px] space-y-1.5">
+                              <div className="flex items-center justify-between text-rose-300 font-bold">
+                                <span className="flex items-center gap-1.5">
+                                  <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                                  <span>Ficha Borrada por el Asesor</span>
+                                </span>
+                                <span className="text-[9.5px] font-mono text-slate-400">
+                                  {d.deletedAt ? new Date(d.deletedAt).toLocaleString() : 'Archivado'}
+                                </span>
+                              </div>
+                              <p className="text-[10px] text-slate-400 leading-tight">
+                                🔒 Bóveda Forense de Dirección General. Esta ficha fue eliminada por el usuario pero permanece en tu base de datos para auditoría.
+                              </p>
+                              <div className="flex items-center gap-2 pt-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleRestoreDossier(d.id)}
+                                  className="flex-1 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 font-bold text-[10px] transition cursor-pointer flex items-center justify-center gap-1"
+                                >
+                                  <RotateCcw className="w-3 h-3" />
+                                  <span>Restaurar Ficha</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteDossier(d.id, true)}
+                                  className="px-2.5 py-1 rounded-lg bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 border border-rose-500/40 font-bold text-[10px] transition cursor-pointer flex items-center justify-center gap-1"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                  <span>Purgar Definitivo</span>
+                                </button>
+                              </div>
+                            </div>
+                          )}
                         </div>
 
                         <button
@@ -9304,7 +9748,12 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
             <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-slate-950 border border-slate-800 text-xs">
               <button
                 type="button"
-                onClick={() => setNewAccountType('director')}
+                onClick={() => {
+                  setNewAccountType('director');
+                  setNewAdvisorMaxCreates(100);
+                  setNewAdvisorMaxAudits(100);
+                  setNewAdvisorMaxRescues(50);
+                }}
                 className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
                   newAccountType === 'director'
                     ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30'
@@ -9317,7 +9766,12 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
               <button
                 type="button"
-                onClick={() => setNewAccountType('internal_advisor')}
+                onClick={() => {
+                  setNewAccountType('internal_advisor');
+                  setNewAdvisorMaxCreates(30);
+                  setNewAdvisorMaxAudits(30);
+                  setNewAdvisorMaxRescues(10);
+                }}
                 className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
                   newAccountType === 'internal_advisor'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
@@ -9330,7 +9784,12 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
               <button
                 type="button"
-                onClick={() => setNewAccountType('partner_agency')}
+                onClick={() => {
+                  setNewAccountType('partner_agency');
+                  setNewAdvisorMaxCreates(60);
+                  setNewAdvisorMaxAudits(60);
+                  setNewAdvisorMaxRescues(20);
+                }}
                 className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
                   newAccountType === 'partner_agency'
                     ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
@@ -9468,6 +9927,64 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     </select>
                   </div>
                 </div>
+              </div>
+
+              {/* Topes de Consumo Mensual de IA */}
+              <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-amber-300 font-bold text-xs">
+                    <Zap className="w-4 h-4 text-amber-400" />
+                    <span>Topes de Consumo Mensual de IA (Freno de Abuso):</span>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-mono">Cupos / mes</span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div>
+                    <label className="block text-[10px] font-bold text-emerald-400 mb-1">
+                      Creaciones
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="1000"
+                      value={newAdvisorMaxCreates}
+                      onChange={(e) => setNewAdvisorMaxCreates(Number(e.target.value))}
+                      className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-emerald-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-amber-400 mb-1">
+                      Auditorías
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="1000"
+                      value={newAdvisorMaxAudits}
+                      onChange={(e) => setNewAdvisorMaxAudits(Number(e.target.value))}
+                      className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-rose-400 mb-1">
+                      Rescates
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="1000"
+                      value={newAdvisorMaxRescues}
+                      onChange={(e) => setNewAdvisorMaxRescues(Number(e.target.value))}
+                      className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-rose-400"
+                    />
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-500 italic">
+                  * Al agotar el cupo mensual, la herramienta se bloqueará automáticamente hasta el siguiente mes o hasta que Dirección General le recargue más usos.
+                </p>
               </div>
 
               <div>
@@ -9659,6 +10176,65 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     onChange={(e) => setEditAdvisorMonthlyFee(Number(e.target.value))}
                     className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-purple-500/50 text-purple-300 font-bold focus:outline-none"
                   />
+                </div>
+              )}
+
+              {editingAdvisor?.accountType !== 'founder' && (
+                <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-amber-300 font-bold text-xs">
+                      <Zap className="w-4 h-4 text-amber-400" />
+                      <span>{isEn ? 'Monthly AI Usage Limits (Reload Uses):' : 'Topes de Consumo Mensual de IA (Cargar más Usos):'}</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-mono">Cupos / mes</span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <label className="block text-[10px] font-bold text-emerald-400 mb-1">
+                        Creaciones
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="1000"
+                        value={editAdvisorMaxCreates}
+                        onChange={(e) => setEditAdvisorMaxCreates(Number(e.target.value))}
+                        className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-emerald-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-amber-400 mb-1">
+                        Auditorías
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="1000"
+                        value={editAdvisorMaxAudits}
+                        onChange={(e) => setEditAdvisorMaxAudits(Number(e.target.value))}
+                        className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-rose-400 mb-1">
+                        Rescates
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="1000"
+                        value={editAdvisorMaxRescues}
+                        onChange={(e) => setEditAdvisorMaxRescues(Number(e.target.value))}
+                        className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-rose-400"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-slate-500 italic">
+                    * Puedes aumentar el número de creaciones, auditorías y rescates para otorgar más créditos al asesor o agencia en tiempo real.
+                  </p>
                 </div>
               )}
 

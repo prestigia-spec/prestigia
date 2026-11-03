@@ -52,6 +52,9 @@ export interface StudioAdvisor {
   monthlyFeeUsd?: number;
   licenseStatus?: 'active' | 'pending_payment' | 'suspended';
   active: boolean;
+  maxCreatesMonthly?: number;
+  maxAuditsMonthly?: number;
+  maxRescuesMonthly?: number;
   createdAt: string;
 }
 
@@ -76,6 +79,8 @@ export interface StudioDossier {
   mode: 'create' | 'audit' | 'rescue';
   businessModel?: 'storefront' | 'service_area';
   status: 'draft' | 'presented' | 'closed';
+  deletedByAdvisor?: boolean;
+  deletedAt?: string;
   // Commercial closing & monetization
   closingStatus?: 'prestigia_subscriber' | 'setup_paid' | 'proposal_sent' | 'negotiating' | 'lead_draft';
   setupFeeChargedUsd?: number;
@@ -1476,12 +1481,35 @@ export async function saveStudioDossier(dossier: StudioDossier): Promise<void> {
   writeDbFile(db);
 }
 
-export async function deleteStudioDossier(dossierId: string): Promise<boolean> {
+export async function deleteStudioDossier(dossierId: string, isPermanentPurge: boolean = false): Promise<boolean> {
   const db = ensureDbFile();
   if (!db.studioDossiers) return false;
-  db.studioDossiers = db.studioDossiers.filter((d) => d.id !== dossierId);
+  if (isPermanentPurge) {
+    db.studioDossiers = db.studioDossiers.filter((d) => d.id !== dossierId);
+  } else {
+    const item = db.studioDossiers.find((d) => d.id === dossierId);
+    if (item) {
+      item.deletedByAdvisor = true;
+      item.deletedAt = new Date().toISOString();
+    } else {
+      return false;
+    }
+  }
   writeDbFile(db);
   return true;
+}
+
+export async function restoreStudioDossier(dossierId: string): Promise<boolean> {
+  const db = ensureDbFile();
+  if (!db.studioDossiers) return false;
+  const item = db.studioDossiers.find((d) => d.id === dossierId);
+  if (item) {
+    item.deletedByAdvisor = false;
+    delete item.deletedAt;
+    writeDbFile(db);
+    return true;
+  }
+  return false;
 }
 
 export const SEED_STUDIO_LANDING_PAGES: StudioLandingPage[] = [

@@ -59,6 +59,9 @@ export async function POST(request: Request) {
       monthlyFeeUsd = 0,
       licenseStatus = 'active',
       active = true,
+      maxCreatesMonthly,
+      maxAuditsMonthly,
+      maxRescuesMonthly,
       masterKey,
     } = body;
 
@@ -91,6 +94,9 @@ export async function POST(request: Request) {
       monthlyFeeUsd: monthlyFeeUsd !== undefined ? Number(monthlyFeeUsd) : (existing?.monthlyFeeUsd || 0),
       licenseStatus: licenseStatus || existing?.licenseStatus || 'active',
       active: active !== undefined ? Boolean(active) : (existing?.active ?? true),
+      maxCreatesMonthly: maxCreatesMonthly !== undefined ? Number(maxCreatesMonthly) : (existing?.maxCreatesMonthly ?? (accountType === 'partner_agency' ? 60 : accountType === 'director' ? 100 : 30)),
+      maxAuditsMonthly: maxAuditsMonthly !== undefined ? Number(maxAuditsMonthly) : (existing?.maxAuditsMonthly ?? (accountType === 'partner_agency' ? 60 : accountType === 'director' ? 100 : 30)),
+      maxRescuesMonthly: maxRescuesMonthly !== undefined ? Number(maxRescuesMonthly) : (existing?.maxRescuesMonthly ?? (accountType === 'partner_agency' ? 20 : accountType === 'director' ? 50 : 10)),
       createdAt: existing?.createdAt || new Date().toISOString(),
     };
 
