@@ -587,14 +587,14 @@ const UI_TEXT = {
     switchProfile: 'Cambiar',
     logoutBtn: 'Salir',
     downloadPdf: 'Descargar PDF',
-    tabCreate: '🏗️ 1. Crear Ficha (Desde Cero)',
-    tabAudit: '🔬 2. Auditar & Optimizar Ficha',
-    tabRescue: '🛡️ 3. Rescatar Ficha Secuestrada',
-    tabTools: '⚡ 4. Armas Top 3 (Geo-Grid & ROI)',
-    tabDossiers: '📁 5. Mis Clientes (Luisma)',
-    tabGuide: '📖 6. Guía Dónde Dar Clic en Google',
-    tabPitch: '🗣️ 7. Guion Comercial para Asesores',
-    tabNetwork: '🏢 8. Red de Asesores & Agencias B2B',
+    tabCreate: '1. Crear Ficha',
+    tabAudit: '2. Auditar & Optimizar',
+    tabRescue: '3. Rescatar Ficha',
+    tabTools: '4. Armas Top 3',
+    tabDossiers: '5. Mis Clientes',
+    tabGuide: '6. Guía Google',
+    tabPitch: '7. Guion Comercial',
+    tabNetwork: '8. Red Asesores B2B',
     mod1Badge: 'Módulo 1: Para Negocios sin Google Maps',
     mod1Title: 'Constructor de Ficha Ganadora (Arquitectura Top 3)',
     mod1Desc: 'Ingresa los datos básicos del negocio. La inteligencia artificial de Prestigia generará el expediente técnico exacto (categorías secretas, título optimizado, copy de 745 caracteres, catálogo y guía de verificación) para configurar la ficha en Google en menos de 10 minutos.',
@@ -672,14 +672,14 @@ const UI_TEXT = {
     switchProfile: 'Switch',
     logoutBtn: 'Log out',
     downloadPdf: 'Download PDF',
-    tabCreate: '🏗️ 1. Build New Listing (From Scratch)',
-    tabAudit: '🔬 2. Audit & Upgrade Existing Listing',
-    tabRescue: '🛡️ 3. Rescue & Claim Profile',
-    tabTools: '⚡ 4. Top 3 Weapons (Geo-Grid & ROI)',
-    tabDossiers: '📁 5. My Clients (Luisma)',
-    tabGuide: '📖 6. Step-by-Step Google Click Guide',
-    tabPitch: '🗣️ 7. Sales Pitch & Objection Scripts',
-    tabNetwork: '🏢 8. Sales Advisors & Agency Network',
+    tabCreate: '1. Build Listing',
+    tabAudit: '2. Audit & Optimize',
+    tabRescue: '3. Rescue Listing',
+    tabTools: '4. Top 3 Weapons',
+    tabDossiers: '5. My Clients',
+    tabGuide: '6. Google Guide',
+    tabPitch: '7. Sales Pitch',
+    tabNetwork: '8. B2B Network',
     mod1Badge: 'Module 1: For Businesses Without Google Maps',
     mod1Title: 'Winning Listing Builder (Top 3 Architecture)',
     mod1Desc: 'Enter the basic business details. Prestigia AI will generate the exact technical blueprint (secret categories, optimized title, 745-char copy, catalog, and verification guide) to set up on Google in under 10 minutes.',
@@ -3113,90 +3113,90 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         </div>
         </header>
 
-        {/* Main Workspace Navigation Switcher (Franja Fija de Pestañas) */}
-        <nav className="bg-slate-900/90 px-4 sm:px-8 py-2 overflow-x-auto">
-        <div className="max-w-7xl mx-auto flex items-center gap-2 min-w-max">
-          <button
-            type="button"
-            onClick={() => setActiveTab('create')}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition flex items-center gap-2 cursor-pointer ${
-              activeTab === 'create'
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-            }`}
-          >
-            <Building2 className="w-3.5 h-3.5" />
-            <span>{t.tabCreate}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('audit')}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition flex items-center gap-2 cursor-pointer ${
-              activeTab === 'audit'
-                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/20'
-                : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-            }`}
-          >
-            <Search className="w-3.5 h-3.5" />
-            <span>{t.tabAudit}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('rescue')}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition flex items-center gap-2 cursor-pointer ${
-              activeTab === 'rescue'
-                ? 'bg-gradient-to-r from-rose-500 to-amber-500 text-slate-950 shadow-md shadow-rose-500/20'
-                : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-            }`}
-          >
-            <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
-            <span>{t.tabRescue}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('tools')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-              activeTab === 'tools'
-                ? 'bg-gradient-to-r from-amber-500 to-indigo-600 text-slate-950 font-black shadow-md'
-                : 'bg-slate-950 text-amber-300 hover:text-white border border-amber-500/40'
-            }`}
-          >
-            <Zap className="w-3.5 h-3.5 text-amber-400" />
-            <span>{t.tabTools}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('dossiers')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-              activeTab === 'dossiers'
-                ? 'bg-amber-500 text-slate-950 shadow-md font-black'
-                : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span>{t.tabDossiers}</span>
-          </button>
-
-          {currentUser?.role === 'admin' && (
+        {/* Main Workspace Navigation Switcher (Pestañas Fijas de Ancho Completo Sin Barra de Movimiento) */}
+        <nav className="bg-slate-900/95 border-b border-slate-800/80 px-2 sm:px-6 py-2">
+          <div className="max-w-7xl mx-auto flex flex-wrap sm:flex-nowrap items-center gap-1.5 sm:gap-2 w-full">
             <button
               type="button"
-              onClick={() => setActiveTab('network')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                activeTab === 'network' || activeTab === 'advisors'
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-black'
-                  : 'bg-slate-950 text-indigo-400 hover:text-white border border-indigo-500/30'
+              onClick={() => setActiveTab('create')}
+              className={`flex-1 min-w-0 px-2.5 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer text-center ${
+                activeTab === 'create'
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
               }`}
             >
-              <Users className="w-3.5 h-3.5" />
-              <span>{t.tabNetwork}</span>
+              <Building2 className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{t.tabCreate}</span>
             </button>
-          )}
-        </div>
-      </nav>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('audit')}
+              className={`flex-1 min-w-0 px-2.5 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer text-center ${
+                activeTab === 'audit'
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/20'
+                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              <Search className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{t.tabAudit}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('rescue')}
+              className={`flex-1 min-w-0 px-2.5 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer text-center ${
+                activeTab === 'rescue'
+                  ? 'bg-gradient-to-r from-rose-500 to-amber-500 text-slate-950 shadow-md shadow-rose-500/20'
+                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="truncate">{t.tabRescue}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('tools')}
+              className={`flex-1 min-w-0 px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer text-center ${
+                activeTab === 'tools'
+                  ? 'bg-gradient-to-r from-amber-500 to-indigo-600 text-slate-950 font-black shadow-md'
+                  : 'bg-slate-950 text-amber-300 hover:text-white border border-amber-500/40'
+              }`}
+            >
+              <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="truncate">{t.tabTools}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('dossiers')}
+              className={`flex-1 min-w-0 px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer text-center ${
+                activeTab === 'dossiers'
+                  ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{t.tabDossiers}</span>
+            </button>
+
+            {currentUser?.role === 'admin' && (
+              <button
+                type="button"
+                onClick={() => setActiveTab('network')}
+                className={`flex-1 min-w-0 px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer text-center ${
+                  activeTab === 'network' || activeTab === 'advisors'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-black'
+                    : 'bg-slate-950 text-indigo-400 hover:text-white border border-indigo-500/30'
+                }`}
+              >
+                <Users className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{t.tabNetwork}</span>
+              </button>
+            )}
+          </div>
+        </nav>
       </div>
 
       {/* Main Workspace Body */}
