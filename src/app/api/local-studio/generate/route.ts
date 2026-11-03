@@ -116,7 +116,7 @@ CRITICAL MULTI-NICHE & QUALITY RULES (ZERO PIGEONHOLING - HIGH IMPACT - FACTUAL)
 10. "whatsappOnboardingMessage": Complete message to client requesting onboarding materials.
 11. "suggestedServiceAreas": ${isSAB ? 'Array of 8 to 10 affluent target coverage areas.' : '[]'}
 12. "hidePhysicalAddress": ${isSAB ? true : false}
-13. "nfcPocketReviewGuide": Review collection protocol on-site.
+13. "nfcPocketReviewGuide": Smart digital QR & WhatsApp review collection protocol on-site (NO physical hardware, 100% digital links/QR).
 14. "reviewVelocityPlan": Object with currentReviews (${effectiveReviews}), targetTop3Reviews (${targetTop3Reviews}), neededReviews (${neededReviews}), pace (8/week), and weeks (${weeksToTop3}).
 15. "monthlyPostsBooster": Array of 4 weekly Google Business Profile posts tailored to the business niche.
 ${mode === 'audit' ? `16. For Audit Mode: "healthScore" (40-68), "criticalGaps" (4-5 gaps), "topCompetitorInsights" (concise 90-day win strategy), and "actionRoadmap" (5 prioritized steps with impact: CRÍTICO/ALTO/MEDIO).` : ''}
@@ -900,21 +900,21 @@ function buildFallbackBlueprint(params: {
     : [];
 
   const nfcPocketReviewGuide = {
-    title: isEn ? 'On-Site NFC & Direct WhatsApp Review Process' : 'Protocolo de Reseñas: Tarjeta NFC de Bolsillo + WhatsApp',
+    title: isEn ? 'Digital QR & Direct WhatsApp Review Protocol' : 'Protocolo Digital de Reseñas: Enlace Inteligente & QR',
     steps: [
       isEn
-        ? 'Present the Prestigia pocket NFC card or QR code to the satisfied customer upon completing the service.'
-        : 'Presenta la tarjeta NFC Prestigia o código QR al cliente satisfecho al concluir la atención.',
+        ? 'Present the Prestigia smart QR or digital review link to the satisfied customer upon completing the service.'
+        : 'Presenta el código QR digital inteligente de Prestigia o envía el enlace directo al cliente satisfecho al concluir la atención.',
       isEn
-        ? 'Ask the customer to tap their smartphone to access the Google review screen directly.'
-        : 'Pide al cliente que acerque su teléfono para abrir directamente la pantalla de calificación en Google.',
+        ? 'Ask the customer to scan the QR code to open the Google review screen directly.'
+        : 'Pide al cliente que escanee el código QR desde su celular para abrir directamente la pantalla de calificación 5★ en Google.',
       isEn
-        ? 'If NFC is unavailable, share the direct review link via WhatsApp.'
-        : 'Si el cliente no tiene NFC, envíale de inmediato el enlace directo por WhatsApp.',
+        ? 'Alternatively, share the direct review link via WhatsApp immediately.'
+        : 'O envíale de inmediato el enlace inteligente directo por WhatsApp con un solo clic.',
     ],
     samplePitch: isEn
-      ? `"Thank you for visiting ${businessName}! Could you take a moment to leave your review on Google? It helps our local team significantly."`
-      : `"¡Gracias por visitar ${businessName}! ¿Podrías dejarnos tu reseña en Google acercando tu teléfono a esta tarjeta? Nos ayuda mucho a seguir mejorando."`,
+      ? `"Thank you for choosing ${businessName}! Could you scan this quick QR to leave your review on Google? It helps our local team significantly."`
+      : `"¡Gracias por confiar en ${businessName}! ¿Podrías escanear este código QR rápido para dejarnos tu reseña 5★ en Google? Nos ayuda mucho a seguir creciendo."`,
   };
 
   const isCreate = mode === 'create';
@@ -1022,7 +1022,7 @@ function buildFallbackBlueprint(params: {
             },
             {
               step: 3,
-              title: isEn ? 'Deploy On-Site NFC Pocket Review Cards' : 'Activar Protocolo de Reseñas NFC & WhatsApp',
+              title: isEn ? 'Deploy Smart Digital QR & WhatsApp Review Protocol' : 'Activar Protocolo Digital de Reseñas QR & WhatsApp',
               impact: 'ALTO',
               action: isEn ? 'Target minimum 8 fresh reviews weekly.' : 'Capturar al menos 8 reseñas 5★ por semana para activar el algoritmo de frescura.',
             },

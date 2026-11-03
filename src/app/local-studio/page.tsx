@@ -892,17 +892,17 @@ const TXT_TOOLS = {
     spyMetricPhotos: 'Fotos en Ficha',
     spyVerdictTitle: 'Radiografía Algorítmica & Veredicto Prestigia',
     spyAttackPlan: 'Plan de Destronamiento en 3 Movimientos Tácticos:',
-    spyMove1: 'Acelerador de Reseñas 5★ con Dispositivos NFC Prestigia (+8 reseñas semanales para quebrar su ventaja)',
+    spyMove1: 'Acelerador Digital de Reseñas 5★ con Software Prestigia (+8 reseñas semanales para quebrar su ventaja)',
     spyMove2: 'Inyección de 5 Subcategorías Secundarias que el rival no tiene registradas',
     spyMove3: 'Booster de 30 Días de Google Posts & Geo-Tagging para superar su frescura algorítmica',
     spyPitchBox: 'Argumento de Cierre Agresivo para el Asesor Comercial:',
     spyPitchText: (client: string, rival: string, weeks: number, clientReviews: number, rivalReviews: number) => {
       if (clientReviews >= rivalReviews) {
-        return `"Don ${client || 'Cliente'}, mire esta radiografía forense. Su negocio tiene ${clientReviews.toLocaleString()} reseñas y ${rival || 'su competidor'} apenas ${rivalReviews}, pero ellos están en el puesto #1 del Top 3 llevándose a sus clientes. ¿Por qué? Porque para el algoritmo 2026 de Google sus reseñas son del pasado: su ficha hoy está dormida (+1 reseña/semana) mientras el rival tiene actividad constante. Con las tarjetas Prestigia Smart NFC en sus mesas/mostrador, inyectamos +8 reseñas semanales frescas con palabras clave de compra, duplicamos sus fotos y en menos de 30 días recuperamos el puesto #1 que por historia le pertenece a usted."`;
+        return `"Don ${client || 'Cliente'}, mire esta radiografía forense. Su negocio tiene ${clientReviews.toLocaleString()} reseñas y ${rival || 'su competidor'} apenas ${rivalReviews}, pero ellos están en el puesto #1 del Top 3 llevándose a sus clientes. ¿Por qué? Porque para el algoritmo 2026 de Google sus reseñas son del pasado: su ficha hoy está dormida (+1 reseña/semana) mientras el rival tiene actividad constante. Con el software inteligente de reseñas de Prestigia y automatización digital, inyectamos +8 reseñas semanales frescas con palabras clave de compra, duplicamos sus fotos y en menos de 30 días recuperamos el puesto #1 que por historia le pertenece a usted."`;
       }
       const gap = Math.max(1, rivalReviews - clientReviews);
       const years = Math.max(1, Math.round((gap / 52) * 10) / 10);
-      return `"Mire ${client || 'Don Cliente'}, ${rival || 'su competidor'} le lleva ${gap} reseñas de ventaja. A su ritmo orgánico actual de +1 reseña por semana, tardaría ${years} AÑOS en alcanzarlos mientras ellos se quedan con el 70% de las llamadas y ventas locales. Al activar Prestigia y nuestros dispositivos inteligentes NFC, aceleramos su velocidad a +8 reseñas 5★ semanales y destronamos a su rival en solo ${weeks} semanas."`;
+      return `"Mire ${client || 'Don Cliente'}, ${rival || 'su competidor'} le lleva ${gap} reseñas de ventaja. A su ritmo orgánico actual de +1 reseña por semana, tardaría ${years} AÑOS en alcanzarlos mientras ellos se quedan con el 70% de las llamadas y ventas locales. Al activar Prestigia y nuestro sistema inteligente de captura 5★, aceleramos su velocidad a +8 reseñas 5★ semanales y destronamos a su rival en solo ${weeks} semanas."`;
     },
     spyBtnCopyPitch: 'Copiar Argumento de Cierre',
   },
@@ -1020,17 +1020,17 @@ const TXT_TOOLS = {
     spyMetricPhotos: 'Photos on Listing',
     spyVerdictTitle: 'Algorithmic Radiography & Prestigia Verdict',
     spyAttackPlan: '3 Tactical Dethroning Moves with Prestigia:',
-    spyMove1: '5★ Review Velocity Accelerator with Prestigia Smart NFC Devices (+8 weekly reviews to eliminate their lead)',
+    spyMove1: '5★ Review Velocity Accelerator with Prestigia Software (+8 weekly reviews to eliminate their lead)',
     spyMove2: 'Secondary Category Injection capturing 5 high-intent keywords missing from competitor profile',
     spyMove3: '30-Day Google Posts Booster & Geo-Tagging to outpace competitor freshness signals',
     spyPitchBox: 'Aggressive Advisor Closing Pitch Script:',
     spyPitchText: (client: string, rival: string, weeks: number, clientReviews: number, rivalReviews: number) => {
       if (clientReviews >= rivalReviews) {
-        return `"${client || 'Client'}, look at this diagnostic data. You have ${clientReviews.toLocaleString()} reviews and ${rival || 'your rival'} has only ${rivalReviews}, yet they are ranking #1 in Google's Top 3 taking your customers. Why? Because Google's 2026 algorithm penalizes dormant profiles: your profile receives only +1 review/week while your competitor has fresh momentum. With Prestigia Smart NFC devices at your counter, we inject +8 weekly 5★ reviews with targeted keywords, double your photo gallery, and within 30 days reclaim the #1 spot that rightfully belongs to you."`;
+        return `"${client || 'Client'}, look at this diagnostic data. You have ${clientReviews.toLocaleString()} reviews and ${rival || 'your rival'} has only ${rivalReviews}, yet they are ranking #1 in Google's Top 3 taking your customers. Why? Because Google's 2026 algorithm penalizes dormant profiles: your profile receives only +1 review/week while your competitor has fresh momentum. With Prestigia's intelligent review software, we inject +8 weekly 5★ reviews with targeted keywords, double your photo gallery, and within 30 days reclaim the #1 spot that rightfully belongs to you."`;
       }
       const gap = Math.max(1, rivalReviews - clientReviews);
       const years = Math.max(1, Math.round((gap / 52) * 10) / 10);
-      return `"${client || 'Client'}, ${rival || 'your competitor'} has a ${gap}-review lead. At your current organic pace of +1 review/week, it would take you ${years} YEARS to catch them while they take 70% of the local customers. By activating Prestigia and our Smart NFC devices, we accelerate your velocity to +8 weekly 5★ reviews and dethrone your competitor in just ${weeks} weeks."`;
+      return `"${client || 'Client'}, ${rival || 'your competitor'} has a ${gap}-review lead. At your current organic pace of +1 review/week, it would take you ${years} YEARS to catch them while they take 70% of the local customers. By activating Prestigia and our 5★ review software, we accelerate your velocity to +8 weekly 5★ reviews and dethrone your competitor in just ${weeks} weeks."`;
     },
     spyBtnCopyPitch: 'Copy Closing Pitch',
   },
@@ -1183,7 +1183,7 @@ const TXT_GUIDE = {
     step5Title: 'Inject Subcategories & Commercial Copy',
     step5Body: 'Click "Edit Profile". Under description, paste the 745-character SEO copy. Under additional categories, paste the 5 secondary subcategories provided by the tool.',
     step6Title: 'Upload Photos & Activate Prestigia Smart QR',
-    step6Body: 'Upload the renamed photos following the tool’s SEO checklist. Then deploy the Prestigia Smart Review NFC/QR plates on counters to start capturing 5★ Google reviews immediately.',
+    step6Body: 'Upload the renamed photos following the tool’s SEO checklist. Then deploy the Prestigia Smart Digital QR & Review Link system to start capturing 5★ Google reviews immediately.',
     trafficLightTitle: 'Google Anti-Suspension Security Traffic Light',
     dangerTitle: '❌ WHAT TO NEVER DO (RISK OF IMMEDIATE BAN):',
     danger1: '• Do not add spam keywords or fake names like "THE BEST RESTAURANT".',
@@ -1788,10 +1788,10 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
       },
       {
         id: 'step_prestigia',
-        title: isEn ? '9. ⚡ Final Step: Prestigia Shield & Smart NFC Hardware Activation' : '9. ⚡ Paso Final: Blindaje con Prestigia y Activación de Dispositivos NFC',
+        title: isEn ? '9. ⚡ Final Step: Prestigia Shield & Smart 5★ Review Engine Activation' : '9. ⚡ Paso Final: Blindaje con Prestigia y Activación de Captura Digital 5★',
         desc: isEn
-          ? 'Connect listing to Prestigia Portal for 1-3★ review protection, 5★ review velocity, and on-site NFC chips'
-          : 'Vincular ficha al Portal Prestigia para filtrar reseñas de 1 a 3★, acelerar 5★ y activar chips NFC',
+          ? 'Connect listing to Prestigia Portal for 1-3★ review protection, 5★ review velocity, and smart QR/WhatsApp flow'
+          : 'Vincular ficha al Portal Prestigia para filtrar reseñas de 1 a 3★, acelerar 5★ y activar enlaces y QR inteligentes',
         isHero: true,
       },
     ];
@@ -4080,16 +4080,16 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     </strong>
                     <p className="text-[11px] text-slate-300 leading-relaxed">
                       {isEn
-                        ? 'Waive 100% of the technical setup fee ($0 implementation cost) as an irresistible closing hook when the client subscribes to their tailored Prestigia plan (Smart NFC cards + 5★ Review Accelerator).'
-                        : 'Bonifica el 100% del setup técnico ($0 costo de implementación) como gancho de cierre de alto impacto si el cliente adquiere su Plan Prestigia a la medida (Tarjetas inteligentes NFC + Captura de reseñas 5★).'}
+                        ? 'Waive 100% of the technical setup fee ($0 implementation cost) as an irresistible closing hook when the client subscribes to their tailored Prestigia plan (Digital QR & WhatsApp Flow + 5★ Review Accelerator).'
+                        : 'Bonifica el 100% del setup técnico ($0 costo de implementación) como gancho de cierre de alto impacto si el cliente adquiere su Plan Prestigia a la medida (Software de Reseñas 5★ + Blindaje Digital).'}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => {
                       const scriptText = isEn
-                        ? `Hello ${businessName || 'Business Owner'}, to build, verify, and architect your Google Maps profile for Top 3 rankings, our technical setup fee is 100% WAIVED ($0 implementation cost) when you activate your tailored Prestigia plan for your business (Smart NFC devices + 5★ Review Accelerator). Shall we reserve your slot and launch this week?`
-                        : `Hola estimado/a ${businessName || 'propietario'}, para crear, verificar y estructurar su ficha en Google Maps con arquitectura de posicionamiento Top 3, le BONIFICAMOS el 100% del Setup Fee técnico ($0 costo de implementación) al activar su Plan Prestigia a la medida de su negocio (Tarjetas Inteligentes NFC + Sistema de Reseñas 5★). ¿Le reservo el cupo y coordinamos la activación esta semana?`;
+                        ? `Hello ${businessName || 'Business Owner'}, to build, verify, and architect your Google Maps profile for Top 3 rankings, our technical setup fee is 100% WAIVED ($0 implementation cost) when you activate your tailored Prestigia plan for your business (5★ Review Accelerator + Digital Reputation Shield). Shall we reserve your slot and launch this week?`
+                        : `Hola estimado/a ${businessName || 'propietario'}, para crear, verificar y estructurar su ficha en Google Maps con arquitectura de posicionamiento Top 3, le BONIFICAMOS el 100% del Setup Fee técnico ($0 costo de implementación) al activar su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital). ¿Le reservo el cupo y coordinamos la activación esta semana?`;
                       copyToClipboard(scriptText, isEn ? 'Setup Fee Proposal' : 'Propuesta de Setup Fee');
                     }}
                     className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
@@ -4282,14 +4282,14 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           </p>
                         </div>
 
-                        {/* Pocket NFC Review Protocol for Independents */}
+                        {/* Digital QR & WhatsApp Review Protocol for Independents */}
                         {generatedData.nfcPocketReviewGuide && (
                           <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2 text-xs">
                             <div className="flex items-center justify-between">
                               <span className="font-black text-amber-300 text-[11px] flex items-center gap-1.5">
-                                💳 {generatedData.nfcPocketReviewGuide.title}
+                                ⭐ {generatedData.nfcPocketReviewGuide.title}
                               </span>
-                              <span className="text-[9px] font-mono text-slate-500">Prestigia Pocket Protocol</span>
+                              <span className="text-[9px] font-mono text-slate-500">Prestigia Digital Review Engine</span>
                             </div>
 
                             <ul className="space-y-1 text-slate-300 text-[11px]">
@@ -4885,7 +4885,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <button
                   type="button"
                   onClick={() => {
-                    const script = `Hola ${businessName || 'Emprendedor'}, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de ${category || 'su sector'} en ${city || 'su ciudad'} y notamos una situación crítica: su negocio sencillamente NO existe en Google Maps. Hoy en día, el 70% de las personas que van a comprar o contratar un servicio eligen entre los 3 primeros perfiles que aparecen en el mapa. Cada día que pasa sin ficha, son decenas de clientes que terminan comprándole a su competencia más cercana. En Prestigia no solo creamos y verificamos su ficha oficial ante Google sin riesgo de suspensión, sino que le instalamos la arquitectura para posicionarlo en el Top 3 y le entregamos tarjetas Smart NFC para capturar reseñas 5 estrellas en su local. Al activar hoy su Plan Prestigia a la medida para su negocio, le bonificamos el 100% del setup técnico ($0 costo de creación) y le entregamos la ficha lista para facturar. ¿Agendamos la grabación del video de 60 segundos hoy mismo?`;
+                    const script = `Hola ${businessName || 'Emprendedor'}, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de ${category || 'su sector'} en ${city || 'su ciudad'} y notamos una situación crítica: su negocio sencillamente NO existe en Google Maps. Hoy en día, el 70% de las personas que van a comprar o contratar un servicio eligen entre los 3 primeros perfiles que aparecen en el mapa. Cada día que pasa sin ficha, son decenas de clientes que terminan comprándole a su competencia más cercana. En Prestigia no solo creamos y verificamos su ficha oficial ante Google sin riesgo de suspensión, sino que le instalamos la arquitectura para posicionarlo en el Top 3 y le activamos nuestro software inteligente de reseñas para capturar 5 estrellas en su negocio. Al activar hoy su Plan Prestigia a la medida para su negocio, le bonificamos el 100% del setup técnico ($0 costo de creación) y le entregamos la ficha lista para facturar. ¿Agendamos la grabación del video de 60 segundos hoy mismo?`;
                     copyToClipboard(script, 'Guión de Venta de Creación');
                   }}
                   className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer shrink-0 active:scale-98"
@@ -4901,7 +4901,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   🎙️ Speech de Prospección & Apertura (Llamada, Visita o WhatsApp):
                 </span>
                 <p>
-                  "Hola <strong>{businessName || 'Emprendedor'}</strong>, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de <strong>{category || 'su sector'}</strong> en <strong>{city || 'su ciudad'}</strong> y notamos una situación crítica: su negocio sencillamente <strong>NO existe en Google Maps</strong>. Hoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha son decenas de ventas que le regala a su competencia. Nosotros creamos y verificamos su perfil oficial ante Google con arquitectura Top 3, y le entregamos tarjetas Smart NFC para disparar sus reseñas 5★ desde la primera semana."
+                  "Hola <strong>{businessName || 'Emprendedor'}</strong>, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de <strong>{category || 'su sector'}</strong> en <strong>{city || 'su ciudad'}</strong> y notamos una situación crítica: su negocio sencillamente <strong>NO existe en Google Maps</strong>. Hoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha son decenas de ventas que le regala a su competencia. Nosotros creamos y verificamos su perfil oficial ante Google con arquitectura Top 3, y le activamos el sistema digital Prestigia para disparar sus reseñas 5★ desde la primera semana."
                 </p>
               </div>
 
@@ -4933,7 +4933,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     🎁 El Gancho de Cierre Prestigia ($0 Setup):
                   </span>
                   <p className="text-slate-300 text-[11px] mt-0.5">
-                    "Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, te bonificamos el 100% del setup técnico de creación (<strong>$0 costo de implementación</strong>) y te incluimos las tarjetas y dispositivos Smart NFC."
+                    "Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, te bonificamos el 100% del setup técnico de creación (<strong>$0 costo de implementación</strong>) e incluimos la activación total de tu software de reseñas 5★ y blindaje reputacional."
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-black text-xs">
@@ -5479,15 +5479,15 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <p className="text-[11px] text-slate-300 leading-relaxed">
                       {isEn
                         ? 'Waive 100% of the forensic overhaul fee ($0 implementation cost) as an irresistible hook when the client acquires their tailored Prestigia plan.'
-                        : 'Bonifica el 100% del setup técnico de auditoría y reingeniería ($0 costo de implementación) como gancho de cierre al adquirir su Plan Prestigia a la medida (Tarjetas inteligentes NFC + Captura de reseñas 5★).'}
+                        : 'Bonifica el 100% del setup técnico de auditoría y reingeniería ($0 costo de implementación) como gancho de cierre al adquirir su Plan Prestigia a la medida (Software de Reseñas 5★ + Blindaje Digital).'}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => {
                       const scriptText = isEn
-                        ? `Hello ${businessName || 'Business Owner'}, after performing our forensic audit on your Google Maps listing, we identified critical gaps keeping you outside the Top 3. When you activate our tailored Prestigia plan for your business (Smart NFC devices + 5★ Review System), we WAIVE 100% of the deep optimization setup fee ($0 USD). Shall we lock in this waiver and elevate your listing this week?`
-                        : `Hola estimado/a ${businessName || 'propietario'}, tras auditar su negocio en Google Maps detectamos fallas críticas que le hacen perder clientes frente a la competencia. Al adquirir su Plan Prestigia a la medida (Tarjetas Inteligentes NFC + Sistema de Reseñas 5★), le BONIFICAMOS el 100% de la optimización técnica ($0 USD). ¿Le gustaría aprovechar esta bonificación y activar su plan a la medida?`;
+                        ? `Hello ${businessName || 'Business Owner'}, after performing our forensic audit on your Google Maps listing, we identified critical gaps keeping you outside the Top 3. When you activate our tailored Prestigia plan for your business (Digital 5★ Review Accelerator + Reputation Shield), we WAIVE 100% of the deep optimization setup fee ($0 USD). Shall we lock in this waiver and elevate your listing this week?`
+                        : `Hola estimado/a ${businessName || 'propietario'}, tras auditar su negocio en Google Maps detectamos fallas críticas que le hacen perder clientes frente a la competencia. Al adquirir su Plan Prestigia a la medida (Software de Reseñas 5★ + Blindaje Digital), le BONIFICAMOS el 100% de la optimización técnica ($0 USD). ¿Le gustaría aprovechar esta bonificación y activar su plan a la medida?`;
                       copyToClipboard(scriptText, isEn ? 'Audit Proposal' : 'Propuesta de Auditoría');
                     }}
                     className="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
@@ -5860,7 +5860,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <button
                   type="button"
                   onClick={() => {
-                    const script = `Hola ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos minuciosamente su perfil de Google Maps en ${city || 'su ciudad'} y descubrimos la razón exacta por la cual no está apareciendo en los primeros 3 lugares: su ficha tiene 3 fugas algorítmicas críticas (carece de categorías secundarias de búsqueda transaccional, su catálogo de servicios no tiene precios y su flujo de opiniones está estancado). Nuestros cálculos muestran que está perdiendo aproximadamente entre $1,000 y $3,000 USD mensuales en clientes que se van con sus competidores del Top 3. En Prestigia reestructuramos el 100% de su perfil y le instalamos nuestros dispositivos Smart NFC en mesa para inyectar reseñas 5 estrellas semanales y superar a sus rivales. Al activar hoy su Plan Prestigia a la medida para su negocio, nosotros absorbemos el 100% del setup técnico de optimización ($0 costo de implementación bonificado). ¿Le gustaría ver la comparativa directa frente a su competidor más fuerte?`;
+                    const script = `Hola ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos minuciosamente su perfil de Google Maps en ${city || 'su ciudad'} y descubrimos la razón exacta por la cual no está apareciendo en los primeros 3 lugares: su ficha tiene 3 fugas algorítmicas críticas (carece de categorías secundarias de búsqueda transaccional, su catálogo de servicios no tiene precios y su flujo de opiniones está estancado). Nuestros cálculos muestran que está perdiendo aproximadamente entre $1,000 y $3,000 USD mensuales en clientes que se van con sus competidores del Top 3. En Prestigia reestructuramos el 100% de su perfil y le activamos nuestro software inteligente de reseñas para inyectar 5 estrellas semanales y superar a sus rivales. Al activar hoy su Plan Prestigia a la medida para su negocio, nosotros absorbemos el 100% del setup técnico de optimización ($0 costo de implementación bonificado). ¿Le gustaría ver la comparativa directa frente a su competidor más fuerte?`;
                     copyToClipboard(script, 'Guión de Venta de Auditoría');
                   }}
                   className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer shrink-0 active:scale-98"
@@ -5876,7 +5876,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   🎙️ Speech de Cierre de Auditoría Forense:
                 </span>
                 <p>
-                  "Hola <strong>{businessName || 'propietario'}</strong>, le saluda el equipo de Prestigia. Auditamos su ficha en <strong>{city || 'su zona'}</strong> y detectamos por qué no está en el Top 3: su perfil tiene <strong>3 fallas algorítmicas graves</strong> que le están costando clientes todos los días. Sus competidores líderes tienen flujo activo semanal y catálogo completo, mientras que su ficha pierde el 68% de las búsquedas por falta de categorías secundarias. Hemos estructurado el plan técnico para desbancar a los líderes e instalar el sistema Smart NFC de Prestigia."
+                  "Hola <strong>{businessName || 'propietario'}</strong>, le saluda el equipo de Prestigia. Auditamos su ficha en <strong>{city || 'su zona'}</strong> y detectamos por qué no está en el Top 3: su perfil tiene <strong>3 fallas algorítmicas graves</strong> que le están costando clientes todos los días. Sus competidores líderes tienen flujo activo semanal y catálogo completo, mientras que su ficha pierde el 68% de las búsquedas por falta de categorías secundarias. Hemos estructurado el plan técnico para desbancar a los líderes y activar la plataforma digital de reseñas de Prestigia."
                 </p>
               </div>
 
@@ -5896,7 +5896,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     ⚠️ Objeción: "¿Me garantizan estar en el puesto #1 exacto?"
                   </strong>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong>Respuesta Asesor:</strong> "Google no le pertenece a ninguna agencia en el mundo. Lo que sí garantizamos es la arquitectura SEO exacta que exige Google y la tecnología Smart NFC en mostrador para quebrar la ventaja de sus rivales y adueñarse de los 3 lugares que se llevan el 70% de las ventas."
+                    <strong>Respuesta Asesor:</strong> "Google no le pertenece a ninguna agencia en el mundo. Lo que sí garantizamos es la arquitectura SEO exacta que exige Google y la tecnología de captura digital de reseñas para quebrar la ventaja de sus rivales y adueñarse de los 3 lugares que se llevan el 70% de las ventas."
                   </p>
                 </div>
               </div>
@@ -5908,7 +5908,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     🎁 El Gancho de Cierre Prestigia ($0 Setup):
                   </span>
                   <p className="text-slate-300 text-[11px] mt-0.5">
-                    "Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, el setup técnico de reingeniería y optimización te queda en <strong>$0 (100% bonificado)</strong> y te entregamos los dispositivos Smart NFC incluidos."
+                    "Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, el setup técnico de reingeniería y optimización te queda en <strong>$0 (100% bonificado)</strong> e incluye la activación completa del software de aceleración 5★ y blindaje reputacional."
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black text-xs">
@@ -6431,16 +6431,16 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     </strong>
                     <p className="text-[11px] text-slate-300 leading-relaxed">
                       {isEn
-                        ? 'Waive 100% of the legal ownership recovery fee ($0 cost) as an irresistible hook when the client acquires their tailored Prestigia plan (Smart NFC cards + 5★ Review Accelerator).'
-                        : 'Bonifica el 100% de los honorarios técnicos y legales de rescate ($0 costo) como gancho de cierre al adquirir su Plan Prestigia a la medida de su negocio (Tarjetas inteligentes NFC + Captura de reseñas 5★).'}
+                        ? 'Waive 100% of the legal ownership recovery fee ($0 cost) as an irresistible hook when the client acquires their tailored Prestigia plan (Digital QR & WhatsApp Flow + 5★ Review Accelerator).'
+                        : 'Bonifica el 100% de los honorarios técnicos y legales de rescate ($0 costo) como gancho de cierre al adquirir su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital).'}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => {
                       const scriptText = isEn
-                        ? `Hello ${businessName || 'Business Owner'}, to reclaim and transfer your Google Maps profile to your direct account, our legal ownership recovery fee is 100% WAIVED ($0 cost) when you activate your tailored Prestigia plan (Smart NFC devices + 5★ Review Accelerator). You get your listing back and your reputation secured. Shall we start the protocol today?`
-                        : `Hola estimado/a ${businessName || 'propietario'}, para recuperar la titularidad legal de su ficha en Google Maps y transferir el control total a su cuenta oficial mediante el protocolo de Google, le BONIFICAMOS el 100% de los costos de gestión técnica y legal de rescate ($0 USD) al adquirir su Plan Prestigia a la medida de su negocio (Tarjetas Inteligentes NFC + Sistema de Reseñas 5★). Recupera su ficha y blindamos su reputación. ¿Iniciamos el protocolo hoy?`;
+                        ? `Hello ${businessName || 'Business Owner'}, to reclaim and transfer your Google Maps profile to your direct account, our legal ownership recovery fee is 100% WAIVED ($0 cost) when you activate your tailored Prestigia plan (Digital 5★ Review Accelerator + Reputation Shield). You get your listing back and your reputation secured. Shall we start the protocol today?`
+                        : `Hola estimado/a ${businessName || 'propietario'}, para recuperar la titularidad legal de su ficha en Google Maps y transferir el control total a su cuenta oficial mediante el protocolo de Google, le BONIFICAMOS el 100% de los costos de gestión técnica y legal de rescate ($0 USD) al adquirir su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital). Recupera su ficha y blindamos su reputación. ¿Iniciamos el protocolo hoy?`;
                       copyToClipboard(scriptText, isEn ? 'Rescue Proposal' : 'Propuesta de Rescate');
                     }}
                     className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
@@ -7759,8 +7759,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             </h4>
                             <p className="text-xs text-slate-300 leading-relaxed">
                               {isEn
-                                ? `At your current organic pace of +1 review/week, it would take you ${organicYearsToOvertake} YEARS to catch them. With Prestigia Smart NFC (+8/wk), you break their lead and dethrone them in just ${weeksToSurpass} weeks.`
-                                : `A tu velocidad orgánica actual de +1 reseña/semana, tardarías ${organicYearsToOvertake} AÑOS en alcanzarlos por tu cuenta. Con Prestigia Smart NFC (+8/sem), quiebras su ventaja y los destronas en solo ${weeksToSurpass} semanas.`}
+                                ? `At your current organic pace of +1 review/week, it would take you ${organicYearsToOvertake} YEARS to catch them. With Prestigia Software 5★ (+8/wk), you break their lead and dethrone them in just ${weeksToSurpass} weeks.`
+                                : `A tu velocidad orgánica actual de +1 reseña/semana, tardarías ${organicYearsToOvertake} AÑOS en alcanzarlos por tu cuenta. Con Prestigia Software 5★ (+8/sem), quiebras su ventaja y los destronas en solo ${weeksToSurpass} semanas.`}
                             </p>
                           </div>
                         </div>
@@ -7794,7 +7794,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
                         <div className="p-3.5 rounded-2xl bg-slate-950 border border-emerald-500/40 bg-emerald-950/20">
                           <span className="text-[10px] text-emerald-400 uppercase font-bold block mb-1">
-                            {isEn ? 'Prestigia NFC Pace' : 'Velocidad con Prestigia'}
+                            {isEn ? 'Prestigia Software Pace' : 'Velocidad con Prestigia'}
                           </span>
                           <strong className="text-xl font-black text-emerald-400">
                             +8 / sem
@@ -7845,7 +7845,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               <span className="text-slate-300 font-medium">+1 reseña/semana (Dormida)</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
-                              <span className="text-[10px] text-emerald-400 block font-bold">Con Prestigia NFC:</span>
+                              <span className="text-[10px] text-emerald-400 block font-bold">Con Prestigia Software 5★:</span>
                               <span className="text-emerald-300 font-bold">+8 a +12 reseñas 5★/sem</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
@@ -7928,7 +7928,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-2.5">
                             <span className="font-black text-emerald-400">1.</span>
                             <span className="text-slate-300">
-                              <strong>Activación de Dispositivos Smart NFC en Punto de Venta:</strong> Inyectamos de +8 a +12 reseñas 5★ por semana directamente desde mesas y mostradores para quebrar la ventaja del competidor.
+                              <strong>Activación del Sistema Inteligente de Reseñas Digitales:</strong> Inyectamos de +8 a +12 reseñas 5★ por semana mediante códigos QR inteligentes y automatización WhatsApp para quebrar la ventaja del competidor.
                             </span>
                           </div>
                           <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-2.5">
@@ -8848,7 +8848,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         rows={3}
                         value={closingFormNotes}
                         onChange={(e) => setClosingFormNotes(e.target.value)}
-                        placeholder="Registra acuerdos, fecha de entrega de tarjetas NFC, objeciones resueltas..."
+                        placeholder="Registra acuerdos, fecha de activación de plataforma, objeciones resueltas..."
                         className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
                       />
                     </div>
