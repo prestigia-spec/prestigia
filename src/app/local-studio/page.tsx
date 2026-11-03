@@ -2007,6 +2007,27 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     }
   };
 
+  const handleResetRescueForm = () => {
+    setRescueSearchQuery('');
+    setScannedListing(null);
+    setBusinessName('');
+    setNeighborhood('');
+    setContactName('');
+    setContactCompany('');
+    setContactPhone('');
+    setContactEmail('');
+    setContactRole('Dueño / Propietario');
+    setPhone('');
+    setGoogleUrl('');
+    setRescueScenario('orphan');
+    setRescueMaskedEmail('');
+    setGeneratedData(null);
+    showToast(isEn ? '✨ Ready to run a new rescue' : '✨ Formulario listo para un nuevo rescate');
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   // -------------------------------------------------------------
   // 3. GENERATION ACTION (LIVE GEMINI + HEURISTIC ENGINE)
   // -------------------------------------------------------------
@@ -6050,6 +6071,16 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <span className="text-[10px] text-slate-400 block font-mono">{isEn ? 'Official Timeline' : 'Tiempo de Trámite'}</span>
                     <span className="text-lg font-black text-amber-400">{isEn ? '72-Hour Protocol' : 'Regla de 72 Horas'}</span>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={handleResetRescueForm}
+                    className="px-3.5 py-2 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-rose-500/20 cursor-pointer shrink-0 active:scale-95"
+                    title={isEn ? 'Clear form to run a new rescue' : 'Realizar un nuevo rescate desde cero'}
+                  >
+                    <Plus className="w-4 h-4 text-slate-950" />
+                    <span>{isEn ? 'New Rescue' : 'Nuevo Rescate'}</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -6061,6 +6092,105 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
                   <KeyRound className="w-4 h-4 text-rose-400" />
                   <h2 className="text-sm font-black text-white">{isEn ? '1. Listing Recognition & Diagnosis' : '1. Reconocimiento de Ficha & Diagnóstico'}</h2>
+                </div>
+
+                {/* Tarjeta de Datos del Cliente / Contratante (Antes de Reconocer la Ficha) */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/30 space-y-2.5">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
+                    <div className="flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-indigo-400" />
+                      <span className="text-xs font-black text-indigo-300">
+                        {isEn ? '👤 Client / Contractor Info (Who Hires & Pays)' : '👤 Datos del Cliente / Contratante (Quién Solicita y Paga el Servicio)'}
+                      </span>
+                    </div>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
+                      CRM
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
+                      </label>
+                      <input
+                        type="text"
+                        value={contactName}
+                        onChange={(e) => setContactName(e.target.value)}
+                        placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
+                      </label>
+                      <input
+                        type="text"
+                        value={contactCompany}
+                        onChange={(e) => setContactCompany(e.target.value)}
+                        placeholder={isEn ? 'e.g. Acme Corp / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                        <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
+                        {contactPhone && (
+                          <a
+                            href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
+                          >
+                            Chat
+                          </a>
+                        )}
+                      </label>
+                      <input
+                        type="tel"
+                        value={contactPhone}
+                        onChange={(e) => setContactPhone(e.target.value)}
+                        placeholder="+57 300 123 4567"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Email' : 'Correo Electrónico'}
+                      </label>
+                      <input
+                        type="email"
+                        value={contactEmail}
+                        onChange={(e) => setContactEmail(e.target.value)}
+                        placeholder="contacto@empresa.com"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Role' : 'Cargo / Relación'}
+                      </label>
+                      <select
+                        value={contactRole}
+                        onChange={(e) => setContactRole(e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
+                      >
+                        <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
+                        <option value="Gerente General">{isEn ? '💼 General Manager' : '💼 Gerente General'}</option>
+                        <option value="Director de Marketing">{isEn ? '📈 Marketing Dir.' : '📈 Dir. Marketing'}</option>
+                        <option value="Administrador">{isEn ? '🏢 Branch Admin' : '🏢 Administrador'}</option>
+                        <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
+                        <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
 
                 {/* 1-Click Google Maps Scanner for Rescue */}
@@ -6388,105 +6518,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </button>
                     </div>
                   </div>
-
-                  {/* Tarjeta de Datos del Cliente / Contratante */}
-                  <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/30 space-y-2.5">
-                    <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
-                      <div className="flex items-center gap-1.5">
-                        <User className="w-3.5 h-3.5 text-indigo-400" />
-                        <span className="text-xs font-black text-indigo-300">
-                          {isEn ? '👤 Client / Contractor Info (Who Hires & Pays)' : '👤 Datos del Cliente / Contratante (Quién Solicita y Paga el Servicio)'}
-                        </span>
-                      </div>
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
-                        CRM
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                          {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
-                        </label>
-                        <input
-                          type="text"
-                          value={contactName}
-                          onChange={(e) => setContactName(e.target.value)}
-                          placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
-                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                          {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
-                        </label>
-                        <input
-                          type="text"
-                          value={contactCompany}
-                          onChange={(e) => setContactCompany(e.target.value)}
-                          placeholder={isEn ? 'e.g. Acme Corp / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
-                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
-                          <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
-                          {contactPhone && (
-                            <a
-                              href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
-                            >
-                              Chat
-                            </a>
-                          )}
-                        </label>
-                        <input
-                          type="tel"
-                          value={contactPhone}
-                          onChange={(e) => setContactPhone(e.target.value)}
-                          placeholder="+57 300 123 4567"
-                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                          {isEn ? 'Email' : 'Correo Electrónico'}
-                        </label>
-                        <input
-                          type="email"
-                          value={contactEmail}
-                          onChange={(e) => setContactEmail(e.target.value)}
-                          placeholder="contacto@empresa.com"
-                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                          {isEn ? 'Role' : 'Cargo / Relación'}
-                        </label>
-                        <select
-                          value={contactRole}
-                          onChange={(e) => setContactRole(e.target.value)}
-                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
-                        >
-                          <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
-                          <option value="Gerente General">{isEn ? '💼 General Manager' : '💼 Gerente General'}</option>
-                          <option value="Director de Marketing">{isEn ? '📈 Marketing Dir.' : '📈 Dir. Marketing'}</option>
-                          <option value="Administrador">{isEn ? '🏢 Branch Admin' : '🏢 Administrador'}</option>
-                          <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
-                          <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Commercial Strategy: Setup Fee & 100% Annual Plan Waiver */}
@@ -6526,10 +6557,40 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <span>{isEn ? 'Copy Tailored Plan Closing Script (WhatsApp)' : 'Copiar Propuesta Comercial de Cierre (WhatsApp)'}</span>
                   </button>
                 </div>
+
+                {/* Botón rápido Nuevo Rescate cuando ya hay datos */}
+                {(scannedListing || businessName || rescueSearchQuery) && (
+                  <button
+                    type="button"
+                    onClick={handleResetRescueForm}
+                    className="w-full py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 border-2 border-rose-500/50 hover:border-rose-400 text-rose-300 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-98"
+                  >
+                    <Plus className="w-4 h-4 text-rose-400" />
+                    <span>{isEn ? 'Run Another Rescue' : 'Nuevo Rescate'}</span>
+                  </button>
+                )}
               </div>
 
               {/* Right Column: Interactive Protocol & Evidentiary Dossier (7 cols) */}
               <div className="lg:col-span-7 space-y-4">
+                {/* Action Bar Header with New Rescue Button */}
+                <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-900 border border-slate-800 print:hidden">
+                  <div className="flex items-center gap-2">
+                    <ShieldAlert className="w-4 h-4 text-rose-400" />
+                    <span className="text-xs font-black text-white">
+                      {isEn ? 'Rescue & Legal Reclaim Protocol' : 'Protocolo Legal de Rescate & Titularidad'}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleResetRescueForm}
+                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-slate-950 text-xs font-black transition flex items-center gap-1.5 shadow-md shadow-rose-500/20 cursor-pointer active:scale-95"
+                    title={isEn ? 'Clear form to run another rescue' : 'Realizar otro nuevo rescate desde cero'}
+                  >
+                    <Plus className="w-3.5 h-3.5 text-slate-950" />
+                    <span>{isEn ? 'New Rescue' : 'Nuevo Rescate'}</span>
+                  </button>
+                </div>
                 {/* Protocol Roadmap Card */}
                 <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-5 text-xs shadow-xl">
                   {rescueScenario === 'orphan' && (
@@ -6959,6 +7020,18 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-black text-xs">
                   Plan a la Medida
                 </span>
+              </div>
+
+              {/* Bottom Quick Action: Nuevo Rescate */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 pb-2 print:hidden">
+                <button
+                  type="button"
+                  onClick={handleResetRescueForm}
+                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-slate-950 font-black text-sm transition flex items-center gap-2 shadow-xl shadow-rose-500/25 cursor-pointer active:scale-95"
+                >
+                  <Plus className="w-4 h-4 text-slate-950" />
+                  <span>{isEn ? 'Run Another Rescue' : 'Nuevo Rescate'}</span>
+                </button>
               </div>
             </div>
 
