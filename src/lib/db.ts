@@ -1297,6 +1297,27 @@ export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
     ];
     writeDbFile(db);
   }
+
+  // Strict Rule: Only Luisma can be Founder / Dirección General. All others are internal_advisor or partner_agency.
+  let modified = false;
+  db.studioAdvisors.forEach((a) => {
+    const isLuisma = a.id === 'adv-luisma' || a.username.toLowerCase() === 'luisma';
+    if (!isLuisma) {
+      if (a.accountType === 'director' || a.accountType === 'founder') {
+        a.accountType = 'internal_advisor';
+        modified = true;
+      }
+    } else {
+      if (a.accountType !== 'founder' || !a.active || a.licenseStatus !== 'active') {
+        a.accountType = 'founder';
+        a.active = true;
+        a.licenseStatus = 'active';
+        modified = true;
+      }
+    }
+  });
+  if (modified) writeDbFile(db);
+
   return db.studioAdvisors || [];
 }
 
@@ -1306,10 +1327,28 @@ export async function saveStudioAdvisor(advisor: StudioAdvisor): Promise<void> {
   const idx = db.studioAdvisors.findIndex(
     (a) => a.id === advisor.id || a.username.toLowerCase() === advisor.username.toLowerCase()
   );
-  if (idx >= 0) {
-    db.studioAdvisors[idx] = { ...db.studioAdvisors[idx], ...advisor };
+
+  const isLuisma = advisor.id === 'adv-luisma' || advisor.username.toLowerCase() === 'luisma';
+  const sanitizedAdvisor = { ...advisor };
+
+  if (isLuisma) {
+    sanitizedAdvisor.id = 'adv-luisma';
+    sanitizedAdvisor.username = 'luisma';
+    sanitizedAdvisor.accountType = 'founder';
+    sanitizedAdvisor.role = 'admin';
+    sanitizedAdvisor.active = true;
+    sanitizedAdvisor.licenseStatus = 'active';
   } else {
-    db.studioAdvisors.push(advisor);
+    // Under no circumstances can any other account be director or founder
+    if (sanitizedAdvisor.accountType === 'director' || sanitizedAdvisor.accountType === 'founder') {
+      sanitizedAdvisor.accountType = 'internal_advisor';
+    }
+  }
+
+  if (idx >= 0) {
+    db.studioAdvisors[idx] = { ...db.studioAdvisors[idx], ...sanitizedAdvisor };
+  } else {
+    db.studioAdvisors.push(sanitizedAdvisor);
   }
   writeDbFile(db);
 }

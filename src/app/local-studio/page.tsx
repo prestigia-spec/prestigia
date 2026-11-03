@@ -1883,7 +1883,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
   // Advisors & Agencies List (for Admin tab)
   const [advisorsList, setAdvisorsList] = useState<StudioAdvisorUser[]>([]);
-  const [newAccountType, setNewAccountType] = useState<'director' | 'internal_advisor' | 'partner_agency'>('internal_advisor');
+  const [newAccountType, setNewAccountType] = useState<'internal_advisor' | 'partner_agency'>('internal_advisor');
   const [newAdvisorName, setNewAdvisorName] = useState('');
   const [newAdvisorUser, setNewAdvisorUser] = useState('');
   const [newAdvisorPass, setNewAdvisorPass] = useState('');
@@ -2901,15 +2901,15 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
           username: newAdvisorUser,
           password: newAdvisorPass,
           phone: newAdvisorPhone,
-          role: newAccountType === 'director' ? 'admin' : 'advisor',
+          role: 'advisor',
           accountType: newAccountType,
           country: newAdvisorCountry,
           city: newAdvisorCity,
           monthlyFeeUsd: Number(newAdvisorMonthlyFee) || 0,
           licenseStatus: newAdvisorLicenseStatus,
-          maxCreatesMonthly: Number(newAdvisorMaxCreates) || (newAccountType === 'partner_agency' ? 60 : newAccountType === 'director' ? 100 : 30),
-          maxAuditsMonthly: Number(newAdvisorMaxAudits) || (newAccountType === 'partner_agency' ? 60 : newAccountType === 'director' ? 100 : 30),
-          maxRescuesMonthly: Number(newAdvisorMaxRescues) || (newAccountType === 'partner_agency' ? 20 : newAccountType === 'director' ? 50 : 10),
+          maxCreatesMonthly: Number(newAdvisorMaxCreates) || (newAccountType === 'partner_agency' ? 60 : 30),
+          maxAuditsMonthly: Number(newAdvisorMaxAudits) || (newAccountType === 'partner_agency' ? 60 : 30),
+          maxRescuesMonthly: Number(newAdvisorMaxRescues) || (newAccountType === 'partner_agency' ? 20 : 10),
           active: true,
           masterKey: adminMasterKey,
         }),
@@ -2918,9 +2918,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
       const resData = await res.json();
       if (resData.success) {
         showToast(
-          newAccountType === 'director'
-            ? `👑 ¡Cuenta de Director General ${newAdvisorName} creada con éxito!`
-            : newAccountType === 'partner_agency'
+          newAccountType === 'partner_agency'
             ? `🏢 ¡Agencia Partner ${newAdvisorName} registrada y licenciada con éxito!`
             : `💼 ¡Asesor Comercial ${newAdvisorName} creado con éxito!`
         );
@@ -9025,7 +9023,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                   >
                     <option value="all">{isEn ? 'All Types' : 'Todos los Tipos'}</option>
-                    <option value="director">{isEn ? '👑 General Directors' : '👑 Directores Generales'}</option>
+                    <option value="director">{isEn ? '👑 General Directorate (Luisma)' : '👑 Dirección General (Luisma)'}</option>
                     <option value="internal_advisor">{isEn ? '💼 Sales Advisors' : '💼 Asesores Comerciales'}</option>
                     <option value="partner_agency">{isEn ? '🏢 Partner Agencies (B2B)' : '🏢 Agencias Partners (B2B)'}</option>
                   </select>
@@ -9744,27 +9742,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               </button>
             </div>
 
-            {/* Toggle Tipo de Cuenta: Fijo */}
+            {/* Toggle Tipo de Cuenta: Asesor o Agencia Partner (Dirección General es exclusiva y única de Luisma) */}
             <div className="p-3 bg-slate-950/80 border-b border-slate-800 shrink-0">
-              <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-slate-900 border border-slate-800 text-xs">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setNewAccountType('director');
-                    setNewAdvisorMaxCreates(100);
-                    setNewAdvisorMaxAudits(100);
-                    setNewAdvisorMaxRescues(50);
-                  }}
-                  className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
-                    newAccountType === 'director'
-                      ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Crown className="w-3.5 h-3.5 shrink-0" />
-                  <span className="truncate">{isEn ? 'Director' : 'Director Gral'}</span>
-                </button>
-
+              <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-slate-900 border border-slate-800 text-xs">
                 <button
                   type="button"
                   onClick={() => {
@@ -9773,14 +9753,14 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     setNewAdvisorMaxAudits(30);
                     setNewAdvisorMaxRescues(10);
                   }}
-                  className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
+                  className={`py-2 px-3 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1.5 text-xs ${
                     newAccountType === 'internal_advisor'
                       ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   <Briefcase className="w-3.5 h-3.5 shrink-0" />
-                  <span className="truncate">{isEn ? 'Advisor' : 'Asesor'}</span>
+                  <span className="truncate">{isEn ? 'Sales Advisor' : '💼 Asesor Comercial'}</span>
                 </button>
 
                 <button
@@ -9791,14 +9771,14 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     setNewAdvisorMaxAudits(60);
                     setNewAdvisorMaxRescues(20);
                   }}
-                  className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
+                  className={`py-2 px-3 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1.5 text-xs ${
                     newAccountType === 'partner_agency'
                       ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   <Building2 className="w-3.5 h-3.5 shrink-0" />
-                  <span className="truncate">{isEn ? 'Agency' : 'Agencia'}</span>
+                  <span className="truncate">{isEn ? 'Partner Agency' : '🏢 Agencia Partner'}</span>
                 </button>
               </div>
             </div>
@@ -9813,9 +9793,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-3.5 text-xs">
               <div>
                 <label className="block font-bold text-slate-300 mb-1">
-                  {newAccountType === 'director'
-                    ? (isEn ? 'General Director Full Name *' : 'Nombre Completo del Director General *')
-                    : newAccountType === 'partner_agency'
+                  {newAccountType === 'partner_agency'
                     ? (isEn ? 'Partner Agency Business Name *' : 'Razón Social o Nombre de la Agencia *')
                     : (isEn ? 'Sales Advisor Full Name *' : 'Nombre Completo del Asesor Comercial *')}
                 </label>
@@ -9824,9 +9802,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   value={newAdvisorName}
                   onChange={(e) => setNewAdvisorName(e.target.value)}
                   placeholder={
-                    newAccountType === 'director'
-                      ? (isEn ? 'e.g. Dr. Roberto Gómez' : 'Ej: Roberto Gómez')
-                      : newAccountType === 'partner_agency'
+                    newAccountType === 'partner_agency'
                       ? (isEn ? 'e.g. Apex Local Growth Agency' : 'Ej: Agencia Digital Rocket 360')
                       : (isEn ? 'e.g. Michael Smith' : 'Ej: Carlos Gómez')
                   }
@@ -10019,8 +9995,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               >
                 {isSavingAdvisor
                   ? 'Registrando...'
-                  : newAccountType === 'director'
-                  ? '👑 + Crear Cuenta Director General'
                   : newAccountType === 'partner_agency'
                   ? '🚀 Activar Licencia de Agencia Partner'
                   : '💼 + Crear Asesor Comercial'}
@@ -10065,8 +10039,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <label className="block font-bold text-slate-300 mb-1">
                   {editAdvisorAccountType === 'founder'
                     ? (isEn ? 'Founder & Master Director Name *' : 'Nombre del Fundador & Director General *')
-                    : editAdvisorAccountType === 'director'
-                    ? (isEn ? 'General Director Full Name *' : 'Nombre Completo del Director General *')
                     : editAdvisorAccountType === 'partner_agency'
                     ? (isEn ? 'Partner Agency Name *' : 'Razón Social o Nombre de la Agencia *')
                     : (isEn ? 'Advisor Full Name *' : 'Nombre Completo del Asesor *')}
@@ -10142,24 +10114,26 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-300 mb-1">{isEn ? 'Account Type' : 'Tipo de Cuenta'}</label>
-                  <select
-                    value={editAdvisorAccountType}
-                    disabled={editingAdvisor?.accountType === 'founder'}
-                    onChange={(e) => setEditAdvisorAccountType(e.target.value as any)}
-                    className={`w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none ${
-                      editingAdvisor?.accountType === 'founder' ? 'opacity-70 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    {editingAdvisor?.accountType === 'founder' ? (
-                      <option value="founder">👑 Fundador & Director General Master</option>
-                    ) : (
-                      <>
-                        <option value="director">{isEn ? '👑 General Director' : '👑 Dirección General'}</option>
-                        <option value="internal_advisor">{isEn ? '💼 Sales Advisor' : '💼 Asesor Comercial Interno'}</option>
-                        <option value="partner_agency">{isEn ? '🏢 Partner Agency (B2B)' : '🏢 Agencia Partner (Licencia Mensual)'}</option>
-                      </>
-                    )}
-                  </select>
+                  {editingAdvisor?.accountType === 'founder' ? (
+                    <div className="w-full px-3.5 py-2 rounded-xl bg-slate-950/80 border border-amber-500/40 text-amber-300 font-bold flex items-center justify-between text-xs">
+                      <span className="flex items-center gap-1.5">
+                        <Crown className="w-3.5 h-3.5 text-amber-400" />
+                        <span>👑 Fundador & Director General</span>
+                      </span>
+                      <span className="text-[10px] text-amber-400 font-black uppercase tracking-wider bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
+                        Único
+                      </span>
+                    </div>
+                  ) : (
+                    <select
+                      value={editAdvisorAccountType}
+                      onChange={(e) => setEditAdvisorAccountType(e.target.value as any)}
+                      className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none"
+                    >
+                      <option value="internal_advisor">{isEn ? '💼 Sales Advisor' : '💼 Asesor Comercial Interno'}</option>
+                      <option value="partner_agency">{isEn ? '🏢 Partner Agency (B2B)' : '🏢 Agencia Partner (Licencia Mensual)'}</option>
+                    </select>
+                  )}
                 </div>
 
                 <div>

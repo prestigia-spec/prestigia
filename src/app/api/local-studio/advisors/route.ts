@@ -81,22 +81,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'La contraseña es obligatoria al registrar una nueva cuenta' }, { status: 400 });
     }
 
+    const isLuisma = (id === 'adv-luisma' || username.trim().toLowerCase() === 'luisma');
+
+    // Strict Rule: Dirección General & Founder is exclusive to Luisma. No other account can have or change to this type.
+    const resolvedAccountType: 'founder' | 'internal_advisor' | 'partner_agency' = isLuisma
+      ? 'founder'
+      : (accountType === 'partner_agency' ? 'partner_agency' : 'internal_advisor');
+
     const advisorObj: StudioAdvisor = {
-      id: id || `adv-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
+      id: isLuisma ? 'adv-luisma' : (id || `adv-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`),
       name: name.trim(),
       username: username.trim().toLowerCase(),
       password: (password && password.trim()) ? password.trim() : (existing?.password || '1234'),
       phone: (phone !== undefined ? phone : (existing?.phone || '+573058314049')).trim(),
-      role: role === 'admin' || accountType === 'director' || accountType === 'founder' ? 'admin' : (existing?.role || 'advisor'),
-      accountType: accountType === 'partner_agency' ? 'partner_agency' : accountType === 'founder' ? 'founder' : accountType === 'director' ? 'director' : 'internal_advisor',
+      role: isLuisma ? 'admin' : (existing?.role || 'advisor'),
+      accountType: resolvedAccountType,
       country: (country || existing?.country || 'Colombia').trim(),
       city: (city || existing?.city || 'Bogotá').trim(),
       monthlyFeeUsd: monthlyFeeUsd !== undefined ? Number(monthlyFeeUsd) : (existing?.monthlyFeeUsd || 0),
-      licenseStatus: (accountType === 'founder' || id === 'adv-luisma' || username.trim().toLowerCase() === 'luisma') ? 'active' : (licenseStatus || existing?.licenseStatus || 'active'),
-      active: (accountType === 'founder' || id === 'adv-luisma' || username.trim().toLowerCase() === 'luisma') ? true : (active !== undefined ? Boolean(active) : (existing?.active ?? true)),
-      maxCreatesMonthly: maxCreatesMonthly !== undefined ? Number(maxCreatesMonthly) : (existing?.maxCreatesMonthly ?? (accountType === 'partner_agency' ? 60 : accountType === 'director' ? 100 : 30)),
-      maxAuditsMonthly: maxAuditsMonthly !== undefined ? Number(maxAuditsMonthly) : (existing?.maxAuditsMonthly ?? (accountType === 'partner_agency' ? 60 : accountType === 'director' ? 100 : 30)),
-      maxRescuesMonthly: maxRescuesMonthly !== undefined ? Number(maxRescuesMonthly) : (existing?.maxRescuesMonthly ?? (accountType === 'partner_agency' ? 20 : accountType === 'director' ? 50 : 10)),
+      licenseStatus: isLuisma ? 'active' : (licenseStatus || existing?.licenseStatus || 'active'),
+      active: isLuisma ? true : (active !== undefined ? Boolean(active) : (existing?.active ?? true)),
+      maxCreatesMonthly: maxCreatesMonthly !== undefined ? Number(maxCreatesMonthly) : (existing?.maxCreatesMonthly ?? (resolvedAccountType === 'partner_agency' ? 60 : 30)),
+      maxAuditsMonthly: maxAuditsMonthly !== undefined ? Number(maxAuditsMonthly) : (existing?.maxAuditsMonthly ?? (resolvedAccountType === 'partner_agency' ? 60 : 30)),
+      maxRescuesMonthly: maxRescuesMonthly !== undefined ? Number(maxRescuesMonthly) : (existing?.maxRescuesMonthly ?? (resolvedAccountType === 'partner_agency' ? 20 : 10)),
       createdAt: existing?.createdAt || new Date().toISOString(),
     };
 
