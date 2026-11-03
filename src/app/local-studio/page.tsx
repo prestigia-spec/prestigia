@@ -1964,6 +1964,26 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     }
   };
 
+  const handleResetCreateForm = () => {
+    setBusinessName('');
+    setNeighborhood('');
+    setContactName('');
+    setContactCompany('');
+    setContactPhone('');
+    setContactEmail('');
+    setContactRole('Dueño / Propietario');
+    setSpecialties('');
+    setPhone('');
+    setServiceAreas('');
+    setGoogleUrl('');
+    setCategory(categoryOptions[0] || CATEGORY_OPTIONS[0]);
+    setGeneratedData(null);
+    showToast(isEn ? '✨ Ready to create a new profile' : '✨ Formulario listo para crear una nueva ficha');
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   // -------------------------------------------------------------
   // 3. GENERATION ACTION (LIVE GEMINI + HEURISTIC ENGINE)
   // -------------------------------------------------------------
@@ -3666,6 +3686,16 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <span className="text-[10px] text-slate-400 block font-mono">{t.mod1Time}</span>
                     <span className="text-lg font-black text-emerald-400">{t.mod1TimeVal}</span>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={handleResetCreateForm}
+                    className="px-3.5 py-2 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-emerald-500/20 cursor-pointer shrink-0 active:scale-95"
+                    title={isEn ? 'Clear form to create another profile' : 'Crear una nueva ficha desde cero'}
+                  >
+                    <Plus className="w-4 h-4 text-slate-950" />
+                    <span>{isEn ? '+ New Profile' : '+ Crear Nueva Ficha'}</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -4002,6 +4032,18 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   )}
                 </button>
 
+                {/* Botón rápido Crear Nueva Ficha cuando ya hay una generada */}
+                {generatedData && (
+                  <button
+                    type="button"
+                    onClick={handleResetCreateForm}
+                    className="w-full py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 border-2 border-emerald-500/50 hover:border-emerald-400 text-emerald-300 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-98"
+                  >
+                    <Plus className="w-4 h-4 text-emerald-400" />
+                    <span>{isEn ? '+ Create Another New Profile' : '+ Crear Nueva Ficha'}</span>
+                  </button>
+                )}
+
                 {/* WhatsApp Request Kit Quick Button */}
                 {generatedData && (
                   <button
@@ -4094,7 +4136,18 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           {isEn ? 'Blueprint Ready: ' : 'Arquitectura Lista: '}<strong className="text-white">{businessName}</strong>
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {/* Botón: Crear Nueva Ficha */}
+                        <button
+                          type="button"
+                          onClick={handleResetCreateForm}
+                          className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-black transition flex items-center gap-1.5 shadow-md shadow-emerald-500/20 cursor-pointer active:scale-95"
+                          title={isEn ? 'Clear form to create another profile' : 'Crear otra nueva ficha desde cero'}
+                        >
+                          <Plus className="w-3.5 h-3.5 text-slate-950" />
+                          <span>{isEn ? '+ New Profile' : '+ Crear Nueva Ficha'}</span>
+                        </button>
+
                         {/* White-Label Logo Uploader */}
                         <div className="flex items-center gap-1">
                           <label
@@ -4886,6 +4939,18 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-black text-xs">
                   Plan a la Medida
                 </span>
+              </div>
+
+              {/* Bottom Quick Action: Crear Otra Nueva Ficha */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 pb-2 print:hidden">
+                <button
+                  type="button"
+                  onClick={handleResetCreateForm}
+                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm transition flex items-center gap-2 shadow-xl shadow-emerald-500/25 cursor-pointer active:scale-95"
+                >
+                  <Plus className="w-4 h-4 text-slate-950" />
+                  <span>{isEn ? '+ Create Another New Profile' : '+ Crear Otra Nueva Ficha'}</span>
+                </button>
               </div>
             </div>
 
