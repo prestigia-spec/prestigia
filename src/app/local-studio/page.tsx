@@ -1482,8 +1482,7 @@ export default function LocalStudioPage() {
   const [showAddCityModal, setShowAddCityModal] = useState<boolean>(false);
   const [targetCountryForNewCity, setTargetCountryForNewCity] = useState<string>('Colombia');
   const [newCountryInput, setNewCountryInput] = useState<string>('');
-  const [newCountryCityInput, setNewCountryCityInput] = useState<string>('');
-  const [newCityInput, setNewCityInput] = useState<string>('');
+    const [newCityInput, setNewCityInput] = useState<string>('');
 
   // Closing modal location states
   const [closingFormCountry, setClosingFormCountry] = useState<string>('Colombia');
@@ -1561,7 +1560,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const handleSaveNewCountry = () => {
     const trimmedCountry = newCountryInput.trim();
     if (!trimmedCountry) return;
-    const trimmedCity = newCountryCityInput.trim();
 
     setCustomCountries((prev) => {
       const updated = Array.from(new Set([...prev, trimmedCountry]));
@@ -1571,31 +1569,18 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
       return updated;
     });
 
-    if (trimmedCity) {
-      setCustomCitiesByCountry((prev) => {
-        const existing = prev[trimmedCountry] || [];
-        const updated = { ...prev, [trimmedCountry]: Array.from(new Set([...existing, trimmedCity])) };
-        try {
-          localStorage.setItem('prestigia_custom_geo_cities', JSON.stringify(updated));
-        } catch {}
-        return updated;
-      });
-      setCity(trimmedCity);
-    } else {
-      const def = (WORLD_REGIONS_GEO[trimmedCountry] || [])[0] || '';
-      if (def) setCity(def);
-    }
-
     setCountry(trimmedCountry);
+    setDossierCountryFilter(trimmedCountry);
+    setDossierCityFilter('all');
+    setDossierNeighborhoodFilter('all');
     setNewCountryInput('');
-    setNewCountryCityInput('');
     setShowAddCountryModal(false);
     showToast(`✓ País "${trimmedCountry}" agregado y seleccionado con éxito`);
   };
 
   const handleSaveNewCity = () => {
     const trimmedCity = newCityInput.trim();
-    const targetC = targetCountryForNewCity || country || 'Colombia';
+    const targetC = targetCountryForNewCity || (dossierCountryFilter !== 'all' ? dossierCountryFilter : country) || 'Colombia';
     if (!trimmedCity) return;
 
     setCustomCitiesByCountry((prev) => {
@@ -1612,6 +1597,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     }
     if (closingFormCountry === targetC) {
       setClosingFormCity(trimmedCity);
+    }
+    if (dossierCountryFilter === targetC) {
+      setDossierCityFilter(trimmedCity);
     }
 
     setNewCityInput('');
@@ -2425,26 +2413,28 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   }, [luismaBaseDossiers, allCountriesList]);
 
   const dossierAvailableCities = useMemo(() => {
-    const set = new Set<string>();
+    // Si no hay país seleccionado, NO aparece ninguna ciudad en la lista
     if (dossierCountryFilter === 'all') {
-      luismaBaseDossiers.forEach((d) => {
-        if (d.city) set.add(d.city);
-      });
-    } else {
-      const countryCities = getCitiesForCountry(dossierCountryFilter);
-      countryCities.forEach((c) => set.add(c));
-      luismaBaseDossiers.forEach((d) => {
-        if ((d.country || 'Colombia') === dossierCountryFilter && d.city) set.add(d.city);
-      });
+      return [];
     }
+    const set = new Set<string>();
+    const countryCities = getCitiesForCountry(dossierCountryFilter);
+    countryCities.forEach((c) => set.add(c));
+    luismaBaseDossiers.forEach((d) => {
+      if ((d.country || 'Colombia') === dossierCountryFilter && d.city) set.add(d.city);
+    });
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [luismaBaseDossiers, dossierCountryFilter, customCitiesByCountry]);
 
   const dossierAvailableNeighborhoods = useMemo(() => {
+    // Si no hay país o no hay ciudad seleccionada, NO aparece ningún barrio en la lista
+    if (dossierCountryFilter === 'all' || dossierCityFilter === 'all') {
+      return [];
+    }
     const set = new Set<string>();
     luismaBaseDossiers.forEach((d) => {
-      if (dossierCountryFilter !== 'all' && (d.country || 'Colombia') !== dossierCountryFilter) return;
-      if (dossierCityFilter !== 'all' && d.city.toLowerCase() !== dossierCityFilter.toLowerCase()) return;
+      if ((d.country || 'Colombia') !== dossierCountryFilter) return;
+      if (d.city.toLowerCase() !== dossierCityFilter.toLowerCase()) return;
       if (d.neighborhood) set.add(d.neighborhood);
     });
     return Array.from(set).sort((a, b) => a.localeCompare(b));
@@ -3364,7 +3354,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             title="Agregar otro País al catálogo"
                           >
                             <Plus className="w-3 h-3" />
-                            <span>Agregar País</span>
+                            <span>País</span>
                           </button>
                         </div>
                         <select
@@ -3405,7 +3395,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             title={`Agregar otra Ciudad a ${country}`}
                           >
                             <Plus className="w-3 h-3" />
-                            <span>Agregar Ciudad</span>
+                            <span>Ciudad</span>
                           </button>
                         </div>
                         <select
@@ -7404,11 +7394,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <button
                       type="button"
                       onClick={() => setShowAddCountryModal(true)}
-                      className="text-[9px] text-amber-400/90 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
+                      className="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[10px] font-bold flex items-center gap-1 border border-amber-500/30 transition cursor-pointer"
                       title="Registrar nuevo País"
                     >
                       <Plus className="w-2.5 h-2.5" />
-                      <span>+ País</span>
+                      <span>País</span>
                     </button>
                   </div>
                   <select
@@ -7446,23 +7436,22 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       <Building2 className="w-3 h-3 text-amber-400" />
                       <span>2º {tDossiers.filterCity}</span>
                     </label>
-                    {dossierCountryFilter !== 'all' && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setTargetCountryForNewCity(dossierCountryFilter);
-                          setShowAddCityModal(true);
-                        }}
-                        className="text-[9px] text-amber-400/90 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
-                        title={`Registrar nueva Ciudad en ${dossierCountryFilter}`}
-                      >
-                        <Plus className="w-2.5 h-2.5" />
-                        <span>+ Ciudad</span>
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTargetCountryForNewCity(dossierCountryFilter !== 'all' ? dossierCountryFilter : country || 'Colombia');
+                        setShowAddCityModal(true);
+                      }}
+                      className="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[10px] font-bold flex items-center gap-1 border border-amber-500/30 transition cursor-pointer"
+                      title="Registrar nueva Ciudad"
+                    >
+                      <Plus className="w-2.5 h-2.5" />
+                      <span>Ciudad</span>
+                    </button>
                   </div>
                   <select
                     value={dossierCityFilter}
+                    disabled={dossierCountryFilter === 'all'}
                     onChange={(e) => {
                       if (e.target.value === '__add_new__') {
                         setTargetCountryForNewCity(dossierCountryFilter !== 'all' ? dossierCountryFilter : 'Colombia');
@@ -7472,62 +7461,75 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         setDossierNeighborhoodFilter('all');
                       }
                     }}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 transition cursor-pointer"
+                    className={`w-full px-3 py-2 rounded-xl text-xs focus:outline-none transition ${
+                      dossierCountryFilter === 'all'
+                        ? 'bg-slate-900/60 border border-slate-800/80 text-slate-500 cursor-not-allowed opacity-60'
+                        : 'bg-slate-950 border border-slate-800 text-white focus:border-amber-400 cursor-pointer'
+                    }`}
                   >
-                    <option value="all">
-                      {dossierCountryFilter === 'all'
-                        ? '🏙️ Todas las Ciudades (o filtra por país primero)'
-                        : `🏙️ Todas las Ciudades de ${dossierCountryFilter}`}
-                    </option>
-                    {dossierAvailableCities.map((city) => {
-                      const count = luismaBaseDossiers.filter(
-                        (d) =>
-                          (dossierCountryFilter === 'all' || (d.country || 'Colombia') === dossierCountryFilter) &&
-                          d.city.toLowerCase() === city.toLowerCase()
-                      ).length;
-                      return (
-                        <option key={city} value={city}>
-                          {city} {count > 0 ? `(${count})` : ''}
+                    {dossierCountryFilter === 'all' ? (
+                      <option value="all">🔒 Selecciona un país primero</option>
+                    ) : (
+                      <>
+                        <option value="all">🏙️ Todas las Ciudades de {dossierCountryFilter} ({dossierAvailableCities.length})</option>
+                        {dossierAvailableCities.map((city) => {
+                          const count = luismaBaseDossiers.filter(
+                            (d) =>
+                              (d.country || 'Colombia') === dossierCountryFilter &&
+                              d.city.toLowerCase() === city.toLowerCase()
+                          ).length;
+                          return (
+                            <option key={city} value={city}>
+                              {city} {count > 0 ? `(${count})` : ''}
+                            </option>
+                          );
+                        })}
+                        <option value="__add_new__" className="text-amber-400 font-bold">
+                          + Agregar otra Ciudad a {dossierCountryFilter}...
                         </option>
-                      );
-                    })}
-                    {dossierCountryFilter !== 'all' && (
-                      <option value="__add_new__" className="text-amber-400 font-bold">
-                        + Agregar otra Ciudad a {dossierCountryFilter}...
-                      </option>
+                      </>
                     )}
                   </select>
                 </div>
 
-                {/* 3º Filtro: Localidad / Barrio Condicionado */}
+                {/* 3º Filtro: Localidad / Barrio Condicionado a la Ciudad */}
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
                     3º {tDossiers.filterNeighborhood}
                   </label>
                   <select
                     value={dossierNeighborhoodFilter}
+                    disabled={dossierCountryFilter === 'all' || dossierCityFilter === 'all'}
                     onChange={(e) => setDossierNeighborhoodFilter(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 transition cursor-pointer"
+                    className={`w-full px-3 py-2 rounded-xl text-xs focus:outline-none transition ${
+                      dossierCountryFilter === 'all' || dossierCityFilter === 'all'
+                        ? 'bg-slate-900/60 border border-slate-800/80 text-slate-500 cursor-not-allowed opacity-60'
+                        : 'bg-slate-950 border border-slate-800 text-white focus:border-amber-400 cursor-pointer'
+                    }`}
                   >
-                    <option value="all">
-                      {dossierCityFilter !== 'all'
-                        ? `📍 Todos los Barrios de ${dossierCityFilter}`
-                        : tDossiers.filterAllNeighborhoods}
-                    </option>
-                    {dossierAvailableNeighborhoods.map((n) => {
-                      const count = luismaBaseDossiers.filter(
-                        (d) =>
-                          (dossierCountryFilter === 'all' || (d.country || 'Colombia') === dossierCountryFilter) &&
-                          (dossierCityFilter === 'all' || d.city.toLowerCase() === dossierCityFilter.toLowerCase()) &&
-                          d.neighborhood &&
-                          d.neighborhood.toLowerCase() === n.toLowerCase()
-                      ).length;
-                      return (
-                        <option key={n} value={n}>
-                          {n} {count > 0 ? `(${count})` : ''}
-                        </option>
-                      );
-                    })}
+                    {dossierCountryFilter === 'all' ? (
+                      <option value="all">🔒 Selecciona un país primero</option>
+                    ) : dossierCityFilter === 'all' ? (
+                      <option value="all">🔒 Selecciona una ciudad primero</option>
+                    ) : (
+                      <>
+                        <option value="all">📍 Todos los Barrios de {dossierCityFilter} ({dossierAvailableNeighborhoods.length})</option>
+                        {dossierAvailableNeighborhoods.map((n) => {
+                          const count = luismaBaseDossiers.filter(
+                            (d) =>
+                              (d.country || 'Colombia') === dossierCountryFilter &&
+                              d.city.toLowerCase() === dossierCityFilter.toLowerCase() &&
+                              d.neighborhood &&
+                              d.neighborhood.toLowerCase() === n.toLowerCase()
+                          ).length;
+                          return (
+                            <option key={n} value={n}>
+                              {n} {count > 0 ? `(${count})` : ''}
+                            </option>
+                          );
+                        })}
+                      </>
+                    )}
                   </select>
                 </div>
 
@@ -7864,7 +7866,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             className="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
                           >
                             <Plus className="w-2.5 h-2.5" />
-                            <span>+ País</span>
+                            <span>País</span>
                           </button>
                         </div>
                         <select
@@ -7904,7 +7906,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             className="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
                           >
                             <Plus className="w-2.5 h-2.5" />
-                            <span>+ Ciudad</span>
+                            <span>Ciudad</span>
                           </button>
                         </div>
                         <select
@@ -8891,8 +8893,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 onClick={() => {
                   setShowAddCountryModal(false);
                   setNewCountryInput('');
-                  setNewCountryCityInput('');
-                }}
+                                  }}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
@@ -8919,25 +8920,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   }}
                 />
               </div>
-
-              <div>
-                <label className="block text-slate-300 font-bold mb-1">
-                  Ciudad Principal Inicial (Opcional)
-                </label>
-                <input
-                  type="text"
-                  value={newCountryCityInput}
-                  onChange={(e) => setNewCountryCityInput(e.target.value)}
-                  placeholder="Ej: La Paz, Sydney, Ámsterdam, Asunción..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleSaveNewCountry();
-                    }
-                  }}
-                />
-              </div>
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
@@ -8946,8 +8928,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 onClick={() => {
                   setShowAddCountryModal(false);
                   setNewCountryInput('');
-                  setNewCountryCityInput('');
-                }}
+                                  }}
                 className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
               >
                 Cancelar
