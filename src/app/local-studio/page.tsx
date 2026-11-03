@@ -6573,24 +6573,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
               {/* Right Column: Interactive Protocol & Evidentiary Dossier (7 cols) */}
               <div className="lg:col-span-7 space-y-4">
-                {/* Action Bar Header with New Rescue Button */}
-                <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-900 border border-slate-800 print:hidden">
-                  <div className="flex items-center gap-2">
-                    <ShieldAlert className="w-4 h-4 text-rose-400" />
-                    <span className="text-xs font-black text-white">
-                      {isEn ? 'Rescue & Legal Reclaim Protocol' : 'Protocolo Legal de Rescate & Titularidad'}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleResetRescueForm}
-                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-slate-950 text-xs font-black transition flex items-center gap-1.5 shadow-md shadow-rose-500/20 cursor-pointer active:scale-95"
-                    title={isEn ? 'Clear form to run another rescue' : 'Realizar otro nuevo rescate desde cero'}
-                  >
-                    <Plus className="w-3.5 h-3.5 text-slate-950" />
-                    <span>{isEn ? 'New Rescue' : 'Nuevo Rescate'}</span>
-                  </button>
-                </div>
                 {/* Protocol Roadmap Card */}
                 <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-5 text-xs shadow-xl">
                   {rescueScenario === 'orphan' && (
