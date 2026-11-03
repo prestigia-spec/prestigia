@@ -3694,7 +3694,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     title={isEn ? 'Clear form to create another profile' : 'Crear una nueva ficha desde cero'}
                   >
                     <Plus className="w-4 h-4 text-slate-950" />
-                    <span>{isEn ? '+ New Profile' : '+ Crear Nueva Ficha'}</span>
+                    <span>{isEn ? 'New Profile' : 'Crear Nueva Ficha'}</span>
                   </button>
                 </div>
               </div>
@@ -4040,7 +4040,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     className="w-full py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 border-2 border-emerald-500/50 hover:border-emerald-400 text-emerald-300 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-98"
                   >
                     <Plus className="w-4 h-4 text-emerald-400" />
-                    <span>{isEn ? '+ Create Another New Profile' : '+ Crear Nueva Ficha'}</span>
+                    <span>{isEn ? 'Create Another Profile' : 'Crear Nueva Ficha'}</span>
                   </button>
                 )}
 
@@ -4145,7 +4145,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           title={isEn ? 'Clear form to create another profile' : 'Crear otra nueva ficha desde cero'}
                         >
                           <Plus className="w-3.5 h-3.5 text-slate-950" />
-                          <span>{isEn ? '+ New Profile' : '+ Crear Nueva Ficha'}</span>
+                          <span>{isEn ? 'New Profile' : 'Crear Nueva Ficha'}</span>
                         </button>
 
                         {/* White-Label Logo Uploader */}
@@ -4949,7 +4949,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm transition flex items-center gap-2 shadow-xl shadow-emerald-500/25 cursor-pointer active:scale-95"
                 >
                   <Plus className="w-4 h-4 text-slate-950" />
-                  <span>{isEn ? '+ Create Another New Profile' : '+ Crear Otra Nueva Ficha'}</span>
+                  <span>{isEn ? 'Create Another Profile' : 'Crear Otra Nueva Ficha'}</span>
                 </button>
               </div>
             </div>
@@ -9038,7 +9038,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer flex items-center gap-1.5 shadow-md active:scale-98"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>{isEn ? '+ Register Advisor / Agency' : '+ Registrar Asesor o Licenciar Agencia'}</span>
+                  <span>{isEn ? 'Register Advisor / Agency' : 'Registrar Asesor o Licenciar Agencia'}</span>
                 </button>
               </div>
 
