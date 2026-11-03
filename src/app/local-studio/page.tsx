@@ -1077,13 +1077,13 @@ const TXT_DOSSIERS = {
     sendWhatsappKit: 'Enviar Kit por WhatsApp',
     deleteDossier: 'Eliminar Expediente',
     confirmDelete: '¿Eliminar este expediente de forma definitiva?',
-    statusPrestigiaSubscriber: '💎 Prestigia ($199/m • Setup $0)',
+    statusPrestigiaSubscriber: '💎 Plan Prestigia (A la Medida • Setup $0)',
     statusSetupPaid: '💵 Setup Cobrado',
     statusProposalSent: '⏳ Propuesta Enviada',
     statusNegotiating: '🤝 En Negociación',
     statusLeadDraft: '📝 Prospección',
     btnManageClosing: '⚙️ Cierre & Cobro',
-    pricingBenchmarkNotice: 'Precios Reales: Creación $150-$250 | Auditoría $200-$350 | Rescate $250-$450 USD | Prestigia $149-$199/mes',
+    pricingBenchmarkNotice: 'Baremos de Mercado: Creación $150-$250 | Auditoría $200-$350 | Rescate $250-$450 USD | Planes Prestigia: A la Medida',
   },
   en: {
     privateBadge: '⭐ Private Client Portfolio',
@@ -1125,13 +1125,13 @@ const TXT_DOSSIERS = {
     sendWhatsappKit: 'Send Kit via WhatsApp',
     deleteDossier: 'Delete Dossier',
     confirmDelete: 'Are you sure you want to permanently delete this dossier?',
-    statusPrestigiaSubscriber: '💎 Prestigia ($199/mo • Setup $0)',
+    statusPrestigiaSubscriber: '💎 Prestigia Plan (Custom • Setup $0)',
     statusSetupPaid: '💵 Setup Paid',
     statusProposalSent: '⏳ Proposal Sent',
     statusNegotiating: '🤝 In Negotiation',
     statusLeadDraft: '📝 Lead / Draft',
     btnManageClosing: '⚙️ Closing & Monetization',
-    pricingBenchmarkNotice: 'Real Benchmarks: Setup $150-$250 | Audit $200-$350 | Rescue $250-$450 USD | Prestigia $149-$199/mo',
+    pricingBenchmarkNotice: 'Market Benchmarks: Setup $150-$250 | Audit $200-$350 | Rescue $250-$450 USD | Prestigia Plans: Custom Tailored',
   },
 };
 
@@ -4034,20 +4034,20 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   </div>
                   <div>
                     <strong className="text-white text-xs block mb-1">
-                      {isEn ? 'Setup Fee + 100% Waiver Closing Hook' : 'Setup Fee de Creación + Gancho 100% Bonificado'}
+                      {isEn ? 'Technical Setup Waiver Closing Hook' : 'Setup Fee de Creación 100% Bonificado'}
                     </strong>
                     <p className="text-[11px] text-slate-300 leading-relaxed">
                       {isEn
-                        ? 'Charge a $150–$250 USD Setup Fee for initial Google Maps architecture, or waive it 100% ($0 USD) as an irresistible closing hook when the client subscribes to the full annual Prestigia NFC review plan.'
-                        : 'Cobra un Setup Fee de $150 a $250 USD por la arquitectura de creación, o bonifícalo al 100% ($0 USD) como gancho de cierre si el cliente adquiere el Plan Anual Prestigia (Tarjetas inteligentes NFC + Captura de reseñas 5★).'}
+                        ? 'Waive 100% of the technical setup fee ($0 implementation cost) as an irresistible closing hook when the client subscribes to their tailored Prestigia plan (Smart NFC cards + 5★ Review Accelerator).'
+                        : 'Bonifica el 100% del setup técnico ($0 costo de implementación) como gancho de cierre de alto impacto si el cliente adquiere su Plan Prestigia a la medida (Tarjetas inteligentes NFC + Captura de reseñas 5★).'}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => {
                       const scriptText = isEn
-                        ? `Hello ${businessName || 'Business Owner'}, our initial Setup Fee to build, verify, and architect your Google Maps profile for Top 3 rankings is $150 USD. However, if you subscribe today to our full Prestigia Annual Plan (Smart NFC devices + 5★ Review Accelerator), we WAIVE 100% of the setup fee ($0 creation cost). Shall we reserve your slot and launch this week?`
-                        : `Hola estimado/a ${businessName || 'propietario'}, para crear, verificar y estructurar su ficha en Google Maps con arquitectura de posicionamiento Top 3, nuestros honorarios de configuración inicial son de $150 USD. Sin embargo, si adquiere hoy nuestro Plan Anual Prestigia (Tarjetas Inteligentes NFC + Sistema de Reseñas 5★), le BONIFICAMOS el 100% del Setup Fee ($0 costo de creación). ¿Le reservo el cupo y coordinamos la verificación esta semana?`;
+                        ? `Hello ${businessName || 'Business Owner'}, to build, verify, and architect your Google Maps profile for Top 3 rankings, our technical setup fee is 100% WAIVED ($0 implementation cost) when you activate your tailored Prestigia plan for your business (Smart NFC devices + 5★ Review Accelerator). Shall we reserve your slot and launch this week?`
+                        : `Hola estimado/a ${businessName || 'propietario'}, para crear, verificar y estructurar su ficha en Google Maps con arquitectura de posicionamiento Top 3, le BONIFICAMOS el 100% del Setup Fee técnico ($0 costo de implementación) al activar su Plan Prestigia a la medida de su negocio (Tarjetas Inteligentes NFC + Sistema de Reseñas 5★). ¿Le reservo el cupo y coordinamos la activación esta semana?`;
                       copyToClipboard(scriptText, isEn ? 'Setup Fee Proposal' : 'Propuesta de Setup Fee');
                     }}
                     className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
@@ -4832,7 +4832,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <button
                   type="button"
                   onClick={() => {
-                    const script = `Hola ${businessName || 'Emprendedor'}, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de ${category || 'su sector'} en ${city || 'su ciudad'} y notamos una situación crítica: su negocio sencillamente NO existe en Google Maps. Hoy en día, el 70% de las personas que van a comprar o contratar un servicio eligen entre los 3 primeros perfiles que aparecen en el mapa. Cada día que pasa sin ficha, son decenas de clientes que terminan comprándole a su competencia más cercana. En Prestigia no solo creamos y verificamos su ficha oficial ante Google sin riesgo de suspensión, sino que le instalamos la arquitectura para posicionarlo en el Top 3 y le entregamos tarjetas Smart NFC para capturar reseñas 5 estrellas en su local. El trabajo técnico de creación tiene un costo único de $200 USD, pero si activa hoy el Plan Mensual Prestigia ($149 a $199 USD/mes), le bonificamos el 100% del setup técnico ($0 USD) y le entregamos la ficha lista para facturar. ¿Agendamos la grabación del video de 60 segundos hoy mismo?`;
+                    const script = `Hola ${businessName || 'Emprendedor'}, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de ${category || 'su sector'} en ${city || 'su ciudad'} y notamos una situación crítica: su negocio sencillamente NO existe en Google Maps. Hoy en día, el 70% de las personas que van a comprar o contratar un servicio eligen entre los 3 primeros perfiles que aparecen en el mapa. Cada día que pasa sin ficha, son decenas de clientes que terminan comprándole a su competencia más cercana. En Prestigia no solo creamos y verificamos su ficha oficial ante Google sin riesgo de suspensión, sino que le instalamos la arquitectura para posicionarlo en el Top 3 y le entregamos tarjetas Smart NFC para capturar reseñas 5 estrellas en su local. Al activar hoy su Plan Prestigia a la medida para su negocio, le bonificamos el 100% del setup técnico ($0 costo de creación) y le entregamos la ficha lista para facturar. ¿Agendamos la grabación del video de 60 segundos hoy mismo?`;
                     copyToClipboard(script, 'Guión de Venta de Creación');
                   }}
                   className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer shrink-0 active:scale-98"
@@ -4880,11 +4880,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     🎁 El Gancho de Cierre Prestigia ($0 Setup):
                   </span>
                   <p className="text-slate-300 text-[11px] mt-0.5">
-                    "La creación técnica cuesta <strong>$200 USD</strong>. Pero si contratas hoy el <strong>Plan Mensual Prestigia ($149 a $199 USD/mes)</strong>, te bonificamos el 100% del setup técnico (<strong>$0 USD</strong>) y te incluimos las tarjetas Smart NFC."
+                    "Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, te bonificamos el 100% del setup técnico de creación (<strong>$0 costo de implementación</strong>) y te incluimos las tarjetas y dispositivos Smart NFC."
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-black text-xs">
-                  Cierre 100% Efectivo
+                  Plan a la Medida
                 </span>
               </div>
             </div>
@@ -5409,26 +5409,26 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   </div>
                   <div>
                     <strong className="text-white text-xs block mb-1">
-                      {isEn ? 'Audit & Upgrade Setup Fee + 100% Waiver' : 'Setup Fee de Auditoría & Gancho 100% Bonificado'}
+                      {isEn ? 'Audit & Upgrade Setup Waiver' : 'Setup Fee de Auditoría 100% Bonificado'}
                     </strong>
                     <p className="text-[11px] text-slate-300 leading-relaxed">
                       {isEn
-                        ? 'Charge a $150–$250 USD Setup Fee for forensic listing overhaul and Top 3 upgrade, or waive it 100% ($0 USD) as an irresistible hook when the client signs up for the annual Prestigia NFC review plan.'
-                        : 'Cobra un Setup Fee de $150 a $250 USD por la auditoría forense y optimización profunda al Top 3, o bonifícalo al 100% ($0 USD) como gancho de cierre si el cliente adquiere el Plan Anual Prestigia (Tarjetas inteligentes NFC + Captura de reseñas 5★).'}
+                        ? 'Waive 100% of the forensic overhaul fee ($0 implementation cost) as an irresistible hook when the client acquires their tailored Prestigia plan.'
+                        : 'Bonifica el 100% del setup técnico de auditoría y reingeniería ($0 costo de implementación) como gancho de cierre al adquirir su Plan Prestigia a la medida (Tarjetas inteligentes NFC + Captura de reseñas 5★).'}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => {
                       const scriptText = isEn
-                        ? `Hello ${businessName || 'Business Owner'}, after performing our forensic audit on your Google Maps listing, we identified critical gaps keeping you outside the Top 3. Our deep optimization Setup Fee is regularly $150 USD. However, if you activate our Prestigia Annual Plan (Smart NFC devices + 5★ Review System), we WAIVE 100% of the optimization fee ($0 USD). Shall we lock in this waiver and elevate your listing this week?`
-                        : `Hola estimado/a ${businessName || 'propietario'}, tras auditar su negocio en Google Maps detectamos fallas críticas que le hacen perder clientes frente a la competencia. Nuestro Setup Fee por la optimización forense al Top 3 es de $150 USD. Sin embargo, si adquiere hoy nuestro Plan Anual Prestigia (Tarjetas Inteligentes NFC + Sistema de Reseñas 5★), le BONIFICAMOS el 100% de la optimización ($0 USD). ¿Le gustaría aprovechar esta bonificación y activar su plan anual?`;
+                        ? `Hello ${businessName || 'Business Owner'}, after performing our forensic audit on your Google Maps listing, we identified critical gaps keeping you outside the Top 3. When you activate our tailored Prestigia plan for your business (Smart NFC devices + 5★ Review System), we WAIVE 100% of the deep optimization setup fee ($0 USD). Shall we lock in this waiver and elevate your listing this week?`
+                        : `Hola estimado/a ${businessName || 'propietario'}, tras auditar su negocio en Google Maps detectamos fallas críticas que le hacen perder clientes frente a la competencia. Al adquirir su Plan Prestigia a la medida (Tarjetas Inteligentes NFC + Sistema de Reseñas 5★), le BONIFICAMOS el 100% de la optimización técnica ($0 USD). ¿Le gustaría aprovechar esta bonificación y activar su plan a la medida?`;
                       copyToClipboard(scriptText, isEn ? 'Audit Proposal' : 'Propuesta de Auditoría');
                     }}
                     className="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
                   >
                     <Copy className="w-3.5 h-3.5" />
-                    <span>{isEn ? 'Copy Annual Plan Closing Script (WhatsApp)' : 'Copiar Propuesta Comercial de Cierre (WhatsApp)'}</span>
+                    <span>{isEn ? 'Copy Tailored Plan Closing Script (WhatsApp)' : 'Copiar Propuesta Comercial de Cierre (WhatsApp)'}</span>
                   </button>
                 </div>
               </div>
@@ -5795,7 +5795,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <button
                   type="button"
                   onClick={() => {
-                    const script = `Hola ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos minuciosamente su perfil de Google Maps en ${city || 'su ciudad'} y descubrimos la razón exacta por la cual no está apareciendo en los primeros 3 lugares: su ficha tiene 3 fugas algorítmicas críticas (carece de categorías secundarias de búsqueda transaccional, su catálogo de servicios no tiene precios y su flujo de opiniones está estancado). Nuestros cálculos muestran que está perdiendo aproximadamente entre $1,000 y $3,000 USD mensuales en clientes que se van con sus competidores del Top 3. En Prestigia reestructuramos el 100% de su perfil y le instalamos nuestros dispositivos Smart NFC en mesa para inyectar reseñas 5 estrellas semanales y superar a sus rivales. La reingeniería y auditoría técnica cuesta $250 USD en el mercado, pero si activa hoy el Plan Mensual Prestigia ($199 USD/mes), nosotros absorbemos el 100% del setup técnico ($0 USD bonificado). ¿Le gustaría ver la comparativa directa frente a su competidor más fuerte?`;
+                    const script = `Hola ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos minuciosamente su perfil de Google Maps en ${city || 'su ciudad'} y descubrimos la razón exacta por la cual no está apareciendo en los primeros 3 lugares: su ficha tiene 3 fugas algorítmicas críticas (carece de categorías secundarias de búsqueda transaccional, su catálogo de servicios no tiene precios y su flujo de opiniones está estancado). Nuestros cálculos muestran que está perdiendo aproximadamente entre $1,000 y $3,000 USD mensuales en clientes que se van con sus competidores del Top 3. En Prestigia reestructuramos el 100% de su perfil y le instalamos nuestros dispositivos Smart NFC en mesa para inyectar reseñas 5 estrellas semanales y superar a sus rivales. Al activar hoy su Plan Prestigia a la medida para su negocio, nosotros absorbemos el 100% del setup técnico de optimización ($0 costo de implementación bonificado). ¿Le gustaría ver la comparativa directa frente a su competidor más fuerte?`;
                     copyToClipboard(script, 'Guión de Venta de Auditoría');
                   }}
                   className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer shrink-0 active:scale-98"
@@ -5843,11 +5843,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     🎁 El Gancho de Cierre Prestigia ($0 Setup):
                   </span>
                   <p className="text-slate-300 text-[11px] mt-0.5">
-                    "La auditoría forense y reestructuración cuesta <strong>$250 USD</strong>. Pero si contratas hoy el <strong>Plan Mensual Prestigia ($199 USD/mes)</strong>, el setup técnico te queda en <strong>$0 USD (100% bonificado)</strong> y te entregamos los dispositivos Smart NFC."
+                    "Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, el setup técnico de reingeniería y optimización te queda en <strong>$0 (100% bonificado)</strong> y te entregamos los dispositivos Smart NFC incluidos."
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black text-xs">
-                  Cierre Dual ROI
+                  Plan a la Medida
                 </span>
               </div>
             </div>
@@ -6362,26 +6362,26 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   </div>
                   <div>
                     <strong className="text-white text-xs block mb-1">
-                      {isEn ? 'Rescue Setup Fee + 100% Waiver Closing Hook' : 'Setup Fee de Rescate + Gancho 100% Bonificado'}
+                      {isEn ? 'Rescue Management Waiver Closing Hook' : 'Gestión Legal de Rescate 100% Bonificada'}
                     </strong>
                     <p className="text-[11px] text-slate-300 leading-relaxed">
                       {isEn
-                        ? 'Charge a $150–$250 USD Setup Fee for legal listing rescue and ownership transfer, or waive it 100% ($0 USD) as an irresistible hook when the client purchases an annual Prestigia NFC review plan.'
-                        : 'Cobra un Setup Fee de $150 a $250 USD por rescatar y transferir la titularidad legal, o bonifícalo al 100% ($0 USD) como gancho de cierre si el cliente adquiere el Plan Anual Prestigia (Tarjetas inteligentes NFC + Captura de reseñas 5★).'}
+                        ? 'Waive 100% of the legal ownership recovery fee ($0 cost) as an irresistible hook when the client acquires their tailored Prestigia plan (Smart NFC cards + 5★ Review Accelerator).'
+                        : 'Bonifica el 100% de los honorarios técnicos y legales de rescate ($0 costo) como gancho de cierre al adquirir su Plan Prestigia a la medida de su negocio (Tarjetas inteligentes NFC + Captura de reseñas 5★).'}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => {
                       const scriptText = isEn
-                        ? `Hello ${businessName || 'Business Owner'}, our legal ownership recovery Setup Fee to reclaim and transfer your Google Maps profile to your direct account is $150 USD. However, if you subscribe today to our full Prestigia Annual Plan (Smart NFC devices + 5★ Review Accelerator), we WAIVE 100% of the rescue fee ($0 cost). You get your listing back completely free and your reputation secured all year round. Shall we start the protocol today?`
-                        : `Hola estimado/a ${businessName || 'propietario'}, para recuperar la titularidad legal de su ficha en Google Maps y transferir el control total a su cuenta oficial mediante el protocolo de Google, nuestros honorarios de gestión son de $150 USD. Sin embargo, si adquiere hoy nuestro Plan Anual Prestigia (Tarjetas Inteligentes NFC + Sistema de Reseñas 5★), le BONIFICAMOS el 100% del rescate ($0 USD). Recupera su ficha gratis y blindamos su reputación todo el año. ¿Iniciamos el protocolo hoy?`;
+                        ? `Hello ${businessName || 'Business Owner'}, to reclaim and transfer your Google Maps profile to your direct account, our legal ownership recovery fee is 100% WAIVED ($0 cost) when you activate your tailored Prestigia plan (Smart NFC devices + 5★ Review Accelerator). You get your listing back and your reputation secured. Shall we start the protocol today?`
+                        : `Hola estimado/a ${businessName || 'propietario'}, para recuperar la titularidad legal de su ficha en Google Maps y transferir el control total a su cuenta oficial mediante el protocolo de Google, le BONIFICAMOS el 100% de los costos de gestión técnica y legal de rescate ($0 USD) al adquirir su Plan Prestigia a la medida de su negocio (Tarjetas Inteligentes NFC + Sistema de Reseñas 5★). Recupera su ficha y blindamos su reputación. ¿Iniciamos el protocolo hoy?`;
                       copyToClipboard(scriptText, isEn ? 'Rescue Proposal' : 'Propuesta de Rescate');
                     }}
                     className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
                   >
                     <Copy className="w-3.5 h-3.5" />
-                    <span>{isEn ? 'Copy Annual Plan Closing Script (WhatsApp)' : 'Copiar Propuesta Comercial de Cierre (WhatsApp)'}</span>
+                    <span>{isEn ? 'Copy Tailored Plan Closing Script (WhatsApp)' : 'Copiar Propuesta Comercial de Cierre (WhatsApp)'}</span>
                   </button>
                 </div>
               </div>
@@ -6763,7 +6763,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <button
                   type="button"
                   onClick={() => {
-                    const script = `Hola ${businessName || 'propietario'}, le saluda el equipo de Prestigia con una alerta prioritaria de su negocio en Google Maps. Detectamos que su ficha oficial se encuentra actualmente secuestrada por un tercero / suspendida por Google. Los clientes que buscan su negocio en ${city || 'su ciudad'} están llamando a números que no le pertenecen o no pueden encontrar su dirección. Por favor NO cometa el grave error de crear una ficha nueva: Google la suspenderá por duplicidad y usted perderá todas sus reseñas, fotos y años de antigüedad comercial. En Prestigia somos especialistas certificados en rescates de titularidad y ejecutamos el Protocolo Oficial de 72 Horas de Google para radicar el expediente probatorio y devolverle el control legal absoluto de su perfil. El trámite legal de rescate tiene un costo de $350 USD, pero si activa hoy el Plan Prestigia ($199 USD/mes), nosotros absorbemos el 100% del costo legal de rescate ($0 USD bonificado) y blindamos su ficha para que nunca nadie vuelva a quitársela. ¿Nos autoriza a radicar la solicitud de titularidad hoy mismo?`;
+                    const script = `Hola ${businessName || 'propietario'}, le saluda el equipo de Prestigia con una alerta prioritaria de su negocio en Google Maps. Detectamos que su ficha oficial se encuentra actualmente secuestrada por un tercero / suspendida por Google. Los clientes que buscan su negocio en ${city || 'su ciudad'} están llamando a números que no le pertenecen o no pueden encontrar su dirección. Por favor NO cometa el grave error de crear una ficha nueva: Google la suspenderá por duplicidad y usted perderá todas sus reseñas, fotos y años de antigüedad comercial. En Prestigia somos especialistas certificados en rescates de titularidad y ejecutamos el Protocolo Oficial de 72 Horas de Google para radicar el expediente probatorio y devolverle el control legal absoluto de su perfil. Al activar hoy su Plan Prestigia a la medida para blindar su reputación, nosotros absorbemos el 100% del costo legal y técnico de rescate ($0 bonificado) y blindamos su ficha para que nunca nadie vuelva a quitársela. ¿Nos autoriza a radicar la solicitud de titularidad hoy mismo?`;
                     copyToClipboard(script, 'Guión de Rescate de Ficha');
                   }}
                   className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg shadow-rose-600/20 cursor-pointer shrink-0 active:scale-98"
@@ -6811,11 +6811,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     🎁 El Gancho de Cierre Prestigia ($0 Setup):
                   </span>
                   <p className="text-slate-300 text-[11px] mt-0.5">
-                    "La gestión y radicación legal de rescate cuesta <strong>$350 USD</strong>. Pero si contratas hoy el <strong>Plan Mensual Prestigia ($199 USD/mes)</strong>, nosotros asumimos el 100% del costo legal (<strong>$0 USD bonificado</strong>) y blindamos tu ficha."
+                    "Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, nosotros asumimos el 100% del costo técnico y legal del rescate (<strong>$0 bonificado</strong>) y blindamos tu ficha."
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-black text-xs">
-                  Rescate 100% Legal
+                  Plan a la Medida
                 </span>
               </div>
             </div>
@@ -7957,7 +7957,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     {isEn ? 'Official Agency Pricing Benchmarks & Prestigia Closing Strategy' : 'Baremos Reales de Mercado de Agencias & Estrategia de Cierre Prestigia'}
                   </span>
                   <p className="text-[11px] text-slate-300 mt-0.5">
-                    <strong>Creación:</strong> $150–$250 USD (3–5h) • <strong>Auditoría Top 3:</strong> $200–$350 USD (4–6h) • <strong>Rescate 72h:</strong> $250–$450 USD (5–8h) • <strong>Suscripción Prestigia:</strong> $149–$199 USD/mes.
+                    <strong>Creación:</strong> $150–$250 USD (3–5h) • <strong>Auditoría Top 3:</strong> $200–$350 USD (4–6h) • <strong>Rescate 72h:</strong> $250–$450 USD (5–8h) • <strong>Planes Prestigia:</strong> 100% a la medida de cada cliente (Setup Técnico $0 bonificado).
                   </p>
                 </div>
               </div>
@@ -8377,7 +8377,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                                 Suscripción Prestigia Activa
                               </span>
                               <strong className="text-xs font-black text-emerald-400">
-                                ${d.monthlyPlanUsd || 199} USD/mes
+                                {d.monthlyPlanUsd ? `$${d.monthlyPlanUsd} USD/mes` : 'Plan a la Medida'}
                               </strong>
                             </div>
                             <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1 border-t border-emerald-500/20">
@@ -8416,7 +8416,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             </div>
                             <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1 border-t border-amber-500/20">
                               <span className="text-slate-400">Opción Prestigia:</span>
-                              <span className="text-emerald-300 font-bold">${d.monthlyPlanUsd || 199}/mes (Setup $0)</span>
+                              <span className="text-emerald-300 font-bold">{d.monthlyPlanUsd ? `$${d.monthlyPlanUsd}/mes` : 'Plan a la Medida'} (Setup $0)</span>
                             </div>
                           </div>
                         ) : d.closingStatus === 'negotiating' ? (
@@ -8547,12 +8547,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         onClick={() => {
                           setClosingFormStatus('prestigia_subscriber');
                           setClosingFormSetupFee(0);
-                          setClosingFormMonthlyPlan(199);
-                          setClosingFormPaymentMethod('Suscripción Prestigia • Setup $0 Bonificado');
+                          setClosingFormPaymentMethod('Plan Prestigia a la Medida • Setup $0 Bonificado');
                         }}
                         className="p-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold text-left transition cursor-pointer"
                       >
-                        💎 Prestigia $199/m
+                        💎 Plan a la Medida
                         <span className="block text-[9px] text-emerald-400/80 font-normal">Setup $0 Bonificado</span>
                       </button>
 
@@ -8756,7 +8755,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           <DollarSign className="w-4 h-4 text-slate-500 absolute left-2.5 top-2.5" />
                         </div>
                         <span className="text-[10px] text-slate-500 mt-0.5 block">
-                          $199/mes Plan Élite • $149/mes Estándar • $0 si solo fue setup.
+                          Tarifa a la medida acordada con el cliente • $0 si solo fue setup.
                         </span>
                       </div>
                     </div>
