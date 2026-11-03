@@ -2986,7 +2986,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         country: editAdvisorCountry.trim(),
         city: editAdvisorCity.trim(),
         monthlyFeeUsd: Number(editAdvisorMonthlyFee) || 0,
-        licenseStatus: editAdvisorLicenseStatus,
+        licenseStatus: (editingAdvisor.accountType === 'founder' || editingAdvisor.id === 'adv-luisma') ? 'active' : editAdvisorLicenseStatus,
         maxCreatesMonthly: Number(editAdvisorMaxCreates),
         maxAuditsMonthly: Number(editAdvisorMaxAudits),
         maxRescuesMonthly: Number(editAdvisorMaxRescues),
@@ -10056,7 +10056,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
             <form onSubmit={handleSaveAdvisorEdit} className="space-y-3.5 text-xs">
               <div>
                 <label className="block font-bold text-slate-300 mb-1">
-                  {editAdvisorAccountType === 'partner_agency'
+                  {editAdvisorAccountType === 'founder'
+                    ? (isEn ? 'Founder & Master Director Name *' : 'Nombre del Fundador & Director General *')
+                    : editAdvisorAccountType === 'director'
+                    ? (isEn ? 'General Director Full Name *' : 'Nombre Completo del Director General *')
+                    : editAdvisorAccountType === 'partner_agency'
                     ? (isEn ? 'Partner Agency Name *' : 'Razón Social o Nombre de la Agencia *')
                     : (isEn ? 'Advisor Full Name *' : 'Nombre Completo del Asesor *')}
                 </label>
@@ -10153,15 +10157,27 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
                 <div>
                   <label className="block font-bold text-slate-300 mb-1">{isEn ? 'License Status' : 'Estatus de Cuenta'}</label>
-                  <select
-                    value={editAdvisorLicenseStatus}
-                    onChange={(e) => setEditAdvisorLicenseStatus(e.target.value as any)}
-                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none"
-                  >
-                    <option value="active">{isEn ? '✅ Active' : '✅ Activa'}</option>
-                    <option value="pending_payment">{isEn ? '⏳ Payment Pending' : '⏳ Pendiente de Pago'}</option>
-                    <option value="suspended">{isEn ? '⛔ Suspended' : '⛔ Suspendida'}</option>
-                  </select>
+                  {editingAdvisor?.accountType === 'founder' ? (
+                    <div className="w-full px-3.5 py-2 rounded-xl bg-slate-950/80 border border-emerald-500/40 text-emerald-300 font-bold flex items-center justify-between text-xs">
+                      <span className="flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>✅ Activa (Permanente)</span>
+                      </span>
+                      <span className="text-[10px] text-amber-400 font-black uppercase tracking-wider bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
+                        Inalterable
+                      </span>
+                    </div>
+                  ) : (
+                    <select
+                      value={editAdvisorLicenseStatus}
+                      onChange={(e) => setEditAdvisorLicenseStatus(e.target.value as any)}
+                      className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none"
+                    >
+                      <option value="active">{isEn ? '✅ Active' : '✅ Activa'}</option>
+                      <option value="pending_payment">{isEn ? '⏳ Payment Pending' : '⏳ Pendiente de Pago'}</option>
+                      <option value="suspended">{isEn ? '⛔ Suspended' : '⛔ Suspendida'}</option>
+                    </select>
+                  )}
                 </div>
               </div>
 
