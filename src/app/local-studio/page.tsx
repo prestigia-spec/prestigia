@@ -9724,81 +9724,83 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
       {/* MODAL: REGISTRAR NUEVO ASESOR O LICENCIAR AGENCIA PARTNER */}
       {showRegisterAdvisorModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 print:hidden animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative space-y-4 max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 print:hidden animate-in fade-in duration-200">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden">
+            <div className="p-5 sm:p-6 pb-4 border-b border-slate-800 bg-slate-900/95 flex items-start justify-between gap-4 shrink-0">
               <div>
                 <h3 className="text-base font-black text-white flex items-center gap-2">
                   <Users className="w-4 h-4 text-amber-400" />
                   <span>{tNetwork.registerTitle}</span>
                 </h3>
-                <p className="text-[11px] text-slate-400">{tNetwork.registerDesc}</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">{tNetwork.registerDesc}</p>
               </div>
 
               <button
                 type="button"
                 onClick={() => setShowRegisterAdvisorModal(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Toggle Tipo de Cuenta: Director General, Asesor Comercial, Agencia Partner */}
-            <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-slate-950 border border-slate-800 text-xs">
-              <button
-                type="button"
-                onClick={() => {
-                  setNewAccountType('director');
-                  setNewAdvisorMaxCreates(100);
-                  setNewAdvisorMaxAudits(100);
-                  setNewAdvisorMaxRescues(50);
-                }}
-                className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
-                  newAccountType === 'director'
-                    ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Crown className="w-3.5 h-3.5 shrink-0" />
-                <span className="truncate">{isEn ? 'Director' : 'Director Gral'}</span>
-              </button>
+            {/* Toggle Tipo de Cuenta: Fijo */}
+            <div className="p-3 bg-slate-950/80 border-b border-slate-800 shrink-0">
+              <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-slate-900 border border-slate-800 text-xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewAccountType('director');
+                    setNewAdvisorMaxCreates(100);
+                    setNewAdvisorMaxAudits(100);
+                    setNewAdvisorMaxRescues(50);
+                  }}
+                  className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
+                    newAccountType === 'director'
+                      ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Crown className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">{isEn ? 'Director' : 'Director Gral'}</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setNewAccountType('internal_advisor');
-                  setNewAdvisorMaxCreates(30);
-                  setNewAdvisorMaxAudits(30);
-                  setNewAdvisorMaxRescues(10);
-                }}
-                className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
-                  newAccountType === 'internal_advisor'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Briefcase className="w-3.5 h-3.5 shrink-0" />
-                <span className="truncate">{isEn ? 'Advisor' : 'Asesor'}</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewAccountType('internal_advisor');
+                    setNewAdvisorMaxCreates(30);
+                    setNewAdvisorMaxAudits(30);
+                    setNewAdvisorMaxRescues(10);
+                  }}
+                  className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
+                    newAccountType === 'internal_advisor'
+                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Briefcase className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">{isEn ? 'Advisor' : 'Asesor'}</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setNewAccountType('partner_agency');
-                  setNewAdvisorMaxCreates(60);
-                  setNewAdvisorMaxAudits(60);
-                  setNewAdvisorMaxRescues(20);
-                }}
-                className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
-                  newAccountType === 'partner_agency'
-                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Building2 className="w-3.5 h-3.5 shrink-0" />
-                <span className="truncate">{isEn ? 'Agency' : 'Agencia'}</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewAccountType('partner_agency');
+                    setNewAdvisorMaxCreates(60);
+                    setNewAdvisorMaxAudits(60);
+                    setNewAdvisorMaxRescues(20);
+                  }}
+                  className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
+                    newAccountType === 'partner_agency'
+                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Building2 className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">{isEn ? 'Agency' : 'Agencia'}</span>
+                </button>
+              </div>
             </div>
 
             <form
@@ -9806,8 +9808,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 await handleCreateAdvisor(e);
                 setShowRegisterAdvisorModal(false);
               }}
-              className="space-y-3.5 text-xs"
+              className="flex flex-col flex-1 overflow-hidden min-h-0"
             >
+              <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-3.5 text-xs">
               <div>
                 <label className="block font-bold text-slate-300 mb-1">
                   {newAccountType === 'director'
@@ -9997,63 +10000,67 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   required
                 />
               </div>
-
-              <div className="pt-2 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowRegisterAdvisorModal(false)}
-                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer"
-                >
-                  Cancelar
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={isSavingAdvisor}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg active:scale-98"
-                >
-                  {isSavingAdvisor
-                    ? 'Registrando...'
-                    : newAccountType === 'director'
-                    ? '👑 + Crear Cuenta Director General'
-                    : newAccountType === 'partner_agency'
-                    ? '🚀 Activar Licencia de Agencia Partner'
-                    : '💼 + Crear Asesor Comercial'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: MODIFICAR CUENTA DE ASESOR / AGENCIA PARTNER */}
-      {showEditAdvisorModal && editingAdvisor && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 print:hidden animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div>
-                <h3 className="text-base font-black text-white flex items-center gap-2">
-                  <Edit3 className="w-4 h-4 text-amber-400" />
-                  <span>{isEn ? 'Modify Account Details' : 'Modificar Cuenta de Usuario'}</span>
-                </h3>
-                <p className="text-[11px] text-slate-400">
-                  {editingAdvisor.name} (@{editingAdvisor.username})
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setShowEditAdvisorModal(false);
-                  setEditingAdvisor(null);
-                }}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
 
-            <form onSubmit={handleSaveAdvisorEdit} className="space-y-3.5 text-xs">
+            {/* Botonera Fija Footer */}
+            <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-900/95 flex items-center justify-end gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowRegisterAdvisorModal(false)}
+                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer"
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="submit"
+                disabled={isSavingAdvisor}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg active:scale-98"
+              >
+                {isSavingAdvisor
+                  ? 'Registrando...'
+                  : newAccountType === 'director'
+                  ? '👑 + Crear Cuenta Director General'
+                  : newAccountType === 'partner_agency'
+                  ? '🚀 Activar Licencia de Agencia Partner'
+                  : '💼 + Crear Asesor Comercial'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
+
+    {/* MODAL: MODIFICAR CUENTA DE ASESOR / AGENCIA PARTNER */}
+    {showEditAdvisorModal && editingAdvisor && (
+      <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 print:hidden animate-in fade-in duration-200">
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden">
+          {/* Cabecera Fija */}
+          <div className="p-5 sm:p-6 pb-4 border-b border-slate-800 bg-slate-900/95 flex items-start justify-between gap-4 shrink-0">
+            <div>
+              <h3 className="text-base font-black text-white flex items-center gap-2">
+                <Edit3 className="w-4 h-4 text-amber-400" />
+                <span>{isEn ? 'Modify Account Details' : 'Modificar Cuenta de Usuario'}</span>
+              </h3>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                {editingAdvisor.name} (@{editingAdvisor.username})
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowEditAdvisorModal(false);
+                setEditingAdvisor(null);
+              }}
+              className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer shrink-0"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <form onSubmit={handleSaveAdvisorEdit} className="flex flex-col flex-1 overflow-hidden min-h-0">
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-3.5 text-xs">
               <div>
                 <label className="block font-bold text-slate-300 mb-1">
                   {editAdvisorAccountType === 'founder'
@@ -10253,37 +10260,39 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   </p>
                 </div>
               )}
+            </div>
 
-              <div className="pt-2 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowEditAdvisorModal(false);
-                    setEditingAdvisor(null);
-                  }}
-                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer"
-                >
-                  {isEn ? 'Cancel' : 'Cancelar'}
-                </button>
+            {/* Botonera Fija Footer */}
+            <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-900/95 flex items-center justify-end gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowEditAdvisorModal(false);
+                  setEditingAdvisor(null);
+                }}
+                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer"
+              >
+                {isEn ? 'Cancel' : 'Cancelar'}
+              </button>
 
-                <button
-                  type="submit"
-                  disabled={isUpdatingAdvisor}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg active:scale-98"
-                >
-                  {isUpdatingAdvisor ? (isEn ? 'Saving...' : 'Guardando...') : (isEn ? 'Save Changes' : 'Guardar Cambios')}
-                </button>
-              </div>
-            </form>
-          </div>
+              <button
+                type="submit"
+                disabled={isUpdatingAdvisor}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg active:scale-98"
+              >
+                {isUpdatingAdvisor ? (isEn ? 'Saving...' : 'Guardando...') : (isEn ? 'Save Changes' : 'Guardar Cambios')}
+              </button>
+            </div>
+          </form>
         </div>
-      )}
+      </div>
+    )}
       </main>
 
       {/* MODAL: LOGIN / SELECTOR DE PERFIL */}
       {showAuthModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 print:hidden animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative text-center space-y-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative text-center space-y-4 max-h-[92vh] overflow-y-auto my-auto">
             {currentUser ? (
               <div className="flex items-center justify-between pb-1 border-b border-slate-800">
                 <button
