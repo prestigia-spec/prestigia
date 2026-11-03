@@ -3148,8 +3148,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               </span>
             </div>
 
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center mx-auto shadow-xl">
-              <Lock className="w-6 h-6 text-slate-950" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 flex items-center justify-center mx-auto shadow-xl p-2.5 relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 to-indigo-500/20 rounded-2xl blur-sm" />
+              <PrestigiaIcon className="w-full h-full relative z-10 drop-shadow-md" />
             </div>
 
             <div>
@@ -10241,8 +10242,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               </div>
             )}
 
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center mx-auto shadow-xl">
-              <Lock className="w-6 h-6 text-slate-950" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 flex items-center justify-center mx-auto shadow-xl p-2.5 relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 to-indigo-500/20 rounded-2xl blur-sm" />
+              <PrestigiaIcon className="w-full h-full relative z-10 drop-shadow-md" />
             </div>
 
             <div>
