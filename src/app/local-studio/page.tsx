@@ -1884,6 +1884,47 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
   // Advisors & Agencies List (for Admin tab)
   const [advisorsList, setAdvisorsList] = useState<StudioAdvisorUser[]>([]);
+
+  // Identificador Inteligente de Rango y Perfil en Tiempo Real según Usuario ingresado
+  const detectedLoginUser = useMemo(() => {
+    const q = loginUsername.trim().toLowerCase();
+    if (!q) return null;
+    if (q === 'luisma') {
+      return {
+        name: 'Luisma',
+        fullName: 'Luisma • Director General & Founder',
+        username: 'luisma',
+        accountType: 'founder' as const,
+        badgeLabel: 'Fundador & Director General',
+        hierarchy: '👑 Dirección General Suprema',
+        description: 'Jerarquía Máxima • Acceso total maestro, Bóveda Forense y Auditorías Globales',
+      };
+    }
+    const match = advisorsList.find((a) => a.username.toLowerCase() === q);
+    if (match) {
+      const isAgency = match.accountType === 'partner_agency';
+      return {
+        name: match.name,
+        fullName: match.name,
+        username: match.username,
+        accountType: isAgency ? ('partner_agency' as const) : ('internal_advisor' as const),
+        badgeLabel: isAgency ? 'Agencia Partner B2B' : 'Asesor Comercial Interno',
+        hierarchy: isAgency ? '🏢 Licencia de Agencia B2B' : '💼 Consultor Comercial Oficial',
+        description: isAgency
+          ? `Licencia de software activa • Cupo: ${match.maxCreatesMonthly ?? 60} creaciones / ${match.maxAuditsMonthly ?? 60} auditorías`
+          : `Asesor comercial habilitado • Cupo: ${match.maxCreatesMonthly ?? 30} creaciones / ${match.maxAuditsMonthly ?? 30} auditorías`,
+      };
+    }
+    return {
+      name: q,
+      fullName: `@${q}`,
+      username: q,
+      accountType: 'unknown' as const,
+      badgeLabel: 'No Identificado',
+      hierarchy: '❓ Usuario no registrado',
+      description: 'Verifica tu ortografía o solicita tu alta en la red a Dirección General',
+    };
+  }, [loginUsername, advisorsList]);
   const [newAccountType, setNewAccountType] = useState<'internal_advisor' | 'partner_agency'>('internal_advisor');
   const [newAdvisorName, setNewAdvisorName] = useState('');
   const [newAdvisorUser, setNewAdvisorUser] = useState('');
@@ -3172,6 +3213,67 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                 />
               </div>
+
+              {/* Sección Dinámica: Identificador Inteligente de Rango y Perfil */}
+              {detectedLoginUser && (
+                <div
+                  className={`p-3 rounded-2xl border transition-all animate-in fade-in zoom-in-95 duration-200 ${
+                    detectedLoginUser.accountType === 'founder'
+                      ? 'bg-gradient-to-r from-amber-950/70 via-slate-900 to-amber-950/40 border-amber-500/60 shadow-lg shadow-amber-500/10'
+                      : detectedLoginUser.accountType === 'partner_agency'
+                      ? 'bg-gradient-to-r from-purple-950/70 via-slate-900 to-purple-950/40 border-purple-500/50 shadow-lg shadow-purple-500/10'
+                      : detectedLoginUser.accountType === 'internal_advisor'
+                      ? 'bg-gradient-to-r from-indigo-950/70 via-slate-900 to-indigo-950/40 border-indigo-500/50 shadow-lg shadow-indigo-500/10'
+                      : 'bg-slate-950/80 border-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black shadow shrink-0 ${
+                        detectedLoginUser.accountType === 'founder'
+                          ? 'bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 ring-2 ring-amber-400/40'
+                          : detectedLoginUser.accountType === 'partner_agency'
+                          ? 'bg-purple-600 text-white ring-2 ring-purple-400/30'
+                          : detectedLoginUser.accountType === 'internal_advisor'
+                          ? 'bg-indigo-600 text-white ring-2 ring-indigo-400/30'
+                          : 'bg-slate-800 text-slate-400 border border-slate-700'
+                      }`}
+                    >
+                      {detectedLoginUser.accountType === 'founder'
+                        ? '👑'
+                        : detectedLoginUser.accountType === 'partner_agency'
+                        ? '🏢'
+                        : detectedLoginUser.accountType === 'internal_advisor'
+                        ? '💼'
+                        : '❓'}
+                    </div>
+
+                    <div className="min-w-0 flex-1 text-left">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-bold text-white text-xs truncate">
+                          {detectedLoginUser.fullName}
+                        </span>
+                        <span
+                          className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${
+                            detectedLoginUser.accountType === 'founder'
+                              ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+                              : detectedLoginUser.accountType === 'partner_agency'
+                              ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                              : detectedLoginUser.accountType === 'internal_advisor'
+                              ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
+                              : 'bg-slate-800 text-slate-400 border-slate-700'
+                          }`}
+                        >
+                          {detectedLoginUser.badgeLabel}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 mt-0.5 leading-tight truncate">
+                        {detectedLoginUser.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block font-bold text-slate-300 mb-1">{tAuth.passwordLabel}</label>
@@ -10266,6 +10368,67 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                 />
               </div>
+
+              {/* Sección Dinámica: Identificador Inteligente de Rango y Perfil */}
+              {detectedLoginUser && (
+                <div
+                  className={`p-3 rounded-2xl border transition-all animate-in fade-in zoom-in-95 duration-200 ${
+                    detectedLoginUser.accountType === 'founder'
+                      ? 'bg-gradient-to-r from-amber-950/70 via-slate-900 to-amber-950/40 border-amber-500/60 shadow-lg shadow-amber-500/10'
+                      : detectedLoginUser.accountType === 'partner_agency'
+                      ? 'bg-gradient-to-r from-purple-950/70 via-slate-900 to-purple-950/40 border-purple-500/50 shadow-lg shadow-purple-500/10'
+                      : detectedLoginUser.accountType === 'internal_advisor'
+                      ? 'bg-gradient-to-r from-indigo-950/70 via-slate-900 to-indigo-950/40 border-indigo-500/50 shadow-lg shadow-indigo-500/10'
+                      : 'bg-slate-950/80 border-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black shadow shrink-0 ${
+                        detectedLoginUser.accountType === 'founder'
+                          ? 'bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 ring-2 ring-amber-400/40'
+                          : detectedLoginUser.accountType === 'partner_agency'
+                          ? 'bg-purple-600 text-white ring-2 ring-purple-400/30'
+                          : detectedLoginUser.accountType === 'internal_advisor'
+                          ? 'bg-indigo-600 text-white ring-2 ring-indigo-400/30'
+                          : 'bg-slate-800 text-slate-400 border border-slate-700'
+                      }`}
+                    >
+                      {detectedLoginUser.accountType === 'founder'
+                        ? '👑'
+                        : detectedLoginUser.accountType === 'partner_agency'
+                        ? '🏢'
+                        : detectedLoginUser.accountType === 'internal_advisor'
+                        ? '💼'
+                        : '❓'}
+                    </div>
+
+                    <div className="min-w-0 flex-1 text-left">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-bold text-white text-xs truncate">
+                          {detectedLoginUser.fullName}
+                        </span>
+                        <span
+                          className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border ${
+                            detectedLoginUser.accountType === 'founder'
+                              ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+                              : detectedLoginUser.accountType === 'partner_agency'
+                              ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                              : detectedLoginUser.accountType === 'internal_advisor'
+                              ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
+                              : 'bg-slate-800 text-slate-400 border-slate-700'
+                          }`}
+                        >
+                          {detectedLoginUser.badgeLabel}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 mt-0.5 leading-tight truncate">
+                        {detectedLoginUser.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block font-bold text-slate-300 mb-1">{tAuth.passwordLabel}</label>
