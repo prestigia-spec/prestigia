@@ -1361,6 +1361,28 @@ export default function LocalStudioPage() {
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [userFieldActive, setUserFieldActive] = useState(false);
+  const [passFieldActive, setPassFieldActive] = useState(false);
+  const [modalUserActive, setModalUserActive] = useState(false);
+  const [modalPassActive, setModalPassActive] = useState(false);
+
+  // Anti-autofill: Garantizar cajas 100% limpias al montar la página
+  useEffect(() => {
+    setLoginUsername('');
+    setLoginPassword('');
+    const t1 = setTimeout(() => {
+      setLoginUsername('');
+      setLoginPassword('');
+    }, 100);
+    const t2 = setTimeout(() => {
+      setLoginUsername('');
+      setLoginPassword('');
+    }, 400);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, []);
 
   // Active Workspace Tab
   const [activeTab, setActiveTab] = useState<'create' | 'audit' | 'rescue' | 'tools' | 'dossiers' | 'guide' | 'pitch' | 'advisors' | 'network'>('create');
@@ -1500,6 +1522,10 @@ export default function LocalStudioPage() {
     setCurrentUser(null);
     setLoginUsername('');
     setLoginPassword('');
+    setUserFieldActive(false);
+    setPassFieldActive(false);
+    setModalUserActive(false);
+    setModalPassActive(false);
     setLoginError('');
     setShowAuthModal(true);
     showToast(isEn ? '👋 Session closed successfully' : '👋 Sesión cerrada exitosamente');
@@ -3205,17 +3231,34 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               <p className="text-xs text-slate-400 mt-0.5">{tAuth.subtitle}</p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-3 text-left text-xs pt-2">
+            <form onSubmit={handleLogin} autoComplete="off" className="space-y-3 text-left text-xs pt-2">
+              {/* Trampa anti-autocompletado para gestores de contraseñas de navegadores */}
+              <div style={{ position: 'absolute', opacity: 0, height: 0, width: 0, zIndex: -1, pointerEvents: 'none', overflow: 'hidden' }} aria-hidden="true">
+                <input type="text" name="prestigia_decoy_user" tabIndex={-1} autoComplete="off" defaultValue="" />
+                <input type="password" name="prestigia_decoy_pass" tabIndex={-1} autoComplete="new-password" defaultValue="" />
+              </div>
+
               <div>
                 <label className="block font-bold text-slate-300 mb-1">{tAuth.usernameLabel}</label>
                 <input
                   type="text"
+                  name="prestigia_id_user"
+                  id="prestigia_id_user"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  readOnly={!userFieldActive}
+                  onFocus={() => setUserFieldActive(true)}
+                  onClick={() => setUserFieldActive(true)}
                   value={loginUsername}
                   onChange={(e) => {
                     setLoginUsername(e.target.value);
                     if (loginError) setLoginError('');
                   }}
-                  placeholder={isEn ? 'e.g. carlos or your username' : 'ej: carlos o tu usuario'}
+                  placeholder={isEn ? 'e.g. luisma or your username' : 'ej: luisma o tu usuario'}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                 />
               </div>
@@ -3286,6 +3329,14 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <div className="relative flex items-center">
                   <input
                     type={showPassword ? 'text' : 'password'}
+                    name="prestigia_sec_token"
+                    id="prestigia_sec_token"
+                    autoComplete="new-password"
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    readOnly={!passFieldActive}
+                    onFocus={() => setPassFieldActive(true)}
+                    onClick={() => setPassFieldActive(true)}
                     value={loginPassword}
                     onChange={(e) => {
                       setLoginPassword(e.target.value);
@@ -10370,17 +10421,34 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               <p className="text-xs text-slate-400 mt-0.5">{tAuth.subtitle}</p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-3 text-left text-xs pt-2">
+            <form onSubmit={handleLogin} autoComplete="off" className="space-y-3 text-left text-xs pt-2">
+              {/* Trampa anti-autocompletado para gestores de contraseñas de navegadores */}
+              <div style={{ position: 'absolute', opacity: 0, height: 0, width: 0, zIndex: -1, pointerEvents: 'none', overflow: 'hidden' }} aria-hidden="true">
+                <input type="text" name="prestigia_decoy_user" tabIndex={-1} autoComplete="off" defaultValue="" />
+                <input type="password" name="prestigia_decoy_pass" tabIndex={-1} autoComplete="new-password" defaultValue="" />
+              </div>
+
               <div>
                 <label className="block font-bold text-slate-300 mb-1">{tAuth.usernameLabel}</label>
                 <input
                   type="text"
+                  name="prestigia_id_user"
+                  id="prestigia_id_user"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  readOnly={!userFieldActive}
+                  onFocus={() => setUserFieldActive(true)}
+                  onClick={() => setUserFieldActive(true)}
                   value={loginUsername}
                   onChange={(e) => {
                     setLoginUsername(e.target.value);
                     if (loginError) setLoginError('');
                   }}
-                  placeholder={isEn ? 'e.g. carlos or your username' : 'ej: carlos o tu usuario'}
+                  placeholder={isEn ? 'e.g. luisma or your username' : 'ej: luisma o tu usuario'}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                 />
               </div>
@@ -10451,6 +10519,14 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <div className="relative flex items-center">
                   <input
                     type={showPassword ? 'text' : 'password'}
+                    name="prestigia_sec_token"
+                    id="prestigia_sec_token"
+                    autoComplete="new-password"
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    readOnly={!passFieldActive}
+                    onFocus={() => setPassFieldActive(true)}
+                    onClick={() => setPassFieldActive(true)}
                     value={loginPassword}
                     onChange={(e) => {
                       setLoginPassword(e.target.value);
