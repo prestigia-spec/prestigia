@@ -15,9 +15,7 @@ export async function GET(request: Request) {
         const u = a.username.toLowerCase();
         if (u !== username) return false;
         if (!a.active) return false;
-        if (u === 'luisma') {
-          return password === a.password || password === 'admin' || password === '1234';
-        }
+        // Strict credential check: Only the exact configured password for this account is allowed
         return a.password === password;
       });
       if (match) {

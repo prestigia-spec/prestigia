@@ -3258,7 +3258,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     setLoginUsername(e.target.value);
                     if (loginError) setLoginError('');
                   }}
-                  placeholder={isEn ? 'e.g. luisma or your username' : 'ej: luisma o tu usuario'}
+                  placeholder={isEn ? 'Enter your username' : 'Ingresa tu usuario'}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                 />
               </div>
@@ -10448,7 +10448,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     setLoginUsername(e.target.value);
                     if (loginError) setLoginError('');
                   }}
-                  placeholder={isEn ? 'e.g. luisma or your username' : 'ej: luisma o tu usuario'}
+                  placeholder={isEn ? 'Enter your username' : 'Ingresa tu usuario'}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                 />
               </div>
