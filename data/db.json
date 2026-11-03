@@ -608,6 +608,73 @@
         },
         "whatsappOnboardingMessage": "Expediente listo para posicionar la taquería en el Top 3 de Polanco."
       }
+    },
+    {
+      "id": "dos-ven-01",
+      "advisorId": "adv-luisma",
+      "advisorName": "Luisma • Director General & Founder",
+      "advisorPhone": "+573058314049",
+      "advisorType": "founder",
+      "country": "Venezuela",
+      "clientName": "Bistro & Grill Las Mercedes",
+      "category": "Restaurante / Gastronomía",
+      "city": "Caracas",
+      "neighborhood": "Las Mercedes",
+      "googleUrl": "https://maps.google.com/?cid=ven-caracas-mercedes",
+      "mode": "audit",
+      "status": "closed",
+      "closingStatus": "prestigia_subscriber",
+      "setupFeeChargedUsd": 0,
+      "monthlyPlanUsd": 199,
+      "prestigiaPlan": "elite",
+      "paymentMethod": "Suscripción Prestigia • Setup $0 Bonificado",
+      "closingNotes": "Cliente clave en Caracas. Posicionado en el Top 3 local de Las Mercedes.",
+      "data": {
+        "businessName": "Bistro & Grill Las Mercedes",
+        "city": "Caracas",
+        "category": "Restaurante / Gastronomía",
+        "neighborhood": "Las Mercedes",
+        "primaryCategory": "Restaurante / Gastronomía",
+        "secondaryCategories": [
+          "Parrilla",
+          "Bar y Grill",
+          "Restaurante familiar"
+        ],
+        "optimizedTitle": "Bistro & Grill Las Mercedes • Parrilla & Cortes Selectos",
+        "shortDescription": "Cortes madurados a la brasa, gastronomía de autor y coctelería en el corazón de Las Mercedes, Caracas.",
+        "longDescription": "Bistro & Grill Las Mercedes es el referente gastronómico en Caracas para amantes de los cortes premium y la parrilla gourmet. Atención de primera, ambiente exclusivo y la mejor experiencia de Las Mercedes.",
+        "photoChecklist": [
+          "Fachada e iluminación nocturna",
+          "Cortes estrella a la brasa",
+          "Área de bar y cócteles"
+        ],
+        "qaPairs": [
+          {
+            "question": "¿Cuentan con servicio de valet parking en Las Mercedes?",
+            "answer": "Sí, disponemos de servicio exclusivo de valet parking vigilado para su total comodidad."
+          }
+        ],
+        "verificationMethod": "Verificación por Video de 60 segundos",
+        "serviceAreaCoverage": [
+          "Las Mercedes",
+          "Chacao",
+          "El Rosal",
+          "Altamira"
+        ],
+        "healthScore": 92,
+        "criticalGaps": [
+          "Optimización de catálogo móvil completada",
+          "Geo-señales de reputación activas"
+        ],
+        "roadmap": [
+          "Configuración de categorías secundarias",
+          "Publicación de fotos semanales geolocalizadas",
+          "Automatización de reseñas 5★ con Prestigia"
+        ],
+        "competitorBenchmark": []
+      },
+      "createdAt": "2026-11-03T00:45:17.947Z",
+      "updatedAt": "2026-11-03T00:45:17.949Z"
     }
   ],
   "studioLandingPages": [

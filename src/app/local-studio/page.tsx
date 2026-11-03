@@ -215,6 +215,12 @@ const WORLD_REGIONS_GEO: Record<string, string[]> = {
     'Pereira', 'Manizales', 'Santa Marta', 'Cúcuta', 'Ibagué', 'Villavicencio',
     'Pasto', 'Armenia', 'Montería', 'Neiva', 'Valledupar', 'Popayán', 'Sincelejo', 'Tunja'
   ],
+  'Venezuela': [
+    'Caracas', 'Maracaibo', 'Valencia', 'Barquisimeto', 'Maracay',
+    'Ciudad Guayana', 'San Cristóbal', 'Lechería', 'Puerto La Cruz',
+    'Maturín', 'Mérida', 'Porlamar', 'Barinas', 'Cabimas', 'Punto Fijo',
+    'Puerto Cabello', 'Los Teques', 'Guatire', 'Cumaná', 'El Tigre'
+  ],
   'México': [
     'Ciudad de México', 'Guadalajara', 'Monterrey', 'Puebla', 'Tijuana',
     'Querétaro', 'Cancún', 'Mérida', 'León', 'San Luis Potosí', 'Toluca',
@@ -299,6 +305,9 @@ const WORLD_REGIONS_GEO: Record<string, string[]> = {
 
 const COUNTRY_ALIASES: Record<string, string> = {
   colombia: 'Colombia',
+  venezuela: 'Venezuela',
+  'república bolivariana de venezuela': 'Venezuela',
+  'republica bolivariana de venezuela': 'Venezuela',
   mexico: 'México',
   méxico: 'México',
   'estados unidos': 'Estados Unidos',
