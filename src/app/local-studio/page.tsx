@@ -8858,10 +8858,10 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       }`}
                     >
                       <div className="space-y-3.5">
-                        {/* Header de Tarjeta: Rol, Estado Encendido/Apagado y Canon */}
-                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                        {/* Header de Tarjeta: Rol, Estado Encendido/Apagado y Canon en 1 Sola Línea Imposible de Romperse */}
+                        <div className="flex items-center justify-between gap-2 h-7">
                           <span
-                            className={`text-[9.5px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                            className={`text-[9.5px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shrink-0 flex items-center gap-1 ${
                               isFounder
                                 ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
                                 : adv.accountType === 'partner_agency'
@@ -8872,27 +8872,22 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             {isFounder
                               ? (isEn ? '👑 Founder & Director' : '👑 Dirección General')
                               : adv.accountType === 'partner_agency'
-                              ? (isEn ? '🏢 Partner Agency' : '🏢 Agencia Partner B2B')
+                              ? (isEn ? `🏢 Partner Agency • $${adv.monthlyFeeUsd || 79}/mo` : `🏢 Agencia Partner • $${adv.monthlyFeeUsd || 79} USD/mes`)
                               : (isEn ? '💼 Sales Advisor' : '💼 Asesor Comercial')}
                           </span>
 
-                          <div className="flex items-center gap-1.5 ml-auto">
-                            {adv.accountType === 'partner_agency' && (
-                              <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                                ${adv.monthlyFeeUsd || 49} {isEn ? 'USD/mo' : 'USD/mes'}
-                              </span>
-                            )}
-
+                          <div className="shrink-0 flex items-center">
                             {/* Badge y Toggle de Estado: Encendida vs Apagada */}
                             {isFounder ? (
-                              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">
-                                🟢 Siempre Activa
+                              <span className="text-[9px] font-bold px-2 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 inline-flex items-center gap-1">
+                                <span>🟢</span>
+                                <span>{isEn ? 'Always Active' : 'Siempre Activa'}</span>
                               </span>
                             ) : (
                               <button
                                 type="button"
                                 onClick={() => handleToggleAdvisorActive(adv)}
-                                className={`text-[9px] font-bold px-2.5 py-0.5 rounded-full border transition cursor-pointer flex items-center gap-1 ${
+                                className={`text-[9px] font-bold px-2.5 py-1 rounded-full border transition cursor-pointer flex items-center gap-1 ${
                                   adv.active
                                     ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40 hover:bg-rose-950/80 hover:text-rose-300 hover:border-rose-500/40'
                                     : 'bg-rose-950 text-rose-300 border-rose-500/40 hover:bg-emerald-950/80 hover:text-emerald-300 hover:border-emerald-500/40'
@@ -8906,22 +8901,22 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           </div>
                         </div>
 
-                        {/* Nombre y Ubicación */}
-                        <div>
-                          <h4 className="text-base font-black text-white group-hover:text-amber-300 transition">
+                        {/* Nombre y Ubicación Parejos */}
+                        <div className="space-y-1">
+                          <h4 className="text-base font-black text-white group-hover:text-amber-300 transition truncate" title={adv.name}>
                             {adv.name}
                           </h4>
-                          <p className="text-xs text-slate-400 mt-0.5">
+                          <p className="text-xs text-slate-400 truncate">
                             📍 {adv.city || 'Bogotá'}, {adv.country || 'Colombia'}
                           </p>
-                          <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1">
-                            <span>Teléfono: <strong className="text-slate-300 font-mono">{adv.phone}</strong></span>
+                          <div className="flex items-center gap-2 text-[11px] text-slate-400 truncate">
+                            <span>Teléfono: <strong className="text-slate-300 font-mono">{adv.phone || 'No registrado'}</strong></span>
                             {adv.phone && (
                               <a
                                 href={`https://wa.me/${adv.phone.replace(/[^0-9]/g, '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-0.5 text-[10px]"
+                                className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-0.5 text-[10px] shrink-0"
                                 title="Abrir WhatsApp directo"
                               >
                                 <MessageSquare className="w-2.5 h-2.5" />
@@ -8994,17 +8989,33 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           </div>
                         </div>
 
-                        {/* Resumen de Producción */}
-                        <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px]">
-                          <span className="text-slate-400 font-bold">{isEn ? 'Production Record:' : 'Fichas Realizadas:'}</span>
-                          <span className="font-black text-amber-300 font-mono">
-                            {advisorDossiers.length} {isEn ? 'dossiers' : 'fichas'} ({createsCount} creadas, {auditsCount} auditadas, {rescuesCount} rescatadas)
-                          </span>
+                        {/* Resumen de Producción Parejo */}
+                        <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px] space-y-1.5">
+                          <div className="flex items-center justify-between font-bold">
+                            <span className="text-slate-400">{isEn ? 'Production Record:' : 'Fichas Realizadas:'}</span>
+                            <span className="font-black text-amber-300 font-mono">
+                              {advisorDossiers.length} {isEn ? 'dossiers' : 'expedientes'}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-3 gap-1 pt-1 border-t border-slate-800/60 text-center text-[10px]">
+                            <div className="bg-slate-900/80 py-0.5 rounded px-1">
+                              <span className="text-slate-400 block text-[9px] uppercase font-semibold">Creadas</span>
+                              <strong className="text-emerald-400 font-mono">{createsCount}</strong>
+                            </div>
+                            <div className="bg-slate-900/80 py-0.5 rounded px-1">
+                              <span className="text-slate-400 block text-[9px] uppercase font-semibold">Auditadas</span>
+                              <strong className="text-blue-400 font-mono">{auditsCount}</strong>
+                            </div>
+                            <div className="bg-slate-900/80 py-0.5 rounded px-1">
+                              <span className="text-slate-400 block text-[9px] uppercase font-semibold">Rescatadas</span>
+                              <strong className="text-amber-400 font-mono">{rescuesCount}</strong>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
                       {/* Botones de Acción: Ver Trabajos, Modificar y Eliminar */}
-                      <div className="pt-2 border-t border-slate-800/80 space-y-2">
+                      <div className="pt-2 border-t border-slate-800/80 space-y-2 mt-auto">
                         {/* Botón Principal para Ver sus Trabajos */}
                         <button
                           type="button"
@@ -9017,25 +9028,29 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           </span>
                         </button>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 h-9">
                           <button
                             type="button"
                             onClick={() => handleOpenEditAdvisor(adv)}
-                            className="flex-1 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/40 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-98"
+                            className="flex-1 h-full rounded-xl bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/40 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-98"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                             <span>{isEn ? 'Edit Account' : 'Modificar Cuenta'}</span>
                           </button>
 
-                          {!isFounder && (
+                          {!isFounder ? (
                             <button
                               type="button"
                               onClick={() => handleDeleteAdvisor(adv)}
-                              className="p-2 rounded-xl bg-rose-950/30 hover:bg-rose-950/70 text-rose-400 hover:text-rose-200 border border-rose-500/30 transition cursor-pointer"
+                              className="w-9 h-full rounded-xl bg-rose-950/30 hover:bg-rose-950/70 text-rose-400 hover:text-rose-200 border border-rose-500/30 transition cursor-pointer flex items-center justify-center shrink-0"
                               title={isEn ? 'Delete Account' : 'Eliminar Cuenta'}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
+                          ) : (
+                            <div className="px-2.5 h-full rounded-xl bg-slate-950/60 border border-slate-800 text-[10px] text-amber-400 font-bold flex items-center justify-center shrink-0">
+                              HQ Master
+                            </div>
                           )}
                         </div>
                       </div>
