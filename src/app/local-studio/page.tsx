@@ -1852,7 +1852,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [editAdvisorCountry, setEditAdvisorCountry] = useState<string>('Colombia');
   const [editAdvisorCity, setEditAdvisorCity] = useState<string>('Bogotá');
   const [editAdvisorAccountType, setEditAdvisorAccountType] = useState<'internal_advisor' | 'partner_agency'>('internal_advisor');
-  const [editAdvisorMonthlyFee, setEditAdvisorMonthlyFee] = useState<number>(49);
+  const [editAdvisorMonthlyFee, setEditAdvisorMonthlyFee] = useState<number>(79);
   const [editAdvisorLicenseStatus, setEditAdvisorLicenseStatus] = useState<'active' | 'pending_payment' | 'suspended'>('active');
   const [isUpdatingAdvisor, setIsUpdatingAdvisor] = useState<boolean>(false);
 
@@ -1865,7 +1865,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [newAdvisorPhone, setNewAdvisorPhone] = useState('+57');
   const [newAdvisorCountry, setNewAdvisorCountry] = useState('Colombia');
   const [newAdvisorCity, setNewAdvisorCity] = useState('Bogotá');
-  const [newAdvisorMonthlyFee, setNewAdvisorMonthlyFee] = useState<number>(49);
+  const [newAdvisorMonthlyFee, setNewAdvisorMonthlyFee] = useState<number>(79);
   const [newAdvisorLicenseStatus, setNewAdvisorLicenseStatus] = useState<'active' | 'pending_payment'>('active');
   const [adminMasterKey, setAdminMasterKey] = useState('admin');
   const [isSavingAdvisor, setIsSavingAdvisor] = useState(false);
@@ -2826,7 +2826,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
           accountType: newAccountType,
           country: newAdvisorCountry,
           city: newAdvisorCity,
-          monthlyFeeUsd: newAccountType === 'partner_agency' ? Number(newAdvisorMonthlyFee) : 0,
+          monthlyFeeUsd: Number(newAdvisorMonthlyFee) || 0,
           licenseStatus: newAdvisorLicenseStatus,
           active: true,
           masterKey: adminMasterKey,
@@ -2865,7 +2865,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     setEditAdvisorCountry(advisor.country || 'Colombia');
     setEditAdvisorCity(advisor.city || 'Bogotá');
     setEditAdvisorAccountType(advisor.accountType === 'partner_agency' ? 'partner_agency' : 'internal_advisor');
-    setEditAdvisorMonthlyFee(advisor.monthlyFeeUsd || 49);
+    setEditAdvisorMonthlyFee(advisor.monthlyFeeUsd ?? 79);
     setEditAdvisorLicenseStatus(advisor.licenseStatus || 'active');
     setShowEditAdvisorModal(true);
   };
@@ -2889,7 +2889,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         accountType: editAdvisorAccountType,
         country: editAdvisorCountry.trim(),
         city: editAdvisorCity.trim(),
-        monthlyFeeUsd: editAdvisorAccountType === 'partner_agency' ? Number(editAdvisorMonthlyFee) : 0,
+        monthlyFeeUsd: Number(editAdvisorMonthlyFee) || 0,
         licenseStatus: editAdvisorLicenseStatus,
         masterKey: 'admin',
       };
@@ -8639,7 +8639,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   <span className="text-[11px] text-slate-400 block">{tNetwork.kpiMrr}</span>
                   <strong className="text-xl font-black text-emerald-400">
                     ${advisorsList
-                      .filter((a) => a.accountType === 'partner_agency' && a.licenseStatus === 'active')
+                      .filter((a) => a.accountType !== 'founder' && (a.licenseStatus === 'active' || a.active))
                       .reduce((sum, a) => sum + (a.monthlyFeeUsd || 0), 0)}{' '}
                     <span className="text-xs font-bold text-slate-400">{isEn ? 'USD/mo' : 'USD/mes'}</span>
                   </strong>
@@ -8872,8 +8872,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             {isFounder
                               ? (isEn ? '👑 Founder & Director' : '👑 Dirección General')
                               : adv.accountType === 'partner_agency'
-                              ? (isEn ? `🏢 Partner Agency • $${adv.monthlyFeeUsd || 79}/mo` : `🏢 Agencia Partner • $${adv.monthlyFeeUsd || 79} USD/mes`)
-                              : (isEn ? '💼 Sales Advisor' : '💼 Asesor Comercial')}
+                              ? (isEn ? `🏢 Partner Agency • $${adv.monthlyFeeUsd ?? 79}/mo` : `🏢 Agencia Partner • $${adv.monthlyFeeUsd ?? 79} USD/mes`)
+                              : (isEn ? `💼 Sales Advisor • $${adv.monthlyFeeUsd ?? 79}/mo` : `💼 Asesor Comercial • $${adv.monthlyFeeUsd ?? 79} USD/mes`)}
                           </span>
 
                           <div className="shrink-0 flex items-center">
@@ -9392,39 +9392,39 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 />
               </div>
 
-              {/* Si es Agencia Partner: Canon y Estado de Licencia */}
-              {newAccountType === 'partner_agency' && (
-                <div className="p-3.5 rounded-2xl bg-purple-950/40 border border-purple-500/40 space-y-2.5">
-                  <div className="flex items-center gap-1.5 text-purple-300 font-bold text-xs">
-                    <DollarSign className="w-4 h-4 text-purple-400" />
-                    <span>Configuración de Licencia Mensual B2B:</span>
+              {/* Canon y Estado de Licencia (Asesores y Agencias) */}
+              <div className="p-3.5 rounded-2xl bg-purple-950/40 border border-purple-500/40 space-y-2.5">
+                <div className="flex items-center gap-1.5 text-purple-300 font-bold text-xs">
+                  <DollarSign className="w-4 h-4 text-purple-400" />
+                  <span>{isEn ? 'Monthly Software License Configuration:' : 'Configuración de Canon Mensual de Licencia:'}</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                      {isEn ? 'Monthly License Fee (USD/mo)' : 'Canon Mensual de Licencia (USD/mes)'}
+                    </label>
+                    <input
+                      type="number"
+                      value={newAdvisorMonthlyFee}
+                      onChange={(e) => setNewAdvisorMonthlyFee(Number(e.target.value))}
+                      className="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-purple-500/50 text-purple-200 font-bold focus:outline-none"
+                    />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">{tNetwork.monthlyFeeLabel}</label>
-                      <input
-                        type="number"
-                        value={newAdvisorMonthlyFee}
-                        onChange={(e) => setNewAdvisorMonthlyFee(Number(e.target.value))}
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-purple-500/50 text-purple-200 font-bold focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">{tNetwork.licenseStatusLabel}</label>
-                      <select
-                        value={newAdvisorLicenseStatus}
-                        onChange={(e) => setNewAdvisorLicenseStatus(e.target.value as any)}
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-purple-500/50 text-white focus:outline-none"
-                      >
-                        <option value="active">✅ Activa</option>
-                        <option value="pending_payment">⏳ Pendiente de Pago</option>
-                      </select>
-                    </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-300 mb-1">{tNetwork.licenseStatusLabel}</label>
+                    <select
+                      value={newAdvisorLicenseStatus}
+                      onChange={(e) => setNewAdvisorLicenseStatus(e.target.value as any)}
+                      className="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-purple-500/50 text-white focus:outline-none"
+                    >
+                      <option value="active">✅ Activa</option>
+                      <option value="pending_payment">⏳ Pendiente de Pago</option>
+                    </select>
                   </div>
                 </div>
-              )}
+              </div>
 
               <div>
                 <label className="block font-bold text-slate-300 mb-1">Clave Maestra de Dueño (Luisma) *</label>
@@ -9592,7 +9592,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 </div>
               </div>
 
-              {editAdvisorAccountType === 'partner_agency' && (
+              {editingAdvisor?.accountType !== 'founder' && (
                 <div>
                   <label className="block font-bold text-purple-300 mb-1">
                     {isEn ? 'Monthly Software Fee (USD/mo)' : 'Canon Mensual de Licencia (USD/mes)'}
