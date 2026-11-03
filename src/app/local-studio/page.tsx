@@ -31,6 +31,7 @@ import {
   ChevronRight,
   Building2,
   Trash2,
+  Crown,
   Save,
   HelpCircle,
   Layers,
@@ -73,7 +74,7 @@ interface StudioAdvisorUser {
   password?: string;
   phone: string;
   role: 'admin' | 'advisor';
-  accountType?: 'internal_advisor' | 'partner_agency' | 'founder';
+  accountType?: 'internal_advisor' | 'partner_agency' | 'founder' | 'director';
   country?: string;
   city?: string;
   monthlyFeeUsd?: number;
@@ -1348,6 +1349,7 @@ export default function LocalStudioPage() {
   // 1. AUTHENTICATION & ADVISOR SESSION
   // -------------------------------------------------------------
   const [currentUser, setCurrentUser] = useState<StudioAdvisorUser | null>(null);
+  const isLuismaMaster = Boolean(currentUser?.id === 'adv-luisma' || currentUser?.username?.toLowerCase() === 'luisma');
   const [loginUsername, setLoginUsername] = useState('luisma');
   const [loginPassword, setLoginPassword] = useState('1234');
   const [showPassword, setShowPassword] = useState(false);
@@ -1365,6 +1367,13 @@ export default function LocalStudioPage() {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
+
+  // Luisma Master Security: Only Luisma can access tab 8 (Network)
+  useEffect(() => {
+    if ((activeTab === 'network' || activeTab === 'advisors') && !isLuismaMaster) {
+      setActiveTab('create');
+    }
+  }, [currentUser, activeTab, isLuismaMaster]);
 
   // Check persisted session
   // Check persisted session
@@ -1833,7 +1842,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [networkSubView, setNetworkSubView] = useState<'monitor' | 'register' | 'directory'>('directory');
   const [networkSearch, setNetworkSearch] = useState('');
   const [networkAdvisorFilter, setNetworkAdvisorFilter] = useState('all');
-  const [networkTypeFilter, setNetworkTypeFilter] = useState<'all' | 'internal_advisor' | 'partner_agency'>('all');
+  const [networkTypeFilter, setNetworkTypeFilter] = useState<'all' | 'director' | 'internal_advisor' | 'partner_agency'>('all');
   const [networkCountryFilter, setNetworkCountryFilter] = useState('all');
   const [networkCityFilter, setNetworkCityFilter] = useState('all');
   const [networkModeFilter, setNetworkModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue'>('all');
@@ -1851,14 +1860,14 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [editAdvisorPhone, setEditAdvisorPhone] = useState<string>('+57');
   const [editAdvisorCountry, setEditAdvisorCountry] = useState<string>('Colombia');
   const [editAdvisorCity, setEditAdvisorCity] = useState<string>('Bogotá');
-  const [editAdvisorAccountType, setEditAdvisorAccountType] = useState<'internal_advisor' | 'partner_agency'>('internal_advisor');
+  const [editAdvisorAccountType, setEditAdvisorAccountType] = useState<'internal_advisor' | 'partner_agency' | 'director' | 'founder'>('internal_advisor');
   const [editAdvisorMonthlyFee, setEditAdvisorMonthlyFee] = useState<number>(79);
   const [editAdvisorLicenseStatus, setEditAdvisorLicenseStatus] = useState<'active' | 'pending_payment' | 'suspended'>('active');
   const [isUpdatingAdvisor, setIsUpdatingAdvisor] = useState<boolean>(false);
 
   // Advisors & Agencies List (for Admin tab)
   const [advisorsList, setAdvisorsList] = useState<StudioAdvisorUser[]>([]);
-  const [newAccountType, setNewAccountType] = useState<'internal_advisor' | 'partner_agency'>('internal_advisor');
+  const [newAccountType, setNewAccountType] = useState<'director' | 'internal_advisor' | 'partner_agency'>('internal_advisor');
   const [newAdvisorName, setNewAdvisorName] = useState('');
   const [newAdvisorUser, setNewAdvisorUser] = useState('');
   const [newAdvisorPass, setNewAdvisorPass] = useState('');
@@ -1899,7 +1908,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     if (activeTab === 'dossiers') {
       fetchDossiers();
     }
-    if ((activeTab === 'advisors' || activeTab === 'network') && currentUser?.role === 'admin') {
+    if ((activeTab === 'advisors' || activeTab === 'network') && isLuismaMaster) {
       fetchAdvisors();
     }
   }, [activeTab]);
@@ -2617,8 +2626,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
       if (networkCountryFilter !== 'all' && (adv.country || 'Colombia') !== networkCountryFilter) return false;
       if (networkCityFilter !== 'all' && (adv.city || '').toLowerCase() !== networkCityFilter.toLowerCase()) return false;
       if (networkTypeFilter !== 'all') {
+        if (networkTypeFilter === 'director' && adv.accountType !== 'director' && adv.accountType !== 'founder') return false;
         if (networkTypeFilter === 'partner_agency' && adv.accountType !== 'partner_agency') return false;
-        if (networkTypeFilter === 'internal_advisor' && (adv.accountType === 'partner_agency' || adv.accountType === 'founder')) return false;
+        if (networkTypeFilter === 'internal_advisor' && adv.accountType !== 'internal_advisor') return false;
       }
       if (networkActiveFilter !== 'all') {
         if (networkActiveFilter === 'active' && !adv.active) return false;
@@ -2822,7 +2832,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
           username: newAdvisorUser,
           password: newAdvisorPass,
           phone: newAdvisorPhone,
-          role: 'advisor',
+          role: newAccountType === 'director' ? 'admin' : 'advisor',
           accountType: newAccountType,
           country: newAdvisorCountry,
           city: newAdvisorCity,
@@ -2836,7 +2846,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
       const resData = await res.json();
       if (resData.success) {
         showToast(
-          newAccountType === 'partner_agency'
+          newAccountType === 'director'
+            ? `👑 ¡Cuenta de Director General ${newAdvisorName} creada con éxito!`
+            : newAccountType === 'partner_agency'
             ? `🏢 ¡Agencia Partner ${newAdvisorName} registrada y licenciada con éxito!`
             : `💼 ¡Asesor Comercial ${newAdvisorName} creado con éxito!`
         );
@@ -2864,7 +2876,15 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     setEditAdvisorPhone(advisor.phone || '+57');
     setEditAdvisorCountry(advisor.country || 'Colombia');
     setEditAdvisorCity(advisor.city || 'Bogotá');
-    setEditAdvisorAccountType(advisor.accountType === 'partner_agency' ? 'partner_agency' : 'internal_advisor');
+    setEditAdvisorAccountType(
+      advisor.accountType === 'partner_agency'
+        ? 'partner_agency'
+        : advisor.accountType === 'director'
+        ? 'director'
+        : advisor.accountType === 'founder'
+        ? 'founder'
+        : 'internal_advisor'
+    );
     setEditAdvisorMonthlyFee(advisor.monthlyFeeUsd ?? 79);
     setEditAdvisorLicenseStatus(advisor.licenseStatus || 'active');
     setShowEditAdvisorModal(true);
@@ -2886,6 +2906,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         name: editAdvisorName.trim(),
         username: editAdvisorUser.trim().toLowerCase(),
         phone: editAdvisorPhone.trim(),
+        role: editAdvisorAccountType === 'director' || editAdvisorAccountType === 'founder' ? 'admin' : 'advisor',
         accountType: editAdvisorAccountType,
         country: editAdvisorCountry.trim(),
         city: editAdvisorCity.trim(),
@@ -3421,7 +3442,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               <span className="truncate">{t.tabDossiers}</span>
             </button>
 
-            {currentUser?.role === 'admin' && (
+            {isLuismaMaster && (
               <button
                 type="button"
                 onClick={() => setActiveTab('network')}
@@ -8564,7 +8585,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
           </div>
         )}
 
-        {(activeTab === 'advisors' || activeTab === 'network') && currentUser?.role === 'admin' && (
+        {(activeTab === 'advisors' || activeTab === 'network') && isLuismaMaster && (
           <div className="space-y-6 print:hidden">
             {/* Header */}
             <div className="bg-gradient-to-r from-amber-500/10 via-slate-900 to-indigo-950/40 border border-amber-500/40 rounded-3xl p-5 sm:p-6 shadow-xl">
@@ -8763,7 +8784,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                   >
                     <option value="all">{isEn ? 'All Types' : 'Todos los Tipos'}</option>
-                    <option value="internal_advisor">{isEn ? '💼 Internal Advisors' : '💼 Asesores Comerciales'}</option>
+                    <option value="director">{isEn ? '👑 General Directors' : '👑 Directores Generales'}</option>
+                    <option value="internal_advisor">{isEn ? '💼 Sales Advisors' : '💼 Asesores Comerciales'}</option>
                     <option value="partner_agency">{isEn ? '🏢 Partner Agencies (B2B)' : '🏢 Agencias Partners (B2B)'}</option>
                   </select>
                 </div>
@@ -8842,6 +8864,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
                 {filteredAdvisors.map((adv) => {
                   const isFounder = adv.id === 'adv-luisma' || adv.accountType === 'founder';
+                  const isDirector = adv.accountType === 'director';
                   const advisorDossiers = savedDossiers.filter((d) => d.advisorId === adv.id);
                   const createsCount = advisorDossiers.filter((d) => d.mode === 'create').length;
                   const auditsCount = advisorDossiers.filter((d) => d.mode === 'audit').length;
@@ -8864,13 +8887,17 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             className={`text-[9.5px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shrink-0 flex items-center gap-1 ${
                               isFounder
                                 ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                : isDirector
+                                ? 'bg-amber-950/70 text-amber-300 border border-amber-500/40'
                                 : adv.accountType === 'partner_agency'
                                 ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
                                 : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
                             }`}
                           >
                             {isFounder
-                              ? (isEn ? '👑 Founder & Director' : '👑 Dirección General')
+                              ? (isEn ? '👑 Founder & Director' : '👑 Fundador Master')
+                              : isDirector
+                              ? (isEn ? `👑 General Director • $${adv.monthlyFeeUsd ?? 79}/mo` : `👑 Director General • $${adv.monthlyFeeUsd ?? 79} USD/mes`)
                               : adv.accountType === 'partner_agency'
                               ? (isEn ? `🏢 Partner Agency • $${adv.monthlyFeeUsd ?? 79}/mo` : `🏢 Agencia Partner • $${adv.monthlyFeeUsd ?? 79} USD/mes`)
                               : (isEn ? `💼 Sales Advisor • $${adv.monthlyFeeUsd ?? 79}/mo` : `💼 Asesor Comercial • $${adv.monthlyFeeUsd ?? 79} USD/mes`)}
@@ -9273,32 +9300,45 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               </button>
             </div>
 
-            {/* Toggle Tipo de Cuenta */}
-            <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-slate-950 border border-slate-800 text-xs">
+            {/* Toggle Tipo de Cuenta: Director General, Asesor Comercial, Agencia Partner */}
+            <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-slate-950 border border-slate-800 text-xs">
+              <button
+                type="button"
+                onClick={() => setNewAccountType('director')}
+                className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
+                  newAccountType === 'director'
+                    ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Crown className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{isEn ? 'Director' : 'Director Gral'}</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => setNewAccountType('internal_advisor')}
-                className={`py-2 px-3 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
                   newAccountType === 'internal_advisor'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                <Briefcase className="w-3.5 h-3.5" />
-                <span>{tNetwork.optAdvisor}</span>
+                <Briefcase className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{isEn ? 'Advisor' : 'Asesor'}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setNewAccountType('partner_agency')}
-                className={`py-2 px-3 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                className={`py-2 px-2 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1 text-[11px] ${
                   newAccountType === 'partner_agency'
                     ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                <Building2 className="w-3.5 h-3.5" />
-                <span>{tNetwork.optAgency}</span>
+                <Building2 className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{isEn ? 'Agency' : 'Agencia'}</span>
               </button>
             </div>
 
@@ -9311,16 +9351,20 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
             >
               <div>
                 <label className="block font-bold text-slate-300 mb-1">
-                  {newAccountType === 'partner_agency'
+                  {newAccountType === 'director'
+                    ? (isEn ? 'General Director Full Name *' : 'Nombre Completo del Director General *')
+                    : newAccountType === 'partner_agency'
                     ? (isEn ? 'Partner Agency Business Name *' : 'Razón Social o Nombre de la Agencia *')
-                    : (isEn ? 'Sales Advisor Full Name *' : 'Nombre Completo del Asesor *')}
+                    : (isEn ? 'Sales Advisor Full Name *' : 'Nombre Completo del Asesor Comercial *')}
                 </label>
                 <input
                   type="text"
                   value={newAdvisorName}
                   onChange={(e) => setNewAdvisorName(e.target.value)}
                   placeholder={
-                    newAccountType === 'partner_agency'
+                    newAccountType === 'director'
+                      ? (isEn ? 'e.g. Dr. Roberto Gómez' : 'Ej: Roberto Gómez')
+                      : newAccountType === 'partner_agency'
                       ? (isEn ? 'e.g. Apex Local Growth Agency' : 'Ej: Agencia Digital Rocket 360')
                       : (isEn ? 'e.g. Michael Smith' : 'Ej: Carlos Gómez')
                   }
@@ -9453,9 +9497,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 >
                   {isSavingAdvisor
                     ? 'Registrando...'
+                    : newAccountType === 'director'
+                    ? '👑 + Crear Cuenta Director General'
                     : newAccountType === 'partner_agency'
                     ? '🚀 Activar Licencia de Agencia Partner'
-                    : '+ Crear Asesor Comercial'}
+                    : '💼 + Crear Asesor Comercial'}
                 </button>
               </div>
             </form>
@@ -9570,11 +9616,21 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   <label className="block font-bold text-slate-300 mb-1">{isEn ? 'Account Type' : 'Tipo de Cuenta'}</label>
                   <select
                     value={editAdvisorAccountType}
+                    disabled={editingAdvisor?.accountType === 'founder'}
                     onChange={(e) => setEditAdvisorAccountType(e.target.value as any)}
-                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none"
+                    className={`w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none ${
+                      editingAdvisor?.accountType === 'founder' ? 'opacity-70 cursor-not-allowed' : ''
+                    }`}
                   >
-                    <option value="internal_advisor">{isEn ? '💼 Internal Advisor' : '💼 Asesor Comercial Interno'}</option>
-                    <option value="partner_agency">{isEn ? '🏢 Partner Agency (B2B)' : '🏢 Agencia Partner (Licencia Mensual)'}</option>
+                    {editingAdvisor?.accountType === 'founder' ? (
+                      <option value="founder">👑 Fundador & Director General Master</option>
+                    ) : (
+                      <>
+                        <option value="director">{isEn ? '👑 General Director' : '👑 Dirección General'}</option>
+                        <option value="internal_advisor">{isEn ? '💼 Sales Advisor' : '💼 Asesor Comercial Interno'}</option>
+                        <option value="partner_agency">{isEn ? '🏢 Partner Agency (B2B)' : '🏢 Agencia Partner (Licencia Mensual)'}</option>
+                      </>
+                    )}
                   </select>
                 </div>
 

@@ -46,7 +46,7 @@ export interface StudioAdvisor {
   password: string;
   phone: string;
   role: 'admin' | 'advisor';
-  accountType?: 'internal_advisor' | 'partner_agency' | 'founder';
+  accountType?: 'internal_advisor' | 'partner_agency' | 'founder' | 'director';
   country?: string;
   city?: string;
   monthlyFeeUsd?: number;
