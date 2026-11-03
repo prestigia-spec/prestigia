@@ -7674,9 +7674,10 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
             {/* Modal for Commercial Closing & Monetization Management */}
             {editingDossierClosing && (
-              <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-                <div className="w-full max-w-xl bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200">
-                  <div className="flex items-start justify-between gap-4">
+              <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md overflow-y-auto p-3 sm:p-6 flex items-center justify-center">
+                <div className="w-full max-w-xl max-h-[92vh] flex flex-col bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden my-auto">
+                  {/* Cabecera Fija */}
+                  <div className="p-5 sm:p-6 pb-3 border-b border-slate-800 flex items-start justify-between gap-4 shrink-0 bg-slate-900/95">
                     <div>
                       <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
                         Control de Monetización & Cierre
@@ -7685,7 +7686,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         {editingDossierClosing.clientName}
                       </h3>
                       <p className="text-xs text-slate-400">
-                        📍 {editingDossierClosing.city} {editingDossierClosing.neighborhood ? `• ${editingDossierClosing.neighborhood}` : ''}
+                        📍 {closingFormCity || editingDossierClosing.city} {closingFormNeighborhood ? `• ${closingFormNeighborhood}` : ''} ({closingFormCountry || editingDossierClosing.country || 'Colombia'})
                       </p>
                     </div>
                     <button
@@ -7696,6 +7697,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       <X className="w-5 h-5" />
                     </button>
                   </div>
+
+                  {/* Cuerpo Desplazable con Barra de Movimiento */}
+                  <div className="p-5 sm:p-6 pt-4 overflow-y-auto space-y-4 text-xs flex-1">
 
                   {/* 1-Click Fast Presets */}
                   <div className="space-y-1.5">
@@ -7951,12 +7955,14 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+                  </div>
+
+                  {/* Pie Fijo con Botones de Acción Siempre Visibles */}
+                  <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-900/95 flex items-center justify-end gap-2 shrink-0">
                     <button
                       type="button"
                       onClick={() => setEditingDossierClosing(null)}
-                      className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
+                      className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
                     >
                       Cancelar
                     </button>
@@ -7964,7 +7970,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       type="button"
                       disabled={isSavingClosing}
                       onClick={handleSaveDossierClosing}
-                      className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-98 disabled:opacity-50"
+                      className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-98 disabled:opacity-50"
                     >
                       {isSavingClosing ? (
                         <>
@@ -8772,8 +8778,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
       {/* Modal: Agregar País al Catálogo */}
       {showAddCountryModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-emerald-500/50 rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl animate-in zoom-in-95">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-emerald-500/50 rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl animate-in zoom-in-95 max-h-[92vh] overflow-y-auto my-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-xl bg-emerald-950 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
@@ -8845,8 +8851,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
       {/* Modal: Agregar Ciudad a País */}
       {showAddCityModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-emerald-500/50 rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl animate-in zoom-in-95">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-emerald-500/50 rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl animate-in zoom-in-95 max-h-[92vh] overflow-y-auto my-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-xl bg-emerald-950 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
