@@ -1403,7 +1403,6 @@ export default function LocalStudioPage() {
   }, [currentUser, activeTab, isLuismaMaster]);
 
   // Check persisted session
-  // Check persisted session
   useEffect(() => {
     try {
       const isLoggedOut = localStorage.getItem('prestigia_studio_logged_out');
@@ -1417,73 +1416,15 @@ export default function LocalStudioPage() {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed && parsed.id) {
-          // If stored was old legacy advisor or carlos, reset to Luisma Director General
-          if (parsed.id === 'adv-brayan' || parsed.id === 'adv-carlos' || parsed.username === 'carlos') {
-            const founderUser: StudioAdvisorUser = {
-              id: 'adv-luisma',
-              name: 'Luisma • Director General & Founder',
-              username: 'luisma',
-              phone: '+573058314049',
-              role: 'admin',
-              accountType: 'founder',
-              active: true,
-            };
-            setCurrentUser(founderUser);
-            localStorage.setItem('prestigia_studio_advisor', JSON.stringify(founderUser));
-            return;
-          }
           setCurrentUser(parsed);
           return;
         }
       }
     } catch {}
 
-    // Default: Luisma (Director General & Founder) with full admin authority
-    const founderUser: StudioAdvisorUser = {
-      id: 'adv-luisma',
-      name: 'Luisma • Director General & Founder',
-      username: 'luisma',
-      phone: '+573058314049',
-      role: 'admin',
-      active: true,
-    };
-    setCurrentUser(founderUser);
-    localStorage.setItem('prestigia_studio_advisor', JSON.stringify(founderUser));
+    // Sin sesión previa activa: requerir inicio de sesión obligatorio con credenciales
+    setCurrentUser(null);
   }, []);
-
-  const handleQuickLogin = (roleType: 'luisma' | 'carlos') => {
-    if (roleType === 'luisma') {
-      const founderUser: StudioAdvisorUser = {
-        id: 'adv-luisma',
-        name: 'Luisma • Director General & Founder',
-        username: 'luisma',
-        phone: '+573058314049',
-        role: 'admin',
-        active: true,
-      };
-      setCurrentUser(founderUser);
-      localStorage.setItem('prestigia_studio_advisor', JSON.stringify(founderUser));
-      localStorage.setItem('prestigia_studio_advisor_explicit', 'true');
-      localStorage.removeItem('prestigia_studio_logged_out');
-      setShowAuthModal(false);
-      showToast('👑 Perfil activo: Luisma • Director General & Founder');
-    } else {
-      const advisorUser: StudioAdvisorUser = {
-        id: 'adv-carlos',
-        name: 'Carlos Mendoza • Asesor Comercial',
-        username: 'carlos',
-        phone: '+573104567890',
-        role: 'advisor',
-        active: true,
-      };
-      setCurrentUser(advisorUser);
-      localStorage.setItem('prestigia_studio_advisor', JSON.stringify(advisorUser));
-      localStorage.setItem('prestigia_studio_advisor_explicit', 'true');
-      localStorage.removeItem('prestigia_studio_logged_out');
-      setShowAuthModal(false);
-      showToast('💼 Perfil activo: Carlos • Consultor Comercial');
-    }
-  };
 
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
