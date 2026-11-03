@@ -1355,8 +1355,8 @@ export default function LocalStudioPage() {
   // -------------------------------------------------------------
   const [currentUser, setCurrentUser] = useState<StudioAdvisorUser | null>(null);
   const isLuismaMaster = Boolean(currentUser?.id === 'adv-luisma' || currentUser?.username?.toLowerCase() === 'luisma');
-  const [loginUsername, setLoginUsername] = useState('luisma');
-  const [loginPassword, setLoginPassword] = useState('1234');
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -1478,6 +1478,9 @@ export default function LocalStudioPage() {
         localStorage.setItem('prestigia_studio_advisor', JSON.stringify(data.advisor));
         localStorage.setItem('prestigia_studio_advisor_explicit', 'true');
         localStorage.removeItem('prestigia_studio_logged_out');
+        setLoginUsername('');
+        setLoginPassword('');
+        setLoginError('');
         setShowAuthModal(false);
         showToast(`¡Bienvenido, ${data.advisor.name}!`);
       } else {
@@ -1495,6 +1498,9 @@ export default function LocalStudioPage() {
     localStorage.removeItem('prestigia_studio_advisor_explicit');
     localStorage.setItem('prestigia_studio_logged_out', 'true');
     setCurrentUser(null);
+    setLoginUsername('');
+    setLoginPassword('');
+    setLoginError('');
     setShowAuthModal(true);
     showToast(isEn ? '👋 Session closed successfully' : '👋 Sesión cerrada exitosamente');
   };
@@ -3441,7 +3447,12 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
           ) : (
             <button
               type="button"
-              onClick={() => setShowAuthModal(true)}
+              onClick={() => {
+                setLoginUsername('');
+                setLoginPassword('');
+                setLoginError('');
+                setShowAuthModal(true);
+              }}
               className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
             >
               <Lock className="w-3.5 h-3.5" />
@@ -10330,7 +10341,12 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowAuthModal(false)}
+                  onClick={() => {
+                    setLoginUsername('');
+                    setLoginPassword('');
+                    setLoginError('');
+                    setShowAuthModal(false);
+                  }}
                   className="text-slate-500 hover:text-white text-xs font-bold px-2 py-1 rounded-lg hover:bg-slate-800 transition cursor-pointer"
                 >
                   {tAuth.close}
