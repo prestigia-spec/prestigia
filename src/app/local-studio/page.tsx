@@ -59,6 +59,7 @@ import {
   Sliders,
   RotateCcw,
   CheckCheck,
+  Plus,
 } from 'lucide-react';
 import type { GooglePlaceData } from '@/app/api/auditor/google-lookup/route';
 
@@ -206,6 +207,188 @@ const CATEGORY_OPTIONS_EN = [
 ];
 
 const CATEGORY_OPTIONS = CATEGORY_OPTIONS_ES;
+
+const WORLD_REGIONS_GEO: Record<string, string[]> = {
+  // América
+  'Colombia': [
+    'Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga',
+    'Pereira', 'Manizales', 'Santa Marta', 'Cúcuta', 'Ibagué', 'Villavicencio',
+    'Pasto', 'Armenia', 'Montería', 'Neiva', 'Valledupar', 'Popayán', 'Sincelejo', 'Tunja'
+  ],
+  'México': [
+    'Ciudad de México', 'Guadalajara', 'Monterrey', 'Puebla', 'Tijuana',
+    'Querétaro', 'Cancún', 'Mérida', 'León', 'San Luis Potosí', 'Toluca',
+    'Chihuahua', 'Hermosillo', 'Aguascalientes', 'Veracruz', 'Mazatlán', 'Cuernavaca'
+  ],
+  'Estados Unidos': [
+    'Miami', 'Orlando', 'Tampa', 'New York', 'Los Angeles', 'Houston',
+    'Chicago', 'Dallas', 'Las Vegas', 'Atlanta', 'Phoenix', 'San Antonio',
+    'San Diego', 'Austin', 'San Francisco', 'Seattle', 'Boston', 'Denver'
+  ],
+  'España': [
+    'Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Zaragoza', 'Málaga',
+    'Murcia', 'Palma de Mallorca', 'Las Palmas', 'Bilbao', 'Alicante',
+    'Córdoba', 'Valladolid', 'Vigo', 'Gijón', 'Granada', 'A Coruña', 'Vitoria'
+  ],
+  'Argentina': [
+    'Buenos Aires', 'Córdoba', 'Rosario', 'Mendoza', 'La Plata',
+    'San Miguel de Tucumán', 'Mar del Plata', 'Salta', 'Santa Fe', 'San Juan', 'Neuquén', 'Bariloche'
+  ],
+  'Chile': [
+    'Santiago', 'Valparaíso', 'Concepción', 'Viña del Mar', 'Antofagasta',
+    'Temuco', 'La Serena', 'Rancagua', 'Puerto Montt', 'Iquique', 'Arica', 'Talca'
+  ],
+  'Perú': [
+    'Lima', 'Arequipa', 'Trujillo', 'Chiclayo', 'Piura', 'Cusco',
+    'Huancayo', 'Iquitos', 'Tacna', 'Pucallpa', 'Chimbote'
+  ],
+  'Ecuador': [
+    'Quito', 'Guayaquil', 'Cuenca', 'Santo Domingo', 'Machala',
+    'Manta', 'Portoviejo', 'Loja', 'Ambato', 'Esmeraldas', 'Riobamba'
+  ],
+  'Panamá': [
+    'Ciudad de Panamá', 'San Miguelito', 'David', 'Colón', 'La Chorrera',
+    'Santiago de Veraguas', 'Penonomé', 'Chitré'
+  ],
+  'República Dominicana': [
+    'Santo Domingo', 'Santiago de los Caballeros', 'Punta Cana', 'La Romana',
+    'Puerto Plata', 'San Pedro de Macorís', 'San Cristóbal', 'Higüey'
+  ],
+  'Costa Rica': [
+    'San José', 'Alajuela', 'Cartago', 'Heredia', 'Liberia',
+    'Puntarenas', 'Limón', 'San Carlos', 'Pérez Zeledón'
+  ],
+  'Guatemala': [
+    'Ciudad de Guatemala', 'Mixco', 'Villa Nueva', 'Quetzaltenango',
+    'Escuintla', 'Antigua Guatemala', 'Cobán', 'San Miguel Petapa'
+  ],
+  'Uruguay': [
+    'Montevideo', 'Maldonado', 'Punta del Este', 'Salto', 'Ciudad de la Costa',
+    'Paysandú', 'Las Piedras', 'Rivera'
+  ],
+  'Canadá': [
+    'Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Ottawa',
+    'Edmonton', 'Quebec City', 'Winnipeg', 'Hamilton', 'Halifax'
+  ],
+  'Brasil': [
+    'São Paulo', 'Rio de Janeiro', 'Brasília', 'Salvador', 'Fortaleza',
+    'Belo Horizonte', 'Curitiba', 'Recife', 'Porto Alegre', 'Florianópolis', 'Campinas'
+  ],
+  // Europa
+  'Reino Unido': [
+    'London', 'Manchester', 'Birmingham', 'Edinburgh', 'Glasgow',
+    'Liverpool', 'Bristol', 'Leeds', 'Sheffield', 'Belfast', 'Newcastle'
+  ],
+  'Francia': [
+    'Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice',
+    'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille', 'Rennes'
+  ],
+  'Italia': [
+    'Roma', 'Milano', 'Napoli', 'Torino', 'Palermo',
+    'Genova', 'Bologna', 'Firenze', 'Bari', 'Catania', 'Verona', 'Venezia'
+  ],
+  'Alemania': [
+    'Berlin', 'München', 'Frankfurt', 'Hamburg', 'Köln',
+    'Stuttgart', 'Düsseldorf', 'Leipzig', 'Dortmund', 'Essen', 'Bremen', 'Dresden'
+  ],
+  'Portugal': [
+    'Lisboa', 'Porto', 'Vila Nova de Gaia', 'Amadora', 'Braga',
+    'Coimbra', 'Funchal', 'Setúbal', 'Faro', 'Aveiro', 'Guimarães'
+  ],
+};
+
+const COUNTRY_ALIASES: Record<string, string> = {
+  colombia: 'Colombia',
+  mexico: 'México',
+  méxico: 'México',
+  'estados unidos': 'Estados Unidos',
+  'united states': 'Estados Unidos',
+  usa: 'Estados Unidos',
+  eeuu: 'Estados Unidos',
+  'ee.uu.': 'Estados Unidos',
+  'u.s.a.': 'Estados Unidos',
+  spain: 'España',
+  españa: 'España',
+  argentina: 'Argentina',
+  chile: 'Chile',
+  peru: 'Perú',
+  perú: 'Perú',
+  ecuador: 'Ecuador',
+  panama: 'Panamá',
+  panamá: 'Panamá',
+  'republica dominicana': 'República Dominicana',
+  'república dominicana': 'República Dominicana',
+  'dominican republic': 'República Dominicana',
+  'costa rica': 'Costa Rica',
+  guatemala: 'Guatemala',
+  uruguay: 'Uruguay',
+  canada: 'Canadá',
+  canadá: 'Canadá',
+  brazil: 'Brasil',
+  brasil: 'Brasil',
+  'united kingdom': 'Reino Unido',
+  uk: 'Reino Unido',
+  'reino unido': 'Reino Unido',
+  france: 'Francia',
+  francia: 'Francia',
+  italy: 'Italia',
+  italia: 'Italia',
+  germany: 'Alemania',
+  alemania: 'Alemania',
+  portugal: 'Portugal',
+};
+
+function parseAddressGeo(
+  rawAddress: string,
+  fallbackCountry: string = 'Colombia',
+  fallbackCity: string = 'Bogotá',
+  fallbackNeighborhood: string = ''
+): { country: string; city: string; neighborhood: string } {
+  if (!rawAddress) {
+    return { country: fallbackCountry, city: fallbackCity, neighborhood: fallbackNeighborhood };
+  }
+  const cleaned = rawAddress.toLowerCase();
+
+  let detectedCountry = fallbackCountry;
+  for (const [alias, canonical] of Object.entries(COUNTRY_ALIASES)) {
+    if (cleaned.includes(alias)) {
+      detectedCountry = canonical;
+      break;
+    }
+  }
+
+  const citiesList = WORLD_REGIONS_GEO[detectedCountry] || [];
+  let detectedCity = fallbackCity;
+  let cityFound = false;
+  for (const c of citiesList) {
+    if (cleaned.includes(c.toLowerCase())) {
+      detectedCity = c;
+      cityFound = true;
+      break;
+    }
+  }
+
+  const parts = rawAddress.split(',').map((p) => p.trim());
+  let detectedNeighborhood = fallbackNeighborhood;
+  if (!cityFound) {
+    if (parts.length >= 3) {
+      detectedCity = parts[parts.length - 2] || fallbackCity;
+      detectedNeighborhood = parts[parts.length - 3] || fallbackNeighborhood;
+    } else if (parts.length >= 2) {
+      detectedCity = parts[parts.length - 2] || fallbackCity;
+    }
+  } else {
+    if (parts.length >= 3) {
+      detectedNeighborhood = parts[parts.length - 3] || fallbackNeighborhood;
+    }
+  }
+
+  return {
+    country: detectedCountry,
+    city: detectedCity,
+    neighborhood: detectedNeighborhood,
+  };
+}
 
 function mapDetectedCategoryToPrestigia(
   primaryCategory: string,
@@ -1288,8 +1471,24 @@ export default function LocalStudioPage() {
   // -------------------------------------------------------------
   const [businessName, setBusinessName] = useState('');
   const [category, setCategory] = useState(CATEGORY_OPTIONS[0]);
-  const [city, setCity] = useState('');
-  const [neighborhood, setNeighborhood] = useState('');
+  const [country, setCountry] = useState<string>('Colombia');
+  const [city, setCity] = useState<string>('Bogotá');
+  const [neighborhood, setNeighborhood] = useState<string>('');
+  const [customCountries, setCustomCountries] = useState<string[]>([]);
+  const [customCitiesByCountry, setCustomCitiesByCountry] = useState<Record<string, string[]>>({});
+
+  // Quick modals for custom country / city
+  const [showAddCountryModal, setShowAddCountryModal] = useState<boolean>(false);
+  const [showAddCityModal, setShowAddCityModal] = useState<boolean>(false);
+  const [targetCountryForNewCity, setTargetCountryForNewCity] = useState<string>('Colombia');
+  const [newCountryInput, setNewCountryInput] = useState<string>('');
+  const [newCountryCityInput, setNewCountryCityInput] = useState<string>('');
+  const [newCityInput, setNewCityInput] = useState<string>('');
+
+  // Closing modal location states
+  const [closingFormCountry, setClosingFormCountry] = useState<string>('Colombia');
+  const [closingFormCity, setClosingFormCity] = useState<string>('Bogotá');
+  const [closingFormNeighborhood, setClosingFormNeighborhood] = useState<string>('');
   const [specialties, setSpecialties] = useState('');
   const [phone, setPhone] = useState('');
   const [googleUrl, setGoogleUrl] = useState('');
@@ -1308,6 +1507,117 @@ export default function LocalStudioPage() {
   const tAuth = TXT_AUTH[lang] || TXT_AUTH.es;
   const isEn = lang === 'en';
   const categoryOptions = lang === 'en' ? CATEGORY_OPTIONS_EN : CATEGORY_OPTIONS_ES;
+
+  // Load custom countries and cities from localStorage on mount
+  useEffect(() => {
+    try {
+      const storedCountries = localStorage.getItem('prestigia_custom_geo_countries');
+      if (storedCountries) {
+        const parsed = JSON.parse(storedCountries);
+        if (Array.isArray(parsed)) setCustomCountries(parsed);
+      }
+      const storedCities = localStorage.getItem('prestigia_custom_geo_cities');
+      if (storedCities) {
+        const parsed = JSON.parse(storedCities);
+        if (typeof parsed === 'object' && parsed !== null) setCustomCitiesByCountry(parsed);
+      }
+    } catch (e) {
+      console.warn('Could not load custom geo data from localStorage', e);
+    }
+  }, []);
+
+const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
+
+  // Combined list of countries (default + custom + dossiers)
+  const allCountriesList = useMemo(() => {
+    const set = new Set<string>(Object.keys(WORLD_REGIONS_GEO));
+    customCountries.forEach((c) => set.add(c));
+    savedDossiers.forEach((d) => {
+      if (d.country) set.add(d.country);
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [customCountries, savedDossiers]);
+
+  // Cities for a given country (default + custom + dossiers)
+  const getCitiesForCountry = (c: string): string[] => {
+    const set = new Set<string>(WORLD_REGIONS_GEO[c] || []);
+    if (customCitiesByCountry[c]) {
+      customCitiesByCountry[c].forEach((cityName) => set.add(cityName));
+    }
+    savedDossiers.forEach((d) => {
+      if ((d.country || 'Colombia') === c && d.city) set.add(d.city);
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  };
+
+  const handleSelectCountry = (newCountry: string) => {
+    setCountry(newCountry);
+    const available = getCitiesForCountry(newCountry);
+    if (!available.includes(city) && available.length > 0) {
+      setCity(available[0]);
+    }
+  };
+
+  const handleSaveNewCountry = () => {
+    const trimmedCountry = newCountryInput.trim();
+    if (!trimmedCountry) return;
+    const trimmedCity = newCountryCityInput.trim();
+
+    setCustomCountries((prev) => {
+      const updated = Array.from(new Set([...prev, trimmedCountry]));
+      try {
+        localStorage.setItem('prestigia_custom_geo_countries', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+
+    if (trimmedCity) {
+      setCustomCitiesByCountry((prev) => {
+        const existing = prev[trimmedCountry] || [];
+        const updated = { ...prev, [trimmedCountry]: Array.from(new Set([...existing, trimmedCity])) };
+        try {
+          localStorage.setItem('prestigia_custom_geo_cities', JSON.stringify(updated));
+        } catch {}
+        return updated;
+      });
+      setCity(trimmedCity);
+    } else {
+      const def = (WORLD_REGIONS_GEO[trimmedCountry] || [])[0] || '';
+      if (def) setCity(def);
+    }
+
+    setCountry(trimmedCountry);
+    setNewCountryInput('');
+    setNewCountryCityInput('');
+    setShowAddCountryModal(false);
+    showToast(`✓ País "${trimmedCountry}" agregado y seleccionado con éxito`);
+  };
+
+  const handleSaveNewCity = () => {
+    const trimmedCity = newCityInput.trim();
+    const targetC = targetCountryForNewCity || country || 'Colombia';
+    if (!trimmedCity) return;
+
+    setCustomCitiesByCountry((prev) => {
+      const existing = prev[targetC] || [];
+      const updated = { ...prev, [targetC]: Array.from(new Set([...existing, trimmedCity])) };
+      try {
+        localStorage.setItem('prestigia_custom_geo_cities', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+
+    if (country === targetC) {
+      setCity(trimmedCity);
+    }
+    if (closingFormCountry === targetC) {
+      setClosingFormCity(trimmedCity);
+    }
+
+    setNewCityInput('');
+    setShowAddCityModal(false);
+    showToast(`✓ Ciudad "${trimmedCity}" agregada a ${targetC} con éxito`);
+  };
 
   const handleToggleLang = (newLang: 'es' | 'en') => {
     setLang(newLang);
@@ -1489,7 +1799,7 @@ export default function LocalStudioPage() {
   const completedChecklistCount = checklistItems.filter((item) => checkedSteps[item.id]).length;
   const checklistProgressPercent = Math.round((completedChecklistCount / checklistItems.length) * 100);
 
-  const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
+
   const [isLoadingDossiers, setIsLoadingDossiers] = useState(false);
   const [dossierSearch, setDossierSearch] = useState('');
   const [dossierModeFilter, setDossierModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue'>('all');
@@ -1716,19 +2026,18 @@ export default function LocalStudioPage() {
         if (place.googleMapsUrl) setGoogleUrl(place.googleMapsUrl);
         if (place.phone) setPhone(place.phone);
 
-        // Address parsing for city and neighborhood
+        // Address parsing for country, city and neighborhood
         let parsedCity = city;
         let parsedNeighborhood = neighborhood;
+        let parsedCountry = country;
         if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
-          const parts = place.address.split(',').map((p) => p.trim());
-          if (parts.length >= 3) {
-            parsedNeighborhood = parts[parts.length - 3] || parsedNeighborhood;
-            parsedCity = parts[parts.length - 2] || parsedCity;
-          } else if (parts.length >= 2) {
-            parsedCity = parts[parts.length - 2] || parsedCity;
-          }
-          if (parsedCity) setCity(parsedCity);
-          if (parsedNeighborhood) setNeighborhood(parsedNeighborhood);
+          const parsedGeo = parseAddressGeo(place.address, country, city, neighborhood);
+          parsedCountry = parsedGeo.country;
+          parsedCity = parsedGeo.city;
+          parsedNeighborhood = parsedGeo.neighborhood;
+          if (parsedGeo.country) setCountry(parsedGeo.country);
+          if (parsedGeo.city) setCity(parsedGeo.city);
+          if (parsedGeo.neighborhood) setNeighborhood(parsedGeo.neighborhood);
         }
 
         // Category mapping
@@ -1826,19 +2135,18 @@ export default function LocalStudioPage() {
         if (place.googleMapsUrl) setGoogleUrl(place.googleMapsUrl);
         if (place.phone) setPhone(place.phone);
 
-        // Address parsing for city and neighborhood
+        // Address parsing for country, city and neighborhood
         let parsedCity = city;
         let parsedNeighborhood = neighborhood;
+        let parsedCountry = country;
         if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
-          const parts = place.address.split(',').map((p) => p.trim());
-          if (parts.length >= 3) {
-            parsedNeighborhood = parts[parts.length - 3] || parsedNeighborhood;
-            parsedCity = parts[parts.length - 2] || parsedCity;
-          } else if (parts.length >= 2) {
-            parsedCity = parts[parts.length - 2] || parsedCity;
-          }
-          if (parsedCity) setCity(parsedCity);
-          if (parsedNeighborhood) setNeighborhood(parsedNeighborhood);
+          const parsedGeo = parseAddressGeo(place.address, country, city, neighborhood);
+          parsedCountry = parsedGeo.country;
+          parsedCity = parsedGeo.city;
+          parsedNeighborhood = parsedGeo.neighborhood;
+          if (parsedGeo.country) setCountry(parsedGeo.country);
+          if (parsedGeo.city) setCity(parsedGeo.city);
+          if (parsedGeo.neighborhood) setNeighborhood(parsedGeo.neighborhood);
         }
 
         const matchedCategory = mapDetectedCategoryToPrestigia(
@@ -1919,18 +2227,18 @@ export default function LocalStudioPage() {
         if (place.phone) setPhone(place.phone);
 
         // Address parsing
+        // Address parsing for country, city and neighborhood
         let parsedCity = city;
         let parsedNeighborhood = neighborhood;
+        let parsedCountry = country;
         if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
-          const parts = place.address.split(',').map((p) => p.trim());
-          if (parts.length >= 3) {
-            parsedNeighborhood = parts[parts.length - 3] || parsedNeighborhood;
-            parsedCity = parts[parts.length - 2] || parsedCity;
-          } else if (parts.length >= 2) {
-            parsedCity = parts[parts.length - 2] || parsedCity;
-          }
-          if (parsedCity) setCity(parsedCity);
-          if (parsedNeighborhood) setNeighborhood(parsedNeighborhood);
+          const parsedGeo = parseAddressGeo(place.address, country, city, neighborhood);
+          parsedCountry = parsedGeo.country;
+          parsedCity = parsedGeo.city;
+          parsedNeighborhood = parsedGeo.neighborhood;
+          if (parsedGeo.country) setCountry(parsedGeo.country);
+          if (parsedGeo.city) setCity(parsedGeo.city);
+          if (parsedGeo.neighborhood) setNeighborhood(parsedGeo.neighborhood);
         }
 
         const matchedCategory = mapDetectedCategoryToPrestigia(
@@ -2054,6 +2362,7 @@ export default function LocalStudioPage() {
         advisorPhone: currentUser?.phone || '+573058314049',
         clientName: businessName.trim(),
         category,
+        country: country.trim() || 'Colombia',
         city: city.trim(),
         neighborhood: neighborhood.trim(),
         googleUrl: googleUrl.trim(),
@@ -2111,17 +2420,25 @@ export default function LocalStudioPage() {
     luismaBaseDossiers.forEach((d) => {
       set.add(d.country || 'Colombia');
     });
-    return Array.from(set).sort();
-  }, [luismaBaseDossiers]);
+    allCountriesList.forEach((c) => set.add(c));
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [luismaBaseDossiers, allCountriesList]);
 
   const dossierAvailableCities = useMemo(() => {
     const set = new Set<string>();
-    luismaBaseDossiers.forEach((d) => {
-      if (dossierCountryFilter !== 'all' && (d.country || 'Colombia') !== dossierCountryFilter) return;
-      if (d.city) set.add(d.city);
-    });
-    return Array.from(set).sort();
-  }, [luismaBaseDossiers, dossierCountryFilter]);
+    if (dossierCountryFilter === 'all') {
+      luismaBaseDossiers.forEach((d) => {
+        if (d.city) set.add(d.city);
+      });
+    } else {
+      const countryCities = getCitiesForCountry(dossierCountryFilter);
+      countryCities.forEach((c) => set.add(c));
+      luismaBaseDossiers.forEach((d) => {
+        if ((d.country || 'Colombia') === dossierCountryFilter && d.city) set.add(d.city);
+      });
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [luismaBaseDossiers, dossierCountryFilter, customCitiesByCountry]);
 
   const dossierAvailableNeighborhoods = useMemo(() => {
     const set = new Set<string>();
@@ -2130,7 +2447,7 @@ export default function LocalStudioPage() {
       if (dossierCityFilter !== 'all' && d.city.toLowerCase() !== dossierCityFilter.toLowerCase()) return;
       if (d.neighborhood) set.add(d.neighborhood);
     });
-    return Array.from(set).sort();
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [luismaBaseDossiers, dossierCountryFilter, dossierCityFilter]);
 
   // Executive portfolio KPI stats (unaffected by active filter view)
@@ -2298,6 +2615,7 @@ export default function LocalStudioPage() {
   const handleLoadDossier = (dossier: StudioDossierRecord) => {
     setBusinessName(dossier.clientName);
     setCategory(dossier.category);
+    if (dossier.country) setCountry(dossier.country);
     setCity(dossier.city);
     setNeighborhood(dossier.neighborhood || '');
     setGoogleUrl(dossier.googleUrl || '');
@@ -2319,6 +2637,9 @@ export default function LocalStudioPage() {
 
   const handleOpenEditClosing = (dossier: StudioDossierRecord) => {
     setEditingDossierClosing(dossier);
+    setClosingFormCountry(dossier.country || 'Colombia');
+    setClosingFormCity(dossier.city || 'Bogotá');
+    setClosingFormNeighborhood(dossier.neighborhood || '');
     setClosingFormMode(dossier.mode || 'audit');
     setClosingFormStatus(dossier.closingStatus || 'lead_draft');
     setClosingFormSetupFee(
@@ -2347,9 +2668,9 @@ export default function LocalStudioPage() {
         id: editingDossierClosing.id,
         clientName: editingDossierClosing.clientName,
         category: editingDossierClosing.category,
-        city: editingDossierClosing.city,
-        neighborhood: editingDossierClosing.neighborhood,
-        country: editingDossierClosing.country || 'Colombia',
+        city: closingFormCity.trim() || editingDossierClosing.city,
+        neighborhood: closingFormNeighborhood.trim(),
+        country: closingFormCountry.trim() || editingDossierClosing.country || 'Colombia',
         mode: closingFormMode,
         closingStatus: closingFormStatus,
         setupFeeChargedUsd: Number(closingFormSetupFee) || 0,
@@ -3020,29 +3341,108 @@ export default function LocalStudioPage() {
                     </select>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {t.city}
-                      </label>
-                      <input
-                        type="text"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        placeholder={t.cityPlaceholder}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
-                      />
+                  {/* Localización Enlazada en Cascada: País -> Ciudad -> Barrio */}
+                  <div className="space-y-2.5 p-3 rounded-2xl bg-slate-900/60 border border-slate-800">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <Globe className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Ubicación Geográfica Enlazada (América y Europa)</span>
+                      </span>
                     </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {/* 1º Selector de País con botón + */}
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-xs font-bold text-slate-300">
+                            1º País *
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setShowAddCountryModal(true)}
+                            className="text-[10px] text-emerald-400 hover:text-emerald-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                            title="Agregar otro País al catálogo"
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>Agregar País</span>
+                          </button>
+                        </div>
+                        <select
+                          value={country}
+                          onChange={(e) => {
+                            if (e.target.value === '__add_new__') {
+                              setShowAddCountryModal(true);
+                            } else {
+                              handleSelectCountry(e.target.value);
+                            }
+                          }}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-emerald-400 transition text-sm cursor-pointer"
+                        >
+                          {allCountriesList.map((c) => (
+                            <option key={c} value={c}>
+                              {c}
+                            </option>
+                          ))}
+                          <option value="__add_new__" className="text-emerald-400 font-bold">
+                            + Agregar otro País...
+                          </option>
+                        </select>
+                      </div>
+
+                      {/* 2º Selector de Ciudad condicionado con botón + */}
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-xs font-bold text-slate-300">
+                            2º Ciudad ({country}) *
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTargetCountryForNewCity(country);
+                              setShowAddCityModal(true);
+                            }}
+                            className="text-[10px] text-emerald-400 hover:text-emerald-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                            title={`Agregar otra Ciudad a ${country}`}
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>Agregar Ciudad</span>
+                          </button>
+                        </div>
+                        <select
+                          value={city}
+                          onChange={(e) => {
+                            if (e.target.value === '__add_new__') {
+                              setTargetCountryForNewCity(country);
+                              setShowAddCityModal(true);
+                            } else {
+                              setCity(e.target.value);
+                            }
+                          }}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-emerald-400 transition text-sm cursor-pointer"
+                        >
+                          {getCitiesForCountry(country).map((cty) => (
+                            <option key={cty} value={cty}>
+                              {cty}
+                            </option>
+                          ))}
+                          <option value="__add_new__" className="text-emerald-400 font-bold">
+                            + Agregar otra Ciudad a {country}...
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* 3º Barrio / Localidad */}
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {t.neighborhood}
+                      <label className="block text-xs font-bold text-slate-300 mb-1">
+                        3º Barrio o Localidad (Opcional)
                       </label>
                       <input
                         type="text"
                         value={neighborhood}
                         onChange={(e) => setNeighborhood(e.target.value)}
-                        placeholder={t.neighborhoodPlaceholder}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
+                        placeholder="Ej: Chapinero, Poblado, Polanco, Brickell, Centro..."
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition text-sm"
                       />
                     </div>
                   </div>
@@ -4245,25 +4645,108 @@ export default function LocalStudioPage() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2.5">
-                        <div>
-                          <label className="block font-bold text-slate-300 mb-1">{t.city}</label>
-                          <input
-                            type="text"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                            placeholder={t.auditCityPlaceholder}
-                            className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition"
-                          />
+                      {/* Localización Enlazada en Cascada: País -> Ciudad -> Barrio */}
+                      <div className="space-y-2.5 p-3 rounded-2xl bg-slate-950/70 border border-slate-800">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                            <Globe className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Ubicación Geográfica Enlazada (América y Europa)</span>
+                          </span>
                         </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          {/* 1º Selector de País con botón + */}
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <label className="text-xs font-bold text-slate-300">
+                                1º País *
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => setShowAddCountryModal(true)}
+                                className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                                title="Agregar otro País al catálogo"
+                              >
+                                <Plus className="w-3 h-3" />
+                                <span>Agregar País</span>
+                              </button>
+                            </div>
+                            <select
+                              value={country}
+                              onChange={(e) => {
+                                if (e.target.value === '__add_new__') {
+                                  setShowAddCountryModal(true);
+                                } else {
+                                  handleSelectCountry(e.target.value);
+                                }
+                              }}
+                              className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition text-xs cursor-pointer"
+                            >
+                              {allCountriesList.map((c) => (
+                                <option key={c} value={c}>
+                                  {c}
+                                </option>
+                              ))}
+                              <option value="__add_new__" className="text-amber-400 font-bold">
+                                + Agregar otro País...
+                              </option>
+                            </select>
+                          </div>
+
+                          {/* 2º Selector de Ciudad condicionado con botón + */}
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <label className="text-xs font-bold text-slate-300">
+                                2º Ciudad ({country}) *
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setTargetCountryForNewCity(country);
+                                  setShowAddCityModal(true);
+                                }}
+                                className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                                title={`Agregar otra Ciudad a ${country}`}
+                              >
+                                <Plus className="w-3 h-3" />
+                                <span>Agregar Ciudad</span>
+                              </button>
+                            </div>
+                            <select
+                              value={city}
+                              onChange={(e) => {
+                                if (e.target.value === '__add_new__') {
+                                  setTargetCountryForNewCity(country);
+                                  setShowAddCityModal(true);
+                                } else {
+                                  setCity(e.target.value);
+                                }
+                              }}
+                              className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition text-xs cursor-pointer"
+                            >
+                              {getCitiesForCountry(country).map((cty) => (
+                                <option key={cty} value={cty}>
+                                  {cty}
+                                </option>
+                              ))}
+                              <option value="__add_new__" className="text-amber-400 font-bold">
+                                + Agregar otra Ciudad a {country}...
+                              </option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* 3º Barrio / Localidad */}
                         <div>
-                          <label className="block font-bold text-slate-300 mb-1">{t.neighborhood}</label>
+                          <label className="block text-xs font-bold text-slate-300 mb-1">
+                            3º Barrio o Localidad (Opcional)
+                          </label>
                           <input
                             type="text"
                             value={neighborhood}
                             onChange={(e) => setNeighborhood(e.target.value)}
                             placeholder={t.auditNeighborhoodPlaceholder}
-                            className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition"
+                            className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition text-xs"
                           />
                         </div>
                       </div>
@@ -4935,15 +5418,110 @@ export default function LocalStudioPage() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block font-bold text-slate-300 mb-1">{isEn ? 'City / Location *' : 'Ciudad / Ubicación *'}</label>
-                    <input
-                      type="text"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      placeholder={isEn ? 'e.g. Miami, FL' : 'Ej: Bogotá o Medellín'}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 transition"
-                    />
+                  {/* Localización Enlazada en Cascada: País -> Ciudad -> Barrio */}
+                  <div className="space-y-2.5 p-3 rounded-2xl bg-slate-900/60 border border-slate-800">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <Globe className="w-3.5 h-3.5 text-rose-400" />
+                        <span>Ubicación Geográfica Enlazada (América y Europa)</span>
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {/* 1º Selector de País con botón + */}
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-xs font-bold text-slate-300">
+                            1º País *
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setShowAddCountryModal(true)}
+                            className="text-[10px] text-rose-400 hover:text-rose-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                            title="Agregar otro País al catálogo"
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>Agregar País</span>
+                          </button>
+                        </div>
+                        <select
+                          value={country}
+                          onChange={(e) => {
+                            if (e.target.value === '__add_new__') {
+                              setShowAddCountryModal(true);
+                            } else {
+                              handleSelectCountry(e.target.value);
+                            }
+                          }}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-rose-400 transition text-sm cursor-pointer"
+                        >
+                          {allCountriesList.map((c) => (
+                            <option key={c} value={c}>
+                              {c}
+                            </option>
+                          ))}
+                          <option value="__add_new__" className="text-rose-400 font-bold">
+                            + Agregar otro País...
+                          </option>
+                        </select>
+                      </div>
+
+                      {/* 2º Selector de Ciudad condicionado con botón + */}
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-xs font-bold text-slate-300">
+                            2º Ciudad ({country}) *
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTargetCountryForNewCity(country);
+                              setShowAddCityModal(true);
+                            }}
+                            className="text-[10px] text-rose-400 hover:text-rose-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                            title={`Agregar otra Ciudad a ${country}`}
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>Agregar Ciudad</span>
+                          </button>
+                        </div>
+                        <select
+                          value={city}
+                          onChange={(e) => {
+                            if (e.target.value === '__add_new__') {
+                              setTargetCountryForNewCity(country);
+                              setShowAddCityModal(true);
+                            } else {
+                              setCity(e.target.value);
+                            }
+                          }}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-rose-400 transition text-sm cursor-pointer"
+                        >
+                          {getCitiesForCountry(country).map((cty) => (
+                            <option key={cty} value={cty}>
+                              {cty}
+                            </option>
+                          ))}
+                          <option value="__add_new__" className="text-rose-400 font-bold">
+                            + Agregar otra Ciudad a {country}...
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* 3º Barrio / Localidad */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-300 mb-1">
+                        3º Barrio o Localidad (Opcional)
+                      </label>
+                      <input
+                        type="text"
+                        value={neighborhood}
+                        onChange={(e) => setNeighborhood(e.target.value)}
+                        placeholder="Ej: Chapinero, Poblado, Polanco, Brickell, Centro..."
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 transition text-sm"
+                      />
+                    </div>
                   </div>
 
                   {rescueScenario === 'third_party' && (
@@ -6814,76 +7392,149 @@ export default function LocalStudioPage() {
                 </div>
               </div>
 
-              {/* Location & Commercial Closing Dropdowns */}
+              {/* Location & Commercial Closing Dropdowns - Filtros Jerárquicos en Cascada */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-2 border-t border-slate-800 text-xs">
-                {/* País Selector */}
+                {/* 1º Filtro: País */}
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    {tDossiers.filterCountry}
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-[10px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                      <Globe className="w-3 h-3 text-amber-400" />
+                      <span>1º {tDossiers.filterCountry}</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddCountryModal(true)}
+                      className="text-[9px] text-amber-400/90 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
+                      title="Registrar nuevo País"
+                    >
+                      <Plus className="w-2.5 h-2.5" />
+                      <span>+ País</span>
+                    </button>
+                  </div>
                   <select
                     value={dossierCountryFilter}
                     onChange={(e) => {
-                      setDossierCountryFilter(e.target.value);
-                      setDossierCityFilter('all');
-                      setDossierNeighborhoodFilter('all');
+                      if (e.target.value === '__add_new__') {
+                        setShowAddCountryModal(true);
+                      } else {
+                        setDossierCountryFilter(e.target.value);
+                        setDossierCityFilter('all');
+                        setDossierNeighborhoodFilter('all');
+                      }
                     }}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 transition cursor-pointer"
                   >
-                    <option value="all">{tDossiers.filterAllCountries}</option>
-                    {dossierAvailableCountries.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
+                    <option value="all">🌐 Todos los Países ({dossierAvailableCountries.length})</option>
+                    {dossierAvailableCountries.map((c) => {
+                      const count = luismaBaseDossiers.filter((d) => (d.country || 'Colombia') === c).length;
+                      return (
+                        <option key={c} value={c}>
+                          {c} {count > 0 ? `(${count} clientes)` : ''}
+                        </option>
+                      );
+                    })}
+                    <option value="__add_new__" className="text-amber-400 font-bold">
+                      + Agregar otro País...
+                    </option>
                   </select>
                 </div>
 
-                {/* Ciudad Selector */}
+                {/* 2º Filtro: Ciudad Condicionada al País */}
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    {tDossiers.filterCity}
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-[10px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                      <Building2 className="w-3 h-3 text-amber-400" />
+                      <span>2º {tDossiers.filterCity}</span>
+                    </label>
+                    {dossierCountryFilter !== 'all' && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTargetCountryForNewCity(dossierCountryFilter);
+                          setShowAddCityModal(true);
+                        }}
+                        className="text-[9px] text-amber-400/90 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
+                        title={`Registrar nueva Ciudad en ${dossierCountryFilter}`}
+                      >
+                        <Plus className="w-2.5 h-2.5" />
+                        <span>+ Ciudad</span>
+                      </button>
+                    )}
+                  </div>
                   <select
                     value={dossierCityFilter}
                     onChange={(e) => {
-                      setDossierCityFilter(e.target.value);
-                      setDossierNeighborhoodFilter('all');
+                      if (e.target.value === '__add_new__') {
+                        setTargetCountryForNewCity(dossierCountryFilter !== 'all' ? dossierCountryFilter : 'Colombia');
+                        setShowAddCityModal(true);
+                      } else {
+                        setDossierCityFilter(e.target.value);
+                        setDossierNeighborhoodFilter('all');
+                      }
                     }}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 transition cursor-pointer"
                   >
-                    <option value="all">{tDossiers.filterAllCities}</option>
-                    {dossierAvailableCities.map((city) => (
-                      <option key={city} value={city}>
-                        {city}
+                    <option value="all">
+                      {dossierCountryFilter === 'all'
+                        ? '🏙️ Todas las Ciudades (o filtra por país primero)'
+                        : `🏙️ Todas las Ciudades de ${dossierCountryFilter}`}
+                    </option>
+                    {dossierAvailableCities.map((city) => {
+                      const count = luismaBaseDossiers.filter(
+                        (d) =>
+                          (dossierCountryFilter === 'all' || (d.country || 'Colombia') === dossierCountryFilter) &&
+                          d.city.toLowerCase() === city.toLowerCase()
+                      ).length;
+                      return (
+                        <option key={city} value={city}>
+                          {city} {count > 0 ? `(${count})` : ''}
+                        </option>
+                      );
+                    })}
+                    {dossierCountryFilter !== 'all' && (
+                      <option value="__add_new__" className="text-amber-400 font-bold">
+                        + Agregar otra Ciudad a {dossierCountryFilter}...
                       </option>
-                    ))}
+                    )}
                   </select>
                 </div>
 
-                {/* Localidad / Barrio Selector */}
+                {/* 3º Filtro: Localidad / Barrio Condicionado */}
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    {tDossiers.filterNeighborhood}
+                    3º {tDossiers.filterNeighborhood}
                   </label>
                   <select
                     value={dossierNeighborhoodFilter}
                     onChange={(e) => setDossierNeighborhoodFilter(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 transition cursor-pointer"
                   >
-                    <option value="all">{tDossiers.filterAllNeighborhoods}</option>
-                    {dossierAvailableNeighborhoods.map((n) => (
-                      <option key={n} value={n}>
-                        {n}
-                      </option>
-                    ))}
+                    <option value="all">
+                      {dossierCityFilter !== 'all'
+                        ? `📍 Todos los Barrios de ${dossierCityFilter}`
+                        : tDossiers.filterAllNeighborhoods}
+                    </option>
+                    {dossierAvailableNeighborhoods.map((n) => {
+                      const count = luismaBaseDossiers.filter(
+                        (d) =>
+                          (dossierCountryFilter === 'all' || (d.country || 'Colombia') === dossierCountryFilter) &&
+                          (dossierCityFilter === 'all' || d.city.toLowerCase() === dossierCityFilter.toLowerCase()) &&
+                          d.neighborhood &&
+                          d.neighborhood.toLowerCase() === n.toLowerCase()
+                      ).length;
+                      return (
+                        <option key={n} value={n}>
+                          {n} {count > 0 ? `(${count})` : ''}
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
 
-                {/* Estado de Cierre / Monetización Selector */}
+                {/* 4º Filtro: Estado de Cierre / Monetización */}
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    {tDossiers.filterClosing}
+                    4º {tDossiers.filterClosing}
                   </label>
                   <select
                     value={dossierClosingFilter}
@@ -7200,6 +7851,95 @@ export default function LocalStudioPage() {
 
                   {/* Form fields */}
                   <div className="space-y-3.5 text-xs">
+                    {/* Location fields in closing modal */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-3 rounded-2xl bg-slate-950 border border-slate-800">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-slate-300 font-bold">
+                            País del Cliente:
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setShowAddCountryModal(true)}
+                            className="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
+                          >
+                            <Plus className="w-2.5 h-2.5" />
+                            <span>+ País</span>
+                          </button>
+                        </div>
+                        <select
+                          value={closingFormCountry}
+                          onChange={(e) => {
+                            if (e.target.value === '__add_new__') {
+                              setShowAddCountryModal(true);
+                            } else {
+                              const newC = e.target.value;
+                              setClosingFormCountry(newC);
+                              const available = getCitiesForCountry(newC);
+                              if (!available.includes(closingFormCity) && available.length > 0) {
+                                setClosingFormCity(available[0]);
+                              }
+                            }
+                          }}
+                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                        >
+                          {allCountriesList.map((c) => (
+                            <option key={c} value={c}>{c}</option>
+                          ))}
+                          <option value="__add_new__" className="text-amber-400 font-bold">+ Agregar otro País...</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-slate-300 font-bold">
+                            Ciudad ({closingFormCountry}):
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTargetCountryForNewCity(closingFormCountry);
+                              setShowAddCityModal(true);
+                            }}
+                            className="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
+                          >
+                            <Plus className="w-2.5 h-2.5" />
+                            <span>+ Ciudad</span>
+                          </button>
+                        </div>
+                        <select
+                          value={closingFormCity}
+                          onChange={(e) => {
+                            if (e.target.value === '__add_new__') {
+                              setTargetCountryForNewCity(closingFormCountry);
+                              setShowAddCityModal(true);
+                            } else {
+                              setClosingFormCity(e.target.value);
+                            }
+                          }}
+                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                        >
+                          {getCitiesForCountry(closingFormCountry).map((cty) => (
+                            <option key={cty} value={cty}>{cty}</option>
+                          ))}
+                          <option value="__add_new__" className="text-amber-400 font-bold">+ Agregar Ciudad a {closingFormCountry}...</option>
+                        </select>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-slate-300 font-bold mb-1">
+                          Barrio o Localidad:
+                        </label>
+                        <input
+                          type="text"
+                          value={closingFormNeighborhood}
+                          onChange={(e) => setClosingFormNeighborhood(e.target.value)}
+                          placeholder="Ej: Chapinero, Poblado, Polanco, Brickell..."
+                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                        />
+                      </div>
+                    </div>
+
                     {/* Service Type */}
                     <div>
                       <label className="block text-slate-300 font-bold mb-1">
@@ -8132,7 +8872,193 @@ export default function LocalStudioPage() {
         </div>
       )}
 
-      {/* Footer */}
+      {/* Modal: Agregar País al Catálogo */}
+      {showAddCountryModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-emerald-500/50 rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl animate-in zoom-in-95">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-emerald-950 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                  <Globe className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-white">Agregar Nuevo País</h3>
+                  <p className="text-[11px] text-slate-400">Se registrará en el catálogo de América y Europa</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddCountryModal(false);
+                  setNewCountryInput('');
+                  setNewCountryCityInput('');
+                }}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block text-slate-300 font-bold mb-1">
+                  Nombre del País *
+                </label>
+                <input
+                  type="text"
+                  autoFocus
+                  value={newCountryInput}
+                  onChange={(e) => setNewCountryInput(e.target.value)}
+                  placeholder="Ej: Bolivia, Australia, Países Bajos, Paraguay..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleSaveNewCountry();
+                    }
+                  }}
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-bold mb-1">
+                  Ciudad Principal Inicial (Opcional)
+                </label>
+                <input
+                  type="text"
+                  value={newCountryCityInput}
+                  onChange={(e) => setNewCountryCityInput(e.target.value)}
+                  placeholder="Ej: La Paz, Sydney, Ámsterdam, Asunción..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleSaveNewCountry();
+                    }
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddCountryModal(false);
+                  setNewCountryInput('');
+                  setNewCountryCityInput('');
+                }}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={!newCountryInput.trim()}
+                onClick={handleSaveNewCountry}
+                className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-lg shadow-emerald-500/20 active:scale-98 disabled:opacity-50"
+              >
+                <Check className="w-4 h-4" />
+                <span>Guardar País</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Agregar Ciudad a País */}
+      {showAddCityModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-emerald-500/50 rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl animate-in zoom-in-95">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-emerald-950 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-white">Agregar Ciudad</h3>
+                  <p className="text-[11px] text-slate-400">
+                    Se enlazará automáticamente a <strong className="text-emerald-400">{targetCountryForNewCity}</strong>
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddCityModal(false);
+                  setNewCityInput('');
+                }}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block text-slate-300 font-bold mb-1">
+                  País al que Pertenece:
+                </label>
+                <select
+                  value={targetCountryForNewCity}
+                  onChange={(e) => setTargetCountryForNewCity(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-emerald-400 transition text-xs"
+                >
+                  {allCountriesList.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-bold mb-1">
+                  Nombre de la Nueva Ciudad *
+                </label>
+                <input
+                  type="text"
+                  autoFocus
+                  value={newCityInput}
+                  onChange={(e) => setNewCityInput(e.target.value)}
+                  placeholder="Ej: Envigado, Zapopan, Fort Lauderdale, Marbella..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleSaveNewCity();
+                    }
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddCityModal(false);
+                  setNewCityInput('');
+                }}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={!newCityInput.trim()}
+                onClick={handleSaveNewCity}
+                className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-lg shadow-emerald-500/20 active:scale-98 disabled:opacity-50"
+              >
+                <Check className="w-4 h-4" />
+                <span>Guardar Ciudad</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {`/* Footer */`}
       <footer className="border-t border-slate-800/80 py-4 px-4 text-center text-xs text-slate-500 print:hidden">
         <p>Prestigia Local Studio™ • Google Maps Top 3 Optimization Engine © 2026</p>
       </footer>
