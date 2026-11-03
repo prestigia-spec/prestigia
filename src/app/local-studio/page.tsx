@@ -1984,6 +1984,29 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     }
   };
 
+  const handleResetAuditForm = () => {
+    setAuditQuery('');
+    setScannedListing(null);
+    setBusinessName('');
+    setNeighborhood('');
+    setContactName('');
+    setContactCompany('');
+    setContactPhone('');
+    setContactEmail('');
+    setContactRole('Dueño / Propietario');
+    setPhone('');
+    setGoogleUrl('');
+    setExistingRating(4.5);
+    setExistingReviews(0);
+    setCategory(categoryOptions[0] || CATEGORY_OPTIONS[0]);
+    setGeneratedData(null);
+    setShowManualAuditFields(false);
+    showToast(isEn ? '✨ Ready to run a new audit' : '✨ Formulario listo para una nueva auditoría');
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   // -------------------------------------------------------------
   // 3. GENERATION ACTION (LIVE GEMINI + HEURISTIC ENGINE)
   // -------------------------------------------------------------
@@ -2137,7 +2160,10 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         if (typeof place.rating === 'number') setExistingRating(place.rating);
         if (typeof place.reviewsCount === 'number') setExistingReviews(place.reviewsCount);
         if (place.googleMapsUrl) setGoogleUrl(place.googleMapsUrl);
-        if (place.phone) setPhone(place.phone);
+        if (place.phone) {
+          setPhone(place.phone);
+          if (!contactPhone) setContactPhone(place.phone);
+        }
 
         // Address parsing for country, city and neighborhood
         let parsedCity = city;
@@ -2252,7 +2278,10 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         if (typeof place.rating === 'number') setExistingRating(place.rating);
         if (typeof place.reviewsCount === 'number') setExistingReviews(place.reviewsCount);
         if (place.googleMapsUrl) setGoogleUrl(place.googleMapsUrl);
-        if (place.phone) setPhone(place.phone);
+        if (place.phone) {
+          setPhone(place.phone);
+          if (!contactPhone) setContactPhone(place.phone);
+        }
 
         // Address parsing for country, city and neighborhood
         let parsedCity = city;
@@ -2343,7 +2372,10 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         if (typeof place.rating === 'number') setExistingRating(place.rating);
         if (typeof place.reviewsCount === 'number') setExistingReviews(place.reviewsCount);
         if (place.googleMapsUrl) setGoogleUrl(place.googleMapsUrl);
-        if (place.phone) setPhone(place.phone);
+        if (place.phone) {
+          setPhone(place.phone);
+          if (!contactPhone) setContactPhone(place.phone);
+        }
 
         // Address parsing
         // Address parsing for country, city and neighborhood
@@ -5008,6 +5040,16 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <span className="text-[10px] text-slate-400 block font-mono">{t.mod2Target}</span>
                     <span className="text-lg font-black text-amber-400">{t.mod2TargetVal}</span>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={handleResetAuditForm}
+                    className="px-3.5 py-2 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-amber-500/20 cursor-pointer shrink-0 active:scale-95"
+                    title={isEn ? 'Clear form to run a new audit' : 'Realizar una nueva auditoría desde cero'}
+                  >
+                    <Plus className="w-4 h-4 text-slate-950" />
+                    <span>{isEn ? 'New Audit' : 'Nueva Auditoría'}</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -5080,33 +5122,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         : '💡 Soporta enlaces cortos (maps.app.goo.gl/...), enlaces web largos o "Nombre Comercial + Ciudad".'}
                     </p>
                   </div>
-
-                  {/* Primary 1-Click Scan & Audit Button */}
-                  {!isLuismaMaster && monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)) && (
-                    <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-                      <span>Tope mensual de {currentUser?.maxAuditsMonthly ?? 30} auditorías alcanzado. Contacta a Dirección General.</span>
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={handleScanAndAudit}
-                    disabled={isScanningListing || isGenerating || !auditQuery.trim() || (!isLuismaMaster && monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))}
-                    className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98"
-                  >
-                    {isScanningListing || isGenerating ? (
-                      <>
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                        <span>{t.btnScanningAndAuditing}</span>
-                      </>
-                    ) : (
-                      <>
-                        <Zap className="w-4 h-4 fill-slate-950" />
-                        <span>{t.btnScanAndAudit}</span>
-                      </>
-                    )}
-                  </button>
                 </div>
 
                 {/* Scanned Listing Profile Card (If recognized) */}
@@ -5177,6 +5192,146 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     )}
                   </div>
                 )}
+
+                {/* Tarjeta de Datos del Cliente / Contratante (Antes de la Auditoría) */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/30 space-y-2.5">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
+                    <div className="flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-indigo-400" />
+                      <span className="text-xs font-black text-indigo-300">
+                        {isEn ? '👤 Client / Contractor Info (Who Hires & Pays)' : '👤 Datos del Cliente / Contratante (Quién Solicita y Paga el Servicio)'}
+                      </span>
+                    </div>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
+                      CRM
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
+                      </label>
+                      <input
+                        type="text"
+                        value={contactName}
+                        onChange={(e) => setContactName(e.target.value)}
+                        placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
+                      </label>
+                      <input
+                        type="text"
+                        value={contactCompany}
+                        onChange={(e) => setContactCompany(e.target.value)}
+                        placeholder={isEn ? 'e.g. Acme Corp / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                        <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
+                        {contactPhone && (
+                          <a
+                            href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
+                          >
+                            Chat
+                          </a>
+                        )}
+                      </label>
+                      <input
+                        type="tel"
+                        value={contactPhone}
+                        onChange={(e) => setContactPhone(e.target.value)}
+                        placeholder="+57 300 123 4567"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Email' : 'Correo Electrónico'}
+                      </label>
+                      <input
+                        type="email"
+                        value={contactEmail}
+                        onChange={(e) => setContactEmail(e.target.value)}
+                        placeholder="contacto@empresa.com"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Role' : 'Cargo / Relación'}
+                      </label>
+                      <select
+                        value={contactRole}
+                        onChange={(e) => setContactRole(e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
+                      >
+                        <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
+                        <option value="Gerente General">{isEn ? '💼 General Manager' : '💼 Gerente General'}</option>
+                        <option value="Director de Marketing">{isEn ? '📈 Marketing Dir.' : '📈 Dir. Marketing'}</option>
+                        <option value="Administrador">{isEn ? '🏢 Branch Admin' : '🏢 Administrador'}</option>
+                        <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
+                        <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Primary 1-Click Scan & Audit Button */}
+                <div className="space-y-2">
+                  {!isLuismaMaster && monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)) && (
+                    <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                      <span>Tope mensual de {currentUser?.maxAuditsMonthly ?? 30} auditorías alcanzado. Contacta a Dirección General.</span>
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={handleScanAndAudit}
+                    disabled={isScanningListing || isGenerating || !auditQuery.trim() || (!isLuismaMaster && monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))}
+                    className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98"
+                  >
+                    {isScanningListing || isGenerating ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>{t.btnScanningAndAuditing}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-4 h-4 fill-slate-950" />
+                        <span>{t.btnScanAndAudit}</span>
+                      </>
+                    )}
+                  </button>
+
+                  {/* Botón rápido Nueva Auditoría cuando ya hay una generada */}
+                  {generatedData?.healthScore && (
+                    <button
+                      type="button"
+                      onClick={handleResetAuditForm}
+                      className="w-full py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 border-2 border-amber-500/50 hover:border-amber-400 text-amber-300 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-98"
+                    >
+                      <Plus className="w-4 h-4 text-amber-400" />
+                      <span>{isEn ? 'Run Another Audit' : 'Nueva Auditoría'}</span>
+                    </button>
+                  )}
+                </div>
 
                 {/* Optional Collapsible Manual Tweaks Accordion */}
                 <div className="pt-1">
@@ -5347,105 +5502,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </select>
                       </div>
 
-                      {/* Tarjeta de Datos del Cliente / Contratante */}
-                      <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/30 space-y-2.5">
-                        <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
-                          <div className="flex items-center gap-1.5">
-                            <User className="w-3.5 h-3.5 text-indigo-400" />
-                            <span className="text-xs font-black text-indigo-300">
-                              {isEn ? '👤 Client / Contractor Info (Who Hires & Pays)' : '👤 Datos del Cliente / Contratante (Quién Solicita y Paga el Servicio)'}
-                            </span>
-                          </div>
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
-                            CRM
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <div>
-                            <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                              {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
-                            </label>
-                            <input
-                              type="text"
-                              value={contactName}
-                              onChange={(e) => setContactName(e.target.value)}
-                              placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
-                              className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                              {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
-                            </label>
-                            <input
-                              type="text"
-                              value={contactCompany}
-                              onChange={(e) => setContactCompany(e.target.value)}
-                              placeholder={isEn ? 'e.g. Acme Corp / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
-                              className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                          <div>
-                            <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
-                              <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
-                              {contactPhone && (
-                                <a
-                                  href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
-                                >
-                                  Chat
-                                </a>
-                              )}
-                            </label>
-                            <input
-                              type="tel"
-                              value={contactPhone}
-                              onChange={(e) => setContactPhone(e.target.value)}
-                              placeholder="+57 300 123 4567"
-                              className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                              {isEn ? 'Email' : 'Correo Electrónico'}
-                            </label>
-                            <input
-                              type="email"
-                              value={contactEmail}
-                              onChange={(e) => setContactEmail(e.target.value)}
-                              placeholder="contacto@empresa.com"
-                              className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                              {isEn ? 'Role' : 'Cargo / Relación'}
-                            </label>
-                            <select
-                              value={contactRole}
-                              onChange={(e) => setContactRole(e.target.value)}
-                              className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
-                            >
-                              <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
-                              <option value="Gerente General">{isEn ? '💼 General Manager' : '💼 Gerente General'}</option>
-                              <option value="Director de Marketing">{isEn ? '📈 Marketing Dir.' : '📈 Dir. Marketing'}</option>
-                              <option value="Administrador">{isEn ? '🏢 Branch Admin' : '🏢 Administrador'}</option>
-                              <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
-                              <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
-                            </select>
-                          </div>
-                        </div>
-                      </div>
-
                       <button
                         type="button"
                         onClick={() => handleGenerate('audit')}
@@ -5566,6 +5622,16 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
                         {/* Action Buttons Group */}
                         <div className="flex flex-wrap items-center gap-2 print:hidden">
+                          {/* Botón: Nueva Auditoría */}
+                          <button
+                            type="button"
+                            onClick={handleResetAuditForm}
+                            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black transition flex items-center gap-1.5 shadow-md shadow-amber-500/20 cursor-pointer active:scale-95"
+                            title={isEn ? 'Clear form to run another audit' : 'Realizar otra nueva auditoría desde cero'}
+                          >
+                            <Plus className="w-3.5 h-3.5 text-slate-950" />
+                            <span>{isEn ? 'New Audit' : 'Nueva Auditoría'}</span>
+                          </button>
                           {/* White-Label Logo Uploader */}
                           <div className="flex items-center gap-1">
                             <label
@@ -5914,6 +5980,17 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black text-xs">
                   Plan a la Medida
                 </span>
+              </div>
+              {/* Bottom Quick Action: Nueva Auditoría */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 pb-2 print:hidden">
+                <button
+                  type="button"
+                  onClick={handleResetAuditForm}
+                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm transition flex items-center gap-2 shadow-xl shadow-amber-500/25 cursor-pointer active:scale-95"
+                >
+                  <Plus className="w-4 h-4 text-slate-950" />
+                  <span>{isEn ? 'Run Another Audit' : 'Nueva Auditoría'}</span>
+                </button>
               </div>
             </div>
 
