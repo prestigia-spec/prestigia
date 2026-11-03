@@ -29,6 +29,11 @@ export async function GET(request: Request) {
       }
     }
 
+    const isAdmin = searchParams.get('isAdmin') === 'true';
+    if (isAdmin) {
+      return NextResponse.json({ success: true, advisors });
+    }
+
     // List all advisors (safe list)
     const safeList = advisors.map(({ password: _, ...a }) => a);
     return NextResponse.json({ success: true, advisors: safeList });

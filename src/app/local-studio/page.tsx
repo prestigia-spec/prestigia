@@ -62,6 +62,7 @@ import {
   Plus,
   User,
   Mail,
+  Power,
 } from 'lucide-react';
 import type { GooglePlaceData } from '@/app/api/auditor/google-lookup/route';
 
@@ -69,6 +70,7 @@ interface StudioAdvisorUser {
   id: string;
   name: string;
   username: string;
+  password?: string;
   phone: string;
   role: 'admin' | 'advisor';
   accountType?: 'internal_advisor' | 'partner_agency' | 'founder';
@@ -1828,13 +1830,17 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [isSavingClosing, setIsSavingClosing] = useState(false);
 
   // Network (Advisors & Agencies B2B) State
-  const [networkSubView, setNetworkSubView] = useState<'monitor' | 'register' | 'directory'>('monitor');
+  const [networkSubView, setNetworkSubView] = useState<'monitor' | 'register' | 'directory'>('directory');
   const [networkSearch, setNetworkSearch] = useState('');
   const [networkAdvisorFilter, setNetworkAdvisorFilter] = useState('all');
   const [networkTypeFilter, setNetworkTypeFilter] = useState<'all' | 'internal_advisor' | 'partner_agency'>('all');
   const [networkCountryFilter, setNetworkCountryFilter] = useState('all');
   const [networkCityFilter, setNetworkCityFilter] = useState('all');
   const [networkModeFilter, setNetworkModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue'>('all');
+  const [networkActiveFilter, setNetworkActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({});
+  const [viewingAdvisorWorks, setViewingAdvisorWorks] = useState<StudioAdvisorUser | null>(null);
+  const [showRegisterAdvisorModal, setShowRegisterAdvisorModal] = useState<boolean>(false);
 
   // Edit Advisor Account Modal State
   const [editingAdvisor, setEditingAdvisor] = useState<StudioAdvisorUser | null>(null);
@@ -1900,7 +1906,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
   const fetchAdvisors = async () => {
     try {
-      const res = await fetch('/api/local-studio/advisors');
+      const res = await fetch('/api/local-studio/advisors?isAdmin=true');
       const data = await res.json();
       if (data.success && Array.isArray(data.advisors)) {
         setAdvisorsList(data.advisors);
@@ -2605,6 +2611,40 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [savedDossiers, advisorsList, networkCountryFilter, customCitiesByCountry]);
 
+  // FILTERED ADVISORS FOR NETWORK TAB (Exclusively Advisor & Agency Cards)
+  const filteredAdvisors = useMemo(() => {
+    return advisorsList.filter((adv) => {
+      if (networkCountryFilter !== 'all' && (adv.country || 'Colombia') !== networkCountryFilter) return false;
+      if (networkCityFilter !== 'all' && (adv.city || '').toLowerCase() !== networkCityFilter.toLowerCase()) return false;
+      if (networkTypeFilter !== 'all') {
+        if (networkTypeFilter === 'partner_agency' && adv.accountType !== 'partner_agency') return false;
+        if (networkTypeFilter === 'internal_advisor' && (adv.accountType === 'partner_agency' || adv.accountType === 'founder')) return false;
+      }
+      if (networkActiveFilter !== 'all') {
+        if (networkActiveFilter === 'active' && !adv.active) return false;
+        if (networkActiveFilter === 'inactive' && adv.active) return false;
+      }
+      if (networkSearch.trim()) {
+        const q = networkSearch.toLowerCase();
+        const match =
+          adv.name.toLowerCase().includes(q) ||
+          adv.username.toLowerCase().includes(q) ||
+          (adv.phone && adv.phone.toLowerCase().includes(q)) ||
+          (adv.city && adv.city.toLowerCase().includes(q)) ||
+          (adv.country && adv.country.toLowerCase().includes(q));
+        if (!match) return false;
+      }
+      return true;
+    });
+  }, [
+    advisorsList,
+    networkCountryFilter,
+    networkCityFilter,
+    networkTypeFilter,
+    networkActiveFilter,
+    networkSearch,
+  ]);
+
   // Distinct countries and cities fallback for general use
   const availableCountries = networkAvailableCountries;
   const availableCities = networkAvailableCities;
@@ -2904,6 +2944,46 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     } catch {
       showToast('⚠️ Error de conexión al eliminar asesor');
     }
+  };
+
+  // Toggle active/inactive (encender / apagar cuenta de asesor)
+  const handleToggleAdvisorActive = async (advisor: StudioAdvisorUser) => {
+    if (advisor.id === 'adv-luisma' || advisor.accountType === 'founder') {
+      showToast('⚠️ La cuenta de Dirección General no se puede desactivar.');
+      return;
+    }
+    const newActiveState = !advisor.active;
+    try {
+      const res = await fetch('/api/local-studio/advisors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: advisor.id,
+          name: advisor.name,
+          username: advisor.username,
+          active: newActiveState,
+          masterKey: 'admin',
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(
+          newActiveState
+            ? `🟢 Cuenta de "${advisor.name}" encendida y activada con éxito.`
+            : `🔴 Cuenta de "${advisor.name}" apagada y desactivada con éxito.`
+        );
+        fetchAdvisors();
+      } else {
+        showToast('⚠️ Error al actualizar estado de la cuenta');
+      }
+    } catch {
+      showToast('⚠️ Error de conexión');
+    }
+  };
+
+  // Toggle visible password for an advisor card
+  const toggleRevealPassword = (id: string) => {
+    setRevealedPasswords((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   // =============================================================
@@ -8567,250 +8647,486 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               </div>
             </div>
 
-            {/* Sub-view Switcher Tabs */}
-            <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-3">
-              <button
-                type="button"
-                onClick={() => setNetworkSubView('monitor')}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
-                  networkSubView === 'monitor'
-                    ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                }`}
-              >
-                <Search className="w-3.5 h-3.5" />
-                <span>{tNetwork.subviewMonitor} ({networkFilteredDossiers.length})</span>
-              </button>
+            {/* Barra de Filtros Inteligentes de Asesores & Agencias */}
+            <div className="p-4 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-slate-300 font-bold">
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-amber-400" />
+                  <span>{isEn ? 'Network Members & Licensees Filters:' : 'Filtros de Asesores & Agencias de la Red:'}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowRegisterAdvisorModal(true)}
+                  className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer flex items-center gap-1.5 shadow-md active:scale-98"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>{isEn ? '+ Register Advisor / Agency' : '+ Registrar Asesor o Licenciar Agencia'}</span>
+                </button>
+              </div>
 
-              <button
-                type="button"
-                onClick={() => setNetworkSubView('register')}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
-                  networkSubView === 'register'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                }`}
-              >
-                <Users className="w-3.5 h-3.5" />
-                <span>{tNetwork.subviewRegister}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setNetworkSubView('directory')}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
-                  networkSubView === 'directory'
-                    ? 'bg-purple-600 text-white shadow-md'
-                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                }`}
-              >
-                <Globe className="w-3.5 h-3.5" />
-                <span>
-                  {tNetwork.subviewDirectory} (
-                  {advisorsList.filter((a) => a.id !== 'adv-admin' && a.id !== 'adv-luisma').length})
-                </span>
-              </button>
-            </div>
-
-            {/* SUB-VIEW 1: MONITOR DE PROSPECCIÓN & AUDITORÍAS CON FILTROS AVANZADOS */}
-            {networkSubView === 'monitor' && (
-              <div className="space-y-4">
-                {/* Advanced Multi-Criteria Filter Bar */}
-                <div className="p-4 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
-                  <div className="flex items-center gap-2 text-slate-300 font-bold">
-                    <Filter className="w-4 h-4 text-amber-400" />
-                    <span>{isEn ? 'Network Audit & Follow-Up Filters:' : 'Filtros de Auditoría y Seguimiento de Red:'}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
+                {/* 1º Filter Country con Botón + País */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-[10px] text-amber-400 uppercase font-black flex items-center gap-1">
+                      <Globe className="w-3 h-3 text-amber-400" />
+                      <span>1º {isEn ? 'Country' : 'País'}</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddCountryModal(true)}
+                      className="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[10px] font-bold flex items-center gap-1 border border-amber-500/30 transition cursor-pointer"
+                      title="Registrar nuevo País"
+                    >
+                      <Plus className="w-2.5 h-2.5" />
+                      <span>País</span>
+                    </button>
                   </div>
+                  <select
+                    value={networkCountryFilter}
+                    onChange={(e) => {
+                      setNetworkCountryFilter(e.target.value);
+                      setNetworkCityFilter('all');
+                    }}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition cursor-pointer"
+                  >
+                    <option value="all">🌐 Todos los Países ({networkAvailableCountries.length})</option>
+                    {networkAvailableCountries.map((c: string) => {
+                      const count = advisorsList.filter((a) => (a.country || 'Colombia') === c).length;
+                      return (
+                        <option key={c} value={c}>
+                          {c === 'Colombia' ? '🇨🇴 Colombia' : c === 'Venezuela' ? '🇻🇪 Venezuela' : c === 'México' ? '🇲🇽 México' : c} {count > 0 ? `(${count})` : ''}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5">
-                    {/* Filter Advisor */}
-                    <div>
-                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">
-                        {isEn ? 'Advisor / Agency' : 'Asesor / Agencia'}
-                      </label>
-                      <select
-                        value={networkAdvisorFilter}
-                        onChange={(e) => setNetworkAdvisorFilter(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
-                      >
-                        <option value="all">{isEn ? 'All Members' : 'Todos los Miembros'}</option>
-                        {advisorsList
-                          .filter((a) => a.id !== 'adv-admin' && a.id !== 'adv-luisma')
-                          .map((adv) => (
-                            <option key={adv.id} value={adv.id}>
-                              {adv.name} ({adv.accountType === 'partner_agency' ? (isEn ? 'Agency' : 'Agencia') : (isEn ? 'Advisor' : 'Asesor')})
-                            </option>
-                          ))}
-                      </select>
-                    </div>
-
-                    {/* Filter Account Type */}
-                    <div>
-                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">
-                        {isEn ? 'Account Type' : 'Tipo de Cuenta'}
-                      </label>
-                      <select
-                        value={networkTypeFilter}
-                        onChange={(e) => setNetworkTypeFilter(e.target.value as any)}
-                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
-                      >
-                        <option value="all">{isEn ? 'All Types' : 'Todos los Tipos'}</option>
-                        <option value="internal_advisor">{isEn ? '💼 Internal Advisors' : '💼 Asesores Internos'}</option>
-                        <option value="partner_agency">{isEn ? '🏢 Partner Agencies (B2B)' : '🏢 Agencias Partners (B2B)'}</option>
-                      </select>
-                    </div>
-
-                    {/* 1º Filter Country con Botón + País */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-[10px] text-amber-400 uppercase font-black flex items-center gap-1">
-                          <Globe className="w-3 h-3 text-amber-400" />
-                          <span>1º {isEn ? 'Country' : 'País'}</span>
-                        </label>
-                        <button
-                          type="button"
-                          onClick={() => setShowAddCountryModal(true)}
-                          className="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[10px] font-bold flex items-center gap-1 border border-amber-500/30 transition cursor-pointer"
-                          title="Registrar nuevo País"
-                        >
-                          <Plus className="w-2.5 h-2.5" />
-                          <span>País</span>
-                        </button>
-                      </div>
-                      <select
-                        value={networkCountryFilter}
-                        onChange={(e) => {
-                          setNetworkCountryFilter(e.target.value);
-                          setNetworkCityFilter('all');
-                        }}
-                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition cursor-pointer"
-                      >
-                        <option value="all">🌐 Todos los Países ({networkAvailableCountries.length})</option>
-                        {networkAvailableCountries.map((c) => {
-                          const count = savedDossiers.filter((d) => (d.country || 'Colombia') === c && d.advisorId !== 'adv-luisma').length;
-                          return (
-                            <option key={c} value={c}>
-                              {c === 'Colombia' ? '🇨🇴 Colombia' : c === 'Venezuela' ? '🇻🇪 Venezuela' : c === 'México' ? '🇲🇽 México' : c} {count > 0 ? `(${count})` : ''}
-                            </option>
-                          );
-                        })}
-                      </select>
-                    </div>
-
-                    {/* 2º Filter City Condicionado Estrictamente al País */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-[10px] text-amber-400 uppercase font-black flex items-center gap-1">
-                          <Building2 className="w-3 h-3 text-amber-400" />
-                          <span>2º {isEn ? 'City' : 'Ciudad'}</span>
-                        </label>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setTargetCountryForNewCity(networkCountryFilter !== 'all' ? networkCountryFilter : country || 'Colombia');
-                            setShowAddCityModal(true);
-                          }}
-                          className="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[10px] font-bold flex items-center gap-1 border border-amber-500/30 transition cursor-pointer"
-                          title="Registrar nueva Ciudad"
-                        >
-                          <Plus className="w-2.5 h-2.5" />
-                          <span>Ciudad</span>
-                        </button>
-                      </div>
-                      <select
-                        value={networkCityFilter}
-                        disabled={networkCountryFilter === 'all'}
-                        onChange={(e) => setNetworkCityFilter(e.target.value)}
-                        className={`w-full px-3 py-2 rounded-xl text-xs focus:outline-none transition ${
-                          networkCountryFilter === 'all'
-                            ? 'bg-slate-900/60 border border-slate-800/80 text-slate-500 cursor-not-allowed opacity-60'
-                            : 'bg-slate-950 border border-slate-700 text-white focus:border-amber-400 cursor-pointer'
-                        }`}
-                      >
-                        {networkCountryFilter === 'all' ? (
-                          <option value="all">🔒 Selecciona un país primero</option>
-                        ) : (
-                          <>
-                            <option value="all">🏙️ Todas las Ciudades de {networkCountryFilter} ({networkAvailableCities.length})</option>
-                            {networkAvailableCities.map((city) => {
-                              const count = savedDossiers.filter(
-                                (d) =>
-                                  (d.country || 'Colombia') === networkCountryFilter &&
-                                  d.city.toLowerCase() === city.toLowerCase() &&
-                                  d.advisorId !== 'adv-luisma'
-                              ).length;
-                              return (
-                                <option key={city} value={city}>
-                                  {city} {count > 0 ? `(${count})` : ''}
-                                </option>
-                              );
-                            })}
-                          </>
-                        )}
-                      </select>
-                    </div>
-
-                    {/* Filter Mode */}
-                    <div>
-                      <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">{isEn ? 'Mode' : 'Modalidad'}</label>
-                      <select
-                        value={networkModeFilter}
-                        onChange={(e) => setNetworkModeFilter(e.target.value as any)}
-                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400"
-                      >
-                        <option value="all">{isEn ? 'All Modes' : 'Todas las Modalidades'}</option>
-                        <option value="create">{isEn ? '🏗️ New Listings' : '🏗️ Fichas Nuevas'}</option>
-                        <option value="audit">{isEn ? '🔬 Top 3 Audits' : '🔬 Auditorías Top 3'}</option>
-                        <option value="rescue">{isEn ? '🛡️ Rescue & Claims' : '🛡️ Rescates & Reclamaciones'}</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Search Input and Reset Button */}
-                  <div className="flex flex-col sm:flex-row items-center gap-2 pt-1 border-t border-slate-800/80">
-                    <div className="flex-1 w-full relative">
-                      <input
-                        type="text"
-                        value={networkSearch}
-                        onChange={(e) => setNetworkSearch(e.target.value)}
-                        placeholder={isEn ? 'Search by client, category, or keywords...' : 'Buscar por cliente, categoría o palabras clave...'}
-                        className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
-                      />
-                      <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
-                    </div>
-
+                {/* 2º Filter City Condicionado Estrictamente al País */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-[10px] text-amber-400 uppercase font-black flex items-center gap-1">
+                      <Building2 className="w-3 h-3 text-amber-400" />
+                      <span>2º {isEn ? 'City' : 'Ciudad'}</span>
+                    </label>
                     <button
                       type="button"
                       onClick={() => {
-                        setNetworkAdvisorFilter('all');
-                        setNetworkTypeFilter('all');
-                        setNetworkCountryFilter('all');
-                        setNetworkCityFilter('all');
-                        setNetworkModeFilter('all');
-                        setNetworkSearch('');
+                        setTargetCountryForNewCity(networkCountryFilter !== 'all' ? networkCountryFilter : country || 'Colombia');
+                        setShowAddCityModal(true);
                       }}
-                      className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs transition cursor-pointer shrink-0"
+                      className="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[10px] font-bold flex items-center gap-1 border border-amber-500/30 transition cursor-pointer"
+                      title="Registrar nueva Ciudad"
                     >
-                      {isEn ? 'Reset Filters' : 'Restablecer Filtros'}
+                      <Plus className="w-2.5 h-2.5" />
+                      <span>Ciudad</span>
                     </button>
                   </div>
+                  <select
+                    value={networkCityFilter}
+                    disabled={networkCountryFilter === 'all'}
+                    onChange={(e) => setNetworkCityFilter(e.target.value)}
+                    className={`w-full px-3 py-2 rounded-xl text-xs focus:outline-none transition ${
+                      networkCountryFilter === 'all'
+                        ? 'bg-slate-900/60 border border-slate-800/80 text-slate-500 cursor-not-allowed opacity-60'
+                        : 'bg-slate-950 border border-slate-700 text-white focus:border-amber-400 cursor-pointer'
+                    }`}
+                  >
+                    {networkCountryFilter === 'all' ? (
+                      <option value="all">🔒 Selecciona un país primero</option>
+                    ) : (
+                      <>
+                        <option value="all">🏙️ Todas las Ciudades de {networkCountryFilter} ({networkAvailableCities.length})</option>
+                        {networkAvailableCities.map((city: string) => {
+                          const count = advisorsList.filter(
+                            (a) => (a.country || 'Colombia') === networkCountryFilter && (a.city || '').toLowerCase() === city.toLowerCase()
+                          ).length;
+                          return (
+                            <option key={city} value={city}>
+                              {city} {count > 0 ? `(${count})` : ''}
+                            </option>
+                          );
+                        })}
+                      </>
+                    )}
+                  </select>
                 </div>
 
-                {/* Dossiers Grid */}
-                {networkFilteredDossiers.length === 0 ? (
-                  <div className="text-center py-16 p-8 rounded-3xl bg-slate-900/40 border border-slate-800 space-y-3">
-                    <Layers className="w-10 h-10 text-slate-600 mx-auto" />
-                    <h3 className="text-base font-bold text-white">{isEn ? 'No dossiers found with current filters' : 'No hay expedientes con los filtros seleccionados'}</h3>
-                    <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                      {isEn ? 'Try adjusting advisor, country, or city filters.' : 'Intenta modificando los filtros de asesor, país o ciudad.'}
-                    </p>
+                {/* Filter Account Type */}
+                <div>
+                  <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">
+                    {isEn ? 'Account Type' : 'Tipo de Cuenta'}
+                  </label>
+                  <select
+                    value={networkTypeFilter}
+                    onChange={(e) => setNetworkTypeFilter(e.target.value as any)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                  >
+                    <option value="all">{isEn ? 'All Types' : 'Todos los Tipos'}</option>
+                    <option value="internal_advisor">{isEn ? '💼 Internal Advisors' : '💼 Asesores Comerciales'}</option>
+                    <option value="partner_agency">{isEn ? '🏢 Partner Agencies (B2B)' : '🏢 Agencias Partners (B2B)'}</option>
+                  </select>
+                </div>
+
+                {/* Filter Active / Inactive (Encendida / Apagada) */}
+                <div>
+                  <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">
+                    {isEn ? 'Account Status' : 'Estado de Cuenta'}
+                  </label>
+                  <select
+                    value={networkActiveFilter}
+                    onChange={(e) => setNetworkActiveFilter(e.target.value as any)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                  >
+                    <option value="all">{isEn ? 'All Statuses' : 'Todos los Estados'}</option>
+                    <option value="active">{isEn ? '🟢 Active (Turned On)' : '🟢 Encendidas (Activas)'}</option>
+                    <option value="inactive">{isEn ? '🔴 Inactive (Turned Off)' : '🔴 Apagadas (Inactivas)'}</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Search Input and Reset Button */}
+              <div className="flex flex-col sm:flex-row items-center gap-2 pt-1 border-t border-slate-800/80">
+                <div className="flex-1 w-full relative">
+                  <input
+                    type="text"
+                    value={networkSearch}
+                    onChange={(e) => setNetworkSearch(e.target.value)}
+                    placeholder={isEn ? 'Search advisor by name, @username, phone, or city...' : 'Buscar asesor o agencia por nombre, @usuario, teléfono o ciudad...'}
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                  <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNetworkCountryFilter('all');
+                    setNetworkCityFilter('all');
+                    setNetworkTypeFilter('all');
+                    setNetworkActiveFilter('all');
+                    setNetworkSearch('');
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs transition cursor-pointer shrink-0"
+                >
+                  {isEn ? 'Reset Filters' : 'Restablecer Filtros'}
+                </button>
+              </div>
+            </div>
+
+            {/* Grid Exclusivo de Fichas de Asesores & Agencias */}
+            {filteredAdvisors.length === 0 ? (
+              <div className="text-center py-16 p-8 rounded-3xl bg-slate-900/40 border border-slate-800 space-y-3">
+                <Users className="w-10 h-10 text-slate-600 mx-auto" />
+                <h3 className="text-base font-bold text-white">
+                  {isEn ? 'No advisors or partner agencies found with current filters' : 'No hay asesores ni agencias con los filtros seleccionados'}
+                </h3>
+                <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                  {isEn ? 'Try adjusting country, city, or status filters.' : 'Intenta modificando los filtros de país, ciudad o estado.'}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNetworkCountryFilter('all');
+                    setNetworkCityFilter('all');
+                    setNetworkTypeFilter('all');
+                    setNetworkActiveFilter('all');
+                    setNetworkSearch('');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition cursor-pointer shadow-md"
+                >
+                  {isEn ? 'Reset Filters' : 'Restablecer Filtros'}
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                {filteredAdvisors.map((adv) => {
+                  const isFounder = adv.id === 'adv-luisma' || adv.accountType === 'founder';
+                  const advisorDossiers = savedDossiers.filter((d) => d.advisorId === adv.id);
+                  const createsCount = advisorDossiers.filter((d) => d.mode === 'create').length;
+                  const auditsCount = advisorDossiers.filter((d) => d.mode === 'audit').length;
+                  const rescuesCount = advisorDossiers.filter((d) => d.mode === 'rescue').length;
+                  const isRevealed = Boolean(revealedPasswords[adv.id]);
+
+                  return (
+                    <div
+                      key={adv.id}
+                      className={`p-5 rounded-3xl border flex flex-col justify-between space-y-4 shadow-xl transition group ${
+                        adv.active
+                          ? 'bg-slate-900 border-slate-800 hover:border-amber-400/50'
+                          : 'bg-slate-950/80 border-rose-950/60 opacity-80'
+                      }`}
+                    >
+                      <div className="space-y-3.5">
+                        {/* Header de Tarjeta: Rol, Estado Encendido/Apagado y Canon */}
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <span
+                            className={`text-[9.5px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                              isFounder
+                                ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                : adv.accountType === 'partner_agency'
+                                ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
+                                : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
+                            }`}
+                          >
+                            {isFounder
+                              ? (isEn ? '👑 Founder & Director' : '👑 Dirección General')
+                              : adv.accountType === 'partner_agency'
+                              ? (isEn ? '🏢 Partner Agency' : '🏢 Agencia Partner B2B')
+                              : (isEn ? '💼 Sales Advisor' : '💼 Asesor Comercial')}
+                          </span>
+
+                          <div className="flex items-center gap-1.5 ml-auto">
+                            {adv.accountType === 'partner_agency' && (
+                              <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                                ${adv.monthlyFeeUsd || 49} {isEn ? 'USD/mo' : 'USD/mes'}
+                              </span>
+                            )}
+
+                            {/* Badge y Toggle de Estado: Encendida vs Apagada */}
+                            {isFounder ? (
+                              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">
+                                🟢 Siempre Activa
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleToggleAdvisorActive(adv)}
+                                className={`text-[9px] font-bold px-2.5 py-0.5 rounded-full border transition cursor-pointer flex items-center gap-1 ${
+                                  adv.active
+                                    ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40 hover:bg-rose-950/80 hover:text-rose-300 hover:border-rose-500/40'
+                                    : 'bg-rose-950 text-rose-300 border-rose-500/40 hover:bg-emerald-950/80 hover:text-emerald-300 hover:border-emerald-500/40'
+                                }`}
+                                title={adv.active ? 'Clic para Apagar cuenta' : 'Clic para Encender cuenta'}
+                              >
+                                <Power className="w-2.5 h-2.5" />
+                                <span>{adv.active ? (isEn ? 'Active • Turn Off' : '🟢 Activa • Apagar') : (isEn ? 'Off • Turn On' : '🔴 Apagada • Encender')}</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Nombre y Ubicación */}
+                        <div>
+                          <h4 className="text-base font-black text-white group-hover:text-amber-300 transition">
+                            {adv.name}
+                          </h4>
+                          <p className="text-xs text-slate-400 mt-0.5">
+                            📍 {adv.city || 'Bogotá'}, {adv.country || 'Colombia'}
+                          </p>
+                          <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1">
+                            <span>Teléfono: <strong className="text-slate-300 font-mono">{adv.phone}</strong></span>
+                            {adv.phone && (
+                              <a
+                                href={`https://wa.me/${adv.phone.replace(/[^0-9]/g, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-0.5 text-[10px]"
+                                title="Abrir WhatsApp directo"
+                              >
+                                <MessageSquare className="w-2.5 h-2.5" />
+                                <span>WhatsApp</span>
+                              </a>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Box Visual de Credenciales de Entrada al Sistema */}
+                        <div className="p-3 rounded-2xl bg-slate-950 border border-amber-500/30 space-y-2">
+                          <div className="flex items-center justify-between text-[10px] font-black uppercase text-amber-400 pb-1 border-b border-slate-800">
+                            <span className="flex items-center gap-1">
+                              <KeyRound className="w-3 h-3 text-amber-400" />
+                              <span>{isEn ? 'System Login Credentials:' : 'Credenciales de Entrada al Sistema:'}</span>
+                            </span>
+                            <span className="text-slate-500 text-[9px] font-mono">ID: {adv.id}</span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            {/* Usuario */}
+                            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                              <span className="text-[9px] uppercase font-bold text-slate-500 block">
+                                {isEn ? 'Username' : 'Usuario'}
+                              </span>
+                              <div className="flex items-center justify-between mt-0.5">
+                                <span className="font-mono font-bold text-indigo-300 truncate mr-1">
+                                  {adv.username}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => copyToClipboard(adv.username, 'Usuario')}
+                                  className="text-slate-400 hover:text-white transition cursor-pointer p-0.5"
+                                  title="Copiar usuario"
+                                >
+                                  <Copy className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Contraseña */}
+                            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                              <span className="text-[9px] uppercase font-bold text-slate-500 block">
+                                {isEn ? 'Password' : 'Contraseña'}
+                              </span>
+                              <div className="flex items-center justify-between mt-0.5">
+                                <span className="font-mono font-bold text-amber-300 truncate mr-1">
+                                  {isRevealed ? (adv.password || 'admin') : '••••••••'}
+                                </span>
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleRevealPassword(adv.id)}
+                                    className="text-slate-400 hover:text-amber-400 transition cursor-pointer p-0.5"
+                                    title={isRevealed ? 'Ocultar contraseña' : 'Ver contraseña'}
+                                  >
+                                    {isRevealed ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => copyToClipboard(adv.password || 'admin', 'Contraseña')}
+                                    className="text-slate-400 hover:text-white transition cursor-pointer p-0.5"
+                                    title="Copiar contraseña"
+                                  >
+                                    <Copy className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Resumen de Producción */}
+                        <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px]">
+                          <span className="text-slate-400 font-bold">{isEn ? 'Production Record:' : 'Fichas Realizadas:'}</span>
+                          <span className="font-black text-amber-300 font-mono">
+                            {advisorDossiers.length} {isEn ? 'dossiers' : 'fichas'} ({createsCount} creadas, {auditsCount} auditadas, {rescuesCount} rescatadas)
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Botones de Acción: Ver Trabajos, Modificar y Eliminar */}
+                      <div className="pt-2 border-t border-slate-800/80 space-y-2">
+                        {/* Botón Principal para Ver sus Trabajos */}
+                        <button
+                          type="button"
+                          onClick={() => setViewingAdvisorWorks(adv)}
+                          className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-98"
+                        >
+                          <Search className="w-3.5 h-3.5 text-slate-950" />
+                          <span>
+                            {isEn ? `📂 View Works & Listings (${advisorDossiers.length})` : `📂 Ver Trabajos / Fichas Realizadas (${advisorDossiers.length})`}
+                          </span>
+                        </button>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditAdvisor(adv)}
+                            className="flex-1 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/40 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-98"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>{isEn ? 'Edit Account' : 'Modificar Cuenta'}</span>
+                          </button>
+
+                          {!isFounder && (
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteAdvisor(adv)}
+                              className="p-2 rounded-xl bg-rose-950/30 hover:bg-rose-950/70 text-rose-400 hover:text-rose-200 border border-rose-500/30 transition cursor-pointer"
+                              title={isEn ? 'Delete Account' : 'Eliminar Cuenta'}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+      {/* MODAL: VER TRABAJOS & FICHAS REALIZADAS POR EL ASESOR */}
+      {viewingAdvisorWorks && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 print:hidden animate-in fade-in duration-200">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden">
+            {/* Cabecera Fija del Modal */}
+            <div className="p-5 sm:p-6 border-b border-slate-800 bg-slate-900/95 flex items-start justify-between gap-4 shrink-0">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
+                    {viewingAdvisorWorks.accountType === 'partner_agency' ? '🏢 Agencia Partner' : '💼 Asesor Comercial'}
+                  </span>
+                  <span className="text-xs text-slate-400 font-mono">@{viewingAdvisorWorks.username}</span>
+                </div>
+                <h3 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+                  <span>📂 Trabajos Realizados por:</span>
+                  <span className="text-amber-400">{viewingAdvisorWorks.name}</span>
+                </h3>
+                <p className="text-xs text-slate-400">
+                  📍 {viewingAdvisorWorks.city || 'Bogotá'}, {viewingAdvisorWorks.country || 'Colombia'} • Tel: {viewingAdvisorWorks.phone}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setViewingAdvisorWorks(null)}
+                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Métricas de Producción del Asesor */}
+            {(() => {
+              const advisorDossiers = savedDossiers.filter((d) => d.advisorId === viewingAdvisorWorks.id);
+              const createsCount = advisorDossiers.filter((d) => d.mode === 'create').length;
+              const auditsCount = advisorDossiers.filter((d) => d.mode === 'audit').length;
+              const rescuesCount = advisorDossiers.filter((d) => d.mode === 'rescue').length;
+
+              return (
+                <div className="p-4 border-b border-slate-800 bg-slate-950/60 grid grid-cols-4 gap-2 text-center text-xs shrink-0">
+                  <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                    <span className="text-[10px] text-slate-400 font-bold block uppercase">Total Fichas</span>
+                    <strong className="text-lg font-black text-white">{advisorDossiers.length}</strong>
                   </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {networkFilteredDossiers.map((d) => (
+                  <div className="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
+                    <span className="text-[10px] text-emerald-400 font-bold block uppercase truncate">🏗️ Creaciones</span>
+                    <strong className="text-lg font-black text-emerald-300">{createsCount}</strong>
+                  </div>
+                  <div className="p-2 rounded-xl bg-amber-950/40 border border-amber-500/30">
+                    <span className="text-[10px] text-amber-400 font-bold block uppercase truncate">🔬 Auditorías</span>
+                    <strong className="text-lg font-black text-amber-300">{auditsCount}</strong>
+                  </div>
+                  <div className="p-2 rounded-xl bg-rose-950/40 border border-rose-500/30">
+                    <span className="text-[10px] text-rose-400 font-bold block uppercase truncate">🛡️ Rescates</span>
+                    <strong className="text-lg font-black text-rose-300">{rescuesCount}</strong>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Cuerpo con Scroll: Lista de Expedientes y Clientes */}
+            <div className="p-5 overflow-y-auto space-y-3.5 flex-1 text-xs">
+              {(() => {
+                const advisorDossiers = savedDossiers.filter((d) => d.advisorId === viewingAdvisorWorks.id);
+                if (advisorDossiers.length === 0) {
+                  return (
+                    <div className="text-center py-12 space-y-2 text-slate-400">
+                      <Layers className="w-10 h-10 text-slate-600 mx-auto" />
+                      <p className="font-bold text-white text-sm">Este miembro aún no tiene expedientes registrados.</p>
+                      <p className="text-xs">Los clientes y fichas creadas, auditadas o rescatadas por este asesor aparecerán aquí automáticamente.</p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    {advisorDossiers.map((d) => (
                       <div
                         key={d.id}
-                        className="p-5 rounded-3xl bg-slate-900 border border-slate-800 hover:border-indigo-500/50 transition flex flex-col justify-between space-y-4 shadow-lg group"
+                        className="p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-amber-400/50 transition space-y-3 flex flex-col justify-between"
                       >
                         <div className="space-y-2">
                           <div className="flex items-center justify-between gap-2">
@@ -8823,65 +9139,44 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                                   : 'bg-amber-950 text-amber-300 border border-amber-500/40'
                               }`}
                             >
-                              {d.mode === 'create'
-                                ? (isEn ? '🏗️ New Listing' : '🏗️ Ficha Nueva')
-                                : d.mode === 'rescue'
-                                ? (isEn ? '🛡️ Rescue & Claim' : '🛡️ Rescate de Ficha')
-                                : (isEn ? '🔬 Top 3 Audit' : '🔬 Auditoría Top 3')}
+                              {d.mode === 'create' ? '🏗️ Ficha Nueva' : d.mode === 'rescue' ? '🛡️ Rescate 72h' : '🔬 Auditoría Top 3'}
                             </span>
 
-                            <span
-                              className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
-                                d.advisorType === 'partner_agency'
-                                  ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
-                                  : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
-                              }`}
-                            >
-                              {d.advisorType === 'partner_agency' ? (isEn ? '🏢 Partner Agency' : '🏢 Agencia Partner') : (isEn ? '💼 Internal Advisor' : '💼 Asesor Interno')}
-                            </span>
-
-                            <span className="text-[10px] text-slate-500 font-mono ml-auto">
+                            <span className="text-[10px] text-slate-500 font-mono">
                               {new Date(d.createdAt).toLocaleDateString()}
                             </span>
                           </div>
 
                           <div>
-                            <h4 className="text-base font-black text-white group-hover:text-amber-300 transition">
-                              {d.clientName}
-                            </h4>
-                            <p className="text-xs text-slate-400">
+                            <h5 className="font-black text-white text-sm leading-tight">{d.clientName}</h5>
+                            <p className="text-slate-400 text-xs mt-0.5">
                               📍 {d.city}, {d.country || 'Colombia'} {d.neighborhood ? `• ${d.neighborhood}` : ''}
                             </p>
-                            <span className="text-[11px] text-indigo-400 font-bold block mt-1">{d.category}</span>
+                            <span className="text-[11px] text-indigo-400 font-bold block">{d.category}</span>
                           </div>
 
-                          {/* Datos del Cliente / Contratante (Quién Solicita y Paga) */}
+                          {/* Datos del Cliente Contratante */}
                           {(d.contactName || d.contactCompany || d.contactPhone || d.contactEmail) && (
-                            <div className="p-2.5 rounded-2xl bg-slate-950/90 border border-indigo-500/30 text-[11px] space-y-1">
-                              <div className="flex items-center justify-between">
-                                <span className="font-black text-indigo-300 flex items-center gap-1.5">
+                            <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] space-y-1">
+                              <div className="flex items-center justify-between text-slate-300 font-bold">
+                                <span className="flex items-center gap-1.5 text-indigo-300">
                                   <User className="w-3.5 h-3.5 text-indigo-400" />
                                   <span>{d.contactName || 'Cliente Contratante'}</span>
                                 </span>
                                 {d.contactRole && (
-                                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/30">
-                                    {d.contactRole}
-                                  </span>
+                                  <span className="text-[9px] font-normal text-slate-400">({d.contactRole})</span>
                                 )}
                               </div>
                               {d.contactCompany && (
-                                <p className="text-[10px] text-slate-400 flex items-center gap-1">
-                                  <Building2 className="w-3 h-3 text-slate-500" />
-                                  <span>{d.contactCompany}</span>
-                                </p>
+                                <p className="text-[10px] text-slate-400">🏢 {d.contactCompany}</p>
                               )}
-                              <div className="flex items-center gap-2.5 pt-0.5 text-[10px]">
+                              <div className="flex items-center gap-2 pt-0.5 text-[10px]">
                                 {d.contactPhone && (
                                   <a
                                     href={`https://wa.me/${d.contactPhone.replace(/[^0-9]/g, '')}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1"
+                                    className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-0.5"
                                   >
                                     <Phone className="w-3 h-3" />
                                     <span>{d.contactPhone}</span>
@@ -8890,443 +9185,268 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                                 {d.contactEmail && (
                                   <a
                                     href={`mailto:${d.contactEmail}`}
-                                    className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 truncate"
+                                    className="text-indigo-400 hover:text-indigo-300 truncate"
                                   >
-                                    <Mail className="w-3 h-3" />
-                                    <span className="truncate">{d.contactEmail}</span>
+                                    {d.contactEmail}
                                   </a>
                                 )}
                               </div>
                             </div>
                           )}
 
-                          {d.data?.healthScore !== undefined && (
-                            <div className="flex items-center gap-2">
-                              <span
-                                className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                                  d.data.healthScore < 50
-                                    ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
-                                    : 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
-                                }`}
-                              >
-                                Score: {d.data.healthScore}/100
-                              </span>
-                              <span className="text-[10px] text-slate-500">
-                                {d.data.healthScore < 50 ? (isEn ? 'High Sales Closing Opportunity' : 'Oportunidad de Venta Alta') : (isEn ? 'Optimized Profile' : 'Perfil Optimizado')}
+                          {d.closingStatus && (
+                            <div className="flex items-center justify-between text-[10.5px] p-2 rounded-xl bg-slate-900/60 border border-slate-800">
+                              <span className="text-slate-400">Estado de Cierre:</span>
+                              <span className="font-bold text-amber-300">
+                                {d.closingStatus === 'prestigia_subscriber' ? '💎 Suscriptor Prestigia' : d.closingStatus === 'setup_paid' ? '💵 Setup Pagado' : '📝 En Estudio'}
                               </span>
                             </div>
                           )}
                         </div>
 
-                        <div className="pt-3 border-t border-slate-800/80 space-y-2.5">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
-                              <span className="w-2 h-2 rounded-full bg-indigo-400" />
-                              {d.advisorName}
-                            </span>
-                            <span className="text-[10px] text-slate-500 font-mono">{d.advisorPhone}</span>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleLoadDossier(d)}
-                              className="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20 active:scale-98"
-                            >
-                              <span>{isEn ? '👁️ Load & View' : '👁️ Cargar y Ver'}</span>
-                            </button>
-
-                            {d.data?.whatsappOnboardingMessage && (
-                              <a
-                                href={`https://wa.me/?text=${encodeURIComponent(d.data.whatsappOnboardingMessage)}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                title={isEn ? 'Send Kit via WhatsApp' : 'Enviar Kit por WhatsApp'}
-                                className="p-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 transition cursor-pointer"
-                              >
-                                <MessageSquare className="w-4 h-4" />
-                              </a>
-                            )}
-
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteDossier(d.id)}
-                              title={isEn ? 'Delete Dossier' : 'Eliminar Expediente'}
-                              className="p-2 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-950/30 transition cursor-pointer"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setViewingAdvisorWorks(null);
+                            handleLoadDossier(d);
+                          }}
+                          className="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md active:scale-98"
+                        >
+                          <span>👁️ Cargar Ficha en Workspace</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     ))}
                   </div>
-                )}
-              </div>
-            )}
+                );
+              })()}
+            </div>
 
-            {/* SUB-VIEW 2: FORMULARIO DE REGISTRO (ASESOR INTERNO VS AGENCIA PARTNER) */}
-            {networkSubView === 'register' && (
-              <div className="max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl">
-                <div>
-                  <h3 className="text-lg font-black text-white">{tNetwork.registerTitle}</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    {tNetwork.registerDesc}
-                  </p>
-                </div>
-
-                {/* Account Type Toggle */}
-                <div className="grid grid-cols-2 gap-3 p-1 rounded-2xl bg-slate-950 border border-slate-800">
-                  <button
-                    type="button"
-                    onClick={() => setNewAccountType('internal_advisor')}
-                    className={`py-3 px-4 rounded-xl text-xs font-black transition cursor-pointer flex items-center justify-center gap-2 ${
-                      newAccountType === 'internal_advisor'
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <Briefcase className="w-4 h-4" />
-                    <span>{tNetwork.optAdvisor}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setNewAccountType('partner_agency')}
-                    className={`py-3 px-4 rounded-xl text-xs font-black transition cursor-pointer flex items-center justify-center gap-2 ${
-                      newAccountType === 'partner_agency'
-                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <Building2 className="w-4 h-4" />
-                    <span>{tNetwork.optAgency}</span>
-                  </button>
-                </div>
-
-                <form onSubmit={handleCreateAdvisor} className="space-y-4 text-xs">
-                  <div>
-                    <label className="block font-bold text-slate-300 mb-1">
-                      {newAccountType === 'partner_agency'
-                        ? (isEn ? 'Partner Agency Business Name *' : 'Razón Social o Nombre de la Agencia *')
-                        : (isEn ? 'Sales Advisor Full Name *' : 'Nombre Completo del Asesor *')}
-                    </label>
-                    <input
-                      type="text"
-                      value={newAdvisorName}
-                      onChange={(e) => setNewAdvisorName(e.target.value)}
-                      placeholder={
-                        newAccountType === 'partner_agency'
-                          ? (isEn ? 'e.g. Apex Local Growth Agency' : 'Ej: Agencia Digital Rocket 360')
-                          : (isEn ? 'e.g. Michael Smith' : 'Ej: Carlos Gómez')
-                      }
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">{tNetwork.countryLabel} *</label>
-                      <input
-                        type="text"
-                        value={newAdvisorCountry}
-                        onChange={(e) => setNewAdvisorCountry(e.target.value)}
-                        placeholder={isEn ? 'USA, Mexico, Spain...' : 'Colombia, México, España...'}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">{tNetwork.cityLabel} *</label>
-                      <input
-                        type="text"
-                        value={newAdvisorCity}
-                        onChange={(e) => setNewAdvisorCity(e.target.value)}
-                        placeholder={isEn ? 'Miami, Austin, CDMX...' : 'Bogotá, Medellín, CDMX...'}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">{tNetwork.userLabel}</label>
-                      <input
-                        type="text"
-                        value={newAdvisorUser}
-                        onChange={(e) => setNewAdvisorUser(e.target.value)}
-                        placeholder={isEn ? 'e.g. michael or apexagency' : 'ej: carlos o rocketagency'}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white lowercase focus:outline-none focus:border-amber-400"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">{tNetwork.passLabel}</label>
-                      <input
-                        type="text"
-                        value={newAdvisorPass}
-                        onChange={(e) => setNewAdvisorPass(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-slate-300 mb-1">
-                      {tNetwork.phoneLabel}
-                    </label>
-                    <input
-                      type="text"
-                      value={newAdvisorPhone}
-                      onChange={(e) => setNewAdvisorPhone(e.target.value)}
-                      placeholder="+13051234567 o +57..."
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
-                    />
-                  </div>
-
-                  {/* Agency-only License monetization settings */}
-                  {newAccountType === 'partner_agency' && (
-                    <div className="p-4 rounded-2xl bg-purple-950/40 border border-purple-500/40 space-y-3">
-                      <div className="flex items-center gap-2 text-purple-300 font-black">
-                        <DollarSign className="w-4 h-4" />
-                        <span>{isEn ? 'B2B Monthly Software License Settings:' : 'Configuración de Licencia Mensual B2B:'}</span>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block font-bold text-slate-300 mb-1">{tNetwork.monthlyFeeLabel}</label>
-                          <input
-                            type="number"
-                            value={newAdvisorMonthlyFee}
-                            onChange={(e) => setNewAdvisorMonthlyFee(Number(e.target.value))}
-                            placeholder="49"
-                            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-purple-500/50 text-purple-200 font-bold focus:outline-none"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block font-bold text-slate-300 mb-1">{tNetwork.licenseStatusLabel}</label>
-                          <select
-                            value={newAdvisorLicenseStatus}
-                            onChange={(e) => setNewAdvisorLicenseStatus(e.target.value as any)}
-                            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-purple-500/50 text-white focus:outline-none"
-                          >
-                            <option value="active">{isEn ? '✅ Active (Paid)' : '✅ Activa y al día'}</option>
-                            <option value="pending_payment">{isEn ? '⏳ Payment Pending' : '⏳ Pendiente de Pago'}</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block font-bold text-slate-300 mb-1">{isEn ? 'Founder Master Key (Luisma) *' : 'Clave Maestra de Dueño (Luisma) *'}</label>
-                    <input
-                      type="password"
-                      value={adminMasterKey}
-                      onChange={(e) => setAdminMasterKey(e.target.value)}
-                      placeholder="admin"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-amber-500/40 text-amber-300 font-mono focus:outline-none"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSavingAdvisor}
-                    className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg active:scale-98"
-                  >
-                    {isSavingAdvisor
-                      ? (isEn ? 'Saving...' : 'Registrando...')
-                      : newAccountType === 'partner_agency'
-                      ? (isEn ? '🚀 Activate Partner Agency License' : '🚀 Activar Licencia de Agencia Partner')
-                      : (isEn ? '+ Create Sales Advisor' : '+ Crear Asesor Comercial')}
-                  </button>
-                </form>
-              </div>
-            )}
-
-            {/* SUB-VIEW 3: DIRECTORIO DE ASESORES & AGENCIAS CON RENDIMIENTO Y GESTIÓN CRUD */}
-            {networkSubView === 'directory' && (
-              <div className="space-y-4">
-                {/* Header de Gestión de Cuentas */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-3xl bg-slate-900 border border-slate-800">
-                  <div className="space-y-0.5">
-                    <h3 className="text-sm font-black text-white flex items-center gap-2">
-                      <Users className="w-4 h-4 text-purple-400" />
-                      <span>{isEn ? 'Team & Partner Agencies Directory (CRUD)' : 'Directorio & Gestión de Cuentas (Asesores & Agencias B2B)'}</span>
-                    </h3>
-                    <p className="text-[11px] text-slate-400">
-                      {isEn
-                        ? 'Add, edit, or delete accounts. View production breakdown for listings created, audited, and rescued per account.'
-                        : 'Agrega, modifica o elimina cuentas de usuarios. Revisa el desglose exacto de Creaciones, Auditorías y Rescates de cada miembro.'}
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setNewAccountType('internal_advisor')}
-                    className="hidden"
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() => setNetworkSubView('register')}
-                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer flex items-center gap-2 shadow-lg shadow-amber-500/20 shrink-0 active:scale-98"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>{isEn ? '+ Register Advisor / License Agency' : '+ Registrar Asesor o Licenciar Agencia'}</span>
-                  </button>
-                </div>
-
-                {/* Grid de Cuentas */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-                  {advisorsList
-                    .filter((adv) => adv.id !== 'adv-admin')
-                    .map((adv) => {
-                      const isFounder = adv.id === 'adv-luisma' || adv.accountType === 'founder';
-                      const advisorDossiers = savedDossiers.filter((d) => d.advisorId === adv.id);
-                      const createsCount = advisorDossiers.filter((d) => d.mode === 'create').length;
-                      const auditsCount = advisorDossiers.filter((d) => d.mode === 'audit').length;
-                      const rescuesCount = advisorDossiers.filter((d) => d.mode === 'rescue').length;
-
-                      return (
-                        <div
-                          key={adv.id}
-                          className="p-5 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-4 shadow-lg hover:border-amber-400/50 transition group"
-                        >
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between gap-2 flex-wrap">
-                              <span
-                                className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
-                                  isFounder
-                                    ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                                    : adv.accountType === 'partner_agency'
-                                    ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
-                                    : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
-                                }`}
-                              >
-                                {isFounder
-                                  ? (isEn ? '👑 Founder & Director' : '👑 Dirección General')
-                                  : adv.accountType === 'partner_agency'
-                                  ? (isEn ? '🏢 Partner Agency' : '🏢 Agencia Partner B2B')
-                                  : (isEn ? '💼 Internal Advisor' : '💼 Asesor Comercial')}
-                              </span>
-
-                              {adv.accountType === 'partner_agency' && (
-                                <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                                  ${adv.monthlyFeeUsd || 49} {isEn ? 'USD/mo' : 'USD/mes'}
-                                </span>
-                              )}
-
-                              <span
-                                className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                                  adv.licenseStatus === 'suspended'
-                                    ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
-                                    : adv.licenseStatus === 'pending_payment'
-                                    ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                                    : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'
-                                }`}
-                              >
-                                {adv.licenseStatus === 'suspended'
-                                  ? (isEn ? 'Suspended' : 'Suspendida')
-                                  : adv.licenseStatus === 'pending_payment'
-                                  ? (isEn ? 'Pending Payment' : 'Pago Pendiente')
-                                  : (isEn ? 'Active' : 'Activa')}
-                              </span>
-                            </div>
-
-                            <div>
-                              <h4 className="text-base font-black text-white group-hover:text-amber-300 transition">
-                                {adv.name}
-                              </h4>
-                              <p className="text-xs text-slate-400 mt-0.5">
-                                📍 {adv.city || 'Bogotá'}, {adv.country || 'Colombia'}
-                              </p>
-                              <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400 mt-1.5 font-mono">
-                                <span className="text-slate-300 font-bold">@{adv.username}</span>
-                                <span>•</span>
-                                <span className="text-emerald-400">{adv.phone}</span>
-                              </div>
-                            </div>
-
-                            {/* Desglose de Producción: Creaciones, Auditorías y Rescates */}
-                            <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-                              <div className="flex items-center justify-between text-xs font-black text-white">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                  {isEn ? 'Production Breakdown:' : 'Producción de Clientes:'}
-                                </span>
-                                <span className="px-2 py-0.5 rounded-full bg-slate-800 text-amber-300 font-mono text-[11px]">
-                                  {advisorDossiers.length} {isEn ? 'Total' : 'Totales'}
-                                </span>
-                              </div>
-
-                              <div className="grid grid-cols-3 gap-1.5 text-center text-[10.5px]">
-                                <div className="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
-                                  <span className="block text-[9px] text-emerald-400 font-bold uppercase truncate">
-                                    {isEn ? '🏗️ Created' : '🏗️ Creación'}
-                                  </span>
-                                  <strong className="text-white font-black text-sm">{createsCount}</strong>
-                                </div>
-
-                                <div className="p-2 rounded-xl bg-amber-950/40 border border-amber-500/30">
-                                  <span className="block text-[9px] text-amber-400 font-bold uppercase truncate">
-                                    {isEn ? '🔬 Audited' : '🔬 Auditoría'}
-                                  </span>
-                                  <strong className="text-white font-black text-sm">{auditsCount}</strong>
-                                </div>
-
-                                <div className="p-2 rounded-xl bg-rose-950/40 border border-rose-500/30">
-                                  <span className="block text-[9px] text-rose-400 font-bold uppercase truncate">
-                                    {isEn ? '🛡️ Rescued' : '🛡️ Rescate'}
-                                  </span>
-                                  <strong className="text-white font-black text-sm">{rescuesCount}</strong>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Acciones: Ver en Monitor, Modificar Cuenta y Eliminar */}
-                          <div className="pt-2 border-t border-slate-800/80 space-y-2">
-                            <button
-                              type="button"
-                              onClick={() => handleViewAdvisorDossiers(adv)}
-                              className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-white font-black text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-md active:scale-98"
-                            >
-                              <Search className="w-3.5 h-3.5" />
-                              <span>{isEn ? 'View Dossiers in Monitor' : 'Ver Expedientes en Monitor'}</span>
-                            </button>
-
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => handleOpenEditAdvisor(adv)}
-                                className="flex-1 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/40 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-98"
-                              >
-                                <Edit3 className="w-3.5 h-3.5" />
-                                <span>{isEn ? 'Edit Account' : 'Modificar Cuenta'}</span>
-                              </button>
-
-                              {!isFounder && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteAdvisor(adv)}
-                                  className="p-2 rounded-xl bg-rose-950/30 hover:bg-rose-950/70 text-rose-400 hover:text-rose-200 border border-rose-500/30 transition cursor-pointer"
-                                  title={isEn ? 'Delete Account' : 'Eliminar Cuenta'}
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                </div>
-              </div>
-            )}
+            {/* Pie Fijo del Modal */}
+            <div className="p-4 border-t border-slate-800 bg-slate-900/95 flex items-center justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setViewingAdvisorWorks(null)}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
-        )}
+        </div>
+      )}
+
+      {/* MODAL: REGISTRAR NUEVO ASESOR O LICENCIAR AGENCIA PARTNER */}
+      {showRegisterAdvisorModal && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 print:hidden animate-in fade-in duration-200">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative space-y-4 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div>
+                <h3 className="text-base font-black text-white flex items-center gap-2">
+                  <Users className="w-4 h-4 text-amber-400" />
+                  <span>{tNetwork.registerTitle}</span>
+                </h3>
+                <p className="text-[11px] text-slate-400">{tNetwork.registerDesc}</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowRegisterAdvisorModal(false)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Toggle Tipo de Cuenta */}
+            <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-slate-950 border border-slate-800 text-xs">
+              <button
+                type="button"
+                onClick={() => setNewAccountType('internal_advisor')}
+                className={`py-2 px-3 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                  newAccountType === 'internal_advisor'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Briefcase className="w-3.5 h-3.5" />
+                <span>{tNetwork.optAdvisor}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setNewAccountType('partner_agency')}
+                className={`py-2 px-3 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                  newAccountType === 'partner_agency'
+                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Building2 className="w-3.5 h-3.5" />
+                <span>{tNetwork.optAgency}</span>
+              </button>
+            </div>
+
+            <form
+              onSubmit={async (e) => {
+                await handleCreateAdvisor(e);
+                setShowRegisterAdvisorModal(false);
+              }}
+              className="space-y-3.5 text-xs"
+            >
+              <div>
+                <label className="block font-bold text-slate-300 mb-1">
+                  {newAccountType === 'partner_agency'
+                    ? (isEn ? 'Partner Agency Business Name *' : 'Razón Social o Nombre de la Agencia *')
+                    : (isEn ? 'Sales Advisor Full Name *' : 'Nombre Completo del Asesor *')}
+                </label>
+                <input
+                  type="text"
+                  value={newAdvisorName}
+                  onChange={(e) => setNewAdvisorName(e.target.value)}
+                  placeholder={
+                    newAccountType === 'partner_agency'
+                      ? (isEn ? 'e.g. Apex Local Growth Agency' : 'Ej: Agencia Digital Rocket 360')
+                      : (isEn ? 'e.g. Michael Smith' : 'Ej: Carlos Gómez')
+                  }
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">{tNetwork.countryLabel} *</label>
+                  <input
+                    type="text"
+                    value={newAdvisorCountry}
+                    onChange={(e) => setNewAdvisorCountry(e.target.value)}
+                    placeholder="Colombia, México, Venezuela..."
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">{tNetwork.cityLabel} *</label>
+                  <input
+                    type="text"
+                    value={newAdvisorCity}
+                    onChange={(e) => setNewAdvisorCity(e.target.value)}
+                    placeholder="Bogotá, Medellín, CDMX, Caracas..."
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">{tNetwork.userLabel} *</label>
+                  <input
+                    type="text"
+                    value={newAdvisorUser}
+                    onChange={(e) => setNewAdvisorUser(e.target.value)}
+                    placeholder="ej: carlos o rocketagency"
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white lowercase focus:outline-none focus:border-amber-400"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">{tNetwork.passLabel} *</label>
+                  <input
+                    type="text"
+                    value={newAdvisorPass}
+                    onChange={(e) => setNewAdvisorPass(e.target.value)}
+                    placeholder="Contraseña de acceso"
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 font-mono"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-300 mb-1">{tNetwork.phoneLabel}</label>
+                <input
+                  type="text"
+                  value={newAdvisorPhone}
+                  onChange={(e) => setNewAdvisorPhone(e.target.value)}
+                  placeholder="+573051234567"
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 font-mono"
+                />
+              </div>
+
+              {/* Si es Agencia Partner: Canon y Estado de Licencia */}
+              {newAccountType === 'partner_agency' && (
+                <div className="p-3.5 rounded-2xl bg-purple-950/40 border border-purple-500/40 space-y-2.5">
+                  <div className="flex items-center gap-1.5 text-purple-300 font-bold text-xs">
+                    <DollarSign className="w-4 h-4 text-purple-400" />
+                    <span>Configuración de Licencia Mensual B2B:</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">{tNetwork.monthlyFeeLabel}</label>
+                      <input
+                        type="number"
+                        value={newAdvisorMonthlyFee}
+                        onChange={(e) => setNewAdvisorMonthlyFee(Number(e.target.value))}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-purple-500/50 text-purple-200 font-bold focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">{tNetwork.licenseStatusLabel}</label>
+                      <select
+                        value={newAdvisorLicenseStatus}
+                        onChange={(e) => setNewAdvisorLicenseStatus(e.target.value as any)}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-purple-500/50 text-white focus:outline-none"
+                      >
+                        <option value="active">✅ Activa</option>
+                        <option value="pending_payment">⏳ Pendiente de Pago</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="block font-bold text-slate-300 mb-1">Clave Maestra de Dueño (Luisma) *</label>
+                <input
+                  type="password"
+                  value={adminMasterKey}
+                  onChange={(e) => setAdminMasterKey(e.target.value)}
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-amber-500/40 text-amber-300 font-mono focus:outline-none"
+                  required
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowRegisterAdvisorModal(false)}
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer"
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isSavingAdvisor}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg active:scale-98"
+                >
+                  {isSavingAdvisor
+                    ? 'Registrando...'
+                    : newAccountType === 'partner_agency'
+                    ? '🚀 Activar Licencia de Agencia Partner'
+                    : '+ Crear Asesor Comercial'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* MODAL: MODIFICAR CUENTA DE ASESOR / AGENCIA PARTNER */}
       {showEditAdvisorModal && editingAdvisor && (
