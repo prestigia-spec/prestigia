@@ -1395,14 +1395,15 @@ export default function LocalStudioPage() {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed && parsed.id) {
-          // If stored was old legacy advisor, upgrade to Luisma Director General
-          if (parsed.id === 'adv-brayan') {
+          // If stored was old legacy advisor or carlos, reset to Luisma Director General
+          if (parsed.id === 'adv-brayan' || parsed.id === 'adv-carlos' || parsed.username === 'carlos') {
             const founderUser: StudioAdvisorUser = {
               id: 'adv-luisma',
               name: 'Luisma • Director General & Founder',
               username: 'luisma',
               phone: '+573058314049',
               role: 'admin',
+              accountType: 'founder',
               active: true,
             };
             setCurrentUser(founderUser);
@@ -3156,60 +3157,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               <p className="text-xs text-slate-400 mt-0.5">{tAuth.subtitle}</p>
             </div>
 
-            {/* Quick 1-Click Selectors */}
-            <div className="space-y-2 pt-1 text-left">
-              <span className="text-[10px] font-black tracking-wider uppercase text-slate-400 block px-1">
-                {tAuth.quickAccess}
-              </span>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('luisma')}
-                className="w-full p-3 rounded-2xl bg-gradient-to-r from-amber-950/60 to-slate-900 border border-amber-500/50 hover:border-amber-400 flex items-center justify-between text-left transition cursor-pointer group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center text-slate-950 font-black text-base shadow-md group-hover:scale-105 transition">
-                    👑
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-black text-amber-200 text-xs">Luisma • Director General</span>
-                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-500 text-slate-950">{tAuth.founderRole}</span>
-                    </div>
-                    <span className="text-[10px] text-slate-400 block">{tAuth.founderDesc}</span>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-amber-400 group-hover:translate-x-0.5 transition" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('carlos')}
-                className="w-full p-3 rounded-2xl bg-gradient-to-r from-indigo-950/60 to-slate-900 border border-indigo-500/40 hover:border-indigo-400 flex items-center justify-between text-left transition cursor-pointer group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-base shadow-md group-hover:scale-105 transition">
-                    💼
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-black text-indigo-200 text-xs">Carlos • Consultor Comercial</span>
-                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">{tAuth.advisorRole}</span>
-                    </div>
-                    <span className="text-[10px] text-slate-400 block">{tAuth.advisorDesc}</span>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-indigo-400 group-hover:translate-x-0.5 transition" />
-              </button>
-            </div>
-
-            <div className="flex items-center gap-2 my-2">
-              <div className="flex-1 h-px bg-slate-800" />
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{tAuth.orCredentials}</span>
-              <div className="flex-1 h-px bg-slate-800" />
-            </div>
-
-            <form onSubmit={handleLogin} className="space-y-3 text-left text-xs">
+            <form onSubmit={handleLogin} className="space-y-3 text-left text-xs pt-2">
               <div>
                 <label className="block font-bold text-slate-300 mb-1">{tAuth.usernameLabel}</label>
                 <input
@@ -10302,60 +10250,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               <p className="text-xs text-slate-400 mt-0.5">{tAuth.subtitle}</p>
             </div>
 
-            {/* Quick 1-Click Selectors */}
-            <div className="space-y-2 pt-1 text-left">
-              <span className="text-[10px] font-black tracking-wider uppercase text-slate-400 block px-1">
-                {tAuth.quickAccess}
-              </span>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('luisma')}
-                className="w-full p-3 rounded-2xl bg-gradient-to-r from-amber-950/60 to-slate-900 border border-amber-500/50 hover:border-amber-400 flex items-center justify-between text-left transition cursor-pointer group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center text-slate-950 font-black text-base shadow-md group-hover:scale-105 transition">
-                    👑
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-black text-amber-200 text-xs">Luisma • Director General</span>
-                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-500 text-slate-950">{tAuth.founderRole}</span>
-                    </div>
-                    <span className="text-[10px] text-slate-400 block">{tAuth.founderDesc}</span>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-amber-400 group-hover:translate-x-0.5 transition" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('carlos')}
-                className="w-full p-3 rounded-2xl bg-gradient-to-r from-indigo-950/60 to-slate-900 border border-indigo-500/40 hover:border-indigo-400 flex items-center justify-between text-left transition cursor-pointer group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-base shadow-md group-hover:scale-105 transition">
-                    💼
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-black text-indigo-200 text-xs">Carlos • Consultor Comercial</span>
-                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">{tAuth.advisorRole}</span>
-                    </div>
-                    <span className="text-[10px] text-slate-400 block">{tAuth.advisorDesc}</span>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-indigo-400 group-hover:translate-x-0.5 transition" />
-              </button>
-            </div>
-
-            <div className="flex items-center gap-2 my-2">
-              <div className="flex-1 h-px bg-slate-800" />
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{tAuth.orCredentials}</span>
-              <div className="flex-1 h-px bg-slate-800" />
-            </div>
-
-            <form onSubmit={handleLogin} className="space-y-3 text-left text-xs">
+            <form onSubmit={handleLogin} className="space-y-3 text-left text-xs pt-2">
               <div>
                 <label className="block font-bold text-slate-300 mb-1">{tAuth.usernameLabel}</label>
                 <input
