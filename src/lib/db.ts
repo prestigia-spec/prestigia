@@ -1268,6 +1268,33 @@ export async function updateBranchGoogleTokens(
 // =========================================================================
 
 export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data, error } = await supabase.from('studio_advisors').select('*');
+      if (!error && Array.isArray(data) && data.length > 0) {
+        return data.map((a: any) => ({
+          id: a.id,
+          name: a.name,
+          username: a.username,
+          password: a.password,
+          phone: a.phone,
+          role: a.role,
+          accountType: a.account_type || a.accountType,
+          country: a.country,
+          city: a.city,
+          monthlyFeeUsd: Number(a.monthly_fee_usd ?? a.monthlyFeeUsd ?? 0),
+          licenseStatus: a.license_status || a.licenseStatus || 'active',
+          active: Boolean(a.active),
+          maxCreatesMonthly: Number(a.max_creates_monthly ?? a.maxCreatesMonthly ?? 30),
+          maxAuditsMonthly: Number(a.max_audits_monthly ?? a.maxAuditsMonthly ?? 30),
+          maxRescuesMonthly: Number(a.max_rescues_monthly ?? a.maxRescuesMonthly ?? 10),
+          createdAt: a.created_at || a.createdAt,
+        }));
+      }
+    }
+  } catch {}
+
   const db = ensureDbFile();
   if (!db.studioAdvisors || db.studioAdvisors.length === 0) {
     db.studioAdvisors = [
@@ -1351,6 +1378,33 @@ export async function saveStudioAdvisor(advisor: StudioAdvisor): Promise<void> {
     db.studioAdvisors.push(sanitizedAdvisor);
   }
   writeDbFile(db);
+
+  // Sync with Supabase PostgreSQL if table is configured
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      Promise.resolve(
+        supabase.from('studio_advisors').upsert({
+          id: sanitizedAdvisor.id,
+          name: sanitizedAdvisor.name,
+          username: sanitizedAdvisor.username,
+          password: sanitizedAdvisor.password,
+          phone: sanitizedAdvisor.phone,
+          role: sanitizedAdvisor.role,
+          account_type: sanitizedAdvisor.accountType,
+          country: sanitizedAdvisor.country,
+          city: sanitizedAdvisor.city,
+          monthly_fee_usd: sanitizedAdvisor.monthlyFeeUsd,
+          license_status: sanitizedAdvisor.licenseStatus,
+          active: sanitizedAdvisor.active,
+          max_creates_monthly: sanitizedAdvisor.maxCreatesMonthly,
+          max_audits_monthly: sanitizedAdvisor.maxAuditsMonthly,
+          max_rescues_monthly: sanitizedAdvisor.maxRescuesMonthly,
+          updated_at: new Date().toISOString(),
+        })
+      ).catch(() => {});
+    }
+  } catch {}
 }
 
 export async function deleteStudioAdvisor(advisorId: string): Promise<boolean> {
@@ -1361,10 +1415,59 @@ export async function deleteStudioAdvisor(advisorId: string): Promise<boolean> {
   if (target?.role === 'admin' || target?.username === 'admin') return false;
   db.studioAdvisors = db.studioAdvisors.filter((a) => a.id !== advisorId);
   writeDbFile(db);
+
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      Promise.resolve(supabase.from('studio_advisors').delete().eq('id', advisorId)).catch(() => {});
+    }
+  } catch {}
+
   return true;
 }
 
 export async function getAllStudioDossiers(): Promise<StudioDossier[]> {
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data, error } = await supabase.from('studio_dossiers').select('*');
+      if (!error && Array.isArray(data) && data.length > 0) {
+        return data.map((d: any) => ({
+          id: d.id,
+          advisorId: d.advisor_id || d.advisorId,
+          advisorName: d.advisor_name || d.advisorName,
+          advisorPhone: d.advisor_phone || d.advisorPhone,
+          advisorType: d.advisor_type || d.advisorType,
+          country: d.country,
+          clientName: d.client_name || d.clientName,
+          contactName: d.contact_name || d.contactName,
+          contactCompany: d.contact_company || d.contactCompany,
+          contactPhone: d.contact_phone || d.contactPhone,
+          contactEmail: d.contact_email || d.contactEmail,
+          contactRole: d.contact_role || d.contactRole,
+          category: d.category,
+          city: d.city,
+          neighborhood: d.neighborhood,
+          googleUrl: d.google_url || d.googleUrl,
+          mode: d.mode,
+          businessModel: d.business_model || d.businessModel,
+          status: d.status,
+          deletedByAdvisor: Boolean(d.deleted_by_advisor ?? d.deletedByAdvisor),
+          deletedAt: d.deleted_at || d.deletedAt,
+          closingStatus: d.closing_status || d.closingStatus,
+          setupFeeChargedUsd: Number(d.setup_fee_charged_usd ?? d.setupFeeChargedUsd ?? 0),
+          monthlyPlanUsd: Number(d.monthly_plan_usd ?? d.monthlyPlanUsd ?? 0),
+          prestigiaPlan: d.prestigia_plan || d.prestigiaPlan,
+          paymentMethod: d.payment_method || d.paymentMethod,
+          closingNotes: d.closing_notes || d.closingNotes,
+          data: d.data,
+          createdAt: d.created_at || d.createdAt,
+          updatedAt: d.updated_at || d.updatedAt,
+        }));
+      }
+    }
+  } catch {}
+
   const db = ensureDbFile();
   if (!db.studioDossiers || db.studioDossiers.length === 0) {
     db.studioDossiers = [
@@ -1520,6 +1623,46 @@ export async function saveStudioDossier(dossier: StudioDossier): Promise<void> {
     db.studioDossiers.unshift(dossier);
   }
   writeDbFile(db);
+
+  // Sync with Supabase PostgreSQL if table is configured
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      Promise.resolve(
+        supabase.from('studio_dossiers').upsert({
+          id: dossier.id,
+          advisor_id: dossier.advisorId,
+          advisor_name: dossier.advisorName,
+          advisor_phone: dossier.advisorPhone,
+          advisor_type: dossier.advisorType,
+          country: dossier.country,
+          client_name: dossier.clientName,
+          contact_name: dossier.contactName,
+          contact_company: dossier.contactCompany,
+          contact_phone: dossier.contactPhone,
+          contact_email: dossier.contactEmail,
+          contact_role: dossier.contactRole,
+          category: dossier.category,
+          city: dossier.city,
+          neighborhood: dossier.neighborhood,
+          google_url: dossier.googleUrl,
+          mode: dossier.mode,
+          business_model: dossier.businessModel,
+          status: dossier.status,
+          deleted_by_advisor: Boolean(dossier.deletedByAdvisor),
+          deleted_at: dossier.deletedAt || null,
+          closing_status: dossier.closingStatus,
+          setup_fee_charged_usd: dossier.setupFeeChargedUsd,
+          monthly_plan_usd: dossier.monthlyPlanUsd,
+          prestigia_plan: dossier.prestigiaPlan,
+          payment_method: dossier.paymentMethod,
+          closing_notes: dossier.closingNotes,
+          data: dossier.data,
+          updated_at: new Date().toISOString(),
+        })
+      ).catch(() => {});
+    }
+  } catch {}
 }
 
 export async function deleteStudioDossier(dossierId: string, isPermanentPurge: boolean = false): Promise<boolean> {
@@ -1537,6 +1680,23 @@ export async function deleteStudioDossier(dossierId: string, isPermanentPurge: b
     }
   }
   writeDbFile(db);
+
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      if (isPermanentPurge) {
+        Promise.resolve(supabase.from('studio_dossiers').delete().eq('id', dossierId)).catch(() => {});
+      } else {
+        Promise.resolve(
+          supabase.from('studio_dossiers').update({
+            deleted_by_advisor: true,
+            deleted_at: new Date().toISOString(),
+          }).eq('id', dossierId)
+        ).catch(() => {});
+      }
+    }
+  } catch {}
+
   return true;
 }
 
@@ -1548,6 +1708,19 @@ export async function restoreStudioDossier(dossierId: string): Promise<boolean> 
     item.deletedByAdvisor = false;
     delete item.deletedAt;
     writeDbFile(db);
+
+    try {
+      const supabase = getSupabase();
+      if (supabase) {
+        Promise.resolve(
+          supabase.from('studio_dossiers').update({
+            deleted_by_advisor: false,
+            deleted_at: null,
+          }).eq('id', dossierId)
+        ).catch(() => {});
+      }
+    } catch {}
+
     return true;
   }
   return false;

@@ -258,6 +258,64 @@ ALTER TABLE device_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE traffic_visits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE master_security ENABLE ROW LEVEL SECURITY;
 
+-- 12. TABLA: ASESORES Y LICENCIAS DE AGENCIA (LOCAL STUDIO)
+CREATE TABLE IF NOT EXISTS studio_advisors (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  username TEXT NOT NULL UNIQUE,
+  password TEXT NOT NULL,
+  phone TEXT,
+  role TEXT DEFAULT 'advisor',
+  account_type TEXT DEFAULT 'internal_advisor',
+  country TEXT DEFAULT 'Colombia',
+  city TEXT DEFAULT 'Bogotá',
+  monthly_fee_usd NUMERIC(10, 2) DEFAULT 0,
+  license_status TEXT DEFAULT 'active',
+  active BOOLEAN DEFAULT TRUE,
+  max_creates_monthly INTEGER DEFAULT 30,
+  max_audits_monthly INTEGER DEFAULT 30,
+  max_rescues_monthly INTEGER DEFAULT 10,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 13. TABLA: DOSSIERS Y AUDITORÍAS COMERCIALES (LOCAL STUDIO & FORENSIC VAULT)
+CREATE TABLE IF NOT EXISTS studio_dossiers (
+  id TEXT PRIMARY KEY,
+  advisor_id TEXT NOT NULL,
+  advisor_name TEXT NOT NULL,
+  advisor_phone TEXT,
+  advisor_type TEXT DEFAULT 'internal_advisor',
+  country TEXT DEFAULT 'Colombia',
+  client_name TEXT NOT NULL,
+  contact_name TEXT,
+  contact_company TEXT,
+  contact_phone TEXT,
+  contact_email TEXT,
+  contact_role TEXT,
+  category TEXT NOT NULL,
+  city TEXT NOT NULL,
+  neighborhood TEXT,
+  google_url TEXT,
+  mode TEXT NOT NULL DEFAULT 'create',
+  business_model TEXT DEFAULT 'storefront',
+  status TEXT NOT NULL DEFAULT 'presented',
+  deleted_by_advisor BOOLEAN DEFAULT FALSE,
+  deleted_at TIMESTAMPTZ,
+  closing_status TEXT DEFAULT 'proposal_sent',
+  setup_fee_charged_usd NUMERIC(10, 2) DEFAULT 0,
+  monthly_plan_usd NUMERIC(10, 2) DEFAULT 0,
+  prestigia_plan TEXT DEFAULT 'elite',
+  payment_method TEXT,
+  closing_notes TEXT,
+  data JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE studio_advisors ENABLE ROW LEVEL SECURITY;
+ALTER TABLE studio_dossiers ENABLE ROW LEVEL SECURITY;
+
 -- Políticas universales para Service Role (acceso total backend) y lectura anónima controlada
 DO $$
 BEGIN
@@ -273,5 +331,7 @@ BEGIN
     CREATE POLICY service_role_all_sessions ON device_sessions FOR ALL TO service_role USING (true) WITH CHECK (true);
     CREATE POLICY service_role_all_traffic ON traffic_visits FOR ALL TO service_role USING (true) WITH CHECK (true);
     CREATE POLICY service_role_all_master ON master_security FOR ALL TO service_role USING (true) WITH CHECK (true);
+    CREATE POLICY service_role_all_studio_advisors ON studio_advisors FOR ALL TO service_role USING (true) WITH CHECK (true);
+    CREATE POLICY service_role_all_studio_dossiers ON studio_dossiers FOR ALL TO service_role USING (true) WITH CHECK (true);
   END IF;
 END $$;

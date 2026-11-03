@@ -71,7 +71,14 @@ Responde ÚNICAMENTE un arreglo JSON con exactamente 3 opciones:
   }
 ]`;
 
-        const candidateModels = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.5-flash-lite'];
+        const candidateModels = [
+          'gemini-3.5-flash',
+          'gemini-3.5-flash-lite',
+          'gemini-flash-latest',
+          'gemini-flash-lite-latest',
+          'gemini-3.8-flash',
+          'gemini-2.5-flash-lite',
+        ];
         for (const modelName of candidateModels) {
           try {
             const geminiRes = await fetch(
