@@ -3359,13 +3359,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </div>
                         <select
                           value={country}
-                          onChange={(e) => {
-                            if (e.target.value === '__add_new__') {
-                              setShowAddCountryModal(true);
-                            } else {
-                              handleSelectCountry(e.target.value);
-                            }
-                          }}
+                          onChange={(e) => handleSelectCountry(e.target.value)}
                           className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-emerald-400 transition text-sm cursor-pointer"
                         >
                           {allCountriesList.map((c) => (
@@ -3373,9 +3367,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               {c}
                             </option>
                           ))}
-                          <option value="__add_new__" className="text-emerald-400 font-bold">
-                            + Agregar otro País...
-                          </option>
                         </select>
                       </div>
 
@@ -3400,14 +3391,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </div>
                         <select
                           value={city}
-                          onChange={(e) => {
-                            if (e.target.value === '__add_new__') {
-                              setTargetCountryForNewCity(country);
-                              setShowAddCityModal(true);
-                            } else {
-                              setCity(e.target.value);
-                            }
-                          }}
+                          onChange={(e) => setCity(e.target.value)}
                           className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-emerald-400 transition text-sm cursor-pointer"
                         >
                           {getCitiesForCountry(country).map((cty) => (
@@ -3415,9 +3399,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               {cty}
                             </option>
                           ))}
-                          <option value="__add_new__" className="text-emerald-400 font-bold">
-                            + Agregar otra Ciudad a {country}...
-                          </option>
                         </select>
                       </div>
                     </div>
@@ -4663,13 +4644,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             </div>
                             <select
                               value={country}
-                              onChange={(e) => {
-                                if (e.target.value === '__add_new__') {
-                                  setShowAddCountryModal(true);
-                                } else {
-                                  handleSelectCountry(e.target.value);
-                                }
-                              }}
+                              onChange={(e) => handleSelectCountry(e.target.value)}
                               className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition text-xs cursor-pointer"
                             >
                               {allCountriesList.map((c) => (
@@ -4677,9 +4652,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                                   {c}
                                 </option>
                               ))}
-                              <option value="__add_new__" className="text-amber-400 font-bold">
-                                + Agregar otro País...
-                              </option>
                             </select>
                           </div>
 
@@ -4704,14 +4676,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             </div>
                             <select
                               value={city}
-                              onChange={(e) => {
-                                if (e.target.value === '__add_new__') {
-                                  setTargetCountryForNewCity(country);
-                                  setShowAddCityModal(true);
-                                } else {
-                                  setCity(e.target.value);
-                                }
-                              }}
+                              onChange={(e) => setCity(e.target.value)}
                               className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition text-xs cursor-pointer"
                             >
                               {getCitiesForCountry(country).map((cty) => (
@@ -4719,9 +4684,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                                   {cty}
                                 </option>
                               ))}
-                              <option value="__add_new__" className="text-amber-400 font-bold">
-                                + Agregar otra Ciudad a {country}...
-                              </option>
                             </select>
                           </div>
                         </div>
@@ -5436,13 +5398,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </div>
                         <select
                           value={country}
-                          onChange={(e) => {
-                            if (e.target.value === '__add_new__') {
-                              setShowAddCountryModal(true);
-                            } else {
-                              handleSelectCountry(e.target.value);
-                            }
-                          }}
+                          onChange={(e) => handleSelectCountry(e.target.value)}
                           className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-rose-400 transition text-sm cursor-pointer"
                         >
                           {allCountriesList.map((c) => (
@@ -5450,9 +5406,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               {c}
                             </option>
                           ))}
-                          <option value="__add_new__" className="text-rose-400 font-bold">
-                            + Agregar otro País...
-                          </option>
                         </select>
                       </div>
 
@@ -5477,14 +5430,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </div>
                         <select
                           value={city}
-                          onChange={(e) => {
-                            if (e.target.value === '__add_new__') {
-                              setTargetCountryForNewCity(country);
-                              setShowAddCityModal(true);
-                            } else {
-                              setCity(e.target.value);
-                            }
-                          }}
+                          onChange={(e) => setCity(e.target.value)}
                           className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-rose-400 transition text-sm cursor-pointer"
                         >
                           {getCitiesForCountry(country).map((cty) => (
@@ -5492,9 +5438,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               {cty}
                             </option>
                           ))}
-                          <option value="__add_new__" className="text-rose-400 font-bold">
-                            + Agregar otra Ciudad a {country}...
-                          </option>
                         </select>
                       </div>
                     </div>
@@ -7383,7 +7326,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               </div>
 
               {/* Location & Commercial Closing Dropdowns - Filtros Jerárquicos en Cascada */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-2 border-t border-slate-800 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-800 text-xs">
                 {/* 1º Filtro: País */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
@@ -7404,13 +7347,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   <select
                     value={dossierCountryFilter}
                     onChange={(e) => {
-                      if (e.target.value === '__add_new__') {
-                        setShowAddCountryModal(true);
-                      } else {
-                        setDossierCountryFilter(e.target.value);
-                        setDossierCityFilter('all');
-                        setDossierNeighborhoodFilter('all');
-                      }
+                      setDossierCountryFilter(e.target.value);
+                      setDossierCityFilter('all');
+                      setDossierNeighborhoodFilter('all');
                     }}
                     className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 transition cursor-pointer"
                   >
@@ -7423,9 +7362,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </option>
                       );
                     })}
-                    <option value="__add_new__" className="text-amber-400 font-bold">
-                      + Agregar otro País...
-                    </option>
                   </select>
                 </div>
 
@@ -7453,13 +7389,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     value={dossierCityFilter}
                     disabled={dossierCountryFilter === 'all'}
                     onChange={(e) => {
-                      if (e.target.value === '__add_new__') {
-                        setTargetCountryForNewCity(dossierCountryFilter !== 'all' ? dossierCountryFilter : 'Colombia');
-                        setShowAddCityModal(true);
-                      } else {
-                        setDossierCityFilter(e.target.value);
-                        setDossierNeighborhoodFilter('all');
-                      }
+                      setDossierCityFilter(e.target.value);
+                      setDossierNeighborhoodFilter('all');
                     }}
                     className={`w-full px-3 py-2 rounded-xl text-xs focus:outline-none transition ${
                       dossierCountryFilter === 'all'
@@ -7484,59 +7415,15 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             </option>
                           );
                         })}
-                        <option value="__add_new__" className="text-amber-400 font-bold">
-                          + Agregar otra Ciudad a {dossierCountryFilter}...
-                        </option>
                       </>
                     )}
                   </select>
                 </div>
 
-                {/* 3º Filtro: Localidad / Barrio Condicionado a la Ciudad */}
+                {/* 3º Filtro: Estado de Cierre / Monetización */}
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    3º {tDossiers.filterNeighborhood}
-                  </label>
-                  <select
-                    value={dossierNeighborhoodFilter}
-                    disabled={dossierCountryFilter === 'all' || dossierCityFilter === 'all'}
-                    onChange={(e) => setDossierNeighborhoodFilter(e.target.value)}
-                    className={`w-full px-3 py-2 rounded-xl text-xs focus:outline-none transition ${
-                      dossierCountryFilter === 'all' || dossierCityFilter === 'all'
-                        ? 'bg-slate-900/60 border border-slate-800/80 text-slate-500 cursor-not-allowed opacity-60'
-                        : 'bg-slate-950 border border-slate-800 text-white focus:border-amber-400 cursor-pointer'
-                    }`}
-                  >
-                    {dossierCountryFilter === 'all' ? (
-                      <option value="all">🔒 Selecciona un país primero</option>
-                    ) : dossierCityFilter === 'all' ? (
-                      <option value="all">🔒 Selecciona una ciudad primero</option>
-                    ) : (
-                      <>
-                        <option value="all">📍 Todos los Barrios de {dossierCityFilter} ({dossierAvailableNeighborhoods.length})</option>
-                        {dossierAvailableNeighborhoods.map((n) => {
-                          const count = luismaBaseDossiers.filter(
-                            (d) =>
-                              (d.country || 'Colombia') === dossierCountryFilter &&
-                              d.city.toLowerCase() === dossierCityFilter.toLowerCase() &&
-                              d.neighborhood &&
-                              d.neighborhood.toLowerCase() === n.toLowerCase()
-                          ).length;
-                          return (
-                            <option key={n} value={n}>
-                              {n} {count > 0 ? `(${count})` : ''}
-                            </option>
-                          );
-                        })}
-                      </>
-                    )}
-                  </select>
-                </div>
-
-                {/* 4º Filtro: Estado de Cierre / Monetización */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    4º {tDossiers.filterClosing}
+                    3º {tDossiers.filterClosing}
                   </label>
                   <select
                     value={dossierClosingFilter}
@@ -7888,7 +7775,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           {allCountriesList.map((c) => (
                             <option key={c} value={c}>{c}</option>
                           ))}
-                          <option value="__add_new__" className="text-amber-400 font-bold">+ Agregar otro País...</option>
+                          
                         </select>
                       </div>
 
@@ -7924,7 +7811,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           {getCitiesForCountry(closingFormCountry).map((cty) => (
                             <option key={cty} value={cty}>{cty}</option>
                           ))}
-                          <option value="__add_new__" className="text-amber-400 font-bold">+ Agregar Ciudad a {closingFormCountry}...</option>
+                          
                         </select>
                       </div>
 
