@@ -1483,18 +1483,127 @@ export default function LocalStudioPage() {
   // -------------------------------------------------------------
   // 2. WORKSPACE FORM STATE
   // -------------------------------------------------------------
-  const [businessName, setBusinessName] = useState('');
-  const [category, setCategory] = useState(CATEGORY_OPTIONS[0]);
-  const [country, setCountry] = useState<string>('Colombia');
-  const [city, setCity] = useState<string>('Bogotá');
-  const [neighborhood, setNeighborhood] = useState<string>('');
-  // Client Contratante State (The person/company contracting the service)
-  const [contactName, setContactName] = useState<string>('');
-  const [contactCompany, setContactCompany] = useState<string>('');
-  const [contactPhone, setContactPhone] = useState<string>('');
-  const [contactEmail, setContactEmail] = useState<string>('');
-  const [contactRole, setContactRole] = useState<string>('Dueño / Propietario');
+  // TAB 1: CREAR FICHA (CREATE) DEDICATED STATE
+  // -------------------------------------------------------------
+  const [createContactName, setCreateContactName] = useState<string>('');
+  const [createContactCompany, setCreateContactCompany] = useState<string>('');
+  const [createContactPhone, setCreateContactPhone] = useState<string>('');
+  const [createContactEmail, setCreateContactEmail] = useState<string>('');
+  const [createContactRole, setCreateContactRole] = useState<string>('Dueño / Propietario');
+  const [createBusinessName, setCreateBusinessName] = useState('');
+  const [createCategory, setCreateCategory] = useState(CATEGORY_OPTIONS[0]);
+  const [createCountry, setCreateCountry] = useState<string>('Colombia');
+  const [createCity, setCreateCity] = useState<string>('Bogotá');
+  const [createNeighborhood, setCreateNeighborhood] = useState<string>('');
+  const [createSpecialties, setCreateSpecialties] = useState('');
+  const [createPhone, setCreatePhone] = useState('');
+  const [createBusinessModel, setCreateBusinessModel] = useState<'storefront' | 'service_area'>('storefront');
+  const [createServiceAreas, setCreateServiceAreas] = useState('');
+  const [isGeneratingCreate, setIsGeneratingCreate] = useState(false);
+  const [createGeneratedData, setCreateGeneratedData] = useState<BlueprintData | null>(null);
 
+  // -------------------------------------------------------------
+  // TAB 2: AUDITAR & OPTIMIZAR (AUDIT) DEDICATED STATE
+  // -------------------------------------------------------------
+  const [auditContactName, setAuditContactName] = useState<string>('');
+  const [auditContactCompany, setAuditContactCompany] = useState<string>('');
+  const [auditContactPhone, setAuditContactPhone] = useState<string>('');
+  const [auditContactEmail, setAuditContactEmail] = useState<string>('');
+  const [auditContactRole, setAuditContactRole] = useState<string>('Dueño / Propietario');
+  const [auditQuery, setAuditQuery] = useState('');
+  const [isScanningAudit, setIsScanningAudit] = useState(false);
+  const [auditScannedListing, setAuditScannedListing] = useState<GooglePlaceData | null>(null);
+  const [showManualAuditFields, setShowManualAuditFields] = useState(false);
+  const [auditBusinessName, setAuditBusinessName] = useState('');
+  const [auditCategory, setAuditCategory] = useState(CATEGORY_OPTIONS[0]);
+  const [auditCountry, setAuditCountry] = useState<string>('Colombia');
+  const [auditCity, setAuditCity] = useState<string>('Bogotá');
+  const [auditNeighborhood, setAuditNeighborhood] = useState<string>('');
+  const [auditPhone, setAuditPhone] = useState('');
+  const [auditGoogleUrl, setAuditGoogleUrl] = useState('');
+  const [auditExistingRating, setAuditExistingRating] = useState<number>(4.2);
+  const [auditExistingReviews, setAuditExistingReviews] = useState<number>(0);
+  const [isGeneratingAudit, setIsGeneratingAudit] = useState(false);
+  const [auditGeneratedData, setAuditGeneratedData] = useState<BlueprintData | null>(null);
+
+  // -------------------------------------------------------------
+  // TAB 3: RESCATAR FICHA (RESCUE) DEDICATED STATE
+  // -------------------------------------------------------------
+  const [rescueContactName, setRescueContactName] = useState<string>('');
+  const [rescueContactCompany, setRescueContactCompany] = useState<string>('');
+  const [rescueContactPhone, setRescueContactPhone] = useState<string>('');
+  const [rescueContactEmail, setRescueContactEmail] = useState<string>('');
+  const [rescueContactRole, setRescueContactRole] = useState<string>('Dueño / Propietario');
+  const [rescueSearchQuery, setRescueSearchQuery] = useState('');
+  const [isRescueScanning, setIsRescueScanning] = useState(false);
+  const [rescueScannedListing, setRescueScannedListing] = useState<GooglePlaceData | null>(null);
+  const [rescueBusinessName, setRescueBusinessName] = useState('');
+  const [rescueCategory, setRescueCategory] = useState(CATEGORY_OPTIONS[0]);
+  const [rescueCountry, setRescueCountry] = useState<string>('Colombia');
+  const [rescueCity, setRescueCity] = useState<string>('Bogotá');
+  const [rescueNeighborhood, setRescueNeighborhood] = useState<string>('');
+  const [rescueScenario, setRescueScenario] = useState<'orphan' | 'third_party' | 'rejected'>('third_party');
+  const [rescueMaskedEmail, setRescueMaskedEmail] = useState('');
+
+  // -------------------------------------------------------------
+  // TAB 4: APELACIÓN Y RESCATE LEGAL DE RESEÑAS 1-3★ DEDICATED STATE
+  // -------------------------------------------------------------
+  const [appealContactName, setAppealContactName] = useState<string>('');
+  const [appealContactCompany, setAppealContactCompany] = useState<string>('');
+  const [appealContactPhone, setAppealContactPhone] = useState<string>('');
+  const [appealContactEmail, setAppealContactEmail] = useState<string>('');
+  const [appealContactRole, setAppealContactRole] = useState<string>('Dueño / Propietario');
+  const [appealSearchQuery, setAppealSearchQuery] = useState('');
+  const [isScanningAppeals, setIsScanningAppeals] = useState(false);
+  const [scannedAppealBiz, setScannedAppealBiz] = useState<GooglePlaceData | null>(null);
+  const [appealReviewsList, setAppealReviewsList] = useState<NegativeReviewItem[]>([]);
+  const [selectedAppealReview, setSelectedAppealReview] = useState<NegativeReviewItem | null>(null);
+  const [isGeneratingAppeal, setIsGeneratingAppeal] = useState(false);
+  const [activeAppealDossier, setActiveAppealDossier] = useState<any | null>(null);
+  const [appealSuccessCopied, setAppealSuccessCopied] = useState<string | null>(null);
+
+  // Manual Review Form State
+  const [showManualReviewForm, setShowManualReviewForm] = useState(false);
+  const [manualAuthor, setManualAuthor] = useState('');
+  const [manualRating, setManualRating] = useState<number>(1);
+  const [manualTimeAgo, setManualTimeAgo] = useState('Reciente');
+  const [manualText, setManualText] = useState('');
+  const [manualContextFlag, setManualContextFlag] = useState<
+    'competitor' | 'ex_employee' | 'fake_customer' | 'defamation' | 'off_topic' | 'extortion' | 'general_bad_faith'
+  >('fake_customer');
+  const [manualNotes, setManualNotes] = useState('');
+
+  // -------------------------------------------------------------
+  // TAB 5: 3 ARMAS TOP 3 (TOOLS) DEDICATED STATE
+  // -------------------------------------------------------------
+  const [toolsActiveTab, setToolsActiveTab] = useState<'geogrid' | 'roicalc' | 'rivalspy'>('geogrid');
+  const [toolsSearchQuery, setToolsSearchQuery] = useState('');
+  const [isToolsScanning, setIsToolsScanning] = useState(false);
+  const [toolsBusinessName, setToolsBusinessName] = useState('');
+  const [toolsScannedListing, setToolsScannedListing] = useState<GooglePlaceData | null>(null);
+  const [toolsCategory, setToolsCategory] = useState(CATEGORY_OPTIONS[0]);
+  const [toolsCity, setToolsCity] = useState('');
+  const [toolsExistingRating, setToolsExistingRating] = useState<number>(4.2);
+  const [toolsExistingReviews, setToolsExistingReviews] = useState<number>(0);
+  const [geoGridKeyword, setGeoGridKeyword] = useState('');
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [geoGridRadius, setGeoGridRadius] = useState<'1km' | '3km' | '5km'>('3km');
+  const [roiAverageTicket, setRoiAverageTicket] = useState<number>(65);
+  const [roiCustomerFrequency, setRoiCustomerFrequency] = useState<number>(3);
+  const [roiCurrentRank, setRoiCurrentRank] = useState<number>(8);
+  const [roiMonthlySearches, setRoiMonthlySearches] = useState<number>(1200);
+
+  // Rival Spy (Head-to-Head Competitor Radar) State
+  const [rivalSearchQuery, setRivalSearchQuery] = useState('');
+  const [isRivalScanning, setIsRivalScanning] = useState(false);
+  const [rivalName, setRivalName] = useState('');
+  const [rivalRating, setRivalRating] = useState<number>(4.8);
+  const [rivalReviews, setRivalReviews] = useState<number>(120);
+  const [rivalWeeklyPace, setRivalWeeklyPace] = useState<number>(3);
+  const [rivalPhotos, setRivalPhotos] = useState<number>(45);
+
+  // Common UI State & Custom Geo State
+  const [lang, setLang] = useState<'es' | 'en'>('es');
   const [customCountries, setCustomCountries] = useState<string[]>([]);
   const [customCitiesByCountry, setCustomCitiesByCountry] = useState<Record<string, string[]>>({});
 
@@ -1503,20 +1612,12 @@ export default function LocalStudioPage() {
   const [showAddCityModal, setShowAddCityModal] = useState<boolean>(false);
   const [targetCountryForNewCity, setTargetCountryForNewCity] = useState<string>('Colombia');
   const [newCountryInput, setNewCountryInput] = useState<string>('');
-    const [newCityInput, setNewCityInput] = useState<string>('');
+  const [newCityInput, setNewCityInput] = useState<string>('');
 
   // Closing modal location states
   const [closingFormCountry, setClosingFormCountry] = useState<string>('Colombia');
   const [closingFormCity, setClosingFormCity] = useState<string>('Bogotá');
   const [closingFormNeighborhood, setClosingFormNeighborhood] = useState<string>('');
-  const [specialties, setSpecialties] = useState('');
-  const [phone, setPhone] = useState('');
-  const [googleUrl, setGoogleUrl] = useState('');
-  const [existingRating, setExistingRating] = useState<number>(4.2);
-  const [existingReviews, setExistingReviews] = useState<number>(0);
-  const [lang, setLang] = useState<'es' | 'en'>('es');
-  const [businessModel, setBusinessModel] = useState<'storefront' | 'service_area'>('storefront');
-  const [serviceAreas, setServiceAreas] = useState('');
 
   const t = UI_TEXT[lang] || UI_TEXT.es;
   const tTools = TXT_TOOLS[lang] || TXT_TOOLS.es;
@@ -1527,6 +1628,12 @@ export default function LocalStudioPage() {
   const tAuth = TXT_AUTH[lang] || TXT_AUTH.es;
   const isEn = lang === 'en';
   const categoryOptions = lang === 'en' ? CATEGORY_OPTIONS_EN : CATEGORY_OPTIONS_ES;
+
+  const hasActiveGeneratedData = Boolean(
+    (activeTab === 'create' && createGeneratedData) ||
+    (activeTab === 'audit' && auditGeneratedData) ||
+    (activeTab === 'appeals' && activeAppealDossier)
+  );
 
   // Load custom countries and cities from localStorage on mount
   useEffect(() => {
@@ -1546,7 +1653,7 @@ export default function LocalStudioPage() {
     }
   }, []);
 
-const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
+  const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
   // Combined list of countries (default + custom + dossiers)
   const allCountriesList = useMemo(() => {
@@ -1570,11 +1677,27 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   };
 
-  const handleSelectCountry = (newCountry: string) => {
-    setCountry(newCountry);
+  const handleSelectCreateCountry = (newCountry: string) => {
+    setCreateCountry(newCountry);
     const available = getCitiesForCountry(newCountry);
-    if (!available.includes(city) && available.length > 0) {
-      setCity(available[0]);
+    if (!available.includes(createCity) && available.length > 0) {
+      setCreateCity(available[0]);
+    }
+  };
+
+  const handleSelectAuditCountry = (newCountry: string) => {
+    setAuditCountry(newCountry);
+    const available = getCitiesForCountry(newCountry);
+    if (!available.includes(auditCity) && available.length > 0) {
+      setAuditCity(available[0]);
+    }
+  };
+
+  const handleSelectRescueCountry = (newCountry: string) => {
+    setRescueCountry(newCountry);
+    const available = getCitiesForCountry(newCountry);
+    if (!available.includes(rescueCity) && available.length > 0) {
+      setRescueCity(available[0]);
     }
   };
 
@@ -1590,7 +1713,10 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
       return updated;
     });
 
-    setCountry(trimmedCountry);
+    if (activeTab === 'create') setCreateCountry(trimmedCountry);
+    else if (activeTab === 'audit') setAuditCountry(trimmedCountry);
+    else if (activeTab === 'rescue') setRescueCountry(trimmedCountry);
+
     setDossierCountryFilter(trimmedCountry);
     setDossierCityFilter('all');
     setDossierNeighborhoodFilter('all');
@@ -1601,7 +1727,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
   const handleSaveNewCity = () => {
     const trimmedCity = newCityInput.trim();
-    const targetC = targetCountryForNewCity || (dossierCountryFilter !== 'all' ? dossierCountryFilter : country) || 'Colombia';
+    const currentActiveCountry = activeTab === 'create' ? createCountry : activeTab === 'audit' ? auditCountry : activeTab === 'rescue' ? rescueCountry : 'Colombia';
+    const targetC = targetCountryForNewCity || (dossierCountryFilter !== 'all' ? dossierCountryFilter : currentActiveCountry) || 'Colombia';
     if (!trimmedCity) return;
 
     setCustomCitiesByCountry((prev) => {
@@ -1613,15 +1740,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
       return updated;
     });
 
-    if (country === targetC) {
-      setCity(trimmedCity);
-    }
-    if (closingFormCountry === targetC) {
-      setClosingFormCity(trimmedCity);
-    }
-    if (dossierCountryFilter === targetC) {
-      setDossierCityFilter(trimmedCity);
-    }
+    if (activeTab === 'create' && createCountry === targetC) setCreateCity(trimmedCity);
+    if (activeTab === 'audit' && auditCountry === targetC) setAuditCity(trimmedCity);
+    if (activeTab === 'rescue' && rescueCountry === targetC) setRescueCity(trimmedCity);
+    if (closingFormCountry === targetC) setClosingFormCity(trimmedCity);
+    if (dossierCountryFilter === targetC) setDossierCityFilter(trimmedCity);
 
     setNewCityInput('');
     setShowAddCityModal(false);
@@ -1632,72 +1755,20 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     setLang(newLang);
     const fromOptions = newLang === 'en' ? CATEGORY_OPTIONS_ES : CATEGORY_OPTIONS_EN;
     const toOptions = newLang === 'en' ? CATEGORY_OPTIONS_EN : CATEGORY_OPTIONS_ES;
-    const idx = fromOptions.indexOf(category);
-    if (idx !== -1 && toOptions[idx]) {
-      setCategory(toOptions[idx]);
-    } else if (!toOptions.includes(category)) {
-      setCategory(toOptions[0]);
-    }
+
+    const mapCat = (c: string) => {
+      const idx = fromOptions.indexOf(c);
+      if (idx !== -1 && toOptions[idx]) return toOptions[idx];
+      return toOptions[0];
+    };
+
+    setCreateCategory((prev) => mapCat(prev));
+    setAuditCategory((prev) => mapCat(prev));
+    setRescueCategory((prev) => mapCat(prev));
+    setToolsCategory((prev) => mapCat(prev));
+
     showToast(newLang === 'en' ? '🇺🇸 Language switched to English' : '🇨🇴 Idioma cambiado a Español');
   };
-
-  // Generator Result State
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedData, setGeneratedData] = useState<BlueprintData | null>(null);
-
-  // Module 2 Google Maps 1-Click Scanner & Live Audit State
-  const [auditQuery, setAuditQuery] = useState('');
-  const [isScanningListing, setIsScanningListing] = useState(false);
-  const [scannedListing, setScannedListing] = useState<GooglePlaceData | null>(null);
-  const [showManualAuditFields, setShowManualAuditFields] = useState(false);
-
-  // 3 Elite Local SEO Power Tools State
-  const [toolsActiveTab, setToolsActiveTab] = useState<'geogrid' | 'roicalc' | 'rivalspy'>('geogrid');
-  const [toolsSearchQuery, setToolsSearchQuery] = useState('');
-  const [isToolsScanning, setIsToolsScanning] = useState(false);
-  const [geoGridKeyword, setGeoGridKeyword] = useState('');
-  const [isDemoMode, setIsDemoMode] = useState(false);
-  const [geoGridRadius, setGeoGridRadius] = useState<'1km' | '3km' | '5km'>('3km');
-  const [roiAverageTicket, setRoiAverageTicket] = useState<number>(65);
-  const [roiCustomerFrequency, setRoiCustomerFrequency] = useState<number>(3);
-  const [roiCurrentRank, setRoiCurrentRank] = useState<number>(8);
-  const [roiMonthlySearches, setRoiMonthlySearches] = useState<number>(1200);
-
-  // Rescue Radar (Ownership Claim Engine) State
-  const [rescueScenario, setRescueScenario] = useState<'orphan' | 'third_party' | 'rejected'>('third_party');
-  const [rescueMaskedEmail, setRescueMaskedEmail] = useState('');
-  const [rescueSearchQuery, setRescueSearchQuery] = useState('');
-  const [isRescueScanning, setIsRescueScanning] = useState(false);
-
-  // Tab 4: Apelación y Rescate Legal de Reseñas 1-3★
-  const [appealSearchQuery, setAppealSearchQuery] = useState('');
-  const [isScanningAppeals, setIsScanningAppeals] = useState(false);
-  const [scannedAppealBiz, setScannedAppealBiz] = useState<GooglePlaceData | null>(null);
-  const [appealReviewsList, setAppealReviewsList] = useState<NegativeReviewItem[]>([]);
-  const [selectedAppealReview, setSelectedAppealReview] = useState<NegativeReviewItem | null>(null);
-  const [isGeneratingAppeal, setIsGeneratingAppeal] = useState(false);
-  const [activeAppealDossier, setActiveAppealDossier] = useState<any | null>(null);
-  const [appealSuccessCopied, setAppealSuccessCopied] = useState<string | null>(null);
-
-  // Manual Review Form State
-  const [showManualReviewForm, setShowManualReviewForm] = useState(false);
-  const [manualAuthor, setManualAuthor] = useState('');
-  const [manualRating, setManualRating] = useState<number>(1);
-  const [manualTimeAgo, setManualTimeAgo] = useState('Reciente');
-  const [manualText, setManualText] = useState('');
-  const [manualContextFlag, setManualContextFlag] = useState<
-    'competitor' | 'ex_employee' | 'fake_customer' | 'defamation' | 'off_topic' | 'extortion' | 'general_bad_faith'
-  >('fake_customer');
-  const [manualNotes, setManualNotes] = useState('');
-
-  // Rival Spy (Head-to-Head Competitor Radar) State
-  const [rivalSearchQuery, setRivalSearchQuery] = useState('');
-  const [isRivalScanning, setIsRivalScanning] = useState(false);
-  const [rivalName, setRivalName] = useState('');
-  const [rivalRating, setRivalRating] = useState<number>(4.8);
-  const [rivalReviews, setRivalReviews] = useState<number>(120);
-  const [rivalWeeklyPace, setRivalWeeklyPace] = useState<number>(3);
-  const [rivalPhotos, setRivalPhotos] = useState<number>(45);
 
   // White-label Custom Logo State
   const [customLogoUrl, setCustomLogoUrl] = useState<string>('');
@@ -1740,9 +1811,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [checkedSteps, setCheckedSteps] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && businessName.trim()) {
+    if (typeof window !== 'undefined' && createBusinessName.trim()) {
       try {
-        const saved = localStorage.getItem(`prestigia_checklist_${businessName.trim()}`);
+        const saved = localStorage.getItem(`prestigia_checklist_${createBusinessName.trim()}`);
         if (saved) {
           setCheckedSteps(JSON.parse(saved));
         } else {
@@ -1752,14 +1823,14 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         setCheckedSteps({});
       }
     }
-  }, [businessName]);
+  }, [createBusinessName]);
 
   const toggleChecklistStep = (stepId: string) => {
     setCheckedSteps((prev) => {
       const updated = { ...prev, [stepId]: !prev[stepId] };
-      if (typeof window !== 'undefined' && businessName.trim()) {
+      if (typeof window !== 'undefined' && createBusinessName.trim()) {
         try {
-          localStorage.setItem(`prestigia_checklist_${businessName.trim()}`, JSON.stringify(updated));
+          localStorage.setItem(`prestigia_checklist_${createBusinessName.trim()}`, JSON.stringify(updated));
         } catch {}
       }
       return updated;
@@ -1767,7 +1838,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   };
 
   const checklistItems = useMemo(() => {
-    const isSab = businessModel === 'service_area';
+    const isSab = createBusinessModel === 'service_area';
     return [
       {
         id: 'step_title',
@@ -1824,7 +1895,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         isHero: true,
       },
     ];
-  }, [isEn, businessModel]);
+  }, [isEn, createBusinessModel]);
 
   const completedChecklistCount = checklistItems.filter((item) => checkedSteps[item.id]).length;
   const checklistProgressPercent = Math.round((completedChecklistCount / checklistItems.length) * 100);
@@ -1997,19 +2068,18 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   };
 
   const handleResetCreateForm = () => {
-    setBusinessName('');
-    setNeighborhood('');
-    setContactName('');
-    setContactCompany('');
-    setContactPhone('');
-    setContactEmail('');
-    setContactRole('Dueño / Propietario');
-    setSpecialties('');
-    setPhone('');
-    setServiceAreas('');
-    setGoogleUrl('');
-    setCategory(categoryOptions[0] || CATEGORY_OPTIONS[0]);
-    setGeneratedData(null);
+    setCreateContactName('');
+    setCreateContactCompany('');
+    setCreateContactPhone('');
+    setCreateContactEmail('');
+    setCreateContactRole('Dueño / Propietario');
+    setCreateBusinessName('');
+    setCreateNeighborhood('');
+    setCreateSpecialties('');
+    setCreatePhone('');
+    setCreateServiceAreas('');
+    setCreateCategory(categoryOptions[0] || CATEGORY_OPTIONS[0]);
+    setCreateGeneratedData(null);
     showToast(isEn ? '✨ Ready to create a new profile' : '✨ Formulario listo para crear una nueva ficha');
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2017,21 +2087,21 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   };
 
   const handleResetAuditForm = () => {
+    setAuditContactName('');
+    setAuditContactCompany('');
+    setAuditContactPhone('');
+    setAuditContactEmail('');
+    setAuditContactRole('Dueño / Propietario');
     setAuditQuery('');
-    setScannedListing(null);
-    setBusinessName('');
-    setNeighborhood('');
-    setContactName('');
-    setContactCompany('');
-    setContactPhone('');
-    setContactEmail('');
-    setContactRole('Dueño / Propietario');
-    setPhone('');
-    setGoogleUrl('');
-    setExistingRating(4.5);
-    setExistingReviews(0);
-    setCategory(categoryOptions[0] || CATEGORY_OPTIONS[0]);
-    setGeneratedData(null);
+    setAuditScannedListing(null);
+    setAuditBusinessName('');
+    setAuditNeighborhood('');
+    setAuditPhone('');
+    setAuditGoogleUrl('');
+    setAuditExistingRating(4.5);
+    setAuditExistingReviews(0);
+    setAuditCategory(categoryOptions[0] || CATEGORY_OPTIONS[0]);
+    setAuditGeneratedData(null);
     setShowManualAuditFields(false);
     showToast(isEn ? '✨ Ready to run a new audit' : '✨ Formulario listo para una nueva auditoría');
     if (typeof window !== 'undefined') {
@@ -2040,20 +2110,18 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   };
 
   const handleResetRescueForm = () => {
+    setRescueContactName('');
+    setRescueContactCompany('');
+    setRescueContactPhone('');
+    setRescueContactEmail('');
+    setRescueContactRole('Dueño / Propietario');
     setRescueSearchQuery('');
-    setScannedListing(null);
-    setBusinessName('');
-    setNeighborhood('');
-    setContactName('');
-    setContactCompany('');
-    setContactPhone('');
-    setContactEmail('');
-    setContactRole('Dueño / Propietario');
-    setPhone('');
-    setGoogleUrl('');
-    setRescueScenario('orphan');
+    setRescueScannedListing(null);
+    setRescueBusinessName('');
+    setRescueNeighborhood('');
+    setRescueCategory(categoryOptions[0] || CATEGORY_OPTIONS[0]);
+    setRescueScenario('third_party');
     setRescueMaskedEmail('');
-    setGeneratedData(null);
     showToast(isEn ? '✨ Ready to run a new rescue' : '✨ Formulario listo para un nuevo rescate');
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2061,6 +2129,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   };
 
   const handleResetAppealForm = () => {
+    setAppealContactName('');
+    setAppealContactCompany('');
+    setAppealContactPhone('');
+    setAppealContactEmail('');
+    setAppealContactRole('Dueño / Propietario');
     setAppealSearchQuery('');
     setScannedAppealBiz(null);
     setAppealReviewsList([]);
@@ -2073,11 +2146,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     setManualText('');
     setManualContextFlag('fake_customer');
     setManualNotes('');
-    setContactName('');
-    setContactCompany('');
-    setContactPhone('');
-    setContactEmail('');
-    setContactRole('Dueño / Propietario');
     showToast(isEn ? '✨ Ready to scan or appeal another review' : '✨ Formulario listo para una nueva apelación');
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2102,11 +2170,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
       if (data.success && data.data) {
         const place: GooglePlaceData = data.data;
         setScannedAppealBiz(place);
-        if (place.name && !contactCompany) {
-          setContactCompany(place.name);
+        if (place.name && !appealContactCompany) {
+          setAppealContactCompany(place.name);
         }
-        if (place.phone && !contactPhone) {
-          setContactPhone(place.phone);
+        if (place.phone && !appealContactPhone) {
+          setAppealContactPhone(place.phone);
         }
         if (place.negativeReviews && place.negativeReviews.length > 0) {
           setAppealReviewsList(place.negativeReviews);
@@ -2124,7 +2192,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
   const handleGenerateAppealForReview = async (review: NegativeReviewItem, customNotes?: string) => {
     const userMaxAppeals = currentUser?.maxAppealsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 25 : currentUser?.accountType === 'director' ? 50 : 15);
-    if (!isLuismaMaster && monthlyUsage.appeals >= userMaxAppeals) {
+    if (!isLuismaMaster && (monthlyUsage.appeals || 0) >= userMaxAppeals) {
       showToast(
         isEn
           ? `⚠️ Monthly limit of ${userMaxAppeals} review appeals reached. Contact General Directorate.`
@@ -2137,9 +2205,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     setIsGeneratingAppeal(true);
     setActiveAppealDossier(null);
 
-    const bizName = (scannedAppealBiz?.name || businessName || contactCompany || 'Negocio').trim();
-    const bizCategory = scannedAppealBiz?.category || category;
-    const bizCity = city || 'Colombia';
+    const bizName = (scannedAppealBiz?.name || appealContactCompany || 'Negocio').trim();
+    const bizCategory = scannedAppealBiz?.category || 'Negocio Local';
+    const bizCity = scannedAppealBiz?.address ? parseAddressGeo(scannedAppealBiz.address).city : 'Colombia';
 
     try {
       const res = await fetch('/api/local-studio/appeal-review', {
@@ -2155,10 +2223,10 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
           reviewText: review.text,
           contextFlag: review.contextFlag,
           additionalNotes: customNotes || manualNotes,
-          contactName,
-          contactCompany: contactCompany || bizName,
-          contactPhone,
-          contactEmail,
+          contactName: appealContactName,
+          contactCompany: appealContactCompany || bizName,
+          contactPhone: appealContactPhone,
+          contactEmail: appealContactEmail,
         }),
       });
 
@@ -2179,14 +2247,14 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               advisorType: currentUser?.accountType || 'founder',
               country: currentUser?.country || 'Colombia',
               clientName: bizName,
-              contactName,
-              contactCompany: contactCompany || bizName,
-              contactPhone,
-              contactEmail,
-              contactRole,
+              contactName: appealContactName,
+              contactCompany: appealContactCompany || bizName,
+              contactPhone: appealContactPhone,
+              contactEmail: appealContactEmail,
+              contactRole: appealContactRole,
               category: bizCategory,
               city: bizCity,
-              googleUrl: scannedAppealBiz?.googleMapsUrl || googleUrl,
+              googleUrl: scannedAppealBiz?.googleMapsUrl || '',
               mode: 'appeal',
               status: 'draft',
               data: resData.dossier,
@@ -2231,69 +2299,40 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   };
 
   // -------------------------------------------------------------
-  // 3. GENERATION ACTION (LIVE GEMINI + HEURISTIC ENGINE)
+  // TAB 1 GENERATION: CREAR FICHA GANADORA
   // -------------------------------------------------------------
-  const handleGenerate = async (
-    targetMode: 'create' | 'audit',
-    overrides?: {
-      businessName?: string;
-      category?: string;
-      city?: string;
-      neighborhood?: string;
-      googleUrl?: string;
-      existingRating?: number;
-      existingReviews?: number;
-      phone?: string;
-      reviewHighlights?: string[];
-    }
-  ) => {
-    const finalBizName = (overrides?.businessName ?? businessName).trim();
+  const handleGenerateCreate = async () => {
+    const finalBizName = createBusinessName.trim();
     if (!finalBizName) {
-      showToast(isEn ? '⚠️ Please enter the business name or link' : '⚠️ Ingresa el nombre comercial o enlace del negocio');
+      showToast(isEn ? '⚠️ Please enter the business name' : '⚠️ Ingresa el nombre comercial del negocio');
       return;
     }
 
     const userMaxCreates = currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30);
-    const userMaxAudits = currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30);
-
-    if (!isLuismaMaster) {
-      if (targetMode === 'create' && monthlyUsage.creates >= userMaxCreates) {
-        showToast(isEn ? `⚠️ Monthly limit of ${userMaxCreates} creations reached. Contact General Directorate.` : `⚠️ Has alcanzado tu cupo mensual de ${userMaxCreates} creaciones. Contacta a Dirección General para ampliar tu plan.`);
-        return;
-      }
-      if (targetMode === 'audit' && monthlyUsage.audits >= userMaxAudits) {
-        showToast(isEn ? `⚠️ Monthly limit of ${userMaxAudits} audits reached. Contact General Directorate.` : `⚠️ Has alcanzado tu cupo mensual de ${userMaxAudits} auditorías. Contacta a Dirección General para ampliar tu plan.`);
-        return;
-      }
+    if (!isLuismaMaster && monthlyUsage.creates >= userMaxCreates) {
+      showToast(isEn ? `⚠️ Monthly limit of ${userMaxCreates} creations reached. Contact General Directorate.` : `⚠️ Has alcanzado tu cupo mensual de ${userMaxCreates} creaciones. Contacta a Dirección General para ampliar tu plan.`);
+      return;
     }
 
-    setIsGenerating(true);
-    setGeneratedData(null);
-
-    const finalCategory = overrides?.category ?? category;
-    const finalCity = (overrides?.city ?? city).trim() || 'Colombia';
-    const finalNeighborhood = (overrides?.neighborhood ?? neighborhood).trim();
-    const finalPhone = (overrides?.phone ?? phone).trim() || currentUser?.phone || '';
-    const finalGoogleUrl = (overrides?.googleUrl ?? googleUrl).trim();
-    const finalRating = targetMode === 'create' ? 5.0 : (Number(overrides?.existingRating ?? existingRating) || 4.5);
-    const finalReviews = targetMode === 'create' ? 0 : (Number(overrides?.existingReviews ?? existingReviews) || 0);
+    setIsGeneratingCreate(true);
+    setCreateGeneratedData(null);
 
     try {
       const payload = {
-        mode: targetMode,
+        mode: 'create',
         businessName: finalBizName,
-        category: finalCategory,
-        city: finalCity,
-        neighborhood: finalNeighborhood,
-        specialties: specialties.trim(),
-        phone: finalPhone,
-        googleUrl: finalGoogleUrl,
-        existingRating: finalRating,
-        existingReviews: finalReviews,
+        category: createCategory,
+        city: createCity.trim() || 'Colombia',
+        neighborhood: createNeighborhood.trim(),
+        specialties: createSpecialties.trim(),
+        phone: createPhone.trim() || createContactPhone.trim() || currentUser?.phone || '',
+        googleUrl: '',
+        existingRating: 5.0,
+        existingReviews: 0,
         lang,
-        businessModel,
-        serviceAreas: serviceAreas.trim(),
-        reviewHighlights: overrides?.reviewHighlights || scannedListing?.reviewHighlights || [],
+        businessModel: createBusinessModel,
+        serviceAreas: createServiceAreas.trim(),
+        reviewHighlights: [],
       };
 
       const res = await fetch('/api/local-studio/generate', {
@@ -2303,33 +2342,30 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
       });
 
       const resData = await res.json();
-
       if (resData.success && resData.data) {
-        setGeneratedData(resData.data);
-        showToast(
-          targetMode === 'audit'
-            ? (isEn ? '✨ Forensic Audit completed with Gemini AI!' : '✨ ¡Auditoría Forense completada con IA Gemini!')
-            : (isEn ? '✨ Winning Top 3 Architecture generated!' : '✨ ¡Arquitectura Top 3 generada y registrada en Cartera!')
-        );
+        setCreateGeneratedData(resData.data);
+        setMonthlyUsage((prev) => ({ ...prev, creates: (prev.creates || 0) + 1 }));
+        showToast(isEn ? '✨ Winning Top 3 Architecture generated!' : '✨ ¡Arquitectura Top 3 generada y registrada en Cartera!');
 
-        // AUTO-SAVE to database so every generation is permanently audited
+        // AUTO-SAVE to database
         try {
           const autoPayload = {
             advisorId: currentUser?.id || 'adv-luisma',
             advisorName: currentUser?.name || 'Luisma • Director General',
             advisorPhone: currentUser?.phone || '+573058314049',
             clientName: finalBizName,
-            contactName: contactName.trim(),
-            contactCompany: contactCompany.trim(),
-            contactPhone: contactPhone.trim(),
-            contactEmail: contactEmail.trim(),
-            contactRole: contactRole.trim(),
-            category: finalCategory,
-            country: country.trim() || 'Colombia',
-            city: finalCity,
-            neighborhood: finalNeighborhood,
-            googleUrl: finalGoogleUrl,
-            mode: targetMode,
+            contactName: createContactName.trim(),
+            contactCompany: createContactCompany.trim(),
+            contactPhone: createContactPhone.trim(),
+            contactEmail: createContactEmail.trim(),
+            contactRole: createContactRole.trim(),
+            category: createCategory,
+            country: createCountry.trim() || 'Colombia',
+            city: createCity.trim(),
+            neighborhood: createNeighborhood.trim(),
+            googleUrl: '',
+            mode: 'create',
+            businessModel: createBusinessModel,
             status: 'draft',
             data: resData.data,
           };
@@ -2347,30 +2383,125 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     } catch (err) {
       showToast('⚠️ Error de conexión con el motor de IA.');
     } finally {
-      setIsGenerating(false);
+      setIsGeneratingCreate(false);
     }
   };
 
   // -------------------------------------------------------------
-  // 3.1. 1-CLICK GOOGLE MAPS API SCANNER & FORENSIC AUDIT
+  // TAB 2 GENERATION: AUDITORÍA FORENSE & TOP 3
   // -------------------------------------------------------------
-  const handleScanAndAudit = async () => {
-    const rawInput = auditQuery.trim();
-    if (!rawInput) {
-      showToast(
-        isEn
-          ? '⚠️ Please paste a Google Maps link or enter business name'
-          : '⚠️ Pega el enlace de Google Maps o escribe el nombre del negocio'
-      );
+  const handleGenerateAudit = async (overrides?: {
+    businessName?: string;
+    category?: string;
+    city?: string;
+    neighborhood?: string;
+    googleUrl?: string;
+    existingRating?: number;
+    existingReviews?: number;
+    phone?: string;
+    reviewHighlights?: string[];
+  }) => {
+    const finalBizName = (overrides?.businessName ?? auditBusinessName).trim();
+    if (!finalBizName) {
+      showToast(isEn ? '⚠️ Please enter the business name or link' : '⚠️ Ingresa el nombre comercial o enlace del negocio');
       return;
     }
 
-    setIsScanningListing(true);
-    showToast(
-      isEn
-        ? '🔍 Querying Google Maps API in real-time...'
-        : '🔍 Reconociendo ficha con la API de Google Maps en vivo...'
-    );
+    const userMaxAudits = currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30);
+    if (!isLuismaMaster && monthlyUsage.audits >= userMaxAudits) {
+      showToast(isEn ? `⚠️ Monthly limit of ${userMaxAudits} audits reached. Contact General Directorate.` : `⚠️ Has alcanzado tu cupo mensual de ${userMaxAudits} auditorías. Contacta a Dirección General para ampliar tu plan.`);
+      return;
+    }
+
+    setIsGeneratingAudit(true);
+    setAuditGeneratedData(null);
+
+    const finalCategory = overrides?.category ?? auditCategory;
+    const finalCity = (overrides?.city ?? auditCity).trim() || 'Colombia';
+    const finalNeighborhood = (overrides?.neighborhood ?? auditNeighborhood).trim();
+    const finalPhone = (overrides?.phone ?? auditPhone).trim() || auditContactPhone.trim() || currentUser?.phone || '';
+    const finalGoogleUrl = (overrides?.googleUrl ?? auditGoogleUrl).trim();
+    const finalRating = Number(overrides?.existingRating ?? auditExistingRating) || 4.5;
+    const finalReviews = Number(overrides?.existingReviews ?? auditExistingReviews) || 0;
+
+    try {
+      const payload = {
+        mode: 'audit',
+        businessName: finalBizName,
+        category: finalCategory,
+        city: finalCity,
+        neighborhood: finalNeighborhood,
+        specialties: '',
+        phone: finalPhone,
+        googleUrl: finalGoogleUrl,
+        existingRating: finalRating,
+        existingReviews: finalReviews,
+        lang,
+        businessModel: 'storefront',
+        serviceAreas: '',
+        reviewHighlights: overrides?.reviewHighlights || auditScannedListing?.reviewHighlights || [],
+      };
+
+      const res = await fetch('/api/local-studio/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const resData = await res.json();
+      if (resData.success && resData.data) {
+        setAuditGeneratedData(resData.data);
+        setMonthlyUsage((prev) => ({ ...prev, audits: (prev.audits || 0) + 1 }));
+        showToast(isEn ? '✨ Forensic Audit completed with Gemini AI!' : '✨ ¡Auditoría Forense completada con IA Gemini!');
+
+        // AUTO-SAVE to database
+        try {
+          const autoPayload = {
+            advisorId: currentUser?.id || 'adv-luisma',
+            advisorName: currentUser?.name || 'Luisma • Director General',
+            advisorPhone: currentUser?.phone || '+573058314049',
+            clientName: finalBizName,
+            contactName: auditContactName.trim(),
+            contactCompany: auditContactCompany.trim(),
+            contactPhone: auditContactPhone.trim(),
+            contactEmail: auditContactEmail.trim(),
+            contactRole: auditContactRole.trim(),
+            category: finalCategory,
+            country: auditCountry.trim() || 'Colombia',
+            city: finalCity,
+            neighborhood: finalNeighborhood,
+            googleUrl: finalGoogleUrl,
+            mode: 'audit',
+            status: 'draft',
+            data: resData.data,
+          };
+          fetch('/api/local-studio/dossiers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(autoPayload),
+          }).then(() => fetchDossiers());
+        } catch (autoErr) {
+          console.warn('Auto-save error:', autoErr);
+        }
+      } else {
+        showToast('⚠️ Error generando la auditoría: ' + (resData.error || 'Reintente'));
+      }
+    } catch (err) {
+      showToast('⚠️ Error de conexión con el motor de IA.');
+    } finally {
+      setIsGeneratingAudit(false);
+    }
+  };
+
+  const handleScanAndAudit = async () => {
+    const rawInput = auditQuery.trim();
+    if (!rawInput) {
+      showToast(isEn ? '⚠️ Please paste a Google Maps link or enter business name' : '⚠️ Pega el enlace de Google Maps o escribe el nombre del negocio');
+      return;
+    }
+
+    setIsScanningAudit(true);
+    showToast(isEn ? '🔍 Querying Google Maps API in real-time...' : '🔍 Reconociendo ficha con la API de Google Maps en vivo...');
 
     try {
       const res = await fetch('/api/auditor/google-lookup', {
@@ -2382,39 +2513,37 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
       if (data?.success && data?.data) {
         const place: GooglePlaceData = data.data;
-        setScannedListing(place);
+        setAuditScannedListing(place);
 
         const extractedName = place.name || rawInput;
-        setBusinessName(extractedName);
-        if (typeof place.rating === 'number') setExistingRating(place.rating);
-        if (typeof place.reviewsCount === 'number') setExistingReviews(place.reviewsCount);
-        if (place.googleMapsUrl) setGoogleUrl(place.googleMapsUrl);
+        setAuditBusinessName(extractedName);
+        if (typeof place.rating === 'number') setAuditExistingRating(place.rating);
+        if (typeof place.reviewsCount === 'number') setAuditExistingReviews(place.reviewsCount);
+        if (place.googleMapsUrl) setAuditGoogleUrl(place.googleMapsUrl);
         if (place.phone) {
-          setPhone(place.phone);
-          if (!contactPhone) setContactPhone(place.phone);
+          setAuditPhone(place.phone);
+          if (!auditContactPhone) setAuditContactPhone(place.phone);
         }
 
-        // Address parsing for country, city and neighborhood
-        let parsedCity = city;
-        let parsedNeighborhood = neighborhood;
-        let parsedCountry = country;
+        let parsedCity = auditCity;
+        let parsedNeighborhood = auditNeighborhood;
+        let parsedCountry = auditCountry;
         if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
-          const parsedGeo = parseAddressGeo(place.address, country, city, neighborhood);
+          const parsedGeo = parseAddressGeo(place.address, auditCountry, auditCity, auditNeighborhood);
           parsedCountry = parsedGeo.country;
           parsedCity = parsedGeo.city;
           parsedNeighborhood = parsedGeo.neighborhood;
-          if (parsedGeo.country) setCountry(parsedGeo.country);
-          if (parsedGeo.city) setCity(parsedGeo.city);
-          if (parsedGeo.neighborhood) setNeighborhood(parsedGeo.neighborhood);
+          if (parsedGeo.country) setAuditCountry(parsedGeo.country);
+          if (parsedGeo.city) setAuditCity(parsedGeo.city);
+          if (parsedGeo.neighborhood) setAuditNeighborhood(parsedGeo.neighborhood);
         }
 
-        // Category mapping
         const matchedCategory = mapDetectedCategoryToPrestigia(
           place.category || '',
           place.detectedCategories || [],
           isEn
         );
-        setCategory(matchedCategory);
+        setAuditCategory(matchedCategory);
 
         showToast(
           isEn
@@ -2422,8 +2551,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
             : `✓ Ficha Reconocida: ${extractedName} (${place.rating}★ · ${place.reviewsCount} opiniones). Ejecutando auditoría IA...`
         );
 
-        // Immediately trigger the full AI Audit Generation!
-        await handleGenerate('audit', {
+        await handleGenerateAudit({
           businessName: extractedName,
           category: matchedCategory,
           city: parsedCity,
@@ -2431,20 +2559,15 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
           googleUrl: place.googleMapsUrl || rawInput,
           existingRating: place.rating,
           existingReviews: place.reviewsCount,
-          phone: place.phone || phone,
+          phone: place.phone || auditPhone,
           reviewHighlights: place.reviewHighlights || [],
         });
       } else {
-        // Fallback: If live lookup fails or returns error, use raw query as name and audit anyway
         const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
-        setBusinessName(fallbackName);
-        if (rawInput.startsWith('http')) setGoogleUrl(rawInput);
-        showToast(
-          isEn
-            ? '⚡ Auditing with detected profile data...'
-            : '⚡ Auditando con los datos detectados...'
-        );
-        await handleGenerate('audit', {
+        setAuditBusinessName(fallbackName);
+        if (rawInput.startsWith('http')) setAuditGoogleUrl(rawInput);
+        showToast(isEn ? '⚡ Auditing with detected profile data...' : '⚡ Auditando con los datos detectados...');
+        await handleGenerateAudit({
           businessName: fallbackName,
           googleUrl: rawInput.startsWith('http') ? rawInput : '',
         });
@@ -2452,28 +2575,24 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     } catch (err: any) {
       console.error('Scan error:', err);
       const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
-      setBusinessName(fallbackName);
-      if (rawInput.startsWith('http')) setGoogleUrl(rawInput);
-      await handleGenerate('audit', {
+      setAuditBusinessName(fallbackName);
+      if (rawInput.startsWith('http')) setAuditGoogleUrl(rawInput);
+      await handleGenerateAudit({
         businessName: fallbackName,
         googleUrl: rawInput.startsWith('http') ? rawInput : '',
       });
     } finally {
-      setIsScanningListing(false);
+      setIsScanningAudit(false);
     }
   };
 
   // -------------------------------------------------------------
-  // 3.1.b 1-CLICK GOOGLE MAPS API SCANNER FOR RESCUE & OWNERSHIP CLAIM
+  // TAB 3 SCANNER: RESCATE DE FICHA
   // -------------------------------------------------------------
   const handleRescueScan = async (queryInput?: string) => {
     const rawInput = (typeof queryInput === 'string' ? queryInput : rescueSearchQuery).trim();
     if (!rawInput) {
-      showToast(
-        isEn
-          ? '⚠️ Please paste a Google Maps link or enter business name'
-          : '⚠️ Pega el enlace de Google Maps o escribe el nombre del negocio'
-      );
+      showToast(isEn ? '⚠️ Please paste a Google Maps link or enter business name' : '⚠️ Pega el enlace de Google Maps o escribe el nombre del negocio');
       return;
     }
 
@@ -2484,11 +2603,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     }
 
     setIsRescueScanning(true);
-    showToast(
-      isEn
-        ? '🔍 Querying Google Maps API in real-time...'
-        : '🔍 Reconociendo ficha con la API de Google Maps en vivo...'
-    );
+    showToast(isEn ? '🔍 Querying Google Maps API in real-time...' : '🔍 Reconociendo ficha con la API de Google Maps en vivo...');
 
     try {
       const res = await fetch('/api/auditor/google-lookup', {
@@ -2500,30 +2615,19 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
       if (data?.success && data?.data) {
         const place: GooglePlaceData = data.data;
-        setScannedListing(place);
+        setRescueScannedListing(place);
 
         const extractedName = place.name || rawInput;
-        setBusinessName(extractedName);
-        if (typeof place.rating === 'number') setExistingRating(place.rating);
-        if (typeof place.reviewsCount === 'number') setExistingReviews(place.reviewsCount);
-        if (place.googleMapsUrl) setGoogleUrl(place.googleMapsUrl);
-        if (place.phone) {
-          setPhone(place.phone);
-          if (!contactPhone) setContactPhone(place.phone);
+        setRescueBusinessName(extractedName);
+        if (place.phone && !rescueContactPhone) {
+          setRescueContactPhone(place.phone);
         }
 
-        // Address parsing for country, city and neighborhood
-        let parsedCity = city;
-        let parsedNeighborhood = neighborhood;
-        let parsedCountry = country;
         if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
-          const parsedGeo = parseAddressGeo(place.address, country, city, neighborhood);
-          parsedCountry = parsedGeo.country;
-          parsedCity = parsedGeo.city;
-          parsedNeighborhood = parsedGeo.neighborhood;
-          if (parsedGeo.country) setCountry(parsedGeo.country);
-          if (parsedGeo.city) setCity(parsedGeo.city);
-          if (parsedGeo.neighborhood) setNeighborhood(parsedGeo.neighborhood);
+          const parsedGeo = parseAddressGeo(place.address, rescueCountry, rescueCity, rescueNeighborhood);
+          if (parsedGeo.country) setRescueCountry(parsedGeo.country);
+          if (parsedGeo.city) setRescueCity(parsedGeo.city);
+          if (parsedGeo.neighborhood) setRescueNeighborhood(parsedGeo.neighborhood);
         }
 
         const matchedCategory = mapDetectedCategoryToPrestigia(
@@ -2531,7 +2635,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
           place.detectedCategories || [],
           isEn
         );
-        setCategory(matchedCategory);
+        setRescueCategory(matchedCategory);
 
         showToast(
           isEn
@@ -2540,49 +2644,31 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         );
       } else {
         const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
-        setBusinessName(fallbackName);
-        if (rawInput.startsWith('http')) setGoogleUrl(rawInput);
-        showToast(
-          isEn
-            ? `✓ Listing set to "${fallbackName}". Rescue protocol ready!`
-            : `✓ Ficha asignada a "${fallbackName}". ¡Protocolo de rescate listo!`
-        );
+        setRescueBusinessName(fallbackName);
+        showToast(isEn ? `✓ Listing set to "${fallbackName}". Rescue protocol ready!` : `✓ Ficha asignada a "${fallbackName}". ¡Protocolo de rescate listo!`);
       }
     } catch (err: any) {
       console.error('Rescue scan error:', err);
       const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
-      setBusinessName(fallbackName);
-      if (rawInput.startsWith('http')) setGoogleUrl(rawInput);
-      showToast(
-        isEn
-          ? '⚠️ Connection error. Profile name set manually.'
-          : '⚠️ Error de conexión. Nombre de ficha asignado.'
-      );
+      setRescueBusinessName(fallbackName);
+      showToast(isEn ? '⚠️ Connection error. Profile name set manually.' : '⚠️ Error de conexión. Nombre de ficha asignado.');
     } finally {
       setIsRescueScanning(false);
     }
   };
 
   // -------------------------------------------------------------
-  // 3.1.c 1-CLICK GOOGLE MAPS API SCANNER FOR SALES ARSENAL (TAB 4)
+  // TAB 5 SCANNER: 3 ARMAS TOP 3 (VENTAS)
   // -------------------------------------------------------------
   const handleToolsScan = async (queryInput?: string) => {
     const rawInput = (typeof queryInput === 'string' ? queryInput : toolsSearchQuery).trim();
     if (!rawInput) {
-      showToast(
-        isEn
-          ? '⚠️ Please paste a Google Maps link or enter business name'
-          : '⚠️ Pega el enlace de Google Maps o escribe el nombre del negocio'
-      );
+      showToast(isEn ? '⚠️ Please paste a Google Maps link or enter business name' : '⚠️ Pega el enlace de Google Maps o escribe el nombre del negocio');
       return;
     }
 
     setIsToolsScanning(true);
-    showToast(
-      isEn
-        ? '🔍 Querying Google Maps API for sales arsenal...'
-        : '🔍 Reconociendo ficha con Google Maps para las herramientas de venta...'
-    );
+    showToast(isEn ? '🔍 Querying Google Maps API for sales arsenal...' : '🔍 Reconociendo ficha con Google Maps para las herramientas de venta...');
 
     try {
       const res = await fetch('/api/auditor/google-lookup', {
@@ -2594,31 +2680,18 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
       if (data?.success && data?.data) {
         const place: GooglePlaceData = data.data;
-        setScannedListing(place);
+        setToolsScannedListing(place);
 
         const extractedName = place.name || rawInput;
-        setBusinessName(extractedName);
-        if (typeof place.rating === 'number') setExistingRating(place.rating);
-        if (typeof place.reviewsCount === 'number') setExistingReviews(place.reviewsCount);
-        if (place.googleMapsUrl) setGoogleUrl(place.googleMapsUrl);
-        if (place.phone) {
-          setPhone(place.phone);
-          if (!contactPhone) setContactPhone(place.phone);
-        }
+        setToolsBusinessName(extractedName);
+        if (typeof place.rating === 'number') setToolsExistingRating(place.rating);
+        if (typeof place.reviewsCount === 'number') setToolsExistingReviews(place.reviewsCount);
 
-        // Address parsing
-        // Address parsing for country, city and neighborhood
-        let parsedCity = city;
-        let parsedNeighborhood = neighborhood;
-        let parsedCountry = country;
+        let parsedCity = toolsCity;
         if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
-          const parsedGeo = parseAddressGeo(place.address, country, city, neighborhood);
-          parsedCountry = parsedGeo.country;
+          const parsedGeo = parseAddressGeo(place.address);
           parsedCity = parsedGeo.city;
-          parsedNeighborhood = parsedGeo.neighborhood;
-          if (parsedGeo.country) setCountry(parsedGeo.country);
-          if (parsedGeo.city) setCity(parsedGeo.city);
-          if (parsedGeo.neighborhood) setNeighborhood(parsedGeo.neighborhood);
+          setToolsCity(parsedGeo.city);
         }
 
         const matchedCategory = mapDetectedCategoryToPrestigia(
@@ -2626,9 +2699,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
           place.detectedCategories || [],
           isEn
         );
-        setCategory(matchedCategory);
+        setToolsCategory(matchedCategory);
 
-        // Niche-based smart adaptations
         const smartTicket = getAverageTicketByNiche(matchedCategory);
         setRoiAverageTicket(smartTicket);
 
@@ -2642,50 +2714,32 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         );
       } else {
         const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
-        setBusinessName(fallbackName);
-        if (rawInput.startsWith('http')) setGoogleUrl(rawInput);
-        setGeoGridKeyword(getDefaultKeywordByNiche(category, city, isEn));
-        showToast(
-          isEn
-            ? `✓ Connected to "${fallbackName}"`
-            : `✓ Conectado a "${fallbackName}"`
-        );
+        setToolsBusinessName(fallbackName);
+        setGeoGridKeyword(getDefaultKeywordByNiche(toolsCategory, toolsCity, isEn));
+        showToast(isEn ? `✓ Connected to "${fallbackName}"` : `✓ Conectado a "${fallbackName}"`);
       }
     } catch (err: any) {
       console.error('Tools scan error:', err);
       const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
-      setBusinessName(fallbackName);
-      if (rawInput.startsWith('http')) setGoogleUrl(rawInput);
-      showToast(
-        isEn
-          ? '⚠️ Lookup failed. Profile name set manually.'
-          : '⚠️ Error al consultar Google Maps. Nombre asignado manualmente.'
-      );
+      setToolsBusinessName(fallbackName);
+      showToast(isEn ? '⚠️ Lookup failed. Profile name set manually.' : '⚠️ Error al consultar Google Maps. Nombre asignado manualmente.');
     } finally {
       setIsToolsScanning(false);
     }
   };
 
   // -------------------------------------------------------------
-  // 3.1.d 1-CLICK COMPETITOR SCANNER FOR RIVAL SPY (HERRAMIENTA 3)
+  // COMPETITOR SCANNER FOR RIVAL SPY
   // -------------------------------------------------------------
   const handleRivalScan = async () => {
     const rawInput = rivalSearchQuery.trim();
     if (!rawInput) {
-      showToast(
-        isEn
-          ? '⚠️ Please enter competitor link or name'
-          : '⚠️ Pega el enlace de Google Maps o escribe el nombre del rival'
-      );
+      showToast(isEn ? '⚠️ Please enter competitor link or name' : '⚠️ Pega el enlace de Google Maps o escribe el nombre del rival');
       return;
     }
 
     setIsRivalScanning(true);
-    showToast(
-      isEn
-        ? '🔍 Inspecting competitor listing on Google Maps...'
-        : '🔍 Escaneando perfil del competidor en Google Maps en tiempo real...'
-    );
+    showToast(isEn ? '🔍 Inspecting competitor listing on Google Maps...' : '🔍 Escaneando perfil del competidor en Google Maps en tiempo real...');
 
     try {
       const res = await fetch('/api/auditor/google-lookup', {
@@ -2708,29 +2762,23 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
       } else {
         const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
         setRivalName(fallbackName);
-        showToast(
-          isEn
-            ? `✓ Competitor set to "${fallbackName}"`
-            : `✓ Competidor asignado a "${fallbackName}"`
-        );
+        showToast(isEn ? `✓ Competitor set to "${fallbackName}"` : `✓ Competidor asignado a "${fallbackName}"`);
       }
     } catch (err: any) {
       console.error('Rival scan error:', err);
       const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
       setRivalName(fallbackName);
-      showToast(
-        isEn
-          ? '⚠️ Competitor lookup error. Name updated.'
-          : '⚠️ Error al escanear competidor. Nombre actualizado.'
-      );
+      showToast(isEn ? '⚠️ Competitor lookup error. Name updated.' : '⚠️ Error al escanear competidor. Nombre actualizado.');
     } finally {
       setIsRivalScanning(false);
     }
   };
 
-  // Save current generated blueprint as a Dossier manually
-  const handleSaveDossier = async () => {
-    if (!generatedData || !businessName.trim()) {
+  // -------------------------------------------------------------
+  // MANUAL SAVE HANDLERS (PER TAB)
+  // -------------------------------------------------------------
+  const handleSaveCreateDossier = async () => {
+    if (!createGeneratedData || !createBusinessName.trim()) {
       showToast('⚠️ Primero genera un expediente para guardar');
       return;
     }
@@ -2740,20 +2788,66 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         advisorId: currentUser?.id || 'adv-luisma',
         advisorName: currentUser?.name || 'Luisma • Director General',
         advisorPhone: currentUser?.phone || '+573058314049',
-        clientName: businessName.trim(),
-        contactName: contactName.trim(),
-        contactCompany: contactCompany.trim(),
-        contactPhone: contactPhone.trim(),
-        contactEmail: contactEmail.trim(),
-        contactRole: contactRole.trim(),
-        category,
-        country: country.trim() || 'Colombia',
-        city: city.trim(),
-        neighborhood: neighborhood.trim(),
-        googleUrl: googleUrl.trim(),
-        mode: activeTab === 'audit' ? 'audit' : activeTab === 'rescue' ? 'rescue' : 'create',
+        clientName: createBusinessName.trim(),
+        contactName: createContactName.trim(),
+        contactCompany: createContactCompany.trim(),
+        contactPhone: createContactPhone.trim(),
+        contactEmail: createContactEmail.trim(),
+        contactRole: createContactRole.trim(),
+        category: createCategory,
+        country: createCountry.trim() || 'Colombia',
+        city: createCity.trim(),
+        neighborhood: createNeighborhood.trim(),
+        googleUrl: '',
+        mode: 'create',
+        businessModel: createBusinessModel,
         status: 'draft',
-        data: generatedData,
+        data: createGeneratedData,
+      };
+
+      const res = await fetch('/api/local-studio/dossiers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const resData = await res.json();
+      if (resData.success) {
+        showToast('💾 ¡Expediente guardado en Cartera de Clientes!');
+        fetchDossiers();
+      } else {
+        showToast('⚠️ Error al guardar: ' + (resData.error || ''));
+      }
+    } catch (err) {
+      showToast('⚠️ Error de conexión al guardar.');
+    }
+  };
+
+  const handleSaveAuditDossier = async () => {
+    if (!auditGeneratedData || !auditBusinessName.trim()) {
+      showToast('⚠️ Primero genera una auditoría para guardar');
+      return;
+    }
+
+    try {
+      const payload = {
+        advisorId: currentUser?.id || 'adv-luisma',
+        advisorName: currentUser?.name || 'Luisma • Director General',
+        advisorPhone: currentUser?.phone || '+573058314049',
+        clientName: auditBusinessName.trim(),
+        contactName: auditContactName.trim(),
+        contactCompany: auditContactCompany.trim(),
+        contactPhone: auditContactPhone.trim(),
+        contactEmail: auditContactEmail.trim(),
+        contactRole: auditContactRole.trim(),
+        category: auditCategory,
+        country: auditCountry.trim() || 'Colombia',
+        city: auditCity.trim(),
+        neighborhood: auditNeighborhood.trim(),
+        googleUrl: auditGoogleUrl.trim(),
+        mode: 'audit',
+        status: 'draft',
+        data: auditGeneratedData,
       };
 
       const res = await fetch('/api/local-studio/dossiers', {
@@ -3072,18 +3166,52 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
   // Load a dossier from list into workspace
   const handleLoadDossier = (dossier: StudioDossierRecord) => {
-    setBusinessName(dossier.clientName);
-    setContactName(dossier.contactName || '');
-    setContactCompany(dossier.contactCompany || '');
-    setContactPhone(dossier.contactPhone || '');
-    setContactEmail(dossier.contactEmail || '');
-    setContactRole(dossier.contactRole || 'Dueño / Propietario');
-    setCategory(dossier.category);
-    if (dossier.country) setCountry(dossier.country);
-    setCity(dossier.city);
-    setNeighborhood(dossier.neighborhood || '');
-    setGoogleUrl(dossier.googleUrl || '');
-    if (dossier.mode === 'appeal') {
+    if (dossier.mode === 'create') {
+      setCreateBusinessName(dossier.clientName);
+      setCreateContactName(dossier.contactName || '');
+      setCreateContactCompany(dossier.contactCompany || '');
+      setCreateContactPhone(dossier.contactPhone || '');
+      setCreateContactEmail(dossier.contactEmail || '');
+      setCreateContactRole(dossier.contactRole || 'Dueño / Propietario');
+      setCreateCategory(dossier.category || categoryOptions[0]);
+      if (dossier.country) setCreateCountry(dossier.country);
+      setCreateCity(dossier.city || 'Bogotá');
+      setCreateNeighborhood(dossier.neighborhood || '');
+      if (dossier.businessModel) setCreateBusinessModel(dossier.businessModel);
+      setCreateGeneratedData(dossier.data);
+      setActiveTab('create');
+    } else if (dossier.mode === 'audit') {
+      setAuditBusinessName(dossier.clientName);
+      setAuditContactName(dossier.contactName || '');
+      setAuditContactCompany(dossier.contactCompany || '');
+      setAuditContactPhone(dossier.contactPhone || '');
+      setAuditContactEmail(dossier.contactEmail || '');
+      setAuditContactRole(dossier.contactRole || 'Dueño / Propietario');
+      setAuditCategory(dossier.category || categoryOptions[0]);
+      if (dossier.country) setAuditCountry(dossier.country);
+      setAuditCity(dossier.city || 'Bogotá');
+      setAuditNeighborhood(dossier.neighborhood || '');
+      setAuditGoogleUrl(dossier.googleUrl || '');
+      setAuditGeneratedData(dossier.data);
+      setActiveTab('audit');
+    } else if (dossier.mode === 'rescue') {
+      setRescueBusinessName(dossier.clientName);
+      setRescueContactName(dossier.contactName || '');
+      setRescueContactCompany(dossier.contactCompany || '');
+      setRescueContactPhone(dossier.contactPhone || '');
+      setRescueContactEmail(dossier.contactEmail || '');
+      setRescueContactRole(dossier.contactRole || 'Dueño / Propietario');
+      setRescueCategory(dossier.category || categoryOptions[0]);
+      if (dossier.country) setRescueCountry(dossier.country);
+      setRescueCity(dossier.city || 'Bogotá');
+      setRescueNeighborhood(dossier.neighborhood || '');
+      setActiveTab('rescue');
+    } else if (dossier.mode === 'appeal') {
+      setAppealContactName(dossier.contactName || '');
+      setAppealContactCompany(dossier.contactCompany || '');
+      setAppealContactPhone(dossier.contactPhone || '');
+      setAppealContactEmail(dossier.contactEmail || '');
+      setAppealContactRole(dossier.contactRole || 'Dueño / Propietario');
       setActiveAppealDossier(dossier.data);
       if (dossier.data?.authorName) {
         setSelectedAppealReview({
@@ -3098,9 +3226,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         });
       }
       setActiveTab('appeals');
-    } else {
-      setGeneratedData(dossier.data);
-      setActiveTab(dossier.mode === 'audit' ? 'audit' : dossier.mode === 'rescue' ? 'rescue' : 'create');
     }
     showToast(`Expediente cargado: ${dossier.clientName}`);
   };
@@ -3795,7 +3920,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
             </button>
           )}
 
-          {generatedData && (
+          {hasActiveGeneratedData && (
             <button
               type="button"
               onClick={handlePrint}
@@ -4027,8 +4152,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="text"
-                        value={contactName}
-                        onChange={(e) => setContactName(e.target.value)}
+                        value={createContactName}
+                        onChange={(e) => setCreateContactName(e.target.value)}
                         placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -4040,8 +4165,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="text"
-                        value={contactCompany}
-                        onChange={(e) => setContactCompany(e.target.value)}
+                        value={createContactCompany}
+                        onChange={(e) => setCreateContactCompany(e.target.value)}
                         placeholder={isEn ? 'e.g. Acme Corp / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -4052,9 +4177,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
                         <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
-                        {contactPhone && (
+                        {createContactPhone && (
                           <a
-                            href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
+                            href={`https://wa.me/${createContactPhone.replace(/[^0-9]/g, '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
@@ -4065,8 +4190,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="tel"
-                        value={contactPhone}
-                        onChange={(e) => setContactPhone(e.target.value)}
+                        value={createContactPhone}
+                        onChange={(e) => setCreateContactPhone(e.target.value)}
                         placeholder="+57 300 123 4567"
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -4078,8 +4203,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="email"
-                        value={contactEmail}
-                        onChange={(e) => setContactEmail(e.target.value)}
+                        value={createContactEmail}
+                        onChange={(e) => setCreateContactEmail(e.target.value)}
                         placeholder="contacto@empresa.com"
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -4090,8 +4215,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         {isEn ? 'Role' : 'Cargo / Relación'}
                       </label>
                       <select
-                        value={contactRole}
-                        onChange={(e) => setContactRole(e.target.value)}
+                        value={createContactRole}
+                        onChange={(e) => setCreateContactRole(e.target.value)}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
                       >
                         <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
@@ -4114,9 +4239,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-slate-950 border border-slate-800">
                       <button
                         type="button"
-                        onClick={() => setBusinessModel('storefront')}
+                        onClick={() => setCreateBusinessModel('storefront')}
                         className={`py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 cursor-pointer text-[11px] ${
-                          businessModel === 'storefront'
+                          createBusinessModel === 'storefront'
                             ? 'bg-emerald-500 text-slate-950 font-black shadow-md shadow-emerald-500/20'
                             : 'text-slate-400 hover:text-white'
                         }`}
@@ -4126,9 +4251,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
                       <button
                         type="button"
-                        onClick={() => setBusinessModel('service_area')}
+                        onClick={() => setCreateBusinessModel('service_area')}
                         className={`py-2 px-3 rounded-xl font-bold transition flex items-center justify-center gap-1.5 cursor-pointer text-[11px] ${
-                          businessModel === 'service_area'
+                          createBusinessModel === 'service_area'
                             ? 'bg-indigo-600 text-white font-black shadow-md shadow-indigo-600/30'
                             : 'text-slate-400 hover:text-white'
                         }`}
@@ -4137,7 +4262,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </button>
                     </div>
 
-                    {businessModel === 'service_area' && (
+                    {createBusinessModel === 'service_area' && (
                       <div className="mt-2 p-2.5 rounded-xl bg-indigo-950/60 border border-indigo-500/40 text-[10.5px] text-indigo-200 leading-relaxed space-y-1">
                         <div className="flex items-center gap-1.5 font-black text-indigo-300">
                           <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
@@ -4154,8 +4279,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     </label>
                     <input
                       type="text"
-                      value={businessName}
-                      onChange={(e) => setBusinessName(e.target.value)}
+                      value={createBusinessName}
+                      onChange={(e) => setCreateBusinessName(e.target.value)}
                       placeholder={t.bizNamePlaceholder}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
                     />
@@ -4166,8 +4291,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       {t.sector}
                     </label>
                     <select
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
+                      value={createCategory}
+                      onChange={(e) => setCreateCategory(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-emerald-400 transition"
                     >
                       {categoryOptions.map((c) => (
@@ -4205,8 +4330,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           </button>
                         </div>
                         <select
-                          value={country}
-                          onChange={(e) => handleSelectCountry(e.target.value)}
+                          value={createCountry}
+                          onChange={(e) => handleSelectCreateCountry(e.target.value)}
                           className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-emerald-400 transition text-sm cursor-pointer"
                         >
                           {allCountriesList.map((c) => (
@@ -4221,27 +4346,27 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <label className="text-xs font-bold text-slate-300">
-                            2º Ciudad ({country}) *
+                            2º Ciudad ({createCountry}) *
                           </label>
                           <button
                             type="button"
                             onClick={() => {
-                              setTargetCountryForNewCity(country);
+                              setTargetCountryForNewCity(createCountry);
                               setShowAddCityModal(true);
                             }}
                             className="text-[10px] text-emerald-400 hover:text-emerald-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
-                            title={`Agregar otra Ciudad a ${country}`}
+                            title={`Agregar otra Ciudad a ${createCountry}`}
                           >
                             <Plus className="w-3 h-3" />
                             <span>Ciudad</span>
                           </button>
                         </div>
                         <select
-                          value={city}
-                          onChange={(e) => setCity(e.target.value)}
+                          value={createCity}
+                          onChange={(e) => setCreateCity(e.target.value)}
                           className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-emerald-400 transition text-sm cursor-pointer"
                         >
-                          {getCitiesForCountry(country).map((cty) => (
+                          {getCitiesForCountry(createCountry).map((cty) => (
                             <option key={cty} value={cty}>
                               {cty}
                             </option>
@@ -4257,23 +4382,23 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="text"
-                        value={neighborhood}
-                        onChange={(e) => setNeighborhood(e.target.value)}
+                        value={createNeighborhood}
+                        onChange={(e) => setCreateNeighborhood(e.target.value)}
                         placeholder="Ej: Chapinero, Poblado, Polanco, Brickell, Centro..."
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition text-sm"
                       />
                     </div>
                   </div>
 
-                  {businessModel === 'service_area' && (
+                  {createBusinessModel === 'service_area' && (
                     <div>
                       <label className="block font-bold text-slate-300 mb-1">
                         {t.coverageAreas}
                       </label>
                       <input
                         type="text"
-                        value={serviceAreas}
-                        onChange={(e) => setServiceAreas(e.target.value)}
+                        value={createServiceAreas}
+                        onChange={(e) => setCreateServiceAreas(e.target.value)}
                         placeholder={t.coveragePlaceholder}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-indigo-500/40 text-indigo-200 placeholder:text-slate-600 focus:outline-none focus:border-indigo-400 transition"
                       />
@@ -4284,8 +4409,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <label className="block font-bold text-slate-300 mb-1">{t.specialties}</label>
                     <input
                       type="text"
-                      value={specialties}
-                      onChange={(e) => setSpecialties(e.target.value)}
+                      value={createSpecialties}
+                      onChange={(e) => setCreateSpecialties(e.target.value)}
                       placeholder={t.specialtiesPlaceholder}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
                     />
@@ -4295,8 +4420,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <label className="block font-bold text-slate-300 mb-1">{t.phone}</label>
                     <input
                       type="text"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      value={createPhone}
+                      onChange={(e) => setCreatePhone(e.target.value)}
                       placeholder={t.phonePlaceholder}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
                     />
@@ -4312,11 +4437,11 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
                 <button
                   type="button"
-                  onClick={() => handleGenerate('create')}
-                  disabled={isGenerating || !businessName.trim() || (!isLuismaMaster && monthlyUsage.creates >= (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))}
+                  onClick={() => handleGenerateCreate()}
+                  disabled={isGeneratingCreate || !createBusinessName.trim() || (!isLuismaMaster && monthlyUsage.creates >= (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))}
                   className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 cursor-pointer active:scale-98"
                 >
-                  {isGenerating ? (
+                  {isGeneratingCreate ? (
                     <>
                       <RefreshCw className="w-4 h-4 animate-spin" />
                       <span>{t.btnGenerating}</span>
@@ -4330,7 +4455,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 </button>
 
                 {/* Botón rápido Crear Nueva Ficha cuando ya hay una generada */}
-                {generatedData && (
+                {createGeneratedData && (
                   <button
                     type="button"
                     onClick={handleResetCreateForm}
@@ -4342,12 +4467,12 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 )}
 
                 {/* WhatsApp Request Kit Quick Button */}
-                {generatedData && (
+                {createGeneratedData && (
                   <button
                     type="button"
                     onClick={() =>
                       copyToClipboard(
-                        generatedData.whatsappOnboardingMessage,
+                        createGeneratedData.whatsappOnboardingMessage,
                         isEn ? 'Client Media Request Kit' : 'Mensaje para pedir fotos y video al cliente'
                       )
                     }
@@ -4385,8 +4510,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     type="button"
                     onClick={() => {
                       const scriptText = isEn
-                        ? `Hello ${businessName || 'Business Owner'}, to build, verify, and architect your Google Maps profile for Top 3 rankings, our technical setup fee is 100% WAIVED ($0 implementation cost) when you activate your tailored Prestigia plan for your business (5★ Review Accelerator + Digital Reputation Shield). Shall we reserve your slot and launch this week?`
-                        : `Hola estimado/a ${businessName || 'propietario'}, para crear, verificar y estructurar su ficha en Google Maps con arquitectura de posicionamiento Top 3, le BONIFICAMOS el 100% del Setup Fee técnico ($0 costo de implementación) al activar su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital). ¿Le reservo el cupo y coordinamos la activación esta semana?`;
+                        ? `Hello ${createBusinessName || 'Business Owner'}, to build, verify, and architect your Google Maps profile for Top 3 rankings, our technical setup fee is 100% WAIVED ($0 implementation cost) when you activate your tailored Prestigia plan for your business (5★ Review Accelerator + Digital Reputation Shield). Shall we reserve your slot and launch this week?`
+                        : `Hola estimado/a ${createBusinessName || 'propietario'}, para crear, verificar y estructurar su ficha en Google Maps con arquitectura de posicionamiento Top 3, le BONIFICAMOS el 100% del Setup Fee técnico ($0 costo de implementación) al activar su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital). ¿Le reservo el cupo y coordinamos la activación esta semana?`;
                       copyToClipboard(scriptText, isEn ? 'Setup Fee Proposal' : 'Propuesta de Setup Fee');
                     }}
                     className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
@@ -4399,7 +4524,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
               {/* Right Column: Output Blueprint (7 cols) */}
               <div className="lg:col-span-7 space-y-5">
-                {!generatedData && !isGenerating && (
+                {!createGeneratedData && !isGeneratingCreate && (
                   <div className="p-8 rounded-3xl bg-slate-900/50 border border-slate-800 text-center space-y-3">
                     <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
                       <Sparkles className="w-6 h-6 text-amber-400" />
@@ -4411,7 +4536,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   </div>
                 )}
 
-                {isGenerating && (
+                {isGeneratingCreate && (
                   <div className="p-12 rounded-3xl bg-slate-900/80 border border-emerald-500/30 text-center space-y-4">
                     <RefreshCw className="w-8 h-8 text-emerald-400 animate-spin mx-auto" />
                     <div>
@@ -4423,14 +4548,14 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   </div>
                 )}
 
-                {generatedData && (
+                {createGeneratedData && (
                   <div className="space-y-4 animate-in fade-in duration-300">
                     {/* Action Bar */}
                     <div className="flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-2xl bg-slate-900 border border-slate-800 print:hidden">
                       <div className="flex items-center gap-2 text-xs">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                         <span className="text-slate-300 font-semibold">
-                          {isEn ? 'Blueprint Ready: ' : 'Arquitectura Lista: '}<strong className="text-white">{businessName}</strong>
+                          {isEn ? 'Blueprint Ready: ' : 'Arquitectura Lista: '}<strong className="text-white">{createBusinessName}</strong>
                         </span>
                       </div>
                       <div className="flex items-center gap-2 flex-wrap">
@@ -4469,7 +4594,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
                         <button
                           type="button"
-                          onClick={handleSaveDossier}
+                          onClick={handleSaveCreateDossier}
                           className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
                         >
                           <Save className="w-3.5 h-3.5 text-amber-400" />
@@ -4496,7 +4621,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           type="button"
                           onClick={() =>
                             copyToClipboard(
-                              `${generatedData.primaryCategory}\nSubcategorías: ${generatedData.secondaryCategories.join(', ')}`,
+                              `${createGeneratedData.primaryCategory}\nSubcategorías: ${createGeneratedData.secondaryCategories.join(', ')}`,
                               'Categorías'
                             )
                           }
@@ -4512,15 +4637,15 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           <span className="text-[10px] font-bold text-emerald-400 uppercase block mb-1">
                             {isEn ? 'Primary Category (Google Official)' : 'Categoría Principal (Oficial Google)'}
                           </span>
-                          <span className="text-sm font-black text-white">{generatedData.primaryCategory}</span>
+                          <span className="text-sm font-black text-white">{createGeneratedData.primaryCategory}</span>
                         </div>
 
                         <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
                           <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">
-                            {generatedData.secondaryCategories.length} {isEn ? 'Secondary Subcategories (To Capture Search Intent)' : 'Subcategorías Secundarias (Para Ganar Búsquedas)'}
+                            {createGeneratedData.secondaryCategories.length} {isEn ? 'Secondary Subcategories (To Capture Search Intent)' : 'Subcategorías Secundarias (Para Ganar Búsquedas)'}
                           </span>
                           <div className="flex flex-wrap gap-1 mt-1">
-                            {generatedData.secondaryCategories.map((sc, i) => (
+                            {createGeneratedData.secondaryCategories.map((sc, i) => (
                               <span
                                 key={i}
                                 className="px-2 py-0.5 rounded-lg bg-indigo-950/80 border border-indigo-500/30 text-indigo-300 text-[10.5px] font-semibold"
@@ -4534,8 +4659,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     </div>
 
                     {/* SPECIAL MODULE FOR INDEPENDENTS / SAB (SERVICE AREA BUSINESS) */}
-                    {(generatedData.businessModel === 'service_area' ||
-                      (generatedData.suggestedServiceAreas && generatedData.suggestedServiceAreas.length > 0)) && (
+                    {(createGeneratedData.businessModel === 'service_area' ||
+                      (createGeneratedData.suggestedServiceAreas && createGeneratedData.suggestedServiceAreas.length > 0)) && (
                       <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-950/40 to-slate-900 border-2 border-indigo-500/40 space-y-4 print-card-box">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
@@ -4558,11 +4683,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               : 'Zonas y Barrios de Cobertura para Registrar en Google Maps:'}
                           </span>
                           <div className="flex flex-wrap gap-1.5">
-                            {(generatedData.suggestedServiceAreas || [
-                              `${city} Norte`,
-                              `${city} Centro`,
-                              `${city} Occidente`,
-                              `Área Metropolitana de ${city}`,
+                            {(createGeneratedData.suggestedServiceAreas || [
+                              `${createCity} Norte`, `${createCity} Centro`, `${createCity} Occidente`, `Área Metropolitana de ${createCity}`,
                             ]).map((area, i) => (
                               <span
                                 key={i}
@@ -4580,17 +4702,17 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </div>
 
                         {/* Digital QR & WhatsApp Review Protocol for Independents */}
-                        {generatedData.nfcPocketReviewGuide && (
+                        {createGeneratedData.nfcPocketReviewGuide && (
                           <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2 text-xs">
                             <div className="flex items-center justify-between">
                               <span className="font-black text-amber-300 text-[11px] flex items-center gap-1.5">
-                                ⭐ {generatedData.nfcPocketReviewGuide.title}
+                                ⭐ {createGeneratedData.nfcPocketReviewGuide.title}
                               </span>
                               <span className="text-[9px] font-mono text-slate-500">Prestigia Digital Review Engine</span>
                             </div>
 
                             <ul className="space-y-1 text-slate-300 text-[11px]">
-                              {generatedData.nfcPocketReviewGuide.steps.map((st, i) => (
+                              {createGeneratedData.nfcPocketReviewGuide.steps.map((st, i) => (
                                 <li key={i} className="flex items-start gap-2">
                                   <span className="text-amber-400 font-black">✓</span>
                                   <span>{st}</span>
@@ -4602,7 +4724,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               <span className="font-bold not-italic text-slate-400 block mb-0.5">
                                 {lang === 'en' ? 'Script to say to the client on-site:' : 'Frase exacta para decirle al cliente al terminar el trabajo:'}
                               </span>
-                              {generatedData.nfcPocketReviewGuide.samplePitch}
+                              {createGeneratedData.nfcPocketReviewGuide.samplePitch}
                             </div>
                           </div>
                         )}
@@ -4617,7 +4739,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </span>
                         <button
                           type="button"
-                          onClick={() => copyToClipboard(generatedData.optimizedTitle, 'Título')}
+                          onClick={() => copyToClipboard(createGeneratedData.optimizedTitle, 'Título')}
                           className="text-[11px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer print:hidden"
                         >
                           <Copy className="w-3.5 h-3.5" />
@@ -4625,7 +4747,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </button>
                       </div>
                       <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-sm font-black text-white flex items-center justify-between">
-                        <span>{generatedData.optimizedTitle}</span>
+                        <span>{createGeneratedData.optimizedTitle}</span>
                       </div>
                       <p className="text-[11px] text-slate-400">
                         {isEn
@@ -4642,12 +4764,12 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             {isEn ? 'Key Step 3: High-Impact Description' : 'Paso Clave 3: Descripción de Alto Impacto'}
                           </span>
                           <span className="text-[10px] text-slate-400 font-mono">
-                            {generatedData.commercialDescription.length} / 750 {isEn ? 'Characters' : 'Caracteres'}
+                            {createGeneratedData.commercialDescription.length} / 750 {isEn ? 'Characters' : 'Caracteres'}
                           </span>
                         </div>
                         <button
                           type="button"
-                          onClick={() => copyToClipboard(generatedData.commercialDescription, 'Descripción')}
+                          onClick={() => copyToClipboard(createGeneratedData.commercialDescription, 'Descripción')}
                           className="text-[11px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer print:hidden"
                         >
                           <Copy className="w-3.5 h-3.5" />
@@ -4655,7 +4777,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </button>
                       </div>
                       <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 leading-relaxed whitespace-pre-wrap">
-                        {generatedData.commercialDescription}
+                        {createGeneratedData.commercialDescription}
                       </div>
                     </div>
 
@@ -4671,7 +4793,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                        {generatedData.serviceCatalog.map((svc, i) => (
+                        {createGeneratedData.serviceCatalog.map((svc, i) => (
                           <div key={i} className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
                             <div className="flex items-center justify-between">
                               <span className="font-extrabold text-white text-xs">{svc.name}</span>
@@ -4694,7 +4816,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </h3>
                       </div>
                       <div className="space-y-2 text-xs">
-                        {generatedData.photoChecklist.map((ph, i) => (
+                        {createGeneratedData.photoChecklist.map((ph, i) => (
                           <div
                             key={i}
                             className="p-3 rounded-xl bg-slate-950 border border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
@@ -4727,7 +4849,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </h3>
                       </div>
                       <div className="space-y-2 text-xs">
-                        {generatedData.preventiveFaqs.map((faq, i) => (
+                        {createGeneratedData.preventiveFaqs.map((faq, i) => (
                           <div key={i} className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
                             <span className="font-bold text-amber-300 block text-xs">{isEn ? 'Q' : 'P'}: {faq.question}</span>
                             <p className="text-slate-300 text-[11px] leading-relaxed">{isEn ? 'A' : 'R'}: {faq.answer}</p>
@@ -4741,27 +4863,27 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Video className="w-5 h-5 text-indigo-400" />
-                          <h3 className="text-sm font-black text-white">{generatedData.verificationGuide.title}</h3>
+                          <h3 className="text-sm font-black text-white">{createGeneratedData.verificationGuide.title}</h3>
                         </div>
                         <span className="text-[10px] font-black uppercase text-amber-300 bg-amber-950 px-2.5 py-0.5 rounded-full border border-amber-500/40">
                           {isEn ? 'Uncut 60s video' : 'Video de 60s sin cortes'}
                         </span>
                       </div>
                       <p className="text-xs text-slate-300 leading-relaxed">
-                        {generatedData.verificationGuide.overview}
+                        {createGeneratedData.verificationGuide.overview}
                       </p>
                       <div className="space-y-2 text-xs">
                         <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800">
                           <strong className="text-amber-400 block mb-0.5">{isEn ? 'Take 1 (Exterior):' : 'Toma 1 (Exterior):'}</strong>
-                          <span className="text-slate-300 text-[11px]">{generatedData.verificationGuide.cameraTake1}</span>
+                          <span className="text-slate-300 text-[11px]">{createGeneratedData.verificationGuide.cameraTake1}</span>
                         </div>
                         <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800">
                           <strong className="text-indigo-300 block mb-0.5">{isEn ? 'Take 2 (Access / Street):' : 'Toma 2 (Acceso):'}</strong>
-                          <span className="text-slate-300 text-[11px]">{generatedData.verificationGuide.cameraTake2}</span>
+                          <span className="text-slate-300 text-[11px]">{createGeneratedData.verificationGuide.cameraTake2}</span>
                         </div>
                         <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800">
                           <strong className="text-emerald-400 block mb-0.5">{isEn ? 'Take 3 (Interior & Billing Tools):' : 'Toma 3 (Interior y Facturación):'}</strong>
-                          <span className="text-slate-300 text-[11px]">{generatedData.verificationGuide.cameraTake3}</span>
+                          <span className="text-slate-300 text-[11px]">{createGeneratedData.verificationGuide.cameraTake3}</span>
                         </div>
                       </div>
                     </div>
@@ -4776,7 +4898,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         <button
                           type="button"
                           onClick={() =>
-                            copyToClipboard(generatedData.whatsappOnboardingMessage, isEn ? 'WhatsApp Message' : 'Mensaje de WhatsApp')
+                            copyToClipboard(createGeneratedData.whatsappOnboardingMessage, isEn ? 'WhatsApp Message' : 'Mensaje de WhatsApp')
                           }
                           className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black transition flex items-center gap-1.5 cursor-pointer print:hidden"
                         >
@@ -4785,12 +4907,12 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </button>
                       </div>
                       <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-300 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
-                        {generatedData.whatsappOnboardingMessage}
+                        {createGeneratedData.whatsappOnboardingMessage}
                       </div>
                     </div>
 
                     {/* 9. Plan de Velocidad de Reseñas para Top 3 (Review Velocity) */}
-                    {generatedData.reviewVelocityPlan && (
+                    {createGeneratedData.reviewVelocityPlan && (
                       <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3 print-card-box">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
@@ -4812,9 +4934,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               {lang === 'en' ? 'Current Reviews' : 'Reseñas Actuales'}
                             </span>
                             <strong className="text-base font-black text-white">
-                              {generatedData.reviewVelocityPlan.currentReviews === 0
+                              {createGeneratedData.reviewVelocityPlan.currentReviews === 0
                                 ? (isEn ? '0 ★ (New Listing)' : '0 ★ (Ficha Nueva)')
-                                : `${generatedData.reviewVelocityPlan.currentReviews} ★`}
+                                : `${createGeneratedData.reviewVelocityPlan.currentReviews} ★`}
                             </strong>
                           </div>
 
@@ -4823,7 +4945,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               {lang === 'en' ? 'Top 3 Competitor Benchmark' : 'Meta del Top 3'}
                             </span>
                             <strong className="text-base font-black text-amber-400">
-                              {generatedData.reviewVelocityPlan.targetTop3Reviews}+
+                              {createGeneratedData.reviewVelocityPlan.targetTop3Reviews}+
                             </strong>
                           </div>
 
@@ -4832,7 +4954,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               {lang === 'en' ? 'Pace per Week' : 'Ritmo Recomendado'}
                             </span>
                             <strong className="text-base font-black text-emerald-400">
-                              +{generatedData.reviewVelocityPlan.reviewsPerWeek} {isEn ? '/ wk' : '/ sem'}
+                              +{createGeneratedData.reviewVelocityPlan.reviewsPerWeek} {isEn ? '/ wk' : '/ sem'}
                             </strong>
                           </div>
 
@@ -4841,7 +4963,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               {lang === 'en' ? 'Time to Top 3' : 'Tiempo al Top 3'}
                             </span>
                             <strong className="text-base font-black text-purple-300">
-                              {generatedData.reviewVelocityPlan.weeksToTop3} {isEn ? 'weeks' : 'semanas'}
+                              {createGeneratedData.reviewVelocityPlan.weeksToTop3} {isEn ? 'weeks' : 'semanas'}
                             </strong>
                           </div>
                         </div>
@@ -4854,7 +4976,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     )}
 
                     {/* 10. Booster de 30 Días de Publicaciones de Google (Google Posts) */}
-                    {generatedData.monthlyPostsBooster && generatedData.monthlyPostsBooster.length > 0 && (
+                    {createGeneratedData.monthlyPostsBooster && createGeneratedData.monthlyPostsBooster.length > 0 && (
                       <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3 print-card-box">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
@@ -4871,7 +4993,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                          {generatedData.monthlyPostsBooster.map((post, i) => (
+                          {createGeneratedData.monthlyPostsBooster.map((post, i) => (
                             <div key={i} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2 flex flex-col justify-between">
                               <div className="space-y-1">
                                 <div className="flex items-center justify-between">
@@ -5182,7 +5304,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <button
                   type="button"
                   onClick={() => {
-                    const script = `Hola ${businessName || 'Emprendedor'}, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de ${category || 'su sector'} en ${city || 'su ciudad'} y notamos una situación crítica: su negocio sencillamente NO existe en Google Maps. Hoy en día, el 70% de las personas que van a comprar o contratar un servicio eligen entre los 3 primeros perfiles que aparecen en el mapa. Cada día que pasa sin ficha, son decenas de clientes que terminan comprándole a su competencia más cercana. En Prestigia no solo creamos y verificamos su ficha oficial ante Google sin riesgo de suspensión, sino que le instalamos la arquitectura para posicionarlo en el Top 3 y le activamos nuestro software inteligente de reseñas para capturar 5 estrellas en su negocio. Al activar hoy su Plan Prestigia a la medida para su negocio, le bonificamos el 100% del setup técnico ($0 costo de creación) y le entregamos la ficha lista para facturar. ¿Agendamos la grabación del video de 60 segundos hoy mismo?`;
+                    const script = `Hola ${createBusinessName || 'Emprendedor'}, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de ${createCategory || 'su sector'} en ${createCity || 'su ciudad'} y notamos una situación crítica: su negocio sencillamente NO existe en Google Maps. Hoy en día, el 70% de las personas que van a comprar o contratar un servicio eligen entre los 3 primeros perfiles que aparecen en el mapa. Cada día que pasa sin ficha, son decenas de clientes que terminan comprándole a su competencia más cercana. En Prestigia no solo creamos y verificamos su ficha oficial ante Google sin riesgo de suspensión, sino que le instalamos la arquitectura para posicionarlo en el Top 3 y le activamos nuestro software inteligente de reseñas para capturar 5 estrellas en su negocio. Al activar hoy su Plan Prestigia a la medida para su negocio, le bonificamos el 100% del setup técnico ($0 costo de creación) y le entregamos la ficha lista para facturar. ¿Agendamos la grabación del video de 60 segundos hoy mismo?`;
                     copyToClipboard(script, 'Guión de Venta de Creación');
                   }}
                   className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer shrink-0 active:scale-98"
@@ -5198,7 +5320,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   🎙️ Speech de Prospección & Apertura (Llamada, Visita o WhatsApp):
                 </span>
                 <p>
-                  "Hola <strong>{businessName || 'Emprendedor'}</strong>, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de <strong>{category || 'su sector'}</strong> en <strong>{city || 'su ciudad'}</strong> y notamos una situación crítica: su negocio sencillamente <strong>NO existe en Google Maps</strong>. Hoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha son decenas de ventas que le regala a su competencia. Nosotros creamos y verificamos su perfil oficial ante Google con arquitectura Top 3, y le activamos el sistema digital Prestigia para disparar sus reseñas 5★ desde la primera semana."
+                  "Hola <strong>{createBusinessName || 'Emprendedor'}</strong>, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de <strong>{createCategory || 'su sector'}</strong> en <strong>{createCity || 'su ciudad'}</strong> y notamos una situación crítica: su negocio sencillamente <strong>NO existe en Google Maps</strong>. Hoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha son decenas de ventas que le regala a su competencia. Nosotros creamos y verificamos su perfil oficial ante Google con arquitectura Top 3, y le activamos el sistema digital Prestigia para disparar sus reseñas 5★ desde la primera semana."
                 </p>
               </div>
 
@@ -5349,8 +5471,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="text"
-                        value={contactName}
-                        onChange={(e) => setContactName(e.target.value)}
+                        value={auditContactName}
+                        onChange={(e) => setAuditContactName(e.target.value)}
                         placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -5362,8 +5484,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="text"
-                        value={contactCompany}
-                        onChange={(e) => setContactCompany(e.target.value)}
+                        value={auditContactCompany}
+                        onChange={(e) => setAuditContactCompany(e.target.value)}
                         placeholder={isEn ? 'e.g. Acme Corp / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -5374,9 +5496,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
                         <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
-                        {contactPhone && (
+                        {auditContactPhone && (
                           <a
-                            href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
+                            href={`https://wa.me/${auditContactPhone.replace(/[^0-9]/g, '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
@@ -5387,8 +5509,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="tel"
-                        value={contactPhone}
-                        onChange={(e) => setContactPhone(e.target.value)}
+                        value={auditContactPhone}
+                        onChange={(e) => setAuditContactPhone(e.target.value)}
                         placeholder="+57 300 123 4567"
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -5400,8 +5522,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="email"
-                        value={contactEmail}
-                        onChange={(e) => setContactEmail(e.target.value)}
+                        value={auditContactEmail}
+                        onChange={(e) => setAuditContactEmail(e.target.value)}
                         placeholder="contacto@empresa.com"
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -5412,8 +5534,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         {isEn ? 'Role' : 'Cargo / Relación'}
                       </label>
                       <select
-                        value={contactRole}
-                        onChange={(e) => setContactRole(e.target.value)}
+                        value={auditContactRole}
+                        onChange={(e) => setAuditContactRole(e.target.value)}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
                       >
                         <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
@@ -5440,7 +5562,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           type="button"
                           onClick={() => {
                             setAuditQuery('');
-                            setScannedListing(null);
+                            setAuditScannedListing(null);
                           }}
                           className="text-[10px] text-slate-400 hover:text-rose-400 transition cursor-pointer"
                         >
@@ -5455,7 +5577,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         value={auditQuery}
                         onChange={(e) => setAuditQuery(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !isScanningListing && !isGenerating && auditQuery.trim()) {
+                          if (e.key === 'Enter' && !isScanningAudit && !isGeneratingAudit && auditQuery.trim()) {
                             e.preventDefault();
                             handleScanAndAudit();
                           }
@@ -5489,16 +5611,16 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 </div>
 
                 {/* Scanned Listing Profile Card (If recognized) */}
-                {scannedListing && (
+                {auditScannedListing && (
                   <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-emerald-500/40 space-y-2.5 animate-in fade-in duration-300">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                         <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                         <span>{t.verifiedListingBadge}</span>
                       </span>
-                      {scannedListing.googleMapsUrl && (
+                      {auditScannedListing.googleMapsUrl && (
                         <a
-                          href={scannedListing.googleMapsUrl}
+                          href={auditScannedListing.googleMapsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-[10px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
@@ -5511,12 +5633,12 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
                     <div>
                       <h4 className="text-sm font-black text-white leading-tight">
-                        {scannedListing.name}
+                        {auditScannedListing.name}
                       </h4>
-                      {scannedListing.address && (
+                      {auditScannedListing.address && (
                         <p className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
                           <MapPin className="w-3 h-3 text-amber-400 shrink-0" />
-                          <span className="truncate">{scannedListing.address}</span>
+                          <span className="truncate">{auditScannedListing.address}</span>
                         </p>
                       )}
                     </div>
@@ -5524,32 +5646,32 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <div className="grid grid-cols-3 gap-2 pt-1">
                       <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-center">
                         <span className="text-[9px] uppercase font-bold text-slate-400 block">Rating</span>
-                        <span className="text-xs font-black text-amber-400">★ {scannedListing.rating}</span>
+                        <span className="text-xs font-black text-amber-400">★ {auditScannedListing.rating}</span>
                       </div>
                       <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-center">
                         <span className="text-[9px] uppercase font-bold text-slate-400 block">{isEn ? 'Reviews' : 'Reseñas'}</span>
-                        <span className="text-xs font-black text-white">{scannedListing.reviewsCount}</span>
+                        <span className="text-xs font-black text-white">{auditScannedListing.reviewsCount}</span>
                       </div>
                       <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-center">
                         <span className="text-[9px] uppercase font-bold text-slate-400 block">{isEn ? 'Niche' : 'Nicho'}</span>
                         <span className="text-[10px] font-black text-teal-300 truncate block">
-                          {scannedListing.category || 'General'}
+                          {auditScannedListing.category || 'General'}
                         </span>
                       </div>
                     </div>
 
-                    {(scannedListing.phone || scannedListing.website) && (
+                    {(auditScannedListing.phone || auditScannedListing.website) && (
                       <div className="flex items-center gap-3 text-[11px] text-slate-400 pt-1 border-t border-slate-800/80">
-                        {scannedListing.phone && (
+                        {auditScannedListing.phone && (
                           <span className="flex items-center gap-1 text-slate-300 truncate">
                             <Phone className="w-3 h-3 text-emerald-400 shrink-0" />
-                            <span>{scannedListing.phone}</span>
+                            <span>{auditScannedListing.phone}</span>
                           </span>
                         )}
-                        {scannedListing.website && (
+                        {auditScannedListing.website && (
                           <span className="flex items-center gap-1 text-slate-300 truncate">
                             <Globe className="w-3 h-3 text-indigo-400 shrink-0" />
-                            <span>{scannedListing.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
+                            <span>{auditScannedListing.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
                           </span>
                         )}
                       </div>
@@ -5569,10 +5691,10 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   <button
                     type="button"
                     onClick={handleScanAndAudit}
-                    disabled={isScanningListing || isGenerating || !auditQuery.trim() || (!isLuismaMaster && monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))}
+                    disabled={isScanningAudit || isGeneratingAudit || !auditQuery.trim() || (!isLuismaMaster && monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))}
                     className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98"
                   >
-                    {isScanningListing || isGenerating ? (
+                    {isScanningAudit || isGeneratingAudit ? (
                       <>
                         <RefreshCw className="w-4 h-4 animate-spin" />
                         <span>{t.btnScanningAndAuditing}</span>
@@ -5586,7 +5708,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   </button>
 
                   {/* Botón rápido Nueva Auditoría cuando ya hay una generada */}
-                  {generatedData?.healthScore && (
+                  {auditGeneratedData?.healthScore && (
                     <button
                       type="button"
                       onClick={handleResetAuditForm}
@@ -5622,8 +5744,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         <label className="block font-bold text-slate-300 mb-1">{t.auditBizName}</label>
                         <input
                           type="text"
-                          value={businessName}
-                          onChange={(e) => setBusinessName(e.target.value)}
+                          value={auditBusinessName}
+                          onChange={(e) => setAuditBusinessName(e.target.value)}
                           placeholder={t.auditBizNamePlaceholder}
                           className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition"
                         />
@@ -5633,8 +5755,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         <label className="block font-bold text-slate-300 mb-1">{t.googleUrl}</label>
                         <input
                           type="text"
-                          value={googleUrl}
-                          onChange={(e) => setGoogleUrl(e.target.value)}
+                          value={auditGoogleUrl}
+                          onChange={(e) => setAuditGoogleUrl(e.target.value)}
                           placeholder={t.googleUrlPlaceholder}
                           className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition"
                         />
@@ -5648,8 +5770,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             step="0.1"
                             min="1"
                             max="5"
-                            value={existingRating}
-                            onChange={(e) => setExistingRating(Number(e.target.value))}
+                            value={auditExistingRating}
+                            onChange={(e) => setAuditExistingRating(Number(e.target.value))}
                             className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition font-bold"
                           />
                         </div>
@@ -5658,8 +5780,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           <input
                             type="number"
                             min="0"
-                            value={existingReviews}
-                            onChange={(e) => setExistingReviews(Number(e.target.value))}
+                            value={auditExistingReviews}
+                            onChange={(e) => setAuditExistingReviews(Number(e.target.value))}
                             className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition font-bold"
                           />
                         </div>
@@ -5692,8 +5814,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               </button>
                             </div>
                             <select
-                              value={country}
-                              onChange={(e) => handleSelectCountry(e.target.value)}
+                              value={auditCountry}
+                              onChange={(e) => handleSelectAuditCountry(e.target.value)}
                               className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition text-xs cursor-pointer"
                             >
                               {allCountriesList.map((c) => (
@@ -5708,27 +5830,27 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           <div>
                             <div className="flex items-center justify-between mb-1">
                               <label className="text-xs font-bold text-slate-300">
-                                2º Ciudad ({country}) *
+                                2º Ciudad ({auditCountry}) *
                               </label>
                               <button
                                 type="button"
                                 onClick={() => {
-                                  setTargetCountryForNewCity(country);
-                                  setShowAddCityModal(true);
-                                }}
-                                className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
-                                title={`Agregar otra Ciudad a ${country}`}
+                              setTargetCountryForNewCity(auditCountry);
+                              setShowAddCityModal(true);
+                            }}
+                            className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                                title={`Agregar otra Ciudad a ${auditCountry}`}
                               >
                                 <Plus className="w-3 h-3" />
                                 <span>Agregar Ciudad</span>
                               </button>
                             </div>
                             <select
-                              value={city}
-                              onChange={(e) => setCity(e.target.value)}
+                              value={auditCity}
+                              onChange={(e) => setAuditCity(e.target.value)}
                               className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition text-xs cursor-pointer"
                             >
-                              {getCitiesForCountry(country).map((cty) => (
+                              {getCitiesForCountry(auditCountry).map((cty) => (
                                 <option key={cty} value={cty}>
                                   {cty}
                                 </option>
@@ -5744,8 +5866,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           </label>
                           <input
                             type="text"
-                            value={neighborhood}
-                            onChange={(e) => setNeighborhood(e.target.value)}
+                            value={auditNeighborhood}
+                            onChange={(e) => setAuditNeighborhood(e.target.value)}
                             placeholder={t.auditNeighborhoodPlaceholder}
                             className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition text-xs"
                           />
@@ -5755,8 +5877,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       <div>
                         <label className="block font-bold text-slate-300 mb-1">{t.sector}</label>
                         <select
-                          value={category}
-                          onChange={(e) => setCategory(e.target.value)}
+                          value={auditCategory}
+                          onChange={(e) => setAuditCategory(e.target.value)}
                           className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition"
                         >
                           {categoryOptions.map((c: string) => (
@@ -5769,8 +5891,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
                       <button
                         type="button"
-                        onClick={() => handleGenerate('audit')}
-                        disabled={isGenerating || !businessName.trim()}
+                        onClick={() => handleGenerateAudit()}
+                        disabled={isGeneratingAudit || !auditBusinessName.trim()}
                         className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
                       >
                         <Search className="w-3.5 h-3.5" />
@@ -5807,8 +5929,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     type="button"
                     onClick={() => {
                       const scriptText = isEn
-                        ? `Hello ${businessName || 'Business Owner'}, after performing our forensic audit on your Google Maps listing, we identified critical gaps keeping you outside the Top 3. When you activate our tailored Prestigia plan for your business (Digital 5★ Review Accelerator + Reputation Shield), we WAIVE 100% of the deep optimization setup fee ($0 USD). Shall we lock in this waiver and elevate your listing this week?`
-                        : `Hola estimado/a ${businessName || 'propietario'}, tras auditar su negocio en Google Maps detectamos fallas críticas que le hacen perder clientes frente a la competencia. Al adquirir su Plan Prestigia a la medida (Software de Reseñas 5★ + Blindaje Digital), le BONIFICAMOS el 100% de la optimización técnica ($0 USD). ¿Le gustaría aprovechar esta bonificación y activar su plan a la medida?`;
+                        ? `Hello ${auditBusinessName || 'Business Owner'}, after performing our forensic audit on your Google Maps listing, we identified critical gaps keeping you outside the Top 3. When you activate our tailored Prestigia plan for your business (Digital 5★ Review Accelerator + Reputation Shield), we WAIVE 100% of the deep optimization setup fee ($0 USD). Shall we lock in this waiver and elevate your listing this week?`
+                        : `Hola estimado/a ${auditBusinessName || 'propietario'}, tras auditar su negocio en Google Maps detectamos fallas críticas que le hacen perder clientes frente a la competencia. Al adquirir su Plan Prestigia a la medida (Software de Reseñas 5★ + Blindaje Digital), le BONIFICAMOS el 100% de la optimización técnica ($0 USD). ¿Le gustaría aprovechar esta bonificación y activar su plan a la medida?`;
                       copyToClipboard(scriptText, isEn ? 'Audit Proposal' : 'Propuesta de Auditoría');
                     }}
                     className="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
@@ -5822,7 +5944,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
               {/* Right Column: Audit Diagnostic Output */}
               <div className="lg:col-span-7 space-y-4">
                 {/* State 1: Scanning & Auditing with Gemini */}
-                {(isScanningListing || isGenerating) && (
+                {(isScanningAudit || isGeneratingAudit) && (
                   <div className="p-8 sm:p-12 rounded-3xl bg-slate-900/80 border border-amber-500/30 text-center space-y-4 animate-pulse">
                     <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
                       <RefreshCw className="w-7 h-7 animate-spin text-amber-400" />
@@ -5844,7 +5966,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 )}
 
                 {/* State 2: Ready to Audit (Empty State) */}
-                {!generatedData?.healthScore && !isScanningListing && !isGenerating && (
+                {!auditGeneratedData?.healthScore && !isScanningAudit && !isGeneratingAudit && (
                   <div className="p-8 sm:p-12 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-4">
                     <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
                       <Search className="w-7 h-7 text-amber-400" />
@@ -5872,7 +5994,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 )}
 
                 {/* State 3: Generated Forensic Audit Results */}
-                {generatedData?.healthScore && !isScanningListing && !isGenerating && (
+                {auditGeneratedData?.healthScore && !isScanningAudit && !isGeneratingAudit && (
                   <div className="space-y-4 animate-in fade-in duration-300">
                     {/* Score Bar & Action Header */}
                     <div className="p-5 sm:p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-4 shadow-xl print-card-box">
@@ -5921,7 +6043,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
                           <button
                             type="button"
-                            onClick={handleSaveDossier}
+                            onClick={handleSaveAuditDossier}
                             className="px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border border-slate-700/80 shadow-sm"
                           >
                             <Save className="w-3.5 h-3.5 text-amber-400" />
@@ -5944,7 +6066,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         <div className="flex items-center gap-3.5">
                           <div className="flex items-baseline gap-1.5 whitespace-nowrap">
                             <span className="text-4xl sm:text-5xl font-black text-amber-400 tracking-tight leading-none">
-                              {generatedData.healthScore}
+                              {auditGeneratedData.healthScore}
                             </span>
                             <span className="text-base sm:text-lg font-bold text-slate-400">
                               / 100
@@ -5953,14 +6075,14 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
                           <span
                             className={`text-xs font-bold px-3 py-1.5 rounded-xl border whitespace-nowrap inline-flex items-center gap-1.5 shadow-sm ${
-                              generatedData.healthScore < 60
+                              auditGeneratedData.healthScore < 60
                                 ? 'bg-rose-950/80 text-rose-300 border-rose-500/40'
-                                : generatedData.healthScore < 80
+                                : auditGeneratedData.healthScore < 80
                                 ? 'bg-amber-950/80 text-amber-300 border-amber-500/40'
                                 : 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40'
                             }`}
                           >
-                            {generatedData.healthScore < 60 ? (
+                            {auditGeneratedData.healthScore < 60 ? (
                               <AlertTriangle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                             ) : (
                               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -5984,13 +6106,13 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         <div className="w-full bg-slate-950 rounded-full h-2 p-0.5 border border-slate-800 overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all duration-700 ${
-                              generatedData.healthScore < 60
+                              auditGeneratedData.healthScore < 60
                                 ? 'bg-gradient-to-r from-rose-500 to-amber-500'
-                                : generatedData.healthScore < 80
+                                : auditGeneratedData.healthScore < 80
                                 ? 'bg-gradient-to-r from-amber-500 to-teal-400'
                                 : 'bg-gradient-to-r from-teal-400 to-emerald-400'
                             }`}
-                            style={{ width: `${Math.min(Math.max(generatedData.healthScore, 5), 100)}%` }}
+                            style={{ width: `${Math.min(Math.max(auditGeneratedData.healthScore, 5), 100)}%` }}
                           />
                         </div>
                       </div>
@@ -6003,7 +6125,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         <h3 className="text-sm font-black text-white">{t.criticalGapsTitle}</h3>
                       </div>
                       <div className="space-y-1.5 text-xs">
-                        {generatedData.criticalGaps?.map((gap, i) => (
+                        {auditGeneratedData.criticalGaps?.map((gap, i) => (
                           <div key={i} className="p-2.5 rounded-xl bg-rose-950/40 border border-rose-500/20 text-rose-200 flex items-center gap-2">
                             <span className="font-bold text-rose-400">❌</span>
                             <span>{gap}</span>
@@ -6016,10 +6138,10 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <div className="p-5 rounded-2xl bg-slate-900 border border-indigo-500/40 space-y-2 print-card-box">
                       <div className="flex items-center gap-2 text-indigo-400">
                         <TrendingUp className="w-4 h-4" />
-                        <h3 className="text-sm font-black text-white">{t.competitorBenchmarkTitle} {city}</h3>
+                        <h3 className="text-sm font-black text-white">{t.competitorBenchmarkTitle} {auditCity}</h3>
                       </div>
                       <p className="text-xs text-slate-300 leading-relaxed">
-                        {generatedData.topCompetitorInsights}
+                        {auditGeneratedData.topCompetitorInsights}
                       </p>
                     </div>
 
@@ -6030,7 +6152,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         <h3 className="text-sm font-black text-white">{t.roadmapTitle}</h3>
                       </div>
                       <div className="space-y-2 text-xs">
-                        {generatedData.actionRoadmap?.map((item, i) => (
+                        {auditGeneratedData.actionRoadmap?.map((item, i) => (
                           <div key={i} className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
                             <div className="flex items-center justify-between">
                               <span className="font-bold text-white text-xs">{t.stepLabel} {item.step}: {item.title}</span>
@@ -6058,7 +6180,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         <h3 className="text-sm font-black text-white">{t.optimizedCopyTitle}</h3>
                         <button
                           type="button"
-                          onClick={() => copyToClipboard(generatedData.commercialDescription, 'Descripción')}
+                          onClick={() => copyToClipboard(auditGeneratedData.commercialDescription, 'Descripción')}
                           className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer print:hidden"
                         >
                           <Copy className="w-3.5 h-3.5" />
@@ -6066,7 +6188,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         </button>
                       </div>
                       <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
-                        {generatedData.commercialDescription}
+                        {auditGeneratedData.commercialDescription}
                       </div>
                     </div>
                   </div>
@@ -6191,7 +6313,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <button
                   type="button"
                   onClick={() => {
-                    const script = `Hola ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos minuciosamente su perfil de Google Maps en ${city || 'su ciudad'} y descubrimos la razón exacta por la cual no está apareciendo en los primeros 3 lugares: su ficha tiene 3 fugas algorítmicas críticas (carece de categorías secundarias de búsqueda transaccional, su catálogo de servicios no tiene precios y su flujo de opiniones está estancado). Nuestros cálculos muestran que está perdiendo aproximadamente entre $1,000 y $3,000 USD mensuales en clientes que se van con sus competidores del Top 3. En Prestigia reestructuramos el 100% de su perfil y le activamos nuestro software inteligente de reseñas para inyectar 5 estrellas semanales y superar a sus rivales. Al activar hoy su Plan Prestigia a la medida para su negocio, nosotros absorbemos el 100% del setup técnico de optimización ($0 costo de implementación bonificado). ¿Le gustaría ver la comparativa directa frente a su competidor más fuerte?`;
+                    const script = `Hola ${auditBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos minuciosamente su perfil de Google Maps en ${auditCity || 'su ciudad'} y descubrimos la razón exacta por la cual no está apareciendo en los primeros 3 lugares: su ficha tiene 3 fugas algorítmicas críticas (carece de categorías secundarias de búsqueda transaccional, su catálogo de servicios no tiene precios y su flujo de opiniones está estancado). Nuestros cálculos muestran que está perdiendo aproximadamente entre $1,000 y $3,000 USD mensuales en clientes que se van con sus competidores del Top 3. En Prestigia reestructuramos el 100% de su perfil y le activamos nuestro software inteligente de reseñas para inyectar 5 estrellas semanales y superar a sus rivales. Al activar hoy su Plan Prestigia a la medida para su negocio, nosotros absorbemos el 100% del setup técnico de optimización ($0 costo de implementación bonificado). ¿Le gustaría ver la comparativa directa frente a su competidor más fuerte?`;
                     copyToClipboard(script, 'Guión de Venta de Auditoría');
                   }}
                   className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer shrink-0 active:scale-98"
@@ -6207,7 +6329,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   🎙️ Speech de Cierre de Auditoría Forense:
                 </span>
                 <p>
-                  "Hola <strong>{businessName || 'propietario'}</strong>, le saluda el equipo de Prestigia. Auditamos su ficha en <strong>{city || 'su zona'}</strong> y detectamos por qué no está en el Top 3: su perfil tiene <strong>3 fallas algorítmicas graves</strong> que le están costando clientes todos los días. Sus competidores líderes tienen flujo activo semanal y catálogo completo, mientras que su ficha pierde el 68% de las búsquedas por falta de categorías secundarias. Hemos estructurado el plan técnico para desbancar a los líderes y activar la plataforma digital de reseñas de Prestigia."
+                  "Hola <strong>{auditBusinessName || 'propietario'}</strong>, le saluda el equipo de Prestigia. Auditamos su ficha en <strong>{auditCity || 'su zona'}</strong> y detectamos por qué no está en el Top 3: su perfil tiene <strong>3 fallas algorítmicas graves</strong> que le están costando clientes todos los días. Sus competidores líderes tienen flujo activo semanal y catálogo completo, mientras que su ficha pierde el 68% de las búsquedas por falta de categorías secundarias. Hemos estructurado el plan técnico para desbancar a los líderes y activar la plataforma digital de reseñas de Prestigia."
                 </p>
               </div>
 
@@ -6359,8 +6481,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="text"
-                        value={contactName}
-                        onChange={(e) => setContactName(e.target.value)}
+                        value={rescueContactName}
+                        onChange={(e) => setRescueContactName(e.target.value)}
                         placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -6372,8 +6494,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="text"
-                        value={contactCompany}
-                        onChange={(e) => setContactCompany(e.target.value)}
+                        value={rescueContactCompany}
+                        onChange={(e) => setRescueContactCompany(e.target.value)}
                         placeholder={isEn ? 'e.g. Acme Corp / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -6384,9 +6506,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
                         <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
-                        {contactPhone && (
+                        {rescueContactPhone && (
                           <a
-                            href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
+                            href={`https://wa.me/${rescueContactPhone.replace(/[^0-9]/g, '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
@@ -6397,8 +6519,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="tel"
-                        value={contactPhone}
-                        onChange={(e) => setContactPhone(e.target.value)}
+                        value={rescueContactPhone}
+                        onChange={(e) => setRescueContactPhone(e.target.value)}
                         placeholder="+57 300 123 4567"
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -6410,8 +6532,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="email"
-                        value={contactEmail}
-                        onChange={(e) => setContactEmail(e.target.value)}
+                        value={rescueContactEmail}
+                        onChange={(e) => setRescueContactEmail(e.target.value)}
                         placeholder="contacto@empresa.com"
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -6422,8 +6544,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         {isEn ? 'Role' : 'Cargo / Relación'}
                       </label>
                       <select
-                        value={contactRole}
-                        onChange={(e) => setContactRole(e.target.value)}
+                        value={rescueContactRole}
+                        onChange={(e) => setRescueContactRole(e.target.value)}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
                       >
                         <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
@@ -6512,16 +6634,16 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 </div>
 
                 {/* Session profile detected sync pill */}
-                {!scannedListing && businessName && (
+                {!rescueScannedListing && rescueBusinessName && (
                   <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between text-xs animate-in fade-in">
                     <div className="truncate mr-2">
                       <span className="text-[10px] text-amber-400 block font-bold">{tTools.rescueSyncBanner}</span>
-                      <span className="text-white font-bold text-xs truncate block">{businessName} {city ? `(${city})` : ''}</span>
+                      <span className="text-white font-bold text-xs truncate block">{rescueBusinessName} {rescueCity ? `(${rescueCity})` : ''}</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => {
-                        const target = businessName + (city ? ' ' + city : '');
+                        const target = rescueBusinessName + (rescueCity ? ' ' + rescueCity : '');
                         setRescueSearchQuery(target);
                         handleRescueScan(target);
                       }}
@@ -6533,16 +6655,16 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 )}
 
                 {/* Verified Listing Card (Recognized from Google) */}
-                {scannedListing && (
+                {rescueScannedListing && (
                   <div className="p-3.5 rounded-2xl bg-slate-950/90 border border-emerald-500/40 space-y-2 animate-in fade-in">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                         <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                         <span>{tTools.rescueDetectedBadge}</span>
                       </span>
-                      {scannedListing.googleMapsUrl && (
+                      {rescueScannedListing.googleMapsUrl && (
                         <a
-                          href={scannedListing.googleMapsUrl}
+                          href={rescueScannedListing.googleMapsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-[10px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
@@ -6554,20 +6676,20 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     </div>
 
                     <div>
-                      <h4 className="font-black text-white text-xs">{scannedListing.name}</h4>
-                      {scannedListing.address && (
-                        <p className="text-[10px] text-slate-400 truncate">{scannedListing.address}</p>
+                      <h4 className="font-black text-white text-xs">{rescueScannedListing.name}</h4>
+                      {rescueScannedListing.address && (
+                        <p className="text-[10px] text-slate-400 truncate">{rescueScannedListing.address}</p>
                       )}
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-300 font-mono">
-                      <span className="text-amber-400 font-bold">★ {scannedListing.rating?.toFixed(1) || '0.0'}</span>
+                      <span className="text-amber-400 font-bold">★ {rescueScannedListing.rating?.toFixed(1) || '0.0'}</span>
                       <span>·</span>
-                      <span>{scannedListing.reviewsCount || 0} {isEn ? 'reviews' : 'reseñas'}</span>
-                      {scannedListing.phone && (
+                      <span>{rescueScannedListing.reviewsCount || 0} {isEn ? 'reviews' : 'reseñas'}</span>
+                      {rescueScannedListing.phone && (
                         <>
                           <span>·</span>
-                          <span className="text-slate-400">{scannedListing.phone}</span>
+                          <span className="text-slate-400">{rescueScannedListing.phone}</span>
                         </>
                       )}
                     </div>
@@ -6579,8 +6701,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <label className="block font-bold text-slate-300 mb-1">{isEn ? 'Business Name on Google Maps *' : 'Nombre de la Ficha en Google Maps *'}</label>
                     <input
                       type="text"
-                      value={businessName}
-                      onChange={(e) => setBusinessName(e.target.value)}
+                      value={rescueBusinessName}
+                      onChange={(e) => setRescueBusinessName(e.target.value)}
                       placeholder={isEn ? 'e.g. Apex Dental Center' : 'Ej: Clínica Dental Sanitas'}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 transition"
                     />
@@ -6613,8 +6735,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           </button>
                         </div>
                         <select
-                          value={country}
-                          onChange={(e) => handleSelectCountry(e.target.value)}
+                          value={rescueCountry}
+                          onChange={(e) => handleSelectRescueCountry(e.target.value)}
                           className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-rose-400 transition text-sm cursor-pointer"
                         >
                           {allCountriesList.map((c) => (
@@ -6629,27 +6751,27 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <label className="text-xs font-bold text-slate-300">
-                            2º Ciudad ({country}) *
+                            2º Ciudad ({rescueCountry}) *
                           </label>
                           <button
                             type="button"
                             onClick={() => {
-                              setTargetCountryForNewCity(country);
+                              setTargetCountryForNewCity(rescueCountry);
                               setShowAddCityModal(true);
                             }}
                             className="text-[10px] text-rose-400 hover:text-rose-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
-                            title={`Agregar otra Ciudad a ${country}`}
+                            title={`Agregar otra Ciudad a ${rescueCountry}`}
                           >
                             <Plus className="w-3 h-3" />
                             <span>Agregar Ciudad</span>
                           </button>
                         </div>
                         <select
-                          value={city}
-                          onChange={(e) => setCity(e.target.value)}
+                          value={rescueCity}
+                          onChange={(e) => setRescueCity(e.target.value)}
                           className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-rose-400 transition text-sm cursor-pointer"
                         >
-                          {getCitiesForCountry(country).map((cty) => (
+                          {getCitiesForCountry(rescueCountry).map((cty) => (
                             <option key={cty} value={cty}>
                               {cty}
                             </option>
@@ -6665,8 +6787,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="text"
-                        value={neighborhood}
-                        onChange={(e) => setNeighborhood(e.target.value)}
+                        value={rescueNeighborhood}
+                        onChange={(e) => setRescueNeighborhood(e.target.value)}
                         placeholder="Ej: Chapinero, Poblado, Polanco, Brickell, Centro..."
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 transition text-sm"
                       />
@@ -6791,8 +6913,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     type="button"
                     onClick={() => {
                       const scriptText = isEn
-                        ? `Hello ${businessName || 'Business Owner'}, to reclaim and transfer your Google Maps profile to your direct account, our legal ownership recovery fee is 100% WAIVED ($0 cost) when you activate your tailored Prestigia plan (Digital 5★ Review Accelerator + Reputation Shield). You get your listing back and your reputation secured. Shall we start the protocol today?`
-                        : `Hola estimado/a ${businessName || 'propietario'}, para recuperar la titularidad legal de su ficha en Google Maps y transferir el control total a su cuenta oficial mediante el protocolo de Google, le BONIFICAMOS el 100% de los costos de gestión técnica y legal de rescate ($0 USD) al adquirir su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital). Recupera su ficha y blindamos su reputación. ¿Iniciamos el protocolo hoy?`;
+                        ? `Hello ${rescueBusinessName || 'Business Owner'}, to reclaim and transfer your Google Maps profile to your direct account, our legal ownership recovery fee is 100% WAIVED ($0 cost) when you activate your tailored Prestigia plan (Digital 5★ Review Accelerator + Reputation Shield). You get your listing back and your reputation secured. Shall we start the protocol today?`
+                        : `Hola estimado/a ${rescueBusinessName || 'propietario'}, para recuperar la titularidad legal de su ficha en Google Maps y transferir el control total a su cuenta oficial mediante el protocolo de Google, le BONIFICAMOS el 100% de los costos de gestión técnica y legal de rescate ($0 USD) al adquirir su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital). Recupera su ficha y blindamos su reputación. ¿Iniciamos el protocolo hoy?`;
                       copyToClipboard(scriptText, isEn ? 'Rescue Proposal' : 'Propuesta de Rescate');
                     }}
                     className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
@@ -6803,7 +6925,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 </div>
 
                 {/* Botón rápido Nuevo Rescate cuando ya hay datos */}
-                {(scannedListing || businessName || rescueSearchQuery) && (
+                {(rescueScannedListing || rescueBusinessName || rescueSearchQuery) && (
                   <button
                     type="button"
                     onClick={handleResetRescueForm}
@@ -6948,9 +7070,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 shrink-0">
-                      {(scannedListing?.googleMapsUrl || googleUrl) && (
+                      {rescueScannedListing?.googleMapsUrl && (
                         <a
-                          href={scannedListing?.googleMapsUrl || googleUrl}
+                          href={rescueScannedListing.googleMapsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition flex items-center gap-1.5 border border-slate-700 cursor-pointer"
@@ -7046,15 +7168,15 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
                         const scriptText = isEn
                           ? rescueScenario === 'orphan'
-                            ? `Hello ${businessName || 'Business Owner'}, this is the Prestigia team. We audited your Google Maps presence and discovered a critical vulnerability: your business listing exists but is currently 'Unclaimed / Orphan'. Any third party or competitor can suggest edits or claim ownership. At Prestigia, we can process your official ownership claim today and secure full legal control without altering your existing reviews or SEO ranking. Shall we start your protection protocol?`
+                            ? `Hello ${rescueBusinessName || 'Business Owner'}, this is the Prestigia team. We audited your Google Maps presence and discovered a critical vulnerability: your business listing exists but is currently 'Unclaimed / Orphan'. Any third party or competitor can suggest edits or claim ownership. At Prestigia, we can process your official ownership claim today and secure full legal control without altering your existing reviews or SEO ranking. Shall we start your protection protocol?`
                             : rescueScenario === 'third_party'
-                            ? `Hello ${businessName || 'Business Owner'}, this is the Prestigia team. Upon auditing your business on Google Maps, we noticed your official listing is linked to an external email ${emailSnippet} and you lack Primary Owner access. Do not worry: creating a new listing is NOT necessary (doing so causes duplicate listing penalties). We execute Google's Official 72-Hour Legal Ownership Protocol to request ownership and transfer complete control directly to your personal account within a week, preserving all reviews and photos. Shall we initiate the protocol today?`
-                            : `Hello ${businessName || 'Business Owner'}, this is the Prestigia team. If a previous agency or ex-employee refused to transfer your Google Maps profile, Google's official policies protect your legitimate ownership. We submit an evidentiary appeal dossier with your corporate tax documentation and storefront evidence so Google Support revokes the third party and restores complete ownership to you. Would you like us to draft the official appeal?`
+                            ? `Hello ${rescueBusinessName || 'Business Owner'}, this is the Prestigia team. Upon auditing your business on Google Maps, we noticed your official listing is linked to an external email ${emailSnippet} and you lack Primary Owner access. Do not worry: creating a new listing is NOT necessary (doing so causes duplicate listing penalties). We execute Google's Official 72-Hour Legal Ownership Protocol to request ownership and transfer complete control directly to your personal account within a week, preserving all reviews and photos. Shall we initiate the protocol today?`
+                            : `Hello ${rescueBusinessName || 'Business Owner'}, this is the Prestigia team. If a previous agency or ex-employee refused to transfer your Google Maps profile, Google's official policies protect your legitimate ownership. We submit an evidentiary appeal dossier with your corporate tax documentation and storefront evidence so Google Support revokes the third party and restores complete ownership to you. Would you like us to draft the official appeal?`
                           : rescueScenario === 'orphan'
-                          ? `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. En Prestigia podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?`
+                          ? `Hola estimado/a ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. En Prestigia podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?`
                           : rescueScenario === 'third_party'
-                          ? `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${emailSnippet} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?`
-                          : `Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?`;
+                          ? `Hola estimado/a ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${emailSnippet} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?`
+                          : `Hola estimado/a ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?`;
                         copyToClipboard(scriptText, isEn ? 'WhatsApp Script' : 'Guion de WhatsApp');
                       }}
                       className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold transition flex items-center gap-1.5 cursor-pointer border border-amber-500/40"
@@ -7066,10 +7188,10 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
                   <p className="text-xs text-slate-300 italic leading-relaxed p-4 rounded-xl bg-slate-950 border border-slate-800">
                     {rescueScenario === 'orphan'
-                      ? `"Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. En Prestigia podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?"`
+                      ? `"Hola estimado/a ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. En Prestigia podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?"`
                       : rescueScenario === 'third_party'
-                      ? `"Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${rescueMaskedEmail.trim() ? `(${rescueMaskedEmail.trim()})` : '(un correo externo no autorizado)'} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?"`
-                      : `"Hola estimado/a ${businessName || 'propietario'}, le saluda el equipo de Prestigia. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?"`}
+                      ? `"Hola estimado/a ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${rescueMaskedEmail.trim() ? `(${rescueMaskedEmail.trim()})` : '(un correo externo no autorizado)'} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?"`
+                      : `"Hola estimado/a ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?"`}
                   </p>
                 </div>
               </div>
@@ -7192,7 +7314,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                 <button
                   type="button"
                   onClick={() => {
-                    const script = `Hola ${businessName || 'propietario'}, le saluda el equipo de Prestigia con una alerta prioritaria de su negocio en Google Maps. Detectamos que su ficha oficial se encuentra actualmente secuestrada por un tercero / suspendida por Google. Los clientes que buscan su negocio en ${city || 'su ciudad'} están llamando a números que no le pertenecen o no pueden encontrar su dirección. Por favor NO cometa el grave error de crear una ficha nueva: Google la suspenderá por duplicidad y usted perderá todas sus reseñas, fotos y años de antigüedad comercial. En Prestigia somos especialistas certificados en rescates de titularidad y ejecutamos el Protocolo Oficial de 72 Horas de Google para radicar el expediente probatorio y devolverle el control legal absoluto de su perfil. Al activar hoy su Plan Prestigia a la medida para blindar su reputación, nosotros absorbemos el 100% del costo legal y técnico de rescate ($0 bonificado) y blindamos su ficha para que nunca nadie vuelva a quitársela. ¿Nos autoriza a radicar la solicitud de titularidad hoy mismo?`;
+                    const script = `Hola ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia con una alerta prioritaria de su negocio en Google Maps. Detectamos que su ficha oficial se encuentra actualmente secuestrada por un tercero / suspendida por Google. Los clientes que buscan su negocio en ${rescueCity || 'su ciudad'} están llamando a números que no le pertenecen o no pueden encontrar su dirección. Por favor NO cometa el grave error de crear una ficha nueva: Google la suspenderá por duplicidad y usted perderá todas sus reseñas, fotos y años de antigüedad comercial. En Prestigia somos especialistas certificados en rescates de titularidad y ejecutamos el Protocolo Oficial de 72 Horas de Google para radicar el expediente probatorio y devolverle el control legal absoluto de su perfil. Al activar hoy su Plan Prestigia a la medida para blindar su reputación, nosotros absorbemos el 100% del costo legal y técnico de rescate ($0 bonificado) y blindamos su ficha para que nunca nadie vuelva a quitársela. ¿Nos autoriza a radicar la solicitud de titularidad hoy mismo?`;
                     copyToClipboard(script, 'Guión de Rescate de Ficha');
                   }}
                   className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg shadow-rose-600/20 cursor-pointer shrink-0 active:scale-98"
@@ -7208,7 +7330,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   🎙️ Speech de Urgencia & Rescate de Titularidad:
                 </span>
                 <p>
-                  "Hola <strong>{businessName || 'propietario'}</strong>, le saluda el equipo de Prestigia con una alerta urgente. Su ficha en Google Maps está actualmente <strong>secuestrada por un tercero / suspendida</strong>. Clientes que buscan su negocio están llamando a números ajenos. <strong>NO cree una ficha nueva</strong>: Google la sancionará por duplicidad y perderá todas sus reseñas. Nosotros ejecutamos el protocolo legal de 72h con Google Trust & Safety para restituirle la titularidad legítima."
+                  "Hola <strong>{rescueBusinessName || 'propietario'}</strong>, le saluda el equipo de Prestigia con una alerta urgente. Su ficha en Google Maps está actualmente <strong>secuestrada por un tercero / suspendida</strong>. Clientes que buscan su negocio están llamando a números ajenos. <strong>NO cree una ficha nueva</strong>: Google la sancionará por duplicidad y perderá todas sus reseñas. Nosotros ejecutamos el protocolo legal de 72h con Google Trust & Safety para restituirle la titularidad legítima."
                 </p>
               </div>
 
@@ -7376,8 +7498,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="text"
-                        value={contactName}
-                        onChange={(e) => setContactName(e.target.value)}
+                        value={appealContactName}
+                        onChange={(e) => setAppealContactName(e.target.value)}
                         placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -7389,8 +7511,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="text"
-                        value={contactCompany}
-                        onChange={(e) => setContactCompany(e.target.value)}
+                        value={appealContactCompany}
+                        onChange={(e) => setAppealContactCompany(e.target.value)}
                         placeholder={isEn ? 'e.g. Acme Services LLC' : 'Ej: Restaurante El Sabor SAS'}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -7401,9 +7523,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
                         <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
-                        {contactPhone && (
+                        {appealContactPhone && (
                           <a
-                            href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
+                            href={`https://wa.me/${appealContactPhone.replace(/[^0-9]/g, '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
@@ -7414,8 +7536,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="tel"
-                        value={contactPhone}
-                        onChange={(e) => setContactPhone(e.target.value)}
+                        value={appealContactPhone}
+                        onChange={(e) => setAppealContactPhone(e.target.value)}
                         placeholder="+57 300 123 4567"
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -7427,8 +7549,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </label>
                       <input
                         type="email"
-                        value={contactEmail}
-                        onChange={(e) => setContactEmail(e.target.value)}
+                        value={appealContactEmail}
+                        onChange={(e) => setAppealContactEmail(e.target.value)}
                         placeholder="contacto@empresa.com"
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
@@ -7439,8 +7561,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         {isEn ? 'Role' : 'Cargo / Relación'}
                       </label>
                       <select
-                        value={contactRole}
-                        onChange={(e) => setContactRole(e.target.value)}
+                        value={appealContactRole}
+                        onChange={(e) => setAppealContactRole(e.target.value)}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
                       >
                         <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
@@ -8102,7 +8224,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
             </div>
 
             {/* If no listing is loaded or active, show the Activation Screen */}
-            {!Boolean(businessName.trim() || scannedListing || isDemoMode) ? (
+            {!Boolean(toolsBusinessName.trim() || toolsScannedListing || isDemoMode) ? (
               <div className="p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-center space-y-6 shadow-2xl">
                 <div className="w-16 h-16 rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400 shadow-lg">
                   <Crosshair className="w-8 h-8" />
@@ -8171,9 +8293,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       type="button"
                       onClick={() => {
                         setIsDemoMode(true);
-                        setBusinessName('Negocio de Ejemplo');
-                        setCity('Bogotá');
-                        setGeoGridKeyword(getDefaultKeywordByNiche(category, 'Bogotá', isEn));
+                        setToolsBusinessName('Negocio de Ejemplo');
+                        setToolsCity('Bogotá');
+                        setGeoGridKeyword(getDefaultKeywordByNiche(toolsCategory, 'Bogotá', isEn));
                       }}
                       className="text-xs text-slate-500 hover:text-amber-400 transition cursor-pointer underline underline-offset-4"
                     >
@@ -8193,27 +8315,27 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                           <span>{tTools.toolsDetectedBadge}</span>
                         </span>
-                        <span className="text-[10px] font-mono text-slate-400">{category}</span>
+                        <span className="text-[10px] font-mono text-slate-400">{toolsCategory}</span>
                         {isDemoMode && (
                           <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/30">
                             {isEn ? 'Demo Mode' : 'Modo Demostración'}
                           </span>
                         )}
                       </div>
-                      <h3 className="font-black text-white text-sm">{businessName || scannedListing?.name}</h3>
-                      {(scannedListing?.address || city) && (
-                        <p className="text-[11px] text-slate-400 truncate">{scannedListing?.address || city}</p>
+                      <h3 className="font-black text-white text-sm">{toolsBusinessName || toolsScannedListing?.name}</h3>
+                      {(toolsScannedListing?.address || toolsCity) && (
+                        <p className="text-[11px] text-slate-400 truncate">{toolsScannedListing?.address || toolsCity}</p>
                       )}
                     </div>
 
                     <div className="flex items-center gap-3 shrink-0">
                       <div className="text-right text-[11px] font-mono">
-                        <span className="text-amber-400 font-black text-sm">★ {scannedListing?.rating?.toFixed(1) || existingRating.toFixed(1)}</span>
-                        <span className="text-slate-400 block">{scannedListing?.reviewsCount || existingReviews} {isEn ? 'reviews' : 'reseñas'}</span>
+                        <span className="text-amber-400 font-black text-sm">★ {toolsScannedListing?.rating?.toFixed(1) || toolsExistingRating.toFixed(1)}</span>
+                        <span className="text-slate-400 block">{toolsScannedListing?.reviewsCount || toolsExistingReviews} {isEn ? 'reviews' : 'reseñas'}</span>
                       </div>
-                      {scannedListing?.googleMapsUrl && (
+                      {toolsScannedListing?.googleMapsUrl && (
                         <a
-                          href={scannedListing.googleMapsUrl}
+                          href={toolsScannedListing?.googleMapsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold transition flex items-center gap-1 border border-slate-700 cursor-pointer"
@@ -8225,9 +8347,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       <button
                         type="button"
                         onClick={() => {
-                          setBusinessName('');
-                          setCity('');
-                          setScannedListing(null);
+                          setToolsBusinessName('');
+                          setToolsCity('');
+                          setToolsScannedListing(null);
                           setIsDemoMode(false);
                           setToolsSearchQuery('');
                           setGeoGridKeyword('');
@@ -8318,13 +8440,13 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   <div className="md:col-span-7 bg-slate-950 p-6 rounded-3xl border border-slate-800 relative">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-800 text-xs">
                       <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                        {tTools.satMap} ({city || (isEn ? 'Your City' : 'Tu Ciudad')})
+                        {tTools.satMap} ({toolsCity || (isEn ? 'Your City' : 'Tu Ciudad')})
                       </span>
                       <div className="flex items-center gap-1.5">
                         <span className="text-amber-400 font-bold text-[10px] shrink-0">{tTools.keyword}</span>
                         <input
                           type="text"
-                          value={geoGridKeyword !== '' ? geoGridKeyword : getDefaultKeywordByNiche(category, city, isEn)}
+                          value={geoGridKeyword !== '' ? geoGridKeyword : getDefaultKeywordByNiche(toolsCategory, toolsCity, isEn)}
                           onChange={(e) => setGeoGridKeyword(e.target.value)}
                           placeholder={tTools.toolsKeywordPlaceholder}
                           className="px-2.5 py-1 rounded-lg bg-slate-900 border border-amber-500/40 text-amber-300 font-black text-xs focus:outline-none focus:border-amber-400 w-52 sm:w-64"
@@ -8375,9 +8497,9 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </span>
                       <p className="text-slate-200 leading-relaxed text-xs">
                         {tTools.diagAdvisorBody(
-                          businessName,
+                          toolsBusinessName,
                           geoGridRadius,
-                          geoGridKeyword !== '' ? geoGridKeyword : getDefaultKeywordByNiche(category, city, isEn)
+                          geoGridKeyword !== '' ? geoGridKeyword : getDefaultKeywordByNiche(toolsCategory, toolsCity, isEn)
                         )}
                       </p>
                     </div>
@@ -8602,7 +8724,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             <Sparkles className="w-3.5 h-3.5" />
                             {tTools.advisorClose}
                           </strong>
-                          {tTools.advisorCloseBody(businessName, monthlyLoss, monthlyGain, breakEvenClients)}
+                          {tTools.advisorCloseBody(toolsBusinessName, monthlyLoss, monthlyGain, breakEvenClients)}
                         </div>
                       </div>
                     </div>
@@ -8651,10 +8773,10 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       </div>
                       <div className="min-w-0 flex-1">
                         <strong className="text-white text-[11px] block truncate">
-                          {businessName || (isEn ? 'Active Client Profile' : 'Ficha Activa del Cliente')}
+                          {toolsBusinessName || (isEn ? 'Active Client Profile' : 'Ficha Activa del Cliente')}
                         </strong>
                         <span className="text-[10px] text-emerald-300/80 block">
-                          {city ? `${city} • ` : ''}{isEn ? 'Data auto-synced from Google Maps' : 'Datos sincronizados de Google Maps'}
+                          {toolsCity ? `${toolsCity} • ` : ''}{isEn ? 'Data auto-synced from Google Maps' : 'Datos sincronizados de Google Maps'}
                         </span>
                       </div>
                     </div>
@@ -8667,7 +8789,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         <div className="relative">
                           <input
                             type="text"
-                            value={businessName}
+                            value={toolsBusinessName}
                             readOnly
                             className="w-full pl-3 pr-8 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-emerald-300 font-bold text-xs cursor-not-allowed select-none focus:outline-none"
                           />
@@ -8683,7 +8805,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           <div className="relative">
                             <input
                               type="text"
-                              value={`${existingRating} ★`}
+                              value={`${toolsExistingRating} ★`}
                               readOnly
                               className="w-full pl-3 pr-8 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-amber-300 font-black text-xs cursor-not-allowed select-none focus:outline-none"
                             />
@@ -8697,7 +8819,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           <div className="relative">
                             <input
                               type="text"
-                              value={`${existingReviews.toLocaleString()} ${isEn ? 'reviews' : 'opiniones'}`}
+                              value={`${toolsExistingReviews.toLocaleString()} ${isEn ? 'reviews' : 'opiniones'}`}
                               readOnly
                               className="w-full pl-3 pr-8 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-white font-black text-xs cursor-not-allowed select-none focus:outline-none"
                             />
@@ -8876,7 +8998,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
                 {/* Head-to-Head Comparison & Algorithm Metrics */}
                 {(() => {
-                  const clientReviews = existingReviews || 0;
+                  const clientReviews = toolsExistingReviews || 0;
                   const isClientHigherInReviews = clientReviews >= rivalReviews;
                   const absReviewGap = Math.abs(rivalReviews - clientReviews);
                   const photoGap = Math.max(0, rivalPhotos - 14);
@@ -9143,7 +9265,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             type="button"
                             onClick={() =>
                               copyToClipboard(
-                                tTools.spyPitchText(businessName, rivalName, weeksToSurpass, clientReviews, rivalReviews),
+                                tTools.spyPitchText(toolsBusinessName, rivalName, weeksToSurpass, clientReviews, rivalReviews),
                                 isEn ? 'Closing Pitch' : 'Argumento de Cierre'
                               )
                             }
@@ -9154,7 +9276,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                           </button>
                         </div>
                         <p className="text-xs text-amber-100/90 italic leading-relaxed bg-slate-900/80 p-3.5 rounded-2xl border border-amber-500/20">
-                          {tTools.spyPitchText(businessName, rivalName, weeksToSurpass, clientReviews, rivalReviews)}
+                          {tTools.spyPitchText(toolsBusinessName, rivalName, weeksToSurpass, clientReviews, rivalReviews)}
                         </p>
                       </div>
                     </div>
@@ -9436,7 +9558,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <button
                       type="button"
                       onClick={() => {
-                        setTargetCountryForNewCity(dossierCountryFilter !== 'all' ? dossierCountryFilter : country || 'Colombia');
+                        setTargetCountryForNewCity(dossierCountryFilter !== 'all' ? dossierCountryFilter : 'Colombia');
                         setShowAddCityModal(true);
                       }}
                       className="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[10px] font-bold flex items-center gap-1 border border-amber-500/30 transition cursor-pointer"
@@ -10291,7 +10413,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     <button
                       type="button"
                       onClick={() => {
-                        setTargetCountryForNewCity(networkCountryFilter !== 'all' ? networkCountryFilter : country || 'Colombia');
+                        setTargetCountryForNewCity(networkCountryFilter !== 'all' ? networkCountryFilter : 'Colombia');
                         setShowAddCityModal(true);
                       }}
                       className="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[10px] font-bold flex items-center gap-1 border border-amber-500/30 transition cursor-pointer"
