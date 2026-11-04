@@ -28,6 +28,7 @@ export async function GET(request: Request) {
       creates: advisorMonthDossiers.filter((d) => d.mode === 'create').length,
       audits: advisorMonthDossiers.filter((d) => d.mode === 'audit').length,
       rescues: advisorMonthDossiers.filter((d) => d.mode === 'rescue').length,
+      appeals: advisorMonthDossiers.filter((d) => d.mode === 'appeal').length,
     };
 
     if (isLuisma) {

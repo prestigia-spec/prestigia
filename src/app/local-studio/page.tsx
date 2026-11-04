@@ -64,8 +64,11 @@ import {
   User,
   Mail,
   Power,
+  Scale,
+  Gavel,
+  FileText,
 } from 'lucide-react';
-import type { GooglePlaceData } from '@/app/api/auditor/google-lookup/route';
+import type { GooglePlaceData, NegativeReviewItem } from '@/app/api/auditor/google-lookup/route';
 
 interface StudioAdvisorUser {
   id: string;
@@ -83,6 +86,7 @@ interface StudioAdvisorUser {
   maxCreatesMonthly?: number;
   maxAuditsMonthly?: number;
   maxRescuesMonthly?: number;
+  maxAppealsMonthly?: number;
 }
 
 interface ServiceCatalogItem {
@@ -175,7 +179,7 @@ interface StudioDossierRecord {
   city: string;
   neighborhood?: string;
   googleUrl?: string;
-  mode: 'create' | 'audit' | 'rescue';
+  mode: 'create' | 'audit' | 'rescue' | 'appeal';
   businessModel?: 'storefront' | 'service_area';
   status: 'draft' | 'presented' | 'closed';
   closingStatus?: 'prestigia_subscriber' | 'setup_paid' | 'proposal_sent' | 'negotiating' | 'lead_draft';
@@ -186,7 +190,7 @@ interface StudioDossierRecord {
   closingNotes?: string;
   deletedByAdvisor?: boolean;
   deletedAt?: string;
-  data: BlueprintData;
+  data: any;
   createdAt: string;
   updatedAt: string;
 }
@@ -614,11 +618,12 @@ const UI_TEXT = {
     tabCreate: '1. Crear Ficha',
     tabAudit: '2. Auditar & Optimizar',
     tabRescue: '3. Rescatar Ficha',
-    tabTools: '4. Armas Top 3',
-    tabDossiers: '5. Mis Clientes',
-    tabGuide: '6. Guía Google',
-    tabPitch: '7. Guion Comercial',
-    tabNetwork: '8. Red Asesores B2B',
+    tabAppeals: '4. Apelar Reseñas 1-3★',
+    tabTools: '5. Armas Top 3',
+    tabDossiers: '6. Mis Clientes',
+    tabGuide: '7. Guía Google',
+    tabPitch: '8. Guion Comercial',
+    tabNetwork: '9. Red Asesores B2B',
     mod1Badge: 'Módulo 1: Para Negocios sin Google Maps',
     mod1Title: 'Constructor de Ficha Ganadora (Arquitectura Top 3)',
     mod1Desc: 'Ingresa los datos básicos del negocio. La inteligencia artificial de Prestigia generará el expediente técnico exacto (categorías secretas, título optimizado, copy de 745 caracteres, catálogo y guía de verificación) para configurar la ficha en Google en menos de 10 minutos.',
@@ -699,11 +704,12 @@ const UI_TEXT = {
     tabCreate: '1. Build Listing',
     tabAudit: '2. Audit & Optimize',
     tabRescue: '3. Rescue Listing',
-    tabTools: '4. Top 3 Weapons',
-    tabDossiers: '5. My Clients',
-    tabGuide: '6. Google Guide',
-    tabPitch: '7. Sales Pitch',
-    tabNetwork: '8. B2B Network',
+    tabAppeals: '4. Appeal 1-3★ Reviews',
+    tabTools: '5. Top 3 Weapons',
+    tabDossiers: '6. My Clients',
+    tabGuide: '7. Google Guide',
+    tabPitch: '8. Sales Pitch',
+    tabNetwork: '9. B2B Network',
     mod1Badge: 'Module 1: For Businesses Without Google Maps',
     mod1Title: 'Winning Listing Builder (Top 3 Architecture)',
     mod1Desc: 'Enter the basic business details. Prestigia AI will generate the exact technical blueprint (secret categories, optimized title, 745-char copy, catalog, and verification guide) to set up on Google in under 10 minutes.',
@@ -1056,6 +1062,7 @@ const TXT_DOSSIERS = {
     filterCreate: '🏗️ Fichas Nuevas',
     filterAudit: '🔬 Auditorías Top 3',
     filterRescue: '🛡️ Rescates 72h',
+    filterAppeal: '⚖️ Apelaciones 1-3★',
     filterCountry: 'País:',
     filterCity: 'Ciudad:',
     filterNeighborhood: 'Barrio / Localidad:',
@@ -1104,6 +1111,7 @@ const TXT_DOSSIERS = {
     filterCreate: '🏗️ New Listings',
     filterAudit: '🔬 Top 3 Audits',
     filterRescue: '🛡️ 72h Rescues',
+    filterAppeal: '⚖️ 1-3★ Appeals',
     filterCountry: 'Country:',
     filterCity: 'City:',
     filterNeighborhood: 'Neighborhood:',
@@ -1385,7 +1393,7 @@ export default function LocalStudioPage() {
   }, []);
 
   // Active Workspace Tab
-  const [activeTab, setActiveTab] = useState<'create' | 'audit' | 'rescue' | 'tools' | 'dossiers' | 'guide' | 'pitch' | 'advisors' | 'network'>('create');
+  const [activeTab, setActiveTab] = useState<'create' | 'audit' | 'rescue' | 'appeals' | 'tools' | 'dossiers' | 'guide' | 'pitch' | 'advisors' | 'network'>('create');
 
   // Toast Notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -1661,6 +1669,27 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [rescueSearchQuery, setRescueSearchQuery] = useState('');
   const [isRescueScanning, setIsRescueScanning] = useState(false);
 
+  // Tab 4: Apelación y Rescate Legal de Reseñas 1-3★
+  const [appealSearchQuery, setAppealSearchQuery] = useState('');
+  const [isScanningAppeals, setIsScanningAppeals] = useState(false);
+  const [scannedAppealBiz, setScannedAppealBiz] = useState<GooglePlaceData | null>(null);
+  const [appealReviewsList, setAppealReviewsList] = useState<NegativeReviewItem[]>([]);
+  const [selectedAppealReview, setSelectedAppealReview] = useState<NegativeReviewItem | null>(null);
+  const [isGeneratingAppeal, setIsGeneratingAppeal] = useState(false);
+  const [activeAppealDossier, setActiveAppealDossier] = useState<any | null>(null);
+  const [appealSuccessCopied, setAppealSuccessCopied] = useState<string | null>(null);
+
+  // Manual Review Form State
+  const [showManualReviewForm, setShowManualReviewForm] = useState(false);
+  const [manualAuthor, setManualAuthor] = useState('');
+  const [manualRating, setManualRating] = useState<number>(1);
+  const [manualTimeAgo, setManualTimeAgo] = useState('Reciente');
+  const [manualText, setManualText] = useState('');
+  const [manualContextFlag, setManualContextFlag] = useState<
+    'competitor' | 'ex_employee' | 'fake_customer' | 'defamation' | 'off_topic' | 'extortion' | 'general_bad_faith'
+  >('fake_customer');
+  const [manualNotes, setManualNotes] = useState('');
+
   // Rival Spy (Head-to-Head Competitor Radar) State
   const [rivalSearchQuery, setRivalSearchQuery] = useState('');
   const [isRivalScanning, setIsRivalScanning] = useState(false);
@@ -1803,13 +1832,13 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
 
   const [isLoadingDossiers, setIsLoadingDossiers] = useState(false);
   const [dossierSearch, setDossierSearch] = useState('');
-  const [dossierModeFilter, setDossierModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue'>('all');
+  const [dossierModeFilter, setDossierModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue' | 'appeal'>('all');
   const [dossierCountryFilter, setDossierCountryFilter] = useState<string>('all');
   const [dossierCityFilter, setDossierCityFilter] = useState<string>('all');
   const [dossierNeighborhoodFilter, setDossierNeighborhoodFilter] = useState<string>('all');
   const [dossierClosingFilter, setDossierClosingFilter] = useState<string>('all');
   const [editingDossierClosing, setEditingDossierClosing] = useState<StudioDossierRecord | null>(null);
-  const [closingFormMode, setClosingFormMode] = useState<'create' | 'audit' | 'rescue'>('audit');
+  const [closingFormMode, setClosingFormMode] = useState<'create' | 'audit' | 'rescue' | 'appeal'>('audit');
   const [closingFormStatus, setClosingFormStatus] = useState<'prestigia_subscriber' | 'setup_paid' | 'proposal_sent' | 'negotiating' | 'lead_draft'>('prestigia_subscriber');
   const [closingFormSetupFee, setClosingFormSetupFee] = useState<number>(0);
   const [closingFormMonthlyPlan, setClosingFormMonthlyPlan] = useState<number>(199);
@@ -1824,7 +1853,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [networkTypeFilter, setNetworkTypeFilter] = useState<'all' | 'director' | 'internal_advisor' | 'partner_agency'>('all');
   const [networkCountryFilter, setNetworkCountryFilter] = useState('all');
   const [networkCityFilter, setNetworkCityFilter] = useState('all');
-  const [networkModeFilter, setNetworkModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue'>('all');
+  const [networkModeFilter, setNetworkModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue' | 'appeal'>('all');
   const [networkActiveFilter, setNetworkActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({});
   const [viewingAdvisorWorks, setViewingAdvisorWorks] = useState<StudioAdvisorUser | null>(null);
@@ -1846,13 +1875,15 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [editAdvisorMaxCreates, setEditAdvisorMaxCreates] = useState<number>(30);
   const [editAdvisorMaxAudits, setEditAdvisorMaxAudits] = useState<number>(30);
   const [editAdvisorMaxRescues, setEditAdvisorMaxRescues] = useState<number>(10);
+  const [editAdvisorMaxAppeals, setEditAdvisorMaxAppeals] = useState<number>(15);
   const [isUpdatingAdvisor, setIsUpdatingAdvisor] = useState<boolean>(false);
 
   // Live Monthly Quota & Usage Monitor
-  const [monthlyUsage, setMonthlyUsage] = useState<{ creates: number; audits: number; rescues: number }>({
+  const [monthlyUsage, setMonthlyUsage] = useState<{ creates: number; audits: number; rescues: number; appeals: number }>({
     creates: 0,
     audits: 0,
     rescues: 0,
+    appeals: 0,
   });
 
   // Advisors & Agencies List (for Admin tab)
@@ -1910,6 +1941,7 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
   const [newAdvisorMaxCreates, setNewAdvisorMaxCreates] = useState<number>(30);
   const [newAdvisorMaxAudits, setNewAdvisorMaxAudits] = useState<number>(30);
   const [newAdvisorMaxRescues, setNewAdvisorMaxRescues] = useState<number>(10);
+  const [newAdvisorMaxAppeals, setNewAdvisorMaxAppeals] = useState<number>(15);
   const [adminMasterKey, setAdminMasterKey] = useState('admin');
   const [isSavingAdvisor, setIsSavingAdvisor] = useState(false);
 
@@ -2026,6 +2058,176 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+
+  const handleResetAppealForm = () => {
+    setAppealSearchQuery('');
+    setScannedAppealBiz(null);
+    setAppealReviewsList([]);
+    setSelectedAppealReview(null);
+    setActiveAppealDossier(null);
+    setShowManualReviewForm(false);
+    setManualAuthor('');
+    setManualRating(1);
+    setManualTimeAgo('Reciente');
+    setManualText('');
+    setManualContextFlag('fake_customer');
+    setManualNotes('');
+    setContactName('');
+    setContactCompany('');
+    setContactPhone('');
+    setContactEmail('');
+    setContactRole('Dueño / Propietario');
+    showToast(isEn ? '✨ Ready to scan or appeal another review' : '✨ Formulario listo para una nueva apelación');
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleScanForAppeals = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const query = appealSearchQuery.trim();
+    if (!query) {
+      showToast(isEn ? '⚠️ Please enter the Google Maps link or business name' : '⚠️ Ingresa el enlace de Google Maps o nombre del negocio');
+      return;
+    }
+    setIsScanningAppeals(true);
+    try {
+      const res = await fetch('/api/auditor/google-lookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        const place: GooglePlaceData = data.data;
+        setScannedAppealBiz(place);
+        if (place.name && !contactCompany) {
+          setContactCompany(place.name);
+        }
+        if (place.phone && !contactPhone) {
+          setContactPhone(place.phone);
+        }
+        if (place.negativeReviews && place.negativeReviews.length > 0) {
+          setAppealReviewsList(place.negativeReviews);
+        }
+        showToast(isEn ? `✅ Listing scanned: ${place.name}` : `✅ Ficha detectada: ${place.name} (${place.rating}★)`);
+      } else {
+        showToast(data.error || (isEn ? 'Could not scan listing' : 'No se pudo escanear la ficha'));
+      }
+    } catch (err: any) {
+      showToast(isEn ? 'Connection error scanning listing' : 'Error de conexión al escanear la ficha');
+    } finally {
+      setIsScanningAppeals(false);
+    }
+  };
+
+  const handleGenerateAppealForReview = async (review: NegativeReviewItem, customNotes?: string) => {
+    const userMaxAppeals = currentUser?.maxAppealsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 25 : currentUser?.accountType === 'director' ? 50 : 15);
+    if (!isLuismaMaster && monthlyUsage.appeals >= userMaxAppeals) {
+      showToast(
+        isEn
+          ? `⚠️ Monthly limit of ${userMaxAppeals} review appeals reached. Contact General Directorate.`
+          : `⚠️ Has alcanzado tu cupo mensual de ${userMaxAppeals} apelaciones de reseñas. Contacta a Dirección General para ampliar tu plan.`
+      );
+      return;
+    }
+
+    setSelectedAppealReview(review);
+    setIsGeneratingAppeal(true);
+    setActiveAppealDossier(null);
+
+    const bizName = (scannedAppealBiz?.name || businessName || contactCompany || 'Negocio').trim();
+    const bizCategory = scannedAppealBiz?.category || category;
+    const bizCity = city || 'Colombia';
+
+    try {
+      const res = await fetch('/api/local-studio/appeal-review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          businessName: bizName,
+          category: bizCategory,
+          city: bizCity,
+          authorName: review.author,
+          rating: review.rating,
+          reviewDate: review.timeAgo,
+          reviewText: review.text,
+          contextFlag: review.contextFlag,
+          additionalNotes: customNotes || manualNotes,
+          contactName,
+          contactCompany: contactCompany || bizName,
+          contactPhone,
+          contactEmail,
+        }),
+      });
+
+      const resData = await res.json();
+      if (resData.success && resData.dossier) {
+        setActiveAppealDossier(resData.dossier);
+        setMonthlyUsage((prev) => ({ ...prev, appeals: (prev.appeals || 0) + 1 }));
+
+        try {
+          await fetch('/api/local-studio/dossiers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: resData.dossier.id,
+              advisorId: currentUser?.id || (isLuismaMaster ? 'adv-luisma' : 'adv-anon'),
+              advisorName: currentUser?.name || 'Luisma • Director General & Founder',
+              advisorPhone: currentUser?.phone || '+573058314049',
+              advisorType: currentUser?.accountType || 'founder',
+              country: currentUser?.country || 'Colombia',
+              clientName: bizName,
+              contactName,
+              contactCompany: contactCompany || bizName,
+              contactPhone,
+              contactEmail,
+              contactRole,
+              category: bizCategory,
+              city: bizCity,
+              googleUrl: scannedAppealBiz?.googleMapsUrl || googleUrl,
+              mode: 'appeal',
+              status: 'draft',
+              data: resData.dossier,
+            }),
+          });
+          fetchDossiers();
+        } catch (saveErr) {
+          console.warn('Could not auto-save appeal dossier:', saveErr);
+        }
+
+        showToast(isEn ? '⚖️ Legal appeal dossier generated successfully!' : '⚖️ ¡Expediente de apelación legal generado con éxito!');
+      } else {
+        showToast(resData.error || (isEn ? 'Error generating appeal' : 'Error al generar la apelación'));
+      }
+    } catch (err: any) {
+      showToast(isEn ? 'Connection error generating appeal' : 'Error de conexión al generar la apelación');
+    } finally {
+      setIsGeneratingAppeal(false);
+    }
+  };
+
+  const handleAddManualReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualText.trim()) {
+      showToast(isEn ? '⚠️ Please enter the review text' : '⚠️ Por favor escribe o pega el texto de la reseña');
+      return;
+    }
+    const newRev: NegativeReviewItem = {
+      id: `manual-rev-${Date.now()}`,
+      author: manualAuthor.trim() || 'Usuario anónimo de Google',
+      rating: manualRating,
+      timeAgo: manualTimeAgo.trim() || 'Reciente',
+      text: manualText.trim(),
+      contextFlag: manualContextFlag,
+      detectedReason: `Ingresada manualmente • Causa: ${manualContextFlag}`,
+      viability: 'ALTA',
+    };
+    setAppealReviewsList((prev) => [newRev, ...prev]);
+    setShowManualReviewForm(false);
+    showToast(isEn ? '✅ Negative review added to radar' : '✅ Reseña crítica añadida al radar de impugnaciones');
+    handleGenerateAppealForReview(newRev, manualNotes);
   };
 
   // -------------------------------------------------------------
@@ -2869,8 +3071,25 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
     setCity(dossier.city);
     setNeighborhood(dossier.neighborhood || '');
     setGoogleUrl(dossier.googleUrl || '');
-    setGeneratedData(dossier.data);
-    setActiveTab(dossier.mode === 'audit' ? 'audit' : dossier.mode === 'rescue' ? 'rescue' : 'create');
+    if (dossier.mode === 'appeal') {
+      setActiveAppealDossier(dossier.data);
+      if (dossier.data?.authorName) {
+        setSelectedAppealReview({
+          id: dossier.id,
+          author: dossier.data.authorName,
+          rating: dossier.data.rating || 1,
+          timeAgo: dossier.data.reviewDate || 'Reciente',
+          text: dossier.data.reviewText || '',
+          contextFlag: dossier.data.contextFlag || 'fake_customer',
+          detectedReason: dossier.data.contextLabel || 'Impugnación previa',
+          viability: dossier.data.successProbability || 'ALTA',
+        });
+      }
+      setActiveTab('appeals');
+    } else {
+      setGeneratedData(dossier.data);
+      setActiveTab(dossier.mode === 'audit' ? 'audit' : dossier.mode === 'rescue' ? 'rescue' : 'create');
+    }
     showToast(`Expediente cargado: ${dossier.clientName}`);
   };
 
@@ -3617,6 +3836,19 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
             >
               <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="truncate">{t.tabRescue}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('appeals')}
+              className={`flex-1 min-w-0 px-2.5 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer text-center ${
+                activeTab === 'appeals'
+                  ? 'bg-gradient-to-r from-rose-500 via-amber-500 to-indigo-600 text-slate-950 shadow-md shadow-rose-500/20'
+                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              <Scale className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="truncate">{t.tabAppeals}</span>
             </button>
 
             <button
@@ -7021,6 +7253,788 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
         )}
 
         {/* =============================================================
+            TAB 4: ESCUDO LEGAL & APELACIÓN DE RESEÑAS 1★ A 3★
+            ============================================================= */}
+        {activeTab === 'appeals' && (
+          <div className="space-y-6">
+            {/* Header intro */}
+            <div className="bg-gradient-to-r from-rose-950/40 via-slate-900 to-indigo-950/30 border border-rose-500/40 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden print:hidden">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300">
+                    {isEn ? '⚖️ Module 4 • Legal Shield & 1★–3★ Review Appeal' : '⚖️ Módulo 4 • Escudo Legal & Apelación de Reseñas 1★ a 3★'}
+                  </span>
+                  <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+                    <Scale className="w-6 h-6 text-amber-400" />
+                    <span>{isEn ? 'Bad-Faith Review Removal & Legal Defense Dossier' : 'Impugnación de Reseñas de Mala Fe & Vicios de Política Google Maps'}</span>
+                  </h1>
+                  <p className="text-xs text-slate-300 max-w-2xl">
+                    {isEn
+                      ? 'Examine your client’s Google Maps profile, detect 1★ to 3★ reviews hurting their score, and generate the formal legal appeal package and mitigation script for Google Trust & Safety.'
+                      : 'Examina la ficha de Google Maps de tu cliente, aísla las opiniones de 1★ a 3★ que dañan su reputación y formula el expediente legal técnico con base en las directrices oficiales de Google Trust & Safety.'}
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 shrink-0">
+                  {/* Credit Counter Badge */}
+                  {isLuismaMaster ? (
+                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                      <Crown className="w-4 h-4 text-amber-400 shrink-0" />
+                      <div className="text-left">
+                        <span className="text-[9px] uppercase font-black tracking-wider text-amber-400/80 block">Créditos de Apelación</span>
+                        <strong className="text-xs font-black text-amber-200">👑 ILIMITADO • Master</strong>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className={`flex items-center gap-2.5 px-3.5 py-1.5 rounded-2xl border transition ${
+                        (monthlyUsage.appeals || 0) >= (currentUser?.maxAppealsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 25 : currentUser?.accountType === 'director' ? 50 : 15))
+                          ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
+                          : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300'
+                      }`}
+                    >
+                      <Zap className="w-4 h-4 text-amber-400 shrink-0" />
+                      <div className="text-left">
+                        <span className="text-[9px] uppercase font-black tracking-wider opacity-80 block">Cupo de Apelaciones</span>
+                        <div className="text-xs font-black flex items-center gap-1">
+                          <span>
+                            {monthlyUsage.appeals || 0} /{' '}
+                            {currentUser?.maxAppealsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 25 : currentUser?.accountType === 'director' ? 50 : 15)} Usadas
+                          </span>
+                          <span className="text-[10px] font-bold opacity-75">
+                            (
+                            {Math.max(
+                              0,
+                              (currentUser?.maxAppealsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 25 : currentUser?.accountType === 'director' ? 50 : 15)) -
+                                (monthlyUsage.appeals || 0)
+                            )}{' '}
+                            disp.)
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="text-right shrink-0">
+                    <span className="text-[10px] text-slate-400 block font-mono">{isEn ? 'Google Workflow SLA' : 'Tiempo de Respuesta Google'}</span>
+                    <span className="text-lg font-black text-amber-400">{isEn ? '3 to 5 Business Days' : '3 a 5 Días Hábiles'}</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleResetAppealForm}
+                    className="px-3.5 py-2 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-rose-500/20 cursor-pointer shrink-0 active:scale-95"
+                    title={isEn ? 'Clear form to run a new appeal' : 'Realizar una nueva apelación desde cero'}
+                  >
+                    <Plus className="w-4 h-4 text-slate-950" />
+                    <span>{isEn ? 'New Appeal' : 'Nueva Apelación'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Appeals Workspace Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column: Client Data + Listing Scanner + Reviews Radar (5 cols) */}
+              <div className="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl print:hidden">
+                <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
+                  <Scale className="w-4 h-4 text-rose-400" />
+                  <h2 className="text-sm font-black text-white">
+                    {isEn ? '1. Client Data & 1★-3★ Reviews Radar' : '1. Datos del Cliente & Radar de Reseñas 1★ a 3★'}
+                  </h2>
+                </div>
+
+                {/* Tarjeta de Datos del Cliente / Contratante */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/30 space-y-2.5">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
+                    <div className="flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-indigo-400" />
+                      <span className="text-xs font-black text-indigo-300">
+                        {isEn ? '👤 Client / Contractor Info (Who Hires & Pays)' : '👤 Datos del Cliente / Contratante (Quién Solicita el Servicio)'}
+                      </span>
+                    </div>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
+                      CRM
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
+                      </label>
+                      <input
+                        type="text"
+                        value={contactName}
+                        onChange={(e) => setContactName(e.target.value)}
+                        placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
+                      </label>
+                      <input
+                        type="text"
+                        value={contactCompany}
+                        onChange={(e) => setContactCompany(e.target.value)}
+                        placeholder={isEn ? 'e.g. Acme Services LLC' : 'Ej: Restaurante El Sabor SAS'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'WhatsApp / Phone' : 'Teléfono / WhatsApp'}
+                      </label>
+                      <input
+                        type="tel"
+                        value={contactPhone}
+                        onChange={(e) => setContactPhone(e.target.value)}
+                        placeholder="+57 300 000 0000"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Email' : 'Correo Electrónico'}
+                      </label>
+                      <input
+                        type="email"
+                        value={contactEmail}
+                        onChange={(e) => setContactEmail(e.target.value)}
+                        placeholder="contacto@empresa.com"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Subcard 2: Google Maps Link Scanner */}
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-slate-300">
+                    {isEn ? 'Google Maps Link or Business Name to Scan *' : 'Enlace de Google Maps o Nombre del Negocio *'}
+                  </label>
+                  <form onSubmit={handleScanForAppeals} className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        value={appealSearchQuery}
+                        onChange={(e) => setAppealSearchQuery(e.target.value)}
+                        placeholder={isEn ? 'Paste Google Maps URL or name...' : 'Pega el link de Google Maps o nombre...'}
+                        className="w-full pl-9 pr-3 py-2.5 rounded-2xl bg-slate-950 border border-slate-700 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isScanningAppeals || !appealSearchQuery.trim()}
+                      className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-md shrink-0"
+                    >
+                      {isScanningAppeals ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
+                          <span>{isEn ? 'Scanning...' : 'Escaneando...'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Search className="w-4 h-4 text-slate-950" />
+                          <span>{isEn ? 'Scan Reviews' : 'Escanear Reseñas'}</span>
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Preview of Scanned Business */}
+                {scannedAppealBiz && (
+                  <div className="p-3 rounded-2xl bg-slate-950 border border-amber-500/30 flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <Building2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span className="text-xs font-black text-white truncate">{scannedAppealBiz.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-400">
+                        <span className="text-amber-400 font-bold flex items-center gap-0.5">
+                          ★ {scannedAppealBiz.rating}
+                        </span>
+                        <span>•</span>
+                        <span>{scannedAppealBiz.reviewsCount} opiniones</span>
+                        <span>•</span>
+                        <span className="truncate">{scannedAppealBiz.category || 'Local'}</span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-500/30 shrink-0">
+                      Verificada
+                    </span>
+                  </div>
+                )}
+
+                {/* Radar of Detected Reviews (1★ to 3★) */}
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center justify-between pb-1 border-b border-slate-800">
+                    <div className="flex items-center gap-1.5">
+                      <ShieldAlert className="w-4 h-4 text-rose-400" />
+                      <span className="text-xs font-black text-white">
+                        {isEn ? 'Critical Reviews Radar (1★ to 3★)' : 'Radar de Reseñas Críticas (1★ a 3★)'}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowManualReviewForm((prev) => !prev)}
+                      className="text-[11px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer transition"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>{showManualReviewForm ? (isEn ? 'Close Form' : 'Cerrar') : (isEn ? 'Paste Review' : 'Pegar Manual')}</span>
+                    </button>
+                  </div>
+
+                  {/* Manual Review Entry Form / Modal Inline */}
+                  {showManualReviewForm && (
+                    <form onSubmit={handleAddManualReview} className="p-3.5 rounded-2xl bg-slate-950 border border-amber-500/40 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-amber-300">
+                          {isEn ? '📝 Input Custom Negative Review to Appeal' : '📝 Ingresar Reseña Crítica para Apelar'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setShowManualReviewForm(false)}
+                          className="text-slate-400 hover:text-white"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                            {isEn ? 'Author / User Name' : 'Nombre del Autor'}
+                          </label>
+                          <input
+                            type="text"
+                            value={manualAuthor}
+                            onChange={(e) => setManualAuthor(e.target.value)}
+                            placeholder={isEn ? 'e.g. John Doe' : 'Ej: Pedro Pérez'}
+                            className="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                            {isEn ? 'Stars Rating' : 'Calificación'}
+                          </label>
+                          <select
+                            value={manualRating}
+                            onChange={(e) => setManualRating(Number(e.target.value))}
+                            className="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
+                          >
+                            <option value={1}>★ 1 Estrella (Crítica Máxima)</option>
+                            <option value={2}>★★ 2 Estrellas (Negativa)</option>
+                            <option value={3}>★★★ 3 Estrellas (Neutro/Dañina)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                          {isEn ? 'Estimated Date / Age' : 'Antigüedad / Fecha aproximada'}
+                        </label>
+                        <input
+                          type="text"
+                          value={manualTimeAgo}
+                          onChange={(e) => setManualTimeAgo(e.target.value)}
+                          placeholder="Ej: Hace 2 semanas / 15 de Octubre"
+                          className="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                          {isEn ? 'Exact Review Text (Copy & Paste from Maps) *' : 'Texto Exacto de la Reseña (Copiar y Pegar de Google Maps) *'}
+                        </label>
+                        <textarea
+                          rows={3}
+                          value={manualText}
+                          onChange={(e) => setManualText(e.target.value)}
+                          placeholder="Pega aquí el texto completo que escribió la persona..."
+                          className="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                          {isEn ? 'Suspected Violation / Motive' : 'Motivo Principal de Impugnación'}
+                        </label>
+                        <select
+                          value={manualContextFlag}
+                          onChange={(e: any) => setManualContextFlag(e.target.value)}
+                          className="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
+                        >
+                          <option value="fake_customer">🚫 Nunca fue cliente / Sin registro de compra ni comanda</option>
+                          <option value="competitor">⚔️ Sospecha de competidor local / Conflicto de intereses</option>
+                          <option value="ex_employee">👔 Ex-empleado o conflicto laboral interno</option>
+                          <option value="defamation">🚨 Acoso, insultos directos o difamación personal</option>
+                          <option value="extortion">💰 Intento de extorsión / Exigencia forzada de dinero</option>
+                          <option value="off_topic">📍 Off-Topic / Confusión con otro local ajeno</option>
+                          <option value="general_bad_faith">⚠️ Mala fe manifiesta / Queja sin hechos verificables</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                          {isEn ? 'Additional Context or Internal Evidence (Optional)' : 'Detalles Internos o Evidencia Adicional (Opcional)'}
+                        </label>
+                        <input
+                          type="text"
+                          value={manualNotes}
+                          onChange={(e) => setManualNotes(e.target.value)}
+                          placeholder="Ej: Revisamos las cámaras y ese día el local estuvo cerrado por mantenimiento..."
+                          className="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={isGeneratingAppeal || !manualText.trim()}
+                        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-slate-950 font-black text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md disabled:opacity-50"
+                      >
+                        <Scale className="w-3.5 h-3.5" />
+                        <span>{isGeneratingAppeal ? 'Generando Expediente...' : 'Analizar & Preparar Apelación Formal'}</span>
+                      </button>
+                    </form>
+                  )}
+
+                  {/* List of Detected or Available Reviews */}
+                  {appealReviewsList.length === 0 ? (
+                    <div className="p-6 rounded-2xl bg-slate-950/60 border border-slate-800 text-center space-y-2">
+                      <Search className="w-8 h-8 text-slate-600 mx-auto" />
+                      <p className="text-xs text-slate-400">
+                        {isEn
+                          ? 'Scan a listing above or click "Paste Review" to analyze any 1★–3★ review hurting this business.'
+                          : 'Escanea un enlace arriba o haz clic en "Pegar Manual" para impugnar cualquier reseña de 1★ a 3★ que perjudique al negocio.'}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2.5">
+                      {appealReviewsList.map((rev) => {
+                        const isSelected = selectedAppealReview?.id === rev.id;
+                        return (
+                          <div
+                            key={rev.id}
+                            className={`p-3.5 rounded-2xl border transition space-y-2 ${
+                              isSelected
+                                ? 'bg-rose-950/30 border-rose-500/60 shadow-lg shadow-rose-950/30'
+                                : 'bg-slate-950 border-slate-800 hover:border-slate-700'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-black text-white">{rev.author}</span>
+                                  <span className="text-[10px] text-slate-400">{rev.timeAgo}</span>
+                                </div>
+                                <div className="flex items-center gap-0.5 mt-0.5 text-amber-400 text-xs">
+                                  {Array.from({ length: rev.rating }).map((_, i) => (
+                                    <span key={i}>★</span>
+                                  ))}
+                                  {Array.from({ length: 5 - rev.rating }).map((_, i) => (
+                                    <span key={i} className="text-slate-700">★</span>
+                                  ))}
+                                </div>
+                              </div>
+                              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-500/30 shrink-0">
+                                Viabilidad: {rev.viability}
+                              </span>
+                            </div>
+
+                            <p className="text-xs text-slate-300 italic line-clamp-3 bg-slate-900/60 p-2 rounded-xl border border-slate-800/80">
+                              «{rev.text}»
+                            </p>
+
+                            <div className="text-[10px] text-amber-400/90 font-mono">
+                              🔍 {rev.detectedReason}
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => handleGenerateAppealForReview(rev)}
+                              disabled={isGeneratingAppeal}
+                              className={`w-full py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md ${
+                                isSelected
+                                  ? 'bg-rose-500 text-slate-950 hover:bg-rose-400'
+                                  : 'bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 hover:border-rose-500/50'
+                              } disabled:opacity-50`}
+                            >
+                              {isGeneratingAppeal && isSelected ? (
+                                <>
+                                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                  <span>{isEn ? 'Drafting Legal Memo...' : 'Redactando Expediente...'}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Scale className="w-3.5 h-3.5 text-amber-400" />
+                                  <span>{isEn ? 'Prepare Formal Appeal' : '⚖️ Preparar Apelación Formal'}</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Bottom Quick Action */}
+                <button
+                  type="button"
+                  onClick={handleResetAppealForm}
+                  className="w-full py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border-2 border-rose-500/50 hover:border-rose-400 text-rose-300 font-black text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-lg active:scale-98"
+                >
+                  <Plus className="w-3.5 h-3.5 text-rose-400" />
+                  <span>{isEn ? 'Run Another Appeal' : 'Nueva Apelación'}</span>
+                </button>
+              </div>
+
+              {/* Right Column: Legal Defense Dossier & Submission Workflow (7 cols) */}
+              <div className="lg:col-span-7 space-y-4">
+                {/* Empty State when no appeal generated */}
+                {!activeAppealDossier && !isGeneratingAppeal && (
+                  <div className="p-8 sm:p-10 rounded-3xl bg-slate-900 border border-slate-800 text-center space-y-6 shadow-xl">
+                    <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-rose-500/20 via-amber-500/20 to-indigo-500/20 border border-rose-500/40 flex items-center justify-center mx-auto shadow-lg">
+                      <Scale className="w-8 h-8 text-amber-400" />
+                    </div>
+
+                    <div className="space-y-2 max-w-lg mx-auto">
+                      <h3 className="text-lg font-black text-white">
+                        {isEn ? 'Legal Review Removal & Trust & Safety Engine' : 'Expediente Legal de Impugnación ante Google Maps'}
+                      </h3>
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        {isEn
+                          ? 'Select any detected critical review on the left or paste a custom one. Prestigia AI will cross-reference it with Google Prohibited Content Policies and generate the full submission package.'
+                          : 'Selecciona una reseña del radar a la izquierda o pega una manualmente. La inteligencia artificial de Prestigia la confrontará con las Directrices Oficiales de Google y formulará el expediente de impugnación con 1 solo clic.'}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left pt-2">
+                      <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider block">1. Infracción Precisa</span>
+                        <p className="text-xs text-slate-300">Cita la cláusula exacta de los Términos de Google (Conflicto, Fake o Acoso).</p>
+                      </div>
+                      <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">2. Memorial Legal</span>
+                        <p className="text-xs text-slate-300">Escrito formal técnico-jurídico redactado para radicar ante Trust & Safety.</p>
+                      </div>
+                      <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">3. Escudo Inmediato</span>
+                        <p className="text-xs text-slate-300">Respuesta pública institucional para frenar el daño mientras Google decide.</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Loading Pulse */}
+                {isGeneratingAppeal && (
+                  <div className="p-12 rounded-3xl bg-slate-900 border border-rose-500/40 text-center space-y-4 shadow-xl">
+                    <RefreshCw className="w-10 h-10 animate-spin text-amber-400 mx-auto" />
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-black text-white">
+                        {isEn ? 'Analyzing Google TOS & Drafting Legal Memorial...' : 'Confrontando Políticas de Google Maps & Redactando Memorial Legal...'}
+                      </h4>
+                      <p className="text-xs text-slate-400">
+                        {isEn
+                          ? 'Formulating policy infringement grounds and public mitigation response...'
+                          : 'Estructurando causales de retiro, memorial para Trust & Safety y respuesta estratégica pública...'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Active Appeal Dossier Result */}
+                {activeAppealDossier && !isGeneratingAppeal && (
+                  <div className="space-y-4">
+                    {/* Viability & Health Banner */}
+                    <div className="p-5 rounded-3xl bg-gradient-to-r from-rose-950/60 via-slate-900 to-amber-950/40 border border-rose-500/50 shadow-xl space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-rose-500/30">
+                        <div>
+                          <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-500/40">
+                            Expediente: {activeAppealDossier.id}
+                          </span>
+                          <h3 className="text-base font-black text-white mt-1 flex items-center gap-2">
+                            <span>Reseña de: "{activeAppealDossier.authorName}"</span>
+                            <span className="text-amber-400 text-xs">({activeAppealDossier.rating}★)</span>
+                          </h3>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <span className="text-[10px] text-slate-400 block font-mono">Índice de Viabilidad</span>
+                            <strong className="text-lg font-black text-emerald-400">
+                              {activeAppealDossier.successProbability} ({activeAppealDossier.successProbabilityPercent}%)
+                            </strong>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => window.print()}
+                            className="px-3 py-2 rounded-xl bg-slate-950 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 print:hidden"
+                          >
+                            <Printer className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Imprimir</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-slate-300 leading-relaxed">
+                        {activeAppealDossier.probabilityDiagnosis}
+                      </p>
+                    </div>
+
+                    {/* Card 1: Google Policy Violation */}
+                    <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 shadow-xl">
+                      <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
+                        <Gavel className="w-4 h-4 text-amber-400" />
+                        <h4 className="text-xs font-black text-white uppercase tracking-wider">
+                          1. Cláusula Infringida de las Políticas de Google Maps
+                        </h4>
+                      </div>
+                      <div className="p-3 rounded-2xl bg-slate-950 border border-amber-500/30 space-y-1.5">
+                        <span className="text-xs font-black text-amber-300 block">
+                          {activeAppealDossier.googlePolicy.clauseTitle}
+                        </span>
+                        <div className="text-[11px] font-mono text-slate-400">
+                          {activeAppealDossier.googlePolicy.tosSection}
+                        </div>
+                        <p className="text-xs text-slate-300 italic pt-1">
+                          {activeAppealDossier.googlePolicy.officialPolicySnippet}
+                        </p>
+                      </div>
+                      <p className="text-xs text-slate-400">
+                        <strong className="text-white">Fundamento Fáctico: </strong>
+                        {activeAppealDossier.googlePolicy.infringementAnalysis}
+                      </p>
+                    </div>
+
+                    {/* Card 2: Google Console Workflow Instructions */}
+                    <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 shadow-xl">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <ExternalLink className="w-4 h-4 text-indigo-400" />
+                          <h4 className="text-xs font-black text-white uppercase tracking-wider">
+                            2. Tramitación en la Consola Oficial de Google
+                          </h4>
+                        </div>
+                        <a
+                          href={activeAppealDossier.googleConsoleWorkflow.officialToolUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-indigo-600/30 cursor-pointer shrink-0"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>Abrir Consola de Google Business</span>
+                        </a>
+                      </div>
+
+                      <div className="p-3 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 flex items-center justify-between gap-3">
+                        <div>
+                          <span className="text-[10px] text-indigo-300 uppercase font-black tracking-wider block">
+                            Opción Exacta a Seleccionar en el Menú de Google:
+                          </span>
+                          <strong className="text-xs font-black text-white">
+                            «{activeAppealDossier.googleConsoleWorkflow.exactCategoryToSelect}»
+                          </strong>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-900 text-indigo-200 shrink-0">
+                          Paso Clave
+                        </span>
+                      </div>
+
+                      <div className="space-y-1.5 pt-1">
+                        {activeAppealDossier.googleConsoleWorkflow.stepByStepInstructions.map((step: string, idx: number) => (
+                          <div key={idx} className="flex items-start gap-2 text-xs text-slate-300">
+                            <span className="text-amber-400 font-bold shrink-0">•</span>
+                            <span>{step}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Card 3: Formal Legal Appeal Memorial (Ready to Copy) */}
+                    <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 shadow-xl">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-rose-400" />
+                          <h4 className="text-xs font-black text-white uppercase tracking-wider">
+                            3. Memorial Legal de Impugnación (Texto para Google Trust & Safety)
+                          </h4>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(
+                              `${activeAppealDossier.legalAppealMemorial.subject}\n\n${activeAppealDossier.legalAppealMemorial.body}`
+                            );
+                            setAppealSuccessCopied('memorial');
+                            setTimeout(() => setAppealSuccessCopied(null), 2500);
+                          }}
+                          className="px-3 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
+                        >
+                          {appealSuccessCopied === 'memorial' ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-slate-950" />
+                              <span>¡Copiado!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5 text-slate-950" />
+                              <span>Copiar Memorial</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="text-[11px] font-mono text-slate-400 bg-slate-950 p-2 rounded-xl border border-slate-800">
+                          <strong className="text-white">ASUNTO: </strong>
+                          {activeAppealDossier.legalAppealMemorial.subject}
+                        </div>
+                        <pre className="text-xs text-slate-300 whitespace-pre-wrap font-mono bg-slate-950 p-4 rounded-2xl border border-slate-800 max-h-72 overflow-y-auto leading-relaxed">
+                          {activeAppealDossier.legalAppealMemorial.body}
+                        </pre>
+                      </div>
+                    </div>
+
+                    {/* Card 4: Public Mitigation Response */}
+                    <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 shadow-xl">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <MessageSquare className="w-4 h-4 text-emerald-400" />
+                          <h4 className="text-xs font-black text-white uppercase tracking-wider">
+                            4. Respuesta Pública de Mitigación Inmediata (Publicar en Maps)
+                          </h4>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(activeAppealDossier.publicMitigationResponse.responseText);
+                            setAppealSuccessCopied('mitigation');
+                            setTimeout(() => setAppealSuccessCopied(null), 2500);
+                          }}
+                          className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
+                        >
+                          {appealSuccessCopied === 'mitigation' ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-slate-950" />
+                              <span>¡Copiado!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5 text-slate-950" />
+                              <span>Copiar Respuesta</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <p className="text-xs text-slate-400">
+                        <strong className="text-amber-400">Estrategia de Blindaje: </strong>
+                        {activeAppealDossier.publicMitigationResponse.damageControlStrategy}
+                      </p>
+
+                      <div className="p-3.5 rounded-2xl bg-slate-950 border border-emerald-500/30 text-xs text-slate-200 leading-relaxed font-sans">
+                        «{activeAppealDossier.publicMitigationResponse.responseText}»
+                      </div>
+                    </div>
+
+                    {/* Card 5: Recommended Evidence Pack */}
+                    <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 shadow-xl">
+                      <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
+                        <ShieldCheck className="w-4 h-4 text-amber-400" />
+                        <h4 className="text-xs font-black text-white uppercase tracking-wider">
+                          5. Pruebas de Soporte Recomendadas para Adjuntar
+                        </h4>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {activeAppealDossier.recommendedEvidence.map((ev: any, idx: number) => (
+                          <div key={idx} className="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-black text-white truncate">{ev.item}</span>
+                              <span
+                                className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                                  ev.importance === 'Crítica'
+                                    ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                                    : 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                }`}
+                              >
+                                {ev.importance}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-400 leading-normal">{ev.description}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Card 6: Advisor Sales Script & Closing */}
+                    <div className="p-5 rounded-3xl bg-gradient-to-br from-indigo-950/60 via-slate-900 to-slate-900 border border-indigo-500/40 space-y-3 shadow-xl">
+                      <div className="flex items-center gap-2 pb-2 border-b border-indigo-500/30">
+                        <Trophy className="w-4 h-4 text-indigo-400" />
+                        <h4 className="text-xs font-black text-indigo-300 uppercase tracking-wider">
+                          6. Guion Comercial para el Asesor de Prestigia
+                        </h4>
+                      </div>
+
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                          Pitch de Presentación al Cliente:
+                        </span>
+                        <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 italic leading-relaxed">
+                          {activeAppealDossier.commercialScript.closingPitch}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 pt-1">
+                        <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">
+                          Manejo de la Objeción: "¿Y me garantizan que Google la borre sí o sí?"
+                        </span>
+                        <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 leading-relaxed font-sans whitespace-pre-wrap">
+                          {activeAppealDossier.commercialScript.clientObjectionHandling}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card 7: Official Legal Disclaimer */}
+                    <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1 text-center">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">
+                        🛡️ Transparencia & Descargo de Responsabilidad Jurídica Prestigia
+                      </span>
+                      <p className="text-[10px] text-slate-500 leading-relaxed max-w-3xl mx-auto">
+                        {activeAppealDossier.legalDisclaimer}
+                      </p>
+                    </div>
+
+                    {/* Bottom Action: New Appeal */}
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3 pb-2 print:hidden">
+                      <button
+                        type="button"
+                        onClick={handleResetAppealForm}
+                        className="px-6 py-3 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-slate-950 font-black text-sm transition flex items-center gap-2 shadow-xl shadow-rose-500/25 cursor-pointer active:scale-95"
+                      >
+                        <Plus className="w-4 h-4 text-slate-950" />
+                        <span>{isEn ? 'Appeal Another Review' : 'Apelar Otra Reseña'}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* =============================================================
             TAB: 4 ARMAS DE ÉLITE LOCAL SEO (GEO-GRID, ROI, GEOTAG, CITAS)
             ============================================================= */}
         {activeTab === 'tools' && (
@@ -8289,6 +9303,17 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   >
                     {tDossiers.filterRescue} ({luismaBaseDossiers.filter((d) => d.mode === 'rescue').length})
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setDossierModeFilter('appeal')}
+                    className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                      dossierModeFilter === 'appeal'
+                        ? 'bg-rose-500 text-slate-950 font-black'
+                        : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                    }`}
+                  >
+                    {tDossiers.filterAppeal} ({luismaBaseDossiers.filter((d) => d.mode === 'appeal').length})
+                  </button>
                 </div>
 
                 {/* Filter Active indicator & Reset button */}
@@ -8481,6 +9506,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                               ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
                               : d.mode === 'rescue'
                               ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                              : d.mode === 'appeal'
+                              ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
                               : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
                           }`}
                         >
@@ -8488,6 +9515,8 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                             ? tDossiers.badgeCreate
                             : d.mode === 'rescue'
                             ? tDossiers.badgeRescue
+                            : d.mode === 'appeal'
+                            ? '⚖️ Apelación 1-3★'
                             : tDossiers.badgeAudit}
                         </span>
 
