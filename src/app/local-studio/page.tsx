@@ -640,13 +640,13 @@ const UI_TEXT = {
     sector: 'Nicho / Sector Comercial *',
     city: 'Ciudad o Sede Principal *',
     cityPlaceholder: 'Ej: Bogotá',
-    neighborhood: 'Barrio o Zona',
+    neighborhood: 'Barrio o Localidad *',
     neighborhoodPlaceholder: 'Ej: Chapinero',
-    coverageAreas: 'Zonas o Barrios de Cobertura a Domicilio',
+    coverageAreas: 'Zonas o Barrios de Cobertura a Domicilio *',
     coveragePlaceholder: 'Ej: Zona Norte, Chicó, Usaquén, Salitre, Chía',
-    specialties: '3 Platos o Servicios Más Vendidos',
+    specialties: '3 Platos o Servicios Más Vendidos *',
     specialtiesPlaceholder: 'Ej: Hamburguesas artesanales, costillas BBQ, cócteles',
-    phone: 'WhatsApp Comercial de Atención',
+    phone: 'WhatsApp Comercial de Atención *',
     phonePlaceholder: 'Ej: +57 300 123 4567',
     btnGenerate: 'Generar Configuración Ganadora en 1-Clic',
     btnGenerating: 'Generando Arquitectura Top 3 con IA...',
@@ -726,13 +726,13 @@ const UI_TEXT = {
     sector: 'Industry / Business Niche *',
     city: 'City or Main Metro Area *',
     cityPlaceholder: 'e.g. Miami, FL',
-    neighborhood: 'Neighborhood / District',
+    neighborhood: 'Neighborhood / District *',
     neighborhoodPlaceholder: 'e.g. Brickell / 33131',
-    coverageAreas: 'Target Service Coverage Areas / Neighborhoods',
+    coverageAreas: 'Target Service Coverage Areas *',
     coveragePlaceholder: 'e.g. Brickell, Downtown, Coral Gables, South Beach',
-    specialties: 'Top 3 Best-Selling Products or Services',
+    specialties: 'Top 3 Best-Selling Products or Services *',
     specialtiesPlaceholder: 'e.g. Cosmetic Dentistry, Teeth Whitening, Veneers',
-    phone: 'Commercial Phone / WhatsApp',
+    phone: 'Commercial WhatsApp / Phone *',
     phonePlaceholder: 'e.g. +1 305 123 4567',
     btnGenerate: 'Generate Winning Setup in 1-Click',
     btnGenerating: 'Generating Top 3 Architecture with AI...',
@@ -2303,8 +2303,44 @@ export default function LocalStudioPage() {
   // -------------------------------------------------------------
   const handleGenerateCreate = async () => {
     const finalBizName = createBusinessName.trim();
+    if (!createContactName.trim()) {
+      showToast(isEn ? '⚠️ Contact Person / Owner is required (*)' : '⚠️ La Persona de Contacto / Dueño es obligatoria (*)');
+      return;
+    }
+    if (!createContactCompany.trim()) {
+      showToast(isEn ? '⚠️ Contracting Company / Business is required (*)' : '⚠️ La Empresa / Razón Social Contratante es obligatoria (*)');
+      return;
+    }
+    if (!createContactPhone.trim()) {
+      showToast(isEn ? '⚠️ Direct WhatsApp is required (*)' : '⚠️ El WhatsApp Directo del cliente es obligatorio (*)');
+      return;
+    }
+    if (!createContactEmail.trim()) {
+      showToast(isEn ? '⚠️ Client Email is required (*)' : '⚠️ El Correo Electrónico del cliente es obligatorio (*)');
+      return;
+    }
     if (!finalBizName) {
-      showToast(isEn ? '⚠️ Please enter the business name' : '⚠️ Ingresa el nombre comercial del negocio');
+      showToast(isEn ? '⚠️ Business Name is required (*)' : '⚠️ El Nombre Comercial o del Especialista es obligatorio (*)');
+      return;
+    }
+    if (!createCity.trim()) {
+      showToast(isEn ? '⚠️ City is required (*)' : '⚠️ La Ciudad es obligatoria (*)');
+      return;
+    }
+    if (!createNeighborhood.trim()) {
+      showToast(isEn ? '⚠️ Neighborhood / District is required (*)' : '⚠️ El Barrio o Localidad es obligatorio (*)');
+      return;
+    }
+    if (createBusinessModel === 'service_area' && !createServiceAreas.trim()) {
+      showToast(isEn ? '⚠️ Service coverage areas are required (*)' : '⚠️ Las Zonas de Cobertura a domicilio son obligatorias (*)');
+      return;
+    }
+    if (!createSpecialties.trim()) {
+      showToast(isEn ? '⚠️ Top 3 products/services are required (*)' : '⚠️ Los 3 Platos o Servicios Más Vendidos son obligatorios (*)');
+      return;
+    }
+    if (!createPhone.trim()) {
+      showToast(isEn ? '⚠️ Commercial WhatsApp / Phone is required (*)' : '⚠️ El WhatsApp Comercial de Atención es obligatorio (*)');
       return;
     }
 
@@ -4148,7 +4184,7 @@ export default function LocalStudioPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
+                        {isEn ? 'Contact Person / Owner *' : 'Persona de Contacto / Dueño *'}
                       </label>
                       <input
                         type="text"
@@ -4161,7 +4197,7 @@ export default function LocalStudioPage() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
+                        {isEn ? 'Contracting Company / Legal Entity *' : 'Empresa / Razón Social Contratante *'}
                       </label>
                       <input
                         type="text"
@@ -4176,7 +4212,7 @@ export default function LocalStudioPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
-                        <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
+                        <span>{isEn ? 'WhatsApp Directo *' : 'WhatsApp Directo *'}</span>
                         {createContactPhone && (
                           <a
                             href={`https://wa.me/${createContactPhone.replace(/[^0-9]/g, '')}`}
@@ -4199,7 +4235,7 @@ export default function LocalStudioPage() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Email' : 'Correo Electrónico'}
+                        {isEn ? 'Email *' : 'Correo Electrónico *'}
                       </label>
                       <input
                         type="email"
@@ -4212,7 +4248,7 @@ export default function LocalStudioPage() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Role' : 'Cargo / Relación'}
+                        {isEn ? 'Role *' : 'Cargo / Relación *'}
                       </label>
                       <select
                         value={createContactRole}
@@ -4378,7 +4414,7 @@ export default function LocalStudioPage() {
                     {/* 3º Barrio / Localidad */}
                     <div>
                       <label className="block text-xs font-bold text-slate-300 mb-1">
-                        3º Barrio o Localidad (Opcional)
+                        3º Barrio o Localidad *
                       </label>
                       <input
                         type="text"
@@ -4438,7 +4474,7 @@ export default function LocalStudioPage() {
                 <button
                   type="button"
                   onClick={() => handleGenerateCreate()}
-                  disabled={isGeneratingCreate || !createBusinessName.trim() || (!isLuismaMaster && monthlyUsage.creates >= (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))}
+                  disabled={isGeneratingCreate || (!isLuismaMaster && monthlyUsage.creates >= (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))}
                   className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 cursor-pointer active:scale-98"
                 >
                   {isGeneratingCreate ? (
@@ -5467,7 +5503,7 @@ export default function LocalStudioPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
+                        {isEn ? 'Contact Person / Owner *' : 'Persona de Contacto / Dueño *'}
                       </label>
                       <input
                         type="text"
@@ -5480,7 +5516,7 @@ export default function LocalStudioPage() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
+                        {isEn ? 'Contracting Company / Legal Entity *' : 'Empresa / Razón Social Contratante *'}
                       </label>
                       <input
                         type="text"
@@ -5495,7 +5531,7 @@ export default function LocalStudioPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
-                        <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
+                        <span>{isEn ? 'WhatsApp Directo *' : 'WhatsApp Directo *'}</span>
                         {auditContactPhone && (
                           <a
                             href={`https://wa.me/${auditContactPhone.replace(/[^0-9]/g, '')}`}
@@ -5518,7 +5554,7 @@ export default function LocalStudioPage() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Email' : 'Correo Electrónico'}
+                        {isEn ? 'Email *' : 'Correo Electrónico *'}
                       </label>
                       <input
                         type="email"
@@ -5531,7 +5567,7 @@ export default function LocalStudioPage() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Role' : 'Cargo / Relación'}
+                        {isEn ? 'Role *' : 'Cargo / Relación *'}
                       </label>
                       <select
                         value={auditContactRole}
@@ -5862,7 +5898,7 @@ export default function LocalStudioPage() {
                         {/* 3º Barrio / Localidad */}
                         <div>
                           <label className="block text-xs font-bold text-slate-300 mb-1">
-                            3º Barrio o Localidad (Opcional)
+                            3º Barrio o Localidad *
                           </label>
                           <input
                             type="text"
@@ -6477,7 +6513,7 @@ export default function LocalStudioPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
+                        {isEn ? 'Contact Person / Owner *' : 'Persona de Contacto / Dueño *'}
                       </label>
                       <input
                         type="text"
@@ -6490,7 +6526,7 @@ export default function LocalStudioPage() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
+                        {isEn ? 'Contracting Company / Legal Entity *' : 'Empresa / Razón Social Contratante *'}
                       </label>
                       <input
                         type="text"
@@ -6505,7 +6541,7 @@ export default function LocalStudioPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
-                        <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
+                        <span>{isEn ? 'WhatsApp Directo *' : 'WhatsApp Directo *'}</span>
                         {rescueContactPhone && (
                           <a
                             href={`https://wa.me/${rescueContactPhone.replace(/[^0-9]/g, '')}`}
@@ -6528,7 +6564,7 @@ export default function LocalStudioPage() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Email' : 'Correo Electrónico'}
+                        {isEn ? 'Email *' : 'Correo Electrónico *'}
                       </label>
                       <input
                         type="email"
@@ -6541,7 +6577,7 @@ export default function LocalStudioPage() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Role' : 'Cargo / Relación'}
+                        {isEn ? 'Role *' : 'Cargo / Relación *'}
                       </label>
                       <select
                         value={rescueContactRole}
@@ -6783,7 +6819,7 @@ export default function LocalStudioPage() {
                     {/* 3º Barrio / Localidad */}
                     <div>
                       <label className="block text-xs font-bold text-slate-300 mb-1">
-                        3º Barrio o Localidad (Opcional)
+                        3º Barrio o Localidad *
                       </label>
                       <input
                         type="text"
@@ -7494,7 +7530,7 @@ export default function LocalStudioPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
+                        {isEn ? 'Contact Person / Owner *' : 'Persona de Contacto / Dueño *'}
                       </label>
                       <input
                         type="text"
@@ -7507,7 +7543,7 @@ export default function LocalStudioPage() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
+                        {isEn ? 'Contracting Company / Legal Entity *' : 'Empresa / Razón Social Contratante *'}
                       </label>
                       <input
                         type="text"
@@ -7522,7 +7558,7 @@ export default function LocalStudioPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
-                        <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
+                        <span>{isEn ? 'WhatsApp Directo *' : 'WhatsApp Directo *'}</span>
                         {appealContactPhone && (
                           <a
                             href={`https://wa.me/${appealContactPhone.replace(/[^0-9]/g, '')}`}
@@ -7545,7 +7581,7 @@ export default function LocalStudioPage() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Email' : 'Correo Electrónico'}
+                        {isEn ? 'Email *' : 'Correo Electrónico *'}
                       </label>
                       <input
                         type="email"
@@ -7558,7 +7594,7 @@ export default function LocalStudioPage() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Role' : 'Cargo / Relación'}
+                        {isEn ? 'Role *' : 'Cargo / Relación *'}
                       </label>
                       <select
                         value={appealContactRole}
