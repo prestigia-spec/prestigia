@@ -3994,6 +3994,105 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   <h2 className="text-sm font-black text-white">{t.formHeader1}</h2>
                 </div>
 
+                {/* Tarjeta de Datos del Cliente / Contratante (Quién Solicita y Paga el Servicio) */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/30 space-y-2.5">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
+                    <div className="flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-indigo-400" />
+                      <span className="text-xs font-black text-indigo-300">
+                        {isEn ? '👤 Client / Contractor Info (Who Hires & Pays)' : '👤 Datos del Cliente / Contratante (Quién Solicita y Paga el Servicio)'}
+                      </span>
+                    </div>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
+                      CRM
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
+                      </label>
+                      <input
+                        type="text"
+                        value={contactName}
+                        onChange={(e) => setContactName(e.target.value)}
+                        placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
+                      </label>
+                      <input
+                        type="text"
+                        value={contactCompany}
+                        onChange={(e) => setContactCompany(e.target.value)}
+                        placeholder={isEn ? 'e.g. Acme Corp / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                        <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
+                        {contactPhone && (
+                          <a
+                            href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
+                          >
+                            Chat
+                          </a>
+                        )}
+                      </label>
+                      <input
+                        type="tel"
+                        value={contactPhone}
+                        onChange={(e) => setContactPhone(e.target.value)}
+                        placeholder="+57 300 123 4567"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Email' : 'Correo Electrónico'}
+                      </label>
+                      <input
+                        type="email"
+                        value={contactEmail}
+                        onChange={(e) => setContactEmail(e.target.value)}
+                        placeholder="contacto@empresa.com"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Role' : 'Cargo / Relación'}
+                      </label>
+                      <select
+                        value={contactRole}
+                        onChange={(e) => setContactRole(e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
+                      >
+                        <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
+                        <option value="Gerente General">{isEn ? '💼 General Manager' : '💼 Gerente General'}</option>
+                        <option value="Director de Marketing">{isEn ? '📈 Marketing Dir.' : '📈 Dir. Marketing'}</option>
+                        <option value="Administrador">{isEn ? '🏢 Branch Admin' : '🏢 Administrador'}</option>
+                        <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
+                        <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-3 text-xs">
                   {/* Business Model Selector */}
                   <div>
@@ -4189,105 +4288,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                       placeholder={t.phonePlaceholder}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
                     />
-                  </div>
-
-                  {/* Tarjeta de Datos del Cliente / Contratante */}
-                  <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/30 space-y-2.5">
-                    <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
-                      <div className="flex items-center gap-1.5">
-                        <User className="w-3.5 h-3.5 text-indigo-400" />
-                        <span className="text-xs font-black text-indigo-300">
-                          {isEn ? '👤 Client / Contractor Info (Who Hires & Pays)' : '👤 Datos del Cliente / Contratante (Quién Solicita y Paga el Servicio)'}
-                        </span>
-                      </div>
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
-                        CRM
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                          {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
-                        </label>
-                        <input
-                          type="text"
-                          value={contactName}
-                          onChange={(e) => setContactName(e.target.value)}
-                          placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
-                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                          {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
-                        </label>
-                        <input
-                          type="text"
-                          value={contactCompany}
-                          onChange={(e) => setContactCompany(e.target.value)}
-                          placeholder={isEn ? 'e.g. Acme Corp / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
-                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
-                          <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
-                          {contactPhone && (
-                            <a
-                              href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
-                            >
-                              Chat
-                            </a>
-                          )}
-                        </label>
-                        <input
-                          type="tel"
-                          value={contactPhone}
-                          onChange={(e) => setContactPhone(e.target.value)}
-                          placeholder="+57 300 123 4567"
-                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                          {isEn ? 'Email' : 'Correo Electrónico'}
-                        </label>
-                        <input
-                          type="email"
-                          value={contactEmail}
-                          onChange={(e) => setContactEmail(e.target.value)}
-                          placeholder="contacto@empresa.com"
-                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                          {isEn ? 'Role' : 'Cargo / Relación'}
-                        </label>
-                        <select
-                          value={contactRole}
-                          onChange={(e) => setContactRole(e.target.value)}
-                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
-                        >
-                          <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
-                          <option value="Gerente General">{isEn ? '💼 General Manager' : '💼 Gerente General'}</option>
-                          <option value="Director de Marketing">{isEn ? '📈 Marketing Dir.' : '📈 Dir. Marketing'}</option>
-                          <option value="Administrador">{isEn ? '🏢 Branch Admin' : '🏢 Administrador'}</option>
-                          <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
-                          <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
-                        </select>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
@@ -5316,6 +5316,105 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                   <h2 className="text-sm font-black text-white">{t.auditFormHeader}</h2>
                 </div>
 
+                {/* Tarjeta de Datos del Cliente / Contratante (Quién Solicita y Paga el Servicio) */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/30 space-y-2.5">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
+                    <div className="flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-indigo-400" />
+                      <span className="text-xs font-black text-indigo-300">
+                        {isEn ? '👤 Client / Contractor Info (Who Hires & Pays)' : '👤 Datos del Cliente / Contratante (Quién Solicita y Paga el Servicio)'}
+                      </span>
+                    </div>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
+                      CRM
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
+                      </label>
+                      <input
+                        type="text"
+                        value={contactName}
+                        onChange={(e) => setContactName(e.target.value)}
+                        placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
+                      </label>
+                      <input
+                        type="text"
+                        value={contactCompany}
+                        onChange={(e) => setContactCompany(e.target.value)}
+                        placeholder={isEn ? 'e.g. Acme Corp / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                        <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
+                        {contactPhone && (
+                          <a
+                            href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
+                          >
+                            Chat
+                          </a>
+                        )}
+                      </label>
+                      <input
+                        type="tel"
+                        value={contactPhone}
+                        onChange={(e) => setContactPhone(e.target.value)}
+                        placeholder="+57 300 123 4567"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Email' : 'Correo Electrónico'}
+                      </label>
+                      <input
+                        type="email"
+                        value={contactEmail}
+                        onChange={(e) => setContactEmail(e.target.value)}
+                        placeholder="contacto@empresa.com"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Role' : 'Cargo / Relación'}
+                      </label>
+                      <select
+                        value={contactRole}
+                        onChange={(e) => setContactRole(e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
+                      >
+                        <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
+                        <option value="Gerente General">{isEn ? '💼 General Manager' : '💼 Gerente General'}</option>
+                        <option value="Director de Marketing">{isEn ? '📈 Marketing Dir.' : '📈 Dir. Marketing'}</option>
+                        <option value="Administrador">{isEn ? '🏢 Branch Admin' : '🏢 Administrador'}</option>
+                        <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
+                        <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Single Google Maps Input Box */}
                 <div className="space-y-3">
                   <div>
@@ -5445,105 +5544,6 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     )}
                   </div>
                 )}
-
-                {/* Tarjeta de Datos del Cliente / Contratante (Antes de la Auditoría) */}
-                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/30 space-y-2.5">
-                  <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
-                    <div className="flex items-center gap-1.5">
-                      <User className="w-3.5 h-3.5 text-indigo-400" />
-                      <span className="text-xs font-black text-indigo-300">
-                        {isEn ? '👤 Client / Contractor Info (Who Hires & Pays)' : '👤 Datos del Cliente / Contratante (Quién Solicita y Paga el Servicio)'}
-                      </span>
-                    </div>
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
-                      CRM
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Contact Person / Owner' : 'Persona de Contacto / Dueño'}
-                      </label>
-                      <input
-                        type="text"
-                        value={contactName}
-                        onChange={(e) => setContactName(e.target.value)}
-                        placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Contracting Company / Legal Entity' : 'Empresa / Razón Social Contratante'}
-                      </label>
-                      <input
-                        type="text"
-                        value={contactCompany}
-                        onChange={(e) => setContactCompany(e.target.value)}
-                        placeholder={isEn ? 'e.g. Acme Corp / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
-                        <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
-                        {contactPhone && (
-                          <a
-                            href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
-                          >
-                            Chat
-                          </a>
-                        )}
-                      </label>
-                      <input
-                        type="tel"
-                        value={contactPhone}
-                        onChange={(e) => setContactPhone(e.target.value)}
-                        placeholder="+57 300 123 4567"
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Email' : 'Correo Electrónico'}
-                      </label>
-                      <input
-                        type="email"
-                        value={contactEmail}
-                        onChange={(e) => setContactEmail(e.target.value)}
-                        placeholder="contacto@empresa.com"
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Role' : 'Cargo / Relación'}
-                      </label>
-                      <select
-                        value={contactRole}
-                        onChange={(e) => setContactRole(e.target.value)}
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
-                      >
-                        <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
-                        <option value="Gerente General">{isEn ? '💼 General Manager' : '💼 Gerente General'}</option>
-                        <option value="Director de Marketing">{isEn ? '📈 Marketing Dir.' : '📈 Dir. Marketing'}</option>
-                        <option value="Administrador">{isEn ? '🏢 Branch Admin' : '🏢 Administrador'}</option>
-                        <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
-                        <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
 
                 {/* Primary 1-Click Scan & Audit Button */}
                 <div className="space-y-2">
@@ -7385,16 +7385,26 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'WhatsApp / Phone' : 'Teléfono / WhatsApp'}
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                        <span>{isEn ? 'WhatsApp' : 'WhatsApp Directo'}</span>
+                        {contactPhone && (
+                          <a
+                            href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
+                          >
+                            Chat
+                          </a>
+                        )}
                       </label>
                       <input
                         type="tel"
                         value={contactPhone}
                         onChange={(e) => setContactPhone(e.target.value)}
-                        placeholder="+57 300 000 0000"
+                        placeholder="+57 300 123 4567"
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
                     </div>
@@ -7410,6 +7420,24 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
                         placeholder="contacto@empresa.com"
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Role' : 'Cargo / Relación'}
+                      </label>
+                      <select
+                        value={contactRole}
+                        onChange={(e) => setContactRole(e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs"
+                      >
+                        <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
+                        <option value="Gerente General">{isEn ? '💼 General Manager' : '💼 Gerente General'}</option>
+                        <option value="Director de Marketing">{isEn ? '📈 Marketing Dir.' : '📈 Dir. Marketing'}</option>
+                        <option value="Administrador">{isEn ? '🏢 Branch Admin' : '🏢 Administrador'}</option>
+                        <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
+                        <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
+                      </select>
                     </div>
                   </div>
                 </div>
