@@ -3270,27 +3270,52 @@ export default function LocalStudioPage() {
     const msg = isPermanentPurge
       ? '¿Seguro que deseas purgar DEFINITIVAMENTE este expediente de la base de datos? Esta acción es irreversible.'
       : '¿Seguro que deseas eliminar este expediente?';
-    if (!confirm(msg)) return;
+    if (typeof window !== 'undefined' && !window.confirm(msg)) return;
+
+    // Actualización optimista inmediata en la UI
+    setSavedDossiers((prev) =>
+      isPermanentPurge
+        ? prev.filter((d) => d.id !== id)
+        : prev.map((d) => (d.id === id ? { ...d, deletedByAdvisor: true } : d))
+    );
+
     try {
       const url = isPermanentPurge
         ? `/api/local-studio/dossiers?id=${id}&purge=true`
         : `/api/local-studio/dossiers?id=${id}`;
       const res = await fetch(url, { method: 'DELETE' });
-      if (res.ok) {
-        showToast(isPermanentPurge ? 'Expediente purgado definitivamente' : 'Expediente eliminado');
-        fetchDossiers();
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success !== false) {
+        showToast(isPermanentPurge ? '🗑️ Expediente purgado definitivamente' : '🗑️ Expediente eliminado con éxito');
+      } else {
+        showToast('⚠️ No se pudo eliminar el expediente del servidor.');
       }
-    } catch {}
+      await fetchDossiers();
+    } catch {
+      showToast('⚠️ Error de conexión al eliminar.');
+      await fetchDossiers();
+    }
   };
 
   const handleRestoreDossier = async (id: string) => {
+    // Actualización optimista inmediata
+    setSavedDossiers((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, deletedByAdvisor: false } : d))
+    );
+
     try {
       const res = await fetch(`/api/local-studio/dossiers?id=${id}&restore=true`, { method: 'DELETE' });
-      if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success !== false) {
         showToast('✓ ¡Expediente restaurado con éxito a la vista activa!');
-        fetchDossiers();
+      } else {
+        showToast('⚠️ No se pudo restaurar el expediente.');
       }
-    } catch {}
+      await fetchDossiers();
+    } catch {
+      showToast('⚠️ Error de conexión al restaurar.');
+      await fetchDossiers();
+    }
   };
 
   const handleOpenEditClosing = (dossier: StudioDossierRecord) => {

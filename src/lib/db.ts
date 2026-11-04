@@ -1416,8 +1416,8 @@ export async function getAllStudioDossiers(): Promise<StudioDossier[]> {
     const supabase = getSupabase();
     if (supabase) {
       const { data, error } = await supabase.from('studio_dossiers').select('*');
-      if (!error && Array.isArray(data) && data.length > 0) {
-        return data.map((d: any) => ({
+      if (!error && Array.isArray(data)) {
+        const mapped: StudioDossier[] = data.map((d: any) => ({
           id: d.id,
           advisorId: d.advisor_id || d.advisorId,
           advisorName: d.advisor_name || d.advisorName,
@@ -1449,9 +1449,16 @@ export async function getAllStudioDossiers(): Promise<StudioDossier[]> {
           createdAt: d.created_at || d.createdAt,
           updatedAt: d.updated_at || d.updatedAt,
         }));
+        // Synchronize local JSON cache with Supabase records
+        const db = ensureDbFile();
+        db.studioDossiers = mapped;
+        writeDbFile(db);
+        return mapped;
       }
     }
-  } catch {}
+  } catch (err) {
+    console.error('Error fetching studio dossiers from Supabase:', err);
+  }
 
   const db = ensureDbFile();
   if (!db.studioDossiers) {
@@ -1476,46 +1483,46 @@ export async function saveStudioDossier(dossier: StudioDossier): Promise<void> {
   try {
     const supabase = getSupabase();
     if (supabase) {
-      Promise.resolve(
-        supabase.from('studio_dossiers').upsert({
-          id: dossier.id,
-          advisor_id: dossier.advisorId,
-          advisor_name: dossier.advisorName,
-          advisor_phone: dossier.advisorPhone,
-          advisor_type: dossier.advisorType,
-          country: dossier.country,
-          client_name: dossier.clientName,
-          contact_name: dossier.contactName,
-          contact_company: dossier.contactCompany,
-          contact_phone: dossier.contactPhone,
-          contact_email: dossier.contactEmail,
-          contact_role: dossier.contactRole,
-          category: dossier.category,
-          city: dossier.city,
-          neighborhood: dossier.neighborhood,
-          google_url: dossier.googleUrl,
-          mode: dossier.mode,
-          business_model: dossier.businessModel,
-          status: dossier.status,
-          deleted_by_advisor: Boolean(dossier.deletedByAdvisor),
-          deleted_at: dossier.deletedAt || null,
-          closing_status: dossier.closingStatus,
-          setup_fee_charged_usd: dossier.setupFeeChargedUsd,
-          monthly_plan_usd: dossier.monthlyPlanUsd,
-          prestigia_plan: dossier.prestigiaPlan,
-          payment_method: dossier.paymentMethod,
-          closing_notes: dossier.closingNotes,
-          data: dossier.data,
-          updated_at: new Date().toISOString(),
-        })
-      ).catch(() => {});
+      await supabase.from('studio_dossiers').upsert({
+        id: dossier.id,
+        advisor_id: dossier.advisorId,
+        advisor_name: dossier.advisorName,
+        advisor_phone: dossier.advisorPhone,
+        advisor_type: dossier.advisorType,
+        country: dossier.country,
+        client_name: dossier.clientName,
+        contact_name: dossier.contactName,
+        contact_company: dossier.contactCompany,
+        contact_phone: dossier.contactPhone,
+        contact_email: dossier.contactEmail,
+        contact_role: dossier.contactRole,
+        category: dossier.category,
+        city: dossier.city,
+        neighborhood: dossier.neighborhood,
+        google_url: dossier.googleUrl,
+        mode: dossier.mode,
+        business_model: dossier.businessModel,
+        status: dossier.status,
+        deleted_by_advisor: Boolean(dossier.deletedByAdvisor),
+        deleted_at: dossier.deletedAt || null,
+        closing_status: dossier.closingStatus,
+        setup_fee_charged_usd: dossier.setupFeeChargedUsd,
+        monthly_plan_usd: dossier.monthlyPlanUsd,
+        prestigia_plan: dossier.prestigiaPlan,
+        payment_method: dossier.paymentMethod,
+        closing_notes: dossier.closingNotes,
+        data: dossier.data,
+        updated_at: new Date().toISOString(),
+      });
     }
-  } catch {}
+  } catch (err) {
+    console.error('Error saving studio dossier to Supabase:', err);
+  }
 }
 
 export async function deleteStudioDossier(dossierId: string, isPermanentPurge: boolean = false): Promise<boolean> {
   const db = ensureDbFile();
-  if (!db.studioDossiers) return false;
+  if (!db.studioDossiers) db.studioDossiers = [];
   if (isPermanentPurge) {
     db.studioDossiers = db.studioDossiers.filter((d) => d.id !== dossierId);
   } else {
@@ -1523,8 +1530,6 @@ export async function deleteStudioDossier(dossierId: string, isPermanentPurge: b
     if (item) {
       item.deletedByAdvisor = true;
       item.deletedAt = new Date().toISOString();
-    } else {
-      return false;
     }
   }
   writeDbFile(db);
@@ -1533,45 +1538,58 @@ export async function deleteStudioDossier(dossierId: string, isPermanentPurge: b
     const supabase = getSupabase();
     if (supabase) {
       if (isPermanentPurge) {
-        Promise.resolve(supabase.from('studio_dossiers').delete().eq('id', dossierId)).catch(() => {});
+        const { error } = await supabase.from('studio_dossiers').delete().eq('id', dossierId);
+        if (error) {
+          console.error('Supabase purge error:', error);
+          return false;
+        }
       } else {
-        Promise.resolve(
-          supabase.from('studio_dossiers').update({
-            deleted_by_advisor: true,
-            deleted_at: new Date().toISOString(),
-          }).eq('id', dossierId)
-        ).catch(() => {});
+        const { error } = await supabase.from('studio_dossiers').update({
+          deleted_by_advisor: true,
+          deleted_at: new Date().toISOString(),
+        }).eq('id', dossierId);
+        if (error) {
+          console.error('Supabase soft-delete error:', error);
+          return false;
+        }
       }
     }
-  } catch {}
+  } catch (err) {
+    console.error('Error deleting studio dossier:', err);
+    return false;
+  }
 
   return true;
 }
 
 export async function restoreStudioDossier(dossierId: string): Promise<boolean> {
   const db = ensureDbFile();
-  if (!db.studioDossiers) return false;
+  if (!db.studioDossiers) db.studioDossiers = [];
   const item = db.studioDossiers.find((d) => d.id === dossierId);
   if (item) {
     item.deletedByAdvisor = false;
     delete item.deletedAt;
     writeDbFile(db);
-
-    try {
-      const supabase = getSupabase();
-      if (supabase) {
-        Promise.resolve(
-          supabase.from('studio_dossiers').update({
-            deleted_by_advisor: false,
-            deleted_at: null,
-          }).eq('id', dossierId)
-        ).catch(() => {});
-      }
-    } catch {}
-
-    return true;
   }
-  return false;
+
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      const { error } = await supabase.from('studio_dossiers').update({
+        deleted_by_advisor: false,
+        deleted_at: null,
+      }).eq('id', dossierId);
+      if (error) {
+        console.error('Supabase restore error:', error);
+        return false;
+      }
+    }
+  } catch (err) {
+    console.error('Error restoring studio dossier:', err);
+    return false;
+  }
+
+  return true;
 }
 
 export const SEED_STUDIO_LANDING_PAGES: StudioLandingPage[] = [

@@ -183,12 +183,18 @@ export async function DELETE(request: Request) {
 
     if (isRestore) {
       const ok = await restoreStudioDossier(dossierId);
-      return NextResponse.json({ success: ok, message: 'Expediente restaurado con éxito' });
+      if (!ok) {
+        return NextResponse.json({ success: false, error: 'No se pudo restaurar el expediente' }, { status: 500 });
+      }
+      return NextResponse.json({ success: true, message: 'Expediente restaurado con éxito' });
     }
 
     const ok = await deleteStudioDossier(dossierId, isPermanentPurge);
+    if (!ok) {
+      return NextResponse.json({ success: false, error: 'No se pudo eliminar el expediente' }, { status: 500 });
+    }
     return NextResponse.json({
-      success: ok,
+      success: true,
       message: isPermanentPurge ? 'Expediente purgado definitivamente de la base de datos' : 'Expediente eliminado con éxito'
     });
   } catch (error: any) {
