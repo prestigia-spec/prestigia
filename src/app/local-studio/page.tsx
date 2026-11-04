@@ -2319,7 +2319,13 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
             advisorName: currentUser?.name || 'Luisma • Director General',
             advisorPhone: currentUser?.phone || '+573058314049',
             clientName: finalBizName,
+            contactName: contactName.trim(),
+            contactCompany: contactCompany.trim(),
+            contactPhone: contactPhone.trim(),
+            contactEmail: contactEmail.trim(),
+            contactRole: contactRole.trim(),
             category: finalCategory,
+            country: country.trim() || 'Colombia',
             city: finalCity,
             neighborhood: finalNeighborhood,
             googleUrl: finalGoogleUrl,
@@ -3031,7 +3037,13 @@ const [savedDossiers, setSavedDossiers] = useState<StudioDossierRecord[]>([]);
       `"${(d.contactCompany || '').replace(/"/g, '""')}"`,
       `"${d.contactPhone || ''}"`,
       `"${(d.category || '').replace(/"/g, '""')}"`,
-      d.mode === 'create' ? 'Ficha Nueva Desde Cero' : d.mode === 'rescue' ? 'Rescate de Ficha Google Maps' : 'Auditoria Forense Top 3',
+      d.mode === 'create'
+        ? 'Ficha Nueva Desde Cero'
+        : d.mode === 'rescue'
+        ? 'Rescate de Ficha Google Maps'
+        : d.mode === 'appeal'
+        ? 'Apelación de Reseñas 1-3★'
+        : 'Auditoria Forense Top 3',
       d.data?.healthScore !== undefined ? `"${d.data.healthScore}/100"` : '"N/A"',
       `"${d.advisorPhone || ''}"`,
     ]);

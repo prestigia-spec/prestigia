@@ -109,11 +109,21 @@ export async function POST(request: Request) {
           ? (currentAdv.maxCreatesMonthly ?? 30)
           : targetMode === 'audit'
           ? (currentAdv.maxAuditsMonthly ?? 30)
+          : targetMode === 'appeal'
+          ? (currentAdv.maxAppealsMonthly ?? 15)
           : (currentAdv.maxRescuesMonthly ?? 10);
 
         if (used >= limit) {
           return NextResponse.json({
-            error: `Has alcanzado tu cupo mensual de ${limit} ${targetMode === 'create' ? 'creaciones' : targetMode === 'audit' ? 'auditorías' : 'rescates'}. Contacta a Dirección General para ampliar tu plan.`
+            error: `Has alcanzado tu cupo mensual de ${limit} ${
+              targetMode === 'create'
+                ? 'creaciones'
+                : targetMode === 'audit'
+                ? 'auditorías'
+                : targetMode === 'appeal'
+                ? 'apelaciones'
+                : 'rescates'
+            }. Contacta a Dirección General para ampliar tu plan.`
           }, { status: 403 });
         }
       }
