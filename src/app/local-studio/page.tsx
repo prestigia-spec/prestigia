@@ -7022,7 +7022,7 @@ export default function LocalStudioPage() {
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                          <span className="font-black text-amber-400 block text-xs">Paso 1: Abrir Enlace Oficial</span>
+                          <span className="font-black text-amber-400 block text-xs">{isEn ? 'Step 1: Open Official Link' : 'Paso 1: Abrir Enlace Oficial'}</span>
                           <p className="text-[11px] text-slate-300">
                             {isEn
                               ? 'Search the business on Google Maps and click "Own this business?" or enter Google Business Profile.'
@@ -7030,7 +7030,7 @@ export default function LocalStudioPage() {
                           </p>
                         </div>
                         <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                          <span className="font-black text-amber-400 block text-xs">Paso 2: Elegir Verificación</span>
+                          <span className="font-black text-amber-400 block text-xs">{isEn ? 'Step 2: Choose Verification' : 'Paso 2: Elegir Verificación'}</span>
                           <p className="text-[11px] text-slate-300">
                             {isEn
                               ? 'Select verification by automated call or SMS directly to the business phone line.'
@@ -7038,7 +7038,7 @@ export default function LocalStudioPage() {
                           </p>
                         </div>
                         <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                          <span className="font-black text-emerald-400 block text-xs">Paso 3: Blindar Titularidad</span>
+                          <span className="font-black text-emerald-400 block text-xs">{isEn ? 'Step 3: Shield Ownership' : 'Paso 3: Blindar Titularidad'}</span>
                           <p className="text-[11px] text-slate-300">
                             {isEn
                               ? 'Enter the 6-digit code. The listing is immediately transferred to the legitimate owner.'
@@ -7063,7 +7063,7 @@ export default function LocalStudioPage() {
 
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                         <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                          <span className="font-black text-indigo-400 block text-xs">Día 1: Radicación</span>
+                          <span className="font-black text-indigo-400 block text-xs">{isEn ? 'Day 1: Submission' : 'Día 1: Radicación'}</span>
                           <p className="text-[11px] text-slate-300">
                             {isEn
                               ? 'Enter business.google.com/create, search the listing, click "Request Access", and choose Owner role.'
@@ -7071,7 +7071,7 @@ export default function LocalStudioPage() {
                           </p>
                         </div>
                         <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                          <span className="font-black text-indigo-400 block text-xs">Días 1-3: Espera</span>
+                          <span className="font-black text-indigo-400 block text-xs">{isEn ? 'Days 1-3: Waiting Period' : 'Días 1-3: Espera'}</span>
                           <p className="text-[11px] text-slate-300">
                             {isEn
                               ? 'Google emails the third party. They have exactly 72 hours to accept or transfer.'
@@ -7087,7 +7087,7 @@ export default function LocalStudioPage() {
                           </p>
                         </div>
                         <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                          <span className="font-black text-emerald-400 block text-xs">Día 5: Control Total</span>
+                          <span className="font-black text-emerald-400 block text-xs">{isEn ? 'Day 5: Full Control' : 'Día 5: Control Total'}</span>
                           <p className="text-[11px] text-slate-300">
                             {isEn
                               ? 'The owner verifies via SMS, phone call or 60s video and takes 100% legal control.'
@@ -7177,9 +7177,9 @@ export default function LocalStudioPage() {
                     <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                       <div>
-                        <strong className="text-white block text-xs">1. Documento de Constitución / Registro Tributario</strong>
+                        <strong className="text-white block text-xs">{isEn ? '1. Incorporation Certificate / Tax Registration' : '1. Documento de Constitución / Registro Tributario'}</strong>
                         <p className="text-[11px] text-slate-400 mt-0.5">
-                          RUT (Colombia), RFC / Constancia SAT (México), CIF (España) o EIN / Articles of Incorporation (USA).
+                          {isEn ? 'EIN / Articles of Incorporation (USA), CIF (Spain), RFC (Mexico), or RUT (Colombia).' : 'RUT (Colombia), RFC / Constancia SAT (México), CIF (España) o EIN / Articles of Incorporation (USA).'}
                         </p>
                       </div>
                     </div>
@@ -7187,9 +7187,9 @@ export default function LocalStudioPage() {
                     <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                       <div>
-                        <strong className="text-white block text-xs">2. Factura de Servicios Públicos o Contrato</strong>
+                        <strong className="text-white block text-xs">{isEn ? '2. Utility Bill or Commercial Lease' : '2. Factura de Servicios Públicos o Contrato'}</strong>
                         <p className="text-[11px] text-slate-400 mt-0.5">
-                          Recibo reciente de energía, agua, gas o internet con el nombre comercial y dirección idéntica a Google Maps.
+                          {isEn ? 'Recent electricity, water, gas or internet bill with business name and address identical to Google Maps.' : 'Recibo reciente de energía, agua, gas o internet con el nombre comercial y dirección idéntica a Google Maps.'}
                         </p>
                       </div>
                     </div>
@@ -7197,9 +7197,9 @@ export default function LocalStudioPage() {
                     <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                       <div>
-                        <strong className="text-white block text-xs">3. Foto Exterior de Fachada con Aviso Visible</strong>
+                        <strong className="text-white block text-xs">{isEn ? '3. Exterior Facade Photo with Visible Signage' : '3. Foto Exterior de Fachada con Aviso Visible'}</strong>
                         <p className="text-[11px] text-slate-400 mt-0.5">
-                          Fotografía tomada desde la calle mostrando el letrero comercial permanente y el número de nomenclatura.
+                          {isEn ? 'Street-view photo showing the permanent commercial sign and street address numbers.' : 'Fotografía tomada desde la calle mostrando el letrero comercial permanente y el número de nomenclatura.'}
                         </p>
                       </div>
                     </div>
@@ -7207,9 +7207,9 @@ export default function LocalStudioPage() {
                     <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                       <div>
-                        <strong className="text-white block text-xs">4. Video Continuo de 60 Segundos del Local</strong>
+                        <strong className="text-white block text-xs">{isEn ? '4. Continuous 60-Second Video Walkthrough' : '4. Video Continuo de 60 Segundos del Local'}</strong>
                         <p className="text-[11px] text-slate-400 mt-0.5">
-                          Grabación continua sin cortes: Fachada exterior (0-15s) → Mostrador de recepción (15-40s) → Software o datáfono (40-60s).
+                          {isEn ? 'One continuous uncut take: Exterior facade (0-15s) → Reception desk (15-40s) → POS terminal or tax document (40-60s).' : 'Grabación continua sin cortes: Fachada exterior (0-15s) → Mostrador de recepción (15-40s) → Software o datáfono (40-60s).'}
                         </p>
                       </div>
                     </div>
@@ -7254,7 +7254,13 @@ export default function LocalStudioPage() {
                   </div>
 
                   <p className="text-xs text-slate-300 italic leading-relaxed p-4 rounded-xl bg-slate-950 border border-slate-800">
-                    {rescueScenario === 'orphan'
+                    {isEn
+                      ? rescueScenario === 'orphan'
+                        ? `"Hello ${rescueBusinessName || 'Business Owner'}, this is the Prestigia team. We audited your Google Maps presence and discovered a critical vulnerability: your business listing exists but is currently 'Unclaimed / Orphan'. Any third party or competitor can suggest edits or claim ownership. At Prestigia, we can process your official ownership claim today and secure full legal control without altering your existing reviews or SEO ranking. Shall we start your protection protocol?"`
+                        : rescueScenario === 'third_party'
+                        ? `"Hello ${rescueBusinessName || 'Business Owner'}, this is the Prestigia team. Upon auditing your business on Google Maps, we noticed your official listing is linked to an external email ${rescueMaskedEmail.trim() ? `(${rescueMaskedEmail.trim()})` : '(an external unauthorized email)'} and you lack Primary Owner access. Do not worry: creating a new listing is NOT necessary (doing so causes duplicate listing penalties). We execute Google's Official 72-Hour Legal Ownership Protocol to request ownership and transfer complete control directly to your personal account within a week, preserving all reviews and photos. Shall we initiate the protocol today?"`
+                        : `"Hello ${rescueBusinessName || 'Business Owner'}, this is the Prestigia team. If a previous agency or ex-employee refused to transfer your Google Maps profile, Google's official policies protect your legitimate ownership. We submit an evidentiary appeal dossier with your corporate tax documentation and storefront evidence so Google Support revokes the third party and restores complete ownership to you. Would you like us to draft the official appeal?"`
+                      : rescueScenario === 'orphan'
                       ? `"Hola estimado/a ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. En Prestigia podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?"`
                       : rescueScenario === 'third_party'
                       ? `"Hola estimado/a ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${rescueMaskedEmail.trim() ? `(${rescueMaskedEmail.trim()})` : '(un correo externo no autorizado)'} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?"`
@@ -7381,8 +7387,10 @@ export default function LocalStudioPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    const script = `Hola ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia con una alerta prioritaria de su negocio en Google Maps. Detectamos que su ficha oficial se encuentra actualmente secuestrada por un tercero / suspendida por Google. Los clientes que buscan su negocio en ${rescueCity || 'su ciudad'} están llamando a números que no le pertenecen o no pueden encontrar su dirección. Por favor NO cometa el grave error de crear una ficha nueva: Google la suspenderá por duplicidad y usted perderá todas sus reseñas, fotos y años de antigüedad comercial. En Prestigia somos especialistas certificados en rescates de titularidad y ejecutamos el Protocolo Oficial de 72 Horas de Google para radicar el expediente probatorio y devolverle el control legal absoluto de su perfil. Al activar hoy su Plan Prestigia a la medida para blindar su reputación, nosotros absorbemos el 100% del costo legal y técnico de rescate ($0 bonificado) y blindamos su ficha para que nunca nadie vuelva a quitársela. ¿Nos autoriza a radicar la solicitud de titularidad hoy mismo?`;
-                    copyToClipboard(script, 'Guión de Rescate de Ficha');
+                    const script = isEn
+                      ? `Hello ${rescueBusinessName || 'Business Owner'}, this is the Prestigia team with an urgent advisory regarding your Google Maps listing. We detected that your official profile is currently compromised by a third party or suspended by Google. Customers searching for your business in ${rescueCity || 'your city'} may be calling outdated numbers or unable to find your address. Please DO NOT make the serious mistake of creating a new profile: Google will penalize both listings for duplicity and you will lose all reviews, photos, and years of commercial seniority. At Prestigia, we are certified listing recovery specialists and execute Google's Official 72-Hour Legal Ownership Protocol to submit the evidentiary dossier and return absolute legal control to you. When you activate your tailored Prestigia Plan today to protect your reputation, we absorb 100% of the technical and legal recovery fee ($0 waived) and shield your listing from future takeovers. Would you authorize us to submit the ownership claim today?`
+                      : `Hola ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia con una alerta prioritaria de su negocio en Google Maps. Detectamos que su ficha oficial se encuentra actualmente secuestrada por un tercero / suspendida por Google. Los clientes que buscan su negocio en ${rescueCity || 'su ciudad'} están llamando a números que no le pertenecen o no pueden encontrar su dirección. Por favor NO cometa el grave error de crear una ficha nueva: Google la suspenderá por duplicidad y usted perderá todas sus reseñas, fotos y años de antigüedad comercial. En Prestigia somos especialistas certificados en rescates de titularidad y ejecutamos el Protocolo Oficial de 72 Horas de Google para radicar el expediente probatorio y devolverle el control legal absoluto de su perfil. Al activar hoy su Plan Prestigia a la medida para blindar su reputación, nosotros absorbemos el 100% del costo legal y técnico de rescate ($0 bonificado) y blindamos su ficha para que nunca nadie vuelva a quitársela. ¿Nos autoriza a radicar la solicitud de titularidad hoy mismo?`;
+                    copyToClipboard(script, isEn ? 'Listing Rescue Pitch' : 'Guión de Rescate de Ficha');
                   }}
                   className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg shadow-rose-600/20 cursor-pointer shrink-0 active:scale-98"
                 >
@@ -7764,9 +7772,9 @@ export default function LocalStudioPage() {
                             onChange={(e) => setManualRating(Number(e.target.value))}
                             className="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
                           >
-                            <option value={1}>★ 1 Estrella (Crítica Máxima)</option>
-                            <option value={2}>★★ 2 Estrellas (Negativa)</option>
-                            <option value={3}>★★★ 3 Estrellas (Neutro/Dañina)</option>
+                            <option value={1}>{isEn ? '★ 1 Star (Severe Critical)' : '★ 1 Estrella (Crítica Máxima)'}</option>
+                            <option value={2}>{isEn ? '★★ 2 Stars (Negative)' : '★★ 2 Estrellas (Negativa)'}</option>
+                            <option value={3}>{isEn ? '★★★ 3 Stars (Neutral / Damaging)' : '★★★ 3 Estrellas (Neutro/Dañina)'}</option>
                           </select>
                         </div>
                       </div>
@@ -7792,7 +7800,7 @@ export default function LocalStudioPage() {
                           rows={3}
                           value={manualText}
                           onChange={(e) => setManualText(e.target.value)}
-                          placeholder="Pega aquí el texto completo que escribió la persona..."
+                          placeholder={isEn ? 'Paste here the full text written by the reviewer...' : 'Pega aquí el texto completo que escribió la persona...'}
                           className="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
                           required
                         />
@@ -7808,12 +7816,12 @@ export default function LocalStudioPage() {
                           className="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
                         >
                           <option value="fake_customer">{isEn ? '🚫 Never a customer / No purchase record or order' : '🚫 Nunca fue cliente / Sin registro de compra ni comanda'}</option>
-                          <option value="competitor">⚔️ Sospecha de competidor local / Conflicto de intereses</option>
-                          <option value="ex_employee">👔 Ex-empleado o conflicto laboral interno</option>
-                          <option value="defamation">🚨 Acoso, insultos directos o difamación personal</option>
-                          <option value="extortion">💰 Intento de extorsión / Exigencia forzada de dinero</option>
-                          <option value="off_topic">📍 Off-Topic / Confusión con otro local ajeno</option>
-                          <option value="general_bad_faith">⚠️ Mala fe manifiesta / Queja sin hechos verificables</option>
+                          <option value="competitor">{isEn ? '⚔️ Local Competitor Suspected / Conflict of Interest' : '⚔️ Sospecha de competidor local / Conflicto de intereses'}</option>
+                          <option value="ex_employee">{isEn ? '👔 Ex-Employee or Internal Labor Dispute' : '👔 Ex-empleado o conflicto laboral interno'}</option>
+                          <option value="defamation">{isEn ? '🚨 Harassment, Direct Insults or Defamation' : '🚨 Acoso, insultos directos o difamación personal'}</option>
+                          <option value="extortion">{isEn ? '💰 Extortion Attempt / Forced Money Demand' : '💰 Intento de extorsión / Exigencia forzada de dinero'}</option>
+                          <option value="off_topic">{isEn ? '📍 Off-Topic / Confusion with an Unrelated Business' : '📍 Off-Topic / Confusión con otro local ajeno'}</option>
+                          <option value="general_bad_faith">{isEn ? '⚠️ Manifest Bad Faith / Unverifiable Claims' : '⚠️ Mala fe manifiesta / Queja sin hechos verificables'}</option>
                         </select>
                       </div>
 
@@ -7825,7 +7833,7 @@ export default function LocalStudioPage() {
                           type="text"
                           value={manualNotes}
                           onChange={(e) => setManualNotes(e.target.value)}
-                          placeholder="Ej: Revisamos las cámaras y ese día el local estuvo cerrado por mantenimiento..."
+                          placeholder={isEn ? 'e.g. We checked cameras and on that date the store was closed for maintenance...' : 'Ej: Revisamos las cámaras y ese día el local estuvo cerrado por mantenimiento...'}
                           className="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
                         />
                       </div>
@@ -7836,7 +7844,7 @@ export default function LocalStudioPage() {
                         className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-slate-950 font-black text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md disabled:opacity-50"
                       >
                         <Scale className="w-3.5 h-3.5" />
-                        <span>{isGeneratingAppeal ? 'Generando Expediente...' : 'Analizar & Preparar Apelación Formal'}</span>
+                        <span>{isGeneratingAppeal ? (isEn ? 'Generating Appeal Dossier...' : 'Generando Expediente...') : (isEn ? 'Analyze & Prepare Formal Appeal' : 'Analizar & Preparar Apelación Formal')}</span>
                       </button>
                     </form>
                   )}
@@ -7954,16 +7962,16 @@ export default function LocalStudioPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left pt-2">
                       <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-                        <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider block">1. Infracción Precisa</span>
-                        <p className="text-xs text-slate-300">Cita la cláusula exacta de los Términos de Google (Conflicto, Fake o Acoso).</p>
+                        <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider block">{isEn ? '1. Exact Infringement' : '1. Infracción Precisa'}</span>
+                        <p className="text-xs text-slate-300">{isEn ? 'Cites the exact clause of Google Terms (Conflict, Fake, or Harassment).' : 'Cita la cláusula exacta de los Términos de Google (Conflicto, Fake o Acoso).'}</p>
                       </div>
                       <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-                        <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">2. Memorial Legal</span>
-                        <p className="text-xs text-slate-300">Escrito formal técnico-jurídico redactado para radicar ante Trust & Safety.</p>
+                        <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">{isEn ? '2. Legal Memorial' : '2. Memorial Legal'}</span>
+                        <p className="text-xs text-slate-300">{isEn ? 'Formal technical-legal petition drafted for Google Trust & Safety.' : 'Escrito formal técnico-jurídico redactado para radicar ante Trust & Safety.'}</p>
                       </div>
                       <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">3. Escudo Inmediato</span>
-                        <p className="text-xs text-slate-300">Respuesta pública institucional para frenar el daño mientras Google decide.</p>
+                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">{isEn ? '3. Immediate Shield' : '3. Escudo Inmediato'}</span>
+                        <p className="text-xs text-slate-300">{isEn ? 'Public institutional response to mitigate damage while Google decides.' : 'Respuesta pública institucional para frenar el daño mientras Google decide.'}</p>
                       </div>
                     </div>
                   </div>
@@ -7997,14 +8005,14 @@ export default function LocalStudioPage() {
                             Expediente: {activeAppealDossier.id}
                           </span>
                           <h3 className="text-base font-black text-white mt-1 flex items-center gap-2">
-                            <span>Reseña de: "{activeAppealDossier.authorName}"</span>
+                            <span>{isEn ? 'Review by:' : 'Reseña de:'} "{activeAppealDossier.authorName}"</span>
                             <span className="text-amber-400 text-xs">({activeAppealDossier.rating}★)</span>
                           </h3>
                         </div>
 
                         <div className="flex items-center gap-3">
                           <div className="text-right">
-                            <span className="text-[10px] text-slate-400 block font-mono">Índice de Viabilidad</span>
+                            <span className="text-[10px] text-slate-400 block font-mono">{isEn ? 'Viability Index' : 'Índice de Viabilidad'}</span>
                             <strong className="text-lg font-black text-emerald-400">
                               {activeAppealDossier.successProbability} ({activeAppealDossier.successProbabilityPercent}%)
                             </strong>
@@ -8015,7 +8023,7 @@ export default function LocalStudioPage() {
                             className="px-3 py-2 rounded-xl bg-slate-950 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 print:hidden"
                           >
                             <Printer className="w-3.5 h-3.5 text-amber-400" />
-                            <span>Imprimir</span>
+                            <span>{isEn ? 'Print' : 'Imprimir'}</span>
                           </button>
                         </div>
                       </div>
@@ -8030,7 +8038,7 @@ export default function LocalStudioPage() {
                       <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
                         <Gavel className="w-4 h-4 text-amber-400" />
                         <h4 className="text-xs font-black text-white uppercase tracking-wider">
-                          1. Cláusula Infringida de las Políticas de Google Maps
+                          {isEn ? '1. Infringed Google Maps Policy Clause' : '1. Cláusula Infringida de las Políticas de Google Maps'}
                         </h4>
                       </div>
                       <div className="p-3 rounded-2xl bg-slate-950 border border-amber-500/30 space-y-1.5">
@@ -8045,7 +8053,7 @@ export default function LocalStudioPage() {
                         </p>
                       </div>
                       <p className="text-xs text-slate-400">
-                        <strong className="text-white">Fundamento Fáctico: </strong>
+                        <strong className="text-white">{isEn ? 'Factual Basis: ' : 'Fundamento Fáctico: '}</strong>
                         {activeAppealDossier.googlePolicy.infringementAnalysis}
                       </p>
                     </div>
@@ -8056,7 +8064,7 @@ export default function LocalStudioPage() {
                         <div className="flex items-center gap-2">
                           <ExternalLink className="w-4 h-4 text-indigo-400" />
                           <h4 className="text-xs font-black text-white uppercase tracking-wider">
-                            2. Tramitación en la Consola Oficial de Google
+                            {isEn ? '2. Official Google Console Submission' : '2. Tramitación en la Consola Oficial de Google'}
                           </h4>
                         </div>
                         <a
@@ -8066,21 +8074,21 @@ export default function LocalStudioPage() {
                           className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-indigo-600/30 cursor-pointer shrink-0"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
-                          <span>Abrir Consola de Google Business</span>
+                          <span>{isEn ? 'Open Google Business Console' : 'Abrir Consola de Google Business'}</span>
                         </a>
                       </div>
 
                       <div className="p-3 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 flex items-center justify-between gap-3">
                         <div>
                           <span className="text-[10px] text-indigo-300 uppercase font-black tracking-wider block">
-                            Opción Exacta a Seleccionar en el Menú de Google:
+                            {isEn ? 'Exact Option to Select in Google Menu:' : 'Opción Exacta a Seleccionar en el Menú de Google:'}
                           </span>
                           <strong className="text-xs font-black text-white">
                             «{activeAppealDossier.googleConsoleWorkflow.exactCategoryToSelect}»
                           </strong>
                         </div>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-900 text-indigo-200 shrink-0">
-                          Paso Clave
+                          {isEn ? 'Key Step' : 'Paso Clave'}
                         </span>
                       </div>
 
@@ -8100,7 +8108,7 @@ export default function LocalStudioPage() {
                         <div className="flex items-center gap-2">
                           <FileText className="w-4 h-4 text-rose-400" />
                           <h4 className="text-xs font-black text-white uppercase tracking-wider">
-                            3. Memorial Legal de Impugnación (Texto para Google Trust & Safety)
+                            {isEn ? '3. Legal Appeal Memorial (Text for Google Trust & Safety)' : '3. Memorial Legal de Impugnación (Texto para Google Trust & Safety)'}
                           </h4>
                         </div>
                         <button
@@ -8117,12 +8125,12 @@ export default function LocalStudioPage() {
                           {appealSuccessCopied === 'memorial' ? (
                             <>
                               <Check className="w-3.5 h-3.5 text-slate-950" />
-                              <span>¡Copiado!</span>
+                              <span>{isEn ? 'Copied!' : '¡Copiado!'}</span>
                             </>
                           ) : (
                             <>
                               <Copy className="w-3.5 h-3.5 text-slate-950" />
-                              <span>Copiar Memorial</span>
+                              <span>{isEn ? 'Copy Memorial' : 'Copiar Memorial'}</span>
                             </>
                           )}
                         </button>
@@ -8130,7 +8138,7 @@ export default function LocalStudioPage() {
 
                       <div className="space-y-2">
                         <div className="text-[11px] font-mono text-slate-400 bg-slate-950 p-2 rounded-xl border border-slate-800">
-                          <strong className="text-white">ASUNTO: </strong>
+                          <strong className="text-white">{isEn ? 'SUBJECT: ' : 'ASUNTO: '}</strong>
                           {activeAppealDossier.legalAppealMemorial.subject}
                         </div>
                         <pre className="text-xs text-slate-300 whitespace-pre-wrap font-mono bg-slate-950 p-4 rounded-2xl border border-slate-800 max-h-72 overflow-y-auto leading-relaxed">
@@ -8145,7 +8153,7 @@ export default function LocalStudioPage() {
                         <div className="flex items-center gap-2">
                           <MessageSquare className="w-4 h-4 text-emerald-400" />
                           <h4 className="text-xs font-black text-white uppercase tracking-wider">
-                            4. Respuesta Pública de Mitigación Inmediata (Publicar en Maps)
+                            {isEn ? '4. Immediate Public Mitigation Response (Publish on Maps)' : '4. Respuesta Pública de Mitigación Inmediata (Publicar en Maps)'}
                           </h4>
                         </div>
                         <button
@@ -8160,12 +8168,12 @@ export default function LocalStudioPage() {
                           {appealSuccessCopied === 'mitigation' ? (
                             <>
                               <Check className="w-3.5 h-3.5 text-slate-950" />
-                              <span>¡Copiado!</span>
+                              <span>{isEn ? 'Copied!' : '¡Copiado!'}</span>
                             </>
                           ) : (
                             <>
                               <Copy className="w-3.5 h-3.5 text-slate-950" />
-                              <span>Copiar Respuesta</span>
+                              <span>{isEn ? 'Copy Response' : 'Copiar Respuesta'}</span>
                             </>
                           )}
                         </button>
@@ -8186,7 +8194,7 @@ export default function LocalStudioPage() {
                       <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
                         <ShieldCheck className="w-4 h-4 text-amber-400" />
                         <h4 className="text-xs font-black text-white uppercase tracking-wider">
-                          5. Pruebas de Soporte Recomendadas para Adjuntar
+                          {isEn ? '5. Recommended Supporting Evidence to Attach' : '5. Pruebas de Soporte Recomendadas para Adjuntar'}
                         </h4>
                       </div>
 
@@ -8216,13 +8224,13 @@ export default function LocalStudioPage() {
                       <div className="flex items-center gap-2 pb-2 border-b border-indigo-500/30">
                         <Trophy className="w-4 h-4 text-indigo-400" />
                         <h4 className="text-xs font-black text-indigo-300 uppercase tracking-wider">
-                          6. Guion Comercial para el Asesor de Prestigia
+                          {isEn ? '6. Commercial Sales Script for Prestigia Advisor' : '6. Guion Comercial para el Asesor de Prestigia'}
                         </h4>
                       </div>
 
                       <div className="space-y-2">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                          Pitch de Presentación al Cliente:
+                          {isEn ? 'Client Presentation Pitch:' : 'Pitch de Presentación al Cliente:'}
                         </span>
                         <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 italic leading-relaxed">
                           {activeAppealDossier.commercialScript.closingPitch}
@@ -8231,7 +8239,7 @@ export default function LocalStudioPage() {
 
                       <div className="space-y-2 pt-1">
                         <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">
-                          Manejo de la Objeción: "¿Y me garantizan que Google la borre sí o sí?"
+                          {isEn ? 'Objection Handling: "Do you guarantee Google will remove it 100%?"' : 'Manejo de la Objeción: "¿Y me garantizan que Google la borre sí o sí?"'}
                         </span>
                         <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 leading-relaxed font-sans whitespace-pre-wrap">
                           {activeAppealDossier.commercialScript.clientObjectionHandling}
@@ -8242,7 +8250,7 @@ export default function LocalStudioPage() {
                     {/* Card 7: Official Legal Disclaimer */}
                     <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1 text-center">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">
-                        🛡️ Transparencia & Descargo de Responsabilidad Jurídica Prestigia
+                        {isEn ? '🛡️ Prestigia Transparency & Legal Disclaimer' : '🛡️ Transparencia & Descargo de Responsabilidad Jurídica Prestigia'}
                       </span>
                       <p className="text-[10px] text-slate-500 leading-relaxed max-w-3xl mx-auto">
                         {activeAppealDossier.legalDisclaimer}
@@ -9216,16 +9224,16 @@ export default function LocalStudioPage() {
                           {/* Factor 1: Velocidad Semanal */}
                           <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-2.5 items-center">
                             <div>
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">1. Velocidad & Frescura</span>
-                              <strong className="text-white text-xs">Impacto en el Algoritmo</strong>
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{isEn ? '1. Velocity & Freshness' : '1. Velocidad & Frescura'}</span>
+                              <strong className="text-white text-xs">{isEn ? 'Algorithm Impact' : 'Impacto en el Algoritmo'}</strong>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
                               <span className="text-[10px] text-rose-400 block font-bold">{isEn ? 'Your Business Today:' : 'Tu Negocio Hoy:'}</span>
-                              <span className="text-slate-300 font-medium">+1 reseña/semana (Dormida)</span>
+                              <span className="text-slate-300 font-medium">{isEn ? '+1 review/week (Stagnant)' : '+1 reseña/semana (Dormida)'}</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
-                              <span className="text-[10px] text-emerald-400 block font-bold">Con Prestigia Software 5★:</span>
-                              <span className="text-emerald-300 font-bold">+8 a +12 reseñas 5★/sem</span>
+                              <span className="text-[10px] text-emerald-400 block font-bold">{isEn ? 'With Prestigia 5★ Software:' : 'Con Prestigia Software 5★:'}</span>
+                              <span className="text-emerald-300 font-bold">{isEn ? '+8 to +12 5★ reviews/wk' : '+8 a +12 reseñas 5★/sem'}</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
                               <span className="text-[10px] text-slate-400 block font-bold">{rivalName || (isEn ? 'Your Rival' : 'Tu Rival')}:</span>
@@ -9236,16 +9244,16 @@ export default function LocalStudioPage() {
                           {/* Factor 2: Galería de Fotos */}
                           <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-2.5 items-center">
                             <div>
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">2. Arsenal Visual (Fotos)</span>
-                              <strong className="text-white text-xs">Confianza & Google Lens</strong>
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{isEn ? '2. Visual Arsenal (Photos)' : '2. Arsenal Visual (Fotos)'}</span>
+                              <strong className="text-white text-xs">{isEn ? 'Trust & Google Lens' : 'Confianza & Google Lens'}</strong>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
                               <span className="text-[10px] text-rose-400 block font-bold">{isEn ? 'Your Business Today:' : 'Tu Negocio Hoy:'}</span>
-                              <span className="text-slate-300 font-medium">14 fotos (Déficit crítico)</span>
+                              <span className="text-slate-300 font-medium">{isEn ? '14 photos (Critical deficit)' : '14 fotos (Déficit crítico)'}</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
-                              <span className="text-[10px] text-emerald-400 block font-bold">Con Prestigia:</span>
-                              <span className="text-emerald-300 font-bold">50+ fotos geolocalizadas</span>
+                              <span className="text-[10px] text-emerald-400 block font-bold">{isEn ? 'With Prestigia:' : 'Con Prestigia:'}</span>
+                              <span className="text-emerald-300 font-bold">{isEn ? '50+ geotagged photos' : '50+ fotos geolocalizadas'}</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
                               <span className="text-[10px] text-slate-400 block font-bold">{rivalName || (isEn ? 'Your Rival' : 'Tu Rival')}:</span>
@@ -9256,40 +9264,40 @@ export default function LocalStudioPage() {
                           {/* Factor 3: Palabras Clave en Reseñas */}
                           <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-2.5 items-center">
                             <div>
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">3. Palabras Clave SEO</span>
-                              <strong className="text-white text-xs">Indexación por Términos</strong>
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{isEn ? '3. SEO Keywords' : '3. Palabras Clave SEO'}</span>
+                              <strong className="text-white text-xs">{isEn ? 'Term Indexation' : 'Indexación por Términos'}</strong>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
                               <span className="text-[10px] text-rose-400 block font-bold">{isEn ? 'Your Business Today:' : 'Tu Negocio Hoy:'}</span>
-                              <span className="text-slate-300 font-medium">Genéricas ("rico", "bueno")</span>
+                              <span className="text-slate-300 font-medium">{isEn ? 'Generic ("tasty", "good")' : 'Genéricas ("rico", "bueno")'}</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
-                              <span className="text-[10px] text-emerald-400 block font-bold">Con Prestigia:</span>
-                              <span className="text-emerald-300 font-bold">Guiadas con palabras de compra</span>
+                              <span className="text-[10px] text-emerald-400 block font-bold">{isEn ? 'With Prestigia:' : 'Con Prestigia:'}</span>
+                              <span className="text-emerald-300 font-bold">{isEn ? 'Guided with buyer intent keywords' : 'Guiadas con palabras de compra'}</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
                               <span className="text-[10px] text-slate-400 block font-bold">{rivalName || (isEn ? 'Your Rival' : 'Tu Rival')}:</span>
-                              <span className="text-slate-300">Orgánicas sin guiar</span>
+                              <span className="text-slate-300">{isEn ? 'Unguided organic' : 'Orgánicas sin guiar'}</span>
                             </div>
                           </div>
 
                           {/* Factor 4: Filtro de Reseñas Negativas */}
                           <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-2.5 items-center">
                             <div>
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">4. Blindaje de Reputación</span>
-                              <strong className="text-white text-xs">Filtro Anti-Negativas</strong>
+                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{isEn ? '4. Reputation Shield' : '4. Blindaje de Reputación'}</span>
+                              <strong className="text-white text-xs">{isEn ? 'Anti-Negative Filter' : 'Filtro Anti-Negativas'}</strong>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
                               <span className="text-[10px] text-rose-400 block font-bold">{isEn ? 'Your Business Today:' : 'Tu Negocio Hoy:'}</span>
-                              <span className="text-slate-300 font-medium">Van directo a Google Maps</span>
+                              <span className="text-slate-300 font-medium">{isEn ? 'Go straight to Google Maps' : 'Van directo a Google Maps'}</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
-                              <span className="text-[10px] text-emerald-400 block font-bold">Con Prestigia:</span>
-                              <span className="text-emerald-300 font-bold">Desvío privado a WhatsApp</span>
+                              <span className="text-[10px] text-emerald-400 block font-bold">{isEn ? 'With Prestigia:' : 'Con Prestigia:'}</span>
+                              <span className="text-emerald-300 font-bold">{isEn ? 'Private redirect to WhatsApp' : 'Desvío privado a WhatsApp'}</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
                               <span className="text-[10px] text-slate-400 block font-bold">{rivalName || (isEn ? 'Your Rival' : 'Tu Rival')}:</span>
-                              <span className="text-slate-300">Sin protección de reseñas</span>
+                              <span className="text-slate-300">{isEn ? 'No review protection' : 'Sin protección de reseñas'}</span>
                             </div>
                           </div>
                         </div>
@@ -9307,19 +9315,19 @@ export default function LocalStudioPage() {
                           <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-2.5">
                             <span className="font-black text-emerald-400">1.</span>
                             <span className="text-slate-300">
-                              <strong>Activación del Sistema Inteligente de Reseñas Digitales:</strong> Inyectamos de +8 a +12 reseñas 5★ por semana mediante códigos QR inteligentes y automatización WhatsApp para quebrar la ventaja del competidor.
+                              {isEn ? <><strong>Intelligent Review System Activation:</strong> We inject +8 to +12 5★ reviews per week via Smart QR codes and WhatsApp automation to break your competitor's lead.</> : <><strong>Activación del Sistema Inteligente de Reseñas Digitales:</strong> Inyectamos de +8 a +12 reseñas 5★ por semana mediante códigos QR inteligentes y automatización WhatsApp para quebrar la ventaja del competidor.</>}
                             </span>
                           </div>
                           <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-2.5">
                             <span className="font-black text-amber-400">2.</span>
                             <span className="text-slate-300">
-                              <strong>Carga de 35+ Fotos Geolocalizadas con Atributos:</strong> Anulamos el déficit visual subiendo platos, instalaciones y servicios optimizados para Google Lens.
+                              {isEn ? <><strong>Upload of 35+ Geotagged Photos with EXIF Attributes:</strong> We nullify the visual gap by uploading dishes, facilities, and services optimized for Google Lens indexing.</> : <><strong>Carga de 35+ Fotos Geolocalizadas con Atributos:</strong> Anulamos el déficit visual subiendo platos, instalaciones y servicios optimizados para Google Lens.</>}
                             </span>
                           </div>
                           <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-2.5">
                             <span className="font-black text-indigo-400">3.</span>
                             <span className="text-slate-300">
-                              <strong>Blindaje Anti-Reseñas Negativas & Respuestas con IA:</strong> Filtramos clientes insatisfechos a soporte interno y respondemos todas las opiniones con IA en menos de 2 horas para sellar el podio #1.
+                              {isEn ? <><strong>Reputation Shield & AI Review Response:</strong> We route dissatisfied customers to internal private support and reply to every review via AI within 2 hours to cement the #1 podium spot.</> : <><strong>Blindaje Anti-Reseñas Negativas & Respuestas con IA:</strong> Filtramos clientes insatisfechos a soporte interno y respondemos todas las opiniones con IA en menos de 2 horas para sellar el podio #1.</>}
                             </span>
                           </div>
                         </div>
@@ -9749,7 +9757,7 @@ export default function LocalStudioPage() {
                             : d.mode === 'rescue'
                             ? tDossiers.badgeRescue
                             : d.mode === 'appeal'
-                            ? '⚖️ Apelación 1-3★'
+                            ? (isEn ? '⚖️ 1-3★ Appeal' : '⚖️ Apelación 1-3★')
                             : tDossiers.badgeAudit}
                         </span>
 
@@ -9833,16 +9841,16 @@ export default function LocalStudioPage() {
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] font-black text-emerald-300 uppercase tracking-wide flex items-center gap-1">
                                 <Sparkles className="w-3 h-3 text-emerald-400" />
-                                Suscripción Prestigia Activa
+                                {isEn ? 'Active Prestigia Subscription' : 'Suscripción Prestigia Activa'}
                               </span>
                               <strong className="text-xs font-black text-emerald-400">
                                 {d.monthlyPlanUsd ? `$${d.monthlyPlanUsd} USD/mes` : (isEn ? 'Tailored Plan' : 'Plan a la Medida')}
                               </strong>
                             </div>
                             <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1 border-t border-emerald-500/20">
-                              <span className="text-slate-400">Setup Técnico:</span>
+                              <span className="text-slate-400">{isEn ? 'Technical Setup:' : 'Setup Técnico:'}</span>
                               <span className="font-bold text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                                $0 USD (100% Bonificado)
+                                {isEn ? '$0 USD (100% Waived)' : '$0 USD (100% Bonificado)'}
                               </span>
                             </div>
                           </div>
@@ -9851,14 +9859,14 @@ export default function LocalStudioPage() {
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] font-black text-cyan-300 uppercase tracking-wide flex items-center gap-1">
                                 <DollarSign className="w-3 h-3 text-cyan-400" />
-                                Setup Técnico Cobrado
+                                {isEn ? 'Technical Setup Paid' : 'Setup Técnico Cobrado'}
                               </span>
                               <strong className="text-xs font-black text-cyan-300">
                                 ${d.setupFeeChargedUsd || 250} USD
                               </strong>
                             </div>
                             <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1 border-t border-cyan-500/20">
-                              <span className="text-slate-400">Plan Mensual:</span>
+                              <span className="text-slate-400">{isEn ? 'Monthly Plan:' : 'Plan Mensual:'}</span>
                               <span className="text-slate-400 italic">{isEn ? 'No subscription (One-Time Sale)' : 'Sin suscripción (Venta Única)'}</span>
                             </div>
                           </div>
@@ -9867,14 +9875,14 @@ export default function LocalStudioPage() {
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] font-black text-amber-300 uppercase tracking-wide flex items-center gap-1">
                                 <Clock className="w-3 h-3 text-amber-400" />
-                                Propuesta Comercial Enviada
+                                {isEn ? 'Commercial Proposal Sent' : 'Propuesta Comercial Enviada'}
                               </span>
                               <span className="text-[11px] font-black text-amber-300">
                                 Setup: ${d.setupFeeChargedUsd || 250} USD
                               </span>
                             </div>
                             <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1 border-t border-amber-500/20">
-                              <span className="text-slate-400">Opción Prestigia:</span>
+                              <span className="text-slate-400">{isEn ? 'Prestigia Option:' : 'Opción Prestigia:'}</span>
                               <span className="text-emerald-300 font-bold">{d.monthlyPlanUsd ? `$${d.monthlyPlanUsd}/mes` : (isEn ? 'Tailored Plan' : 'Plan a la Medida')} (Setup $0)</span>
                             </div>
                           </div>
@@ -9882,7 +9890,7 @@ export default function LocalStudioPage() {
                           <div className="p-3 rounded-2xl bg-purple-950/50 border border-purple-500/30 space-y-1">
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] font-black text-purple-300 uppercase tracking-wide">
-                                🤝 En Negociación de Cierre
+                                {isEn ? '🤝 In Closing Negotiation' : '🤝 En Negociación de Cierre'}
                               </span>
                               <span className="text-[11px] font-bold text-slate-300">
                                 Setup: ${d.setupFeeChargedUsd || 250} USD
@@ -9974,7 +9982,7 @@ export default function LocalStudioPage() {
                   <div className="p-5 sm:p-6 pb-3 border-b border-slate-800 flex items-start justify-between gap-4 shrink-0 bg-slate-900/95">
                     <div>
                       <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
-                        Control de Monetización & Cierre
+                        {isEn ? 'Monetization & Closing Control' : 'Control de Monetización & Cierre'}
                       </span>
                       <h3 className="text-lg font-black text-white mt-1">
                         {editingDossierClosing.clientName}
@@ -9998,7 +10006,7 @@ export default function LocalStudioPage() {
                   {/* 1-Click Fast Presets */}
                   <div className="space-y-1.5">
                     <span className="text-[10px] font-bold text-slate-400 uppercase">
-                      Plantillas Rápidas de Cierre:
+                      {isEn ? 'Quick Closing Presets:' : 'Plantillas Rápidas de Cierre:'}
                     </span>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
                       <button
@@ -10024,8 +10032,8 @@ export default function LocalStudioPage() {
                         }}
                         className="p-2 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 text-[11px] font-bold text-left transition cursor-pointer"
                       >
-                        💵 Setup Solo $250
-                        <span className="block text-[9px] text-cyan-400/80 font-normal">Pago Único (Sin MRR)</span>
+                        💵 {isEn ? 'Setup Only $250' : 'Setup Solo $250'}
+                        <span className="block text-[9px] text-cyan-400/80 font-normal">{isEn ? 'One-Time Payment (No MRR)' : 'Pago Único (Sin MRR)'}</span>
                       </button>
 
                       <button
@@ -10038,8 +10046,8 @@ export default function LocalStudioPage() {
                         }}
                         className="p-2 rounded-xl bg-amber-950/80 hover:bg-amber-900 border border-amber-500/40 text-amber-300 text-[11px] font-bold text-left transition cursor-pointer"
                       >
-                        🛡️ Rescate 72h $350
-                        <span className="block text-[9px] text-amber-400/80 font-normal">Recuperación Legal</span>
+                        🛡️ {isEn ? '72h Rescue $350' : 'Rescate 72h $350'}
+                        <span className="block text-[9px] text-amber-400/80 font-normal">{isEn ? 'Legal Ownership Recovery' : 'Recuperación Legal'}</span>
                       </button>
                     </div>
                   </div>
@@ -10051,7 +10059,7 @@ export default function LocalStudioPage() {
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <label className="text-slate-300 font-bold">
-                            País del Cliente:
+                            {isEn ? 'Client Country:' : 'País del Cliente:'}
                           </label>
                           <button
                             type="button"
@@ -10138,7 +10146,7 @@ export default function LocalStudioPage() {
                     {/* Service Type */}
                     <div>
                       <label className="block text-slate-300 font-bold mb-1">
-                        Tipo de Servicio Técnico Realizado:
+                        {isEn ? 'Technical Service Delivered:' : 'Tipo de Servicio Técnico Realizado:'}
                       </label>
                       <select
                         value={closingFormMode}
@@ -10154,7 +10162,7 @@ export default function LocalStudioPage() {
                     {/* Closing Status */}
                     <div>
                       <label className="block text-slate-300 font-bold mb-1">
-                        Estado de Negociación y Cierre:
+                        {isEn ? 'Negotiation & Closing Status:' : 'Estado de Negociación y Cierre:'}
                       </label>
                       <select
                         value={closingFormStatus}
@@ -10169,9 +10177,9 @@ export default function LocalStudioPage() {
                         className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
                       >
                         <option value="prestigia_subscriber">{isEn ? '💎 Active Prestigia Subscriber (Setup $0 USD 100% Waived)' : '💎 Suscriptor Prestigia Activo (Setup $0 USD 100% Bonificado)'}</option>
-                        <option value="setup_paid">💵 Setup Técnico Cobrado (Pago único por trabajo técnico)</option>
+                        <option value="setup_paid">{isEn ? '💵 Technical Setup Paid (One-time technical delivery fee)' : '💵 Setup Técnico Cobrado (Pago único por trabajo técnico)'}</option>
                         <option value="proposal_sent">{isEn ? '⏳ Proposal Sent (In commercial follow-up)' : '⏳ Propuesta Enviada (En seguimiento comercial)'}</option>
-                        <option value="negotiating">🤝 En Negociación Activa</option>
+                        <option value="negotiating">{isEn ? '🤝 In Active Negotiation' : '🤝 En Negociación Activa'}</option>
                         <option value="lead_draft">{isEn ? '📝 Prospect / Profile Under Review' : '📝 Prospección / Ficha en Estudio'}</option>
                       </select>
                     </div>
@@ -10180,7 +10188,7 @@ export default function LocalStudioPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="block text-slate-300 font-bold mb-1">
-                          Valor Cobrado de Setup (USD):
+                          {isEn ? 'Setup Fee Charged (USD):' : 'Valor Cobrado de Setup (USD):'}
                         </label>
                         <div className="relative">
                           <input
@@ -10194,13 +10202,13 @@ export default function LocalStudioPage() {
                           <DollarSign className="w-4 h-4 text-slate-500 absolute left-2.5 top-2.5" />
                         </div>
                         <span className="text-[10px] text-slate-500 mt-0.5 block">
-                          Si adquirió Prestigia, coloca $0 (Setup bonificado).
+                          {isEn ? 'If client subscribed to Prestigia, enter $0 (Setup waived).' : 'Si adquirió Prestigia, coloca $0 (Setup bonificado).'}
                         </span>
                       </div>
 
                       <div>
                         <label className="block text-slate-300 font-bold mb-1">
-                          Plan Mensual Prestigia (USD/mes):
+                          {isEn ? 'Prestigia Monthly Plan (USD/mo):' : 'Plan Mensual Prestigia (USD/mes):'}
                         </label>
                         <div className="relative">
                           <input
@@ -10214,7 +10222,7 @@ export default function LocalStudioPage() {
                           <DollarSign className="w-4 h-4 text-slate-500 absolute left-2.5 top-2.5" />
                         </div>
                         <span className="text-[10px] text-slate-500 mt-0.5 block">
-                          Tarifa a la medida acordada con el cliente • $0 si solo fue setup.
+                          {isEn ? 'Tailored rate agreed with client • $0 if setup only.' : 'Tarifa a la medida acordada con el cliente • $0 si solo fue setup.'}
                         </span>
                       </div>
                     </div>
@@ -10222,13 +10230,13 @@ export default function LocalStudioPage() {
                     {/* Payment Method */}
                     <div>
                       <label className="block text-slate-300 font-bold mb-1">
-                        Método de Pago / Detalle de Cobro:
+                        {isEn ? 'Payment Method / Billing Detail:' : 'Método de Pago / Detalle de Cobro:'}
                       </label>
                       <input
                         type="text"
                         value={closingFormPaymentMethod}
                         onChange={(e) => setClosingFormPaymentMethod(e.target.value)}
-                        placeholder="Ej: Stripe Recurrente, Transferencia Bancaria, Datáfono..."
+                        placeholder={isEn ? 'e.g. Stripe Recurring, Wire Transfer, POS Terminal...' : 'Ej: Stripe Recurrente, Transferencia Bancaria, Datáfono...'} 
                         className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
                       />
                     </div>
@@ -10236,13 +10244,13 @@ export default function LocalStudioPage() {
                     {/* Closing Notes */}
                     <div>
                       <label className="block text-slate-300 font-bold mb-1">
-                        Bitácora & Notas de Negociación:
+                        {isEn ? 'Negotiation Log & Commercial Notes:' : 'Bitácora & Notas de Negociación:'}
                       </label>
                       <textarea
                         rows={3}
                         value={closingFormNotes}
                         onChange={(e) => setClosingFormNotes(e.target.value)}
-                        placeholder="Registra acuerdos, fecha de activación de plataforma, objeciones resueltas..."
+                        placeholder={isEn ? 'Log client agreements, activation date, resolved objections...' : 'Registra acuerdos, fecha de activación de plataforma, objeciones resueltas...'}
                         className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
                       />
                     </div>
@@ -10257,7 +10265,7 @@ export default function LocalStudioPage() {
                       onClick={() => setEditingDossierClosing(null)}
                       className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
                     >
-                      Cancelar
+                      {isEn ? 'Cancel' : 'Cancelar'}
                     </button>
                     <button
                       type="button"
