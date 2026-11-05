@@ -1090,9 +1090,7 @@ export default function RatingCapturePage() {
       {/* Footer */}
       <footer className="py-5 text-center flex flex-col items-center justify-center gap-1.5">
         <div className="flex items-center justify-center gap-2 select-none">
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-amber-500 via-indigo-600 to-indigo-800 flex items-center justify-center p-1 shadow-md shadow-indigo-600/30">
-            <PrestigiaIcon className="w-3.5 h-3.5 text-white" />
-          </div>
+          <PrestigiaIcon className="w-5 h-5 drop-shadow-sm shrink-0" />
           <span className="text-xs font-black tracking-widest text-white">
             PRESTIGIA <span className="text-[9px] text-amber-300 font-bold px-1.5 py-0.2 rounded-full bg-amber-500/15 border border-amber-500/30">5★ SUITE</span>
           </span>

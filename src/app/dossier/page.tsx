@@ -173,9 +173,7 @@ export default function DossierOficialPage() {
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-indigo-800 flex items-center justify-center p-1.5 shadow-md">
-                <PrestigiaIcon className="w-5 h-5 text-white" />
-              </div>
+              <PrestigiaIcon className="w-8 h-8 drop-shadow-md shrink-0 group-hover:scale-105 transition-transform duration-300" />
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-black text-sm tracking-wider text-white">PRESTIGIA</span>
@@ -236,9 +234,7 @@ export default function DossierOficialPage() {
           
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-slate-800">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center p-2.5">
-                <PrestigiaIcon className="w-7 h-7 text-white" />
-              </div>
+              <PrestigiaIcon className="w-12 h-12 drop-shadow-lg shrink-0" />
               <div>
                 <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">PRESTIGIA</h1>
                 <p className="text-xs text-amber-300/90 font-medium">

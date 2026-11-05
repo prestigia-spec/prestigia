@@ -299,9 +299,7 @@ export default function LandingStudioPage() {
               href="/"
               className="flex items-center gap-2.5 sm:gap-3 group cursor-pointer select-none"
             >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-indigo-800 flex items-center justify-center p-2 shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform duration-300 shrink-0">
-                <PrestigiaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-              </div>
+              <PrestigiaIcon className="w-8 h-8 sm:w-9 sm:h-9 drop-shadow-md shrink-0 group-hover:scale-105 transition-transform duration-300" />
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
                   <span className="text-white text-base sm:text-lg font-black tracking-widest">PRESTIGIA</span>
