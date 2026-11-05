@@ -213,9 +213,9 @@ export default function MasterclassPlanesPage() {
               <span className="text-slate-400 block">{isEn ? 'Immediate Breakeven:' : 'Punto de Equilibrio Inmediato:'}</span>
               <span className="text-emerald-400 font-black text-base flex items-center gap-1">
                 <Rocket className="w-4 h-4 text-emerald-400" />
-                <span>{isEn ? '1 Single Client ($100 USD)' : '1 Solo Cliente ($100 USD)'}</span>
+                <span>{isEn ? '1 Single Client ($100 - $250 USD)' : '1 Solo Cliente ($100 - $250 USD)'}</span>
               </span>
-              <span className="text-[10px] text-slate-400 block">{isEn ? 'Recovers 204% of Starter plan' : 'Recupera el 204% de la inversión'}</span>
+              <span className="text-[10px] text-slate-400 block">{isEn ? 'Recovers 204% to 510% of investment' : 'Recupera del 204% al 510% de la inversión'}</span>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
@@ -224,7 +224,7 @@ export default function MasterclassPlanesPage() {
                 <DollarSign className="w-4 h-4 text-amber-400" />
                 <span>$100 - $250 USD / {isEn ? 'service' : 'servicio'}</span>
               </span>
-              <span className="text-[10px] text-slate-400 block">{isEn ? 'Agency standard market fee' : 'Estándar de cobro en agencias'}</span>
+              <span className="text-[10px] text-slate-400 block">{isEn ? 'Agency standard fee (High Profit Margin)' : 'Estándar de agencias (Alto Margen)'}</span>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
@@ -307,7 +307,7 @@ export default function MasterclassPlanesPage() {
 
               <div className="pt-4 border-t border-slate-800 space-y-2">
                 <div className="p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-500/20 text-[11px] text-emerald-300">
-                  <strong>{isEn ? 'Breakeven:' : 'Retorno:'}</strong> {isEn ? '1 client at $100 USD = 204% recovered.' : 'Vendes 1 cliente a $100 USD y recuperas el 204% de tu inversión.'}
+                  <strong>{isEn ? 'Breakeven:' : 'Retorno:'}</strong> {isEn ? '1 client at $100–$250 USD = 204% to 510% recovered.' : 'Vendes 1 cliente a $100-$250 USD y recuperas del 204% al 510% de tu inversión.'}
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Annual Software Commission:' : 'Comisión Plan Anual:'}</span>
@@ -376,7 +376,7 @@ export default function MasterclassPlanesPage() {
 
               <div className="pt-4 border-t border-slate-800 space-y-2">
                 <div className="p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-500/20 text-[11px] text-emerald-300">
-                  <strong>{isEn ? 'Breakeven:' : 'Retorno:'}</strong> {isEn ? '1 single $100 USD client pays off the entire plan.' : 'Con 1 solo cliente de $100 USD pagas el plan completo.'}
+                  <strong>{isEn ? 'Breakeven:' : 'Retorno:'}</strong> {isEn ? '1 single $100–$250 USD client pays the plan (111% to 277% return).' : 'Con 1 solo cliente ($100-$250 USD) pagas el plan y ganas del 111% al 277%.'}
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Annual Software Commission:' : 'Comisión Plan Anual:'}</span>
@@ -441,7 +441,7 @@ export default function MasterclassPlanesPage() {
 
               <div className="pt-4 border-t border-slate-800 space-y-2">
                 <div className="p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-500/20 text-[11px] text-emerald-300">
-                  <strong>{isEn ? 'Breakeven:' : 'Retorno:'}</strong> {isEn ? '1.5 clients recover 100% of your investment.' : 'Con 1 cliente y medio recuperas el 100% de la inversión.'}
+                  <strong>{isEn ? 'Breakeven:' : 'Retorno:'}</strong> {isEn ? '1 single $140–$250 USD client recovers 100% to 178% of your investment.' : 'Con 1 solo cliente de $140-$250 USD recuperas del 100% al 178% de la inversión.'}
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Annual Software Commission:' : 'Comisión Plan Anual:'}</span>
