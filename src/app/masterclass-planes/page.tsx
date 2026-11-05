@@ -266,7 +266,7 @@ export default function MasterclassPlanesPage() {
                   <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-bold">
                     {isEn ? 'Independent Advisor' : 'Asesor Independiente'}
                   </span>
-                  <span className="text-slate-500 text-xs font-mono">Nivel 1</span>
+                  <span className="text-slate-500 text-xs font-mono">{isEn ? 'Tier 1' : 'Nivel 1'}</span>
                 </div>
                 <div>
                   <h3 className="text-2xl font-black text-white">$49 <span className="text-xs text-slate-400 font-normal">USD</span></h3>
@@ -278,7 +278,7 @@ export default function MasterclassPlanesPage() {
                 <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-1.5 text-xs">
                   <div className="flex justify-between font-bold text-white">
                     <span>{isEn ? 'Total Credits Included:' : 'Total Créditos Incluidos:'}</span>
-                    <span className="text-amber-400 font-mono text-sm">40 Créditos</span>
+                    <span className="text-amber-400 font-mono text-sm">40 {isEn ? 'Credits' : 'Créditos'}</span>
                   </div>
                   <p className="text-[10px] text-slate-400 font-mono">
                     10 {isEn ? 'credits per tab' : 'créditos en cada pestaña'} ($1.22 USD / {isEn ? 'use' : 'uso'})
@@ -315,7 +315,7 @@ export default function MasterclassPlanesPage() {
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
-                  <span className="text-amber-400 font-black">Hasta $4.000 USD</span>
+                  <span className="text-amber-400 font-black">{isEn ? 'Up to $4,000 USD' : 'Hasta $4.000 USD'}</span>
                 </div>
               </div>
             </div>
@@ -331,7 +331,7 @@ export default function MasterclassPlanesPage() {
                   <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">
                     {isEn ? 'Digital Agency' : 'Plan Agencias'}
                   </span>
-                  <span className="text-indigo-400 text-xs font-mono">Nivel 2</span>
+                  <span className="text-indigo-400 text-xs font-mono">{isEn ? 'Tier 2' : 'Nivel 2'}</span>
                 </div>
                 <div>
                   <h3 className="text-2xl font-black text-white">$90 <span className="text-xs text-slate-400 font-normal">USD</span></h3>
@@ -343,7 +343,7 @@ export default function MasterclassPlanesPage() {
                 <div className="p-3 rounded-xl bg-slate-950/70 border border-indigo-500/30 space-y-1.5 text-xs">
                   <div className="flex justify-between font-bold text-white">
                     <span>{isEn ? 'Total Credits Included:' : 'Total Créditos Incluidos:'}</span>
-                    <span className="text-amber-400 font-mono text-sm">80 Créditos</span>
+                    <span className="text-amber-400 font-mono text-sm">80 {isEn ? 'Credits' : 'Créditos'}</span>
                   </div>
                   <p className="text-[10px] text-slate-400 font-mono">
                     20 {isEn ? 'credits per tab' : 'créditos en cada pestaña'} ($1.12 USD / {isEn ? 'use' : 'uso'})
@@ -384,7 +384,7 @@ export default function MasterclassPlanesPage() {
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
-                  <span className="text-amber-400 font-black">Hasta $8.000 USD</span>
+                  <span className="text-amber-400 font-black">{isEn ? 'Up to $8,000 USD' : 'Hasta $8.000 USD'}</span>
                 </div>
               </div>
             </div>
@@ -396,7 +396,7 @@ export default function MasterclassPlanesPage() {
                   <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-cyan-950/60 text-cyan-300 font-bold border border-cyan-500/30">
                     {isEn ? 'Super Agency' : 'Súper Agencias'}
                   </span>
-                  <span className="text-cyan-400 text-xs font-mono">Nivel 3</span>
+                  <span className="text-cyan-400 text-xs font-mono">{isEn ? 'Tier 3' : 'Nivel 3'}</span>
                 </div>
                 <div>
                   <h3 className="text-2xl font-black text-white">$140 <span className="text-xs text-slate-400 font-normal">USD</span></h3>
@@ -408,7 +408,7 @@ export default function MasterclassPlanesPage() {
                 <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-1.5 text-xs">
                   <div className="flex justify-between font-bold text-white">
                     <span>{isEn ? 'Total Credits Included:' : 'Total Créditos Incluidos:'}</span>
-                    <span className="text-amber-400 font-mono text-sm">120 Créditos</span>
+                    <span className="text-amber-400 font-mono text-sm">120 {isEn ? 'Credits' : 'Créditos'}</span>
                   </div>
                   <p className="text-[10px] text-slate-400 font-mono">
                     30 {isEn ? 'credits per tab' : 'créditos en cada pestaña'} ($1.16 USD / {isEn ? 'use' : 'uso'})
@@ -449,7 +449,7 @@ export default function MasterclassPlanesPage() {
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
-                  <span className="text-amber-400 font-black">Hasta $12.000 USD</span>
+                  <span className="text-amber-400 font-black">{isEn ? 'Up to $12,000 USD' : 'Hasta $12.000 USD'}</span>
                 </div>
               </div>
             </div>
@@ -480,9 +480,9 @@ export default function MasterclassPlanesPage() {
               <div className="flex items-center justify-between">
                 <span className="text-amber-400 font-bold flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-amber-400" />
-                  <span>Pestaña 1: Creación & Setup Técnico</span>
+                  <span>{isEn ? 'Tab 1: Creation & Technical Setup' : 'Pestaña 1: Creación & Setup Técnico'}</span>
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">PVP: $100 USD</span>
+                <span className="text-[10px] font-mono text-slate-400">{isEn ? 'RRP: $100 USD' : 'PVP: $100 USD'}</span>
               </div>
               <p className="text-slate-300 text-[11px] leading-relaxed">
                 {isEn
@@ -496,9 +496,9 @@ export default function MasterclassPlanesPage() {
               <div className="flex items-center justify-between">
                 <span className="text-indigo-400 font-bold flex items-center gap-1.5">
                   <Search className="w-4 h-4 text-indigo-400" />
-                  <span>Pestaña 2: Auditoría Forense Top 3</span>
+                  <span>{isEn ? 'Tab 2: Top 3 Forensic Audit' : 'Pestaña 2: Auditoría Forense Top 3'}</span>
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">PVP: $100 USD</span>
+                <span className="text-[10px] font-mono text-slate-400">{isEn ? 'RRP: $100 USD' : 'PVP: $100 USD'}</span>
               </div>
               <p className="text-slate-300 text-[11px] leading-relaxed">
                 {isEn
@@ -512,9 +512,9 @@ export default function MasterclassPlanesPage() {
               <div className="flex items-center justify-between">
                 <span className="text-rose-400 font-bold flex items-center gap-1.5">
                   <LifeBuoy className="w-4 h-4 text-rose-400" />
-                  <span>Pestaña 3: Protocolo de Rescate 72h</span>
+                  <span>{isEn ? 'Tab 3: 72h Suspension Rescue' : 'Pestaña 3: Protocolo de Rescate 72h'}</span>
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">PVP: $100 USD</span>
+                <span className="text-[10px] font-mono text-slate-400">{isEn ? 'RRP: $100 USD' : 'PVP: $100 USD'}</span>
               </div>
               <p className="text-slate-300 text-[11px] leading-relaxed">
                 {isEn
@@ -528,9 +528,9 @@ export default function MasterclassPlanesPage() {
               <div className="flex items-center justify-between">
                 <span className="text-purple-400 font-bold flex items-center gap-1.5">
                   <Scale className="w-4 h-4 text-purple-400" />
-                  <span>Pestaña 4: Apelación de Reseñas 1★</span>
+                  <span>{isEn ? 'Tab 4: 1-Star Review Appeals' : 'Pestaña 4: Apelación de Reseñas 1★'}</span>
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">PVP: $100 USD</span>
+                <span className="text-[10px] font-mono text-slate-400">{isEn ? 'RRP: $100 USD' : 'PVP: $100 USD'}</span>
               </div>
               <p className="text-slate-300 text-[11px] leading-relaxed">
                 {isEn
