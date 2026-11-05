@@ -26,6 +26,7 @@ import {
   LifeBuoy,
   Scale,
   MessageCircle,
+  Coins,
 } from 'lucide-react';
 
 export default function MasterclassPlanesPage() {
@@ -255,8 +256,8 @@ export default function MasterclassPlanesPage() {
 
           <p className="text-xs text-slate-300">
             {isEn
-              ? 'Every plan grants full, unrestricted access to all 4 AI production engines and white-label PDF exports. Solo advisors operate with the exact same power as a top agency from day one; the only difference is the credit volume and commission tier.'
-              : 'Todos los planes otorgan acceso total e idéntico a las 4 herramientas de ingeniería de IA y a la exportación de informes en PDF con tu marca. El consultor independiente opera desde el día uno con el mismo poder de una agencia pro; la única diferencia es el volumen de créditos y la escala de comisiones.'}
+              ? 'Every plan grants full, unrestricted access to all 5 AI production engines and white-label PDF exports. Solo advisors operate with the exact same power as a top agency from day one; the only difference is the credit volume and commission tier.'
+              : 'Todos los planes otorgan acceso total e idéntico a las 5 herramientas de ingeniería de IA y a la exportación de informes en PDF con tu marca. El consultor independiente opera desde el día uno con el mismo poder de una agencia pro; la única diferencia es el volumen de créditos y la escala de comisiones.'}
           </p>
 
           {/* Pricing Grid */}
@@ -281,10 +282,10 @@ export default function MasterclassPlanesPage() {
                 <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-1.5 text-xs">
                   <div className="flex justify-between font-bold text-white">
                     <span>{isEn ? 'Total Credits Included:' : 'Total Créditos Incluidos:'}</span>
-                    <span className="text-amber-400 font-mono text-sm">40 {isEn ? 'Credits' : 'Créditos'}</span>
+                    <span className="text-amber-400 font-mono text-sm">50 {isEn ? 'Credits' : 'Créditos'}</span>
                   </div>
                   <p className="text-[10px] text-slate-400 font-mono">
-                    10 {isEn ? 'credits per tab' : 'créditos en cada pestaña'} ($1.22 USD / {isEn ? 'use' : 'uso'})
+                    10 {isEn ? 'credits in each of the 5 tabs' : 'créditos en cada una de las 5 pestañas'} ($0.98 USD / {isEn ? 'use' : 'uso'})
                   </p>
                 </div>
 
@@ -305,6 +306,10 @@ export default function MasterclassPlanesPage() {
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span><strong>10</strong> {isEn ? '1-Star Review Appeals (Tab 4)' : 'Apelaciones de Reseñas 1★ (Pestaña 4)'}</span>
                   </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span><strong>10</strong> {isEn ? 'Top 3 Closing Weapons: Geo-Grid, ROI & Spy (Tab 5)' : 'Armas Top 3 de Cierre: Geo-Grid, ROI & Spy (Pestaña 5)'}</span>
+                  </li>
                   <li className="flex items-center gap-2 text-emerald-300 font-medium">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span>{isEn ? 'White Label PDF Dossier Exports' : 'Exportación de PDF con Logo Marca Blanca'}</span>
@@ -322,7 +327,7 @@ export default function MasterclassPlanesPage() {
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
-                  <span className="text-amber-400 font-black">{isEn ? '$4,000 to $10,000 USD' : '$4.000 a $10.000 USD'}</span>
+                  <span className="text-amber-400 font-black">{isEn ? '$5,000 to $12,500 USD' : '$5.000 a $12.500 USD'}</span>
                 </div>
               </div>
             </div>
@@ -350,10 +355,10 @@ export default function MasterclassPlanesPage() {
                 <div className="p-3 rounded-xl bg-slate-950/70 border border-indigo-500/30 space-y-1.5 text-xs">
                   <div className="flex justify-between font-bold text-white">
                     <span>{isEn ? 'Total Credits Included:' : 'Total Créditos Incluidos:'}</span>
-                    <span className="text-amber-400 font-mono text-sm">80 {isEn ? 'Credits' : 'Créditos'}</span>
+                    <span className="text-amber-400 font-mono text-sm">100 {isEn ? 'Credits' : 'Créditos'}</span>
                   </div>
                   <p className="text-[10px] text-slate-400 font-mono">
-                    20 {isEn ? 'credits per tab' : 'créditos en cada pestaña'} ($1.12 USD / {isEn ? 'use' : 'uso'})
+                    20 {isEn ? 'credits in each of the 5 tabs' : 'créditos en cada una de las 5 pestañas'} ($0.90 USD / {isEn ? 'use' : 'uso'})
                   </p>
                 </div>
 
@@ -374,6 +379,10 @@ export default function MasterclassPlanesPage() {
                     <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
                     <span><strong>20</strong> {isEn ? '1-Star Review Appeals (Tab 4)' : 'Apelaciones de Reseñas 1★ (Pestaña 4)'}</span>
                   </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                    <span><strong>20</strong> {isEn ? 'Top 3 Closing Weapons: Geo-Grid, ROI & Spy (Tab 5)' : 'Armas Top 3 de Cierre: Geo-Grid, ROI & Spy (Pestaña 5)'}</span>
+                  </li>
                   <li className="flex items-center gap-2 text-amber-300 font-medium">
                     <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span>{isEn ? 'White Label PDF Dossier Exports' : 'Exportación de PDF con Logo Marca Blanca'}</span>
@@ -391,7 +400,7 @@ export default function MasterclassPlanesPage() {
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
-                  <span className="text-amber-400 font-black">{isEn ? '$8,000 to $20,000 USD' : '$8.000 a $20.000 USD'}</span>
+                  <span className="text-amber-400 font-black">{isEn ? '$10,000 to $25,000 USD' : '$10.000 a $25.000 USD'}</span>
                 </div>
               </div>
             </div>
@@ -415,10 +424,10 @@ export default function MasterclassPlanesPage() {
                 <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-1.5 text-xs">
                   <div className="flex justify-between font-bold text-white">
                     <span>{isEn ? 'Total Credits Included:' : 'Total Créditos Incluidos:'}</span>
-                    <span className="text-amber-400 font-mono text-sm">120 {isEn ? 'Credits' : 'Créditos'}</span>
+                    <span className="text-amber-400 font-mono text-sm">150 {isEn ? 'Credits' : 'Créditos'}</span>
                   </div>
                   <p className="text-[10px] text-slate-400 font-mono">
-                    30 {isEn ? 'credits per tab' : 'créditos en cada pestaña'} ($1.16 USD / {isEn ? 'use' : 'uso'})
+                    30 {isEn ? 'credits in each of the 5 tabs' : 'créditos en cada una de las 5 pestañas'} ($0.93 USD / {isEn ? 'use' : 'uso'})
                   </p>
                 </div>
 
@@ -439,6 +448,10 @@ export default function MasterclassPlanesPage() {
                     <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                     <span><strong>30</strong> {isEn ? '1-Star Review Appeals (Tab 4)' : 'Apelaciones de Reseñas 1★ (Pestaña 4)'}</span>
                   </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                    <span><strong>30</strong> {isEn ? 'Top 3 Closing Weapons: Geo-Grid, ROI & Spy (Tab 5)' : 'Armas Top 3 de Cierre: Geo-Grid, ROI & Spy (Pestaña 5)'}</span>
+                  </li>
                   <li className="flex items-center gap-2 text-cyan-300 font-medium">
                     <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                     <span>{isEn ? 'White Label PDF Dossier Exports' : 'Exportación de PDF con Logo Marca Blanca'}</span>
@@ -456,7 +469,7 @@ export default function MasterclassPlanesPage() {
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
-                  <span className="text-amber-400 font-black">{isEn ? '$12,000 to $30,000 USD' : '$12.000 a $30.000 USD'}</span>
+                  <span className="text-amber-400 font-black">{isEn ? '$15,000 to $37,500 USD' : '$15.000 a $37.500 USD'}</span>
                 </div>
               </div>
             </div>
@@ -464,11 +477,11 @@ export default function MasterclassPlanesPage() {
           </div>
         </section>
 
-        {/* SECTION 2: THE 4 OPERATIONAL PRODUCTION TABS */}
+        {/* SECTION 2: THE 5 OPERATIONAL PRODUCTION TABS */}
         <section className="space-y-4 print-card p-6 rounded-2xl bg-[#090D17] border border-slate-800 page-break-before">
           <div className="flex items-center gap-2 text-indigo-400 font-bold text-xs uppercase tracking-wider">
             <Building2 className="w-4 h-4" />
-            <span>{isEn ? '2. The 4 Monetizable Engines in Local Studio' : '2. Las 4 Herramientas Monetizables de Local Studio'}</span>
+            <span>{isEn ? '2. The 5 Monetizable & High-Closing Engines in Local Studio' : '2. Las 5 Herramientas de Producción & Cierre en Local Studio'}</span>
           </div>
           <h3 className="text-lg sm:text-xl font-black text-white">
             {isEn
@@ -544,6 +557,88 @@ export default function MasterclassPlanesPage() {
                   ? 'Algorithmic defense against fake, defamatory, or competitor attack reviews. Generates legal policy violation reports directly mapped to Google Content Policies.'
                   : 'Blindaje reputacional. Redacta la impugnación legal fundamentada en los artículos oficiales de Google (conflicto de interés, difamación, spam o acoso) para solicitar la remoción definitiva de opiniones malintencionadas.'}
               </p>
+            </div>
+
+            {/* Engine 5: ARMAS TOP 3 */}
+            <div className="p-4 rounded-xl bg-slate-900/80 border border-amber-500/30 space-y-2 sm:col-span-2">
+              <div className="flex items-center justify-between">
+                <span className="text-amber-400 font-bold flex items-center gap-1.5">
+                  <Zap className="w-4 h-4 text-amber-400" />
+                  <span>{isEn ? 'Tab 5: Top 3 Sales Arsenal (3x3 Geo-Grid, ROI Balance & Rival Spy)' : 'Pestaña 5: Armas Top 3 de Cierre (Geo-Grid 3x3, Balanza ROI & Rival Spy)'}</span>
+                </span>
+                <span className="text-[10px] font-mono text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">{isEn ? 'RRP: $100 - $250 USD' : 'PVP: $100 - $250 USD'}</span>
+              </div>
+              <p className="text-slate-300 text-[11px] leading-relaxed">
+                {isEn
+                  ? 'The ultimate visual closing weapon. Generates real-time 3x3 Geo-Grid heatmaps (green vs. red ranking pins), calculates exact monthly revenue lost from being outside the Top 3, and conducts live competitor espionage (reviews, age, and keyword gaps) to close clients on the spot.'
+                  : 'El arma definitiva de prospección visual y cierre en frío. Genera el mapa de calor Geo-Grid 3x3 (pines verdes vs rojos), calcula el dinero exacto que el negocio pierde al mes por no estar en el Top 3, y ejecuta la radiografía espía cara a cara frente a su rival #1 para cerrar contratos al instante.'}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* MARKET COST REALITY COMPARISON */}
+        <section className="space-y-4 print-card p-6 rounded-2xl bg-[#090D17] border border-amber-500/30">
+          <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-wider">
+            <Coins className="w-4 h-4 text-amber-400" />
+            <span>{isEn ? 'Market Cost Reality: Traditional Agency Software vs. Prestigia Local Studio' : 'Realidad de Costos en el Mercado: Software de Agencia Tradicional vs. Prestigia Local Studio'}</span>
+          </div>
+          <h3 className="text-lg sm:text-xl font-black text-white">
+            {isEn
+              ? 'Why Local Studio Destroys the Fragmented $200/Mo Agency Software Model'
+              : 'Por qué Local Studio Deja Obsoleto el Modelo Tradicional de Pagar $200 USD/mes'}
+          </h3>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            {isEn
+              ? 'Traditional marketing agencies are forced to pay multiple expensive monthly subscriptions in USD, even if they have zero clients in a given month. Prestigia unites everything into one single operational engine with no mandatory monthly fees:'
+              : 'Cualquier agencia tradicional que ofrezca posicionamiento en Google Maps tiene que pagar suscripciones mensuales obligatorias en dólares, vendan o no vendan clientes en el mes. Prestigia une todo el flujo en una sola plataforma sin mensualidades forzadas:'}
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs">
+            {/* Box 1: What Agencies Pay */}
+            <div className="p-4 rounded-xl bg-slate-950/80 border border-rose-500/30 space-y-3">
+              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 font-bold border border-rose-500/20">
+                {isEn ? '1. Software Costs for Traditional Agencies' : '1. Lo que Paga una Agencia en Software'}
+              </span>
+              <ul className="space-y-1.5 text-slate-300 text-[11px]">
+                <li>• <strong>BrightLocal:</strong> $39 a $79 USD/mes (para apenas 3 a 5 negocios).</li>
+                <li>• <strong>Local Falcon (Geo-Grids):</strong> $25 a $50 USD/mes en créditos.</li>
+                <li>• <strong>ChatGPT Plus / Jasper AI:</strong> $20 a $49 USD/mes para redactar.</li>
+              </ul>
+              <div className="p-2.5 rounded-lg bg-rose-950/30 border border-rose-500/30 text-[11px] text-rose-300 font-semibold">
+                {isEn ? 'Total Fixed Monthly Cost: $100 to $200 USD EVERY MONTH, whether they sell or not, doing manual work.' : 'Gasto Fijo Mensual: $100 a $200 USD TODOS los meses, vendas o no vendas clientes, haciendo todo a mano.'}
+              </div>
+            </div>
+
+            {/* Box 2: What Agencies Charge Clients */}
+            <div className="p-4 rounded-xl bg-slate-950/80 border border-amber-500/30 space-y-3">
+              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 font-bold border border-amber-500/20">
+                {isEn ? '2. Market Rates Charged to End Clients' : '2. Lo que Cobra una Agencia al Cliente'}
+              </span>
+              <ul className="space-y-1.5 text-slate-300 text-[11px]">
+                <li>• <strong>Setup & Optimización Técnica:</strong> $200 a $500 USD (un solo pago).</li>
+                <li>• <strong>Mantenimiento Mensual Maps:</strong> $150 a $350 USD/mes.</li>
+                <li>• <strong>Rescate de Ficha / Propiedad:</strong> $150 a $400 USD (en Upwork/Fiverr cobran $100+ solo por la apelación).</li>
+              </ul>
+              <div className="p-2.5 rounded-lg bg-amber-950/30 border border-amber-500/30 text-[11px] text-amber-300 font-semibold">
+                {isEn ? 'High Perceived Value: Businesses happily pay $100–$250 USD per service because losing Google Maps kills their sales.' : 'Alto Valor Percibido: Los negocios pagan felices $100-$250 USD porque no estar en Google Maps los hace quebrar.'}
+              </div>
+            </div>
+
+            {/* Box 3: The Prestigia Advantage */}
+            <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-950/40 via-slate-950 to-indigo-950/40 border border-emerald-500/40 space-y-3">
+              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                {isEn ? '3. The Prestigia Local Studio Advantage' : '3. La Ventaja Prestigia Local Studio'}
+              </span>
+              <ul className="space-y-1.5 text-slate-200 text-[11px]">
+                <li>• <strong>Todo en 1 solo lugar:</strong> Las 5 herramientas en una sola suite integrada.</li>
+                <li>• <strong>Cero mensualidades obligatorias:</strong> Consumes créditos a tu ritmo al vender.</li>
+                <li>• <strong>IA Algorítmica 2026:</strong> Genera blueprints, auditorías y mapas en segundos.</li>
+                <li>• <strong>Dossier PDF con tu marca:</strong> Informes ejecutivos listos para entregar.</li>
+              </ul>
+              <div className="p-2.5 rounded-lg bg-emerald-950/30 border border-emerald-500/30 text-[11px] text-emerald-300 font-semibold">
+                {isEn ? 'Invest from $49 USD (one-time). Sell 1 single client and pocket a 95% to 99% profit margin.' : 'Inviertes desde $49 USD (pago único). Vendes 1 solo cliente y te queda un margen de ganancia del 95% al 99%.'}
+              </div>
             </div>
           </div>
         </section>
@@ -624,9 +719,9 @@ export default function MasterclassPlanesPage() {
                   : 'Quienes adquieran su paquete durante la Masterclass o en las siguientes 24 horas reciben un 10% adicional de créditos gratis en cada pestaña:'}
               </p>
               <ul className="space-y-1 font-mono text-[11px] text-amber-300 pt-1">
-                <li>• {isEn ? 'Independent Advisor:' : 'Asesor:'} <strong>{isEn ? '11 credits / tab' : '11 créditos / pestaña'}</strong> {isEn ? '(44 total services).' : '(44 servicios en total).'}</li>
-                <li>• {isEn ? 'Agencies:' : 'Agencias:'} <strong>{isEn ? '22 credits / tab' : '22 créditos / pestaña'}</strong> {isEn ? '(88 total services).' : '(88 servicios en total).'}</li>
-                <li>• {isEn ? 'Super Agencies:' : 'Súper Agencias:'} <strong>{isEn ? '33 credits / tab' : '33 créditos / pestaña'}</strong> {isEn ? '(132 total services).' : '(132 servicios en total).'}</li>
+                <li>• {isEn ? 'Independent Advisor:' : 'Asesor:'} <strong>{isEn ? '11 credits / tab' : '11 créditos / pestaña'}</strong> {isEn ? '(55 total services across 5 tabs).' : '(55 servicios en total en las 5 pestañas).'}</li>
+                <li>• {isEn ? 'Agencies:' : 'Agencias:'} <strong>{isEn ? '22 credits / tab' : '22 créditos / pestaña'}</strong> {isEn ? '(110 total services across 5 tabs).' : '(110 servicios en total en las 5 pestañas).'}</li>
+                <li>• {isEn ? 'Super Agencies:' : 'Súper Agencias:'} <strong>{isEn ? '33 credits / tab' : '33 créditos / pestaña'}</strong> {isEn ? '(165 total services across 5 tabs).' : '(165 servicios en total en las 5 pestañas).'}</li>
               </ul>
             </div>
 
