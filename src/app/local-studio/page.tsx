@@ -5265,62 +5265,60 @@ export default function LocalStudioPage() {
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">1</span>
-                    <strong className="text-white text-xs">Abrir e Iniciar Sesión</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Open & Sign In' : 'Abrir e Iniciar Sesión'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Entra a <strong>business.google.com</strong>. Inicia sesión con el correo Gmail oficial del negocio (o el tuyo temporalmente para luego transferirlo).
+                    {isEn ? <>Go to <strong>business.google.com</strong>. Sign in with the official business Gmail account (or yours temporarily to transfer later).</> : <>Entra a <strong>business.google.com</strong>. Inicia sesión con el correo Gmail oficial del negocio (o el tuyo temporalmente para luego transferirlo).</>}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">2</span>
-                    <strong className="text-white text-xs">Nombre & Categoría Oficial</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Name & Official Category' : 'Nombre & Categoría Oficial'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Pega el <strong>Título Optimizado</strong> generado arriba. En "Categoría empresarial", escribe la <strong>Categoría Principal</strong> y elígela del menú oficial de Google.
+                    {isEn ? <>Paste the <strong>Optimized Title</strong> generated above. In "Business Category", enter the <strong>Primary Category</strong> and select it from Google\'s official menu.</> : <>Pega el <strong>Título Optimizado</strong> generado arriba. En "Categoría empresarial", escribe la <strong>Categoría Principal</strong> y elígela del menú oficial de Google.</>}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">3</span>
-                    <strong className="text-white text-xs">Local Físico vs Domicilio (SAB)</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Physical Storefront vs SAB Service Area' : 'Local Físico vs Domicilio (SAB)'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    • <strong>Local comercial:</strong> Marca "Sí tienes local abierto al público" y fija el pin en la puerta.<br/>
-                    • <strong>A domicilio / independiente:</strong> Marca "No, presto servicios en la ubicación del cliente" para ocultar la dirección de casa y evitar suspensiones.
+                    {isEn ? <>• <strong>Storefront:</strong> Select "Yes, location open to the public" and pin the entrance.<br/>• <strong>Service Area / Remote:</strong> Select "No, I deliver services to customers" to hide residential addresses and prevent suspensions.</> : <>• <strong>Local comercial:</strong> Marca "Sí tienes local abierto al público" y fija el pin en la puerta.<br/>• <strong>A domicilio / independiente:</strong> Marca "No, presto servicios en la ubicación del cliente" para ocultar la dirección de casa y evitar suspensiones.</>}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">4</span>
-                    <strong className="text-white text-xs">Teléfono & Sitio Web Oficial</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Phone & Official Website' : 'Teléfono & Sitio Web Oficial'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Ingresa la línea de WhatsApp o PBX de atención al cliente. En sitio web, coloca la web del negocio o el link de su landing page generada en Prestigia.
+                    {isEn ? <>Enter the customer service line or WhatsApp. Under website, add the official domain or the Prestigia-generated landing page URL.</> : <>Ingresa la línea de WhatsApp o PBX de atención al cliente. En sitio web, coloca la web del negocio o el link de su landing page generada en Prestigia.</>}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">5</span>
-                    <strong className="text-white text-xs">Video de Verificación de 60s</strong>
+                    <strong className="text-white text-xs">{isEn ? '60s Video Verification' : 'Video de Verificación de 60s'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Graba continuo sin cortes con el móvil:<br/>
-                    <strong>0-15s:</strong> Calle y aviso exterior • <strong>15-40s:</strong> Abrir puerta con llave física e interior • <strong>40-60s:</strong> Datáfono en caja y RUT / documento fiscal.
+                    {isEn ? <>Record one continuous take on mobile:<br/><strong>0-15s:</strong> Street & exterior signage • <strong>15-40s:</strong> Unlocking door & interior • <strong>40-60s:</strong> POS terminal & tax certificate / business license.</> : <>Graba continuo sin cortes con el móvil:<br/><strong>0-15s:</strong> Calle y aviso exterior • <strong>15-40s:</strong> Abrir puerta con llave física e interior • <strong>40-60s:</strong> Datáfono en caja y RUT / documento fiscal.</>}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">6</span>
-                    <strong className="text-white text-xs">Carga del Catálogo Inicial</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Initial Catalog Upload' : 'Carga del Catálogo Inicial'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Una vez enviada la verificación, ve a "Editar servicios" y carga los 6 servicios y 15 fotografías generadas en este expediente para activar el algoritmo.
+                    {isEn ? <>Once verification is submitted, go to "Edit Services" and upload the 6 services and 15 photos generated in this blueprint to trigger the algorithm.</> : <>Una vez enviada la verificación, ve a "Editar servicios" y carga los 6 servicios y 15 fotografías generadas en este expediente para activar el algoritmo.</>}
                   </p>
                 </div>
               </div>
@@ -5329,14 +5327,14 @@ export default function LocalStudioPage() {
               <div className="p-4 rounded-2xl bg-slate-950 border border-rose-500/30 text-xs text-slate-300 space-y-2">
                 <span className="font-bold text-rose-400 flex items-center gap-1.5 text-xs uppercase tracking-wide">
                   <AlertTriangle className="w-4 h-4 text-rose-400" />
-                  Semáforo Anti-Suspensión Inmediata (Reglas Críticas de Google 2026)
+                  {isEn ? 'Immediate Anti-Suspension Traffic Light (Critical Google 2026 Guidelines)' : 'Semáforo Anti-Suspensión Inmediata (Reglas Críticas de Google 2026)'}
                 </span>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px]">
                   <p className="text-rose-300/90 bg-rose-950/40 p-2.5 rounded-xl border border-rose-500/20">
-                    🔴 <strong>Prohibido editar nombre o categoría en los primeros 14 días:</strong> Cualquier cambio en datos sensibles durante el periodo de revisión activa una suspensión automática por sospecha de spam.
+                    🔴 <strong>{isEn ? 'Forbidden to edit name or category within the first 14 days:' : 'Prohibido editar nombre o categoría en los primeros 14 días:'}</strong> {isEn ? 'Any edits to core data during the review period triggers an automatic suspension for suspected spam.' : 'Cualquier cambio en datos sensibles durante el periodo de revisión activa una suspensión automática por sospecha de spam.'}
                   </p>
                   <p className="text-emerald-300/90 bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-500/20">
-                    🟢 <strong>Acelerador seguro:</strong> Cargar fotos desde el móvil en la misma red Wi-Fi o coordenadas GPS del local valida la autenticidad física de la empresa ante Google AI.
+                    🟢 <strong>{isEn ? 'Safe accelerator:' : 'Acelerador seguro:'}</strong> {isEn ? 'Uploading photos directly from a mobile device on the business Wi-Fi or GPS coordinates validates physical authenticity to Google AI.' : 'Cargar fotos desde el móvil en la misma red Wi-Fi o coordenadas GPS del local valida la autenticidad física de la empresa ante Google AI.'}
                   </p>
                 </div>
               </div>
@@ -5371,17 +5369,21 @@ export default function LocalStudioPage() {
                   className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer shrink-0 active:scale-98"
                 >
                   <Copy className="w-4 h-4" />
-                  <span>Copiar Guión de Creación</span>
+                  <span>{isEn ? 'Copy Creation Pitch' : 'Copiar Guión de Creación'}</span>
                 </button>
               </div>
 
               {/* Pitch Display Card */}
               <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-500/30 text-xs text-slate-200 leading-relaxed italic space-y-2">
                 <span className="font-bold text-emerald-300 not-italic block text-xs">
-                  🎙️ Speech de Prospección & Apertura (Llamada, Visita o WhatsApp):
+                  {isEn ? '🎙️ Outreach & Opening Pitch (Call, On-Site or WhatsApp):' : '🎙️ Speech de Prospección & Apertura (Llamada, Visita o WhatsApp):'}
                 </span>
                 <p>
-                  "Hola <strong>{createBusinessName || 'Emprendedor'}</strong>, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de <strong>{createCategory || 'su sector'}</strong> en <strong>{createCity || 'su ciudad'}</strong> y notamos una situación crítica: su negocio sencillamente <strong>NO existe en Google Maps</strong>. Hoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha son decenas de ventas que le regala a su competencia. Nosotros creamos y verificamos su perfil oficial ante Google con arquitectura Top 3, y le activamos el sistema digital Prestigia para disparar sus reseñas 5★ desde la primera semana."
+                  {isEn ? (
+                    <>"Hello <strong>{createBusinessName || 'Business Owner'}</strong>, this is the Prestigia team. We were analyzing customer searches for <strong>{createCategory || 'your industry'}</strong> in <strong>{createCity || 'your area'}</strong> and noticed a critical gap: your business simply <strong>DOES NOT exist on Google Maps</strong>. Today, 70% of local buyers choose directly from the top 3 map profiles. Every single day without a verified listing represents dozens of paying clients handed to your closest rivals. At Prestigia, we build and verify your official Google profile with Top 3 architecture, and activate our digital 5-star review acceleration platform from week one."</>
+                  ) : (
+                    <>"Hola <strong>{createBusinessName || 'Emprendedor'}</strong>, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de <strong>{createCategory || 'su sector'}</strong> en <strong>{createCity || 'su ciudad'}</strong> y notamos una situación crítica: su negocio sencillamente <strong>NO existe en Google Maps</strong>. Hoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha son decenas de ventas que le regala a su competencia. Nosotros creamos y verificamos su perfil oficial ante Google con arquitectura Top 3, y le activamos el sistema digital Prestigia para disparar sus reseñas 5★ desde la primera semana."</>
+                  )}
                 </p>
               </div>
 
@@ -5389,19 +5391,19 @@ export default function LocalStudioPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
                   <strong className="text-amber-300 block text-xs">
-                    ⚠️ Objeción: "¿Por qué pagarles si crear una ficha en Google es gratis?"
+                    {isEn ? '⚠️ Objection: "Why pay you if creating a Google listing is free?"' : '⚠️ Objeción: "¿Por qué pagarles si crear una ficha en Google es gratis?"'}
                   </strong>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong>Respuesta Asesor:</strong> "Google es gratis, pero el 80% de los negocios son suspendidos en el video de verificación o quedan sepultados en la página 4 sin recibir una sola llamada. Con Prestigia no paga por la ficha, paga por la <strong>arquitectura técnica que evita suspensiones, optimiza categorías y posiciona en el Top 3</strong> para que la ficha facture clientes reales desde el primer mes."
+                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"Google is free, but 80% of unassisted listings get immediately suspended on video verification or buried on page 4 without receiving a single call. With Prestigia, you don\'t pay for the listing—you invest in the technical architecture that prevents suspensions, locks winning keywords, and propels you into the Top 3 to generate real revenue from month one."' : '"Google es gratis, pero el 80% de los negocios son suspendidos en el video de verificación o quedan sepultados en la página 4 sin recibir una sola llamada. Con Prestigia no paga por la ficha, paga por la arquitectura técnica que evita suspensiones, optimiza categorías y posiciona en el Top 3 para que la ficha facture clientes reales desde el primer mes."'}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
                   <strong className="text-amber-300 block text-xs">
-                    ⚠️ Objeción: "No tengo tiempo para ocuparme de fotos ni trámites."
+                    {isEn ? '⚠️ Objection: "I don\'t have time to deal with photos and paperwork."' : '⚠️ Objeción: "No tengo tiempo para ocuparme de fotos ni trámites."'}
                   </strong>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong>Respuesta Asesor:</strong> "Esa es la ventaja de nuestro servicio llave en mano: solo necesitamos 60 segundos de video que grabamos juntos desde su local y nosotros nos encargamos del 100% de la radicación, redacción SEO y verificación con Google."
+                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"That is the beauty of our turnkey service: we only need a 60-second walkthrough video recorded together on-site, and our team manages 100% of the SEO copywriting, documentation, and official Google verification."' : '"Esa es la ventaja de nuestro servicio llave en mano: solo necesitamos 60 segundos de video que grabamos juntos desde su local y nosotros nos encargamos del 100% de la radicación, redacción SEO y verificación con Google."'}
                   </p>
                 </div>
               </div>
@@ -5410,10 +5412,10 @@ export default function LocalStudioPage() {
               <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-900 border border-emerald-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                 <div>
                   <span className="font-black text-emerald-300 uppercase tracking-wide block text-xs">
-                    🎁 El Gancho de Cierre Prestigia ($0 Setup):
+                    {isEn ? '🎁 The Prestigia Closing Hook ($0 Setup Waiver):' : '🎁 El Gancho de Cierre Prestigia ($0 Setup):'}
                   </span>
                   <p className="text-slate-300 text-[11px] mt-0.5">
-                    "Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, te bonificamos el 100% del setup técnico de creación (<strong>$0 costo de implementación</strong>) e incluimos la activación total de tu software de reseñas 5★ y blindaje reputacional."
+                    {isEn ? <>"When you subscribe today to your tailored <strong>Prestigia Plan</strong> for your business, we waive 100% of the technical setup fee (<strong>$0 implementation cost</strong>) and include full activation of your 5★ review software and digital shield."</> : <>"Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, te bonificamos el 100% del setup técnico de creación (<strong>$0 costo de implementación</strong>) e incluimos la activación total de tu software de reseñas 5★ y blindaje reputacional."</>}
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-black text-xs">
@@ -5461,8 +5463,8 @@ export default function LocalStudioPage() {
                     <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
                       <Crown className="w-4 h-4 text-amber-400 shrink-0" />
                       <div className="text-left">
-                        <span className="text-[9px] uppercase font-black tracking-wider text-amber-400/80 block">Créditos IA Mensuales</span>
-                        <strong className="text-xs font-black text-amber-200">👑 ILIMITADO • Master</strong>
+                        <span className="text-[9px] uppercase font-black tracking-wider text-amber-400/80 block">{isEn ? 'Monthly AI Credits' : 'Créditos IA Mensuales'}</span>
+                        <strong className="text-xs font-black text-amber-200">{isEn ? '👑 UNLIMITED • Master' : '👑 ILIMITADO • Master'}</strong>
                       </div>
                     </div>
                   ) : (
@@ -6380,17 +6382,21 @@ export default function LocalStudioPage() {
                   className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer shrink-0 active:scale-98"
                 >
                   <Copy className="w-4 h-4" />
-                  <span>Copiar Guión de Auditoría</span>
+                  <span>{isEn ? 'Copy Audit Pitch' : 'Copiar Guión de Auditoría'}</span>
                 </button>
               </div>
 
               {/* Pitch Display Card */}
               <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 text-xs text-slate-200 leading-relaxed italic space-y-2">
                 <span className="font-bold text-amber-300 not-italic block text-xs">
-                  🎙️ Speech de Cierre de Auditoría Forense:
+                  {isEn ? '🎙️ Forensic Audit Closing Pitch:' : '🎙️ Speech de Cierre de Auditoría Forense:'}
                 </span>
                 <p>
-                  "Hola <strong>{auditBusinessName || 'propietario'}</strong>, le saluda el equipo de Prestigia. Auditamos su ficha en <strong>{auditCity || 'su zona'}</strong> y detectamos por qué no está en el Top 3: su perfil tiene <strong>3 fallas algorítmicas graves</strong> que le están costando clientes todos los días. Sus competidores líderes tienen flujo activo semanal y catálogo completo, mientras que su ficha pierde el 68% de las búsquedas por falta de categorías secundarias. Hemos estructurado el plan técnico para desbancar a los líderes y activar la plataforma digital de reseñas de Prestigia."
+                  {isEn ? (
+                    <>"Hello <strong>{auditBusinessName || 'Business Owner'}</strong>, this is the Prestigia team. We audited your Google profile in <strong>{auditCity || 'your area'}</strong> and pinpointed exactly why you aren\'t ranking in the Top 3: your listing suffers from <strong>3 critical algorithmic flaws</strong> leaking clients daily. Your podium competitors capture 68% of all searches due to secondary category indexing and fresh weekly reviews. We structured the exact 5-step blueprint to dethrone them."</>
+                  ) : (
+                    <>"Hola <strong>{auditBusinessName || 'propietario'}</strong>, le saluda el equipo de Prestigia. Auditamos su ficha en <strong>{auditCity || 'su zona'}</strong> y detectamos por qué no está en el Top 3: su perfil tiene <strong>3 fallas algorítmicas graves</strong> que le están costando clientes todos los días. Sus competidores líderes tienen flujo activo semanal y catálogo completo, mientras que su ficha pierde el 68% de las búsquedas por falta de categorías secundarias. Hemos estructurado el plan técnico para desbancar a los líderes y activar la plataforma digital de reseñas de Prestigia."</>
+                  )}
                 </p>
               </div>
 
@@ -6398,19 +6404,19 @@ export default function LocalStudioPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
                   <strong className="text-amber-300 block text-xs">
-                    ⚠️ Objeción: "Yo ya tengo más reseñas que mi competidor, ¿para qué optimizar?"
+                    {isEn ? '⚠️ Objection: "I already have more reviews than my rival, why optimize?"' : '⚠️ Objeción: "Yo ya tengo más reseñas que mi competidor, ¿para qué optimizar?"'}
                   </strong>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong>Respuesta Asesor:</strong> "Ese es el error más costoso: en 2026, el algoritmo de Google premia la <strong>velocidad y frescura reciente</strong>, no el volumen estancado de hace un año. Si su competidor suma 10 reseñas este mes y usted 1, Google lo enviará a la segunda página. Prestigia mantiene su flujo semanal activo de 5★ permanentemente."
+                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"That is the costliest misconception: in 2026, Google\'s algorithm rewards fresh review velocity and recent sentiment over static numbers from last year. If your rival gains 10 reviews this month and you gain 1, Google drops you below them. Prestigia keeps your 5★ velocity continuously active."' : '"Ese es el error más costoso: en 2026, el algoritmo de Google premia la velocidad y frescura reciente, no el volumen estancado de hace un año. Si su competidor suma 10 reseñas este mes y usted 1, Google lo enviará a la segunda página. Prestigia mantiene su flujo semanal activo de 5★ permanentemente."'}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
                   <strong className="text-amber-300 block text-xs">
-                    ⚠️ Objeción: "¿Me garantizan estar en el puesto #1 exacto?"
+                    {isEn ? '⚠️ Objection: "Do you guarantee rank #1 exactly?"' : '⚠️ Objeción: "¿Me garantizan estar en el puesto #1 exacto?"'}
                   </strong>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong>Respuesta Asesor:</strong> "Google no le pertenece a ninguna agencia en el mundo. Lo que sí garantizamos es la arquitectura SEO exacta que exige Google y la tecnología de captura digital de reseñas para quebrar la ventaja de sus rivales y adueñarse de los 3 lugares que se llevan el 70% de las ventas."
+                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"No agency owns Google. What we do guarantee is the exact mathematical SEO compliance and digital review acceleration engine to shatter competitor moats and capture the Local 3-Pack where 70% of buyer calls happen."' : '"Google no le pertenece a ninguna agencia en el mundo. Lo que sí garantizamos es la arquitectura SEO exacta que exige Google y la tecnología de captura digital de reseñas para quebrar la ventaja de sus rivales y adueñarse de los 3 lugares que se llevan el 70% de las ventas."'}
                   </p>
                 </div>
               </div>
@@ -6419,10 +6425,10 @@ export default function LocalStudioPage() {
               <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-950/80 via-slate-900 to-slate-900 border border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                 <div>
                   <span className="font-black text-amber-300 uppercase tracking-wide block text-xs">
-                    🎁 El Gancho de Cierre Prestigia ($0 Setup):
+                    {isEn ? '🎁 The Prestigia Closing Hook ($0 Setup Waiver):' : '🎁 El Gancho de Cierre Prestigia ($0 Setup):'}
                   </span>
                   <p className="text-slate-300 text-[11px] mt-0.5">
-                    "Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, el setup técnico de reingeniería y optimización te queda en <strong>$0 (100% bonificado)</strong> e incluye la activación completa del software de aceleración 5★ y blindaje reputacional."
+                    {isEn ? <>"When you subscribe today to your tailored <strong>Prestigia Plan</strong>, the entire technical reengineering setup is <strong>100% WAIVED ($0 implementation cost)</strong>, including instant access to our 5★ review software and reputation shield."</> : <>"Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, el setup técnico de reingeniería y optimización te queda en <strong>$0 (100% bonificado)</strong> e incluye la activación completa del software de aceleración 5★ y blindaje reputacional."</>}
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black text-xs">
@@ -6471,8 +6477,8 @@ export default function LocalStudioPage() {
                     <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
                       <Crown className="w-4 h-4 text-amber-400 shrink-0" />
                       <div className="text-left">
-                        <span className="text-[9px] uppercase font-black tracking-wider text-amber-400/80 block">Créditos IA Mensuales</span>
-                        <strong className="text-xs font-black text-amber-200">👑 ILIMITADO • Master</strong>
+                        <span className="text-[9px] uppercase font-black tracking-wider text-amber-400/80 block">{isEn ? 'Monthly AI Credits' : 'Créditos IA Mensuales'}</span>
+                        <strong className="text-xs font-black text-amber-200">{isEn ? '👑 UNLIMITED • Master' : '👑 ILIMITADO • Master'}</strong>
                       </div>
                     </div>
                   ) : (
@@ -7381,17 +7387,21 @@ export default function LocalStudioPage() {
                   className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg shadow-rose-600/20 cursor-pointer shrink-0 active:scale-98"
                 >
                   <Copy className="w-4 h-4" />
-                  <span>Copiar Guión de Rescate</span>
+                  <span>{isEn ? 'Copy Rescue Pitch' : 'Copiar Guión de Rescate'}</span>
                 </button>
               </div>
 
               {/* Pitch Display Card */}
               <div className="p-4 rounded-2xl bg-slate-900 border border-rose-500/30 text-xs text-slate-200 leading-relaxed italic space-y-2">
                 <span className="font-bold text-rose-300 not-italic block text-xs">
-                  🎙️ Speech de Urgencia & Rescate de Titularidad:
+                  {isEn ? '🎙️ High-Urgency Ownership Rescue Pitch:' : '🎙️ Speech de Urgencia & Rescate de Titularidad:'}
                 </span>
                 <p>
-                  "Hola <strong>{rescueBusinessName || 'propietario'}</strong>, le saluda el equipo de Prestigia con una alerta urgente. Su ficha en Google Maps está actualmente <strong>secuestrada por un tercero / suspendida</strong>. Clientes que buscan su negocio están llamando a números ajenos. <strong>NO cree una ficha nueva</strong>: Google la sancionará por duplicidad y perderá todas sus reseñas. Nosotros ejecutamos el protocolo legal de 72h con Google Trust & Safety para restituirle la titularidad legítima."
+                  {isEn ? (
+                    <>"Hello <strong>{rescueBusinessName || 'Business Owner'}</strong>, this is the Prestigia team with an urgent advisory. Your official Google Maps profile is currently <strong>compromised / suspended by Google</strong>. Potential clients searching your business are calling outdated numbers. <strong>DO NOT create a duplicate profile</strong>: Google will penalize both listings and you will lose all reviews and domain history. We execute the official 72-Hour Legal Protocol with Google Trust & Safety to restore full ownership."</>
+                  ) : (
+                    <>"Hola <strong>{rescueBusinessName || 'propietario'}</strong>, le saluda el equipo de Prestigia con una alerta urgente. Su ficha en Google Maps está actualmente <strong>secuestrada por un tercero / suspendida</strong>. Clientes que buscan su negocio están llamando a números ajenos. <strong>NO cree una ficha nueva</strong>: Google la sancionará por duplicidad y perderá todas sus reseñas. Nosotros ejecutamos el protocolo legal de 72h con Google Trust & Safety para restituirle la titularidad legítima."</>
+                  )}
                 </p>
               </div>
 
@@ -7399,19 +7409,19 @@ export default function LocalStudioPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
                   <strong className="text-amber-300 block text-xs">
-                    ⚠️ Objeción: "Una agencia anterior o ex-empleado me pide dinero para entregármela."
+                    {isEn ? '⚠️ Objection: "A former agency or ex-employee wants money to release it."' : '⚠️ Objeción: "Una agencia anterior o ex-empleado me pide dinero para entregármela."'}
                   </strong>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong>Respuesta Asesor:</strong> "No les pague un solo centavo. Las directrices de Google sancionan penalmente la extorsión de perfiles comerciales. Con nuestro expediente legal (RUT, facturas de servicios y datáfono), Google revoca al tercero de inmediato y le transfiere la titularidad a usted sin depender de ellos."
+                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"Never pay extortion fees. Google strictly prohibits third parties from withholding commercial listings. Through our official evidentiary claim (tax ID, utility bill, and point-of-sale receipt), Google Trust & Safety revokes the unauthorized holder directly and reassigns ownership to you."' : '"No les pague un solo centavo. Las directrices de Google sancionan penalmente la extorsión de perfiles comerciales. Con nuestro expediente legal (RUT, facturas de servicios y datáfono), Google revoca al tercero de inmediato y le transfiere la titularidad a usted sin depender de ellos."'}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
                   <strong className="text-amber-300 block text-xs">
-                    ⚠️ Objeción: "¿Cuánto tiempo demora y qué garantías tengo?"
+                    {isEn ? '⚠️ Objection: "How long does it take and what are the guarantees?"' : '⚠️ Objeción: "¿Cuánto tiempo demora y qué garantías tengo?"'}
                   </strong>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong>Respuesta Asesor:</strong> "El protocolo de 72 horas de Google da un plazo perentorio de 3 días hábiles. Si no responden, el botón de verificación se libera inmediatamente. Más del 95% de los rescates probatorios con documentación legal se resuelven con éxito en menos de una semana."
+                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"Google\'s 72-Hour protocol gives unauthorized managers exactly 3 business days to reply. If they fail to answer, the verification trigger releases automatically. Over 95% of evidentiary rescues are resolved within 7 business days."' : '"El protocolo de 72 horas de Google da un plazo perentorio de 3 días hábiles. Si no responden, el botón de verificación se libera inmediatamente. Más del 95% de los rescates probatorios con documentación legal se resuelven con éxito en menos de una semana."'}
                   </p>
                 </div>
               </div>
@@ -7420,10 +7430,10 @@ export default function LocalStudioPage() {
               <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-950/80 via-slate-900 to-slate-900 border border-rose-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                 <div>
                   <span className="font-black text-rose-300 uppercase tracking-wide block text-xs">
-                    🎁 El Gancho de Cierre Prestigia ($0 Setup):
+                    {isEn ? '🎁 The Prestigia Closing Hook ($0 Setup Waiver):' : '🎁 El Gancho de Cierre Prestigia ($0 Setup):'}
                   </span>
                   <p className="text-slate-300 text-[11px] mt-0.5">
-                    "Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, nosotros asumimos el 100% del costo técnico y legal del rescate (<strong>$0 bonificado</strong>) y blindamos tu ficha."
+                    {isEn ? <>"When you activate your tailored <strong>Prestigia Plan</strong> today, we absorb 100% of the technical and legal rescue fee (<strong>$0 cost waived</strong>) and shield your listing from future hijackings."</> : <>"Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, nosotros asumimos el 100% del costo técnico y legal del rescate (<strong>$0 bonificado</strong>) y blindamos tu ficha."</>}
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-black text-xs">
@@ -7476,7 +7486,7 @@ export default function LocalStudioPage() {
                       <Crown className="w-4 h-4 text-amber-400 shrink-0" />
                       <div className="text-left">
                         <span className="text-[9px] uppercase font-black tracking-wider text-amber-400/80 block">{isEn ? 'Appeal Credits' : 'Créditos de Apelación'}</span>
-                        <strong className="text-xs font-black text-amber-200">👑 ILIMITADO • Master</strong>
+                        <strong className="text-xs font-black text-amber-200">{isEn ? '👑 UNLIMITED • Master' : '👑 ILIMITADO • Master'}</strong>
                       </div>
                     </div>
                   ) : (
