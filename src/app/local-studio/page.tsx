@@ -6044,13 +6044,13 @@ export default function LocalStudioPage() {
                     </div>
                     <div className="pt-2 flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-400">
                       <span className="px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700/60">
-                        ⚡ Reconocimiento en Vivo
+                        ⚡ {isEn ? 'Live Recognition' : 'Reconocimiento en Vivo'}
                       </span>
                       <span className="px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700/60">
-                        ★ Calificación Real & Reseñas
+                        ★ {isEn ? 'Live Rating & Reviews' : 'Calificación Real & Reseñas'}
                       </span>
                       <span className="px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700/60">
-                        🎯 Brechas frente al Top 3
+                        🎯 {isEn ? 'Top 3 Gap Analysis' : 'Brechas frente al Top 3'}
                       </span>
                     </div>
                   </div>
@@ -6294,60 +6294,60 @@ export default function LocalStudioPage() {
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">1</span>
-                    <strong className="text-white text-xs">Acceder a "Editar Perfil"</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Access "Edit Profile"' : 'Acceder a "Editar Perfil"'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Entra a <strong>business.google.com</strong> o busca el nombre de tu negocio en Google. Haz clic en el botón circular <strong>"Editar perfil"</strong>.
+                    {isEn ? <>Go to <strong>business.google.com</strong> or search your business name on Google. Click the circular <strong>"Edit profile"</strong> button.</> : <>Entra a <strong>business.google.com</strong> o busca el nombre de tu negocio en Google. Haz clic en el botón circular <strong>"Editar perfil"</strong>.</>}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">2</span>
-                    <strong className="text-white text-xs">Ajustar Título Despenalizado</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Set Penalization-Free Title' : 'Ajustar Título Despenalizado'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    En "Información de la empresa", reemplaza títulos con mayúsculas spam por el <strong>Título Optimizado</strong> sugerido, evitando penalizaciones de visibilidad.
+                    {isEn ? <>In "Business information", replace spammy all-caps titles with the suggested <strong>Optimized Title</strong>, preventing visibility penalties.</> : <>En "Información de la empresa", reemplaza títulos con mayúsculas spam por el <strong>Título Optimizado</strong> sugerido, evitando penalizaciones de visibilidad.</>}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">3</span>
-                    <strong className="text-white text-xs">Inyectar Categorías Secundarias</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Inject Secondary Categories' : 'Inyectar Categorías Secundarias'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Haz clic en "Categoría de la empresa" → <strong>"+ Agregar otra categoría"</strong>. Añade las 3-5 subcategorías del Blueprint para aumentar un +35% de impresiones.
+                    {isEn ? <>Click "Business category" → <strong>"+ Add another category"</strong>. Add the 3-5 subcategories from the Blueprint to increase impressions by +35%.</> : <>Haz clic en "Categoría de la empresa" → <strong>"+ Agregar otra categoría"</strong>. Añade las 3-5 subcategorías del Blueprint para aumentar un +35% de impresiones.</>}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">4</span>
-                    <strong className="text-white text-xs">Cargar Menú / Catálogo de Servicios</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Upload Menu / Service Catalog' : 'Cargar Menú / Catálogo de Servicios'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    En el menú principal de Google, haz clic en <strong>"Editar servicios"</strong> o "Editar menú". Sube los platos o servicios clave con descripciones persuasivas y precios reales.
+                    {isEn ? <>In the Google main menu, click <strong>"Edit services"</strong> or "Edit menu". Upload key offerings with persuasive copy and transparent pricing.</> : <>En el menú principal de Google, haz clic en <strong>"Editar servicios"</strong> o "Editar menú". Sube los platos o servicios clave con descripciones persuasivas y precios reales.</>}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">5</span>
-                    <strong className="text-white text-xs">Subir Fotografías Geonombradas</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Upload Geo-Named Photos' : 'Subir Fotografías Geonombradas'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Haz clic en <strong>"Agregar foto"</strong>. Sube fotos de alta resolución con nombres SEO locales (ej: <em>clinica-dental-sonrisas-medellin.jpg</em>) en Fachada e Interior.
+                    {isEn ? <>Click <strong>"Add photo"</strong>. Upload high-res photos with local SEO filenames (e.g., <em>dental-clinic-brickell-miami.jpg</em>) for Exterior and Interior.</> : <>Haz clic en <strong>"Agregar foto"</strong>. Sube fotos de alta resolución con nombres SEO locales (ej: <em>clinica-dental-sonrisas-medellin.jpg</em>) en Fachada e Interior.</>}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">6</span>
-                    <strong className="text-white text-xs">Sembrar Preguntas Oficiales (Q&A)</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Seed Official Q&A' : 'Sembrar Preguntas Oficiales (Q&A)'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Desde Google Maps en el perfil público, ve a "Preguntas y respuestas", formula las preguntas preventivas (parqueadero, reservas, precios) y respóndelas de inmediato como propietario.
+                    {isEn ? <>From the public Google Maps profile, go to "Questions & answers", post the preventive FAQs (parking, bookings, pricing) and answer them immediately as the owner.</> : <>Desde Google Maps en el perfil público, ve a "Preguntas y respuestas", formula las preguntas preventivas (parqueadero, reservas, precios) y respóndelas de inmediato como propietario.</>}
                   </p>
                 </div>
               </div>
@@ -7302,37 +7302,37 @@ export default function LocalStudioPage() {
                     <strong className="text-white text-xs">{isEn ? 'Locate Profile on Maps' : 'Localizar Ficha en Maps'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Abre el navegador en modo incógnito. Busca el nombre comercial exacto del negocio en Google Maps y abre el perfil público.
+                    {isEn ? <>Open an incognito browser window. Search for the exact business name on Google Maps and open the public profile.</> : <>Abre el navegador en modo incógnito. Busca el nombre comercial exacto del negocio en Google Maps y abre el perfil público.</>}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">2</span>
-                    <strong className="text-white text-xs">Clic en "Reclamar Empresa"</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Click "Claim this Business"' : 'Clic en "Reclamar Empresa"'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Debajo de la dirección, haz clic en el enlace azul: <strong>"¿Eres el propietario de esta empresa?"</strong> o <strong>"Reclamar este negocio"</strong>.
+                    {isEn ? <>Below the address, click the link: <strong>"Own this business?"</strong> or <strong>"Claim this business"</strong>.</> : <>Debajo de la dirección, haz clic en el enlace azul: <strong>"¿Eres el propietario de esta empresa?"</strong> o <strong>"Reclamar este negocio"</strong>.</>}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">3</span>
-                    <strong className="text-white text-xs">Clic en "Solicitar Acceso"</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Click "Request Access"' : 'Clic en "Solicitar Acceso"'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Si Google muestra que la ficha pertenece a un correo externo (ej: <em>c*****@gmail.com</em>), haz clic en el botón azul <strong>"Solicitar acceso"</strong> (Request Access).
+                    {isEn ? <>If Google indicates the profile belongs to an external email (e.g. <em>c*****@gmail.com</em>), click the blue <strong>"Request Access"</strong> button.</> : <>Si Google muestra que la ficha pertenece a un correo externo (ej: <em>c*****@gmail.com</em>), haz clic en el botón azul <strong>"Solicitar acceso"</strong> (Request Access).</>}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">4</span>
-                    <strong className="text-white text-xs">Nivel "Propietario" & Plazo 72h</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Role "Owner" & 72-Hour Window' : 'Nivel "Propietario" & Plazo 72h'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Elige nivel <strong>"Propietario"</strong>. Google notifica al secuestrador dándole <strong>3 días (72 horas)</strong> obligatorios. Si no responde, Google libera la verificación directa para ti.
+                    {isEn ? <>Select level <strong>"Owner"</strong>. Google notifies the holder with a mandatory <strong>3-day (72 hours)</strong> window. If they don\'t answer, Google releases direct verification to you.</> : <>Elige nivel <strong>"Propietario"</strong>. Google notifica al secuestrador dándole <strong>3 días (72 horas)</strong> obligatorios. Si no responde, Google libera la verificación directa para ti.</>}
                   </p>
                 </div>
 
@@ -7342,17 +7342,17 @@ export default function LocalStudioPage() {
                     <strong className="text-white text-xs">{isEn ? 'Formal Appeal if Rejected' : 'Apelación Formal si Rechazan'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Si el secuestrador rechaza o el perfil está suspendido, ingresa a la <strong>Herramienta Oficial de Apelaciones</strong> y abre un caso formal de restitución.
+                    {isEn ? <>If the current manager denies or the listing is suspended, access the <strong>Official Google Appeals Tool</strong> and file a formal reinstatement claim.</> : <>Si el secuestrador rechaza o el perfil está suspendido, ingresa a la <strong>Herramienta Oficial de Apelaciones</strong> y abre un caso formal de restitución.</>}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">6</span>
-                    <strong className="text-white text-xs">Carga de Expediente Probatorio</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Evidentiary Dossier Upload' : 'Carga de Expediente Probatorio'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    Adjunta los 4 documentos oficiales: RUT / Tax ID, factura de energía reciente, foto de fachada y datáfono en caja ante Google Trust & Safety para revocar al secuestrador.
+                    {isEn ? <>Attach the 4 official records: Tax ID / Business license, recent utility bill, facade photo, and POS terminal to Google Trust & Safety to revoke unauthorized holders.</> : <>Adjunta los 4 documentos oficiales: RUT / Tax ID, factura de energía reciente, foto de fachada y datáfono en caja ante Google Trust & Safety para revocar al secuestrador.</>}
                   </p>
                 </div>
               </div>
