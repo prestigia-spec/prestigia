@@ -1635,8 +1635,11 @@ export default function LocalStudioPage() {
     (activeTab === 'appeals' && activeAppealDossier)
   );
 
-  // Load custom countries and cities from localStorage on mount
+  // Load custom countries and cities from localStorage on mount & set browser tab title
   useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.title = 'Prestigia Local Studio';
+    }
     try {
       const storedCountries = localStorage.getItem('prestigia_custom_geo_countries');
       if (storedCountries) {
