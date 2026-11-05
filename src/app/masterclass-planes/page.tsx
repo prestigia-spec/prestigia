@@ -311,7 +311,7 @@ export default function MasterclassPlanesPage() {
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Annual Software Commission:' : 'Comisión Plan Anual:'}</span>
-                  <span className="text-cyan-400 font-black">10% de Contado</span>
+                  <span className="text-cyan-400 font-black">{isEn ? '10% Cash Upfront' : '10% de Contado'}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
@@ -380,7 +380,7 @@ export default function MasterclassPlanesPage() {
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Annual Software Commission:' : 'Comisión Plan Anual:'}</span>
-                  <span className="text-cyan-400 font-black text-sm">20% de Contado</span>
+                  <span className="text-cyan-400 font-black text-sm">{isEn ? '20% Cash Upfront' : '20% de Contado'}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
@@ -445,7 +445,7 @@ export default function MasterclassPlanesPage() {
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Annual Software Commission:' : 'Comisión Plan Anual:'}</span>
-                  <span className="text-cyan-400 font-black text-sm">25% de Contado</span>
+                  <span className="text-cyan-400 font-black text-sm">{isEn ? '25% Cash Upfront' : '25% de Contado'}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
@@ -560,24 +560,36 @@ export default function MasterclassPlanesPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-xs">
             <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
-              <span className="text-slate-400 font-mono text-[10px] uppercase">Plan Asesor Independiente</span>
-              <div className="text-2xl font-black text-cyan-400">10% <span className="text-xs text-white font-normal">de Contado</span></div>
+              <span className="text-slate-400 font-mono text-[10px] uppercase">
+                {isEn ? 'Independent Advisor Plan' : 'Plan Asesor Independiente'}
+              </span>
+              <div className="text-2xl font-black text-cyan-400">
+                10% <span className="text-xs text-white font-normal">{isEn ? 'Cash Upfront' : 'de Contado'}</span>
+              </div>
               <p className="text-[11px] text-slate-300">
                 {isEn ? 'In a $600 USD annual agreement, you receive $60 USD upfront.' : 'En un contrato anual de $600 USD, recibes $60 USD de contado (¡ya pagaste tu plan de $49!).'}
               </p>
             </div>
 
             <div className="p-4 rounded-xl bg-indigo-950/30 border border-indigo-500/30 space-y-2">
-              <span className="text-indigo-400 font-mono text-[10px] uppercase">Plan Agencias</span>
-              <div className="text-2xl font-black text-cyan-400">20% <span className="text-xs text-white font-normal">de Contado</span></div>
+              <span className="text-indigo-400 font-mono text-[10px] uppercase">
+                {isEn ? 'Digital Agency Plan' : 'Plan Agencias'}
+              </span>
+              <div className="text-2xl font-black text-cyan-400">
+                20% <span className="text-xs text-white font-normal">{isEn ? 'Cash Upfront' : 'de Contado'}</span>
+              </div>
               <p className="text-[11px] text-slate-300">
                 {isEn ? 'In a $600 USD annual agreement, you receive $120 USD upfront.' : 'En un contrato anual de $600 USD, recibes $120 USD de contado (más de lo que invertiste en tu plan).'}
               </p>
             </div>
 
             <div className="p-4 rounded-xl bg-cyan-950/30 border border-cyan-500/30 space-y-2">
-              <span className="text-cyan-400 font-mono text-[10px] uppercase">Plan Súper Agencias</span>
-              <div className="text-2xl font-black text-cyan-400">25% <span className="text-xs text-white font-normal">de Contado</span></div>
+              <span className="text-cyan-400 font-mono text-[10px] uppercase">
+                {isEn ? 'Super Agency Plan' : 'Plan Súper Agencias'}
+              </span>
+              <div className="text-2xl font-black text-cyan-400">
+                25% <span className="text-xs text-white font-normal">{isEn ? 'Cash Upfront' : 'de Contado'}</span>
+              </div>
               <p className="text-[11px] text-slate-300">
                 {isEn ? 'In a $600 USD annual agreement, you receive $150 USD upfront.' : 'En un contrato anual de $600 USD, recibes $150 USD de contado en una sola transacción.'}
               </p>
@@ -605,9 +617,9 @@ export default function MasterclassPlanesPage() {
                   : 'Quienes adquieran su paquete durante la Masterclass o en las siguientes 24 horas reciben un 10% adicional de créditos gratis en cada pestaña:'}
               </p>
               <ul className="space-y-1 font-mono text-[11px] text-amber-300 pt-1">
-                <li>• Asesor: <strong>11 créditos / pestaña</strong> (44 servicios en total).</li>
-                <li>• Agencias: <strong>22 créditos / pestaña</strong> (88 servicios en total).</li>
-                <li>• Súper Agencias: <strong>33 créditos / pestaña</strong> (132 servicios en total).</li>
+                <li>• {isEn ? 'Independent Advisor:' : 'Asesor:'} <strong>{isEn ? '11 credits / tab' : '11 créditos / pestaña'}</strong> {isEn ? '(44 total services).' : '(44 servicios en total).'}</li>
+                <li>• {isEn ? 'Agencies:' : 'Agencias:'} <strong>{isEn ? '22 credits / tab' : '22 créditos / pestaña'}</strong> {isEn ? '(88 total services).' : '(88 servicios en total).'}</li>
+                <li>• {isEn ? 'Super Agencies:' : 'Súper Agencias:'} <strong>{isEn ? '33 credits / tab' : '33 créditos / pestaña'}</strong> {isEn ? '(132 total services).' : '(132 servicios en total).'}</li>
               </ul>
             </div>
 
@@ -623,7 +635,7 @@ export default function MasterclassPlanesPage() {
                   : 'Los asesores que agoten sus créditos pueden comprar recargas sueltas a $5 USD por crédito para cualquier pestaña. Los paquetes iniciales ahorran hasta un 75% frente a la recarga suelta.'}
               </p>
               <div className="pt-2 text-[10px] text-slate-400 font-mono">
-                Recargas disponibles 24/7 sin fecha de vencimiento.
+                {isEn ? 'Reloads available 24/7 with no expiration date.' : 'Recargas disponibles 24/7 sin fecha de vencimiento.'}
               </div>
             </div>
           </div>
