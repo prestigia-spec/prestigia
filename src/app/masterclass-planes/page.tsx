@@ -197,8 +197,8 @@ export default function MasterclassPlanesPage() {
             </div>
             <h2 className="text-xl sm:text-3xl font-black text-white leading-tight">
               {isEn
-                ? 'Monetize Google Maps Optimization with Zero Tech Barrier: Invest $49, Double with Your 1st Client'
-                : 'Monetiza la Optimización de Google Maps sin Barrera Técnica: Invierte $49 USD y Duplica desde tu 1er Cliente'}
+                ? 'Monetize Google Maps Optimization with Zero Tech Barrier: Invest from $49 USD, Double with Your 1st Client'
+                : 'Monetiza la Optimización de Google Maps sin Barrera Técnica: Invierte desde $49 USD y Duplica desde tu 1er Cliente'}
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl">
               {isEn
