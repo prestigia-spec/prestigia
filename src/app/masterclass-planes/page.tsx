@@ -252,8 +252,8 @@ export default function MasterclassPlanesPage() {
 
           <p className="text-xs text-slate-300">
             {isEn
-              ? 'Each plan grants dedicated operational credits across all 4 production engines of Prestigia Local Studio. No recurring maintenance fees; consume credits as you close clients.'
-              : 'Cada plan otorga créditos de uso independientes para las 4 herramientas de producción técnica de Prestigia Local Studio. Sin costos ocultos de servidores ni mantenimiento.'}
+              ? 'Every plan grants full, unrestricted access to all 4 AI production engines and white-label PDF exports. Solo advisors operate with the exact same power as a top agency from day one; the only difference is the credit volume and commission tier.'
+              : 'Todos los planes otorgan acceso total e idéntico a las 4 herramientas de ingeniería de IA y a la exportación de informes en PDF con tu marca. El consultor independiente opera desde el día uno con el mismo poder de una agencia pro; la única diferencia es el volumen de créditos y la escala de comisiones.'}
           </p>
 
           {/* Pricing Grid */}
@@ -301,6 +301,10 @@ export default function MasterclassPlanesPage() {
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span><strong>10</strong> {isEn ? '1-Star Review Appeals (Tab 4)' : 'Apelaciones de Reseñas 1★ (Pestaña 4)'}</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-emerald-300 font-medium">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>{isEn ? 'White Label PDF Dossier Exports' : 'Exportación de PDF con Logo Marca Blanca'}</span>
                   </li>
                 </ul>
               </div>
@@ -434,7 +438,7 @@ export default function MasterclassPlanesPage() {
                   </li>
                   <li className="flex items-center gap-2 text-cyan-300 font-medium">
                     <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                    <span>{isEn ? 'Priority Queue & Multi-Advisor Subaccounts' : 'Cola de IA Prioritaria & Subcuentas para Asesores'}</span>
+                    <span>{isEn ? 'White Label PDF Dossier Exports' : 'Exportación de PDF con Logo Marca Blanca'}</span>
                   </li>
                 </ul>
               </div>
