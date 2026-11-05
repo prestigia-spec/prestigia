@@ -601,9 +601,9 @@ export default function MasterclassPlanesPage() {
                 {isEn ? '1. Software Costs for Traditional Agencies' : '1. Lo que Paga una Agencia en Software'}
               </span>
               <ul className="space-y-1.5 text-slate-300 text-[11px]">
-                <li>• <strong>BrightLocal:</strong> $39 a $79 USD/mes (para apenas 3 a 5 negocios).</li>
-                <li>• <strong>Local Falcon (Geo-Grids):</strong> $25 a $50 USD/mes en créditos.</li>
-                <li>• <strong>ChatGPT Plus / Jasper AI:</strong> $20 a $49 USD/mes para redactar.</li>
+                <li>• <strong>BrightLocal:</strong> {isEn ? '$39 to $79 USD/mo (limited to just 3 to 5 businesses).' : '$39 a $79 USD/mes (para apenas 3 a 5 negocios).'}</li>
+                <li>• <strong>Local Falcon (Geo-Grids):</strong> {isEn ? '$25 to $50 USD/mo in credit bundles.' : '$25 a $50 USD/mes en créditos.'}</li>
+                <li>• <strong>ChatGPT Plus / Jasper AI:</strong> {isEn ? '$20 to $49 USD/mo for copywriting & appeals.' : '$20 a $49 USD/mes para redactar.'}</li>
               </ul>
               <div className="p-2.5 rounded-lg bg-rose-950/30 border border-rose-500/30 text-[11px] text-rose-300 font-semibold">
                 {isEn ? 'Total Fixed Monthly Cost: $100 to $200 USD EVERY MONTH, whether they sell or not, doing manual work.' : 'Gasto Fijo Mensual: $100 a $200 USD TODOS los meses, vendas o no vendas clientes, haciendo todo a mano.'}
@@ -616,9 +616,9 @@ export default function MasterclassPlanesPage() {
                 {isEn ? '2. Market Rates Charged to End Clients' : '2. Lo que Cobra una Agencia al Cliente'}
               </span>
               <ul className="space-y-1.5 text-slate-300 text-[11px]">
-                <li>• <strong>Setup & Optimización Técnica:</strong> $200 a $500 USD (un solo pago).</li>
-                <li>• <strong>Mantenimiento Mensual Maps:</strong> $150 a $350 USD/mes.</li>
-                <li>• <strong>Rescate de Ficha / Propiedad:</strong> $150 a $400 USD (en Upwork/Fiverr cobran $100+ solo por la apelación).</li>
+                <li>• <strong>{isEn ? 'Setup & Technical Optimization:' : 'Setup & Optimización Técnica:'}</strong> {isEn ? '$200 to $500 USD (one-time fee).' : '$200 a $500 USD (un solo pago).'}</li>
+                <li>• <strong>{isEn ? 'Monthly Maps Management:' : 'Mantenimiento Mensual Maps:'}</strong> {isEn ? '$150 to $350 USD/mo.' : '$150 a $350 USD/mes.'}</li>
+                <li>• <strong>{isEn ? 'Listing Rescue / Ownership Appeal:' : 'Rescate de Ficha / Propiedad:'}</strong> {isEn ? '$150 to $400 USD (Upwork/Fiverr freelancers charge $100+ just for the appeal letter).' : '$150 a $400 USD (en Upwork/Fiverr cobran $100+ solo por la apelación).'}</li>
               </ul>
               <div className="p-2.5 rounded-lg bg-amber-950/30 border border-amber-500/30 text-[11px] text-amber-300 font-semibold">
                 {isEn ? 'High Perceived Value: Businesses happily pay $100–$250 USD per service because losing Google Maps kills their sales.' : 'Alto Valor Percibido: Los negocios pagan felices $100-$250 USD porque no estar en Google Maps los hace quebrar.'}
@@ -631,10 +631,10 @@ export default function MasterclassPlanesPage() {
                 {isEn ? '3. The Prestigia Local Studio Advantage' : '3. La Ventaja Prestigia Local Studio'}
               </span>
               <ul className="space-y-1.5 text-slate-200 text-[11px]">
-                <li>• <strong>Todo en 1 solo lugar:</strong> Las 5 herramientas en una sola suite integrada.</li>
-                <li>• <strong>Cero mensualidades obligatorias:</strong> Consumes créditos a tu ritmo al vender.</li>
-                <li>• <strong>IA Algorítmica 2026:</strong> Genera blueprints, auditorías y mapas en segundos.</li>
-                <li>• <strong>Dossier PDF con tu marca:</strong> Informes ejecutivos listos para entregar.</li>
+                <li>• <strong>{isEn ? 'All in 1 single place:' : 'Todo en 1 solo lugar:'}</strong> {isEn ? 'All 5 production engines unified in one integrated suite.' : 'Las 5 herramientas en una sola suite integrada.'}</li>
+                <li>• <strong>{isEn ? 'Zero mandatory monthly fees:' : 'Cero mensualidades obligatorias:'}</strong> {isEn ? 'Consume credits at your own pace as you close deals.' : 'Consumes créditos a tu ritmo al vender.'}</li>
+                <li>• <strong>{isEn ? '2026 Algorithmic AI:' : 'IA Algorítmica 2026:'}</strong> {isEn ? 'Generates blueprints, audits, and heatmaps in seconds.' : 'Genera blueprints, auditorías y mapas en segundos.'}</li>
+                <li>• <strong>{isEn ? 'White-Label PDF Dossier:' : 'Dossier PDF con tu marca:'}</strong> {isEn ? 'Executive reports ready to deliver to your clients.' : 'Informes ejecutivos listos para entregar.'}</li>
               </ul>
               <div className="p-2.5 rounded-lg bg-emerald-950/30 border border-emerald-500/30 text-[11px] text-emerald-300 font-semibold">
                 {isEn ? 'Invest from $49 USD (one-time). Sell 1 single client and pocket a 95% to 99% profit margin.' : 'Inviertes desde $49 USD (pago único). Vendes 1 solo cliente y te queda un margen de ganancia del 95% al 99%.'}
