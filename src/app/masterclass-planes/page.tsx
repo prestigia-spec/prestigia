@@ -334,7 +334,7 @@ export default function MasterclassPlanesPage() {
                   <span className="text-indigo-400 text-xs font-mono">Nivel 2</span>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-white">$99 <span className="text-xs text-slate-400 font-normal">USD</span></h3>
+                  <h3 className="text-2xl font-black text-white">$90 <span className="text-xs text-slate-400 font-normal">USD</span></h3>
                   <p className="text-[11px] text-slate-300 mt-0.5">
                     {isEn ? 'For commercial teams and active agencies.' : 'Para agencias digitales y equipos comerciales activos.'}
                   </p>
@@ -346,7 +346,7 @@ export default function MasterclassPlanesPage() {
                     <span className="text-amber-400 font-mono text-sm">80 Créditos</span>
                   </div>
                   <p className="text-[10px] text-slate-400 font-mono">
-                    20 {isEn ? 'credits per tab' : 'créditos en cada pestaña'} ($1.23 USD / {isEn ? 'use' : 'uso'})
+                    20 {isEn ? 'credits per tab' : 'créditos en cada pestaña'} ($1.12 USD / {isEn ? 'use' : 'uso'})
                   </p>
                 </div>
 
@@ -399,7 +399,7 @@ export default function MasterclassPlanesPage() {
                   <span className="text-cyan-400 text-xs font-mono">Nivel 3</span>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-white">$149 <span className="text-xs text-slate-400 font-normal">USD</span></h3>
+                  <h3 className="text-2xl font-black text-white">$140 <span className="text-xs text-slate-400 font-normal">USD</span></h3>
                   <p className="text-[11px] text-slate-400 mt-0.5">
                     {isEn ? 'For high-volume prospecting and franchise networks.' : 'Para prospección masiva y redes de franquicias.'}
                   </p>
@@ -411,7 +411,7 @@ export default function MasterclassPlanesPage() {
                     <span className="text-amber-400 font-mono text-sm">120 Créditos</span>
                   </div>
                   <p className="text-[10px] text-slate-400 font-mono">
-                    30 {isEn ? 'credits per tab' : 'créditos en cada pestaña'} ($1.24 USD / {isEn ? 'use' : 'uso'})
+                    30 {isEn ? 'credits per tab' : 'créditos en cada pestaña'} ($1.16 USD / {isEn ? 'use' : 'uso'})
                   </p>
                 </div>
 
