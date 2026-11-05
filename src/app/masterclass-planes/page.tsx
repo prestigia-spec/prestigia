@@ -631,15 +631,15 @@ export default function MasterclassPlanesPage() {
             <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
               <div className="flex items-center gap-2 text-white font-bold text-sm">
                 <Zap className="w-4 h-4 text-emerald-400" />
-                <span>{isEn ? 'Single Credit Reload Policy ($5 USD / use)' : 'Política de Recargas Sueltas ($5 USD / uso)'}</span>
+                <span>{isEn ? 'Credit Reload Policy ($5 USD / credit • Min. 10 credits)' : 'Política de Recargas ($5 USD / crédito • Mínimo 10 créditos)'}</span>
               </div>
               <p className="text-slate-300 text-[11px] leading-relaxed">
                 {isEn
-                  ? 'Advisors who run out of credits before their cycle can buy individual top-up credits for $5 USD each across any tab. Buying a package saves up to 75% per credit.'
-                  : 'Los asesores que agoten sus créditos pueden comprar recargas sueltas a $5 USD por crédito para cualquier pestaña. Los paquetes iniciales ahorran hasta un 75% frente a la recarga suelta.'}
+                  ? 'Advisors who run out of credits can purchase top-up credits at $5 USD each for any tab, with a minimum reload package of 10 credits ($50 USD). Initial Masterclass packages save up to 75% compared to reload rates.'
+                  : 'Los asesores que agoten sus créditos pueden comprar paquetes de recarga a $5 USD por crédito para cualquier pestaña, con una recarga mínima de 10 créditos ($50 USD). Los planes iniciales de la Masterclass ahorran hasta un 75% frente a la recarga suelta.'}
               </p>
               <div className="pt-2 text-[10px] text-slate-400 font-mono">
-                {isEn ? 'Reloads available 24/7 with no expiration date.' : 'Recargas disponibles 24/7 sin fecha de vencimiento.'}
+                {isEn ? 'Minimum reload: 10 credits ($50 USD). Available 24/7 with no expiration date.' : 'Recarga mínima: 10 créditos ($50 USD). Disponibles 24/7 sin fecha de vencimiento.'}
               </div>
             </div>
           </div>
