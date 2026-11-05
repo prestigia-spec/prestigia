@@ -108,7 +108,7 @@ CRITICAL MULTI-NICHE & QUALITY RULES (ZERO PIGEONHOLING - HIGH IMPACT - FACTUAL)
 
 3. "primaryCategory": The exact official Google Business Profile primary category corresponding to the niche.
 4. "secondaryCategories": Exactly 4 to 5 official Google secondary categories strictly relevant to the niche. NEVER include unrelated categories.
-5. "optimizedTitle": Strategic formula: "[Brand Name] | [Core Category/Specialty] en [City/Area]".
+5. "optimizedTitle": Strategic formula: "[Brand Name] | [Core Category/Specialty] ${isEn ? 'in' : 'en'} [City/Area]".
 6. "serviceCatalog": Array derived STRICTLY from the business niche and user specialties.
 7. "photoChecklist": Array of 5 photo types tailored to the niche (e.g., medical equipment for clinics, exam rooms for vets, hair stations for barbers, hall setups for events, kitchen/dishes for restaurants).
 8. "preventiveFaqs": Exactly 5 strategic Q&As addressing common customer objections for this specific niche.
@@ -756,7 +756,7 @@ function buildFallbackBlueprint(params: {
   const cleanSpecialties = specialties.trim();
   const rawSpecialties = cleanSpecialties || (isEn ? 'our main specialty items' : 'nuestros productos y servicios principales');
 
-  const optimizedTitle = `${businessName} | ${primaryCategory} en ${locationTag}`;
+  const optimizedTitle = `${businessName} | ${primaryCategory} ${isEn ? 'in' : 'en'} ${locationTag}`;
 
   // Multi-niche rich commercial description (600-745 chars) honoring place, food/offering, customer care, and reviews
   const commercialDescription = generateNicheCommercialDescription({
