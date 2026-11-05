@@ -3268,8 +3268,12 @@ export default function LocalStudioPage() {
 
   const handleDeleteDossier = async (id: string, isPermanentPurge?: boolean) => {
     const msg = isPermanentPurge
-      ? '¿Seguro que deseas purgar DEFINITIVAMENTE este expediente de la base de datos? Esta acción es irreversible.'
-      : '¿Seguro que deseas eliminar este expediente?';
+      ? (isEn
+          ? '🛡️ PRESTIGIA LOCAL STUDIO:\n\nAre you sure you want to PERMANENTLY purge this dossier from the database? This action is irreversible.'
+          : '🛡️ PRESTIGIA LOCAL STUDIO:\n\n¿Seguro que deseas purgar DEFINITIVAMENTE este expediente de la base de datos? Esta acción es irreversible.')
+      : (isEn
+          ? '🛡️ PRESTIGIA LOCAL STUDIO:\n\nAre you sure you want to delete this dossier?'
+          : '🛡️ PRESTIGIA LOCAL STUDIO:\n\n¿Seguro que deseas eliminar este expediente?');
     if (typeof window !== 'undefined' && !window.confirm(msg)) return;
 
     // Actualización optimista inmediata en la UI
@@ -3528,8 +3532,8 @@ export default function LocalStudioPage() {
       return;
     }
     const confirmMsg = isEn
-      ? `Are you sure you want to delete the account "${advisor.name}" (@${advisor.username})? All their dossiers will remain in the database.`
-      : `¿Estás seguro de que deseas eliminar la cuenta de "${advisor.name}" (@${advisor.username})? Sus expedientes se conservarán en el sistema.`;
+      ? `🛡️ PRESTIGIA LOCAL STUDIO:\n\nAre you sure you want to delete the account "${advisor.name}" (@${advisor.username})? All their dossiers will remain in the database.`
+      : `🛡️ PRESTIGIA LOCAL STUDIO:\n\n¿Estás seguro de que deseas eliminar la cuenta de "${advisor.name}" (@${advisor.username})? Sus expedientes se conservarán en el sistema.`;
     if (!window.confirm(confirmMsg)) return;
 
     try {
