@@ -269,26 +269,149 @@ function detectTaxonomy(params: {
   businessName: string;
   isEn: boolean;
 }) {
-  const combined = `${params.category} ${params.specialties} ${params.businessName}`.toLowerCase();
+  const cat = (params.category || '').toLowerCase();
+  const spec = (params.specialties || '').toLowerCase();
+  const name = (params.businessName || '').toLowerCase();
+  const combined = `${cat} ${spec} ${name}`;
   const isEn = params.isEn;
 
-  // 1. GASTRONOMÍA
+  // PRIORIDAD 1: BELLEZA / SPA / ESTÉTICA / BARBERÍA / PELUQUERÍA
+  // (Debe evaluarse ANTES que gastronomía para evitar que "barbería" se confunda con "bar")
   if (
+    cat.includes('estética') ||
+    cat.includes('estetica') ||
+    cat.includes('spa') ||
+    cat.includes('belleza') ||
+    cat.includes('barber') ||
+    cat.includes('beauty') ||
+    combined.includes('manicure') ||
+    combined.includes('pedicure') ||
+    combined.includes('facial') ||
+    combined.includes('cejas') ||
+    combined.includes('pestañas') ||
+    combined.includes('uñas') ||
+    combined.includes('masaje') ||
+    (combined.includes('barber') && !combined.includes('barbacoa')) ||
+    combined.includes('peluquer') ||
+    combined.includes('estilista')
+  ) {
+    if (combined.includes('barber') && !combined.includes('spa') && !combined.includes('estétic')) {
+      return {
+        primaryCategory: isEn ? 'Barber Shop' : 'Barbería',
+        secondaryCategories: isEn
+          ? ['Hair Salon', 'Beauty Salon', 'Stylist', 'Skin Care Clinic', 'Cosmetics Store']
+          : ['Peluquería', 'Salón de belleza', 'Estilista', 'Cuidado de la piel', 'Tienda de cosméticos'],
+      };
+    }
+    if (combined.includes('spa') || combined.includes('masaje')) {
+      return {
+        primaryCategory: isEn ? 'Day Spa' : 'Spa',
+        secondaryCategories: isEn
+          ? ['Beauty Salon', 'Facial Spa', 'Nail Salon', 'Health Spa', 'Massage Therapist']
+          : ['Salón de belleza', 'Centro de estética', 'Salón de manicura y pedicura', 'Spa de masajes', 'Cosméticos y cuidado facial'],
+      };
+    }
+    return {
+      primaryCategory: isEn ? 'Beauty Salon' : 'Salón de belleza',
+      secondaryCategories: isEn
+        ? ['Hair Salon', 'Nail Salon', 'Day Spa', 'Esthetician', 'Cosmetics Store']
+        : ['Peluquería', 'Salón de manicura', 'Centro de estética', 'Spa y bienestar', 'Estilista'],
+    };
+  }
+
+  // PRIORIDAD 2: ODONTOLOGÍA
+  if (cat.includes('odontol') || cat.includes('dental') || combined.includes('dient') || combined.includes('sonrisa') || combined.includes('ortodoncia') || combined.includes('implante')) {
+    return {
+      primaryCategory: isEn ? 'Dental Clinic' : 'Clínica dental',
+      secondaryCategories: isEn
+        ? ['Dentist', 'Orthodontist', 'Emergency Dental Service', 'Cosmetic Dentist', 'Dental Laboratory']
+        : ['Dentista', 'Ortodoncista', 'Servicio dental de urgencia', 'Centro odontológico', 'Clínica especializada'],
+    };
+  }
+
+  // PRIORIDAD 3: SALUD / CLÍNICA MÉDICA
+  if (cat.includes('salud') || cat.includes('médic') || cat.includes('medic') || cat.includes('clinic') || cat.includes('consultorio') || combined.includes('doctor')) {
+    return {
+      primaryCategory: isEn ? 'Medical Clinic' : 'Clínica médica',
+      secondaryCategories: isEn
+        ? ['Doctor', 'Medical Center', 'Specialized Clinic', 'Health Consultant', 'Family Practice Physician']
+        : ['Centro médico', 'Médico especialista', 'Consultorio médico', 'Centro de salud y bienestar', 'Clínica especializada'],
+    };
+  }
+
+  // PRIORIDAD 4: VETERINARIA / MASCOTAS
+  if (cat.includes('veterin') || cat.includes('mascot') || cat.includes('pet') || combined.includes('canin') || combined.includes('felin')) {
+    return {
+      primaryCategory: isEn ? 'Veterinary Care' : 'Clínica veterinaria',
+      secondaryCategories: isEn
+        ? ['Veterinarian', 'Pet Groomer', 'Pet Supply Store', 'Animal Hospital', 'Emergency Veterinarian Service']
+        : ['Veterinario', 'Peluquería de mascotas', 'Hospital para animales', 'Tienda de artículos para mascotas', 'Urgencias veterinarias'],
+    };
+  }
+
+  // PRIORIDAD 5: AUTOMOTRIZ / TALLER MECÁNICO
+  if (cat.includes('auto') || cat.includes('taller') || cat.includes('mecánic') || cat.includes('mecanic') || cat.includes('lavadero') || combined.includes('frenos') || combined.includes('vehícul')) {
+    return {
+      primaryCategory: isEn ? 'Auto Repair Shop' : 'Taller mecánico',
+      secondaryCategories: isEn
+        ? ['Brake Shop', 'Oil Change Service', 'Car Inspection Station', 'Mechanic', 'Auto Electrical Service']
+        : ['Taller de automóviles', 'Servicio de cambio de aceite', 'Taller de frenos', 'Mecánico', 'Diagnóstico automotriz'],
+    };
+  }
+
+  // PRIORIDAD 6: FITNESS / GIMNASIO
+  if (cat.includes('fitness') || cat.includes('gimnasio') || cat.includes('gym') || cat.includes('entrenamiento')) {
+    return {
+      primaryCategory: isEn ? 'Gym' : 'Gimnasio',
+      secondaryCategories: isEn
+        ? ['Fitness Center', 'Personal Trainer', 'Aerobics Program', 'Yoga Studio', 'Pilates Studio']
+        : ['Centro de fitness', 'Entrenador personal', 'Centro deportivo', 'Gimnasio de crossfit', 'Salón de entrenamiento'],
+    };
+  }
+
+  // PRIORIDAD 7: SERVICIOS PROFESIONALES / LEGAL / B2B
+  if (cat.includes('legal') || cat.includes('abog') || cat.includes('contab') || cat.includes('b2b') || combined.includes('juríd')) {
+    return {
+      primaryCategory: isEn ? 'Law Firm' : 'Bufete de abogados',
+      secondaryCategories: isEn
+        ? ['Lawyer', 'Legal Services', 'Corporate Office', 'Business Management Consultant', 'Real Estate Attorney']
+        : ['Abogado', 'Servicios legales', 'Asesoría jurídica', 'Consultoría legal', 'Abogado laboralista'],
+    };
+  }
+
+  // PRIORIDAD 8: RETAIL / TIENDA DE MODA / COMERCIO
+  if (cat.includes('retail') || cat.includes('tienda') || cat.includes('moda') || cat.includes('comercio') || cat.includes('ropa') || cat.includes('boutique')) {
+    return {
+      primaryCategory: isEn ? 'Clothing Store' : 'Tienda de ropa',
+      secondaryCategories: isEn
+        ? ['Boutique', 'Fashion Accessories Store', 'Women\'s Clothing Store', 'Men\'s Clothing Store', 'Shoe Store']
+        : ['Boutique', 'Tienda de accesorios de moda', 'Tienda de ropa para mujer', 'Tienda de ropa de hombre', 'Zapatería'],
+    };
+  }
+
+  // PRIORIDAD 9: GASTRONOMÍA / RESTAURANTES / BARES
+  // (Solo si explícitamente es comida, restaurante o bebida, evitando falsos positivos con 'barbería')
+  if (
+    cat.includes('restauran') ||
+    cat.includes('gastro') ||
+    cat.includes('cafetería') ||
+    cat.includes('cafeteria') ||
+    cat.includes('panadería') ||
+    cat.includes('panaderia') ||
     combined.includes('restauran') ||
     combined.includes('gastro') ||
     combined.includes('comida') ||
     combined.includes('alimento') ||
     combined.includes('pasta') ||
-    combined.includes('lasa') ||
     combined.includes('pizza') ||
     combined.includes('burger') ||
     combined.includes('hamburgues') ||
-    combined.includes('carne') ||
     combined.includes('parrilla') ||
+    combined.includes('asado') ||
     combined.includes('sushi') ||
-    combined.includes('cafe') ||
-    combined.includes('café') ||
-    combined.includes('bar')
+    combined.includes('gastrobar') ||
+    combined.includes('cervecer') ||
+    /\bbar\b/i.test(combined)
   ) {
     // 1A. Pastas / Italiano / Lasaña
     if (
@@ -571,19 +694,17 @@ function generateNicheCommercialDescription(params: {
   let niche: 'gastro' | 'health' | 'veterinary' | 'beauty' | 'events' | 'automotive' | 'fitness' | 'retail' | 'general' = 'general';
 
   if (
-    catCombined.includes('restauran') ||
-    catCombined.includes('cafe') ||
-    catCombined.includes('café') ||
-    catCombined.includes('panader') ||
-    catCombined.includes('comida') ||
-    catCombined.includes('pizza') ||
-    catCombined.includes('burger') ||
-    catCombined.includes('parrilla') ||
-    catCombined.includes('pasta') ||
-    catCombined.includes('gastro') ||
-    catCombined.includes('bar')
+    catCombined.includes('barber') ||
+    catCombined.includes('peluquer') ||
+    catCombined.includes('salon') ||
+    catCombined.includes('spa') ||
+    catCombined.includes('estetic') ||
+    catCombined.includes('estética') ||
+    catCombined.includes('belleza') ||
+    catCombined.includes('uñas') ||
+    catCombined.includes('manicure')
   ) {
-    niche = 'gastro';
+    niche = 'beauty';
   } else if (
     catCombined.includes('dental') ||
     catCombined.includes('odont') ||
@@ -596,15 +717,20 @@ function generateNicheCommercialDescription(params: {
   } else if (catCombined.includes('veterin') || catCombined.includes('mascot') || catCombined.includes('pet')) {
     niche = 'veterinary';
   } else if (
-    catCombined.includes('barber') ||
-    catCombined.includes('peluquer') ||
-    catCombined.includes('salon') ||
-    catCombined.includes('spa') ||
-    catCombined.includes('estetic') ||
-    catCombined.includes('belleza') ||
-    catCombined.includes('uñas')
+    catCombined.includes('restauran') ||
+    catCombined.includes('cafe') ||
+    catCombined.includes('café') ||
+    catCombined.includes('panader') ||
+    catCombined.includes('comida') ||
+    catCombined.includes('pizza') ||
+    catCombined.includes('burger') ||
+    catCombined.includes('parrilla') ||
+    catCombined.includes('pasta') ||
+    catCombined.includes('gastro') ||
+    catCombined.includes('gastrobar') ||
+    /\bbar\b/i.test(catCombined)
   ) {
-    niche = 'beauty';
+    niche = 'gastro';
   } else if (
     catCombined.includes('evento') ||
     catCombined.includes('recepc') ||
