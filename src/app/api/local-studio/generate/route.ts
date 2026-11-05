@@ -61,70 +61,38 @@ export async function POST(request: Request) {
     const weeksToTop3 = Math.ceil(neededReviews / reviewsPerWeek) || (mode === 'create' ? 13 : 10);
 
     // -------------------------------------------------------------
-    // 1. LIVE GEMINI 1.5 FLASH ENGINE
+    // 1. LIVE GEMINI 3.1 FLASH LITE ENGINE (Maximum Analytics & Low Token Footprint)
     // -------------------------------------------------------------
     const geminiKey = process.env.GEMINI_API_KEY;
     if (geminiKey) {
       try {
-        const prompt = `You are the Lead Google Business Profile & Local SEO Architect at Prestigia.
-Your task is to generate the EXACT technical architecture and winning Google Maps Top 3 (Local 3-Pack) setup for the following business.
-Language of the entire output: ${isEn ? 'ENGLISH (USA Market Standard)' : 'SPANISH (LatAm Standard)'}.
+        const prompt = `You are Prestigia's Elite Google Maps Local SEO & Local 3-Pack Algorithm Architect.
+Analyze the business data below with deep vertical rigor and produce a winning technical profile in ${isEn ? 'ENGLISH' : 'SPANISH'}.
 
-BUSINESS SPECIFICATIONS:
-- Mode: ${mode === 'create' ? 'BUILD NEW PROFILE FROM SCRATCH (Ficha 1)' : 'FORENSIC AUDIT & TOP 3 UPGRADE (Ficha 2)'}
-- Business Model: ${isSAB ? 'SERVICE AREA BUSINESS / INDEPENDENT PROFESSIONAL (SAB - No physical customer storefront, travels to client or works remotely)' : 'STOREFRONT WITH PHYSICAL ADDRESS (Customers visit location)'}
-- Business Name: "${cleanName}"
-- Sector/Category: "${category}"
-- City / State / Metro Area: "${cleanCity}"
-- Neighborhood / Zone: "${cleanNeighborhood || 'Central commercial district'}"
-- Coverage / Target Areas (if SAB): "${cleanServiceAreas || 'Key affluent neighborhoods across ' + cleanCity}"
-- Star Specialties / Top Services: "${cleanSpecialties || 'High demand flagship services'}"
-- Official Phone / WhatsApp: "${cleanPhone || 'Direct line'}"
-- Existing Rating & Reviews (if audit): ${existingRating}★ (${existingReviews} reviews)
-- Verified Customer Feedback Highlights (if audit): ${cleanReviewHighlights.length > 0 ? cleanReviewHighlights.join(' | ') : 'Positive public feedback on quality, hospitality, and personalized service'}
+DATA INPUTS:
+- Mode: ${mode === 'create' ? 'NEW LISTING SETUP' : 'FORENSIC AUDIT & TOP 3 UPGRADE'}
+- Business Model: ${isSAB ? 'Service Area Business / Independent Professional (No physical storefront)' : 'Storefront with Physical Address (Walk-in customer location)'}
+- Brand Name: "${cleanName}"
+- Dropdown Niche: "${category}"
+- Exact City & Neighborhood: "${cleanNeighborhood ? cleanNeighborhood + ', ' : ''}${cleanCity}"
+- Service Areas (if SAB): "${cleanServiceAreas || cleanCity}"
+- Star Specialties & Flagship Services: "${cleanSpecialties || 'High-demand local services'}"
+- Commercial WhatsApp/Phone: "${cleanPhone || 'Direct line'}"
+- Existing Rating: ${existingRating}★ (${existingReviews} reviews)
+${cleanReviewHighlights.length > 0 ? `- Real Customer Feedback Highlights: "${cleanReviewHighlights.join(' | ')}"` : ''}
 
-CRITICAL MULTI-NICHE & QUALITY RULES (ZERO PIGEONHOLING - HIGH IMPACT - FACTUAL):
+ANALYTICAL DIRECTIVES:
+1. OPERATIONAL ACCURACY: Deduce the EXACT industry from the Niche ("${category}"), Brand ("${cleanName}"), and Specialties ("${cleanSpecialties}"). Never confuse beauty/spa with food, medical with retail, etc.
+2. COMMERCIAL DESCRIPTION (STRICT: 620-740 CHARACTERS):
+   Craft an engaging, high-converting commercial text. Highlight the atmosphere, signature craft/services in "${cleanSpecialties}", location in ${cleanNeighborhood ? cleanNeighborhood + ', ' : ''}${cleanCity}, and a warm call-to-action with WhatsApp (${cleanPhone}). Grounded, professional, and authentic (no generic spam).
+3. CATEGORIES: Primary category must be the precise official Google Maps category. Provide exactly 4-5 strictly relevant secondary categories.
+4. OPTIMIZED TITLE: Formula: "${cleanName} | [Primary Specialty/Category] ${isEn ? 'in' : 'en'} ${cleanNeighborhood || cleanCity}".
+5. SERVICE CATALOG: 4-6 services directly derived from "${cleanSpecialties}", with commercial name, benefit description, and local search tag.
+6. PROTOCOLS & MEDIA: 5 specific photo guidelines tailored to this business, 5 preventive FAQs, and a 60-90s video verification guide tailored to ${isSAB ? 'SAB' : 'storefront'}.
+7. POSTS & VELOCITY: 4 weekly Google update posts and a review velocity schedule (target: ${targetTop3Reviews} reviews, ${reviewsPerWeek}/week).
+${mode === 'audit' ? `8. AUDIT FORENSICS: Realistic healthScore (45-70), 4 critical profile gaps, Top 3 competitive insights, and a 5-step prioritized action roadmap.` : ''}
 
-1. MULTI-NICHE INTELLIGENCE (DO NOT PIGEONHOLE INTO RESTAURANTS):
-   Identify the TRUE operational industry from the name, category, and specialties. Adapt ALL vocabulary, tone, services, and photo guidance to that specific field:
-   - GASTRO (Restaurante, Cafetería, Pastelería, Pizzería, Bar): Food recipes, authentic flavors, fresh ingredients, dining atmosphere, hospitality, dine-in / takeout / delivery.
-   - HEALTH / DENTAL (Clínica médica, Consultorio, Odontología): Clinical rigor, modern diagnostic equipment, sterilization standards, compassionate bedside manner, painless procedures, appointment booking. NEVER mention food, delivery, or dishes!
-   - VETERINARY / PET CARE (Veterinaria, Cuidado animal, Peluquería canina): Love for pets, preventative diagnostics, gentle animal handling, compassionate communication with pet owners.
-   - BEAUTY / SALON / BARBERSHOP (Barbería, Peluquería, Spa, Estética): Barber/stylist artistry, precision haircutting, beard grooming, relaxing lounge atmosphere, premium products.
-   - EVENT VENUE / BANQUET (Salón de eventos, Recepciones, Fiestas): Hall capacity, spatial elegance, acoustics, lighting, celebration packages, dedicated event coordination.
-   - AUTOMOTIVE (Taller mecánico, Concesionario, Lavadero, Detailing): Mechanical precision, computerized diagnostic tools, honest estimates, certified technicians, warranty.
-   - FITNESS (Gimnasio, Crossfit, Centro de entrenamiento): Modern workout machines, certified trainers, motivating community, clean facilities.
-   - RETAIL / COMMERCE (Tienda, Ropa, Moda, Boutique): Curated selections, garment quality, personalized styling advice.
-   - PROFESSIONAL SERVICES (Legal, Contable, Consultoría): Strategic expertise, confidentiality, tailored advisory, rigorous compliance.
-
-2. COMMERCIAL DESCRIPTION ARCHITECTURE (MUST BE BETWEEN 600 AND 745 CHARACTERS - HARD LIMIT 750 CHARACTERS):
-   - In "commercialDescription":
-     ${mode === 'audit' ? `* FOR AUDIT MODE:
-       Weave in what real satisfied customers praise based on the ${existingRating}★ rating and public feedback highlights (${cleanReviewHighlights.length > 0 ? cleanReviewHighlights.join(' | ') : 'high quality, great attention to detail, and customer satisfaction'}). Mention specific elements clients love (e.g. food taste and portion sizes for gastro, doctor gentleness and painless care for clinics, caring pet handling for vets, haircut precision for barbers, spacious elegance for event venues). Include neighborhood (${cleanNeighborhood}) and city (${cleanCity}) naturally for Local 3-Pack SEO rank. End with a welcoming call-to-action with direct WhatsApp contact (${cleanPhone}).` : `* FOR CREATE MODE (NEW LISTING):
-       Vividly portray three pillars:
-       1) The physical space / atmosphere / comfort of the location (lighting, cleanliness, welcoming vibe).
-       2) The core offering and signature craft (fresh culinary recipes for food; diagnostic procedures & patient care for clinics; pet health & grooming for vets; styling & cuts for barbers; celebration packages for event halls; etc.).
-       3) The warm, dedicated customer attention and service commitment.
-       Include location keywords (${cleanNeighborhood ? cleanNeighborhood + ', ' : ''}${cleanCity}) and direct WhatsApp contact (${cleanPhone}).`}
-     * STRICT CHARACTER CONSTRAINT: Must be at least 600 characters and strictly UNDER 745 characters (Google cuts off at 750).
-     * AUTHENTIC & GROUNDED: Zero generic buzzwords ('somos los mejores', 'líder supremo'). Grounded 100% in the real business.
-
-3. "primaryCategory": The exact official Google Business Profile primary category corresponding to the niche.
-4. "secondaryCategories": Exactly 4 to 5 official Google secondary categories strictly relevant to the niche. NEVER include unrelated categories.
-5. "optimizedTitle": Strategic formula: "[Brand Name] | [Core Category/Specialty] ${isEn ? 'in' : 'en'} [City/Area]".
-6. "serviceCatalog": Array derived STRICTLY from the business niche and user specialties.
-7. "photoChecklist": Array of 5 photo types tailored to the niche (e.g., medical equipment for clinics, exam rooms for vets, hair stations for barbers, hall setups for events, kitchen/dishes for restaurants).
-8. "preventiveFaqs": Exactly 5 strategic Q&As addressing common customer objections for this specific niche.
-9. "verificationGuide": Foolproof 60-90 second continuous video verification guide tailored to storefront or SAB.
-10. "whatsappOnboardingMessage": Complete message to client requesting onboarding materials.
-11. "suggestedServiceAreas": ${isSAB ? 'Array of 8 to 10 affluent target coverage areas.' : '[]'}
-12. "hidePhysicalAddress": ${isSAB ? true : false}
-13. "nfcPocketReviewGuide": Smart digital QR & WhatsApp review collection protocol on-site (NO physical hardware, 100% digital links/QR).
-14. "reviewVelocityPlan": Object with currentReviews (${effectiveReviews}), targetTop3Reviews (${targetTop3Reviews}), neededReviews (${neededReviews}), pace (8/week), and weeks (${weeksToTop3}).
-15. "monthlyPostsBooster": Array of 4 weekly Google Business Profile posts tailored to the business niche.
-${mode === 'audit' ? `16. For Audit Mode: "healthScore" (40-68), "criticalGaps" (4-5 gaps), "topCompetitorInsights" (concise 90-day win strategy), and "actionRoadmap" (5 prioritized steps with impact: CRÍTICO/ALTO/MEDIO).` : ''}
-
-RETURN ONLY A VALID JSON OBJECT WITH THIS STRUCTURE (NO MARKDOWN WRAPPERS, NO EXTRA TEXT):
+RETURN STRICTLY A COMPACT VALID JSON OBJECT (NO MARKDOWN WRAPPERS):
 {
   "businessModel": "${isSAB ? 'service_area' : 'storefront'}",
   "hidePhysicalAddress": ${isSAB ? true : false},
@@ -150,7 +118,7 @@ RETURN ONLY A VALID JSON OBJECT WITH THIS STRUCTURE (NO MARKDOWN WRAPPERS, NO EX
     "documents": ["...", "..."]
   },
   "whatsappOnboardingMessage": "...",
-  "suggestedServiceAreas": ["...", "...", "...", "..."],
+  "suggestedServiceAreas": ${isSAB ? '["...", "...", "..."]' : '[]'},
   "nfcPocketReviewGuide": {
     "title": "...",
     "steps": ["...", "...", "..."],
@@ -196,8 +164,8 @@ RETURN ONLY A VALID JSON OBJECT WITH THIS STRUCTURE (NO MARKDOWN WRAPPERS, NO EX
                 body: JSON.stringify({
                   contents: [{ parts: [{ text: prompt }] }],
                   generationConfig: {
-                    temperature: 0.2,
-                    maxOutputTokens: 2500,
+                    temperature: 0.15,
+                    maxOutputTokens: 2000,
                     responseMimeType: 'application/json',
                   },
                 }),
