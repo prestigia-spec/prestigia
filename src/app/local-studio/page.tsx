@@ -9409,7 +9409,11 @@ export default function LocalStudioPage() {
                     {isEn ? 'Official Agency Pricing Benchmarks & Prestigia Closing Strategy' : 'Baremos Reales de Mercado de Agencias & Estrategia de Cierre Prestigia'}
                   </span>
                   <p className="text-[11px] text-slate-300 mt-0.5">
-                    <strong>Creación:</strong> $150–$250 USD (3–5h) • <strong>Auditoría Top 3:</strong> $200–$350 USD (4–6h) • <strong>Rescate 72h:</strong> $250–$450 USD (5–8h) • <strong>Planes Prestigia:</strong> 100% a la medida de cada cliente (Setup Técnico $0 bonificado).
+                    {isEn ? (
+                      <><strong>Creation:</strong> $150–$250 USD (3–5h) • <strong>Top 3 Audit:</strong> $200–$350 USD (4–6h) • <strong>72h Rescue:</strong> $250–$450 USD (5–8h) • <strong>Prestigia Plans:</strong> 100% custom-tailored per client (Technical Setup $0 waived).</>
+                    ) : (
+                      <><strong>Creación:</strong> $150–$250 USD (3–5h) • <strong>Auditoría Top 3:</strong> $200–$350 USD (4–6h) • <strong>Rescate 72h:</strong> $250–$450 USD (5–8h) • <strong>Planes Prestigia:</strong> 100% a la medida de cada cliente (Setup Técnico $0 bonificado).</>
+                    )}
                   </p>
                 </div>
               </div>
@@ -9728,7 +9732,7 @@ export default function LocalStudioPage() {
                   }}
                   className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition cursor-pointer shadow-md"
                 >
-                  Restablecer Todos los Filtros
+                  {isEn ? 'Reset All Filters' : 'Restablecer Todos los Filtros'}
                 </button>
               </div>
             ) : (
@@ -10797,15 +10801,15 @@ export default function LocalStudioPage() {
                           </div>
                           <div className="grid grid-cols-3 gap-1 pt-1 border-t border-slate-800/60 text-center text-[10px]">
                             <div className="bg-slate-900/80 py-0.5 rounded px-1">
-                              <span className="text-slate-400 block text-[9px] uppercase font-semibold">Creadas</span>
+                              <span className="text-slate-400 block text-[9px] uppercase font-semibold">{isEn ? 'Created' : 'Creadas'}</span>
                               <strong className="text-emerald-400 font-mono">{createsCount}</strong>
                             </div>
                             <div className="bg-slate-900/80 py-0.5 rounded px-1">
-                              <span className="text-slate-400 block text-[9px] uppercase font-semibold">Auditadas</span>
+                              <span className="text-slate-400 block text-[9px] uppercase font-semibold">{isEn ? 'Audited' : 'Auditadas'}</span>
                               <strong className="text-blue-400 font-mono">{auditsCount}</strong>
                             </div>
                             <div className="bg-slate-900/80 py-0.5 rounded px-1">
-                              <span className="text-slate-400 block text-[9px] uppercase font-semibold">Rescatadas</span>
+                              <span className="text-slate-400 block text-[9px] uppercase font-semibold">{isEn ? 'Rescued' : 'Rescatadas'}</span>
                               <strong className="text-amber-400 font-mono">{rescuesCount}</strong>
                             </div>
                           </div>
@@ -10817,29 +10821,29 @@ export default function LocalStudioPage() {
                             <div className="flex items-center justify-between font-bold">
                               <span className="text-amber-400 flex items-center gap-1 text-[10.5px]">
                                 <Zap className="w-3 h-3 text-amber-400" />
-                                <span>Consumo IA Mes Actual:</span>
+                                <span>{isEn ? 'Current Month AI Usage:' : 'Consumo IA Mes Actual:'}</span>
                               </span>
                               {deletedCountForAdv > 0 && (
                                 <span className="text-[9px] font-bold text-rose-400 bg-rose-950/60 border border-rose-500/30 px-1.5 py-0.5 rounded-full">
-                                  🗑️ {deletedCountForAdv} en Bóveda
+                                  🗑️ {deletedCountForAdv} {isEn ? 'in Vault' : 'en Bóveda'}
                                 </span>
                               )}
                             </div>
                             <div className="grid grid-cols-3 gap-1 pt-1 border-t border-slate-800/60 text-center text-[10px]">
                               <div className="bg-slate-900/80 py-1 rounded px-1">
-                                <span className="text-slate-400 block text-[8.5px] uppercase font-semibold">Crea</span>
+                                <span className="text-slate-400 block text-[8.5px] uppercase font-semibold">{isEn ? 'Build' : 'Crea'}</span>
                                 <strong className={`font-mono text-[11px] ${monthCreates >= (adv.maxCreatesMonthly ?? 30) ? 'text-rose-400' : 'text-emerald-400'}`}>
                                   {monthCreates} / {adv.maxCreatesMonthly ?? (adv.accountType === 'partner_agency' ? 60 : adv.accountType === 'director' ? 100 : 30)}
                                 </strong>
                               </div>
                               <div className="bg-slate-900/80 py-1 rounded px-1">
-                                <span className="text-slate-400 block text-[8.5px] uppercase font-semibold">Audita</span>
+                                <span className="text-slate-400 block text-[8.5px] uppercase font-semibold">{isEn ? 'Audit' : 'Audita'}</span>
                                 <strong className={`font-mono text-[11px] ${monthAudits >= (adv.maxAuditsMonthly ?? 30) ? 'text-rose-400' : 'text-amber-400'}`}>
                                   {monthAudits} / {adv.maxAuditsMonthly ?? (adv.accountType === 'partner_agency' ? 60 : adv.accountType === 'director' ? 100 : 30)}
                                 </strong>
                               </div>
                               <div className="bg-slate-900/80 py-1 rounded px-1">
-                                <span className="text-slate-400 block text-[8.5px] uppercase font-semibold">Rescata</span>
+                                <span className="text-slate-400 block text-[8.5px] uppercase font-semibold">{isEn ? 'Rescue' : 'Rescata'}</span>
                                 <strong className={`font-mono text-[11px] ${monthRescues >= (adv.maxRescuesMonthly ?? 10) ? 'text-rose-400' : 'text-rose-300'}`}>
                                   {monthRescues} / {adv.maxRescuesMonthly ?? (adv.accountType === 'partner_agency' ? 20 : adv.accountType === 'director' ? 50 : 10)}
                                 </strong>
@@ -10913,10 +10917,10 @@ export default function LocalStudioPage() {
               <div className="text-center py-16 p-8 rounded-3xl bg-slate-900/40 border border-slate-800 space-y-3">
                 <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
                 <h3 className="text-base font-bold text-white">
-                  Bóveda Forense Limpia
+                  {isEn ? 'Clean Forensic Vault' : 'Bóveda Forense Limpia'}
                 </h3>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  No hay expedientes ni auditorías borradas por asesores o agencias. Todo el trabajo se encuentra activo.
+                  {isEn ? 'No deleted dossiers or audits found from advisors or partner agencies. All production is active.' : 'No hay expedientes ni auditorías borradas por asesores o agencias. Todo el trabajo se encuentra activo.'}
                 </p>
               </div>
             ) : (
@@ -11079,7 +11083,7 @@ export default function LocalStudioPage() {
                   return (
                     <div className="text-center py-12 space-y-2 text-slate-400">
                       <Layers className="w-10 h-10 text-slate-600 mx-auto" />
-                      <p className="font-bold text-white text-sm">Este miembro aún no tiene expedientes registrados.</p>
+                      <p className="font-bold text-white text-sm">{isEn ? 'This member does not have any recorded dossiers yet.' : 'Este miembro aún no tiene expedientes registrados.'}</p>
                       <p className="text-xs">{isEn ? 'Clients and listings created, audited, or rescued by this advisor will appear here automatically.' : 'Los clientes y fichas creadas, auditadas o rescatadas por este asesor aparecerán aquí automáticamente.'}</p>
                     </div>
                   );
@@ -11984,7 +11988,7 @@ export default function LocalStudioPage() {
                 </div>
                 <div>
                   <h3 className="text-base font-black text-white">{isEn ? 'Add New Country' : 'Agregar Nuevo País'}</h3>
-                  <p className="text-[11px] text-slate-400">Se registrará en el catálogo de América y Europa</p>
+                  <p className="text-[11px] text-slate-400">{isEn ? 'Will be added to the America & Europe regional catalog' : 'Se registrará en el catálogo de América y Europa'}</p>
                 </div>
               </div>
               <button
