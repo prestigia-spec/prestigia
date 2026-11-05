@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PrestigiaIcon } from '@/components/PrestigiaIcon';
 import { TechnologicalSolutionsLogo } from '@/components/TechnologicalSolutionsLogo';
@@ -34,6 +34,33 @@ import {
 
 export default function DossierOficialPage() {
   const [lang, setLang] = useState<'es' | 'en'>('es');
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.title = lang === 'en' ? 'Prestigia | Official Executive Dossier 2026' : 'Prestigia | Dossier Oficial Ejecutivo 2026';
+    }
+  }, [lang]);
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlLang = urlParams.get('lang');
+      if (urlLang === 'es' || urlLang === 'en') {
+        setLang(urlLang);
+        return;
+      }
+      const stored = localStorage.getItem('prestigia_landing_lang');
+      if (stored === 'es' || stored === 'en') {
+        setLang(stored);
+      }
+    } catch {}
+  }, []);
+
+  const handleLanguageChange = (newLang: 'es' | 'en') => {
+    setLang(newLang);
+    try {
+      localStorage.setItem('prestigia_landing_lang', newLang);
+    } catch {}
+  };
 
   const handlePrint = () => {
     if (typeof window !== 'undefined') {
@@ -190,14 +217,14 @@ export default function DossierOficialPage() {
             <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-0.5 text-xs font-bold">
               <button
                 type="button"
-                onClick={() => setLang('es')}
+                onClick={() => handleLanguageChange('es')}
                 className={`px-2.5 py-1 rounded-lg transition ${lang === 'es' ? 'bg-amber-500 text-slate-950 font-black shadow' : 'text-slate-400 hover:text-white'}`}
               >
                 🇪🇸 ES
               </button>
               <button
                 type="button"
-                onClick={() => setLang('en')}
+                onClick={() => handleLanguageChange('en')}
                 className={`px-2.5 py-1 rounded-lg transition ${lang === 'en' ? 'bg-amber-500 text-slate-950 font-black shadow' : 'text-slate-400 hover:text-white'}`}
               >
                 🇺🇸 EN
@@ -274,7 +301,7 @@ export default function DossierOficialPage() {
             </div>
             <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
               <span className="text-slate-400 block">{isEn ? 'Damage Prevention Rate:' : 'Contención de Daño Público:'}</span>
-              <span className="text-emerald-400 font-black text-base">100% Blindado en Sala</span>
+              <span className="text-emerald-400 font-black text-base">{isEn ? '100% In-Venue Shielding' : '100% Blindado en Sala'}</span>
             </div>
             <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
               <span className="text-slate-400 block">{isEn ? 'Corporate Backing:' : 'Respaldo Institucional:'}</span>
@@ -428,8 +455,12 @@ export default function DossierOficialPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 text-xs">
             <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
-              <span className="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Nivel 1 • {isEn ? '1 Location' : '1 Sede'}</span>
-              <h4 className="font-black text-base text-white">Plan Básico</h4>
+              <span className="text-[10px] font-mono uppercase text-slate-400 tracking-wider">
+                {isEn ? 'Tier 1 • 1 Location' : 'Nivel 1 • 1 Sede'}
+              </span>
+              <h4 className="font-black text-base text-white">
+                {isEn ? 'Basic Plan' : 'Plan Básico'}
+              </h4>
               <p className="text-slate-400 text-[11px]">
                 {isEn ? 'Essential protection for single-location venues.' : 'Blindaje esencial para negocios de 1 sola sede.'}
               </p>
@@ -450,15 +481,19 @@ export default function DossierOficialPage() {
             </div>
 
             <div className="p-4 rounded-2xl bg-indigo-950/20 border-2 border-indigo-500/40 space-y-3 relative">
-              <span className="text-[10px] font-mono uppercase text-indigo-400 tracking-wider">Nivel 2 • {isEn ? 'Recommended' : 'Más Elegido'}</span>
-              <h4 className="font-black text-base text-white">Plan Pro</h4>
+              <span className="text-[10px] font-mono uppercase text-indigo-400 tracking-wider">
+                {isEn ? 'Tier 2 • Recommended' : 'Nivel 2 • Más Elegido'}
+              </span>
+              <h4 className="font-black text-base text-white">
+                {isEn ? 'Pro Plan' : 'Plan Pro'}
+              </h4>
               <p className="text-slate-400 text-[11px]">
                 {isEn ? 'AI dispatch, staff podium, and retention.' : 'Inteligencia Artificial, podio de meseros y retención.'}
               </p>
               <ul className="space-y-1.5 text-slate-300 text-[11px]">
                 <li className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                  <span>{isEn ? 'All features from Básico' : 'Todo lo incluido en Plan Básico'}</span>
+                  <span>{isEn ? 'All features from Basic Plan' : 'Todo lo incluido en Plan Básico'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
@@ -476,15 +511,19 @@ export default function DossierOficialPage() {
             </div>
 
             <div className="p-4 rounded-2xl bg-purple-950/20 border-2 border-purple-500/40 space-y-3">
-              <span className="text-[10px] font-mono uppercase text-purple-400 tracking-wider">Nivel 3 • {isEn ? 'Up to 3 Venues' : 'Hasta 3 Sedes'}</span>
-              <h4 className="font-black text-base text-white">Plan Élite</h4>
+              <span className="text-[10px] font-mono uppercase text-purple-400 tracking-wider">
+                {isEn ? 'Tier 3 • Up to 3 Venues' : 'Nivel 3 • Hasta 3 Sedes'}
+              </span>
+              <h4 className="font-black text-base text-white">
+                {isEn ? 'Elite Plan' : 'Plan Élite'}
+              </h4>
               <p className="text-slate-400 text-[11px]">
                 {isEn ? 'Multi-branch brands with TV displays.' : 'Marcas multisede con TV en salón.'}
               </p>
               <ul className="space-y-1.5 text-slate-300 text-[11px]">
                 <li className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                  <span>{isEn ? 'All features from Pro' : 'Todo lo incluido en Plan Pro'}</span>
+                  <span>{isEn ? 'All features from Pro Plan' : 'Todo lo incluido en Plan Pro'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
@@ -502,15 +541,19 @@ export default function DossierOficialPage() {
             </div>
 
             <div className="p-4 rounded-2xl bg-cyan-950/20 border-2 border-cyan-500/40 space-y-3">
-              <span className="text-[10px] font-mono uppercase text-cyan-400 tracking-wider">Nivel 4 • {isEn ? 'Enterprise Unlimited' : 'Holding Ilimitado'}</span>
-              <h4 className="font-black text-base text-white">Plan Empresarial</h4>
+              <span className="text-[10px] font-mono uppercase text-cyan-400 tracking-wider">
+                {isEn ? 'Tier 4 • Enterprise Unlimited' : 'Nivel 4 • Holding Ilimitado'}
+              </span>
+              <h4 className="font-black text-base text-white">
+                {isEn ? 'Enterprise Plan' : 'Plan Empresarial'}
+              </h4>
               <p className="text-slate-400 text-[11px]">
                 {isEn ? 'Franchises, nationwide holdings, and API integration.' : 'Franquicias, holdings nacionales y API dedicada.'}
               </p>
               <ul className="space-y-1.5 text-slate-300 text-[11px]">
                 <li className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                  <span>{isEn ? 'All features from Élite' : 'Todo lo incluido en Plan Élite'}</span>
+                  <span>{isEn ? 'All features from Elite Plan' : 'Todo lo incluido en Plan Élite'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
@@ -552,7 +595,7 @@ export default function DossierOficialPage() {
             </span>
             <div className="flex items-center gap-3 font-bold text-amber-400">
               <a
-                href="https://wa.me/573058314049?text=Hola%20Prestigia,%20le%C3%AD%20el%20Dossier%20Oficial%20y%20deseo%20una%20propuesta"
+                href={isEn ? "https://wa.me/573058314049?text=Hello%20Prestigia,%20I%20reviewed%20the%20Official%20Dossier%20and%20would%20like%20a%20proposal" : "https://wa.me/573058314049?text=Hola%20Prestigia,%20le%C3%AD%20el%20Dossier%20Oficial%20y%20deseo%20una%20propuesta"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline flex items-center gap-1 text-emerald-400"
