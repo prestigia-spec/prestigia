@@ -5419,7 +5419,7 @@ export default function LocalStudioPage() {
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-black text-xs">
-                  Plan a la Medida
+                  {isEn ? 'Tailored Plan' : (isEn ? 'Tailored Plan' : 'Plan a la Medida')}
                 </span>
               </div>
 
@@ -5747,7 +5747,7 @@ export default function LocalStudioPage() {
                   {!isLuismaMaster && monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)) && (
                     <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-                      <span>Tope mensual de {currentUser?.maxAuditsMonthly ?? 30} auditorías alcanzado. Contacta a Dirección General.</span>
+                      <span>{isEn ? `Monthly limit of ${currentUser?.maxAuditsMonthly ?? 30} audits reached. Contact Management.` : `Tope mensual de ${currentUser?.maxAuditsMonthly ?? 30} auditorías alcanzado. Contacta a Dirección General.`}</span>
                     </div>
                   )}
 
@@ -6432,7 +6432,7 @@ export default function LocalStudioPage() {
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black text-xs">
-                  Plan a la Medida
+                  {isEn ? 'Tailored Plan' : (isEn ? 'Tailored Plan' : 'Plan a la Medida')}
                 </span>
               </div>
               {/* Bottom Quick Action: Nueva Auditoría */}
@@ -6676,7 +6676,7 @@ export default function LocalStudioPage() {
                   {!isLuismaMaster && monthlyUsage.rescues >= (currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)) && (
                     <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-                      <span>Tope mensual de {currentUser?.maxRescuesMonthly ?? 10} rescates alcanzado. Contacta a Dirección General.</span>
+                      <span>{isEn ? `Monthly limit of ${currentUser?.maxRescuesMonthly ?? 10} rescues reached. Contact Management.` : `Tope mensual de ${currentUser?.maxRescuesMonthly ?? 10} rescates alcanzado. Contacta a Dirección General.`}</span>
                     </div>
                   )}
 
@@ -7079,7 +7079,7 @@ export default function LocalStudioPage() {
                           </p>
                         </div>
                         <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                          <span className="font-black text-amber-400 block text-xs">Día 4: Desbloqueo</span>
+                          <span className="font-black text-amber-400 block text-xs">{isEn ? 'Day 4: Unlocking' : 'Día 4: Desbloqueo'}</span>
                           <p className="text-[11px] text-slate-300">
                             {isEn
                               ? 'If third party does not reply within 72h, Google unlocks the "Claim & Verify" button for the client.'
@@ -7299,7 +7299,7 @@ export default function LocalStudioPage() {
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">1</span>
-                    <strong className="text-white text-xs">Localizar Ficha en Maps</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Locate Profile on Maps' : 'Localizar Ficha en Maps'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
                     Abre el navegador en modo incógnito. Busca el nombre comercial exacto del negocio en Google Maps y abre el perfil público.
@@ -7339,7 +7339,7 @@ export default function LocalStudioPage() {
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">5</span>
-                    <strong className="text-white text-xs">Apelación Formal si Rechazan</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Formal Appeal if Rejected' : 'Apelación Formal si Rechazan'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
                     Si el secuestrador rechaza o el perfil está suspendido, ingresa a la <strong>Herramienta Oficial de Apelaciones</strong> y abre un caso formal de restitución.
@@ -7437,7 +7437,7 @@ export default function LocalStudioPage() {
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-black text-xs">
-                  Plan a la Medida
+                  {isEn ? 'Tailored Plan' : (isEn ? 'Tailored Plan' : 'Plan a la Medida')}
                 </span>
               </div>
 
@@ -7807,7 +7807,7 @@ export default function LocalStudioPage() {
                           onChange={(e: any) => setManualContextFlag(e.target.value)}
                           className="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
                         >
-                          <option value="fake_customer">🚫 Nunca fue cliente / Sin registro de compra ni comanda</option>
+                          <option value="fake_customer">{isEn ? '🚫 Never a customer / No purchase record or order' : '🚫 Nunca fue cliente / Sin registro de compra ni comanda'}</option>
                           <option value="competitor">⚔️ Sospecha de competidor local / Conflicto de intereses</option>
                           <option value="ex_employee">👔 Ex-empleado o conflicto laboral interno</option>
                           <option value="defamation">🚨 Acoso, insultos directos o difamación personal</option>
@@ -8172,7 +8172,7 @@ export default function LocalStudioPage() {
                       </div>
 
                       <p className="text-xs text-slate-400">
-                        <strong className="text-amber-400">Estrategia de Blindaje: </strong>
+                        <strong className="text-amber-400">{isEn ? 'Reputation Shield Strategy: ' : 'Estrategia de Blindaje: '}</strong>
                         {activeAppealDossier.publicMitigationResponse.damageControlStrategy}
                       </p>
 
@@ -9220,7 +9220,7 @@ export default function LocalStudioPage() {
                               <strong className="text-white text-xs">Impacto en el Algoritmo</strong>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
-                              <span className="text-[10px] text-rose-400 block font-bold">Tu Negocio Hoy:</span>
+                              <span className="text-[10px] text-rose-400 block font-bold">{isEn ? 'Your Business Today:' : 'Tu Negocio Hoy:'}</span>
                               <span className="text-slate-300 font-medium">+1 reseña/semana (Dormida)</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
@@ -9228,8 +9228,8 @@ export default function LocalStudioPage() {
                               <span className="text-emerald-300 font-bold">+8 a +12 reseñas 5★/sem</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
-                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || 'Tu Rival'}:</span>
-                              <span className="text-slate-300">+{rivalWeekly} reseñas/sem</span>
+                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || (isEn ? 'Your Rival' : 'Tu Rival')}:</span>
+                              <span className="text-slate-300">+{rivalWeekly} {isEn ? 'reviews/wk' : 'reseñas/sem'}</span>
                             </div>
                           </div>
 
@@ -9240,7 +9240,7 @@ export default function LocalStudioPage() {
                               <strong className="text-white text-xs">Confianza & Google Lens</strong>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
-                              <span className="text-[10px] text-rose-400 block font-bold">Tu Negocio Hoy:</span>
+                              <span className="text-[10px] text-rose-400 block font-bold">{isEn ? 'Your Business Today:' : 'Tu Negocio Hoy:'}</span>
                               <span className="text-slate-300 font-medium">14 fotos (Déficit crítico)</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
@@ -9248,8 +9248,8 @@ export default function LocalStudioPage() {
                               <span className="text-emerald-300 font-bold">50+ fotos geolocalizadas</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
-                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || 'Tu Rival'}:</span>
-                              <span className="text-slate-300">{rivalPhotos} fotos</span>
+                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || (isEn ? 'Your Rival' : 'Tu Rival')}:</span>
+                              <span className="text-slate-300">{rivalPhotos} {isEn ? 'photos' : 'fotos'}</span>
                             </div>
                           </div>
 
@@ -9260,7 +9260,7 @@ export default function LocalStudioPage() {
                               <strong className="text-white text-xs">Indexación por Términos</strong>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
-                              <span className="text-[10px] text-rose-400 block font-bold">Tu Negocio Hoy:</span>
+                              <span className="text-[10px] text-rose-400 block font-bold">{isEn ? 'Your Business Today:' : 'Tu Negocio Hoy:'}</span>
                               <span className="text-slate-300 font-medium">Genéricas ("rico", "bueno")</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
@@ -9268,7 +9268,7 @@ export default function LocalStudioPage() {
                               <span className="text-emerald-300 font-bold">Guiadas con palabras de compra</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
-                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || 'Tu Rival'}:</span>
+                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || (isEn ? 'Your Rival' : 'Tu Rival')}:</span>
                               <span className="text-slate-300">Orgánicas sin guiar</span>
                             </div>
                           </div>
@@ -9280,7 +9280,7 @@ export default function LocalStudioPage() {
                               <strong className="text-white text-xs">Filtro Anti-Negativas</strong>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
-                              <span className="text-[10px] text-rose-400 block font-bold">Tu Negocio Hoy:</span>
+                              <span className="text-[10px] text-rose-400 block font-bold">{isEn ? 'Your Business Today:' : 'Tu Negocio Hoy:'}</span>
                               <span className="text-slate-300 font-medium">Van directo a Google Maps</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
@@ -9288,7 +9288,7 @@ export default function LocalStudioPage() {
                               <span className="text-emerald-300 font-bold">Desvío privado a WhatsApp</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
-                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || 'Tu Rival'}:</span>
+                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || (isEn ? 'Your Rival' : 'Tu Rival')}:</span>
                               <span className="text-slate-300">Sin protección de reseñas</span>
                             </div>
                           </div>
@@ -9836,7 +9836,7 @@ export default function LocalStudioPage() {
                                 Suscripción Prestigia Activa
                               </span>
                               <strong className="text-xs font-black text-emerald-400">
-                                {d.monthlyPlanUsd ? `$${d.monthlyPlanUsd} USD/mes` : 'Plan a la Medida'}
+                                {d.monthlyPlanUsd ? `$${d.monthlyPlanUsd} USD/mes` : (isEn ? 'Tailored Plan' : 'Plan a la Medida')}
                               </strong>
                             </div>
                             <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1 border-t border-emerald-500/20">
@@ -9875,7 +9875,7 @@ export default function LocalStudioPage() {
                             </div>
                             <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1 border-t border-amber-500/20">
                               <span className="text-slate-400">Opción Prestigia:</span>
-                              <span className="text-emerald-300 font-bold">{d.monthlyPlanUsd ? `$${d.monthlyPlanUsd}/mes` : 'Plan a la Medida'} (Setup $0)</span>
+                              <span className="text-emerald-300 font-bold">{d.monthlyPlanUsd ? `$${d.monthlyPlanUsd}/mes` : (isEn ? 'Tailored Plan' : 'Plan a la Medida')} (Setup $0)</span>
                             </div>
                           </div>
                         ) : d.closingStatus === 'negotiating' ? (
@@ -10010,8 +10010,8 @@ export default function LocalStudioPage() {
                         }}
                         className="p-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold text-left transition cursor-pointer"
                       >
-                        💎 Plan a la Medida
-                        <span className="block text-[9px] text-emerald-400/80 font-normal">Setup $0 Bonificado</span>
+                        💎 {isEn ? 'Tailored Plan' : 'Plan a la Medida'}
+                        <span className="block text-[9px] text-emerald-400/80 font-normal">{isEn ? 'Setup $0 Waived' : 'Setup $0 Bonificado'}</span>
                       </button>
 
                       <button
@@ -10145,9 +10145,9 @@ export default function LocalStudioPage() {
                         onChange={(e) => setClosingFormMode(e.target.value as any)}
                         className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
                       >
-                        <option value="create">🏗️ Ficha Creada Desde Cero (Benchmark: $150 – $250 USD)</option>
-                        <option value="audit">🔬 Auditoría Forense & Optimización Top 3 (Benchmark: $200 – $350 USD)</option>
-                        <option value="rescue">🛡️ Rescate de Ficha Secuestrada / Reclamación 72h (Benchmark: $250 – $450 USD)</option>
+                        <option value="create">{isEn ? '🏗️ Profile Created From Scratch (Benchmark: $150 – $250 USD)' : '🏗️ Ficha Creada Desde Cero (Benchmark: $150 – $250 USD)'}</option>
+                        <option value="audit">{isEn ? '🔬 Forensic Audit & Top 3 Optimization (Benchmark: $200 – $350 USD)' : '🔬 Auditoría Forense & Optimización Top 3 (Benchmark: $200 – $350 USD)'}</option>
+                        <option value="rescue">{isEn ? '🛡️ Hijacked Profile Rescue / 72h Claim (Benchmark: $250 – $450 USD)' : '🛡️ Rescate de Ficha Secuestrada / Reclamación 72h (Benchmark: $250 – $450 USD)'}</option>
                       </select>
                     </div>
 
@@ -10168,11 +10168,11 @@ export default function LocalStudioPage() {
                         }}
                         className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
                       >
-                        <option value="prestigia_subscriber">💎 Suscriptor Prestigia Activo (Setup $0 USD 100% Bonificado)</option>
+                        <option value="prestigia_subscriber">{isEn ? '💎 Active Prestigia Subscriber (Setup $0 USD 100% Waived)' : '💎 Suscriptor Prestigia Activo (Setup $0 USD 100% Bonificado)'}</option>
                         <option value="setup_paid">💵 Setup Técnico Cobrado (Pago único por trabajo técnico)</option>
-                        <option value="proposal_sent">⏳ Propuesta Enviada (En seguimiento comercial)</option>
+                        <option value="proposal_sent">{isEn ? '⏳ Proposal Sent (In commercial follow-up)' : '⏳ Propuesta Enviada (En seguimiento comercial)'}</option>
                         <option value="negotiating">🤝 En Negociación Activa</option>
-                        <option value="lead_draft">📝 Prospección / Ficha en Estudio</option>
+                        <option value="lead_draft">{isEn ? '📝 Prospect / Profile Under Review' : '📝 Prospección / Ficha en Estudio'}</option>
                       </select>
                     </div>
 
@@ -10894,10 +10894,10 @@ export default function LocalStudioPage() {
             <div className="p-4 rounded-2xl bg-rose-950/30 border border-rose-500/40 text-xs space-y-1">
               <div className="flex items-center gap-2 text-rose-300 font-bold">
                 <ShieldCheck className="w-4 h-4 text-rose-400" />
-                <span className="text-sm">Auditoría Forense Exclusiva de Dirección General</span>
+                <span className="text-sm">{isEn ? 'General Management Exclusive Forensic Audit' : 'Auditoría Forense Exclusiva de Dirección General'}</span>
               </div>
               <p className="text-slate-400 text-xs leading-relaxed">
-                Cuando un asesor o agencia pulsa "Eliminar" en su interfaz, la ficha desaparece de su pantalla pero <strong>se preserva permanentemente en esta bóveda</strong>. Como Fundador y Director General, tienes acceso a todo su trabajo histórico para auditar y prevenir cualquier pérdida de información o manipulación.
+                {isEn ? 'When an advisor or partner agency clicks "Delete" on their dashboard, the profile disappears from their screen but remains permanently preserved in this forensic vault. As Founder and General Director, you have unrestricted access to all historical records to audit and prevent data loss or tampering.' : 'Cuando un asesor o agencia pulsa "Eliminar" en su interfaz, la ficha desaparece de su pantalla pero se preserva permanentemente en esta bóveda. Como Fundador y Director General, tienes acceso a todo su trabajo histórico para auditar y prevenir cualquier pérdida de información o manipulación.'}
               </p>
             </div>
 
@@ -10943,7 +10943,7 @@ export default function LocalStudioPage() {
                       {/* Contacto del Cliente */}
                       {(d.contactName || d.contactPhone || d.contactEmail) && (
                         <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-[11px] space-y-1">
-                          <span className="text-slate-400 block text-[9.5px] uppercase font-bold">Contacto Cliente:</span>
+                          <span className="text-slate-400 block text-[9.5px] uppercase font-bold">{isEn ? 'Client Contact:' : 'Contacto Cliente:'}</span>
                           <div className="text-white font-bold">{d.contactName || 'No especificado'} {d.contactRole ? `(${d.contactRole})` : ''}</div>
                           {d.contactPhone && (
                             <div className="text-emerald-400 font-mono text-[10.5px]">📞 {d.contactPhone}</div>
@@ -11044,7 +11044,7 @@ export default function LocalStudioPage() {
               return (
                 <div className="p-4 border-b border-slate-800 bg-slate-950/60 grid grid-cols-4 gap-2 text-center text-xs shrink-0">
                   <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
-                    <span className="text-[10px] text-slate-400 font-bold block uppercase">Total Fichas</span>
+                    <span className="text-[10px] text-slate-400 font-bold block uppercase">{isEn ? 'Total Profiles' : 'Total Fichas'}</span>
                     <strong className="text-lg font-black text-white">{advisorDossiers.length}</strong>
                   </div>
                   <div className="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
@@ -11052,11 +11052,11 @@ export default function LocalStudioPage() {
                     <strong className="text-lg font-black text-emerald-300">{createsCount}</strong>
                   </div>
                   <div className="p-2 rounded-xl bg-amber-950/40 border border-amber-500/30">
-                    <span className="text-[10px] text-amber-400 font-bold block uppercase truncate">🔬 Auditorías</span>
+                    <span className="text-[10px] text-amber-400 font-bold block uppercase truncate">{isEn ? '🔬 Audits' : '🔬 Auditorías'}</span>
                     <strong className="text-lg font-black text-amber-300">{auditsCount}</strong>
                   </div>
                   <div className="p-2 rounded-xl bg-rose-950/40 border border-rose-500/30">
-                    <span className="text-[10px] text-rose-400 font-bold block uppercase truncate">🛡️ Rescates</span>
+                    <span className="text-[10px] text-rose-400 font-bold block uppercase truncate">{isEn ? '🛡️ Rescues' : '🛡️ Rescates'}</span>
                     <strong className="text-lg font-black text-rose-300">{rescuesCount}</strong>
                   </div>
                 </div>
@@ -11072,7 +11072,7 @@ export default function LocalStudioPage() {
                     <div className="text-center py-12 space-y-2 text-slate-400">
                       <Layers className="w-10 h-10 text-slate-600 mx-auto" />
                       <p className="font-bold text-white text-sm">Este miembro aún no tiene expedientes registrados.</p>
-                      <p className="text-xs">Los clientes y fichas creadas, auditadas o rescatadas por este asesor aparecerán aquí automáticamente.</p>
+                      <p className="text-xs">{isEn ? 'Clients and listings created, audited, or rescued by this advisor will appear here automatically.' : 'Los clientes y fichas creadas, auditadas o rescatadas por este asesor aparecerán aquí automáticamente.'}</p>
                     </div>
                   );
                 }
@@ -11169,14 +11169,16 @@ export default function LocalStudioPage() {
                               <div className="flex items-center justify-between text-rose-300 font-bold">
                                 <span className="flex items-center gap-1.5">
                                   <Trash2 className="w-3.5 h-3.5 text-rose-400" />
-                                  <span>Ficha Borrada por el Asesor</span>
+                                  <span>{isEn ? 'Profile Deleted by Advisor' : 'Ficha Borrada por el Asesor'}</span>
                                 </span>
                                 <span className="text-[9.5px] font-mono text-slate-400">
                                   {d.deletedAt ? new Date(d.deletedAt).toLocaleString() : 'Archivado'}
                                 </span>
                               </div>
                               <p className="text-[10px] text-slate-400 leading-tight">
-                                🔒 Bóveda Forense de Dirección General. Esta ficha fue eliminada por el usuario pero permanece en tu base de datos para auditoría.
+                                {isEn
+                                  ? '🔒 General Management Forensic Vault. This profile was removed by the user but remains in your database for auditing.'
+                                  : '🔒 Bóveda Forense de Dirección General. Esta ficha fue eliminada por el usuario pero permanece en tu base de datos para auditoría.'}
                               </p>
                               <div className="flex items-center gap-2 pt-1">
                                 <button
@@ -11185,7 +11187,7 @@ export default function LocalStudioPage() {
                                   className="flex-1 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 font-bold text-[10px] transition cursor-pointer flex items-center justify-center gap-1"
                                 >
                                   <RotateCcw className="w-3 h-3" />
-                                  <span>Restaurar Ficha</span>
+                                  <span>{isEn ? 'Restore Profile' : 'Restaurar Ficha'}</span>
                                 </button>
                                 <button
                                   type="button"
