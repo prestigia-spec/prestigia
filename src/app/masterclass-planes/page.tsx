@@ -202,8 +202,8 @@ export default function MasterclassPlanesPage() {
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl">
               {isEn
-                ? 'Prestigia Local Studio equips independent advisors and digital agencies with proprietary AI algorithmic engineering. Sell premium profile creation, forensic gap audits, 72h suspension rescues, and review appeals at $100 USD each, generating immediate cash flow while building recurring revenue through Prestigia annual software agreements.'
-                : 'Prestigia Local Studio equipa a consultores independientes y agencias digitales con ingeniería algorítmica de IA propia. Vende creación técnica de fichas, auditorías forenses Top 3, rescates de suspensión en 72 horas y apelación de reseñas falsas a $100 USD cada servicio, recuperando el 100% de tu inversión desde tu primera venta y generando comisiones de contado con paquetes anuales de Prestigia.'}
+                ? 'Prestigia Local Studio equips independent advisors and digital agencies with proprietary AI algorithmic engineering. Sell premium profile creation, forensic gap audits, 72h ownership rescues (claimed/orphan listings), and review appeals at $100 USD each, generating immediate cash flow while building recurring revenue through Prestigia annual software agreements.'
+                : 'Prestigia Local Studio equipa a consultores independientes y agencias digitales con ingeniería algorítmica de IA propia. Vende creación técnica de fichas, auditorías forenses Top 3, rescates de titularidad en 72h (fichas en manos de terceros o huérfanas) y apelación de reseñas falsas a $100 USD cada servicio, recuperando el 100% de tu inversión desde tu primera venta y generando comisiones de contado con paquetes anuales de Prestigia.'}
             </p>
           </div>
 
@@ -296,7 +296,7 @@ export default function MasterclassPlanesPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span><strong>10</strong> {isEn ? '72h Suspension Rescues (Tab 3)' : 'Rescates de Suspensión 72h (Pestaña 3)'}</span>
+                    <span><strong>10</strong> {isEn ? '72h Ownership Rescues (Tab 3)' : 'Rescates de Titularidad 72h (Pestaña 3)'}</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -361,7 +361,7 @@ export default function MasterclassPlanesPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                    <span><strong>20</strong> {isEn ? '72h Suspension Rescues (Tab 3)' : 'Rescates de Suspensión 72h (Pestaña 3)'}</span>
+                    <span><strong>20</strong> {isEn ? '72h Ownership Rescues (Tab 3)' : 'Rescates de Titularidad 72h (Pestaña 3)'}</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
@@ -426,7 +426,7 @@ export default function MasterclassPlanesPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                    <span><strong>30</strong> {isEn ? '72h Suspension Rescues (Tab 3)' : 'Rescates de Suspensión 72h (Pestaña 3)'}</span>
+                    <span><strong>30</strong> {isEn ? '72h Ownership Rescues (Tab 3)' : 'Rescates de Titularidad 72h (Pestaña 3)'}</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
@@ -512,14 +512,14 @@ export default function MasterclassPlanesPage() {
               <div className="flex items-center justify-between">
                 <span className="text-rose-400 font-bold flex items-center gap-1.5">
                   <LifeBuoy className="w-4 h-4 text-rose-400" />
-                  <span>{isEn ? 'Tab 3: 72h Suspension Rescue' : 'Pestaña 3: Protocolo de Rescate 72h'}</span>
+                  <span>{isEn ? 'Tab 3: 72h Ownership Rescue & Claim' : 'Pestaña 3: Rescate de Titularidad 72h (Ownership Claim)'}</span>
                 </span>
                 <span className="text-[10px] font-mono text-slate-400">{isEn ? 'RRP: $100 USD' : 'PVP: $100 USD'}</span>
               </div>
               <p className="text-slate-300 text-[11px] leading-relaxed">
                 {isEn
-                  ? 'Emergency defense protocol for suspended, duplicated, or orphaned listings. Compiles evidentiary checklists, legal utility proof, and drafts formal appeals to Google Support.'
-                  : 'Servicio de alta urgencia y dolor extremo. Diagnóstica causales de suspensión engañosa o calidad, organiza las 4 pruebas de posesión legal y redacta la carta de apelación formal para escalamiento ante Google.'}
+                  ? 'Official protocol to recover legal ownership of an existing listing held by a former agency, ex-employee, or unknown account. Activates Google’s 72-hour transfer deadline to restore full control without losing reviews, photos, or seniority.'
+                  : 'Recupera el control legal de una ficha existente cuando el dueño no tiene acceso (creada por una ex-agencia, exempleado o tercero). Activa el protocolo oficial de 72 horas de Google para transferir la propiedad al dueño legítimo sin perder reseñas, fotos ni antigüedad.'}
               </p>
             </div>
 
