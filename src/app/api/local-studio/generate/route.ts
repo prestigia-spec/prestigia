@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
+
 interface GenerateRequest {
   mode: 'create' | 'audit';
   businessName: string;
@@ -175,20 +178,21 @@ RETURN ONLY A VALID JSON OBJECT WITH THIS STRUCTURE (NO MARKDOWN WRAPPERS, NO EX
 }`;
 
         const candidateModels = [
-          'gemini-3.5-flash',
+          'gemini-3.1-flash-lite',
           'gemini-3.5-flash-lite',
-          'gemini-flash-latest',
           'gemini-flash-lite-latest',
-          'gemini-3.8-flash',
-          'gemini-2.5-flash-lite',
+          'gemini-3.5-flash',
         ];
         for (const modelName of candidateModels) {
           try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 6000);
             const geminiRes = await fetch(
               `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiKey}`,
               {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                signal: controller.signal,
                 body: JSON.stringify({
                   contents: [{ parts: [{ text: prompt }] }],
                   generationConfig: {
@@ -199,6 +203,7 @@ RETURN ONLY A VALID JSON OBJECT WITH THIS STRUCTURE (NO MARKDOWN WRAPPERS, NO EX
                 }),
               }
             );
+            clearTimeout(timeoutId);
 
             if (geminiRes.ok) {
               const aiData = await geminiRes.json();
