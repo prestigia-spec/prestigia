@@ -143,13 +143,16 @@ export default function MasterclassPlanesPage() {
               <span>{isEn ? 'Download / Print PDF (A4)' : 'Descargar en PDF / Imprimir (A4)'}</span>
             </button>
 
-            {/* Return to Local Studio */}
-            <Link
-              href="/local-studio"
-              className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-xs border border-slate-700 transition"
+            {/* Direct WhatsApp CTA */}
+            <a
+              href={isEn ? "https://wa.me/573058314049?text=Hello%20Prestigia,%20I%20want%20to%20activate%20my%20Local%20Studio%20Partner%20Plan" : "https://wa.me/573058314049?text=Hola%20Prestigia,%20deseo%20activar%20mi%20Plan%20de%20Partner%20en%20Local%20Studio"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/20 active:scale-95 cursor-pointer"
             >
-              {isEn ? '← Local Studio' : '← Abrir Local Studio'}
-            </Link>
+              <MessageCircle className="w-3.5 h-3.5" />
+              <span>{isEn ? 'Activate Plan' : 'Activar Plan'}</span>
+            </a>
           </div>
         </div>
       </header>
@@ -666,20 +669,16 @@ export default function MasterclassPlanesPage() {
             <span>
               Prestigia &copy; 2026 &bull; {isEn ? 'All rights reserved.' : 'Todos los derechos reservados.'}
             </span>
-            <div className="flex items-center gap-3 font-bold text-amber-400">
+            <div className="flex items-center gap-3 font-bold">
               <a
                 href={isEn ? "https://wa.me/573058314049?text=Hello%20Prestigia,%20I%20want%20to%20activate%20my%20Local%20Studio%20Partner%20Plan" : "https://wa.me/573058314049?text=Hola%20Prestigia,%20deseo%20activar%20mi%20Plan%20de%20Partner%20en%20Local%20Studio"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:underline flex items-center gap-1 text-emerald-400"
+                className="hover:underline flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/30 transition hover:bg-emerald-500/20"
               >
                 <MessageCircle className="w-3.5 h-3.5" />
                 <span>{isEn ? 'Activate Partner Plan via WhatsApp' : 'Activar Plan de Partner por WhatsApp'}</span>
               </a>
-              <span>&bull;</span>
-              <Link href="/local-studio" className="hover:underline text-cyan-400">
-                <span>{isEn ? 'Open Local Studio' : 'Abrir Local Studio'}</span>
-              </Link>
             </div>
           </div>
         </section>
