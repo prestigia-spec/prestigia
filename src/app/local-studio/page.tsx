@@ -4499,7 +4499,7 @@ export default function LocalStudioPage() {
                 {!isLuismaMaster && monthlyUsage.creates >= (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)) && (
                   <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-                    <span>Tope mensual de {currentUser?.maxCreatesMonthly ?? 30} creaciones alcanzado. Contacta a Dirección General.</span>
+                    <span>{isEn ? `Monthly limit of ${currentUser?.maxCreatesMonthly ?? 30} creations reached. Contact Management.` : `Tope mensual de ${currentUser?.maxCreatesMonthly ?? 30} creaciones alcanzado. Contacta a Dirección General.`}</span>
                   </div>
                 )}
 
@@ -6235,7 +6235,7 @@ export default function LocalStudioPage() {
                                     : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
                                 }`}
                               >
-                                {item.impact}
+                                {isEn ? (item.impact === 'CRÍTICO' ? 'CRITICAL' : item.impact === 'ALTO' ? 'HIGH' : 'MEDIUM') : item.impact}
                               </span>
                             </div>
                             <p className="text-[11px] text-slate-300">{item.action}</p>
@@ -6250,7 +6250,7 @@ export default function LocalStudioPage() {
                         <h3 className="text-sm font-black text-white">{t.optimizedCopyTitle}</h3>
                         <button
                           type="button"
-                          onClick={() => copyToClipboard(auditGeneratedData.commercialDescription, 'Descripción')}
+                          onClick={() => copyToClipboard(auditGeneratedData.commercialDescription, isEn ? 'Description' : 'Descripción')}
                           className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer print:hidden"
                         >
                           <Copy className="w-3.5 h-3.5" />
@@ -11036,12 +11036,12 @@ export default function LocalStudioPage() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
-                    {viewingAdvisorWorks.accountType === 'partner_agency' ? '🏢 Agencia Partner' : '💼 Asesor Comercial'}
+                    {viewingAdvisorWorks.accountType === 'partner_agency' ? (isEn ? '🏢 Partner Agency' : '🏢 Agencia Partner') : (isEn ? '💼 Sales Advisor' : '💼 Asesor Comercial')}
                   </span>
                   <span className="text-xs text-slate-400 font-mono">@{viewingAdvisorWorks.username}</span>
                 </div>
                 <h3 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
-                  <span>📂 Trabajos Realizados por:</span>
+                  <span>{isEn ? '📂 Work Delivered by:' : '📂 Trabajos Realizados por:'}</span>
                   <span className="text-amber-400">{viewingAdvisorWorks.name}</span>
                 </h3>
                 <p className="text-xs text-slate-400">
@@ -11373,7 +11373,7 @@ export default function LocalStudioPage() {
                     type="text"
                     value={newAdvisorCity}
                     onChange={(e) => setNewAdvisorCity(e.target.value)}
-                    placeholder="Bogotá, Medellín, CDMX, Caracas..."
+                    placeholder={isEn ? 'Miami, New York, London, Madrid...' : 'Bogotá, Medellín, CDMX, Caracas...'}
                     className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                     required
                   />
@@ -11387,7 +11387,7 @@ export default function LocalStudioPage() {
                     type="text"
                     value={newAdvisorUser}
                     onChange={(e) => setNewAdvisorUser(e.target.value)}
-                    placeholder="ej: carlos o rocketagency"
+                    placeholder={isEn ? 'e.g. carlos or rocketagency' : 'ej: carlos o rocketagency'}
                     className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white lowercase focus:outline-none focus:border-amber-400"
                     required
                   />
@@ -11399,7 +11399,7 @@ export default function LocalStudioPage() {
                     type="text"
                     value={newAdvisorPass}
                     onChange={(e) => setNewAdvisorPass(e.target.value)}
-                    placeholder="Contraseña de acceso"
+                    placeholder={isEn ? 'Access password' : 'Contraseña de acceso'}
                     className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 font-mono"
                     required
                   />
@@ -11458,7 +11458,7 @@ export default function LocalStudioPage() {
                     <Zap className="w-4 h-4 text-amber-400" />
                     <span>Topes de Consumo Mensual de IA (Freno de Abuso):</span>
                   </div>
-                  <span className="text-[10px] text-slate-400 font-mono">Cupos / mes</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{isEn ? 'Quota / mo' : 'Cupos / mes'}</span>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 text-center">
@@ -11505,12 +11505,12 @@ export default function LocalStudioPage() {
                   </div>
                 </div>
                 <p className="text-[10px] text-slate-500 italic">
-                  * Al agotar el cupo mensual, la herramienta se bloqueará automáticamente hasta el siguiente mes o hasta que Dirección General le recargue más usos.
+                  {isEn ? '* When the monthly quota is exhausted, the tool locks automatically until the next month or until reloaded by General Management.' : '* Al agotar el cupo mensual, la herramienta se bloqueará automáticamente hasta el siguiente mes o hasta que Dirección General le recargue más usos.'}
                 </p>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-300 mb-1">Clave Maestra de Dueño (Luisma) *</label>
+                <label className="block font-bold text-slate-300 mb-1">{isEn ? 'Owner Master Key (Luisma) *' : 'Clave Maestra de Dueño (Luisma) *'}</label>
                 <input
                   type="password"
                   value={adminMasterKey}
@@ -11528,7 +11528,7 @@ export default function LocalStudioPage() {
                 onClick={() => setShowRegisterAdvisorModal(false)}
                 className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer"
               >
-                Cancelar
+                {isEn ? 'Cancel' : 'Cancelar'}
               </button>
 
               <button
@@ -11537,10 +11537,10 @@ export default function LocalStudioPage() {
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg active:scale-98"
               >
                 {isSavingAdvisor
-                  ? 'Registrando...'
+                  ? (isEn ? 'Registering...' : 'Registrando...')
                   : newAccountType === 'partner_agency'
-                  ? '🚀 Activar Licencia de Agencia Partner'
-                  : '💼 + Crear Asesor Comercial'}
+                  ? (isEn ? '🚀 Activate Partner Agency License' : '🚀 Activar Licencia de Agencia Partner')
+                  : (isEn ? '💼 + Create Sales Advisor' : '💼 + Crear Asesor Comercial')}
               </button>
             </div>
           </form>
@@ -11732,7 +11732,7 @@ export default function LocalStudioPage() {
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div>
                       <label className="block text-[10px] font-bold text-emerald-400 mb-1">
-                        Creaciones
+                        {isEn ? 'Creations' : 'Creaciones'}
                       </label>
                       <input
                         type="number"
@@ -11746,7 +11746,7 @@ export default function LocalStudioPage() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-amber-400 mb-1">
-                        Auditorías
+                        {isEn ? 'Audits' : 'Auditorías'}
                       </label>
                       <input
                         type="number"
@@ -11760,7 +11760,7 @@ export default function LocalStudioPage() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-rose-400 mb-1">
-                        Rescates
+                        {isEn ? 'Rescues' : 'Rescates'}
                       </label>
                       <input
                         type="number"
@@ -11773,7 +11773,7 @@ export default function LocalStudioPage() {
                     </div>
                   </div>
                   <p className="text-[10px] text-slate-500 italic">
-                    * Puedes aumentar el número de creaciones, auditorías y rescates para otorgar más créditos al asesor o agencia en tiempo real.
+                    {isEn ? '* You can increase the limit of creations, audits, and rescues to grant more credits in real time.' : '* Puedes aumentar el número de creaciones, auditorías y rescates para otorgar más créditos al asesor o agencia en tiempo real.'}
                   </p>
                 </div>
               )}
@@ -12051,7 +12051,7 @@ export default function LocalStudioPage() {
                                   }}
                 className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
               >
-                Cancelar
+                {isEn ? 'Cancel' : 'Cancelar'}
               </button>
               <button
                 type="button"
@@ -12079,7 +12079,7 @@ export default function LocalStudioPage() {
                 <div>
                   <h3 className="text-base font-black text-white">{isEn ? 'Add City' : 'Agregar Ciudad'}</h3>
                   <p className="text-[11px] text-slate-400">
-                    Se enlazará automáticamente a <strong className="text-emerald-400">{targetCountryForNewCity}</strong>
+                    {isEn ? <>Will automatically link to <strong className="text-emerald-400">{targetCountryForNewCity}</strong></> : <>Se enlazará automáticamente a <strong className="text-emerald-400">{targetCountryForNewCity}</strong></>}
                   </p>
                 </div>
               </div>
@@ -12098,7 +12098,7 @@ export default function LocalStudioPage() {
             <div className="space-y-3 text-xs">
               <div>
                 <label className="block text-slate-300 font-bold mb-1">
-                  País al que Pertenece:
+                  {isEn ? 'Belongs to Country:' : 'País al que Pertenece:'}
                 </label>
                 <select
                   value={targetCountryForNewCity}
@@ -12115,14 +12115,14 @@ export default function LocalStudioPage() {
 
               <div>
                 <label className="block text-slate-300 font-bold mb-1">
-                  Nombre de la Nueva Ciudad *
+                  {isEn ? 'New City Name *' : 'Nombre de la Nueva Ciudad *'}
                 </label>
                 <input
                   type="text"
                   autoFocus
                   value={newCityInput}
                   onChange={(e) => setNewCityInput(e.target.value)}
-                  placeholder="Ej: Envigado, Zapopan, Fort Lauderdale, Marbella..."
+                  placeholder={isEn ? 'e.g. Austin, Brooklyn, Scottsdale, Marbella...' : 'Ej: Envigado, Zapopan, Fort Lauderdale, Marbella...'}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -12143,7 +12143,7 @@ export default function LocalStudioPage() {
                 }}
                 className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
               >
-                Cancelar
+                {isEn ? 'Cancel' : 'Cancelar'}
               </button>
               <button
                 type="button"

@@ -118,6 +118,7 @@ export default function BusinessAuditorPage() {
     }
   };
 
+  const isEn = lang === 'en';
   const t = AUDITOR_TRANSLATIONS[lang];
 
   // Currency selector
@@ -1991,7 +1992,7 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center gap-1.5">
                           <Sparkles className="w-3 h-3 text-indigo-400" />
-                          <span>PRESTIGIA RADAR 360° • AUDITORÍA SEO LOCAL & FICHA GOOGLE</span>
+                          <span>{isEn ? 'PRESTIGIA 360° RADAR • LOCAL SEO AUDIT & GOOGLE LISTING' : 'PRESTIGIA RADAR 360° • AUDITORÍA SEO LOCAL & FICHA GOOGLE'}</span>
                         </span>
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
                           ⚡ Escaneo del Algoritmo Local de Google
@@ -2093,22 +2094,22 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-black text-slate-200 flex items-center gap-1.5">
                           <Tag className="w-3.5 h-3.5 text-indigo-400" />
-                          <span>1. Categoría Principal & Subcategorías Faltantes</span>
+                          <span>{isEn ? '1. Primary Category & Missing Subcategories' : '1. Categoría Principal & Subcategorías Faltantes'}</span>
                         </span>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
-                          Factor Clave #1
+                          {isEn ? 'Key Factor #1' : 'Factor Clave #1'}
                         </span>
                       </div>
                       <div className="space-y-1.5 text-xs">
                         <div className="flex items-center gap-2">
-                          <span className="text-slate-400 text-[11px]">Categoría activa en Maps:</span>
+                          <span className="text-slate-400 text-[11px]">{isEn ? 'Active category on Maps:' : 'Categoría activa en Maps:'}</span>
                           <span className="font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/70 border border-emerald-500/30 text-[11px]">
                             ✓ {mainSeoAudit?.primaryCategory || category}
                           </span>
                         </div>
                         <div className="space-y-1 pt-1">
                           <span className="text-[11px] font-bold text-rose-300 block">
-                            ❌ Subcategorías secundarias no configuradas (Desaprovechadas):
+                            {isEn ? '❌ Secondary subcategories not configured (Untapped reach):' : '❌ Subcategorías secundarias no configuradas (Desaprovechadas):'}
                           </span>
                           <div className="flex flex-wrap gap-1.5">
                             {(mainSeoAudit?.missingCategories || [
@@ -2128,7 +2129,7 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                           </div>
                         </div>
                         <p className="text-[10.5px] text-slate-400 pt-1 leading-relaxed">
-                          Google permite hasta 10 categorías en cada ficha. Al dejar las subcategorías vacías, este negocio queda <strong>100% invisible</strong> cuando un cliente busca esos términos en Google Maps.
+                          {isEn ? <>Google allows up to 10 categories on each profile. Leaving subcategories empty leaves this business <strong>100% invisible</strong> when customers search those terms on Google Maps.</> : <>Google permite hasta 10 categorías en cada ficha. Al dejar las subcategorías vacías, este negocio queda <strong>100% invisible</strong> cuando un cliente busca esos términos en Google Maps.</>}
                         </p>
                       </div>
                     </div>
@@ -2138,7 +2139,7 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-black text-slate-200 flex items-center gap-1.5">
                           <FileText className="w-3.5 h-3.5 text-amber-400" />
-                          <span>2. Optimización de Título (SEO Local)</span>
+                          <span>{isEn ? '2. Title Optimization (Local SEO)' : '2. Optimización de Título (SEO Local)'}</span>
                         </span>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
                           Score: {mainSeoAudit?.titleAudit?.score ?? 55} / 100
@@ -2146,15 +2147,15 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                       </div>
                       <div className="space-y-2 text-xs">
                         <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-                          <span className="text-[10px] text-slate-500 uppercase font-bold block mb-0.5">Título actual en Google:</span>
+                          <span className="text-[10px] text-slate-500 uppercase font-bold block mb-0.5">{isEn ? 'Current title on Google:' : 'Título actual en Google:'}</span>
                           <span className="font-mono font-bold text-slate-300 text-[11px] block">{businessName || 'Nombre del Negocio'}</span>
                         </div>
                         <p className="text-[10.5px] text-slate-400 leading-relaxed">
                           {mainSeoAudit?.titleAudit?.analysis ||
-                            'El título solo tiene el nombre comercial plano. Pierde miles de búsquedas mensuales sin intención geográfica ni palabra clave del nicho.'}
+                            isEn ? 'Title only has the bare business name. Missing thousands of monthly searches without geo-intent or core niche keywords.' : 'El título solo tiene el nombre comercial plano. Pierde miles de búsquedas mensuales sin intención geográfica ni palabra clave del nicho.'}
                         </p>
                         <div className="p-2.5 rounded-xl bg-indigo-950/50 border border-indigo-500/30 space-y-1">
-                          <span className="text-[10px] font-black uppercase text-indigo-300 block">💡 Título Optimizado Recomendado:</span>
+                          <span className="text-[10px] font-black uppercase text-indigo-300 block">{isEn ? '💡 Recommended Optimized Title:' : '💡 Título Optimizado Recomendado:'}</span>
                           <span className="font-mono text-[11px] font-bold text-indigo-200 block">
                             {mainSeoAudit?.titleAudit?.suggestedTitle || `${businessName} | ${category} en tu Ciudad`}
                           </span>
@@ -2167,25 +2168,25 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-black text-slate-200 flex items-center gap-1.5">
                           <Compass className="w-3.5 h-3.5 text-purple-400" />
-                          <span>3. Biografía y Descripción Corporativa</span>
+                          <span>{isEn ? '3. Corporate Biography & Description' : '3. Biografía y Descripción Corporativa'}</span>
                         </span>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/15 text-purple-300 border border-purple-500/30">
-                          750 Caracteres
+                          {isEn ? '750 Characters' : '750 Caracteres'}
                         </span>
                       </div>
                       <div className="space-y-2 text-xs">
                         <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-800 text-[11px]">
-                          <span className="text-slate-400">Estado de indexación:</span>
+                          <span className="text-slate-400">{isEn ? 'Indexation status:' : 'Estado de indexación:'}</span>
                           <span className="font-bold text-rose-400">
-                            {mainSeoAudit?.descriptionAudit?.status === 'optimized' ? '✓ Optimizada' : '❌ Vacía o Deficiente'}
+                            {mainSeoAudit?.descriptionAudit?.status === 'optimized' ? (isEn ? '✓ Optimized' : '✓ Optimizada') : (isEn ? '❌ Empty or Deficient' : '❌ Vacía o Deficiente')}
                           </span>
                         </div>
                         <p className="text-[10.5px] text-slate-400 leading-relaxed">
                           {mainSeoAudit?.descriptionAudit?.analysis ||
-                            'No se detectó biografía corporativa en Google Maps. Estás desperdiciando los 750 caracteres que la IA de Google lee para posicionar y recomendar tu negocio a turistas y clientes.'}
+                            isEn ? 'No corporate biography detected on Google Maps. You are wasting the 750 characters Google AI parses to rank and recommend your business to local searchers.' : 'No se detectó biografía corporativa en Google Maps. Estás desperdiciando los 750 caracteres que la IA de Google lee para posicionar y recomendar tu negocio a turistas y clientes.'}
                         </p>
                         <div className="text-[10.5px] text-indigo-300 font-semibold flex items-center gap-1">
-                          <span>✦ Solución Prestigia: Redactamos la descripción con keywords de compra.</span>
+                          <span>{isEn ? '✦ Prestigia Solution: We craft the description with buyer intent keywords.' : '✦ Solución Prestigia: Redactamos la descripción con keywords de compra.'}</span>
                         </div>
                       </div>
                     </div>
@@ -2195,30 +2196,30 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-black text-slate-200 flex items-center gap-1.5">
                           <Globe className="w-3.5 h-3.5 text-teal-400" />
-                          <span>4. Canales de Conversión & Respuesta</span>
+                          <span>{isEn ? '4. Conversion Channels & Response Speed' : '4. Canales de Conversión & Respuesta'}</span>
                         </span>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-500/15 text-teal-300 border border-teal-500/30">
-                          Factor de Ranking
+                          {isEn ? 'Ranking Factor' : 'Factor de Ranking'}
                         </span>
                       </div>
                       <div className="space-y-2 text-xs">
                         <div className="grid grid-cols-2 gap-2 text-[11px]">
                           <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5">
                             <Globe className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            <span className="truncate">{mainSeoAudit?.linksAndConversion?.hasWebsite ? '✓ Web Vinculada' : '❌ Sin Web Oficial'}</span>
+                            <span className="truncate">{mainSeoAudit?.linksAndConversion?.hasWebsite ? (isEn ? '✓ Website Linked' : '✓ Web Vinculada') : (isEn ? '❌ No Official Website' : '❌ Sin Web Oficial')}</span>
                           </div>
                           <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5">
                             <PhoneCall className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            <span className="truncate">{mainSeoAudit?.contactAudit?.hasPhone ? '✓ Teléfono Activo' : '❌ Sin Teléfono'}</span>
+                            <span className="truncate">{mainSeoAudit?.contactAudit?.hasPhone ? (isEn ? '✓ Active Phone' : '✓ Teléfono Activo') : (isEn ? '❌ No Phone Number' : '❌ Sin Teléfono')}</span>
                           </div>
                         </div>
                         <p className="text-[10.5px] text-slate-400 leading-relaxed">
                           {mainSeoAudit?.reviewsEngagement?.analysis ||
-                            'Google prioriza perfiles que responden el 100% de reseñas en menos de 24 horas. Los negocios con reseñas abandonadas sufren penalización de posición en el mapa.'}
+                            isEn ? 'Google prioritizes profiles that respond to 100% of reviews within 24 hours. Businesses with unreplied reviews suffer map ranking penalties.' : 'Google prioriza perfiles que responden el 100% de reseñas en menos de 24 horas. Los negocios con reseñas abandonadas sufren penalización de posición en el mapa.'}
                         </p>
                         <div className="p-2 rounded-xl bg-emerald-950/50 border border-emerald-500/30 text-[10.5px] text-emerald-300 font-bold flex items-center gap-1.5">
                           <Check className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>Prestigia activa la respuesta oficial en 1-Clic para salvar el ranking.</span>
+                          <span>{isEn ? 'Prestigia enables 1-Click official AI responses to protect rankings.' : 'Prestigia activa la respuesta oficial en 1-Clic para salvar el ranking.'}</span>
                         </div>
                       </div>
                     </div>
@@ -2229,16 +2230,16 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                     <div className="space-y-0.5 text-center sm:text-left">
                       <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider flex items-center gap-1 justify-center sm:justify-start">
                         <Flame className="w-3.5 h-3.5 text-amber-500" />
-                        <span>Plan de Aceleración Prestigia Boost</span>
+                        <span>{isEn ? 'Prestigia Boost Acceleration Plan' : 'Plan de Aceleración Prestigia Boost'}</span>
                       </span>
                       <p className="text-xs font-bold text-white">
-                        Implementando estos 4 ajustes, este negocio puede escalar al Top 3 de Google Maps en 14 días.
+                        {isEn ? 'By implementing these 4 adjustments, this business can climb into Google Maps Top 3 in 14 days.' : 'Implementando estos 4 ajustes, este negocio puede escalar al Top 3 de Google Maps en 14 días.'}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/25 flex items-center gap-1">
                         <Zap className="w-3.5 h-3.5 fill-current" />
-                        <span>Potencial: +45% Visitas Locales</span>
+                        <span>{isEn ? 'Potential: +45% Local Visits' : 'Potencial: +45% Visitas Locales'}</span>
                       </span>
                     </div>
                   </div>

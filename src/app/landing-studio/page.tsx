@@ -894,7 +894,7 @@ export default function LandingStudioPage() {
                     }`}
                   >
                     <Smartphone className="w-3 h-3" />
-                    <span>Móvil</span>
+                    <span>{isEn ? 'Mobile' : 'Móvil'}</span>
                   </button>
                   <button
                     type="button"
@@ -932,7 +932,7 @@ export default function LandingStudioPage() {
                       <Lock className="w-7 h-7" />
                     </div>
                     <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-500/30">
-                      Conexión Pausada
+                      {isEn ? 'Connection Paused' : 'Conexión Pausada'}
                     </span>
                     <h4 className="text-base font-black text-white">Sitio en Mantenimiento</h4>
                     <p className="text-xs text-slate-400 max-w-xs leading-relaxed">
@@ -1015,7 +1015,7 @@ export default function LandingStudioPage() {
                           <Sparkles className="w-3 h-3" />
                           <span>Resultados Reales</span>
                         </span>
-                        <span className="text-slate-400">Antes / Después</span>
+                        <span className="text-slate-400">{isEn ? 'Before / After' : 'Antes / Después'}</span>
                       </div>
                       <div className="h-24 rounded-xl overflow-hidden relative border border-white/10">
                         <img
@@ -1025,7 +1025,7 @@ export default function LandingStudioPage() {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent flex items-end p-2">
                           <span className="text-[9px] font-bold text-emerald-300 bg-slate-950/80 px-2 py-0.5 rounded">
-                            ✨ Caso Clínico Verificado
+                            {isEn ? '✨ Verified Clinical Case' : '✨ Caso Clínico Verificado'}
                           </span>
                         </div>
                       </div>
@@ -1144,7 +1144,7 @@ export default function LandingStudioPage() {
                             : 'bg-rose-950 text-rose-300 border border-rose-500/30'
                         }`}
                       >
-                        {page.status === 'active' ? '🟢 En Línea' : '🔴 Suspendida'}
+                        {page.status === 'active' ? (isEn ? '🟢 Live / Online' : '🟢 En Línea') : (isEn ? '🔴 Suspended' : '🔴 Suspendida')}
                       </span>
                     </div>
 
@@ -1189,7 +1189,7 @@ export default function LandingStudioPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-2 rounded-xl text-emerald-400 hover:text-emerald-300 hover:bg-emerald-950/40 transition cursor-pointer"
-                        title="Abrir página"
+                        title={isEn ? 'Open Page' : 'Abrir página'}
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                       </a>
