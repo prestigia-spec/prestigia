@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Prestigia | Evaluación y Experiencia',
-  description: 'Sistema de evaluación de experiencia y reputación para comercio local',
+  title: 'Prestigia | Suite 5★ & Crecimiento en Google Maps',
+  description: 'La suite de crecimiento comercial, blindaje reputacional B2B y posicionamiento Top 3 en Google Maps',
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },

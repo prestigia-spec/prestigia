@@ -577,6 +577,14 @@ export default function HomePage() {
     } catch {}
   }, []);
 
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.title = lang === 'en'
+        ? 'Prestigia | 5★ Suite & Google Maps Growth'
+        : 'Prestigia | Suite 5★ & Crecimiento en Google Maps';
+    }
+  }, [lang]);
+
   const handleLanguageChange = (newLang: LandingLang) => {
     setLang(newLang);
     try {
