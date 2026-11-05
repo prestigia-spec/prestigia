@@ -1,18 +1,19 @@
-﻿import React from 'react';
+import React from 'react';
 
 interface PrestigiaIconProps {
   className?: string;
   size?: number;
+  withBadge?: boolean;
 }
 
-export function PrestigiaIcon({ className = "w-8 h-8", size }: PrestigiaIconProps) {
-  return (
+export function PrestigiaIcon({ className = "w-8 h-8", size, withBadge = false }: PrestigiaIconProps) {
+  const svg = (
     <svg
       viewBox="0 0 100 100"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      style={size ? { width: size, height: size } : undefined}
+      className={withBadge ? "w-5 h-5 sm:w-6 sm:h-6 text-white shrink-0" : className}
+      style={!withBadge && size ? { width: size, height: size } : undefined}
       aria-label="Isotipo Oficial Prestigia"
     >
       {/* Escudo exterior (Blindaje / Seguridad) */}
@@ -35,4 +36,14 @@ export function PrestigiaIcon({ className = "w-8 h-8", size }: PrestigiaIconProp
       />
     </svg>
   );
+
+  if (withBadge) {
+    return (
+      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-indigo-800 flex items-center justify-center p-2 shadow-lg shadow-indigo-600/30 shrink-0 ${className}`}>
+        {svg}
+      </div>
+    );
+  }
+
+  return svg;
 }

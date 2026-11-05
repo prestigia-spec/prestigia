@@ -296,14 +296,19 @@ export default function LandingStudioPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link
-              href="/landing-studio"
-              className="flex items-center gap-2.5 font-black text-lg tracking-tight text-white hover:opacity-90 transition"
+              href="/"
+              className="flex items-center gap-2.5 sm:gap-3 group cursor-pointer select-none"
             >
-              <PrestigiaIcon className="w-8 h-8 drop-shadow-md shrink-0" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-indigo-800 flex items-center justify-center p-2 shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform duration-300 shrink-0">
+                <PrestigiaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-white">PRESTIGIA</span>
-                  <span className="text-indigo-400">LANDING STUDIO™</span>
+                  <span className="text-white text-base sm:text-lg font-black tracking-widest">PRESTIGIA</span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[9px] font-bold tracking-wider uppercase">
+                    5★ SUITE
+                  </span>
+                  <span className="text-indigo-400 text-xs font-black tracking-wider">LANDING STUDIO™</span>
                 </div>
                 <span className="text-[10px] text-slate-400 font-normal">
                   {isEn ? 'High-Converting Mobile Page Builder & Anti-Churn Engine' : 'Motor de Páginas Web de Alta Conversión & Candado Anti-Churn'}

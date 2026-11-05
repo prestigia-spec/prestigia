@@ -3889,13 +3889,20 @@ export default function LocalStudioPage() {
         {/* Top Header */}
         <header className="px-4 sm:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/70">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 select-none">
-            <PrestigiaIcon className="w-8 h-8 drop-shadow-md shrink-0" />
+          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group cursor-pointer select-none">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-indigo-800 flex items-center justify-center p-2 shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform duration-300 shrink-0">
+              <PrestigiaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </div>
             <div className="flex flex-col">
-              <span className="text-xs font-black tracking-widest text-white">PRESTIGIA</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm sm:text-base font-black tracking-widest text-white">PRESTIGIA</span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[9px] font-bold tracking-wider uppercase">
+                  5★ SUITE
+                </span>
+              </div>
               <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">Local Studio • Top 3 Engine</span>
             </div>
-          </div>
+          </Link>
           <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-950/80 border border-indigo-500/40 text-indigo-300 text-[11px] font-bold">
             <Sparkles className="w-3 h-3 text-amber-400" />
             <span>{t.tagline}</span>

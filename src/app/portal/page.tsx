@@ -9098,13 +9098,20 @@ export default function PortalPage() {
               className={`flex items-center gap-2.5 pr-3 sm:pr-4 border-r select-none ${theme === 'light' ? 'border-slate-300' : 'border-slate-800/80'}`}
             >
               <div className="relative">
-                <PrestigiaIcon className="w-8 h-8 drop-shadow-md shrink-0" />
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-indigo-800 flex items-center justify-center p-2 shadow-lg shadow-indigo-600/30 shrink-0">
+                  <PrestigiaIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                </div>
                 <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-[#0D1424] animate-pulse" title="Sistemas 100% Operativos" />
               </div>
               <div className="hidden sm:block leading-tight">
-                <span className={`text-xs font-black tracking-widest block ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
-                  PRESTIGIA
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className={`text-xs font-black tracking-widest block ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
+                    PRESTIGIA
+                  </span>
+                  <span className="px-1.5 py-0.2 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[8px] font-bold tracking-wider uppercase">
+                    5★ SUITE
+                  </span>
+                </div>
                 <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-wider flex items-center gap-1.5">
                   <span>{t.navbar.portalB2b}</span>
                   <span className="text-[8px] font-extrabold px-1 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
