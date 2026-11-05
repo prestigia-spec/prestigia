@@ -10632,6 +10632,7 @@ export default function LocalStudioPage() {
                   const createsCount = advisorDossiers.filter((d) => d.mode === 'create').length;
                   const auditsCount = advisorDossiers.filter((d) => d.mode === 'audit').length;
                   const rescuesCount = advisorDossiers.filter((d) => d.mode === 'rescue').length;
+                  const appealsCount = advisorDossiers.filter((d) => d.mode === 'appeal').length;
                   const isRevealed = Boolean(revealedPasswords[adv.id]);
 
                   const curNow = new Date();
@@ -10799,7 +10800,7 @@ export default function LocalStudioPage() {
                               {advisorDossiers.length} {isEn ? 'dossiers' : 'expedientes'}
                             </span>
                           </div>
-                          <div className="grid grid-cols-3 gap-1 pt-1 border-t border-slate-800/60 text-center text-[10px]">
+                          <div className="grid grid-cols-4 gap-1 pt-1 border-t border-slate-800/60 text-center text-[10px]">
                             <div className="bg-slate-900/80 py-0.5 rounded px-1">
                               <span className="text-slate-400 block text-[9px] uppercase font-semibold">{isEn ? 'Created' : 'Creadas'}</span>
                               <strong className="text-emerald-400 font-mono">{createsCount}</strong>
@@ -10811,6 +10812,10 @@ export default function LocalStudioPage() {
                             <div className="bg-slate-900/80 py-0.5 rounded px-1">
                               <span className="text-slate-400 block text-[9px] uppercase font-semibold">{isEn ? 'Rescued' : 'Rescatadas'}</span>
                               <strong className="text-amber-400 font-mono">{rescuesCount}</strong>
+                            </div>
+                            <div className="bg-slate-900/80 py-0.5 rounded px-1">
+                              <span className="text-slate-400 block text-[9px] uppercase font-semibold">{isEn ? 'Appealed' : 'Apeladas'}</span>
+                              <strong className="text-purple-400 font-mono">{appealsCount}</strong>
                             </div>
                           </div>
                         </div>
@@ -11052,24 +11057,29 @@ export default function LocalStudioPage() {
               const createsCount = advisorDossiers.filter((d) => d.mode === 'create').length;
               const auditsCount = advisorDossiers.filter((d) => d.mode === 'audit').length;
               const rescuesCount = advisorDossiers.filter((d) => d.mode === 'rescue').length;
+              const appealsCount = advisorDossiers.filter((d) => d.mode === 'appeal').length;
 
               return (
-                <div className="p-4 border-b border-slate-800 bg-slate-950/60 grid grid-cols-4 gap-2 text-center text-xs shrink-0">
-                  <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                <div className="p-4 border-b border-slate-800 bg-slate-950/60 grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs shrink-0">
+                  <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 col-span-2 sm:col-span-1">
                     <span className="text-[10px] text-slate-400 font-bold block uppercase">{isEn ? 'Total Profiles' : 'Total Fichas'}</span>
                     <strong className="text-lg font-black text-white">{advisorDossiers.length}</strong>
                   </div>
                   <div className="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
-                    <span className="text-[10px] text-emerald-400 font-bold block uppercase truncate">🏗️ Creaciones</span>
+                    <span className="text-[10px] text-emerald-400 font-bold block uppercase truncate">{isEn ? '🏗️ Builds' : '🏗️ Creaciones'}</span>
                     <strong className="text-lg font-black text-emerald-300">{createsCount}</strong>
                   </div>
-                  <div className="p-2 rounded-xl bg-amber-950/40 border border-amber-500/30">
-                    <span className="text-[10px] text-amber-400 font-bold block uppercase truncate">{isEn ? '🔬 Audits' : '🔬 Auditorías'}</span>
-                    <strong className="text-lg font-black text-amber-300">{auditsCount}</strong>
+                  <div className="p-2 rounded-xl bg-blue-950/40 border border-blue-500/30">
+                    <span className="text-[10px] text-blue-400 font-bold block uppercase truncate">{isEn ? '🔬 Audits' : '🔬 Auditorías'}</span>
+                    <strong className="text-lg font-black text-blue-300">{auditsCount}</strong>
                   </div>
-                  <div className="p-2 rounded-xl bg-rose-950/40 border border-rose-500/30">
-                    <span className="text-[10px] text-rose-400 font-bold block uppercase truncate">{isEn ? '🛡️ Rescues' : '🛡️ Rescates'}</span>
-                    <strong className="text-lg font-black text-rose-300">{rescuesCount}</strong>
+                  <div className="p-2 rounded-xl bg-amber-950/40 border border-amber-500/30">
+                    <span className="text-[10px] text-amber-400 font-bold block uppercase truncate">{isEn ? '🛡️ Rescues' : '🛡️ Rescates'}</span>
+                    <strong className="text-lg font-black text-amber-300">{rescuesCount}</strong>
+                  </div>
+                  <div className="p-2 rounded-xl bg-purple-950/40 border border-purple-500/30">
+                    <span className="text-[10px] text-purple-400 font-bold block uppercase truncate">{isEn ? '⚖️ Appeals' : '⚖️ Apelaciones'}</span>
+                    <strong className="text-lg font-black text-purple-300">{appealsCount}</strong>
                   </div>
                 </div>
               );
@@ -11111,7 +11121,7 @@ export default function LocalStudioPage() {
                                   : 'bg-amber-950 text-amber-300 border border-amber-500/40'
                               }`}
                             >
-                              {d.mode === 'create' ? '🏗️ Ficha Nueva' : d.mode === 'rescue' ? '🛡️ Rescate 72h' : '🔬 Auditoría Top 3'}
+                              {d.mode === 'create' ? (isEn ? '🏗️ New Listing' : '🏗️ Ficha Nueva') : d.mode === 'rescue' ? (isEn ? '🛡️ 72h Rescue' : '🛡️ Rescate 72h') : d.mode === 'appeal' ? (isEn ? '⚖️ 1-3★ Appeal' : '⚖️ Apelación 1-3★') : (isEn ? '🔬 Top 3 Audit' : '🔬 Auditoría Top 3')}
                             </span>
 
                             <span className="text-[10px] text-slate-500 font-mono">
