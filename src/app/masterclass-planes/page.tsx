@@ -202,8 +202,8 @@ export default function MasterclassPlanesPage() {
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl">
               {isEn
-                ? 'Prestigia Local Studio equips independent advisors and digital agencies with proprietary AI algorithmic engineering. Sell premium profile creation, forensic gap audits, 72h ownership rescues (claimed/orphan listings), and review appeals at $100 USD each, generating immediate cash flow while building recurring revenue through Prestigia annual software agreements.'
-                : 'Prestigia Local Studio equipa a consultores independientes y agencias digitales con ingeniería algorítmica de IA propia. Vende creación técnica de fichas, auditorías forenses Top 3, rescates de titularidad en 72h (fichas en manos de terceros o huérfanas) y apelación de reseñas falsas a $100 USD cada servicio, recuperando el 100% de tu inversión desde tu primera venta y generando comisiones de contado con paquetes anuales de Prestigia.'}
+                ? 'Prestigia Local Studio equips independent advisors and digital agencies with proprietary AI algorithmic engineering. Sell premium profile creation, forensic gap audits, 72h ownership rescues, and review appeals at $100–$250 USD each (agency market standard), generating immediate cash flow while building recurring revenue through Prestigia annual software agreements.'
+                : 'Prestigia Local Studio equipa a consultores independientes y agencias digitales con ingeniería algorítmica de IA propia. Vende creación técnica de fichas, auditorías forenses Top 3, rescates de titularidad en 72h y apelación de reseñas falsas de $100 a $250 USD por cada servicio (estándar de cobro en agencias), recuperando el 100% de tu inversión desde tu primera venta y generando comisiones de contado con paquetes anuales de Prestigia.'}
             </p>
           </div>
 
@@ -222,9 +222,9 @@ export default function MasterclassPlanesPage() {
               <span className="text-slate-400 block">{isEn ? 'Suggested End-Client Price:' : 'Precio Sugerido al Cliente:'}</span>
               <span className="text-amber-400 font-black text-base flex items-center gap-1">
                 <DollarSign className="w-4 h-4 text-amber-400" />
-                <span>$100 USD / {isEn ? 'service' : 'servicio'}</span>
+                <span>$100 - $250 USD / {isEn ? 'service' : 'servicio'}</span>
               </span>
-              <span className="text-[10px] text-slate-400 block">{isEn ? 'Instant perceived market value' : 'Alto valor percibido en frío'}</span>
+              <span className="text-[10px] text-slate-400 block">{isEn ? 'Agency standard market fee' : 'Estándar de cobro en agencias'}</span>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
@@ -246,7 +246,7 @@ export default function MasterclassPlanesPage() {
               <span>{isEn ? '1. Official Credit Packages & Partner Tiers' : '1. Planes Oficiales por Créditos & Escalas de Partner'}</span>
             </div>
             <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
-              {isEn ? 'Suggested Sale Price: $100 USD / service' : 'Precio Sugerido de Venta: $100 USD / servicio'}
+              {isEn ? 'Agency Standard: $100 - $250 USD / service' : 'Estándar en Agencias: $100 - $250 USD / servicio'}
             </span>
           </div>
 
@@ -315,7 +315,7 @@ export default function MasterclassPlanesPage() {
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
-                  <span className="text-amber-400 font-black">{isEn ? 'Up to $4,000 USD' : 'Hasta $4.000 USD'}</span>
+                  <span className="text-amber-400 font-black">{isEn ? '$4,000 to $10,000 USD' : '$4.000 a $10.000 USD'}</span>
                 </div>
               </div>
             </div>
@@ -384,7 +384,7 @@ export default function MasterclassPlanesPage() {
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
-                  <span className="text-amber-400 font-black">{isEn ? 'Up to $8,000 USD' : 'Hasta $8.000 USD'}</span>
+                  <span className="text-amber-400 font-black">{isEn ? '$8,000 to $20,000 USD' : '$8.000 a $20.000 USD'}</span>
                 </div>
               </div>
             </div>
@@ -449,7 +449,7 @@ export default function MasterclassPlanesPage() {
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
-                  <span className="text-amber-400 font-black">{isEn ? 'Up to $12,000 USD' : 'Hasta $12.000 USD'}</span>
+                  <span className="text-amber-400 font-black">{isEn ? '$12,000 to $30,000 USD' : '$12.000 a $30.000 USD'}</span>
                 </div>
               </div>
             </div>
@@ -465,8 +465,8 @@ export default function MasterclassPlanesPage() {
           </div>
           <h3 className="text-lg sm:text-xl font-black text-white">
             {isEn
-              ? 'Why Clients Happily Pay $100 USD for Each Service'
-              : 'Por qué los Negocios Pagan Felices $100 USD por Cada Servicio'}
+              ? 'Why Clients Happily Pay $100–$250 USD for Each Service'
+              : 'Por qué los Negocios Pagan Felices entre $100 y $250 USD por Cada Servicio'}
           </h3>
           <p className="text-xs text-slate-300 leading-relaxed">
             {isEn
@@ -482,7 +482,7 @@ export default function MasterclassPlanesPage() {
                   <MapPin className="w-4 h-4 text-amber-400" />
                   <span>{isEn ? 'Tab 1: Creation & Technical Setup' : 'Pestaña 1: Creación & Setup Técnico'}</span>
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">{isEn ? 'RRP: $100 USD' : 'PVP: $100 USD'}</span>
+                <span className="text-[10px] font-mono text-slate-400">{isEn ? 'RRP: $100 - $250 USD' : 'PVP: $100 - $250 USD'}</span>
               </div>
               <p className="text-slate-300 text-[11px] leading-relaxed">
                 {isEn
@@ -498,7 +498,7 @@ export default function MasterclassPlanesPage() {
                   <Search className="w-4 h-4 text-indigo-400" />
                   <span>{isEn ? 'Tab 2: Top 3 Forensic Audit' : 'Pestaña 2: Auditoría Forense Top 3'}</span>
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">{isEn ? 'RRP: $100 USD' : 'PVP: $100 USD'}</span>
+                <span className="text-[10px] font-mono text-slate-400">{isEn ? 'RRP: $100 - $250 USD' : 'PVP: $100 - $250 USD'}</span>
               </div>
               <p className="text-slate-300 text-[11px] leading-relaxed">
                 {isEn
@@ -514,7 +514,7 @@ export default function MasterclassPlanesPage() {
                   <LifeBuoy className="w-4 h-4 text-rose-400" />
                   <span>{isEn ? 'Tab 3: 72h Ownership Rescue & Claim' : 'Pestaña 3: Rescate de Titularidad 72h (Ownership Claim)'}</span>
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">{isEn ? 'RRP: $100 USD' : 'PVP: $100 USD'}</span>
+                <span className="text-[10px] font-mono text-slate-400">{isEn ? 'RRP: $100 - $250 USD' : 'PVP: $100 - $250 USD'}</span>
               </div>
               <p className="text-slate-300 text-[11px] leading-relaxed">
                 {isEn
@@ -530,7 +530,7 @@ export default function MasterclassPlanesPage() {
                   <Scale className="w-4 h-4 text-purple-400" />
                   <span>{isEn ? 'Tab 4: 1-Star Review Appeals' : 'Pestaña 4: Apelación de Reseñas 1★'}</span>
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">{isEn ? 'RRP: $100 USD' : 'PVP: $100 USD'}</span>
+                <span className="text-[10px] font-mono text-slate-400">{isEn ? 'RRP: $100 - $250 USD' : 'PVP: $100 - $250 USD'}</span>
               </div>
               <p className="text-slate-300 text-[11px] leading-relaxed">
                 {isEn
