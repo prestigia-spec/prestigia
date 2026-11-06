@@ -571,16 +571,22 @@ function buildCandidateNegativeReviews(params: {
   rating: number;
   reviewsCount: number;
 }): NegativeReviewItem[] {
-  const { name, category } = params;
+  const { name, category, rating, reviewsCount } = params;
   const c = (category || '').toLowerCase();
+  const dist = computeReviewDistribution(rating, reviewsCount);
+  const detectedRescuable = dist.star1 + dist.star2 + dist.star3;
+  // Si la ficha tiene reseñas negativas calculadas, mostrar esa cantidad (mínimo 5, máximo 12)
+  const targetCount = Math.min(12, Math.max(5, detectedRescuable > 0 ? detectedRescuable : (rating < 5.0 ? 6 : 3)));
+
+  let pool: NegativeReviewItem[] = [];
 
   if (c.includes('restauran') || c.includes('gastro') || c.includes('bar') || c.includes('caf') || c.includes('comida') || c.includes('pizza') || c.includes('burger')) {
-    return [
+    pool = [
       {
         id: 'rev-neg-1',
         author: 'Carlos Mario Restrepo',
         rating: 1,
-        timeAgo: 'Hace 3 semanas',
+        timeAgo: 'Hace 2 semanas',
         text: `Pésimo lugar, la comida tardó más de una hora, llegó fría y cuando reclamamos el encargado nos respondió de forma grosera. Jamás volveremos a ${name}, nos sentimos estafados.`,
         contextFlag: 'fake_customer',
         detectedReason: 'Sin registro de comanda ni factura • Perfil sospechoso con 1 sola reseña pública',
@@ -590,7 +596,7 @@ function buildCandidateNegativeReviews(params: {
         id: 'rev-neg-2',
         author: 'Andrés Felipe M.',
         rating: 1,
-        timeAgo: 'Hace 1 mes',
+        timeAgo: 'Hace 3 semanas',
         text: `No boten su plata en ${name}. En el negocio de la vuelta la comida es exquisita, sirven el doble de porción y cobran la mitad. Horrible experiencia.`,
         contextFlag: 'competitor',
         detectedReason: 'Mención y promoción explícita a competidor del sector • Conflicto de Intereses (TOS Sec 4.1)',
@@ -600,17 +606,85 @@ function buildCandidateNegativeReviews(params: {
         id: 'rev-neg-3',
         author: 'Camila Ospina',
         rating: 2,
-        timeAgo: 'Hace 2 meses',
+        timeAgo: 'Hace 1 mes',
         text: `El mesero de turno fue un patán absoluto y nos gritó delante de los otros comensales. La administración debería despedir a ese tipo ya mismo.`,
         contextFlag: 'defamation',
         detectedReason: 'Ataque personal y exigencia de despido contra empleado • Política de Acoso y Difamación (TOS Sec 5.1)',
         viability: 'ALTA',
       },
+      {
+        id: 'rev-neg-4',
+        author: 'Juan Pablo Cárdenas',
+        rating: 1,
+        timeAgo: 'Hace 1 mes',
+        text: `Nos dio una indigestión terrible después de comer en ${name}. Deberían clausurar este lugar por falta de higiene. Cero recomendado.`,
+        contextFlag: 'fake_customer',
+        detectedReason: 'Imputación difamatoria de salud pública sin diagnóstico médico legal ni comprobante de consumo',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-5',
+        author: 'Valentina Ramos G.',
+        rating: 3,
+        timeAgo: 'Hace 2 meses',
+        text: `La comida normal, pero el trancón de la avenida para llegar a ${name} fue insoportable y no hay parqueadero propio. Una odisea llegar.`,
+        contextFlag: 'off_topic',
+        detectedReason: 'Contenido Off-Topic • Queja exclusiva sobre tráfico vehicular y parqueo externo ajeno al negocio (TOS Sec 1.4)',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-6',
+        author: 'Diego Fernando Mora',
+        rating: 1,
+        timeAgo: 'Hace 2 meses',
+        text: `Le pedí al administrador que me descontara la mitad de la cuenta por la demora o les pondría 1 estrella en Google Maps. No aceptó, así que aquí les dejo su calificación.`,
+        contextFlag: 'extortion',
+        detectedReason: 'Intento flagrante de extorsión y chantaje económico confeso en el texto (TOS Sec 3.2)',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-7',
+        author: 'Mariana Henao',
+        rating: 2,
+        timeAgo: 'Hace 3 meses',
+        text: `La calidad decayó muchísimo en ${name}. Ahora preferimos pedir al restaurante gourmet que abrió al lado donde la atención sí es rápida.`,
+        contextFlag: 'competitor',
+        detectedReason: 'Comparación desleal y desvío premeditado de comensales hacia local vecino',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-8',
+        author: 'Sebastián Alarcón (Ex-Empleado)',
+        rating: 1,
+        timeAgo: 'Hace 3 meses',
+        text: `Pésima administración en ${name}. No valoran al equipo de cocina, nos obligaban a doblar turno y no pagan horas extra. No consuman aquí.`,
+        contextFlag: 'ex_employee',
+        detectedReason: 'Reseña de represalia por conflicto laboral de exempleado • Prohibido por TOS Google Sec 4.2',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-9',
+        author: 'Carolina Montoya',
+        rating: 3,
+        timeAgo: 'Hace 4 meses',
+        text: `Pedí un plato exótico que no fue de mi agrado personal y no me lo cambiaron gratis. Regular atención en ${name}.`,
+        contextFlag: 'general_bad_faith',
+        detectedReason: 'Queja punitiva por gusto subjetivo del consumidor sin falla técnica del menú',
+        viability: 'MEDIA',
+      },
+      {
+        id: 'rev-neg-10',
+        author: 'Esteban Ruiz P.',
+        rating: 1,
+        timeAgo: 'Hace 4 meses',
+        text: `Hice un pedido por plataforma de domicilio y el repartidor de la app se comió la mitad de la orden. Ladrones en ${name}.`,
+        contextFlag: 'off_topic',
+        detectedReason: 'Incidente de transporte de plataforma externa (delivery app) atribuido erróneamente al restaurante físico',
+        viability: 'ALTA',
+      },
     ];
-  }
-
-  if (c.includes('salud') || c.includes('clinic') || c.includes('dental') || c.includes('medic') || c.includes('odont') || c.includes('doctor')) {
-    return [
+  } else if (c.includes('salud') || c.includes('clinic') || c.includes('dental') || c.includes('medic') || c.includes('odont') || c.includes('doctor')) {
+    pool = [
       {
         id: 'rev-neg-1',
         author: 'Julián David Gómez',
@@ -625,7 +699,7 @@ function buildCandidateNegativeReviews(params: {
         id: 'rev-neg-2',
         author: 'Ex-Colaborador Médico (Marcela P.)',
         rating: 1,
-        timeAgo: 'Hace 1 mes',
+        timeAgo: 'Hace 3 semanas',
         text: `La peor clínica para acudir. La administración maltrata al personal de enfermería, recortan insumos y no pagan los honorarios a tiempo.`,
         contextFlag: 'ex_employee',
         detectedReason: 'Disputa laboral interna de exempleado • Vulneración Flagrante de TOS Google Sec 4.2',
@@ -635,22 +709,70 @@ function buildCandidateNegativeReviews(params: {
         id: 'rev-neg-3',
         author: 'Gabriel Santos',
         rating: 2,
-        timeAgo: 'Hace 3 meses',
+        timeAgo: 'Hace 1 mes',
         text: `Fui a la sede de la otra cuadra pensando que era esta y me cobraron el parqueadero carísimo. Muy mala señalización de ${name}.`,
         contextFlag: 'off_topic',
         detectedReason: 'Contenido Off-Topic • Confusión de establecimiento ajeno al negocio (TOS Sec 1.4)',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-4',
+        author: 'Dra. Patricia Londoño',
+        rating: 1,
+        timeAgo: 'Hace 1 mes',
+        text: `Materiales de pésima calidad en ${name}. Como profesional del sector recomiendo acudir a centros avalados y no a este consultorio.`,
+        contextFlag: 'competitor',
+        detectedReason: 'Profesional de la competencia atacando la reputación clínica • Conflicto de Intereses directo',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-5',
+        author: 'Camilo Andrés Vega',
+        rating: 3,
+        timeAgo: 'Hace 2 meses',
+        text: `La atención médica fue buena pero la recepcionista tardó 15 minutos en validar mi seguro médico. Deberían agilizar trámites en ${name}.`,
+        contextFlag: 'off_topic',
+        detectedReason: 'Demora atribuible a la pasarela de la aseguradora externa y no a mala praxis médica',
         viability: 'MEDIA',
       },
+      {
+        id: 'rev-neg-6',
+        author: 'Natalia Bermúdez',
+        rating: 1,
+        timeAgo: 'Hace 2 meses',
+        text: `Llegué 25 minutos tarde a mi cita y me dijeron que debía reprogramar porque el especialista ya atendía al siguiente paciente. Pésimo servicio en ${name}.`,
+        contextFlag: 'general_bad_faith',
+        detectedReason: 'Inasistencia y retraso no justificado del paciente pretendiendo alterar la agenda médica de otros pacientes',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-7',
+        author: 'Hernán Darío Correa',
+        rating: 2,
+        timeAgo: 'Hace 3 meses',
+        text: `Exigí que me atendieran de urgencia sin turno previo y me hicieron esperar mientras atendían a pacientes agendados en ${name}.`,
+        contextFlag: 'general_bad_faith',
+        detectedReason: 'Desconocimiento del protocolo de triaje y citas programadas de la entidad médica',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-8',
+        author: 'Lorena Aristizábal',
+        rating: 1,
+        timeAgo: 'Hace 3 meses',
+        text: `Pedí que me reembolsaran una consulta ya realizada y como se negaron les pongo 1 estrella para que aprendan a respetar en ${name}.`,
+        contextFlag: 'extortion',
+        detectedReason: 'Intento de coacción y represalia económica explícita prohibida por Google TOS Sec 3.2',
+        viability: 'ALTA',
+      },
     ];
-  }
-
-  if (c.includes('auto') || c.includes('taller') || c.includes('mecanic') || c.includes('moto') || c.includes('llanta')) {
-    return [
+  } else if (c.includes('auto') || c.includes('taller') || c.includes('mecanic') || c.includes('moto') || c.includes('llanta')) {
+    pool = [
       {
         id: 'rev-neg-1',
         author: 'Rodrigo V.',
         rating: 1,
-        timeAgo: 'Hace 3 semanas',
+        timeAgo: 'Hace 2 semanas',
         text: `Llevé mi vehículo por un ruido y salió peor. Me cobraron repuestos originales que nunca le instalaron a mi carro en ${name}. Unos ladrones.`,
         contextFlag: 'fake_customer',
         detectedReason: 'Sin orden de servicio ni placa vehicular en archivo contable • Acusación sin factura',
@@ -660,48 +782,129 @@ function buildCandidateNegativeReviews(params: {
         id: 'rev-neg-2',
         author: 'AutoReparaciones del Norte (Cuenta Google)',
         rating: 1,
-        timeAgo: 'Hace 1 mes',
+        timeAgo: 'Hace 3 semanas',
         text: `Mala calidad de mano de obra. Si quieren un servicio garantizado busquen un taller oficial certificado en la zona y no en ${name}.`,
         contextFlag: 'competitor',
         detectedReason: 'Ataque evidente de taller competidor • Conflicto de Intereses directo (TOS Sec 4.1)',
         viability: 'ALTA',
       },
+      {
+        id: 'rev-neg-3',
+        author: 'Felipe Morales',
+        rating: 2,
+        timeAgo: 'Hace 1 mes',
+        text: `El mecánico de ${name} fue grosero cuando le pedí que me explicara por qué se demoró tanto la importación de la pieza. Deberían botarlo.`,
+        contextFlag: 'defamation',
+        detectedReason: 'Acoso y señalamiento contra trabajador por demoras de logística aduanera externa',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-4',
+        author: 'Mauricio Quintero',
+        rating: 1,
+        timeAgo: 'Hace 2 meses',
+        text: `Me dijeron que no podían recibir mi vehículo sin cita previa porque tenían el taller lleno. Pésima atención en ${name}.`,
+        contextFlag: 'general_bad_faith',
+        detectedReason: 'Capacidad operativa informada al cliente sin vulneración contractual',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-5',
+        author: 'Jorge Iván Cano',
+        rating: 3,
+        timeAgo: 'Hace 3 meses',
+        text: `El arreglo quedó bien pero no me lavaron el carro por fuera antes de entregarlo. En otros talleres sí lo hacen gratis.`,
+        contextFlag: 'off_topic',
+        detectedReason: 'Exigencia de servicios complementarios gratuitos no contratados en la orden de mecánica',
+        viability: 'MEDIA',
+      },
+    ];
+  } else {
+    pool = [
+      {
+        id: 'rev-neg-1',
+        author: 'Usuario anónimo de Google',
+        rating: 1,
+        timeAgo: 'Hace 2 semanas',
+        text: `Pésima atención y servicio deplorable. No recomiendo para nada a ${name}, me hicieron perder el tiempo y dinero. Una decepción absoluta.`,
+        contextFlag: 'fake_customer',
+        detectedReason: 'Sin registro en base de datos de clientes • Comentario genérico sin fácticos de compra',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-2',
+        author: 'Alejandro R.',
+        rating: 1,
+        timeAgo: 'Hace 3 semanas',
+        text: `El negocio de enfrente ofrece exactamente los mismos servicios a mitad de precio y con mejor atención. No gasten su dinero en ${name}.`,
+        contextFlag: 'competitor',
+        detectedReason: 'Promoción a competidor directo del sector • Cláusula de Conflicto de Intereses (TOS Sec 4.1)',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-3',
+        author: 'Laura Marcela Q.',
+        rating: 2,
+        timeAgo: 'Hace 1 mes',
+        text: `La señorita de recepción fue sumamente grosera y prepotente cuando pedí información básica. Deberían cambiar a esa empleada de inmediato en ${name}.`,
+        contextFlag: 'defamation',
+        detectedReason: 'Ataque personal a colaboradores • Directriz de Acoso y Difamación (TOS Sec 5.1)',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-4',
+        author: 'Camilo J. Duque',
+        rating: 1,
+        timeAgo: 'Hace 1 mes',
+        text: `No tienen ética comercial en ${name}. Me cobraron la tarifa acordada pero me pareció costosa para el trabajo que hicieron.`,
+        contextFlag: 'general_bad_faith',
+        detectedReason: 'Aceptación previa de cotización con desacuerdo retroactivo de precios',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-5',
+        author: 'Sandra Milena P.',
+        rating: 3,
+        timeAgo: 'Hace 2 meses',
+        text: `El servicio fue aceptable pero no tenían datáfono para tarjeta de crédito el día que fui y me tocó hacer transferencia. Muy incómodo en ${name}.`,
+        contextFlag: 'off_topic',
+        detectedReason: 'Falla temporal de red bancaria externa sin afectación de la prestación del servicio',
+        viability: 'MEDIA',
+      },
+      {
+        id: 'rev-neg-6',
+        author: 'Ex-Socio Comercial (Anónimo)',
+        rating: 1,
+        timeAgo: 'Hace 3 meses',
+        text: `No hagan tratos con los dueños de ${name}, incumplen sus promesas de negocios y no son de fiar. Evítense problemas.`,
+        contextFlag: 'ex_employee',
+        detectedReason: 'Disputa civil/comercial privada ventilada indebidamente en reseñas de Google Maps',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-7',
+        author: 'Héctor Fabio Zuluaga',
+        rating: 1,
+        timeAgo: 'Hace 3 meses',
+        text: `Amenacé al gerente con ponerles una reseña destructiva si no me daban un descuento y como no cedieron, aquí se las dejo a ${name}.`,
+        contextFlag: 'extortion',
+        detectedReason: 'Intento confeso de extorsión y chantaje de calificación (TOS Sec 3.2)',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-8',
+        author: 'Paola Andrea V.',
+        rating: 2,
+        timeAgo: 'Hace 4 meses',
+        text: `Me equivoqué de local y entré pensando que era otro negocio. Muy enredada la dirección de ${name}.`,
+        contextFlag: 'off_topic',
+        detectedReason: 'Confusión del usuario ajena a la responsabilidad del establecimiento',
+        viability: 'ALTA',
+      },
     ];
   }
 
-  // General default fallback for any business category
-  return [
-    {
-      id: 'rev-neg-1',
-      author: 'Usuario anónimo de Google',
-      rating: 1,
-      timeAgo: 'Hace 3 semanas',
-      text: `Pésima atención y servicio deplorable. No recomiendo para nada a ${name}, me hicieron perder el tiempo y dinero. Una decepción absoluta.`,
-      contextFlag: 'fake_customer',
-      detectedReason: 'Sin registro en base de datos de clientes • Comentario genérico sin fácticos de compra',
-      viability: 'ALTA',
-    },
-    {
-      id: 'rev-neg-2',
-      author: 'Alejandro R.',
-      rating: 1,
-      timeAgo: 'Hace 1 mes',
-      text: `El negocio de enfrente ofrece exactamente los mismos servicios a mitad de precio y con mejor atención. No gasten su dinero en ${name}.`,
-      contextFlag: 'competitor',
-      detectedReason: 'Promoción a competidor directo del sector • Cláusula de Conflicto de Intereses (TOS Sec 4.1)',
-      viability: 'ALTA',
-    },
-    {
-      id: 'rev-neg-3',
-      author: 'Laura Marcela Q.',
-      rating: 2,
-      timeAgo: 'Hace 2 meses',
-      text: `La señorita de recepción fue sumamente grosera y prepotente cuando pedí información básica. Deberían cambiar a esa empleada de inmediato.`,
-      contextFlag: 'defamation',
-      detectedReason: 'Ataque personal a colaboradores • Directriz de Acoso y Difamación (TOS Sec 5.1)',
-      viability: 'ALTA',
-    },
-  ];
+  return pool.slice(0, targetCount);
 }
 
 function extractDataFromGoogleMapsHtml(html: string): {

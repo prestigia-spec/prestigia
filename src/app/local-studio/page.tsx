@@ -2446,7 +2446,11 @@ export default function LocalStudioPage() {
           console.warn('Could not auto-save appeal dossier:', saveErr);
         }
 
-        showToast(isEn ? '⚖️ Legal appeal dossier generated successfully!' : '⚖️ ¡Expediente de apelación legal generado con éxito!');
+        showToast(
+          isEn
+            ? `⚖️ 1 Credit deducted. Formal legal rescue dossier generated for ${review.author}!`
+            : `⚖️ 1 Crédito descontado. ¡Expediente de rescate/apelación generado para ${review.author}!`
+        );
       } else {
         showToast(resData.error || (isEn ? 'Error generating appeal' : 'Error al generar la apelación'));
       }
@@ -9436,77 +9440,136 @@ export default function LocalStudioPage() {
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-2.5">
-                      {appealReviewsList.map((rev) => {
-                        const isSelected = selectedAppealReview?.id === rev.id;
-                        return (
-                          <div
-                            key={rev.id}
-                            className={`p-3.5 rounded-2xl border transition space-y-2 ${
-                              isSelected
-                                ? 'bg-rose-950/30 border-rose-500/60 shadow-lg shadow-rose-950/30'
-                                : 'bg-slate-950 border-slate-800 hover:border-slate-700'
-                            }`}
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs font-black text-white">{rev.author}</span>
-                                  <span className="text-[10px] text-slate-400">{rev.timeAgo}</span>
-                                </div>
-                                <div className="flex items-center gap-0.5 mt-0.5 text-amber-400 text-xs">
-                                  {Array.from({ length: rev.rating }).map((_, i) => (
-                                    <span key={i}>★</span>
-                                  ))}
-                                  {Array.from({ length: 5 - rev.rating }).map((_, i) => (
-                                    <span key={i} className="text-slate-700">★</span>
-                                  ))}
-                                </div>
-                              </div>
-                              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-500/30 shrink-0">
-                                Viabilidad: {rev.viability}
-                              </span>
+                    <div className="space-y-3">
+                      {/* Resumen Ejecutivo de Reseñas Rescatables & Balance de Créditos */}
+                      <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-950/70 via-slate-950 to-indigo-950/50 border border-rose-500/40 space-y-3 shadow-lg">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 font-black text-xs shrink-0">
+                              ⚖️
                             </div>
-
-                            <p className="text-xs text-slate-300 italic line-clamp-3 bg-slate-900/60 p-2 rounded-xl border border-slate-800/80">
-                              «{rev.text}»
-                            </p>
-
-                            <div className="text-[10px] text-amber-400/90 font-mono">
-                              🔍 {rev.detectedReason}
+                            <div>
+                              <h4 className="font-black text-white text-xs">
+                                {isEn ? 'Rescuable Reviews Audit' : 'Auditoría de Reseñas Rescatables (1★ a 3★)'}
+                              </h4>
+                              <p className="text-[10px] text-slate-400">
+                                {isEn
+                                  ? `${appealReviewsList.length} critical reviews identified hurting profile rating`
+                                  : `${appealReviewsList.length} reseñas críticas identificadas que están devaluando la ficha`}
+                              </p>
                             </div>
-
-                            <button
-                              type="button"
-                              onClick={() => handleGenerateAppealForReview(rev)}
-                              disabled={
-                                isGeneratingAppeal ||
-                                !appealContactName.trim() ||
-                                !appealContactCompany.trim() ||
-                                !appealContactPhone.trim() ||
-                                !appealContactEmail.trim()
-                              }
-                              className={`w-full py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md ${
-                                isSelected
-                                  ? 'bg-rose-500 text-slate-950 hover:bg-rose-400'
-                                  : 'bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 hover:border-rose-500/50'
-                              } disabled:opacity-50`}
-                            >
-                              {isGeneratingAppeal && isSelected ? (
-                                <>
-                                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                                  <span>{isEn ? 'Drafting Legal Memo...' : 'Redactando Expediente...'}</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Scale className="w-3.5 h-3.5 text-amber-400" />
-                                  <span>{isEn ? 'Prepare Formal Appeal' : '⚖️ Preparar Apelación Formal'}</span>
-                                </>
-                              )}
-                            </button>
                           </div>
-                        );
-                      })}
+                          <span className="text-[10px] font-mono font-black px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 shrink-0">
+                            {appealReviewsList.length} {isEn ? 'Rescuable' : 'Rescatables'}
+                          </span>
+                        </div>
+
+                        {/* Desglose por estrellas */}
+                        <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                          <div className="p-2 rounded-xl bg-slate-900 border border-rose-500/30">
+                            <span className="text-[9.5px] text-slate-400 block">{isEn ? '1★ Critical' : '1★ Críticas'}</span>
+                            <strong className="text-rose-400 font-mono text-sm">
+                              {appealReviewsList.filter((r) => r.rating === 1).length}
+                            </strong>
+                          </div>
+                          <div className="p-2 rounded-xl bg-slate-900 border border-amber-500/30">
+                            <span className="text-[9.5px] text-slate-400 block">{isEn ? '2★ Negative' : '2★ Negativas'}</span>
+                            <strong className="text-amber-400 font-mono text-sm">
+                              {appealReviewsList.filter((r) => r.rating === 2).length}
+                            </strong>
+                          </div>
+                          <div className="p-2 rounded-xl bg-slate-900 border border-yellow-500/30">
+                            <span className="text-[9.5px] text-slate-400 block">{isEn ? '3★ Damaging' : '3★ Dañinas'}</span>
+                            <strong className="text-yellow-400 font-mono text-sm">
+                              {appealReviewsList.filter((r) => r.rating === 3).length}
+                            </strong>
+                          </div>
+                        </div>
+
+                        {/* Recordatorio de consumo de créditos */}
+                        <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between text-[11px]">
+                          <div className="flex items-center gap-1.5 text-amber-300 font-bold">
+                            <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <span>{isEn ? 'Each review you rescue/appeal consumes 1 Credit' : 'Cada reseña que decidas rescatar/apelar descuenta 1 Crédito'}</span>
+                          </div>
+                          <span className="text-[10px] font-mono text-amber-300 font-black bg-amber-950 px-2 py-0.5 rounded border border-amber-500/40 shrink-0">
+                            ⚡ 1 Crédito / Reseña
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2.5">
+                        {appealReviewsList.map((rev) => {
+                          const isSelected = selectedAppealReview?.id === rev.id;
+                          return (
+                            <div
+                              key={rev.id}
+                              className={`p-3.5 rounded-2xl border transition space-y-2 ${
+                                isSelected
+                                  ? 'bg-rose-950/30 border-rose-500/60 shadow-lg shadow-rose-950/30'
+                                  : 'bg-slate-950 border-slate-800 hover:border-slate-700'
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-2">
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs font-black text-white">{rev.author}</span>
+                                    <span className="text-[10px] text-slate-400">{rev.timeAgo}</span>
+                                  </div>
+                                  <div className="flex items-center gap-0.5 mt-0.5 text-amber-400 text-xs">
+                                    {Array.from({ length: rev.rating }).map((_, i) => (
+                                      <span key={i}>★</span>
+                                    ))}
+                                    {Array.from({ length: 5 - rev.rating }).map((_, i) => (
+                                      <span key={i} className="text-slate-700">★</span>
+                                    ))}
+                                  </div>
+                                </div>
+                                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-500/30 shrink-0">
+                                  Viabilidad: {rev.viability}
+                                </span>
+                              </div>
+
+                              <p className="text-xs text-slate-300 italic line-clamp-3 bg-slate-900/60 p-2 rounded-xl border border-slate-800/80">
+                                «{rev.text}»
+                              </p>
+
+                              <div className="text-[10px] text-amber-400/90 font-mono">
+                                🔍 {rev.detectedReason}
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => handleGenerateAppealForReview(rev)}
+                                disabled={
+                                  isGeneratingAppeal ||
+                                  !appealContactName.trim() ||
+                                  !appealContactCompany.trim() ||
+                                  !appealContactPhone.trim() ||
+                                  !appealContactEmail.trim()
+                                }
+                                className={`w-full py-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md ${
+                                  isSelected
+                                    ? 'bg-rose-500 text-slate-950 hover:bg-rose-400'
+                                    : 'bg-gradient-to-r from-rose-500 via-amber-500 to-amber-600 hover:from-rose-400 hover:to-amber-500 text-slate-950 shadow-rose-500/20 active:scale-98'
+                                } disabled:opacity-50`}
+                              >
+                                {isGeneratingAppeal && isSelected ? (
+                                  <>
+                                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                    <span>{isEn ? 'Drafting Legal Memo...' : 'Redactando Expediente...'}</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Scale className="w-3.5 h-3.5 text-slate-950" />
+                                    <span>{isEn ? '⚖️ Rescue Review (1 Credit) → Prepare Appeal' : '⚖️ Rescatar Esta Reseña (1 Crédito) → Preparar Apelación'}</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
