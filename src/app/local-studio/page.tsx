@@ -3095,7 +3095,7 @@ export default function LocalStudioPage() {
             !d.deletedByAdvisor
         );
 
-    // Deduplicación inteligente: si existen registros duplicados accidentales para el mismo cliente y modo, mostrar únicamente el más reciente
+    // Deduplicación inteligente: si existen registros duplicados accidentales para el mismo cliente y modo, fusionar preservando siempre todos los datos de contacto y negocio
     const map = new Map<string, StudioDossierRecord>();
     rawList.forEach((d) => {
       const key = `${d.advisorId}_${d.mode}_${d.clientName.trim().toLowerCase()}`;
@@ -3105,9 +3105,20 @@ export default function LocalStudioPage() {
       } else {
         const prevTime = new Date(prev.updatedAt || prev.createdAt).getTime();
         const currTime = new Date(d.updatedAt || d.createdAt).getTime();
-        if (currTime >= prevTime) {
-          map.set(key, d);
-        }
+        const newest = currTime >= prevTime ? d : prev;
+        const oldest = currTime >= prevTime ? prev : d;
+        const merged: StudioDossierRecord = {
+          ...oldest,
+          ...newest,
+          contactName: newest.contactName?.trim() || oldest.contactName?.trim() || '',
+          contactCompany: newest.contactCompany?.trim() || oldest.contactCompany?.trim() || '',
+          contactPhone: newest.contactPhone?.trim() || oldest.contactPhone?.trim() || '',
+          contactEmail: newest.contactEmail?.trim() || oldest.contactEmail?.trim() || '',
+          contactRole: newest.contactRole?.trim() || oldest.contactRole?.trim() || 'Dueño / Propietario',
+          neighborhood: newest.neighborhood?.trim() || oldest.neighborhood?.trim() || '',
+          data: newest.data && Object.keys(newest.data).length > 0 ? newest.data : oldest.data,
+        };
+        map.set(key, merged);
       }
     });
 
@@ -3245,9 +3256,20 @@ export default function LocalStudioPage() {
       } else {
         const prevTime = new Date(prev.updatedAt || prev.createdAt).getTime();
         const currTime = new Date(d.updatedAt || d.createdAt).getTime();
-        if (currTime >= prevTime) {
-          map.set(key, d);
-        }
+        const newest = currTime >= prevTime ? d : prev;
+        const oldest = currTime >= prevTime ? prev : d;
+        const merged: StudioDossierRecord = {
+          ...oldest,
+          ...newest,
+          contactName: newest.contactName?.trim() || oldest.contactName?.trim() || '',
+          contactCompany: newest.contactCompany?.trim() || oldest.contactCompany?.trim() || '',
+          contactPhone: newest.contactPhone?.trim() || oldest.contactPhone?.trim() || '',
+          contactEmail: newest.contactEmail?.trim() || oldest.contactEmail?.trim() || '',
+          contactRole: newest.contactRole?.trim() || oldest.contactRole?.trim() || 'Dueño / Propietario',
+          neighborhood: newest.neighborhood?.trim() || oldest.neighborhood?.trim() || '',
+          data: newest.data && Object.keys(newest.data).length > 0 ? newest.data : oldest.data,
+        };
+        map.set(key, merged);
       }
     });
 
@@ -3400,62 +3422,73 @@ export default function LocalStudioPage() {
 
   // Load a dossier from list into workspace
   const handleLoadDossier = (dossier: StudioDossierRecord) => {
+    const contactName = dossier.contactName || dossier.data?.contactName || '';
+    const contactCompany = dossier.contactCompany || dossier.data?.contactCompany || dossier.clientName || '';
+    const contactPhone = dossier.contactPhone || dossier.data?.contactPhone || '';
+    const contactEmail = dossier.contactEmail || dossier.data?.contactEmail || '';
+    const contactRole = dossier.contactRole || dossier.data?.contactRole || 'Dueño / Propietario';
+    const city = dossier.city || dossier.data?.city || 'Bogotá';
+    const neighborhood = dossier.neighborhood || dossier.data?.neighborhood || '';
+    const country = dossier.country || dossier.data?.country || 'Colombia';
+    const category = dossier.category || dossier.data?.category || categoryOptions[0];
+    const bizModel = (dossier.businessModel || dossier.data?.businessModel || 'storefront') as 'storefront' | 'service_area';
+
     if (dossier.mode === 'create') {
       setActiveCreateDossierId(dossier.id);
       setCreateBusinessName(dossier.clientName);
-      setCreateContactName(dossier.contactName || '');
-      setCreateContactCompany(dossier.contactCompany || '');
-      setCreateContactPhone(dossier.contactPhone || '');
-      setCreateContactEmail(dossier.contactEmail || '');
-      setCreateContactRole(dossier.contactRole || 'Dueño / Propietario');
-      setCreateCategory(dossier.category || categoryOptions[0]);
-      if (dossier.country) setCreateCountry(dossier.country);
-      setCreateCity(dossier.city || 'Bogotá');
-      setCreateNeighborhood(dossier.neighborhood || '');
-      if (dossier.businessModel) setCreateBusinessModel(dossier.businessModel);
+      setCreateContactName(contactName);
+      setCreateContactCompany(contactCompany);
+      setCreateContactPhone(contactPhone);
+      setCreateContactEmail(contactEmail);
+      setCreateContactRole(contactRole);
+      setCreateCategory(category);
+      setCreateCountry(country);
+      setCreateCity(city);
+      setCreateNeighborhood(neighborhood);
+      setCreateBusinessModel(bizModel);
       setCreateGeneratedData(dossier.data);
       setActiveTab('create');
     } else if (dossier.mode === 'audit') {
       setActiveAuditDossierId(dossier.id);
       setAuditBusinessName(dossier.clientName);
-      setAuditContactName(dossier.contactName || '');
-      setAuditContactCompany(dossier.contactCompany || '');
-      setAuditContactPhone(dossier.contactPhone || '');
-      setAuditContactEmail(dossier.contactEmail || '');
-      setAuditContactRole(dossier.contactRole || 'Dueño / Propietario');
-      setAuditCategory(dossier.category || categoryOptions[0]);
-      if (dossier.country) setAuditCountry(dossier.country);
-      setAuditCity(dossier.city || 'Bogotá');
-      setAuditNeighborhood(dossier.neighborhood || '');
+      setAuditContactName(contactName);
+      setAuditContactCompany(contactCompany);
+      setAuditContactPhone(contactPhone);
+      setAuditContactEmail(contactEmail);
+      setAuditContactRole(contactRole);
+      setAuditCategory(category);
+      setAuditCountry(country);
+      setAuditCity(city);
+      setAuditNeighborhood(neighborhood);
       setAuditGoogleUrl(dossier.googleUrl || '');
       setAuditGeneratedData(dossier.data);
       setActiveTab('audit');
     } else if (dossier.mode === 'rescue') {
       setActiveRescueDossierId(dossier.id);
       setRescueBusinessName(dossier.clientName);
-      setRescueContactName(dossier.contactName || '');
-      setRescueContactCompany(dossier.contactCompany || '');
-      setRescueContactPhone(dossier.contactPhone || '');
-      setRescueContactEmail(dossier.contactEmail || '');
-      setRescueContactRole(dossier.contactRole || 'Dueño / Propietario');
-      setRescueCategory(dossier.category || categoryOptions[0]);
-      if (dossier.country) setRescueCountry(dossier.country);
-      setRescueCity(dossier.city || 'Bogotá');
-      setRescueNeighborhood(dossier.neighborhood || '');
+      setRescueContactName(contactName);
+      setRescueContactCompany(contactCompany);
+      setRescueContactPhone(contactPhone);
+      setRescueContactEmail(contactEmail);
+      setRescueContactRole(contactRole);
+      setRescueCategory(category);
+      setRescueCountry(country);
+      setRescueCity(city);
+      setRescueNeighborhood(neighborhood);
       setActiveTab('rescue');
     } else if (dossier.mode === 'tools') {
       setActiveToolsDossierId(dossier.id);
       setToolsBusinessName(dossier.clientName);
-      if (dossier.category) setToolsCategory(dossier.category);
-      if (dossier.city) setToolsCity(dossier.city);
+      setToolsCategory(category);
+      setToolsCity(city);
       if (dossier.data?.placeData) setToolsScannedListing(dossier.data.placeData);
       setActiveTab('tools');
     } else if (dossier.mode === 'appeal') {
-      setAppealContactName(dossier.contactName || '');
-      setAppealContactCompany(dossier.contactCompany || '');
-      setAppealContactPhone(dossier.contactPhone || '');
-      setAppealContactEmail(dossier.contactEmail || '');
-      setAppealContactRole(dossier.contactRole || 'Dueño / Propietario');
+      setAppealContactName(contactName);
+      setAppealContactCompany(contactCompany);
+      setAppealContactPhone(contactPhone);
+      setAppealContactEmail(contactEmail);
+      setAppealContactRole(contactRole);
       setActiveAppealDossier(dossier.data);
       if (dossier.data?.authorName) {
         setSelectedAppealReview({
@@ -3471,6 +3504,11 @@ export default function LocalStudioPage() {
       }
       setActiveTab('appeals');
     }
+
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     showToast(`Expediente cargado: ${dossier.clientName}`);
   };
 
@@ -3562,11 +3600,18 @@ export default function LocalStudioPage() {
       const payload = {
         id: editingDossierClosing.id,
         clientName: editingDossierClosing.clientName,
+        contactName: editingDossierClosing.contactName,
+        contactCompany: editingDossierClosing.contactCompany,
+        contactPhone: editingDossierClosing.contactPhone,
+        contactEmail: editingDossierClosing.contactEmail,
+        contactRole: editingDossierClosing.contactRole,
         category: editingDossierClosing.category,
         city: closingFormCity.trim() || editingDossierClosing.city,
         neighborhood: closingFormNeighborhood.trim(),
         country: closingFormCountry.trim() || editingDossierClosing.country || 'Colombia',
         mode: editingDossierClosing.mode || closingFormMode,
+        businessModel: editingDossierClosing.businessModel,
+        data: editingDossierClosing.data,
         closingStatus: closingFormStatus,
         setupFeeChargedUsd: Number(closingFormSetupFee) || 0,
         monthlyPlanUsd: Number(closingFormMonthlyPlan) || 0,
@@ -4892,6 +4937,104 @@ export default function LocalStudioPage() {
                           <Printer className="w-3.5 h-3.5" />
                           <span>{t.downloadPdf}</span>
                         </button>
+                      </div>
+                    </div>
+
+                    {/* Ficha Ejecutiva de Identificación del Negocio y Cliente Contratante */}
+                    <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950/40 border-2 border-indigo-500/30 space-y-3.5 shadow-xl print-card-box">
+                      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                        <div className="flex items-center gap-3">
+                          <div className="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-black text-xl shrink-0 shadow-inner">
+                            🏢
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="text-base sm:text-lg font-black text-white tracking-tight">
+                                {createBusinessName || 'Negocio Registrado'}
+                              </h3>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                                {createBusinessModel === 'service_area' ? (isEn ? 'Service Area (SAB)' : 'Servicio a Domicilio') : (isEn ? 'Storefront' : 'Local Físico')}
+                              </span>
+                            </div>
+                            <p className="text-xs text-slate-300 flex items-center gap-1.5 mt-0.5 font-medium">
+                              <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                              <span>{createCity || 'Bogotá'}{createNeighborhood ? ` • ${createNeighborhood}` : ''} ({createCountry || 'Colombia'})</span>
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="text-left sm:text-right">
+                          <span className="text-[9px] uppercase font-mono font-bold tracking-wider text-slate-400 block">
+                            {isEn ? 'Official Category:' : 'Categoría Oficial:'}
+                          </span>
+                          <span className="text-xs font-bold text-amber-300">
+                            {createCategory}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Metadatos del Cliente Contratante */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 text-xs pt-0.5">
+                        <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-0.5">
+                          <span className="text-[9.5px] uppercase font-bold text-slate-400 block tracking-wider">
+                            {isEn ? '👤 Contact Person' : '👤 Persona de Contacto'}
+                          </span>
+                          <strong className="text-xs font-black text-white block truncate">
+                            {createContactName || 'No especificado'}
+                          </strong>
+                          <span className="text-[10px] text-indigo-300 block truncate">
+                            {createContactRole || 'Dueño / Propietario'}
+                          </span>
+                        </div>
+
+                        <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-0.5">
+                          <span className="text-[9.5px] uppercase font-bold text-slate-400 block tracking-wider">
+                            {isEn ? '🏢 Contracting Company' : '🏢 Empresa Contratante'}
+                          </span>
+                          <strong className="text-xs font-black text-white block truncate">
+                            {createContactCompany || createBusinessName || 'No especificada'}
+                          </strong>
+                          <span className="text-[10px] text-slate-400 block truncate">
+                            {isEn ? 'Billing Entity' : 'Razón Social'}
+                          </span>
+                        </div>
+
+                        <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-0.5">
+                          <span className="text-[9.5px] uppercase font-bold text-slate-400 block tracking-wider">
+                            {isEn ? '📱 Direct WhatsApp' : '📱 WhatsApp Directo'}
+                          </span>
+                          {createContactPhone ? (
+                            <a
+                              href={`https://wa.me/${createContactPhone.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs font-black text-emerald-400 hover:text-emerald-300 flex items-center gap-1 truncate"
+                            >
+                              <span>{createContactPhone}</span>
+                              <ExternalLink className="w-2.5 h-2.5 shrink-0 opacity-70" />
+                            </a>
+                          ) : (
+                            <span className="text-xs text-slate-500 font-bold">Sin registrar</span>
+                          )}
+                          <span className="text-[10px] text-slate-400 block">Canal directo</span>
+                        </div>
+
+                        <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-0.5">
+                          <span className="text-[9.5px] uppercase font-bold text-slate-400 block tracking-wider">
+                            {isEn ? '✉️ Client Email' : '✉️ Correo Electrónico'}
+                          </span>
+                          {createContactEmail ? (
+                            <a
+                              href={`mailto:${createContactEmail}`}
+                              className="text-xs font-black text-indigo-300 hover:text-indigo-200 block truncate"
+                            >
+                              {createContactEmail}
+                            </a>
+                          ) : (
+                            <span className="text-xs text-slate-500 font-bold">Sin registrar</span>
+                          )}
+                          <span className="text-[10px] text-slate-400 block">Notificaciones</span>
+                        </div>
                       </div>
                     </div>
 
@@ -6282,6 +6425,104 @@ export default function LocalStudioPage() {
                 {/* State 3: Generated Forensic Audit Results */}
                 {auditGeneratedData?.healthScore && !isScanningAudit && !isGeneratingAudit && (
                   <div className="space-y-4 animate-in fade-in duration-300">
+                    {/* Ficha Ejecutiva de Identificación del Negocio y Cliente Contratante (Auditoría Forense) */}
+                    <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-amber-950/20 border-2 border-amber-500/30 space-y-3.5 shadow-xl print-card-box">
+                      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                        <div className="flex items-center gap-3">
+                          <div className="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-black text-xl shrink-0 shadow-inner">
+                            🔬
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="text-base sm:text-lg font-black text-white tracking-tight">
+                                {auditBusinessName || 'Negocio Auditado'}
+                              </h3>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-500/40">
+                                {isEn ? 'Forensic Top 3 Audit' : 'Auditoría Forense Top 3'}
+                              </span>
+                            </div>
+                            <p className="text-xs text-slate-300 flex items-center gap-1.5 mt-0.5 font-medium">
+                              <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                              <span>{auditCity || 'Bogotá'}{auditNeighborhood ? ` • ${auditNeighborhood}` : ''} ({auditCountry || 'Colombia'})</span>
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="text-left sm:text-right">
+                          <span className="text-[9px] uppercase font-mono font-bold tracking-wider text-slate-400 block">
+                            {isEn ? 'Category Analyzed:' : 'Categoría Analizada:'}
+                          </span>
+                          <span className="text-xs font-bold text-amber-300">
+                            {auditCategory}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Metadatos del Cliente Contratante */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 text-xs pt-0.5">
+                        <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-0.5">
+                          <span className="text-[9.5px] uppercase font-bold text-slate-400 block tracking-wider">
+                            {isEn ? '👤 Contact Person' : '👤 Persona de Contacto'}
+                          </span>
+                          <strong className="text-xs font-black text-white block truncate">
+                            {auditContactName || 'No especificado'}
+                          </strong>
+                          <span className="text-[10px] text-indigo-300 block truncate">
+                            {auditContactRole || 'Dueño / Propietario'}
+                          </span>
+                        </div>
+
+                        <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-0.5">
+                          <span className="text-[9.5px] uppercase font-bold text-slate-400 block tracking-wider">
+                            {isEn ? '🏢 Contracting Company' : '🏢 Empresa Contratante'}
+                          </span>
+                          <strong className="text-xs font-black text-white block truncate">
+                            {auditContactCompany || auditBusinessName || 'No especificada'}
+                          </strong>
+                          <span className="text-[10px] text-slate-400 block truncate">
+                            {isEn ? 'Billing Entity' : 'Razón Social'}
+                          </span>
+                        </div>
+
+                        <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-0.5">
+                          <span className="text-[9.5px] uppercase font-bold text-slate-400 block tracking-wider">
+                            {isEn ? '📱 Direct WhatsApp' : '📱 WhatsApp Directo'}
+                          </span>
+                          {auditContactPhone ? (
+                            <a
+                              href={`https://wa.me/${auditContactPhone.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs font-black text-emerald-400 hover:text-emerald-300 flex items-center gap-1 truncate"
+                            >
+                              <span>{auditContactPhone}</span>
+                              <ExternalLink className="w-2.5 h-2.5 shrink-0 opacity-70" />
+                            </a>
+                          ) : (
+                            <span className="text-xs text-slate-500 font-bold">Sin registrar</span>
+                          )}
+                          <span className="text-[10px] text-slate-400 block">Canal directo</span>
+                        </div>
+
+                        <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-0.5">
+                          <span className="text-[9.5px] uppercase font-bold text-slate-400 block tracking-wider">
+                            {isEn ? '✉️ Client Email' : '✉️ Correo Electrónico'}
+                          </span>
+                          {auditContactEmail ? (
+                            <a
+                              href={`mailto:${auditContactEmail}`}
+                              className="text-xs font-black text-indigo-300 hover:text-indigo-200 block truncate"
+                            >
+                              {auditContactEmail}
+                            </a>
+                          ) : (
+                            <span className="text-xs text-slate-500 font-bold">Sin registrar</span>
+                          )}
+                          <span className="text-[10px] text-slate-400 block">Notificaciones</span>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Score Bar & Action Header */}
                     <div className="p-5 sm:p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-4 shadow-xl print-card-box">
                       {/* Top Row: Section Label + Action Buttons */}
