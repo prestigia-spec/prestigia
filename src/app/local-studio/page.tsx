@@ -1547,6 +1547,7 @@ export default function LocalStudioPage() {
   const [rescueNeighborhood, setRescueNeighborhood] = useState<string>('');
   const [rescueScenario, setRescueScenario] = useState<'orphan' | 'third_party' | 'rejected'>('third_party');
   const [rescueMaskedEmail, setRescueMaskedEmail] = useState('');
+  const [activeRescueDossierId, setActiveRescueDossierId] = useState<string | null>(null);
 
   // -------------------------------------------------------------
   // TAB 4: APELACIÓN Y RESCATE LEGAL DE RESEÑAS 1-3★ DEDICATED STATE
@@ -1588,6 +1589,7 @@ export default function LocalStudioPage() {
   const [toolsCity, setToolsCity] = useState('');
   const [toolsExistingRating, setToolsExistingRating] = useState<number>(4.2);
   const [toolsExistingReviews, setToolsExistingReviews] = useState<number>(0);
+  const [activeToolsDossierId, setActiveToolsDossierId] = useState<string | null>(null);
   const [geoGridKeyword, setGeoGridKeyword] = useState('');
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [geoGridRadius, setGeoGridRadius] = useState<'1km' | '3km' | '5km'>('3km');
@@ -2151,6 +2153,7 @@ export default function LocalStudioPage() {
     setRescueCategory(categoryOptions[0] || CATEGORY_OPTIONS[0]);
     setRescueScenario('third_party');
     setRescueMaskedEmail('');
+    setActiveRescueDossierId(null);
     showToast(isEn ? '✨ Ready to run a new rescue' : '✨ Formulario listo para un nuevo rescate');
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2686,6 +2689,12 @@ export default function LocalStudioPage() {
     setIsRescueScanning(true);
     showToast(isEn ? '🔍 Querying Google Maps API in real-time...' : '🔍 Reconociendo ficha con la API de Google Maps en vivo...');
 
+    let extractedName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
+    let matchedCategory = rescueCategory;
+    let parsedCity = rescueCity;
+    let parsedNeighborhood = rescueNeighborhood;
+    let placeData: GooglePlaceData | null = null;
+
     try {
       const res = await fetch('/api/auditor/google-lookup', {
         method: 'POST',
@@ -2696,9 +2705,10 @@ export default function LocalStudioPage() {
 
       if (data?.success && data?.data) {
         const place: GooglePlaceData = data.data;
+        placeData = place;
         setRescueScannedListing(place);
 
-        const extractedName = place.name || rawInput;
+        extractedName = place.name || rawInput;
         setRescueBusinessName(extractedName);
         if (place.phone && !rescueContactPhone) {
           setRescueContactPhone(place.phone);
@@ -2707,11 +2717,17 @@ export default function LocalStudioPage() {
         if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
           const parsedGeo = parseAddressGeo(place.address, rescueCountry, rescueCity, rescueNeighborhood);
           if (parsedGeo.country) setRescueCountry(parsedGeo.country);
-          if (parsedGeo.city) setRescueCity(parsedGeo.city);
-          if (parsedGeo.neighborhood) setRescueNeighborhood(parsedGeo.neighborhood);
+          if (parsedGeo.city) {
+            parsedCity = parsedGeo.city;
+            setRescueCity(parsedGeo.city);
+          }
+          if (parsedGeo.neighborhood) {
+            parsedNeighborhood = parsedGeo.neighborhood;
+            setRescueNeighborhood(parsedGeo.neighborhood);
+          }
         }
 
-        const matchedCategory = mapDetectedCategoryToPrestigia(
+        matchedCategory = mapDetectedCategoryToPrestigia(
           place.category || '',
           place.detectedCategories || [],
           isEn
@@ -2725,8 +2741,52 @@ export default function LocalStudioPage() {
         );
       } else {
         const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
+        extractedName = fallbackName;
         setRescueBusinessName(fallbackName);
         showToast(isEn ? `✓ Listing set to "${fallbackName}". Rescue protocol ready!` : `✓ Ficha asignada a "${fallbackName}". ¡Protocolo de rescate listo!`);
+      }
+
+      // Descontar exactamente 1 crédito en la sesión en vivo
+      setMonthlyUsage((prev) => ({ ...prev, rescues: (prev.rescues || 0) + 1 }));
+
+      try {
+        const rescueRes = await fetch('/api/local-studio/dossiers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: activeRescueDossierId || undefined,
+            advisorId: currentUser?.id || (isLuismaMaster ? 'adv-luisma' : 'adv-anon'),
+            advisorName: currentUser?.name || 'Luisma • Director General & Founder',
+            advisorPhone: currentUser?.phone || '+573058314049',
+            advisorType: currentUser?.accountType || 'founder',
+            country: rescueCountry || 'Colombia',
+            clientName: extractedName,
+            contactName: rescueContactName,
+            contactCompany: rescueContactCompany || extractedName,
+            contactPhone: rescueContactPhone,
+            contactEmail: rescueContactEmail,
+            contactRole: rescueContactRole,
+            category: matchedCategory,
+            city: parsedCity,
+            neighborhood: rescueNeighborhood,
+            googleUrl: (placeData as any)?.googleMapsUrl || (rawInput.startsWith('http') ? rawInput : ''),
+            mode: 'rescue',
+            closingStatus: 'lead_draft',
+            setupFeeChargedUsd: 150,
+            data: {
+              placeData,
+              scenario: rescueScenario,
+              scannedAt: new Date().toISOString(),
+            },
+          }),
+        });
+        const rescueData = await rescueRes.json();
+        if (rescueData?.dossier?.id) {
+          setActiveRescueDossierId(rescueData.dossier.id);
+        }
+        fetchDossiers();
+      } catch (saveErr) {
+        console.warn('Auto-save rescue dossier error:', saveErr);
       }
     } catch (err: any) {
       console.error('Rescue scan error:', err);
@@ -2819,10 +2879,11 @@ export default function LocalStudioPage() {
 
       // Guardar expediente del escaneo para trazabilidad y contabilidad de créditos
       try {
-        await fetch('/api/local-studio/dossiers', {
+        const toolsRes = await fetch('/api/local-studio/dossiers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            id: activeToolsDossierId || undefined,
             advisorId: currentUser?.id || (isLuismaMaster ? 'adv-luisma' : 'adv-anon'),
             advisorName: currentUser?.name || 'Luisma • Director General & Founder',
             advisorPhone: currentUser?.phone || '+573058314049',
@@ -2841,6 +2902,10 @@ export default function LocalStudioPage() {
             },
           }),
         });
+        const toolsData = await toolsRes.json();
+        if (toolsData?.dossier?.id) {
+          setActiveToolsDossierId(toolsData.dossier.id);
+        }
         fetchDossiers();
       } catch (saveErr) {
         console.warn('Auto-save tools dossier error:', saveErr);
@@ -3366,6 +3431,7 @@ export default function LocalStudioPage() {
       setAuditGeneratedData(dossier.data);
       setActiveTab('audit');
     } else if (dossier.mode === 'rescue') {
+      setActiveRescueDossierId(dossier.id);
       setRescueBusinessName(dossier.clientName);
       setRescueContactName(dossier.contactName || '');
       setRescueContactCompany(dossier.contactCompany || '');
@@ -3377,6 +3443,13 @@ export default function LocalStudioPage() {
       setRescueCity(dossier.city || 'Bogotá');
       setRescueNeighborhood(dossier.neighborhood || '');
       setActiveTab('rescue');
+    } else if (dossier.mode === 'tools') {
+      setActiveToolsDossierId(dossier.id);
+      setToolsBusinessName(dossier.clientName);
+      if (dossier.category) setToolsCategory(dossier.category);
+      if (dossier.city) setToolsCity(dossier.city);
+      if (dossier.data?.placeData) setToolsScannedListing(dossier.data.placeData);
+      setActiveTab('tools');
     } else if (dossier.mode === 'appeal') {
       setAppealContactName(dossier.contactName || '');
       setAppealContactCompany(dossier.contactCompany || '');
