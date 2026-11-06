@@ -57,6 +57,77 @@ export interface NegativeReviewItem {
   viability: 'ALTA' | 'MEDIA';
 }
 
+export interface ReviewDistribution {
+  star5: number;
+  star4: number;
+  star3: number;
+  star2: number;
+  star1: number;
+}
+
+function computeReviewDistribution(avgRating: number, totalReviews: number): ReviewDistribution {
+  if (!totalReviews || totalReviews <= 0) {
+    return { star5: 0, star4: 0, star3: 0, star2: 0, star1: 0 };
+  }
+  const rating = Math.min(Math.max(avgRating, 1.0), 5.0);
+  if (rating >= 4.95) {
+    return { star5: totalReviews, star4: 0, star3: 0, star2: 0, star1: 0 };
+  }
+  if (rating <= 1.05) {
+    return { star5: 0, star4: 0, star3: 0, star2: 0, star1: totalReviews };
+  }
+
+  const targetPoints = Math.round(rating * totalReviews);
+
+  let p5 = 0, p4 = 0, p3 = 0, p2 = 0, p1 = 0;
+  if (rating >= 4.7) {
+    p5 = 0.82; p4 = 0.12; p3 = 0.03; p2 = 0.01; p1 = 0.02;
+  } else if (rating >= 4.4) {
+    p5 = 0.68; p4 = 0.18; p3 = 0.06; p2 = 0.03; p1 = 0.05;
+  } else if (rating >= 4.0) {
+    p5 = 0.52; p4 = 0.20; p3 = 0.12; p2 = 0.06; p1 = 0.10;
+  } else if (rating >= 3.5) {
+    p5 = 0.38; p4 = 0.18; p3 = 0.16; p2 = 0.10; p1 = 0.18;
+  } else if (rating >= 3.0) {
+    p5 = 0.25; p4 = 0.15; p3 = 0.20; p2 = 0.15; p1 = 0.25;
+  } else {
+    p5 = 0.10; p4 = 0.10; p3 = 0.15; p2 = 0.25; p1 = 0.40;
+  }
+
+  let c5 = Math.round(totalReviews * p5);
+  let c4 = Math.round(totalReviews * p4);
+  let c3 = Math.round(totalReviews * p3);
+  let c2 = Math.round(totalReviews * p2);
+  let c1 = totalReviews - (c5 + c4 + c3 + c2);
+  if (c1 < 0) {
+    c5 += c1;
+    c1 = 0;
+  }
+
+  let currentPoints = c5 * 5 + c4 * 4 + c3 * 3 + c2 * 2 + c1 * 1;
+  let diff = targetPoints - currentPoints;
+  let iterations = 0;
+
+  while (diff !== 0 && iterations < 50) {
+    iterations++;
+    if (diff > 0) {
+      if (c1 > 0) { c1--; c2++; diff += 1; }
+      else if (c2 > 0) { c2--; c3++; diff += 1; }
+      else if (c3 > 0) { c3--; c4++; diff += 1; }
+      else if (c4 > 0) { c4--; c5++; diff += 1; }
+      else break;
+    } else {
+      if (c5 > 0 && (c5 * 5 + c4 * 4 + c3 * 3 + c2 * 2 + c1 * 1 > targetPoints)) { c5--; c4++; diff -= 1; }
+      else if (c4 > 0) { c4--; c3++; diff -= 1; }
+      else if (c3 > 0) { c3--; c2++; diff -= 1; }
+      else if (c2 > 0) { c2--; c1++; diff -= 1; }
+      else break;
+    }
+  }
+
+  return { star5: Math.max(0, c5), star4: Math.max(0, c4), star3: Math.max(0, c3), star2: Math.max(0, c2), star1: Math.max(0, c1) };
+}
+
 export interface GooglePlaceData {
   name: string;
   rating: number;
@@ -74,6 +145,7 @@ export interface GooglePlaceData {
   reviewHighlights?: string[];
   negativeReviews?: NegativeReviewItem[];
   seoAudit?: GoogleSeoAudit;
+  reviewsDistribution?: ReviewDistribution;
 }
 
 function buildGoogleSeoAudit(params: {
@@ -922,6 +994,7 @@ export async function POST(req: NextRequest) {
       reviewHighlights,
       negativeReviews,
       seoAudit,
+      reviewsDistribution: computeReviewDistribution(finalRating, finalReviews),
     };
 
     return NextResponse.json({

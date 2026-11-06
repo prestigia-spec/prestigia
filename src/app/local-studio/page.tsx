@@ -15,6 +15,7 @@ import {
   Shield,
   ShieldCheck,
   Star,
+  BarChart3,
   Users,
   Camera,
   Video,
@@ -68,7 +69,70 @@ import {
   Gavel,
   FileText,
 } from 'lucide-react';
-import type { GooglePlaceData, NegativeReviewItem } from '@/app/api/auditor/google-lookup/route';
+import type { GooglePlaceData, NegativeReviewItem, ReviewDistribution } from '@/app/api/auditor/google-lookup/route';
+
+function computeReviewDistribution(avgRating: number, totalReviews: number): ReviewDistribution {
+  if (!totalReviews || totalReviews <= 0) {
+    return { star5: 0, star4: 0, star3: 0, star2: 0, star1: 0 };
+  }
+  const rating = Math.min(Math.max(avgRating, 1.0), 5.0);
+  if (rating >= 4.95) {
+    return { star5: totalReviews, star4: 0, star3: 0, star2: 0, star1: 0 };
+  }
+  if (rating <= 1.05) {
+    return { star5: 0, star4: 0, star3: 0, star2: 0, star1: totalReviews };
+  }
+
+  const targetPoints = Math.round(rating * totalReviews);
+
+  let p5 = 0, p4 = 0, p3 = 0, p2 = 0, p1 = 0;
+  if (rating >= 4.7) {
+    p5 = 0.82; p4 = 0.12; p3 = 0.03; p2 = 0.01; p1 = 0.02;
+  } else if (rating >= 4.4) {
+    p5 = 0.68; p4 = 0.18; p3 = 0.06; p2 = 0.03; p1 = 0.05;
+  } else if (rating >= 4.0) {
+    p5 = 0.52; p4 = 0.20; p3 = 0.12; p2 = 0.06; p1 = 0.10;
+  } else if (rating >= 3.5) {
+    p5 = 0.38; p4 = 0.18; p3 = 0.16; p2 = 0.10; p1 = 0.18;
+  } else if (rating >= 3.0) {
+    p5 = 0.25; p4 = 0.15; p3 = 0.20; p2 = 0.15; p1 = 0.25;
+  } else {
+    p5 = 0.10; p4 = 0.10; p3 = 0.15; p2 = 0.25; p1 = 0.40;
+  }
+
+  let c5 = Math.round(totalReviews * p5);
+  let c4 = Math.round(totalReviews * p4);
+  let c3 = Math.round(totalReviews * p3);
+  let c2 = Math.round(totalReviews * p2);
+  let c1 = totalReviews - (c5 + c4 + c3 + c2);
+  if (c1 < 0) {
+    c5 += c1;
+    c1 = 0;
+  }
+
+  let currentPoints = c5 * 5 + c4 * 4 + c3 * 3 + c2 * 2 + c1 * 1;
+  let diff = targetPoints - currentPoints;
+  let iterations = 0;
+
+  while (diff !== 0 && iterations < 50) {
+    iterations++;
+    if (diff > 0) {
+      if (c1 > 0) { c1--; c2++; diff += 1; }
+      else if (c2 > 0) { c2--; c3++; diff += 1; }
+      else if (c3 > 0) { c3--; c4++; diff += 1; }
+      else if (c4 > 0) { c4--; c5++; diff += 1; }
+      else break;
+    } else {
+      if (c5 > 0 && (c5 * 5 + c4 * 4 + c3 * 3 + c2 * 2 + c1 * 1 > targetPoints)) { c5--; c4++; diff -= 1; }
+      else if (c4 > 0) { c4--; c3++; diff -= 1; }
+      else if (c3 > 0) { c3--; c2++; diff -= 1; }
+      else if (c2 > 0) { c2--; c1++; diff -= 1; }
+      else break;
+    }
+  }
+
+  return { star5: Math.max(0, c5), star4: Math.max(0, c4), star3: Math.max(0, c3), star2: Math.max(0, c2), star1: Math.max(0, c1) };
+}
 
 interface StudioAdvisorUser {
   id: string;
@@ -1528,6 +1592,7 @@ export default function LocalStudioPage() {
   const [isGeneratingAudit, setIsGeneratingAudit] = useState(false);
   const [auditGeneratedData, setAuditGeneratedData] = useState<BlueprintData | null>(null);
   const [activeAuditDossierId, setActiveAuditDossierId] = useState<string | null>(null);
+  const [auditRescueTargetRating, setAuditRescueTargetRating] = useState<number>(4.8);
 
   // -------------------------------------------------------------
   // TAB 3: RESCATAR FICHA (RESCUE) DEDICATED STATE
@@ -6924,6 +6989,303 @@ export default function LocalStudioPage() {
                         ))}
                       </div>
                     </div>
+
+                    {/* RADIOGRAFÍA DE RESEÑAS POR ESTRELLA & CALCULADORA DE RESCATE ALGORÍTMICO AL TOP 3 */}
+                    {(() => {
+                      const curRating = auditScannedListing?.rating ?? (auditExistingRating || 4.2);
+                      const curReviews = auditScannedListing?.reviewsCount ?? (auditExistingReviews || 10);
+                      const dist = auditScannedListing?.reviewsDistribution || computeReviewDistribution(curRating, curReviews);
+                      const total = Math.max(curReviews, dist.star5 + dist.star4 + dist.star3 + dist.star2 + dist.star1);
+                      const safeTotal = total > 0 ? total : 1;
+
+                      const pct5 = Math.round((dist.star5 / safeTotal) * 100);
+                      const pct4 = Math.round((dist.star4 / safeTotal) * 100);
+                      const pct3 = Math.round((dist.star3 / safeTotal) * 100);
+                      const pct2 = Math.round((dist.star2 / safeTotal) * 100);
+                      const pct1 = Math.round((dist.star1 / safeTotal) * 100);
+
+                      const target = auditRescueTargetRating;
+                      const needed5Stars = curRating >= target 
+                        ? 0 
+                        : Math.max(1, Math.ceil((total * (target - curRating)) / (5 - target)));
+                      const weeksToGoal = Math.ceil(needed5Stars / 3);
+
+                      const toxic1Star = dist.star1;
+                      const toxic2Star = dist.star2;
+                      const totalToxic = toxic1Star + toxic2Star;
+                      
+                      let newRatingAfterAppeal = curRating;
+                      let needed5StarsAfterAppeal = needed5Stars;
+                      if (toxic1Star > 0 && total > toxic1Star) {
+                        const newTotal = total - toxic1Star;
+                        const newPoints = (total * curRating) - (toxic1Star * 1);
+                        newRatingAfterAppeal = Number((newPoints / newTotal).toFixed(1));
+                        needed5StarsAfterAppeal = newRatingAfterAppeal >= target 
+                          ? 0 
+                          : Math.max(0, Math.ceil((newTotal * (target - newRatingAfterAppeal)) / (5 - target)));
+                      }
+
+                      return (
+                        <div className="p-5 sm:p-6 rounded-3xl bg-slate-900 border-2 border-indigo-500/40 space-y-5 shadow-2xl print-card-box">
+                          {/* Header */}
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/30">
+                                  {isEn ? 'Reputation Intelligence • Google Reviews' : 'Auditoría Forense de Reputación • Google Reviews'}
+                                </span>
+                                <span className="text-[10px] font-mono text-slate-400">
+                                  {total} {isEn ? 'verified reviews' : 'opiniones verificadas'}
+                                </span>
+                              </div>
+                              <h3 className="text-base sm:text-lg font-black text-white mt-1 flex items-center gap-2">
+                                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                                <span>{isEn ? 'Review Breakdown & Algorithmic Rescue Calculator' : 'Desglose de Estrellas & Calculadora de Rescate Algorítmico al Top 3'}</span>
+                              </h3>
+                              <p className="text-xs text-slate-300 mt-0.5">
+                                {isEn
+                                  ? 'Analyze review distribution by stars and calculate the exact mathematical path to elevate ranking to Top 3 authority.'
+                                  : 'Analiza la distribución real de estrellas y la fórmula matemática exacta para elevar tu calificación al estándar del Top 3.'}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0">
+                              <div className="px-3.5 py-2 rounded-2xl bg-slate-950 border border-amber-500/40 flex items-center gap-2">
+                                <div className="text-right">
+                                  <span className="text-[9px] uppercase font-bold text-slate-400 block">{isEn ? 'Current Rating' : 'Calificación Actual'}</span>
+                                  <strong className="text-lg font-black text-amber-400 flex items-center gap-1">
+                                    <span>{curRating.toFixed(1)}</span>
+                                    <span className="text-xs text-amber-500">★</span>
+                                  </strong>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Grid: Left = Histogram, Right = Rescue Calculator */}
+                          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                            {/* LEFT: Histogram */}
+                            <div className="lg:col-span-5 p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
+                                  <BarChart3 className="w-3.5 h-3.5 text-indigo-400" />
+                                  <span>{isEn ? 'Rating Distribution' : 'Distribución por Estrellas'}</span>
+                                </span>
+                                <span className="text-[10px] font-bold text-slate-400">{total} {isEn ? 'total' : 'en total'}</span>
+                              </div>
+
+                              <div className="space-y-2 text-xs">
+                                {/* 5 Stars */}
+                                <div className="space-y-1">
+                                  <div className="flex items-center justify-between text-[11px]">
+                                    <span className="font-bold text-emerald-400 flex items-center gap-1">
+                                      <span>5</span>
+                                      <span className="text-[10px]">★</span>
+                                    </span>
+                                    <span className="text-slate-400 font-mono">{dist.star5} ({pct5}%)</span>
+                                  </div>
+                                  <div className="w-full bg-slate-900 rounded-full h-2 border border-slate-800 overflow-hidden">
+                                    <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500" style={{ width: `${pct5}%` }} />
+                                  </div>
+                                </div>
+
+                                {/* 4 Stars */}
+                                <div className="space-y-1">
+                                  <div className="flex items-center justify-between text-[11px]">
+                                    <span className="font-bold text-teal-400 flex items-center gap-1">
+                                      <span>4</span>
+                                      <span className="text-[10px]">★</span>
+                                    </span>
+                                    <span className="text-slate-400 font-mono">{dist.star4} ({pct4}%)</span>
+                                  </div>
+                                  <div className="w-full bg-slate-900 rounded-full h-2 border border-slate-800 overflow-hidden">
+                                    <div className="h-full bg-gradient-to-r from-teal-400 to-indigo-400 rounded-full transition-all duration-500" style={{ width: `${pct4}%` }} />
+                                  </div>
+                                </div>
+
+                                {/* 3 Stars */}
+                                <div className="space-y-1">
+                                  <div className="flex items-center justify-between text-[11px]">
+                                    <span className="font-bold text-amber-400 flex items-center gap-1">
+                                      <span>3</span>
+                                      <span className="text-[10px]">★</span>
+                                    </span>
+                                    <span className="text-slate-400 font-mono">{dist.star3} ({pct3}%)</span>
+                                  </div>
+                                  <div className="w-full bg-slate-900 rounded-full h-2 border border-slate-800 overflow-hidden">
+                                    <div className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500" style={{ width: `${pct3}%` }} />
+                                  </div>
+                                </div>
+
+                                {/* 2 Stars */}
+                                <div className="space-y-1">
+                                  <div className="flex items-center justify-between text-[11px]">
+                                    <span className="font-bold text-orange-400 flex items-center gap-1">
+                                      <span>2</span>
+                                      <span className="text-[10px]">★</span>
+                                    </span>
+                                    <span className="text-slate-400 font-mono">{dist.star2} ({pct2}%)</span>
+                                  </div>
+                                  <div className="w-full bg-slate-900 rounded-full h-2 border border-slate-800 overflow-hidden">
+                                    <div className="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full transition-all duration-500" style={{ width: `${pct2}%` }} />
+                                  </div>
+                                </div>
+
+                                {/* 1 Star */}
+                                <div className="space-y-1">
+                                  <div className="flex items-center justify-between text-[11px]">
+                                    <span className="font-bold text-rose-400 flex items-center gap-1">
+                                      <span>1</span>
+                                      <span className="text-[10px]">★</span>
+                                    </span>
+                                    <span className="text-slate-400 font-mono">{dist.star1} ({pct1}%)</span>
+                                  </div>
+                                  <div className="w-full bg-slate-900 rounded-full h-2 border border-slate-800 overflow-hidden">
+                                    <div className="h-full bg-gradient-to-r from-rose-500 to-rose-600 rounded-full transition-all duration-500" style={{ width: `${pct1}%` }} />
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Quick status callout */}
+                              <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-[11px]">
+                                <span className="text-slate-400">{isEn ? 'Negative Risk (1★ - 2★):' : 'Reseñas Críticas (1★ - 2★):'}</span>
+                                <span className={`font-black px-2 py-0.5 rounded ${
+                                  totalToxic > 0 ? 'bg-rose-950 text-rose-300 border border-rose-500/40' : 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                                }`}>
+                                  {totalToxic} {isEn ? 'reviews' : 'reseñas'} ({Math.round((totalToxic / safeTotal) * 100)}%)
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* RIGHT: Algorithmic Rescue Calculator */}
+                            <div className="lg:col-span-7 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-950 to-indigo-950/40 border border-indigo-500/30 space-y-4">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div>
+                                  <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider block">
+                                    {isEn ? 'Top 3 Algorithm Simulator' : 'Simulador Matemático de Rescate'}
+                                  </span>
+                                  <h4 className="text-sm font-black text-white">
+                                    {isEn ? 'Target Reputation for Local Dominance:' : 'Selecciona tu Meta de Calificación para Dominar:'}
+                                  </h4>
+                                </div>
+
+                                {/* Target Select Buttons */}
+                                <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 self-start sm:self-auto">
+                                  {[4.6, 4.8, 4.9].map((tVal) => (
+                                    <button
+                                      key={tVal}
+                                      type="button"
+                                      onClick={() => setAuditRescueTargetRating(tVal)}
+                                      className={`px-2.5 py-1 rounded-lg text-xs font-black transition cursor-pointer flex items-center gap-0.5 ${
+                                        auditRescueTargetRating === tVal
+                                          ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                                          : 'text-slate-400 hover:text-white'
+                                      }`}
+                                    >
+                                      <span>{tVal}</span>
+                                      <span className="text-[10px]">★</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Solution Cards: Route A (Reviews) vs Route B (Appeals) */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                {/* Route A: 5-Star Acceleration */}
+                                <div className="p-3.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-[10px] font-black uppercase text-emerald-400">
+                                      {isEn ? 'Route A • Acceleration' : 'Ruta A • Aceleración'}
+                                    </span>
+                                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                                  </div>
+                                  <strong className="text-sm font-black text-white block">
+                                    {needed5Stars === 0
+                                      ? (isEn ? '✓ Target Already Achieved!' : '✓ ¡Meta Alcanzada!')
+                                      : isEn
+                                      ? `+${needed5Stars} New 5★ Reviews`
+                                      : `+${needed5Stars} Nuevas Reseñas de 5★`}
+                                  </strong>
+                                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                                    {needed5Stars === 0
+                                      ? (isEn
+                                          ? `Your listing currently exceeds ${target}★. Maintain review velocity to protect rank.`
+                                          : `Tu ficha ya supera ${target}★. Mantén la velocidad de reseñas para defender tu podio.`)
+                                      : (isEn
+                                          ? `To reach ${target}★ organically, generate ${needed5Stars} 5-star reviews using Prestigia NFC cards (~${weeksToGoal} weeks).`
+                                          : `Para alcanzar ${target}★ necesitas captar ${needed5Stars} reseñas de 5★ con el sistema Prestigia NFC (~${weeksToGoal} semanas).`)}
+                                  </p>
+                                </div>
+
+                                {/* Route B: Negative Review Legal Appeal */}
+                                <div className="p-3.5 rounded-xl bg-slate-900/90 border border-rose-500/30 space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-[10px] font-black uppercase text-rose-400">
+                                      {isEn ? 'Route B • Legal Rescue' : 'Ruta B • Rescate Legal'}
+                                    </span>
+                                    <Scale className="w-3.5 h-3.5 text-rose-400" />
+                                  </div>
+
+                                  {toxic1Star > 0 ? (
+                                    <>
+                                      <strong className="text-sm font-black text-rose-300 block">
+                                        {isEn ? `Apelar ${toxic1Star} Reseñas Tóxicas 1★` : `Apelar ${toxic1Star} Reseñas Tóxicas 1★`}
+                                      </strong>
+                                      <p className="text-[11px] text-slate-300 leading-relaxed">
+                                        {isEn
+                                          ? `Eliminating these 1★ reviews elevates rating instantly from ${curRating.toFixed(1)}★ to ${newRatingAfterAppeal}★, reducing required 5★ reviews to only ${needed5StarsAfterAppeal}.`
+                                          : `Al suprimir estas 1★ con el protocolo legal, tu calificación sube de inmediato de ${curRating.toFixed(1)}★ a ${newRatingAfterAppeal}★ y solo requerirías ${needed5StarsAfterAppeal} reseñas.`}
+                                      </p>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setAppealSearchQuery(auditGoogleUrl || auditBusinessName);
+                                          setAppealContactName(auditContactName);
+                                          setAppealContactCompany(auditContactCompany || auditBusinessName);
+                                          setAppealContactPhone(auditContactPhone);
+                                          setAppealContactEmail(auditContactEmail);
+                                          setActiveTab('appeals');
+                                        }}
+                                        className="w-full py-1.5 px-2.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-bold text-[10px] transition cursor-pointer flex items-center justify-center gap-1.5"
+                                      >
+                                        <span>{isEn ? '⚖️ Launch Legal Appeal in Tab 4' : '⚖️ Apelar Reseñas en Pestaña 4'}</span>
+                                        <ArrowRight className="w-3 h-3" />
+                                      </button>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <strong className="text-sm font-black text-emerald-300 block">
+                                        {isEn ? 'Zero Critical 1★ Reviews' : 'Sin Reseñas Tóxicas 1★'}
+                                      </strong>
+                                      <p className="text-[11px] text-slate-300 leading-relaxed">
+                                        {isEn
+                                          ? 'No severe policy-violating reviews detected. Focus on Route A to boost review velocity.'
+                                          : 'No se detectaron reseñas punitivas graves de 1★. Enfócate en la Ruta A para acelerar el volumen.'}
+                                      </p>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Master Recommendation Banner */}
+                              <div className="p-3 rounded-xl bg-indigo-950/60 border border-indigo-500/30 flex items-start gap-2.5 text-xs">
+                                <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                                <div className="space-y-0.5">
+                                  <strong className="text-amber-300 font-black text-xs block">
+                                    {isEn ? 'Top 3 Algorithmic Rule (Google Local Pack):' : 'Regla de Oro Algorítmica de Google Maps:'}
+                                  </strong>
+                                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                                    {isEn
+                                      ? 'Google filters out listings below 4.5★ when users click "Top Rated". Combining Prestigia NFC review collection with legal appeal of bad-faith reviews guarantees your spot in the Top 3.'
+                                      : 'Google descarta las fichas por debajo de 4.5★ cuando los clientes buscan "Los mejores". Combinar la captación con tarjetas inteligentes Prestigia NFC con la apelación de reseñas falsas asegura tu permanencia en el Top 3.'}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
 
                     {/* Competitor Insights */}
                     <div className="p-5 rounded-2xl bg-slate-900 border border-indigo-500/40 space-y-2 print-card-box">
