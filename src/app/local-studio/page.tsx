@@ -87,6 +87,7 @@ interface StudioAdvisorUser {
   maxAuditsMonthly?: number;
   maxRescuesMonthly?: number;
   maxAppealsMonthly?: number;
+  maxToolsMonthly?: number;
 }
 
 interface ServiceCatalogItem {
@@ -179,7 +180,7 @@ interface StudioDossierRecord {
   city: string;
   neighborhood?: string;
   googleUrl?: string;
-  mode: 'create' | 'audit' | 'rescue' | 'appeal';
+  mode: 'create' | 'audit' | 'rescue' | 'appeal' | 'tools';
   businessModel?: 'storefront' | 'service_area';
   status: 'draft' | 'presented' | 'closed';
   closingStatus?: 'prestigia_subscriber' | 'setup_paid' | 'proposal_sent' | 'negotiating' | 'lead_draft';
@@ -1906,13 +1907,13 @@ export default function LocalStudioPage() {
 
   const [isLoadingDossiers, setIsLoadingDossiers] = useState(false);
   const [dossierSearch, setDossierSearch] = useState('');
-  const [dossierModeFilter, setDossierModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue' | 'appeal'>('all');
+  const [dossierModeFilter, setDossierModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue' | 'appeal' | 'tools'>('all');
   const [dossierCountryFilter, setDossierCountryFilter] = useState<string>('all');
   const [dossierCityFilter, setDossierCityFilter] = useState<string>('all');
   const [dossierNeighborhoodFilter, setDossierNeighborhoodFilter] = useState<string>('all');
   const [dossierClosingFilter, setDossierClosingFilter] = useState<string>('all');
   const [editingDossierClosing, setEditingDossierClosing] = useState<StudioDossierRecord | null>(null);
-  const [closingFormMode, setClosingFormMode] = useState<'create' | 'audit' | 'rescue' | 'appeal'>('audit');
+  const [closingFormMode, setClosingFormMode] = useState<'create' | 'audit' | 'rescue' | 'appeal' | 'tools'>('audit');
   const [closingFormStatus, setClosingFormStatus] = useState<'prestigia_subscriber' | 'setup_paid' | 'proposal_sent' | 'negotiating' | 'lead_draft'>('prestigia_subscriber');
   const [closingFormSetupFee, setClosingFormSetupFee] = useState<number>(0);
   const [closingFormMonthlyPlan, setClosingFormMonthlyPlan] = useState<number>(199);
@@ -1927,7 +1928,7 @@ export default function LocalStudioPage() {
   const [networkTypeFilter, setNetworkTypeFilter] = useState<'all' | 'director' | 'internal_advisor' | 'partner_agency'>('all');
   const [networkCountryFilter, setNetworkCountryFilter] = useState('all');
   const [networkCityFilter, setNetworkCityFilter] = useState('all');
-  const [networkModeFilter, setNetworkModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue' | 'appeal'>('all');
+  const [networkModeFilter, setNetworkModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue' | 'appeal' | 'tools'>('all');
   const [networkActiveFilter, setNetworkActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({});
   const [viewingAdvisorWorks, setViewingAdvisorWorks] = useState<StudioAdvisorUser | null>(null);
@@ -1950,14 +1951,16 @@ export default function LocalStudioPage() {
   const [editAdvisorMaxAudits, setEditAdvisorMaxAudits] = useState<number>(30);
   const [editAdvisorMaxRescues, setEditAdvisorMaxRescues] = useState<number>(10);
   const [editAdvisorMaxAppeals, setEditAdvisorMaxAppeals] = useState<number>(15);
+  const [editAdvisorMaxTools, setEditAdvisorMaxTools] = useState<number>(30);
   const [isUpdatingAdvisor, setIsUpdatingAdvisor] = useState<boolean>(false);
 
   // Live Monthly Quota & Usage Monitor
-  const [monthlyUsage, setMonthlyUsage] = useState<{ creates: number; audits: number; rescues: number; appeals: number }>({
+  const [monthlyUsage, setMonthlyUsage] = useState<{ creates: number; audits: number; rescues: number; appeals: number; tools: number }>({
     creates: 0,
     audits: 0,
     rescues: 0,
     appeals: 0,
+    tools: 0,
   });
 
   // Advisors & Agencies List (for Admin tab)
@@ -2016,6 +2019,7 @@ export default function LocalStudioPage() {
   const [newAdvisorMaxAudits, setNewAdvisorMaxAudits] = useState<number>(30);
   const [newAdvisorMaxRescues, setNewAdvisorMaxRescues] = useState<number>(10);
   const [newAdvisorMaxAppeals, setNewAdvisorMaxAppeals] = useState<number>(15);
+  const [newAdvisorMaxTools, setNewAdvisorMaxTools] = useState<number>(30);
   const [adminMasterKey, setAdminMasterKey] = useState('admin');
   const [isSavingAdvisor, setIsSavingAdvisor] = useState(false);
 
@@ -2706,6 +2710,16 @@ export default function LocalStudioPage() {
       return;
     }
 
+    const userMaxTools = currentUser?.maxToolsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10);
+    if (!isLuismaMaster && (monthlyUsage.tools || 0) >= userMaxTools) {
+      showToast(
+        isEn
+          ? `⚠️ Monthly limit of ${userMaxTools} Top 3 Sales Arsenal credits reached. Upgrade your plan or reload credits.`
+          : `⚠️ Has alcanzado tu cupo de ${userMaxTools} créditos de Armas Top 3 de Cierre. Contacta a Dirección General o recarga créditos.`
+      );
+      return;
+    }
+
     setIsToolsScanning(true);
     showToast(isEn ? '🔍 Querying Google Maps API for sales arsenal...' : '🔍 Reconociendo ficha con Google Maps para las herramientas de venta...');
 
@@ -2717,23 +2731,28 @@ export default function LocalStudioPage() {
       });
       const data = await res.json();
 
+      let extractedName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
+      let matchedCategory = toolsCategory;
+      let parsedCity = toolsCity;
+      let placeData: GooglePlaceData | null = null;
+
       if (data?.success && data?.data) {
         const place: GooglePlaceData = data.data;
+        placeData = place;
         setToolsScannedListing(place);
 
-        const extractedName = place.name || rawInput;
+        extractedName = place.name || rawInput;
         setToolsBusinessName(extractedName);
         if (typeof place.rating === 'number') setToolsExistingRating(place.rating);
         if (typeof place.reviewsCount === 'number') setToolsExistingReviews(place.reviewsCount);
 
-        let parsedCity = toolsCity;
         if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
           const parsedGeo = parseAddressGeo(place.address);
           parsedCity = parsedGeo.city;
           setToolsCity(parsedGeo.city);
         }
 
-        const matchedCategory = mapDetectedCategoryToPrestigia(
+        matchedCategory = mapDetectedCategoryToPrestigia(
           place.category || '',
           place.detectedCategories || [],
           isEn
@@ -2752,10 +2771,41 @@ export default function LocalStudioPage() {
             : `✓ Ficha Conectada: ${extractedName} (${matchedCategory}). ¡Armas de venta configuradas!`
         );
       } else {
-        const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
-        setToolsBusinessName(fallbackName);
+        setToolsBusinessName(extractedName);
         setGeoGridKeyword(getDefaultKeywordByNiche(toolsCategory, toolsCity, isEn));
-        showToast(isEn ? `✓ Connected to "${fallbackName}"` : `✓ Conectado a "${fallbackName}"`);
+        showToast(isEn ? `✓ Connected to "${extractedName}"` : `✓ Conectado a "${extractedName}"`);
+      }
+
+      // Descontar crédito en la sesión en vivo
+      setMonthlyUsage((prev) => ({ ...prev, tools: (prev.tools || 0) + 1 }));
+
+      // Guardar expediente del escaneo para trazabilidad y contabilidad de créditos
+      try {
+        await fetch('/api/local-studio/dossiers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            advisorId: currentUser?.id || (isLuismaMaster ? 'adv-luisma' : 'adv-anon'),
+            advisorName: currentUser?.name || 'Luisma • Director General & Founder',
+            advisorPhone: currentUser?.phone || '+573058314049',
+            advisorType: currentUser?.accountType || 'founder',
+            country: currentUser?.country || 'Colombia',
+            clientName: extractedName,
+            category: matchedCategory,
+            city: parsedCity,
+            googleUrl: placeData?.googleMapsUrl || (rawInput.startsWith('http') ? rawInput : ''),
+            mode: 'tools',
+            closingStatus: 'lead_draft',
+            setupFeeChargedUsd: 100,
+            data: {
+              placeData,
+              scannedAt: new Date().toISOString(),
+            },
+          }),
+        });
+        fetchDossiers();
+      } catch (saveErr) {
+        console.warn('Auto-save tools dossier error:', saveErr);
       }
     } catch (err: any) {
       console.error('Tools scan error:', err);
@@ -3422,6 +3472,8 @@ export default function LocalStudioPage() {
           maxCreatesMonthly: Number(newAdvisorMaxCreates) || (newAccountType === 'partner_agency' ? 60 : 30),
           maxAuditsMonthly: Number(newAdvisorMaxAudits) || (newAccountType === 'partner_agency' ? 60 : 30),
           maxRescuesMonthly: Number(newAdvisorMaxRescues) || (newAccountType === 'partner_agency' ? 20 : 10),
+          maxAppealsMonthly: Number(newAdvisorMaxAppeals) || (newAccountType === 'partner_agency' ? 20 : 15),
+          maxToolsMonthly: Number(newAdvisorMaxTools) || (newAccountType === 'partner_agency' ? 30 : 20),
           active: true,
           masterKey: adminMasterKey,
         }),
@@ -3472,6 +3524,8 @@ export default function LocalStudioPage() {
     setEditAdvisorMaxCreates(advisor.maxCreatesMonthly ?? (advisor.accountType === 'partner_agency' ? 60 : advisor.accountType === 'director' ? 100 : 30));
     setEditAdvisorMaxAudits(advisor.maxAuditsMonthly ?? (advisor.accountType === 'partner_agency' ? 60 : advisor.accountType === 'director' ? 100 : 30));
     setEditAdvisorMaxRescues(advisor.maxRescuesMonthly ?? (advisor.accountType === 'partner_agency' ? 20 : advisor.accountType === 'director' ? 50 : 10));
+    setEditAdvisorMaxAppeals(advisor.maxAppealsMonthly ?? (advisor.accountType === 'partner_agency' ? 20 : advisor.accountType === 'director' ? 50 : 15));
+    setEditAdvisorMaxTools(advisor.maxToolsMonthly ?? (advisor.accountType === 'partner_agency' ? 30 : advisor.accountType === 'director' ? 50 : 20));
     setShowEditAdvisorModal(true);
   };
 
@@ -3500,6 +3554,8 @@ export default function LocalStudioPage() {
         maxCreatesMonthly: Number(editAdvisorMaxCreates),
         maxAuditsMonthly: Number(editAdvisorMaxAudits),
         maxRescuesMonthly: Number(editAdvisorMaxRescues),
+        maxAppealsMonthly: Number(editAdvisorMaxAppeals),
+        maxToolsMonthly: Number(editAdvisorMaxTools),
         masterKey: 'admin',
       };
       if (editAdvisorPass.trim()) {
@@ -8306,7 +8362,33 @@ export default function LocalStudioPage() {
                     {tTools.desc}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  {isLuismaMaster ? (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <div className="text-left">
+                        <span className="text-[9px] uppercase font-black tracking-wider text-amber-400/80 block">{isEn ? 'Monthly AI Credits' : 'Créditos IA Mensuales'}</span>
+                        <strong className="text-xs font-black text-amber-200">{isEn ? '👑 UNLIMITED • Master' : '👑 ILIMITADO • Master'}</strong>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-2xl border transition ${
+                      (monthlyUsage.tools || 0) >= (currentUser?.maxToolsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10))
+                        ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
+                        : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                    }`}>
+                      <Zap className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <div className="text-left">
+                        <span className="text-[9px] uppercase font-black tracking-wider opacity-80 block">{isEn ? 'Top 3 Arsenal Quota' : 'Cupo Armas Top 3'}</span>
+                        <div className="text-xs font-black flex items-center gap-1">
+                          <span>{(monthlyUsage.tools || 0)} / {currentUser?.maxToolsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)} {isEn ? 'Used' : 'Usadas'}</span>
+                          <span className="text-[10px] font-bold opacity-75">
+                            ({Math.max(0, (currentUser?.maxToolsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)) - (monthlyUsage.tools || 0))} {isEn ? 'avail.)' : 'disp.)'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <span className="text-xs text-emerald-400 font-bold bg-emerald-950/80 border border-emerald-500/30 px-3 py-1.5 rounded-xl">
                     {tTools.activeAlgo}
                   </span>
@@ -8360,10 +8442,21 @@ export default function LocalStudioPage() {
                     </button>
                   </div>
 
+                  {!isLuismaMaster && (monthlyUsage.tools || 0) >= (currentUser?.maxToolsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)) && (
+                    <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-bold flex items-center justify-center gap-2">
+                      <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+                      <span>
+                        {isEn
+                          ? `⚠️ Monthly limit of ${currentUser?.maxToolsMonthly ?? 20} Top 3 Sales Arsenal credits reached. Upgrade your plan or reload credits.`
+                          : `⚠️ Has alcanzado tu cupo de ${currentUser?.maxToolsMonthly ?? 20} créditos de Armas Top 3 de Cierre. Recarga créditos para continuar.`}
+                      </span>
+                    </div>
+                  )}
+
                   <button
                     type="button"
                     onClick={() => handleToolsScan()}
-                    disabled={isToolsScanning || !toolsSearchQuery.trim()}
+                    disabled={isToolsScanning || !toolsSearchQuery.trim() || (!isLuismaMaster && (monthlyUsage.tools || 0) >= (currentUser?.maxToolsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)))}
                     className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98"
                   >
                     {isToolsScanning ? (
@@ -8374,7 +8467,7 @@ export default function LocalStudioPage() {
                     ) : (
                       <>
                         <Zap className="w-4 h-4 fill-slate-950" />
-                        <span>{tTools.toolsEmptyScanBtn}</span>
+                        <span>{tTools.toolsEmptyScanBtn} ({isEn ? '1 Credit' : '1 Crédito'})</span>
                       </>
                     )}
                   </button>
@@ -10645,6 +10738,7 @@ export default function LocalStudioPage() {
                   const auditsCount = advisorDossiers.filter((d) => d.mode === 'audit').length;
                   const rescuesCount = advisorDossiers.filter((d) => d.mode === 'rescue').length;
                   const appealsCount = advisorDossiers.filter((d) => d.mode === 'appeal').length;
+                  const toolsCount = advisorDossiers.filter((d) => d.mode === 'tools').length;
                   const isRevealed = Boolean(revealedPasswords[adv.id]);
 
                   const curNow = new Date();
@@ -10657,6 +10751,8 @@ export default function LocalStudioPage() {
                   const monthCreates = advisorMonthDossiers.filter((d) => d.mode === 'create').length;
                   const monthAudits = advisorMonthDossiers.filter((d) => d.mode === 'audit').length;
                   const monthRescues = advisorMonthDossiers.filter((d) => d.mode === 'rescue').length;
+                  const monthAppeals = advisorMonthDossiers.filter((d) => d.mode === 'appeal').length;
+                  const monthTools = advisorMonthDossiers.filter((d) => d.mode === 'tools').length;
                   const deletedCountForAdv = advisorDossiers.filter((d) => d.deletedByAdvisor).length;
 
                   return (
@@ -10812,22 +10908,26 @@ export default function LocalStudioPage() {
                               {advisorDossiers.length} {isEn ? 'dossiers' : 'expedientes'}
                             </span>
                           </div>
-                          <div className="grid grid-cols-4 gap-1 pt-1 border-t border-slate-800/60 text-center text-[10px]">
-                            <div className="bg-slate-900/80 py-0.5 rounded px-1">
-                              <span className="text-slate-400 block text-[9px] uppercase font-semibold">{isEn ? 'Created' : 'Creadas'}</span>
-                              <strong className="text-emerald-400 font-mono">{createsCount}</strong>
+                          <div className="grid grid-cols-5 gap-1 pt-1 border-t border-slate-800/60 text-center text-[10px]">
+                            <div className="bg-slate-900/80 py-0.5 rounded px-0.5">
+                              <span className="text-slate-400 block text-[8px] uppercase font-semibold">{isEn ? 'Created' : 'Crea'}</span>
+                              <strong className="text-emerald-400 font-mono text-[10.5px]">{createsCount}</strong>
                             </div>
-                            <div className="bg-slate-900/80 py-0.5 rounded px-1">
-                              <span className="text-slate-400 block text-[9px] uppercase font-semibold">{isEn ? 'Audited' : 'Auditadas'}</span>
-                              <strong className="text-blue-400 font-mono">{auditsCount}</strong>
+                            <div className="bg-slate-900/80 py-0.5 rounded px-0.5">
+                              <span className="text-slate-400 block text-[8px] uppercase font-semibold">{isEn ? 'Audited' : 'Audita'}</span>
+                              <strong className="text-blue-400 font-mono text-[10.5px]">{auditsCount}</strong>
                             </div>
-                            <div className="bg-slate-900/80 py-0.5 rounded px-1">
-                              <span className="text-slate-400 block text-[9px] uppercase font-semibold">{isEn ? 'Rescued' : 'Rescatadas'}</span>
-                              <strong className="text-amber-400 font-mono">{rescuesCount}</strong>
+                            <div className="bg-slate-900/80 py-0.5 rounded px-0.5">
+                              <span className="text-slate-400 block text-[8px] uppercase font-semibold">{isEn ? 'Rescued' : 'Rescata'}</span>
+                              <strong className="text-amber-400 font-mono text-[10.5px]">{rescuesCount}</strong>
                             </div>
-                            <div className="bg-slate-900/80 py-0.5 rounded px-1">
-                              <span className="text-slate-400 block text-[9px] uppercase font-semibold">{isEn ? 'Appealed' : 'Apeladas'}</span>
-                              <strong className="text-purple-400 font-mono">{appealsCount}</strong>
+                            <div className="bg-slate-900/80 py-0.5 rounded px-0.5">
+                              <span className="text-slate-400 block text-[8px] uppercase font-semibold">{isEn ? 'Appealed' : 'Apela'}</span>
+                              <strong className="text-purple-400 font-mono text-[10.5px]">{appealsCount}</strong>
+                            </div>
+                            <div className="bg-slate-900/80 py-0.5 rounded px-0.5">
+                              <span className="text-slate-400 block text-[8px] uppercase font-semibold">{isEn ? 'Tools' : 'Armas'}</span>
+                              <strong className="text-amber-300 font-mono text-[10.5px]">{toolsCount}</strong>
                             </div>
                           </div>
                         </div>
@@ -10846,23 +10946,35 @@ export default function LocalStudioPage() {
                                 </span>
                               )}
                             </div>
-                            <div className="grid grid-cols-3 gap-1 pt-1 border-t border-slate-800/60 text-center text-[10px]">
-                              <div className="bg-slate-900/80 py-1 rounded px-1">
-                                <span className="text-slate-400 block text-[8.5px] uppercase font-semibold">{isEn ? 'Build' : 'Crea'}</span>
-                                <strong className={`font-mono text-[11px] ${monthCreates >= (adv.maxCreatesMonthly ?? 30) ? 'text-rose-400' : 'text-emerald-400'}`}>
-                                  {monthCreates} / {adv.maxCreatesMonthly ?? (adv.accountType === 'partner_agency' ? 60 : adv.accountType === 'director' ? 100 : 30)}
+                            <div className="grid grid-cols-5 gap-1 pt-1 border-t border-slate-800/60 text-center text-[10px]">
+                              <div className="bg-slate-900/80 py-1 rounded px-0.5">
+                                <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Build' : 'Crea'}</span>
+                                <strong className={`font-mono text-[10px] ${monthCreates >= (adv.maxCreatesMonthly ?? 30) ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                  {monthCreates}/{adv.maxCreatesMonthly ?? (adv.accountType === 'partner_agency' ? 60 : adv.accountType === 'director' ? 100 : 30)}
                                 </strong>
                               </div>
-                              <div className="bg-slate-900/80 py-1 rounded px-1">
-                                <span className="text-slate-400 block text-[8.5px] uppercase font-semibold">{isEn ? 'Audit' : 'Audita'}</span>
-                                <strong className={`font-mono text-[11px] ${monthAudits >= (adv.maxAuditsMonthly ?? 30) ? 'text-rose-400' : 'text-amber-400'}`}>
-                                  {monthAudits} / {adv.maxAuditsMonthly ?? (adv.accountType === 'partner_agency' ? 60 : adv.accountType === 'director' ? 100 : 30)}
+                              <div className="bg-slate-900/80 py-1 rounded px-0.5">
+                                <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Audit' : 'Audita'}</span>
+                                <strong className={`font-mono text-[10px] ${monthAudits >= (adv.maxAuditsMonthly ?? 30) ? 'text-rose-400' : 'text-amber-400'}`}>
+                                  {monthAudits}/{adv.maxAuditsMonthly ?? (adv.accountType === 'partner_agency' ? 60 : adv.accountType === 'director' ? 100 : 30)}
                                 </strong>
                               </div>
-                              <div className="bg-slate-900/80 py-1 rounded px-1">
-                                <span className="text-slate-400 block text-[8.5px] uppercase font-semibold">{isEn ? 'Rescue' : 'Rescata'}</span>
-                                <strong className={`font-mono text-[11px] ${monthRescues >= (adv.maxRescuesMonthly ?? 10) ? 'text-rose-400' : 'text-rose-300'}`}>
-                                  {monthRescues} / {adv.maxRescuesMonthly ?? (adv.accountType === 'partner_agency' ? 20 : adv.accountType === 'director' ? 50 : 10)}
+                              <div className="bg-slate-900/80 py-1 rounded px-0.5">
+                                <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Rescue' : 'Rescata'}</span>
+                                <strong className={`font-mono text-[10px] ${monthRescues >= (adv.maxRescuesMonthly ?? 10) ? 'text-rose-400' : 'text-rose-300'}`}>
+                                  {monthRescues}/{adv.maxRescuesMonthly ?? (adv.accountType === 'partner_agency' ? 20 : adv.accountType === 'director' ? 50 : 10)}
+                                </strong>
+                              </div>
+                              <div className="bg-slate-900/80 py-1 rounded px-0.5">
+                                <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Appeal' : 'Apela'}</span>
+                                <strong className={`font-mono text-[10px] ${monthAppeals >= (adv.maxAppealsMonthly ?? 15) ? 'text-rose-400' : 'text-blue-300'}`}>
+                                  {monthAppeals}/{adv.maxAppealsMonthly ?? (adv.accountType === 'partner_agency' ? 20 : adv.accountType === 'director' ? 50 : 15)}
+                                </strong>
+                              </div>
+                              <div className="bg-slate-900/80 py-1 rounded px-0.5">
+                                <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Tools' : 'Armas'}</span>
+                                <strong className={`font-mono text-[10px] ${monthTools >= (adv.maxToolsMonthly ?? 20) ? 'text-rose-400' : 'text-amber-300'}`}>
+                                  {monthTools}/{adv.maxToolsMonthly ?? (adv.accountType === 'partner_agency' ? 30 : adv.accountType === 'director' ? 50 : 20)}
                                 </strong>
                               </div>
                             </div>
@@ -11300,6 +11412,8 @@ export default function LocalStudioPage() {
                     setNewAdvisorMaxCreates(30);
                     setNewAdvisorMaxAudits(30);
                     setNewAdvisorMaxRescues(10);
+                    setNewAdvisorMaxAppeals(15);
+                    setNewAdvisorMaxTools(20);
                   }}
                   className={`py-2 px-3 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1.5 text-xs ${
                     newAccountType === 'internal_advisor'
@@ -11318,6 +11432,8 @@ export default function LocalStudioPage() {
                     setNewAdvisorMaxCreates(60);
                     setNewAdvisorMaxAudits(60);
                     setNewAdvisorMaxRescues(20);
+                    setNewAdvisorMaxAppeals(20);
+                    setNewAdvisorMaxTools(30);
                   }}
                   className={`py-2 px-3 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1.5 text-xs ${
                     newAccountType === 'partner_agency'
@@ -11466,10 +11582,10 @@ export default function LocalStudioPage() {
                   <span className="text-[10px] text-slate-400 font-mono">{isEn ? 'Quota / mo' : 'Cupos / mes'}</span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
                   <div>
                     <label className="block text-[10px] font-bold text-emerald-400 mb-1">
-                      Creaciones
+                      {isEn ? 'Creations' : 'Creaciones'}
                     </label>
                     <input
                       type="number"
@@ -11483,7 +11599,7 @@ export default function LocalStudioPage() {
 
                   <div>
                     <label className="block text-[10px] font-bold text-amber-400 mb-1">
-                      Auditorías
+                      {isEn ? 'Audits' : 'Auditorías'}
                     </label>
                     <input
                       type="number"
@@ -11497,7 +11613,7 @@ export default function LocalStudioPage() {
 
                   <div>
                     <label className="block text-[10px] font-bold text-rose-400 mb-1">
-                      Rescates
+                      {isEn ? 'Rescues' : 'Rescates'}
                     </label>
                     <input
                       type="number"
@@ -11506,6 +11622,34 @@ export default function LocalStudioPage() {
                       value={newAdvisorMaxRescues}
                       onChange={(e) => setNewAdvisorMaxRescues(Number(e.target.value))}
                       className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-rose-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-blue-400 mb-1">
+                      {isEn ? 'Appeals' : 'Apelaciones'}
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="1000"
+                      value={newAdvisorMaxAppeals}
+                      onChange={(e) => setNewAdvisorMaxAppeals(Number(e.target.value))}
+                      className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-blue-400"
+                    />
+                  </div>
+
+                  <div className="col-span-2 sm:col-span-1">
+                    <label className="block text-[10px] font-bold text-amber-300 mb-1">
+                      {isEn ? 'Top 3 Arms' : 'Armas Top 3'}
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="1000"
+                      value={newAdvisorMaxTools}
+                      onChange={(e) => setNewAdvisorMaxTools(Number(e.target.value))}
+                      className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-amber-400"
                     />
                   </div>
                 </div>
@@ -11734,7 +11878,7 @@ export default function LocalStudioPage() {
                     <span className="text-[10px] text-slate-400 font-mono">Cupos / mes</span>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
                     <div>
                       <label className="block text-[10px] font-bold text-emerald-400 mb-1">
                         {isEn ? 'Creations' : 'Creaciones'}
@@ -11776,9 +11920,37 @@ export default function LocalStudioPage() {
                         className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-rose-400"
                       />
                     </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-blue-400 mb-1">
+                        {isEn ? 'Appeals' : 'Apelaciones'}
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="1000"
+                        value={editAdvisorMaxAppeals}
+                        onChange={(e) => setEditAdvisorMaxAppeals(Number(e.target.value))}
+                        className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-blue-400"
+                      />
+                    </div>
+
+                    <div className="col-span-2 sm:col-span-1">
+                      <label className="block text-[10px] font-bold text-amber-300 mb-1">
+                        {isEn ? 'Top 3 Arms' : 'Armas Top 3'}
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="1000"
+                        value={editAdvisorMaxTools}
+                        onChange={(e) => setEditAdvisorMaxTools(Number(e.target.value))}
+                        className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
                   </div>
                   <p className="text-[10px] text-slate-500 italic">
-                    {isEn ? '* You can increase the limit of creations, audits, and rescues to grant more credits in real time.' : '* Puedes aumentar el número de creaciones, auditorías y rescates para otorgar más créditos al asesor o agencia en tiempo real.'}
+                    {isEn ? '* You can increase the limit of any engine to grant more credits to this partner in real time.' : '* Puedes aumentar el cupo de cualquiera de los 5 motores para otorgar más créditos al asesor o agencia en tiempo real.'}
                   </p>
                 </div>
               )}

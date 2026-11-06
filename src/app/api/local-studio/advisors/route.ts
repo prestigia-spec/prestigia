@@ -60,6 +60,8 @@ export async function POST(request: Request) {
       maxCreatesMonthly,
       maxAuditsMonthly,
       maxRescuesMonthly,
+      maxAppealsMonthly,
+      maxToolsMonthly,
       masterKey,
     } = body;
 
@@ -102,6 +104,8 @@ export async function POST(request: Request) {
       maxCreatesMonthly: maxCreatesMonthly !== undefined ? Number(maxCreatesMonthly) : (existing?.maxCreatesMonthly ?? (resolvedAccountType === 'partner_agency' ? 60 : 30)),
       maxAuditsMonthly: maxAuditsMonthly !== undefined ? Number(maxAuditsMonthly) : (existing?.maxAuditsMonthly ?? (resolvedAccountType === 'partner_agency' ? 60 : 30)),
       maxRescuesMonthly: maxRescuesMonthly !== undefined ? Number(maxRescuesMonthly) : (existing?.maxRescuesMonthly ?? (resolvedAccountType === 'partner_agency' ? 20 : 10)),
+      maxAppealsMonthly: maxAppealsMonthly !== undefined ? Number(maxAppealsMonthly) : (existing?.maxAppealsMonthly ?? (resolvedAccountType === 'partner_agency' ? 20 : 15)),
+      maxToolsMonthly: maxToolsMonthly !== undefined ? Number(maxToolsMonthly) : (existing?.maxToolsMonthly ?? (resolvedAccountType === 'partner_agency' ? 30 : 20)),
       createdAt: existing?.createdAt || new Date().toISOString(),
     };
 

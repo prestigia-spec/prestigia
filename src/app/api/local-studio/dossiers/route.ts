@@ -29,6 +29,7 @@ export async function GET(request: Request) {
       audits: advisorMonthDossiers.filter((d) => d.mode === 'audit').length,
       rescues: advisorMonthDossiers.filter((d) => d.mode === 'rescue').length,
       appeals: advisorMonthDossiers.filter((d) => d.mode === 'appeal').length,
+      tools: advisorMonthDossiers.filter((d) => d.mode === 'tools').length,
     };
 
     if (isLuisma) {
@@ -111,6 +112,8 @@ export async function POST(request: Request) {
           ? (currentAdv.maxAuditsMonthly ?? 30)
           : targetMode === 'appeal'
           ? (currentAdv.maxAppealsMonthly ?? 15)
+          : targetMode === 'tools'
+          ? (currentAdv.maxToolsMonthly ?? 30)
           : (currentAdv.maxRescuesMonthly ?? 10);
 
         if (used >= limit) {
@@ -122,6 +125,8 @@ export async function POST(request: Request) {
                 ? 'auditorías'
                 : targetMode === 'appeal'
                 ? 'apelaciones'
+                : targetMode === 'tools'
+                ? 'escaneos de Armas Top 3'
                 : 'rescates'
             }. Contacta a Dirección General para ampliar tu plan.`
           }, { status: 403 });

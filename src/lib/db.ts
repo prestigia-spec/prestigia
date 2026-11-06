@@ -56,6 +56,7 @@ export interface StudioAdvisor {
   maxAuditsMonthly?: number;
   maxRescuesMonthly?: number;
   maxAppealsMonthly?: number;
+  maxToolsMonthly?: number;
   createdAt: string;
 }
 
@@ -77,7 +78,7 @@ export interface StudioDossier {
   city: string;
   neighborhood?: string;
   googleUrl?: string;
-  mode: 'create' | 'audit' | 'rescue' | 'appeal';
+  mode: 'create' | 'audit' | 'rescue' | 'appeal' | 'tools';
   businessModel?: 'storefront' | 'service_area';
   status: 'draft' | 'presented' | 'closed';
   deletedByAdvisor?: boolean;
