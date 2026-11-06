@@ -2687,7 +2687,13 @@ export default function LocalStudioPage() {
       const res = await fetch('/api/auditor/google-lookup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: rawInput }),
+        body: JSON.stringify({
+          url: rawInput,
+          city: auditCity,
+          neighborhood: auditNeighborhood,
+          country: auditCountry,
+          businessName: auditBusinessName,
+        }),
       });
       const data = await res.json();
 
@@ -2812,7 +2818,13 @@ export default function LocalStudioPage() {
       const res = await fetch('/api/auditor/google-lookup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: rawInput }),
+        body: JSON.stringify({
+          url: rawInput,
+          city: rescueCity,
+          neighborhood: rescueNeighborhood,
+          country: rescueCountry,
+          businessName: rescueBusinessName,
+        }),
       });
       const data = await res.json();
 
@@ -2938,7 +2950,12 @@ export default function LocalStudioPage() {
       const res = await fetch('/api/auditor/google-lookup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: rawInput }),
+        body: JSON.stringify({
+          url: rawInput,
+          city: toolsCity,
+          country: currentUser?.country || 'Colombia',
+          businessName: toolsBusinessName,
+        }),
       });
       const data = await res.json();
 
@@ -3050,7 +3067,12 @@ export default function LocalStudioPage() {
       const res = await fetch('/api/auditor/google-lookup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: rawInput }),
+        body: JSON.stringify({
+          url: rawInput,
+          city: toolsCity,
+          country: currentUser?.country || 'Colombia',
+          businessName: toolsBusinessName,
+        }),
       });
       const data = await res.json();
 
@@ -6861,22 +6883,218 @@ export default function LocalStudioPage() {
                       </div>
                     </div>
 
-                    {/* Copyable Optimized Assets */}
-                    <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3 print-card-box">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-black text-white">{t.optimizedCopyTitle}</h3>
-                        <button
-                          type="button"
-                          onClick={() => copyToClipboard(auditGeneratedData.commercialDescription, isEn ? 'Description' : 'Descripción')}
-                          className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer print:hidden"
+                    {/* SOLUCIONES TÉCNICAS OFICIALES PARA EDITAR LA FICHA EN GOOGLE BUSINESS PROFILE */}
+                    <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950/30 border-2 border-amber-500/40 space-y-5 shadow-2xl print-card-box">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                              {isEn ? 'Official Blueprint • Top 3 Optimization' : 'Blueprint Oficial • Optimización Top 3'}
+                            </span>
+                          </div>
+                          <h3 className="text-base sm:text-lg font-black text-white mt-1 flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-amber-400" />
+                            <span>{isEn ? 'Exact Solutions to Edit Profile in Google Business' : 'Soluciones Exactas para Editar la Ficha en Google Business Profile'}</span>
+                          </h3>
+                          <p className="text-xs text-slate-300 mt-0.5">
+                            {isEn
+                              ? 'Inject these exact categories, title, and description directly into your Google profile to dominate the Local 3-Pack.'
+                              : 'Configura estos datos exactos de categoría, título y descripción en tu panel de Google para conquistar el podio del Local 3-Pack.'}
+                          </p>
+                        </div>
+                        <a
+                          href="https://business.google.com"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-amber-500/20 cursor-pointer shrink-0 self-start sm:self-center"
                         >
-                          <Copy className="w-3.5 h-3.5" />
-                          <span>{t.copyNewDesc}</span>
-                        </button>
+                          <span>{isEn ? 'Open Google Business' : 'Abrir Google Business'}</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
                       </div>
-                      <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
-                        {auditGeneratedData.commercialDescription}
+
+                      {/* 1. Categoría Principal y Subcategorías */}
+                      <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="w-5 h-5 rounded-lg bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">1</span>
+                              <span className="text-xs font-black text-white uppercase tracking-wider">
+                                {isEn ? 'Primary Category (Google Maps Factor #1)' : 'Categoría Principal Oficial (Factor Algorítmico #1)'}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-300">
+                              {isEn
+                                ? 'Set this exact primary category in "Edit Profile" → "Business Category". It defines 60% of Google Maps search visibility.'
+                                : 'Coloca esta categoría exacta como la PRIMARIA en "Editar perfil" → "Categoría de la empresa". Es el factor más influyente en Google Maps.'}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard(auditGeneratedData.primaryCategory, isEn ? 'Primary Category' : 'Categoría Principal')}
+                            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 border border-slate-700"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>{isEn ? 'Copy Category' : 'Copiar Categoría'}</span>
+                          </button>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-amber-500/40 flex items-center justify-between">
+                          <div className="flex items-center gap-2.5">
+                            <Crown className="w-4 h-4 text-amber-400 shrink-0" />
+                            <strong className="text-sm font-black text-amber-300">
+                              {auditGeneratedData.primaryCategory || 'Restaurante / Hamburguesería'}
+                            </strong>
+                          </div>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/40">
+                            {isEn ? 'Recommended Primary' : 'Primaria Recomendada'}
+                          </span>
+                        </div>
+
+                        {/* Subcategorías Secundarias */}
+                        <div className="space-y-2 pt-2 border-t border-slate-800">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className="w-5 h-5 rounded-lg bg-indigo-500 text-white font-black text-xs flex items-center justify-center shrink-0">2</span>
+                              <span className="text-xs font-black text-white uppercase tracking-wider">
+                                {isEn ? 'Secondary Subcategories to Add (+40% to +60% Reach)' : 'Subcategorías Secundarias a Inyectar (+40% a +60% Alcance)'}
+                              </span>
+                            </div>
+                            {auditGeneratedData.secondaryCategories?.length > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => copyToClipboard(auditGeneratedData.secondaryCategories.join(', '), isEn ? 'Secondary Categories' : 'Subcategorías Secundarias')}
+                                className="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 cursor-pointer"
+                              >
+                                <Copy className="w-3 h-3" />
+                                <span>{isEn ? 'Copy All Subcategories' : 'Copiar Todas las Subcategorías'}</span>
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-slate-400">
+                            {isEn
+                              ? 'In Google Business Profile, click "+ Add another category" and add each of these subcategories to capture indirect searches:'
+                              : 'En Google Business Profile, haz clic en "+ Agregar otra categoría" e incorpora cada una de estas subcategorías para capturar búsquedas indirectas:'}
+                          </p>
+
+                          <div className="flex flex-wrap gap-2 pt-1">
+                            {auditGeneratedData.secondaryCategories?.map((subcat, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => copyToClipboard(subcat, subcat)}
+                                title={isEn ? `Click to copy "${subcat}"` : `Clic para copiar "${subcat}"`}
+                                className="px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-indigo-500/40 hover:border-indigo-400 text-indigo-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm group"
+                              >
+                                <span>+ {subcat}</span>
+                                <Copy className="w-3 h-3 text-slate-500 group-hover:text-amber-400 transition" />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
+
+                      {/* 2. Título Optimizado para Google Maps */}
+                      <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="w-5 h-5 rounded-lg bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">3</span>
+                              <span className="text-xs font-black text-white uppercase tracking-wider">
+                                {isEn ? 'Optimized Google Business Title (Penalty-Free)' : 'Título Oficial Optimizado para Google Maps (Sin Penalizaciones)'}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-300">
+                              {isEn
+                                ? 'Formula: Brand Name | Category in Location. Complies with Google Guidelines while triggering local SEO keyword matches.'
+                                : 'Fórmula: Nombre Comercial | Categoría en Ubicación. Cumple las políticas de Google y activa concordancias de búsqueda en la zona.'}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard(auditGeneratedData.optimizedTitle, isEn ? 'Optimized Title' : 'Título Optimizado')}
+                            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 border border-slate-700"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>{isEn ? 'Copy Title' : 'Copiar Título'}</span>
+                          </button>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-emerald-500/40 text-xs sm:text-sm font-black text-emerald-300 flex items-center justify-between">
+                          <span>{auditGeneratedData.optimizedTitle}</span>
+                        </div>
+                      </div>
+
+                      {/* 3. Descripción Comercial Optimizada (750 caracteres) */}
+                      <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="w-5 h-5 rounded-lg bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">4</span>
+                              <span className="text-xs font-black text-white uppercase tracking-wider">
+                                {isEn ? 'Optimized 750-Char Commercial Description' : 'Descripción Comercial Optimizada de 750 Caracteres'}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-300">
+                              {isEn
+                                ? 'Maximized with local purchasing intent keywords, atmosphere, star products, and WhatsApp call-to-action.'
+                                : 'Redactada para aprovechar los 750 caracteres indexables de Google con palabras de intención de compra, ubicación y llamado a WhatsApp.'}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="text-[10px] font-mono px-2 py-1 rounded bg-slate-950 text-slate-400 border border-slate-800">
+                              {auditGeneratedData.commercialDescription?.length || 0} / 750 {isEn ? 'chars' : 'caracteres'}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(auditGeneratedData.commercialDescription, isEn ? 'Description' : 'Descripción')}
+                              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border border-slate-700"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                              <span>{isEn ? 'Copy Description' : 'Copiar Descripción'}</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
+                          {auditGeneratedData.commercialDescription}
+                        </div>
+                      </div>
+
+                      {/* 4. Catálogo de Servicios / Especialidades a Cargar en Google Maps */}
+                      {auditGeneratedData.serviceCatalog && auditGeneratedData.serviceCatalog.length > 0 && (
+                        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-2">
+                                <span className="w-5 h-5 rounded-lg bg-cyan-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">5</span>
+                                <span className="text-xs font-black text-white uppercase tracking-wider">
+                                  {isEn ? 'High-Demand Services & Star Offerings to Add to Profile' : 'Servicios & Especialidades Estrella para Agregar a Google Maps'}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-400">
+                                {isEn
+                                  ? 'Add these services in Google Business Profile → "Edit Services" to capture transactional mobile searches.'
+                                  : 'Carga estos servicios en Google Business Profile → "Editar servicios" para capturar búsquedas transaccionales en móviles.'}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                            {auditGeneratedData.serviceCatalog.map((svc, sIdx) => (
+                              <div key={sIdx} className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                                <div className="flex items-center justify-between">
+                                  <strong className="text-xs font-bold text-white">{svc.name}</strong>
+                                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/30">
+                                    {svc.tag || 'Servicio'}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-slate-400 leading-relaxed">{svc.description}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

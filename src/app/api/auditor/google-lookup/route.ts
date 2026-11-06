@@ -99,6 +99,9 @@ function buildGoogleSeoAudit(params: {
     lowerName.includes('comida') ||
     lowerName.includes('pizza') ||
     lowerName.includes('burger') ||
+    lowerName.includes('hamburg') ||
+    lowerName.includes('arepa') ||
+    lowerName.includes('pollo') ||
     lowerName.includes('parrilla') ||
     lowerName.includes('gastro') ||
     lowerName.includes('taco') ||
@@ -152,15 +155,24 @@ function buildGoogleSeoAudit(params: {
   }
 
   const nicheSubcategoriesMap: Record<string, string[]> = {
-    gastro: [
-      'Restaurante familiar',
-      'Restaurante para almorzar',
-      'Bar y parrilla',
-      'Comida para llevar',
-      'Entrega a domicilio',
-      'Restaurante de comida tradicional',
-      'Cafetería y brunch',
-    ],
+    gastro: (lowerName.includes('hamburg') || lowerName.includes('burger'))
+      ? [
+          'Hamburguesería',
+          'Restaurante de comida rápida',
+          'Restaurante americano',
+          'Comida para llevar',
+          'Entrega a domicilio',
+          'Restaurante informal',
+        ]
+      : [
+          'Restaurante familiar',
+          'Restaurante para almorzar',
+          'Bar y parrilla',
+          'Comida para llevar',
+          'Entrega a domicilio',
+          'Restaurante de comida tradicional',
+          'Cafetería y brunch',
+        ],
     health: [
       'Clínica dental',
       'Ortodoncista',
@@ -213,7 +225,15 @@ function buildGoogleSeoAudit(params: {
   const currentCats =
     categories.length > 0
       ? categories
-      : [niche === 'gastro' ? 'Restaurante' : niche === 'health' ? 'Clínica' : 'Negocio Local'];
+      : [
+          niche === 'gastro'
+            ? lowerName.includes('hamburg') || lowerName.includes('burger')
+              ? 'Hamburguesería'
+              : 'Restaurante'
+            : niche === 'health'
+            ? 'Clínica'
+            : 'Negocio Local',
+        ];
 
   const missingCategories = pool
     .filter((sc) => !currentCats.some((cc) => cc.toLowerCase().includes(sc.toLowerCase())))
@@ -621,7 +641,7 @@ export async function POST(req: NextRequest) {
     } catch {
       body = { url: rawText };
     }
-    const { url, query } = body || {};
+    const { url, query, city, neighborhood, country, businessName } = body || {};
 
     const input = (url || query || '').trim();
     if (!input) {
@@ -691,15 +711,43 @@ export async function POST(req: NextRequest) {
       detectedName = targetUrl;
     }
 
-    // 4. Query Google Maps Search RPC endpoint (tbm=map) for real-time rating & review data
-    let fetchedSuccessfully = false;
-    const searchTarget = detectedName || targetUrl;
+    // Extract coordinates if present in targetUrl: @4.7330027,-74.0338056
+    let coords = '';
+    const coordsMatch = targetUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (coordsMatch) {
+      coords = `${coordsMatch[1]},${coordsMatch[2]}`;
+    }
 
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    // Extract hex feature id if present: 0x8e3f8f09f51c8a39:0x47c6d442cad48185
+    let featureHex = '';
+    const hexMatch = targetUrl.match(/0x[a-f0-9]+:0x[a-f0-9]+/i);
+    if (hexMatch) {
+      featureHex = hexMatch[0];
+    }
+
+    const baseName = (detectedName || businessName || '').trim();
+    const cleanCity = (city || '').trim();
+    const cleanNeighborhood = (neighborhood || '').trim();
+    const cleanCountry = (country || 'Colombia').trim();
+
+    // Multi-strategy queries to query Google Maps Search RPC endpoint (tbm=map)
+    const queriesToTry: string[] = [];
+    if (baseName && cleanCity) queriesToTry.push(`${baseName} ${cleanCity}`);
+    if (baseName && cleanNeighborhood) queriesToTry.push(`${baseName} ${cleanNeighborhood}`);
+    if (baseName && cleanNeighborhood && cleanCity) queriesToTry.push(`${baseName} ${cleanNeighborhood} ${cleanCity}`);
+    if (baseName && cleanCountry) queriesToTry.push(`${baseName} ${cleanCountry}`);
+    if (baseName) queriesToTry.push(baseName);
+    if (featureHex) queriesToTry.push(featureHex);
+    if (!targetUrl.startsWith('http') && targetUrl.trim() && !queriesToTry.includes(targetUrl.trim())) {
+      queriesToTry.push(targetUrl.trim());
+    }
+
+    let fetchedSuccessfully = false;
+
+    for (const q of queriesToTry) {
+      if (fetchedSuccessfully) break;
       try {
-        const searchEndpoint = `https://www.google.com/search?tbm=map&authuser=0&hl=es&gl=co&q=${encodeURIComponent(
-          searchTarget
-        )}`;
+        const searchEndpoint = `https://www.google.com/search?tbm=map&authuser=0&hl=es&gl=co&q=${encodeURIComponent(q)}${coords ? `&ll=${coords}` : ''}`;
         const searchRes = await fetch(searchEndpoint, {
           headers: {
             'User-Agent':
@@ -806,13 +854,13 @@ export async function POST(req: NextRequest) {
             }
           }
 
-          if (detectedRating !== null && detectedReviews !== null && detectedReviews > 0) {
+          if (detectedRating !== null || (detectedReviews !== null && detectedReviews > 0) || detectedCategories.length > 0) {
             fetchedSuccessfully = true;
             break;
           }
         }
       } catch (err) {
-        console.warn(`Google tbm=map lookup attempt ${attempt} failed:`, err);
+        console.warn(`Google tbm=map lookup query "${q}" failed:`, err);
       }
     }
 
