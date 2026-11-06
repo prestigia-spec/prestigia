@@ -2186,9 +2186,26 @@ export default function LocalStudioPage() {
 
   const handleScanForAppeals = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (!appealContactName.trim()) {
+      showToast(isEn ? '⚠️ Contact Person / Owner is required (*)' : '⚠️ La Persona de Contacto / Dueño es obligatoria (*)');
+      return;
+    }
+    if (!appealContactCompany.trim()) {
+      showToast(isEn ? '⚠️ Contracting Company / Business is required (*)' : '⚠️ La Empresa / Razón Social Contratante es obligatoria (*)');
+      return;
+    }
+    if (!appealContactPhone.trim()) {
+      showToast(isEn ? '⚠️ Direct WhatsApp is required (*)' : '⚠️ El WhatsApp Directo del cliente es obligatorio (*)');
+      return;
+    }
+    if (!appealContactEmail.trim()) {
+      showToast(isEn ? '⚠️ Client Email is required (*)' : '⚠️ El Correo Electrónico del cliente es obligatorio (*)');
+      return;
+    }
+
     const query = appealSearchQuery.trim();
     if (!query) {
-      showToast(isEn ? '⚠️ Please enter the Google Maps link or business name' : '⚠️ Ingresa el enlace de Google Maps o nombre del negocio');
+      showToast(isEn ? '⚠️ Google Maps link or business name is required (*)' : '⚠️ El enlace de Google Maps o nombre del negocio es obligatorio (*)');
       return;
     }
     setIsScanningAppeals(true);
@@ -2223,6 +2240,23 @@ export default function LocalStudioPage() {
   };
 
   const handleGenerateAppealForReview = async (review: NegativeReviewItem, customNotes?: string) => {
+    if (!appealContactName.trim()) {
+      showToast(isEn ? '⚠️ Contact Person / Owner is required (*)' : '⚠️ La Persona de Contacto / Dueño es obligatoria (*)');
+      return;
+    }
+    if (!appealContactCompany.trim()) {
+      showToast(isEn ? '⚠️ Contracting Company / Business is required (*)' : '⚠️ La Empresa / Razón Social Contratante es obligatoria (*)');
+      return;
+    }
+    if (!appealContactPhone.trim()) {
+      showToast(isEn ? '⚠️ Direct WhatsApp is required (*)' : '⚠️ El WhatsApp Directo del cliente es obligatorio (*)');
+      return;
+    }
+    if (!appealContactEmail.trim()) {
+      showToast(isEn ? '⚠️ Client Email is required (*)' : '⚠️ El Correo Electrónico del cliente es obligatorio (*)');
+      return;
+    }
+
     const userMaxAppeals = currentUser?.maxAppealsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 25 : currentUser?.accountType === 'director' ? 50 : 15);
     if (!isLuismaMaster && (monthlyUsage.appeals || 0) >= userMaxAppeals) {
       showToast(
@@ -2310,13 +2344,33 @@ export default function LocalStudioPage() {
 
   const handleAddManualReview = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!appealContactName.trim()) {
+      showToast(isEn ? '⚠️ Contact Person / Owner is required (*)' : '⚠️ La Persona de Contacto / Dueño es obligatoria (*)');
+      return;
+    }
+    if (!appealContactCompany.trim()) {
+      showToast(isEn ? '⚠️ Contracting Company / Business is required (*)' : '⚠️ La Empresa / Razón Social Contratante es obligatoria (*)');
+      return;
+    }
+    if (!appealContactPhone.trim()) {
+      showToast(isEn ? '⚠️ Direct WhatsApp is required (*)' : '⚠️ El WhatsApp Directo del cliente es obligatorio (*)');
+      return;
+    }
+    if (!appealContactEmail.trim()) {
+      showToast(isEn ? '⚠️ Client Email is required (*)' : '⚠️ El Correo Electrónico del cliente es obligatorio (*)');
+      return;
+    }
+    if (!manualAuthor.trim()) {
+      showToast(isEn ? '⚠️ Review author name is required (*)' : '⚠️ El nombre del autor de la reseña es obligatorio (*)');
+      return;
+    }
     if (!manualText.trim()) {
-      showToast(isEn ? '⚠️ Please enter the review text' : '⚠️ Por favor escribe o pega el texto de la reseña');
+      showToast(isEn ? '⚠️ Review text is required (*)' : '⚠️ El texto exacto de la reseña es obligatorio (*)');
       return;
     }
     const newRev: NegativeReviewItem = {
       id: `manual-rev-${Date.now()}`,
-      author: manualAuthor.trim() || 'Usuario anónimo de Google',
+      author: manualAuthor.trim(),
       rating: manualRating,
       timeAgo: manualTimeAgo.trim() || 'Reciente',
       text: manualText.trim(),
@@ -2477,9 +2531,34 @@ export default function LocalStudioPage() {
     phone?: string;
     reviewHighlights?: string[];
   }) => {
+    if (!auditContactName.trim()) {
+      showToast(isEn ? '⚠️ Contact Person / Owner is required (*)' : '⚠️ La Persona de Contacto / Dueño es obligatoria (*)');
+      return;
+    }
+    if (!auditContactCompany.trim()) {
+      showToast(isEn ? '⚠️ Contracting Company / Business is required (*)' : '⚠️ La Empresa / Razón Social Contratante es obligatoria (*)');
+      return;
+    }
+    if (!auditContactPhone.trim()) {
+      showToast(isEn ? '⚠️ Direct WhatsApp is required (*)' : '⚠️ El WhatsApp Directo del cliente es obligatorio (*)');
+      return;
+    }
+    if (!auditContactEmail.trim()) {
+      showToast(isEn ? '⚠️ Client Email is required (*)' : '⚠️ El Correo Electrónico del cliente es obligatorio (*)');
+      return;
+    }
+
     const finalBizName = (overrides?.businessName ?? auditBusinessName).trim();
     if (!finalBizName) {
-      showToast(isEn ? '⚠️ Please enter the business name or link' : '⚠️ Ingresa el nombre comercial o enlace del negocio');
+      showToast(isEn ? '⚠️ Business Name is required (*)' : '⚠️ El Nombre Comercial o del Negocio es obligatorio (*)');
+      return;
+    }
+    if (!auditCity.trim()) {
+      showToast(isEn ? '⚠️ City is required (*)' : '⚠️ La Ciudad es obligatoria (*)');
+      return;
+    }
+    if (!auditNeighborhood.trim()) {
+      showToast(isEn ? '⚠️ Neighborhood / District is required (*)' : '⚠️ El Barrio o Localidad es obligatorio (*)');
       return;
     }
 
@@ -2578,9 +2657,26 @@ export default function LocalStudioPage() {
   };
 
   const handleScanAndAudit = async () => {
+    if (!auditContactName.trim()) {
+      showToast(isEn ? '⚠️ Contact Person / Owner is required (*)' : '⚠️ La Persona de Contacto / Dueño es obligatoria (*)');
+      return;
+    }
+    if (!auditContactCompany.trim()) {
+      showToast(isEn ? '⚠️ Contracting Company / Business is required (*)' : '⚠️ La Empresa / Razón Social Contratante es obligatoria (*)');
+      return;
+    }
+    if (!auditContactPhone.trim()) {
+      showToast(isEn ? '⚠️ Direct WhatsApp is required (*)' : '⚠️ El WhatsApp Directo del cliente es obligatorio (*)');
+      return;
+    }
+    if (!auditContactEmail.trim()) {
+      showToast(isEn ? '⚠️ Client Email is required (*)' : '⚠️ El Correo Electrónico del cliente es obligatorio (*)');
+      return;
+    }
+
     const rawInput = auditQuery.trim();
     if (!rawInput) {
-      showToast(isEn ? '⚠️ Please paste a Google Maps link or enter business name' : '⚠️ Pega el enlace de Google Maps o escribe el nombre del negocio');
+      showToast(isEn ? '⚠️ Google Maps link or business name is required (*)' : '⚠️ El enlace de Google Maps o nombre comercial es obligatorio (*)');
       return;
     }
 
@@ -2674,9 +2770,26 @@ export default function LocalStudioPage() {
   // TAB 3 SCANNER: RESCATE DE FICHA
   // -------------------------------------------------------------
   const handleRescueScan = async (queryInput?: string) => {
+    if (!rescueContactName.trim()) {
+      showToast(isEn ? '⚠️ Contact Person / Owner is required (*)' : '⚠️ La Persona de Contacto / Dueño es obligatoria (*)');
+      return;
+    }
+    if (!rescueContactCompany.trim()) {
+      showToast(isEn ? '⚠️ Contracting Company / Business is required (*)' : '⚠️ La Empresa / Razón Social Contratante es obligatoria (*)');
+      return;
+    }
+    if (!rescueContactPhone.trim()) {
+      showToast(isEn ? '⚠️ Direct WhatsApp is required (*)' : '⚠️ El WhatsApp Directo del cliente es obligatorio (*)');
+      return;
+    }
+    if (!rescueContactEmail.trim()) {
+      showToast(isEn ? '⚠️ Client Email is required (*)' : '⚠️ El Correo Electrónico del cliente es obligatorio (*)');
+      return;
+    }
+
     const rawInput = (typeof queryInput === 'string' ? queryInput : rescueSearchQuery).trim();
     if (!rawInput) {
-      showToast(isEn ? '⚠️ Please paste a Google Maps link or enter business name' : '⚠️ Pega el enlace de Google Maps o escribe el nombre del negocio');
+      showToast(isEn ? '⚠️ Google Maps link or business name is required (*)' : '⚠️ El enlace de Google Maps o nombre comercial es obligatorio (*)');
       return;
     }
 
@@ -3595,6 +3708,22 @@ export default function LocalStudioPage() {
 
   const handleSaveDossierClosing = async () => {
     if (!editingDossierClosing) return;
+    if (!closingFormCountry.trim()) {
+      showToast(isEn ? '⚠️ Client Country is required (*)' : '⚠️ El País del cliente es obligatorio (*)');
+      return;
+    }
+    if (!closingFormCity.trim()) {
+      showToast(isEn ? '⚠️ Client City is required (*)' : '⚠️ La Ciudad del cliente es obligatoria (*)');
+      return;
+    }
+    if (!closingFormNeighborhood.trim()) {
+      showToast(isEn ? '⚠️ Neighborhood / District is required (*)' : '⚠️ El Barrio o Localidad es obligatorio (*)');
+      return;
+    }
+    if (!closingFormPaymentMethod.trim()) {
+      showToast(isEn ? '⚠️ Payment Method / Billing Detail is required (*)' : '⚠️ El Método de Pago o Detalle de Cobro es obligatorio (*)');
+      return;
+    }
     setIsSavingClosing(true);
     try {
       const payload = {
@@ -4767,7 +4896,20 @@ export default function LocalStudioPage() {
                 <button
                   type="button"
                   onClick={() => handleGenerateCreate()}
-                  disabled={isGeneratingCreate || (!isLuismaMaster && monthlyUsage.creates >= (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))}
+                  disabled={
+                    isGeneratingCreate ||
+                    !createContactName.trim() ||
+                    !createContactCompany.trim() ||
+                    !createContactPhone.trim() ||
+                    !createContactEmail.trim() ||
+                    !createBusinessName.trim() ||
+                    !createCity.trim() ||
+                    !createNeighborhood.trim() ||
+                    !createSpecialties.trim() ||
+                    !createPhone.trim() ||
+                    (createBusinessModel === 'service_area' && !createServiceAreas.trim()) ||
+                    (!isLuismaMaster && monthlyUsage.creates >= (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))
+                  }
                   className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 cursor-pointer active:scale-98"
                 >
                   {isGeneratingCreate ? (
@@ -6120,7 +6262,16 @@ export default function LocalStudioPage() {
                   <button
                     type="button"
                     onClick={handleScanAndAudit}
-                    disabled={isScanningAudit || isGeneratingAudit || !auditQuery.trim() || (!isLuismaMaster && monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))}
+                    disabled={
+                      isScanningAudit ||
+                      isGeneratingAudit ||
+                      !auditContactName.trim() ||
+                      !auditContactCompany.trim() ||
+                      !auditContactPhone.trim() ||
+                      !auditContactEmail.trim() ||
+                      !auditQuery.trim() ||
+                      (!isLuismaMaster && monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))
+                    }
                     className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98"
                   >
                     {isScanningAudit || isGeneratingAudit ? (
@@ -6321,7 +6472,16 @@ export default function LocalStudioPage() {
                       <button
                         type="button"
                         onClick={() => handleGenerateAudit()}
-                        disabled={isGeneratingAudit || !auditBusinessName.trim()}
+                        disabled={
+                          isGeneratingAudit ||
+                          !auditContactName.trim() ||
+                          !auditContactCompany.trim() ||
+                          !auditContactPhone.trim() ||
+                          !auditContactEmail.trim() ||
+                          !auditBusinessName.trim() ||
+                          !auditCity.trim() ||
+                          !auditNeighborhood.trim()
+                        }
                         className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
                       >
                         <Search className="w-3.5 h-3.5" />
@@ -7147,7 +7307,15 @@ export default function LocalStudioPage() {
                   <button
                     type="button"
                     onClick={() => handleRescueScan()}
-                    disabled={isRescueScanning || !rescueSearchQuery.trim() || (!isLuismaMaster && monthlyUsage.rescues >= (currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)))}
+                    disabled={
+                      isRescueScanning ||
+                      !rescueContactName.trim() ||
+                      !rescueContactCompany.trim() ||
+                      !rescueContactPhone.trim() ||
+                      !rescueContactEmail.trim() ||
+                      !rescueSearchQuery.trim() ||
+                      (!isLuismaMaster && monthlyUsage.rescues >= (currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)))
+                    }
                     className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 disabled:opacity-50 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-98"
                   >
                     {isRescueScanning ? (
@@ -8137,7 +8305,14 @@ export default function LocalStudioPage() {
                     </div>
                     <button
                       type="submit"
-                      disabled={isScanningAppeals || !appealSearchQuery.trim()}
+                      disabled={
+                        isScanningAppeals ||
+                        !appealContactName.trim() ||
+                        !appealContactCompany.trim() ||
+                        !appealContactPhone.trim() ||
+                        !appealContactEmail.trim() ||
+                        !appealSearchQuery.trim()
+                      }
                       className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-md shrink-0"
                     >
                       {isScanningAppeals ? (
@@ -8304,7 +8479,15 @@ export default function LocalStudioPage() {
 
                       <button
                         type="submit"
-                        disabled={isGeneratingAppeal || !manualText.trim()}
+                        disabled={
+                          isGeneratingAppeal ||
+                          !appealContactName.trim() ||
+                          !appealContactCompany.trim() ||
+                          !appealContactPhone.trim() ||
+                          !appealContactEmail.trim() ||
+                          !manualAuthor.trim() ||
+                          !manualText.trim()
+                        }
                         className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-slate-950 font-black text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md disabled:opacity-50"
                       >
                         <Scale className="w-3.5 h-3.5" />
@@ -8367,7 +8550,13 @@ export default function LocalStudioPage() {
                             <button
                               type="button"
                               onClick={() => handleGenerateAppealForReview(rev)}
-                              disabled={isGeneratingAppeal}
+                              disabled={
+                                isGeneratingAppeal ||
+                                !appealContactName.trim() ||
+                                !appealContactCompany.trim() ||
+                                !appealContactPhone.trim() ||
+                                !appealContactEmail.trim()
+                              }
                               className={`w-full py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md ${
                                 isSelected
                                   ? 'bg-rose-500 text-slate-950 hover:bg-rose-400'
@@ -10587,7 +10776,7 @@ export default function LocalStudioPage() {
 
                       <div className="sm:col-span-2">
                         <label className="block text-slate-300 font-bold mb-1">
-                          Barrio o Localidad:
+                          {isEn ? 'Neighborhood / District *:' : 'Barrio o Localidad *:'}
                         </label>
                         <input
                           type="text"
@@ -10719,7 +10908,7 @@ export default function LocalStudioPage() {
                     {/* Payment Method */}
                     <div>
                       <label className="block text-slate-300 font-bold mb-1">
-                        {isEn ? 'Payment Method / Billing Detail:' : 'Método de Pago / Detalle de Cobro:'}
+                        {isEn ? 'Payment Method / Billing Detail *:' : 'Método de Pago / Detalle de Cobro *:'}
                       </label>
                       <input
                         type="text"
@@ -10758,7 +10947,13 @@ export default function LocalStudioPage() {
                     </button>
                     <button
                       type="button"
-                      disabled={isSavingClosing}
+                      disabled={
+                        isSavingClosing ||
+                        !closingFormCountry.trim() ||
+                        !closingFormCity.trim() ||
+                        !closingFormNeighborhood.trim() ||
+                        !closingFormPaymentMethod.trim()
+                      }
                       onClick={handleSaveDossierClosing}
                       className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-98 disabled:opacity-50"
                     >
