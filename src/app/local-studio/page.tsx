@@ -2006,6 +2006,24 @@ export default function LocalStudioPage() {
       description: 'Verifica tu ortografía o solicita tu alta en la red a Dirección General',
     };
   }, [loginUsername, advisorsList]);
+
+  // Kit de WhatsApp para solicitar fotos y video al cliente (garantía antibugs)
+  const effectiveWhatsappKit = useMemo(() => {
+    const msg = createGeneratedData?.whatsappOnboardingMessage || '';
+    const hasMedia = (msg.toLowerCase().includes('foto') || msg.toLowerCase().includes('photo')) &&
+      (msg.toLowerCase().includes('video') || msg.toLowerCase().includes('grab'));
+    if (msg && hasMedia && msg.length >= 120) return msg;
+
+    const bName = createBusinessName.trim() || 'tu negocio';
+    const isSAB = createBusinessModel === 'service_area';
+    return isSAB
+      ? (isEn
+          ? `Hello ${bName}! 👋\n\nTo complete your Google Maps profile setup as an Independent / Service Area Professional, please provide the following details:\n\n📸 *1. PHOTOS (Clear lighting):*\n- 3 Photos of your tools, equipment, or service vehicle\n- 2 Photos of your dedicated workspace or materials\n- 1 Photo of you in professional attire\n- Official logo in high resolution\n\n🎥 *2. CONTINUOUS 60s VERIFICATION VIDEO:*\n- Recording your equipment/tools\n- Recording your tax document (RUT/LLC) and business card\n- Recording your workspace or service vehicle\n\n📋 *3. OPERATING DATA:*\n- Specialties list\n- Target service areas\n- Payment methods\n- Official Gmail account where you want profile ownership\n\nWe will configure your Google Business Profile with verified local SEO categories! 🚀`
+          : `¡Hola ${bName}! 👋\n\nPara configurar la ficha oficial de tu actividad como Profesional Independiente / Servicios a Domicilio en Google Maps, requerimos los siguientes datos:\n\n📸 *1. FOTOS (Con buena luz):*\n- 3 Fotos de tus herramientas, equipos o vehículo de trabajo\n- 2 Fotos de tu espacio de trabajo o materiales\n- 1 Foto tuya con vestimenta laboral\n- Logo en buena resolución\n\n🎥 *2. VIDEO CONTINUO DE 60 SEGUNDOS (Exigido por Google):*\n- Grabando tus herramientas o equipo de servicio\n- Grabando tu RUT / registro tributario con dirección\n- Grabando tu espacio de trabajo o vehículo\n\n📋 *3. DATOS OPERATIVOS:*\n- Lista de especialidades\n- Zonas de cobertura\n- Medios de pago aceptados\n- Correo Gmail donde deseas la propiedad de la ficha\n\n¡Nos encargamos de toda la configuración técnica en Google Maps! 🚀`)
+      : (isEn
+          ? `Hello ${bName}! 👋\n\nTo complete your official Google Business Profile setup on Google Maps, please provide the following materials:\n\n📸 *1. PHOTOS (Clear lighting):*\n- 2 Exterior facade photos (daytime and evening with illuminated sign)\n- 3 Interior customer area photos\n- 4 Photos of your main specialties (${createSpecialties || 'products/services'})\n- 1 Photo of your working team\n- Official logo in high resolution\n\n🎥 *2. CONTINUOUS 60s VERIFICATION VIDEO (Official Google Protocol):*\n- Take 1: Recording the street and exterior permanent sign\n- Take 2: Opening the front door with keys\n- Take 3: Recording the register, POS, and interior operation\n\n📋 *3. OPERATING DATA:*\n- Exact operating hours\n- Accepted payment methods\n- Gmail address for profile ownership\n\nWe will configure your Google Business Profile with verified local SEO categories! 🚀`
+          : `¡Hola ${bName}! 👋\n\nPara configurar y verificar la ficha oficial de tu negocio en Google Maps con máxima autoridad, requerimos los siguientes materiales:\n\n📸 *1. FOTOS TÉCNICAS (Con buena iluminación):*\n- 2 Fotos de fachada exterior (de día y de noche con aviso comercial visible)\n- 3 Fotos del local o área de atención a clientes limpia y equipada\n- 4 Fotos de tus especialidades principales (${createSpecialties || 'servicios y tratamientos'})\n- 1 Foto del equipo de trabajo o especialistas uniformados\n- Logo oficial en alta resolución\n\n🎥 *2. VIDEO CONTINUO DE 60 SEGUNDOS (Exigido por Google sin cortes):*\n- Toma 1: Grabando la calle, número de dirección y el aviso de la fachada\n- Toma 2: Abriendo la puerta de entrada con llaves\n- Toma 3: Grabando el mostrador de recepción, datáfono/caja e instalaciones operativas\n\n📋 *3. DATOS OPERATIVOS:*\n- Horarios exactos de atención semanal\n- Medios de pago recibidos (efectivo, tarjetas, transferencias)\n- Correo de Gmail donde deseas recibir la propiedad de la ficha\n\n¡Nos encargamos de toda la arquitectura técnica, palabras clave locales y posicionamiento en Google Maps! 🚀`);
+  }, [createGeneratedData?.whatsappOnboardingMessage, createBusinessName, createBusinessModel, createSpecialties, isEn]);
   const [newAccountType, setNewAccountType] = useState<'internal_advisor' | 'partner_agency'>('internal_advisor');
   const [newAdvisorName, setNewAdvisorName] = useState('');
   const [newAdvisorUser, setNewAdvisorUser] = useState('');
@@ -4601,7 +4619,7 @@ export default function LocalStudioPage() {
                     type="button"
                     onClick={() =>
                       copyToClipboard(
-                        createGeneratedData.whatsappOnboardingMessage,
+                        effectiveWhatsappKit,
                         isEn ? 'Client Media Request Kit' : 'Mensaje para pedir fotos y video al cliente'
                       )
                     }
@@ -5027,7 +5045,7 @@ export default function LocalStudioPage() {
                         <button
                           type="button"
                           onClick={() =>
-                            copyToClipboard(createGeneratedData.whatsappOnboardingMessage, isEn ? 'WhatsApp Message' : 'Mensaje de WhatsApp')
+                            copyToClipboard(effectiveWhatsappKit, isEn ? 'WhatsApp Message' : 'Mensaje de WhatsApp')
                           }
                           className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black transition flex items-center gap-1.5 cursor-pointer print:hidden"
                         >
@@ -5036,7 +5054,7 @@ export default function LocalStudioPage() {
                         </button>
                       </div>
                       <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-300 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
-                        {createGeneratedData.whatsappOnboardingMessage}
+                        {effectiveWhatsappKit}
                       </div>
                     </div>
 

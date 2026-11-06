@@ -89,8 +89,20 @@ ANALYTICAL DIRECTIVES:
 4. OPTIMIZED TITLE: Formula: "${cleanName} | [Primary Specialty/Category] ${isEn ? 'in' : 'en'} ${cleanNeighborhood || cleanCity}".
 5. SERVICE CATALOG: 4-6 services directly derived from "${cleanSpecialties}", with commercial name, benefit description, and local search tag.
 6. PROTOCOLS & MEDIA: 5 specific photo guidelines tailored to this business, 5 preventive FAQs, and a 60-90s video verification guide tailored to ${isSAB ? 'SAB' : 'storefront'}.
-7. POSTS & VELOCITY: 4 weekly Google update posts and a review velocity schedule (target: ${targetTop3Reviews} reviews, ${reviewsPerWeek}/week).
-${mode === 'audit' ? `8. AUDIT FORENSICS: Realistic healthScore (45-70), 4 critical profile gaps, Top 3 competitive insights, and a 5-step prioritized action roadmap.` : ''}
+7. WHATSAPP MEDIA REQUEST KIT ("whatsappOnboardingMessage"):
+   The exact, ready-to-copy WhatsApp message for the agency to send directly to the owner/manager of "${cleanName}".
+   CRITICAL REQUIREMENT: This is NOT a customer greeting or chatbot response for consumers. This is an agency onboarding message asking the BUSINESS OWNER to provide their media and materials to build and verify their Google Maps profile.
+   MUST strictly include this structure with clear bullet points and emojis:
+   - Greeting to the owner: "${isEn ? `Hello ${cleanName}! 👋 To configure and verify your official Google Maps profile with maximum authority, please send us the following materials:` : `¡Hola ${cleanName}! 👋 Para configurar y verificar la ficha oficial de tu negocio en Google Maps con máxima autoridad, requerimos que nos compartas los siguientes materiales:`}"
+   - 📸 *1. FOTOS TÉCNICAS (Con buena iluminación):*
+     4-5 specific photo instructions tailored to "${cleanName}" (${cleanSpecialties || 'facade with sign, reception, clean service stations, products, team in uniform, high-res logo'}).
+   - 🎥 *2. VIDEO CONTINUO DE 60 SEGUNDOS (Verificación oficial de Google sin cortes):*
+     Toma 1: Calle, número exterior y letrero comercial. Toma 2: Abriendo la puerta con llaves. Toma 3: Mostrador de recepción, datáfono/caja y herramientas de trabajo operativas.
+   - 📋 *3. DATOS OPERATIVOS:*
+     Horarios exactos de atención, medios de pago recibidos y correo Gmail para transferir la propiedad de la ficha.
+   - Closing: "${isEn ? 'We will handle all technical architecture, SEO categories, and Google Maps local rankings! 🚀' : '¡Nosotros nos encargamos de toda la arquitectura técnica, palabras clave locales y posicionamiento en Google Maps! 🚀'}"
+8. POSTS & VELOCITY: 4 weekly Google update posts and a review velocity schedule (target: ${targetTop3Reviews} reviews, ${reviewsPerWeek}/week).
+${mode === 'audit' ? `9. AUDIT FORENSICS: Realistic healthScore (45-70), 4 critical profile gaps, Top 3 competitive insights, and a 5-step prioritized action roadmap.` : ''}
 
 RETURN STRICTLY A COMPACT VALID JSON OBJECT (NO MARKDOWN WRAPPERS):
 {
@@ -187,6 +199,21 @@ RETURN STRICTLY A COMPACT VALID JSON OBJECT (NO MARKDOWN WRAPPERS):
                   clean = clean.substring(firstBrace, lastBrace + 1);
                 }
                 const parsed = JSON.parse(clean);
+
+                // Sanitize / Enforce WhatsApp Media Kit integrity
+                const rawMsg = parsed?.whatsappOnboardingMessage || '';
+                const hasMediaTerms = (rawMsg.toLowerCase().includes('foto') || rawMsg.toLowerCase().includes('photo')) &&
+                  (rawMsg.toLowerCase().includes('video') || rawMsg.toLowerCase().includes('grab'));
+                if (!rawMsg || !hasMediaTerms || rawMsg.length < 120) {
+                  parsed.whatsappOnboardingMessage = isSAB
+                    ? isEn
+                      ? `Hello ${cleanName}! 👋\n\nTo complete your Google Maps profile setup as an Independent / Service Area Professional, please provide the following details:\n\n📸 *1. PHOTOS (Clear lighting):*\n- 3 Photos of your tools, equipment, or service vehicle\n- 2 Photos of your dedicated workspace or materials\n- 1 Photo of you in professional attire\n- Official logo in high resolution\n\n🎥 *2. CONTINUOUS 60s VERIFICATION VIDEO:*\n- Recording your equipment/tools\n- Recording your tax document (RUT/LLC) and business card\n- Recording your workspace or service vehicle\n\n📋 *3. OPERATING DATA:*\n- Specialties list\n- Target service areas\n- Payment methods\n- Official Gmail account where you want profile ownership\n\nWe will configure your Google Business Profile with verified local SEO categories! 🚀`
+                      : `¡Hola ${cleanName}! 👋\n\nPara configurar la ficha oficial de tu actividad como Profesional Independiente / Servicios a Domicilio en Google Maps, requerimos los siguientes datos:\n\n📸 *1. FOTOS (Con buena luz):*\n- 3 Fotos de tus herramientas, equipos o vehículo de trabajo\n- 2 Fotos de tu espacio de trabajo o materiales\n- 1 Foto tuya con vestimenta laboral\n- Logo en buena resolución\n\n🎥 *2. VIDEO CONTINUO DE 60 SEGUNDOS (Exigido por Google):*\n- Grabando tus herramientas o equipo de servicio\n- Grabando tu RUT / registro tributario con dirección\n- Grabando tu espacio de trabajo o vehículo\n\n📋 *3. DATOS OPERATIVOS:*\n- Lista de especialidades\n- Zonas de cobertura\n- Medios de pago aceptados\n- Correo Gmail donde deseas la propiedad de la ficha\n\n¡Nos encargamos de toda la configuración técnica en Google Maps! 🚀`
+                    : isEn
+                    ? `Hello ${cleanName}! 👋\n\nTo complete your official Google Business Profile setup on Google Maps, please provide the following materials:\n\n📸 *1. PHOTOS (Clear lighting):*\n- 2 Exterior facade photos (daytime and evening with illuminated sign)\n- 3 Interior customer area photos\n- 4 Photos of your main specialties (${cleanSpecialties || 'products/services'})\n- 1 Photo of your working team\n- Official logo in high resolution\n\n🎥 *2. CONTINUOUS 60s VERIFICATION VIDEO (Official Google Protocol):*\n- Take 1: Recording the street and exterior permanent sign\n- Take 2: Opening the front door with keys\n- Take 3: Recording the register, POS, and interior operation\n\n📋 *3. OPERATING DATA:*\n- Exact operating hours\n- Accepted payment methods\n- Gmail address for profile ownership\n\nWe will configure your Google Business Profile with verified local SEO categories! 🚀`
+                    : `¡Hola ${cleanName}! 👋\n\nPara configurar y verificar la ficha oficial de tu negocio en Google Maps con máxima autoridad, requerimos los siguientes materiales:\n\n📸 *1. FOTOS TÉCNICAS (Con buena iluminación):*\n- 2 Fotos de fachada exterior (de día y de noche con aviso comercial visible)\n- 3 Fotos del local o área de atención a clientes limpia y equipada\n- 4 Fotos de tus especialidades principales (${cleanSpecialties || 'servicios y tratamientos'})\n- 1 Foto del equipo de trabajo o especialistas uniformados\n- Logo oficial en alta resolución\n\n🎥 *2. VIDEO CONTINUO DE 60 SEGUNDOS (Exigido por Google sin cortes):*\n- Toma 1: Grabando la calle, número de dirección y el aviso de la fachada\n- Toma 2: Abriendo la puerta de entrada con llaves\n- Toma 3: Grabando el mostrador de recepción, datáfono/caja e instalaciones\n\n📋 *3. DATOS OPERATIVOS:*\n- Horarios exactos de atención semanal\n- Medios de pago recibidos (efectivo, tarjetas, transferencias)\n- Correo de Gmail donde deseas recibir la propiedad de la ficha\n\n¡Nos encargamos de toda la arquitectura técnica, palabras clave locales y posicionamiento en Google Maps! 🚀`;
+                }
+
                 return NextResponse.json({ success: true, engine: modelName, data: parsed });
               }
             } else {
