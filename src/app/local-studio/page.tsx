@@ -3664,8 +3664,31 @@ export default function LocalStudioPage() {
       setCreateCity(city);
       setCreateNeighborhood(neighborhood);
       setCreateBusinessModel(bizModel);
-      setCreateSpecialties(dossier.data?.specialties || (dossier.data?.coreKeywords ? dossier.data.coreKeywords.join(', ') : ''));
-      setCreatePhone(contactPhone || dossier.data?.phone || '');
+      const detectedSpecialties =
+        dossier.data?.specialties ||
+        (Array.isArray(dossier.data?.serviceCatalog) && dossier.data.serviceCatalog.length > 0
+          ? dossier.data.serviceCatalog.map((s: any) => s.name || s.title || s).filter(Boolean).slice(0, 3).join(', ')
+          : '') ||
+        (Array.isArray(dossier.data?.starOfferings) && dossier.data.starOfferings.length > 0
+          ? dossier.data.starOfferings.map((s: any) => s.name || s.title || s).filter(Boolean).slice(0, 3).join(', ')
+          : '') ||
+        (Array.isArray(dossier.data?.coreKeywords) && dossier.data.coreKeywords.length > 0
+          ? dossier.data.coreKeywords.slice(0, 3).join(', ')
+          : '') ||
+        (Array.isArray(dossier.data?.services) && dossier.data.services.length > 0
+          ? dossier.data.services.map((s: any) => typeof s === 'string' ? s : s.name).join(', ')
+          : '');
+      setCreateSpecialties(detectedSpecialties);
+
+      const detectedCommercialPhone =
+        dossier.data?.phone ||
+        dossier.data?.commercialPhone ||
+        contactPhone ||
+        dossier.contactPhone ||
+        dossier.data?.placeData?.phone ||
+        dossier.data?.scannedListing?.phone ||
+        '';
+      setCreatePhone(detectedCommercialPhone);
       setCreateServiceAreas(dossier.data?.serviceAreas || (dossier.data?.suggestedServiceAreas ? dossier.data.suggestedServiceAreas.join(', ') : ''));
       setCreateGeneratedData(dossier.data);
       setActiveTab('create');
@@ -4818,7 +4841,13 @@ export default function LocalStudioPage() {
                       <input
                         type="tel"
                         value={createContactPhone}
-                        onChange={(e) => setCreateContactPhone(e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCreateContactPhone(val);
+                          if (!createPhone || createPhone === createContactPhone) {
+                            setCreatePhone(val);
+                          }
+                        }}
                         placeholder="+57 300 123 4567"
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
