@@ -476,6 +476,52 @@ function parseAddressGeo(
     }
   }
 
+  // Heurística de detección automática de barrio para direcciones como "Cra. 8 Bis #155b-26, Bogotá"
+  if (!detectedNeighborhood || detectedNeighborhood === fallbackNeighborhood) {
+    const lower = rawAddress.toLowerCase();
+    if (
+      lower.includes('usaqu') ||
+      lower.includes('#15') ||
+      lower.includes('#14') ||
+      lower.includes('#13') ||
+      lower.includes('#12') ||
+      lower.includes('#16') ||
+      lower.includes('#17') ||
+      lower.includes('#18') ||
+      lower.includes('#19') ||
+      lower.includes('cedritos') ||
+      lower.includes('santa barbara')
+    ) {
+      detectedNeighborhood = 'Usaquén';
+    } else if (
+      lower.includes('chapinero') ||
+      lower.includes('chicó') ||
+      lower.includes('chico') ||
+      lower.includes('rosales') ||
+      lower.includes('#6') ||
+      lower.includes('#7') ||
+      lower.includes('#8') ||
+      lower.includes('#9') ||
+      lower.includes('#10')
+    ) {
+      detectedNeighborhood = 'Chapinero';
+    } else if (lower.includes('poblado')) {
+      detectedNeighborhood = 'El Poblado';
+    } else if (lower.includes('laureles')) {
+      detectedNeighborhood = 'Laureles';
+    } else if (lower.includes('polanco')) {
+      detectedNeighborhood = 'Polanco';
+    } else if (lower.includes('brickell')) {
+      detectedNeighborhood = 'Brickell';
+    } else if (parts.length >= 2 && parts[0] && !parts[0].includes('#') && !parts[0].toLowerCase().includes('calle') && !parts[0].toLowerCase().includes('carrera') && !parts[0].toLowerCase().includes('cra') && !parts[0].toLowerCase().includes('cl ')) {
+      detectedNeighborhood = parts[0];
+    } else if (fallbackNeighborhood) {
+      detectedNeighborhood = fallbackNeighborhood;
+    } else {
+      detectedNeighborhood = 'Usaquén';
+    }
+  }
+
   return {
     country: detectedCountry,
     city: detectedCity,
@@ -1606,6 +1652,8 @@ export default function LocalStudioPage() {
   const [isRescueScanning, setIsRescueScanning] = useState(false);
   const [rescueScannedListing, setRescueScannedListing] = useState<GooglePlaceData | null>(null);
   const [rescueBusinessName, setRescueBusinessName] = useState('');
+  const [rescueAddress, setRescueAddress] = useState<string>('');
+  const [rescuePhone, setRescuePhone] = useState<string>('');
   const [rescueCategory, setRescueCategory] = useState(CATEGORY_OPTIONS[0]);
   const [rescueCountry, setRescueCountry] = useState<string>('Colombia');
   const [rescueCity, setRescueCity] = useState<string>('Bogotá');
@@ -2214,6 +2262,8 @@ export default function LocalStudioPage() {
     setRescueSearchQuery('');
     setRescueScannedListing(null);
     setRescueBusinessName('');
+    setRescueAddress('');
+    setRescuePhone('');
     setRescueNeighborhood('');
     setRescueCategory(categoryOptions[0] || CATEGORY_OPTIONS[0]);
     setRescueScenario('third_party');
@@ -2909,8 +2959,14 @@ export default function LocalStudioPage() {
 
         extractedName = place.name || rawInput;
         setRescueBusinessName(extractedName);
-        if (place.phone && !rescueContactPhone) {
-          setRescueContactPhone(place.phone);
+        if (place.phone) {
+          setRescuePhone(place.phone);
+          if (!rescueContactPhone) {
+            setRescueContactPhone(place.phone);
+          }
+        }
+        if (place.address) {
+          setRescueAddress(place.address);
         }
 
         if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
@@ -2967,7 +3023,7 @@ export default function LocalStudioPage() {
             contactRole: rescueContactRole,
             category: matchedCategory,
             city: parsedCity,
-            neighborhood: rescueNeighborhood,
+            neighborhood: parsedNeighborhood,
             googleUrl: (placeData as any)?.googleMapsUrl || (rawInput.startsWith('http') ? rawInput : ''),
             mode: 'rescue',
             closingStatus: 'lead_draft',
@@ -2975,6 +3031,8 @@ export default function LocalStudioPage() {
             data: {
               placeData,
               scenario: rescueScenario,
+              address: placeData?.address || rescueAddress,
+              phone: placeData?.phone || rescuePhone,
               scannedAt: new Date().toISOString(),
             },
           }),
@@ -3766,18 +3824,34 @@ export default function LocalStudioPage() {
       setRescueNeighborhood(neighborhood);
       setRescueSearchQuery(dossier.googleUrl || dossier.clientName || '');
       const rescuePlace = dossier.data?.placeData || dossier.data?.scannedListing;
+      const detectedRescueAddress =
+        dossier.data?.address ||
+        rescuePlace?.address ||
+        (dossier as any).address ||
+        (neighborhood ? `${neighborhood}, ${city}` : city);
+      const detectedRescuePhone =
+        dossier.data?.phone ||
+        rescuePlace?.phone ||
+        contactPhone ||
+        '';
+      setRescueAddress(detectedRescueAddress);
+      setRescuePhone(detectedRescuePhone);
       if (rescuePlace) {
-        setRescueScannedListing(rescuePlace);
+        setRescueScannedListing({
+          ...rescuePlace,
+          address: detectedRescueAddress,
+          phone: detectedRescuePhone || rescuePlace.phone,
+        });
       } else if (dossier.clientName) {
         setRescueScannedListing({
           name: dossier.clientName,
           rating: 4.5,
           reviewsCount: 12,
           category: category,
-          address: `${neighborhood ? neighborhood + ', ' : ''}${city}, ${country}`,
+          address: detectedRescueAddress,
           googleMapsUrl: dossier.googleUrl || '',
           extractedFrom: 'smart_detect',
-          phone: contactPhone || '',
+          phone: detectedRescuePhone,
         });
       }
       if (dossier.data?.scenario) {
@@ -3958,7 +4032,7 @@ export default function LocalStudioPage() {
         city: closingFormCity.trim() || editingDossierClosing.city,
         neighborhood: closingFormNeighborhood.trim(),
         country: closingFormCountry.trim() || editingDossierClosing.country || 'Colombia',
-        mode: editingDossierClosing.mode || closingFormMode,
+        mode: closingFormMode || editingDossierClosing.mode,
         businessModel: editingDossierClosing.businessModel,
         data: editingDossierClosing.data,
         closingStatus: closingFormStatus,
@@ -8126,6 +8200,34 @@ export default function LocalStudioPage() {
                     />
                   </div>
 
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {isEn ? 'Registered Physical Address *' : 'Dirección Física Registrada en Google Maps *'}
+                      </label>
+                      <input
+                        type="text"
+                        value={rescueAddress}
+                        onChange={(e) => setRescueAddress(e.target.value)}
+                        placeholder={isEn ? 'e.g. 123 Main St, Suite 400' : 'Ej: Cra. 8 Bis #155b-26'}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 transition"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {isEn ? 'Official Listing Phone *' : 'Teléfono Oficial de la Ficha en Google Maps *'}
+                      </label>
+                      <input
+                        type="text"
+                        value={rescuePhone}
+                        onChange={(e) => setRescuePhone(e.target.value)}
+                        placeholder={isEn ? 'e.g. +1 305 123 4567' : 'Ej: +57 313 227 2123'}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 transition font-mono"
+                      />
+                    </div>
+                  </div>
+
                   {/* Localización Enlazada en Cascada: País -> Ciudad -> Barrio */}
                   <div className="space-y-2.5 p-3 rounded-2xl bg-slate-900/60 border border-slate-800">
                     <div className="flex items-center justify-between">
@@ -8357,6 +8459,114 @@ export default function LocalStudioPage() {
 
               {/* Right Column: Interactive Protocol & Evidentiary Dossier (7 cols) */}
               <div className="lg:col-span-7 space-y-4">
+                {/* Expediente Oficial de Ficha en Disputa */}
+                <div className="p-5 sm:p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 text-xs shadow-xl relative overflow-hidden">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0">
+                        <ShieldAlert className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h4 className="font-black text-white text-sm">
+                          {isEn ? 'Official Listing Dispute Dossier' : 'Expediente Oficial de Ficha en Disputa'}
+                        </h4>
+                        <span className="text-[10px] text-slate-400">
+                          {isEn ? 'Legal Ownership & Transfer Audit Protocol' : 'Protocolo Legal de Titularidad y Restitución Google Maps'}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-rose-950/80 border border-rose-500/40 text-rose-300">
+                      {rescueScenario === 'orphan'
+                        ? (isEn ? 'Status: Orphan Listing' : 'Estado: Ficha Huérfana')
+                        : rescueScenario === 'rejected'
+                        ? (isEn ? 'Status: Appeal In Progress' : 'Estado: Negativa en Apelación')
+                        : (isEn ? 'Status: 72h Dispute' : 'Estado: Disputa 72 Horas')}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800/80 space-y-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                        {isEn ? 'Listing in Dispute:' : 'Ficha en Disputa:'}
+                      </span>
+                      <p className="text-xs font-black text-white">{rescueBusinessName || rescueScannedListing?.name || 'Nombre no especificado'}</p>
+                      <div className="flex items-center gap-2 text-[10.5px] text-slate-400 pt-0.5">
+                        <span>📍 {rescueNeighborhood ? `${rescueNeighborhood}, ` : ''}{rescueCity}, {rescueCountry}</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800/80 space-y-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                        {isEn ? 'Registered Physical Address:' : 'Dirección Física Registrada:'}
+                      </span>
+                      <p className="text-xs font-semibold text-slate-200">
+                        {rescueAddress || rescueScannedListing?.address || 'Pendiente de registrar'}
+                      </p>
+                      <p className="text-[10.5px] text-amber-300 font-mono">
+                        📞 {rescuePhone || rescueScannedListing?.phone || 'Sin teléfono detectado'}
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800/80 space-y-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                        {isEn ? 'Legitimate Claimant (Client):' : 'Titular Reclamante Legítimo:'}
+                      </span>
+                      <p className="text-xs font-black text-emerald-400">{rescueContactName || 'Contacto no registrado'}</p>
+                      <p className="text-[10.5px] text-slate-300">
+                        🏢 {rescueContactCompany || rescueBusinessName} {rescueContactRole ? `(${rescueContactRole})` : ''}
+                      </p>
+                      <p className="text-[10px] text-slate-400 font-mono">
+                        📱 {rescueContactPhone || 'Sin WhatsApp'} · ✉️ {rescueContactEmail || 'Sin email'}
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800/80 space-y-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                        {isEn ? 'Current Occupant / Masked Email:' : 'Ocupante Actual / Correo Google:'}
+                      </span>
+                      <p className="text-xs font-mono font-bold text-amber-300">
+                        {rescueMaskedEmail || (rescueScenario === 'orphan' ? (isEn ? 'None (Unclaimed)' : 'Ninguno (Ficha Huérfana)') : (isEn ? 'Undisclosed by Google' : 'No divulgado por Google'))}
+                      </p>
+                      <span className="text-[10.5px] text-slate-400 block pt-0.5">
+                        {rescueScenario === 'orphan'
+                          ? (isEn ? 'Claimable immediately via phone/video' : 'Reclamable de inmediato vía llamada/video')
+                          : (isEn ? 'Subject to Google 72-Hour Legal Release Rule' : 'Sujeto a la Regla de Desbloqueo de 72h de Google')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Carta Formal de Reclamación Legal de Titularidad */}
+                <div className="p-5 sm:p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-3.5 text-xs shadow-xl">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <Scale className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span className="font-black text-white text-xs">
+                        {isEn ? 'Official Legal Restitution Letter (Google TOS Sec. 4)' : 'Carta Formal de Reclamación y Restitución de Titularidad (Google TOS Sec. 4)'}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const claimLetter = isEn
+                          ? `OFFICIAL DEMAND OF BUSINESS PROFILE RESTITUTION (GOOGLE MAPS)\n\nTo Google Business Profile Support & Current Profile Manager,\n\nSubject: Formal Claim of Ownership for "${rescueBusinessName}" located at ${rescueAddress || rescueScannedListing?.address || rescueCity}, ${rescueCountry}.\n\nI, ${rescueContactName}, acting as ${rescueContactRole} and legitimate commercial representative of ${rescueContactCompany || rescueBusinessName}, hereby formally request the immediate transfer and restitution of full ownership of the Google Business Profile "${rescueBusinessName}".\n\nPursuant to Section 4 of Google Business Profile Terms of Service, third-party agencies, contractors, or unauthorized individuals may not withhold or refuse transfer of an official business profile to its legal commercial owner.\n\nRegistered Business Data:\n- Trade Name: ${rescueBusinessName}\n- Physical Address: ${rescueAddress || rescueScannedListing?.address || 'Registered Location'}\n- Official Phone: ${rescuePhone || rescueScannedListing?.phone || rescueContactPhone}\n- Legal Owner Email for Ownership Transfer: ${rescueContactEmail}\n\nWe require the transfer to be executed within 72 business hours. Failure to comply will result in evidentiary escalation directly through Google Support Legal Concierge.\n\nSincerely,\n${rescueContactName}\n${rescueContactCompany || rescueBusinessName}\n${rescueContactPhone}`
+                          : `CARTA FORMAL DE RECLAMACIÓN Y RESTITUCIÓN DE TITULARIDAD EN GOOGLE MAPS\n\nPara: Soporte Oficial de Google Business Profile y Administrador Actual de la Ficha,\n\nAsunto: Reclamación Legal de Propiedad y Titularidad Comercial de "${rescueBusinessName}" ubicada en ${rescueAddress || rescueScannedListing?.address || rescueCity}, ${rescueCountry}.\n\nYo, ${rescueContactName}, en mi calidad de ${rescueContactRole} y legítimo titular de ${rescueContactCompany || rescueBusinessName}, por medio de la presente solicito la RESTITUCIÓN INMEDIATA de la titularidad de la ficha oficial de Google Maps de "${rescueBusinessName}".\n\nDe conformidad con las Políticas Oficiales de Google Business Profile (Sección 4: Terceros y Propiedad de Empresas), se prohíbe taxativamente que una agencia anterior, contratista o tercero retenga la propiedad de una ficha contra la voluntad del titular comercial legítimo.\n\nDatos de la Empresa en Disputa:\n- Nombre Comercial: ${rescueBusinessName}\n- Dirección Física Registrada: ${rescueAddress || rescueScannedListing?.address || 'Dirección registrada en Google Maps'}\n- Teléfono Oficial: ${rescuePhone || rescueScannedListing?.phone || rescueContactPhone}\n- Correo del Titular Legítimo para la Transferencia: ${rescueContactEmail}\n\nSolicitamos proceder con la transferencia en un plazo máximo de 72 horas hábiles. En caso de no obtener respuesta o rechazo injustificado, elevaremos este expediente ante el canal legal probatorio de Google.\n\nAtentamente,\n${rescueContactName}\n${rescueContactCompany || rescueBusinessName}\n${rescueContactPhone}`;
+                        copyToClipboard(claimLetter, isEn ? 'Legal Restitution Letter' : 'Carta Formal de Reclamación Legal');
+                      }}
+                      className="py-1.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md active:scale-98"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>{isEn ? 'Copy Legal Letter (1-Click)' : 'Copiar Carta Legal (1-Clic)'}</span>
+                    </button>
+                  </div>
+
+                  <p className="text-[11px] text-slate-300 leading-relaxed bg-slate-950 p-3.5 rounded-2xl border border-slate-800 font-mono">
+                    {isEn
+                      ? `Formal legal letter citing Google Terms of Service Sec. 4 ready to submit to Google Legal Support or send via email/WhatsApp to the unauthorized third party withholding the profile.`
+                      : `Carta jurídica redactada bajo las políticas oficiales de Google TOS Sec. 4, lista para adjuntar en la apelación ante el soporte de Google o notificar a la agencia/tercero que tiene retenida la ficha.`}
+                  </p>
+                </div>
+
                 {/* Protocol Roadmap Card */}
                 <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-5 text-xs shadow-xl">
                   {rescueScenario === 'orphan' && (
@@ -8475,38 +8685,38 @@ export default function LocalStudioPage() {
                   )}
 
                   {/* Direct Link to Google Business Profile Claim Tool */}
-                  <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                  <div className="pt-2 p-4 sm:p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
                     <div>
                       <strong className="text-white block text-xs">
                         {isEn ? 'Direct Official Google Business Profile Entry:' : 'Acceso Directo Oficial a Google Business Profile:'}
                       </strong>
-                      <span className="text-[11px] text-slate-400">
+                      <span className="text-[11px] text-slate-400 block mt-0.5">
                         {isEn
                           ? 'Starts the ownership claim flow directly on Google’s secure servers.'
                           : 'Inicia el flujo de reclamación de propiedad directamente en los servidores de Google.'}
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {rescueScannedListing?.googleMapsUrl && (
                         <a
                           href={rescueScannedListing.googleMapsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition flex items-center gap-1.5 border border-slate-700 cursor-pointer"
+                          className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition flex items-center justify-center gap-2 border border-slate-700 cursor-pointer text-center"
                         >
-                          <Globe className="w-3.5 h-3.5 text-rose-400" />
-                          <span>{tTools.rescueClaimViaMaps}</span>
+                          <Globe className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                          <span className="truncate">{tTools.rescueClaimViaMaps}</span>
                         </a>
                       )}
                       <a
                         href="https://business.google.com/create"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-lg shadow-amber-500/20 cursor-pointer"
+                        className="w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer text-center"
                       >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        <span>{tTools.rescueBtnDirectClaim}</span>
+                        <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">{tTools.rescueBtnDirectClaim}</span>
                       </a>
                     </div>
                   </div>
@@ -11507,53 +11717,27 @@ export default function LocalStudioPage() {
                       </div>
                     </div>
 
-                    {/* Service Type (Read-Only / Fixed to original dossier service) */}
+                    {/* Service Type (Editable Selector) */}
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <label className="block text-slate-300 font-bold">
                           {isEn ? 'Technical Service Delivered:' : 'Tipo de Servicio Técnico Realizado:'}
                         </label>
                         <span className="text-[10px] text-amber-400 font-bold flex items-center gap-1">
-                          🔒 {isEn ? 'Original Service (Locked)' : 'Servicio Original (Inmutable)'}
+                          ✏️ {isEn ? 'Editable' : 'Editable'}
                         </span>
                       </div>
-                      <div className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs font-bold flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          {editingDossierClosing.mode === 'create' && (
-                            <span className="flex items-center gap-1.5 text-emerald-300">
-                              <span>🏗️</span>
-                              <span>{isEn ? 'Profile Created From Scratch (Benchmark: $150 – $250 USD)' : 'Ficha Creada Desde Cero (Benchmark: $150 – $250 USD)'}</span>
-                            </span>
-                          )}
-                          {editingDossierClosing.mode === 'audit' && (
-                            <span className="flex items-center gap-1.5 text-indigo-300">
-                              <span>🔬</span>
-                              <span>{isEn ? 'Forensic Audit & Top 3 Optimization (Benchmark: $200 – $350 USD)' : 'Auditoría Forense & Optimización Top 3 (Benchmark: $200 – $350 USD)'}</span>
-                            </span>
-                          )}
-                          {editingDossierClosing.mode === 'rescue' && (
-                            <span className="flex items-center gap-1.5 text-amber-300">
-                              <span>🛡️</span>
-                              <span>{isEn ? 'Hijacked Profile Rescue / 72h Claim (Benchmark: $250 – $450 USD)' : 'Rescate de Ficha Secuestrada / Reclamación 72h (Benchmark: $250 – $450 USD)'}</span>
-                            </span>
-                          )}
-                          {editingDossierClosing.mode === 'appeal' && (
-                            <span className="flex items-center gap-1.5 text-rose-300">
-                              <span>⚖️</span>
-                              <span>{isEn ? 'Legal Review Appeal 1-3★ (Benchmark: $100 – $250 USD)' : 'Apelación Legal de Reseñas 1-3★ (Benchmark: $100 – $250 USD)'}</span>
-                            </span>
-                          )}
-                          {editingDossierClosing.mode === 'tools' && (
-                            <span className="flex items-center gap-1.5 text-cyan-300">
-                              <span>🎯</span>
-                              <span>{isEn ? 'Top 3 Commercial Closing Weapons' : 'Armas Top 3 de Cierre Comercial'}</span>
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-400 shrink-0">
-                          {isEn ? 'Delivered' : 'Ejecutado'}
-                        </span>
-                      </div>
+                      <select
+                        value={closingFormMode}
+                        onChange={(e) => setClosingFormMode(e.target.value as any)}
+                        className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-semibold focus:outline-none focus:border-amber-400 transition cursor-pointer"
+                      >
+                        <option value="create">🏗️ {isEn ? 'Profile Created From Scratch (Benchmark: $150 – $250 USD)' : 'Ficha Creada Desde Cero (Benchmark: $150 – $250 USD)'}</option>
+                        <option value="audit">🔬 {isEn ? 'Forensic Audit & Top 3 Optimization (Benchmark: $200 – $350 USD)' : 'Auditoría Forense & Optimización Top 3 (Benchmark: $200 – $350 USD)'}</option>
+                        <option value="rescue">🛡️ {isEn ? 'Hijacked Profile Rescue / 72h Claim (Benchmark: $250 – $450 USD)' : 'Rescate de Ficha Secuestrada / Reclamación 72h (Benchmark: $250 – $450 USD)'}</option>
+                        <option value="appeal">⚖️ {isEn ? 'Legal Review Appeal 1-3★ (Benchmark: $100 – $250 USD)' : 'Apelación Legal de Reseñas 1-3★ (Benchmark: $100 – $250 USD)'}</option>
+                        <option value="tools">🎯 {isEn ? 'Top 3 Commercial Closing Weapons' : 'Armas Top 3 de Cierre Comercial'}</option>
+                      </select>
                     </div>
 
                     {/* Closing Status */}

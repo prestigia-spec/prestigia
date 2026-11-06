@@ -704,6 +704,107 @@ function buildCandidateNegativeReviews(params: {
   ];
 }
 
+function extractDataFromGoogleMapsHtml(html: string): {
+  name?: string;
+  rating?: number;
+  reviewsCount?: number;
+  category?: string;
+  address?: string;
+  phone?: string;
+} {
+  const result: {
+    name?: string;
+    rating?: number;
+    reviewsCount?: number;
+    category?: string;
+    address?: string;
+    phone?: string;
+  } = {};
+
+  if (!html) return result;
+
+  // 1. Meta og:title / itemprop=name
+  const ogTitleMatch =
+    html.match(/<meta\s+property=["']og:title["']\s+content=["']([^"']+)["']/i) ||
+    html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:title["']/i);
+  if (ogTitleMatch && ogTitleMatch[1]) {
+    const rawTitle = ogTitleMatch[1].replace(/\s*-\s*Google Maps$/i, '').trim();
+    if (rawTitle && !rawTitle.toLowerCase().includes('google maps')) {
+      result.name = rawTitle;
+    }
+  }
+
+  // 2. Meta og:description (ej: "★★★★★ · 5,0 (10) · Hamburguesería · Cra. 8 Bis #155b-26, Bogotá")
+  const ogDescMatch =
+    html.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i) ||
+    html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:description["']/i);
+  if (ogDescMatch && ogDescMatch[1]) {
+    const desc = ogDescMatch[1];
+    const starRevMatch =
+      desc.match(/([1-5][.,]\d)\s*\((\d+[\d.,]*)\)/) ||
+      desc.match(/([1-5])\s*\((\d+[\d.,]*)\)/) ||
+      desc.match(/★+\s*·\s*([1-5][.,]\d)\s*\((\d+)\)/);
+    if (starRevMatch) {
+      result.rating = parseFloat(starRevMatch[1].replace(',', '.'));
+      result.reviewsCount = parseInt(starRevMatch[2].replace(/[.,]/g, ''), 10);
+    }
+    const parts = desc.split(/[·•]/).map((p) => p.trim());
+    for (const part of parts) {
+      const lower = part.toLowerCase();
+      if (
+        lower.includes('hamburg') ||
+        lower.includes('restauran') ||
+        lower.includes('caf') ||
+        lower.includes('odont') ||
+        lower.includes('clinic') ||
+        lower.includes('spa') ||
+        lower.includes('barber') ||
+        lower.includes('tienda') ||
+        lower.includes('taller') ||
+        lower.includes('veterinar') ||
+        lower.includes('hotel') ||
+        lower.includes('gimnas') ||
+        lower.includes('gym')
+      ) {
+        result.category = part;
+      } else if (
+        part.includes('#') ||
+        /(calle|cra|carrera|av|avenida|cll|kr|diagonal|transversal)/i.test(part)
+      ) {
+        result.address = part;
+      }
+    }
+  }
+
+  // 3. aria-label="5,0 estrellas 10 reseñas" o "5.0 stars 10 reviews"
+  const ariaRatingMatch = html.match(
+    /aria-label=["']([1-5][.,]\d)\s*estrellas?\s*(\d+[\d.,]*)\s*(?:reseñas?|opiniones?)/i
+  );
+  if (ariaRatingMatch) {
+    if (!result.rating) result.rating = parseFloat(ariaRatingMatch[1].replace(',', '.'));
+    if (!result.reviewsCount) result.reviewsCount = parseInt(ariaRatingMatch[2].replace(/[.,]/g, ''), 10);
+  }
+
+  // 4. Bloques JSON integrados en window.APP_INITIALIZATION_STATE
+  if (!result.rating || !result.reviewsCount) {
+    const jsonStarMatch =
+      html.match(/\[\s*([1-5]\.\d)\s*,\s*(\d+)\s*,\s*\[/) ||
+      html.match(/\[\s*\"([1-5]\.\d)\"\s*,\s*(\d+)\s*\]/);
+    if (jsonStarMatch) {
+      if (!result.rating) result.rating = parseFloat(jsonStarMatch[1]);
+      if (!result.reviewsCount) result.reviewsCount = parseInt(jsonStarMatch[2], 10);
+    }
+  }
+
+  // 5. Teléfonos colombianos o internacionales (ej: "313 2272123" o "+57 313...")
+  const phoneMatch = html.match(/(?:\+?57[\s.-]?)?(3\d{2}[\s.-]?\d{3}[\s.-]?\d{4}|\b60\d[\s.-]?\d{7}\b)/);
+  if (phoneMatch && phoneMatch[0]) {
+    result.phone = phoneMatch[0].trim();
+  }
+
+  return result;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const rawText = await req.text();
@@ -724,9 +825,10 @@ export async function POST(req: NextRequest) {
     }
 
     let targetUrl = input;
+    let directExtractedData: ReturnType<typeof extractDataFromGoogleMapsHtml> = {};
 
     // Follow shortened Google Maps links (e.g. https://maps.app.goo.gl/... or goo.gl/maps/...)
-    if (input.includes('maps.app.goo.gl') || input.includes('goo.gl/maps')) {
+    if (input.startsWith('http')) {
       try {
         const redirectRes = await fetch(input, {
           method: 'GET',
@@ -735,24 +837,28 @@ export async function POST(req: NextRequest) {
             'User-Agent':
               'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             'Accept-Language': 'es-419,es;q=0.9,en;q=0.8',
+            Cookie:
+              'CONSENT=YES+; SOCS=CAESHAgBEhJnd3NfMjAyNDA0MTUtMF9SQzIaAmVzIAEaBgiA_K-wBg',
           },
         });
         if (redirectRes.url) {
           targetUrl = redirectRes.url;
         }
+        const html = await redirectRes.text();
+        directExtractedData = extractDataFromGoogleMapsHtml(html);
       } catch (err) {
-        console.warn('Could not follow shortened redirect:', err);
+        console.warn('Could not follow shortened redirect or read HTML:', err);
       }
     }
 
-    let detectedName = '';
-    let detectedRating: number | null = null;
-    let detectedReviews: number | null = null;
-    let detectedAddress = '';
+    let detectedName = directExtractedData.name || '';
+    let detectedRating: number | null = directExtractedData.rating ?? null;
+    let detectedReviews: number | null = directExtractedData.reviewsCount ?? null;
+    let detectedAddress = directExtractedData.address || '';
     let detectedPlaceId = '';
-    let detectedCategories: string[] = [];
+    let detectedCategories: string[] = directExtractedData.category ? [directExtractedData.category] : [];
     let detectedWebsite = '';
-    let detectedPhone = '';
+    let detectedPhone = directExtractedData.phone || '';
     let detectedDescription = '';
     let extractedReviewSnippets: string[] = [];
 
