@@ -3566,7 +3566,7 @@ export default function LocalStudioPage() {
         city: closingFormCity.trim() || editingDossierClosing.city,
         neighborhood: closingFormNeighborhood.trim(),
         country: closingFormCountry.trim() || editingDossierClosing.country || 'Colombia',
-        mode: closingFormMode,
+        mode: editingDossierClosing.mode || closingFormMode,
         closingStatus: closingFormStatus,
         setupFeeChargedUsd: Number(closingFormSetupFee) || 0,
         monthlyPlanUsd: Number(closingFormMonthlyPlan) || 0,
@@ -10267,55 +10267,6 @@ export default function LocalStudioPage() {
                   {/* Cuerpo Desplazable con Barra de Movimiento */}
                   <div className="p-5 sm:p-6 pt-4 overflow-y-auto space-y-4 text-xs flex-1">
 
-                  {/* 1-Click Fast Presets */}
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">
-                      {isEn ? 'Quick Closing Presets:' : 'Plantillas Rápidas de Cierre:'}
-                    </span>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setClosingFormStatus('prestigia_subscriber');
-                          setClosingFormSetupFee(0);
-                          setClosingFormPaymentMethod('Plan Prestigia a la Medida • Setup $0 Bonificado');
-                        }}
-                        className="p-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold text-left transition cursor-pointer"
-                      >
-                        💎 {isEn ? 'Tailored Plan' : 'Plan a la Medida'}
-                        <span className="block text-[9px] text-emerald-400/80 font-normal">{isEn ? 'Setup $0 Waived' : 'Setup $0 Bonificado'}</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setClosingFormStatus('setup_paid');
-                          setClosingFormSetupFee(250);
-                          setClosingFormMonthlyPlan(0);
-                          setClosingFormPaymentMethod('Transferencia Bancaria');
-                        }}
-                        className="p-2 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 text-[11px] font-bold text-left transition cursor-pointer"
-                      >
-                        💵 {isEn ? 'Setup Only $250' : 'Setup Solo $250'}
-                        <span className="block text-[9px] text-cyan-400/80 font-normal">{isEn ? 'One-Time Payment (No MRR)' : 'Pago Único (Sin MRR)'}</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setClosingFormMode('rescue');
-                          setClosingFormStatus('setup_paid');
-                          setClosingFormSetupFee(350);
-                          setClosingFormPaymentMethod('Transferencia / Pasarela');
-                        }}
-                        className="p-2 rounded-xl bg-amber-950/80 hover:bg-amber-900 border border-amber-500/40 text-amber-300 text-[11px] font-bold text-left transition cursor-pointer"
-                      >
-                        🛡️ {isEn ? '72h Rescue $350' : 'Rescate 72h $350'}
-                        <span className="block text-[9px] text-amber-400/80 font-normal">{isEn ? 'Legal Ownership Recovery' : 'Recuperación Legal'}</span>
-                      </button>
-                    </div>
-                  </div>
-
                   {/* Form fields */}
                   <div className="space-y-3.5 text-xs">
                     {/* Location fields in closing modal */}
@@ -10407,20 +10358,53 @@ export default function LocalStudioPage() {
                       </div>
                     </div>
 
-                    {/* Service Type */}
+                    {/* Service Type (Read-Only / Fixed to original dossier service) */}
                     <div>
-                      <label className="block text-slate-300 font-bold mb-1">
-                        {isEn ? 'Technical Service Delivered:' : 'Tipo de Servicio Técnico Realizado:'}
-                      </label>
-                      <select
-                        value={closingFormMode}
-                        onChange={(e) => setClosingFormMode(e.target.value as any)}
-                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
-                      >
-                        <option value="create">{isEn ? '🏗️ Profile Created From Scratch (Benchmark: $150 – $250 USD)' : '🏗️ Ficha Creada Desde Cero (Benchmark: $150 – $250 USD)'}</option>
-                        <option value="audit">{isEn ? '🔬 Forensic Audit & Top 3 Optimization (Benchmark: $200 – $350 USD)' : '🔬 Auditoría Forense & Optimización Top 3 (Benchmark: $200 – $350 USD)'}</option>
-                        <option value="rescue">{isEn ? '🛡️ Hijacked Profile Rescue / 72h Claim (Benchmark: $250 – $450 USD)' : '🛡️ Rescate de Ficha Secuestrada / Reclamación 72h (Benchmark: $250 – $450 USD)'}</option>
-                      </select>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-slate-300 font-bold">
+                          {isEn ? 'Technical Service Delivered:' : 'Tipo de Servicio Técnico Realizado:'}
+                        </label>
+                        <span className="text-[10px] text-amber-400 font-bold flex items-center gap-1">
+                          🔒 {isEn ? 'Original Service (Locked)' : 'Servicio Original (Inmutable)'}
+                        </span>
+                      </div>
+                      <div className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs font-bold flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {editingDossierClosing.mode === 'create' && (
+                            <span className="flex items-center gap-1.5 text-emerald-300">
+                              <span>🏗️</span>
+                              <span>{isEn ? 'Profile Created From Scratch (Benchmark: $150 – $250 USD)' : 'Ficha Creada Desde Cero (Benchmark: $150 – $250 USD)'}</span>
+                            </span>
+                          )}
+                          {editingDossierClosing.mode === 'audit' && (
+                            <span className="flex items-center gap-1.5 text-indigo-300">
+                              <span>🔬</span>
+                              <span>{isEn ? 'Forensic Audit & Top 3 Optimization (Benchmark: $200 – $350 USD)' : 'Auditoría Forense & Optimización Top 3 (Benchmark: $200 – $350 USD)'}</span>
+                            </span>
+                          )}
+                          {editingDossierClosing.mode === 'rescue' && (
+                            <span className="flex items-center gap-1.5 text-amber-300">
+                              <span>🛡️</span>
+                              <span>{isEn ? 'Hijacked Profile Rescue / 72h Claim (Benchmark: $250 – $450 USD)' : 'Rescate de Ficha Secuestrada / Reclamación 72h (Benchmark: $250 – $450 USD)'}</span>
+                            </span>
+                          )}
+                          {editingDossierClosing.mode === 'appeal' && (
+                            <span className="flex items-center gap-1.5 text-rose-300">
+                              <span>⚖️</span>
+                              <span>{isEn ? 'Legal Review Appeal 1-3★ (Benchmark: $100 – $250 USD)' : 'Apelación Legal de Reseñas 1-3★ (Benchmark: $100 – $250 USD)'}</span>
+                            </span>
+                          )}
+                          {editingDossierClosing.mode === 'tools' && (
+                            <span className="flex items-center gap-1.5 text-cyan-300">
+                              <span>🎯</span>
+                              <span>{isEn ? 'Top 3 Commercial Closing Weapons' : 'Armas Top 3 de Cierre Comercial'}</span>
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-400 shrink-0">
+                          {isEn ? 'Delivered' : 'Ejecutado'}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Closing Status */}
