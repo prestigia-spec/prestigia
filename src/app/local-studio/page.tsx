@@ -2490,7 +2490,12 @@ export default function LocalStudioPage() {
             mode: 'create',
             businessModel: createBusinessModel,
             status: 'draft',
-            data: resData.data,
+            data: {
+              ...(resData.data || {}),
+              specialties: createSpecialties.trim(),
+              phone: createPhone.trim() || createContactPhone.trim(),
+              serviceAreas: createServiceAreas.trim(),
+            },
           };
           fetch('/api/local-studio/dossiers', {
             method: 'POST',
@@ -2629,7 +2634,11 @@ export default function LocalStudioPage() {
             googleUrl: finalGoogleUrl,
             mode: 'audit',
             status: 'draft',
-            data: resData.data,
+            data: {
+              ...(resData.data || {}),
+              placeData: auditScannedListing,
+              phone: auditPhone.trim() || auditContactPhone.trim(),
+            },
           };
           fetch('/api/local-studio/dossiers', {
             method: 'POST',
@@ -3130,7 +3139,12 @@ export default function LocalStudioPage() {
         mode: 'create',
         businessModel: createBusinessModel,
         status: 'draft',
-        data: createGeneratedData,
+        data: {
+          ...(createGeneratedData || {}),
+          specialties: createSpecialties.trim(),
+          phone: createPhone.trim() || createContactPhone.trim(),
+          serviceAreas: createServiceAreas.trim(),
+        },
       };
 
       const res = await fetch('/api/local-studio/dossiers', {
@@ -3179,7 +3193,11 @@ export default function LocalStudioPage() {
         googleUrl: auditGoogleUrl.trim(),
         mode: 'audit',
         status: 'draft',
-        data: auditGeneratedData,
+        data: {
+          ...(auditGeneratedData || {}),
+          placeData: auditScannedListing,
+          phone: auditPhone.trim() || auditContactPhone.trim(),
+        },
       };
 
       const res = await fetch('/api/local-studio/dossiers', {
@@ -3581,6 +3599,9 @@ export default function LocalStudioPage() {
       setCreateCity(city);
       setCreateNeighborhood(neighborhood);
       setCreateBusinessModel(bizModel);
+      setCreateSpecialties(dossier.data?.specialties || (dossier.data?.coreKeywords ? dossier.data.coreKeywords.join(', ') : ''));
+      setCreatePhone(contactPhone || dossier.data?.phone || '');
+      setCreateServiceAreas(dossier.data?.serviceAreas || (dossier.data?.suggestedServiceAreas ? dossier.data.suggestedServiceAreas.join(', ') : ''));
       setCreateGeneratedData(dossier.data);
       setActiveTab('create');
     } else if (dossier.mode === 'audit') {
@@ -3595,7 +3616,24 @@ export default function LocalStudioPage() {
       setAuditCountry(country);
       setAuditCity(city);
       setAuditNeighborhood(neighborhood);
+      setAuditPhone(contactPhone || dossier.data?.phone || '');
       setAuditGoogleUrl(dossier.googleUrl || '');
+      setAuditQuery(dossier.googleUrl || dossier.clientName || '');
+      const auditPlace = dossier.data?.placeData || dossier.data?.scannedListing;
+      if (auditPlace) {
+        setAuditScannedListing(auditPlace);
+      } else if (dossier.clientName) {
+        setAuditScannedListing({
+          name: dossier.clientName,
+          rating: dossier.data?.overallScore ? Number((dossier.data.overallScore / 20).toFixed(1)) : 4.8,
+          reviewsCount: dossier.data?.reviewsAnalyzed || 15,
+          category: category,
+          address: `${neighborhood ? neighborhood + ', ' : ''}${city}, ${country}`,
+          googleMapsUrl: dossier.googleUrl || '',
+          extractedFrom: 'smart_detect',
+          phone: contactPhone || dossier.data?.phone || '',
+        });
+      }
       setAuditGeneratedData(dossier.data);
       setActiveTab('audit');
     } else if (dossier.mode === 'rescue') {
@@ -3610,13 +3648,46 @@ export default function LocalStudioPage() {
       setRescueCountry(country);
       setRescueCity(city);
       setRescueNeighborhood(neighborhood);
+      setRescueSearchQuery(dossier.googleUrl || dossier.clientName || '');
+      const rescuePlace = dossier.data?.placeData || dossier.data?.scannedListing;
+      if (rescuePlace) {
+        setRescueScannedListing(rescuePlace);
+      } else if (dossier.clientName) {
+        setRescueScannedListing({
+          name: dossier.clientName,
+          rating: 4.5,
+          reviewsCount: 12,
+          category: category,
+          address: `${neighborhood ? neighborhood + ', ' : ''}${city}, ${country}`,
+          googleMapsUrl: dossier.googleUrl || '',
+          extractedFrom: 'smart_detect',
+          phone: contactPhone || '',
+        });
+      }
+      if (dossier.data?.scenario) {
+        setRescueScenario(dossier.data.scenario);
+      }
       setActiveTab('rescue');
     } else if (dossier.mode === 'tools') {
       setActiveToolsDossierId(dossier.id);
       setToolsBusinessName(dossier.clientName);
       setToolsCategory(category);
       setToolsCity(city);
-      if (dossier.data?.placeData) setToolsScannedListing(dossier.data.placeData);
+      setToolsSearchQuery(dossier.googleUrl || dossier.clientName || '');
+      const toolsPlace = dossier.data?.placeData || dossier.data?.scannedListing;
+      if (toolsPlace) {
+        setToolsScannedListing(toolsPlace);
+      } else if (dossier.clientName) {
+        setToolsScannedListing({
+          name: dossier.clientName,
+          rating: 4.8,
+          reviewsCount: 25,
+          category: category,
+          address: `${city}, ${country}`,
+          googleMapsUrl: dossier.googleUrl || '',
+          extractedFrom: 'smart_detect',
+        });
+      }
       setActiveTab('tools');
     } else if (dossier.mode === 'appeal') {
       setAppealContactName(contactName);
@@ -3624,6 +3695,17 @@ export default function LocalStudioPage() {
       setAppealContactPhone(contactPhone);
       setAppealContactEmail(contactEmail);
       setAppealContactRole(contactRole);
+      setAppealSearchQuery(dossier.googleUrl || dossier.clientName || '');
+      if (!scannedAppealBiz && dossier.clientName) {
+        setScannedAppealBiz({
+          name: dossier.clientName,
+          rating: 3.5,
+          reviewsCount: 10,
+          category: category,
+          googleMapsUrl: dossier.googleUrl || '',
+          extractedFrom: 'smart_detect',
+        });
+      }
       setActiveAppealDossier(dossier.data);
       if (dossier.data?.authorName) {
         setSelectedAppealReview({
