@@ -1502,6 +1502,7 @@ export default function LocalStudioPage() {
   const [createServiceAreas, setCreateServiceAreas] = useState('');
   const [isGeneratingCreate, setIsGeneratingCreate] = useState(false);
   const [createGeneratedData, setCreateGeneratedData] = useState<BlueprintData | null>(null);
+  const [activeCreateDossierId, setActiveCreateDossierId] = useState<string | null>(null);
 
   // -------------------------------------------------------------
   // TAB 2: AUDITAR & OPTIMIZAR (AUDIT) DEDICATED STATE
@@ -1526,6 +1527,7 @@ export default function LocalStudioPage() {
   const [auditExistingReviews, setAuditExistingReviews] = useState<number>(0);
   const [isGeneratingAudit, setIsGeneratingAudit] = useState(false);
   const [auditGeneratedData, setAuditGeneratedData] = useState<BlueprintData | null>(null);
+  const [activeAuditDossierId, setActiveAuditDossierId] = useState<string | null>(null);
 
   // -------------------------------------------------------------
   // TAB 3: RESCATAR FICHA (RESCUE) DEDICATED STATE
@@ -2105,6 +2107,7 @@ export default function LocalStudioPage() {
     setCreateServiceAreas('');
     setCreateCategory(categoryOptions[0] || CATEGORY_OPTIONS[0]);
     setCreateGeneratedData(null);
+    setActiveCreateDossierId(null);
     showToast(isEn ? '✨ Ready to create a new profile' : '✨ Formulario listo para crear una nueva ficha');
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2127,6 +2130,7 @@ export default function LocalStudioPage() {
     setAuditExistingReviews(0);
     setAuditCategory(categoryOptions[0] || CATEGORY_OPTIONS[0]);
     setAuditGeneratedData(null);
+    setActiveAuditDossierId(null);
     setShowManualAuditFields(false);
     showToast(isEn ? '✨ Ready to run a new audit' : '✨ Formulario listo para una nueva auditoría');
     if (typeof window !== 'undefined') {
@@ -2411,6 +2415,7 @@ export default function LocalStudioPage() {
         // AUTO-SAVE to database
         try {
           const autoPayload = {
+            id: activeCreateDossierId || undefined,
             advisorId: currentUser?.id || 'adv-luisma',
             advisorName: currentUser?.name || 'Luisma • Director General',
             advisorPhone: currentUser?.phone || '+573058314049',
@@ -2434,7 +2439,14 @@ export default function LocalStudioPage() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(autoPayload),
-          }).then(() => fetchDossiers());
+          })
+            .then((r) => r.json())
+            .then((saveData) => {
+              if (saveData?.dossier?.id) {
+                setActiveCreateDossierId(saveData.dossier.id);
+              }
+              fetchDossiers();
+            });
         } catch (autoErr) {
           console.warn('Auto-save error:', autoErr);
         }
@@ -2518,6 +2530,7 @@ export default function LocalStudioPage() {
         // AUTO-SAVE to database
         try {
           const autoPayload = {
+            id: activeAuditDossierId || undefined,
             advisorId: currentUser?.id || 'adv-luisma',
             advisorName: currentUser?.name || 'Luisma • Director General',
             advisorPhone: currentUser?.phone || '+573058314049',
@@ -2540,7 +2553,14 @@ export default function LocalStudioPage() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(autoPayload),
-          }).then(() => fetchDossiers());
+          })
+            .then((r) => r.json())
+            .then((saveData) => {
+              if (saveData?.dossier?.id) {
+                setActiveAuditDossierId(saveData.dossier.id);
+              }
+              fetchDossiers();
+            });
         } catch (autoErr) {
           console.warn('Auto-save error:', autoErr);
         }
@@ -2892,6 +2912,7 @@ export default function LocalStudioPage() {
 
     try {
       const payload = {
+        id: activeCreateDossierId || undefined,
         advisorId: currentUser?.id || 'adv-luisma',
         advisorName: currentUser?.name || 'Luisma • Director General',
         advisorPhone: currentUser?.phone || '+573058314049',
@@ -2920,7 +2941,10 @@ export default function LocalStudioPage() {
 
       const resData = await res.json();
       if (resData.success) {
-        showToast('💾 ¡Expediente guardado en Cartera de Clientes!');
+        if (resData.dossier?.id) {
+          setActiveCreateDossierId(resData.dossier.id);
+        }
+        showToast(isEn ? '💾 Dossier saved & synced in Client Portfolio!' : '💾 ¡Expediente guardado y sincronizado en Cartera de Clientes!');
         fetchDossiers();
       } else {
         showToast('⚠️ Error al guardar: ' + (resData.error || ''));
@@ -2938,6 +2962,7 @@ export default function LocalStudioPage() {
 
     try {
       const payload = {
+        id: activeAuditDossierId || undefined,
         advisorId: currentUser?.id || 'adv-luisma',
         advisorName: currentUser?.name || 'Luisma • Director General',
         advisorPhone: currentUser?.phone || '+573058314049',
@@ -2965,7 +2990,10 @@ export default function LocalStudioPage() {
 
       const resData = await res.json();
       if (resData.success) {
-        showToast('💾 ¡Expediente guardado en Cartera de Clientes!');
+        if (resData.dossier?.id) {
+          setActiveAuditDossierId(resData.dossier.id);
+        }
+        showToast(isEn ? '💾 Audit saved & synced in Client Portfolio!' : '💾 ¡Auditoría guardada y sincronizada en Cartera!');
         fetchDossiers();
       } else {
         showToast('⚠️ Error al guardar: ' + (resData.error || ''));
@@ -2992,16 +3020,33 @@ export default function LocalStudioPage() {
 
   // 100% PRIVATE DOSSIERS: ONLY Luisma's personal clients (Never mixed with team)
   const luismaBaseDossiers = useMemo(() => {
-    if (!isLuismaMaster) {
-      return savedDossiers.filter((d) => !d.deletedByAdvisor);
-    }
-    return savedDossiers.filter(
-      (d) =>
-        (d.advisorId === 'adv-luisma' ||
-        d.advisorName.toLowerCase().includes('luisma') ||
-        d.advisorName.toLowerCase().includes('director')) &&
-        !d.deletedByAdvisor
-    );
+    const rawList = !isLuismaMaster
+      ? savedDossiers.filter((d) => !d.deletedByAdvisor)
+      : savedDossiers.filter(
+          (d) =>
+            (d.advisorId === 'adv-luisma' ||
+            d.advisorName.toLowerCase().includes('luisma') ||
+            d.advisorName.toLowerCase().includes('director')) &&
+            !d.deletedByAdvisor
+        );
+
+    // Deduplicación inteligente: si existen registros duplicados accidentales para el mismo cliente y modo, mostrar únicamente el más reciente
+    const map = new Map<string, StudioDossierRecord>();
+    rawList.forEach((d) => {
+      const key = `${d.advisorId}_${d.mode}_${d.clientName.trim().toLowerCase()}`;
+      const prev = map.get(key);
+      if (!prev) {
+        map.set(key, d);
+      } else {
+        const prevTime = new Date(prev.updatedAt || prev.createdAt).getTime();
+        const currTime = new Date(d.updatedAt || d.createdAt).getTime();
+        if (currTime >= prevTime) {
+          map.set(key, d);
+        }
+      }
+    });
+
+    return Array.from(map.values());
   }, [savedDossiers, isLuismaMaster]);
 
   // Dynamic filter values from Luisma's portfolio
@@ -3098,7 +3143,7 @@ export default function LocalStudioPage() {
 
   // NETWORK DOSSIERS: All team advisors and licensed B2B partner agencies
   const networkFilteredDossiers = useMemo(() => {
-    return savedDossiers
+    const list = savedDossiers
       .filter((d) => d.advisorId !== 'adv-luisma' && !d.deletedByAdvisor) // Exclude Luisma's private records & deleted
       .filter((d) => {
         if (networkAdvisorFilter !== 'all' && d.advisorId !== networkAdvisorFilter) return false;
@@ -3125,6 +3170,23 @@ export default function LocalStudioPage() {
         }
         return true;
       });
+
+    const map = new Map<string, StudioDossierRecord>();
+    list.forEach((d) => {
+      const key = `${d.advisorId}_${d.mode}_${d.clientName.trim().toLowerCase()}`;
+      const prev = map.get(key);
+      if (!prev) {
+        map.set(key, d);
+      } else {
+        const prevTime = new Date(prev.updatedAt || prev.createdAt).getTime();
+        const currTime = new Date(d.updatedAt || d.createdAt).getTime();
+        if (currTime >= prevTime) {
+          map.set(key, d);
+        }
+      }
+    });
+
+    return Array.from(map.values());
   }, [
     savedDossiers,
     networkAdvisorFilter,
@@ -3274,6 +3336,7 @@ export default function LocalStudioPage() {
   // Load a dossier from list into workspace
   const handleLoadDossier = (dossier: StudioDossierRecord) => {
     if (dossier.mode === 'create') {
+      setActiveCreateDossierId(dossier.id);
       setCreateBusinessName(dossier.clientName);
       setCreateContactName(dossier.contactName || '');
       setCreateContactCompany(dossier.contactCompany || '');
@@ -3288,6 +3351,7 @@ export default function LocalStudioPage() {
       setCreateGeneratedData(dossier.data);
       setActiveTab('create');
     } else if (dossier.mode === 'audit') {
+      setActiveAuditDossierId(dossier.id);
       setAuditBusinessName(dossier.clientName);
       setAuditContactName(dossier.contactName || '');
       setAuditContactCompany(dossier.contactCompany || '');

@@ -88,7 +88,22 @@ export async function POST(request: Request) {
     }
 
     const allDossiers = await getAllStudioDossiers();
-    const existing = id ? allDossiers.find((d) => d.id === id) : null;
+    const cleanClient = clientName.trim().toLowerCase();
+    const cleanPhone = (contactPhone || '').trim();
+    const cleanEmail = (contactEmail || '').trim().toLowerCase();
+    const targetMode = (mode as any) || 'create';
+
+    const existing = id
+      ? allDossiers.find((d) => d.id === id)
+      : allDossiers.find((d) => {
+          if (d.deletedByAdvisor) return false;
+          if (d.advisorId !== advisorId) return false;
+          if (d.mode !== targetMode) return false;
+          const sameName = d.clientName.trim().toLowerCase() === cleanClient;
+          const samePhone = Boolean(cleanPhone && d.contactPhone && d.contactPhone.trim() === cleanPhone);
+          const sameEmail = Boolean(cleanEmail && d.contactEmail && d.contactEmail.trim().toLowerCase() === cleanEmail);
+          return sameName || samePhone || sameEmail;
+        });
 
     if (!existing && advisorId !== 'adv-luisma' && advisorId !== 'luisma') {
       const { getAllStudioAdvisors } = await import('@/lib/db');
@@ -104,7 +119,6 @@ export async function POST(request: Request) {
           return cd.getFullYear() === curYear && cd.getMonth() === curMonth;
         });
 
-        const targetMode = (mode as any) || 'create';
         const used = monthDossiers.filter((d) => d.mode === targetMode).length;
         const limit = targetMode === 'create'
           ? (currentAdv.maxCreatesMonthly ?? 30)
@@ -135,7 +149,7 @@ export async function POST(request: Request) {
     }
 
     const dossierObj: StudioDossier = {
-      id: id || `dos-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
+      id: existing?.id || id || `dos-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
       advisorId: existing?.advisorId || advisorId,
       advisorName: existing?.advisorName || advisorName,
       advisorPhone: existing?.advisorPhone || advisorPhone,
