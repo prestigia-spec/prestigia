@@ -3640,16 +3640,40 @@ export default function LocalStudioPage() {
 
   // Load a dossier from list into workspace
   const handleLoadDossier = (dossier: StudioDossierRecord) => {
-    const contactName = dossier.contactName || dossier.data?.contactName || '';
-    const contactCompany = dossier.contactCompany || dossier.data?.contactCompany || dossier.clientName || '';
-    const contactPhone = dossier.contactPhone || dossier.data?.contactPhone || '';
-    const contactEmail = dossier.contactEmail || dossier.data?.contactEmail || '';
-    const contactRole = dossier.contactRole || dossier.data?.contactRole || 'Dueño / Propietario';
-    const city = dossier.city || dossier.data?.city || 'Bogotá';
-    const neighborhood = dossier.neighborhood || dossier.data?.neighborhood || '';
-    const country = dossier.country || dossier.data?.country || 'Colombia';
-    const category = dossier.category || dossier.data?.category || categoryOptions[0];
-    const bizModel = (dossier.businessModel || dossier.data?.businessModel || 'storefront') as 'storefront' | 'service_area';
+    const raw: any = dossier;
+    const contactName = dossier.contactName || raw.contact_name || dossier.data?.contactName || '';
+    const contactCompany = dossier.contactCompany || raw.contact_company || dossier.data?.contactCompany || dossier.clientName || '';
+    const contactPhone =
+      dossier.contactPhone ||
+      raw.contact_phone ||
+      dossier.data?.contactPhone ||
+      dossier.data?.phone ||
+      dossier.data?.commercialPhone ||
+      dossier.data?.placeData?.phone ||
+      dossier.data?.scannedListing?.phone ||
+      '';
+    const contactEmail =
+      dossier.contactEmail ||
+      raw.contact_email ||
+      dossier.data?.contactEmail ||
+      dossier.data?.email ||
+      dossier.data?.placeData?.email ||
+      '';
+    const contactRole = dossier.contactRole || raw.contact_role || dossier.data?.contactRole || 'Dueño / Propietario';
+    const city = dossier.city || raw.city || dossier.data?.city || 'Bogotá';
+    const neighborhood = dossier.neighborhood || raw.neighborhood || dossier.data?.neighborhood || '';
+    const country = dossier.country || raw.country || dossier.data?.country || 'Colombia';
+    const category = dossier.category || raw.category || dossier.data?.category || categoryOptions[0];
+    const bizModel = (dossier.businessModel || raw.business_model || dossier.data?.businessModel || 'storefront') as 'storefront' | 'service_area';
+    const resolvedGoogleUrl =
+      dossier.googleUrl ||
+      raw.google_url ||
+      dossier.data?.googleUrl ||
+      dossier.data?.googleMapsUrl ||
+      dossier.data?.placeData?.googleMapsUrl ||
+      dossier.data?.scannedListing?.googleMapsUrl ||
+      dossier.data?.url ||
+      '';
 
     if (dossier.mode === 'create') {
       setActiveCreateDossierId(dossier.id);
@@ -3705,11 +3729,15 @@ export default function LocalStudioPage() {
       setAuditCity(city);
       setAuditNeighborhood(neighborhood);
       setAuditPhone(contactPhone || dossier.data?.phone || '');
-      setAuditGoogleUrl(dossier.googleUrl || '');
-      setAuditQuery(dossier.googleUrl || dossier.clientName || '');
+      setAuditGoogleUrl(resolvedGoogleUrl);
+      setAuditQuery(resolvedGoogleUrl || dossier.clientName || '');
       const auditPlace = dossier.data?.placeData || dossier.data?.scannedListing;
       if (auditPlace) {
-        setAuditScannedListing(auditPlace);
+        setAuditScannedListing({
+          ...auditPlace,
+          phone: auditPlace.phone || contactPhone,
+          googleMapsUrl: auditPlace.googleMapsUrl || resolvedGoogleUrl,
+        });
       } else if (dossier.clientName) {
         setAuditScannedListing({
           name: dossier.clientName,
@@ -3717,7 +3745,7 @@ export default function LocalStudioPage() {
           reviewsCount: dossier.data?.reviewsAnalyzed || 15,
           category: category,
           address: `${neighborhood ? neighborhood + ', ' : ''}${city}, ${country}`,
-          googleMapsUrl: dossier.googleUrl || '',
+          googleMapsUrl: resolvedGoogleUrl || '',
           extractedFrom: 'smart_detect',
           phone: contactPhone || dossier.data?.phone || '',
         });
