@@ -2209,6 +2209,23 @@ export default function LocalStudioPage() {
     }
   };
 
+  // Sanitización y Validación Estricta de Entradas (Letras para nombres, + y números para teléfonos, formato de email obligatorio)
+  const sanitizeLettersOnly = (val: string) => {
+    return val.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]/g, '');
+  };
+
+  const sanitizePhoneOnly = (val: string) => {
+    const cleaned = val.replace(/[^\d+]/g, '');
+    if (cleaned.startsWith('+')) {
+      return '+' + cleaned.slice(1).replace(/\+/g, '');
+    }
+    return cleaned.replace(/\+/g, '');
+  };
+
+  const isValidEmailFormat = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
+  };
+
   const handleResetCreateForm = () => {
     setCreateContactName('');
     setCreateContactCompany('');
@@ -2317,6 +2334,14 @@ export default function LocalStudioPage() {
       showToast(isEn ? '⚠️ Client Email is required (*)' : '⚠️ El Correo Electrónico del cliente es obligatorio (*)');
       return;
     }
+    if (!isValidEmailFormat(appealContactEmail)) {
+      showToast(isEn ? '⚠️ Client Email must have a valid email format (e.g. name@company.com) (*)' : '⚠️ El Correo Electrónico debe tener un formato válido obligatorio (ej: nombre@empresa.com) (*)');
+      return;
+    }
+    if (appealContactPhone.replace(/[^\d]/g, '').length < 7) {
+      showToast(isEn ? '⚠️ Direct WhatsApp must contain at least 7 digits (*)' : '⚠️ El WhatsApp Directo debe contener al menos 7 números (*)');
+      return;
+    }
 
     const query = appealSearchQuery.trim();
     if (!query) {
@@ -2369,6 +2394,14 @@ export default function LocalStudioPage() {
     }
     if (!appealContactEmail.trim()) {
       showToast(isEn ? '⚠️ Client Email is required (*)' : '⚠️ El Correo Electrónico del cliente es obligatorio (*)');
+      return;
+    }
+    if (!isValidEmailFormat(appealContactEmail)) {
+      showToast(isEn ? '⚠️ Client Email must have a valid email format (e.g. name@company.com) (*)' : '⚠️ El Correo Electrónico debe tener un formato válido obligatorio (ej: nombre@empresa.com) (*)');
+      return;
+    }
+    if (appealContactPhone.replace(/[^\d]/g, '').length < 7) {
+      showToast(isEn ? '⚠️ Direct WhatsApp must contain at least 7 digits (*)' : '⚠️ El WhatsApp Directo debe contener al menos 7 números (*)');
       return;
     }
 
@@ -2479,6 +2512,14 @@ export default function LocalStudioPage() {
       showToast(isEn ? '⚠️ Client Email is required (*)' : '⚠️ El Correo Electrónico del cliente es obligatorio (*)');
       return;
     }
+    if (!isValidEmailFormat(appealContactEmail)) {
+      showToast(isEn ? '⚠️ Client Email must have a valid email format (e.g. name@company.com) (*)' : '⚠️ El Correo Electrónico debe tener un formato válido obligatorio (ej: nombre@empresa.com) (*)');
+      return;
+    }
+    if (appealContactPhone.replace(/[^\d]/g, '').length < 7) {
+      showToast(isEn ? '⚠️ Direct WhatsApp must contain at least 7 digits (*)' : '⚠️ El WhatsApp Directo debe contener al menos 7 números (*)');
+      return;
+    }
     if (!manualAuthor.trim()) {
       showToast(isEn ? '⚠️ Review author name is required (*)' : '⚠️ El nombre del autor de la reseña es obligatorio (*)');
       return;
@@ -2522,6 +2563,14 @@ export default function LocalStudioPage() {
     }
     if (!createContactEmail.trim()) {
       showToast(isEn ? '⚠️ Client Email is required (*)' : '⚠️ El Correo Electrónico del cliente es obligatorio (*)');
+      return;
+    }
+    if (!isValidEmailFormat(createContactEmail)) {
+      showToast(isEn ? '⚠️ Client Email must have a valid email format (e.g. name@company.com) (*)' : '⚠️ El Correo Electrónico debe tener un formato válido obligatorio (ej: nombre@empresa.com) (*)');
+      return;
+    }
+    if (createContactPhone.replace(/[^\d]/g, '').length < 7) {
+      showToast(isEn ? '⚠️ Direct WhatsApp must contain at least 7 digits (*)' : '⚠️ El WhatsApp Directo debe contener al menos 7 números (*)');
       return;
     }
     if (!finalBizName) {
@@ -2671,6 +2720,14 @@ export default function LocalStudioPage() {
       showToast(isEn ? '⚠️ Client Email is required (*)' : '⚠️ El Correo Electrónico del cliente es obligatorio (*)');
       return;
     }
+    if (!isValidEmailFormat(auditContactEmail)) {
+      showToast(isEn ? '⚠️ Client Email must have a valid email format (e.g. name@company.com) (*)' : '⚠️ El Correo Electrónico debe tener un formato válido obligatorio (ej: nombre@empresa.com) (*)');
+      return;
+    }
+    if (auditContactPhone.replace(/[^\d]/g, '').length < 7) {
+      showToast(isEn ? '⚠️ Direct WhatsApp must contain at least 7 digits (*)' : '⚠️ El WhatsApp Directo debe contener al menos 7 números (*)');
+      return;
+    }
 
     const finalBizName = (overrides?.businessName ?? auditBusinessName).trim();
     if (!finalBizName) {
@@ -2801,6 +2858,14 @@ export default function LocalStudioPage() {
       showToast(isEn ? '⚠️ Client Email is required (*)' : '⚠️ El Correo Electrónico del cliente es obligatorio (*)');
       return;
     }
+    if (!isValidEmailFormat(auditContactEmail)) {
+      showToast(isEn ? '⚠️ Client Email must have a valid email format (e.g. name@company.com) (*)' : '⚠️ El Correo Electrónico debe tener un formato válido obligatorio (ej: nombre@empresa.com) (*)');
+      return;
+    }
+    if (auditContactPhone.replace(/[^\d]/g, '').length < 7) {
+      showToast(isEn ? '⚠️ Direct WhatsApp must contain at least 7 digits (*)' : '⚠️ El WhatsApp Directo debe contener al menos 7 números (*)');
+      return;
+    }
 
     const rawInput = auditQuery.trim();
     if (!rawInput) {
@@ -2918,6 +2983,14 @@ export default function LocalStudioPage() {
     }
     if (!rescueContactEmail.trim()) {
       showToast(isEn ? '⚠️ Client Email is required (*)' : '⚠️ El Correo Electrónico del cliente es obligatorio (*)');
+      return;
+    }
+    if (!isValidEmailFormat(rescueContactEmail)) {
+      showToast(isEn ? '⚠️ Client Email must have a valid email format (e.g. name@company.com) (*)' : '⚠️ El Correo Electrónico debe tener un formato válido obligatorio (ej: nombre@empresa.com) (*)');
+      return;
+    }
+    if (rescueContactPhone.replace(/[^\d]/g, '').length < 7) {
+      showToast(isEn ? '⚠️ Direct WhatsApp must contain at least 7 digits (*)' : '⚠️ El WhatsApp Directo debe contener al menos 7 números (*)');
       return;
     }
 
@@ -4909,8 +4982,8 @@ export default function LocalStudioPage() {
                       <input
                         type="text"
                         value={createContactName}
-                        onChange={(e) => setCreateContactName(e.target.value)}
-                        placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
+                        onChange={(e) => setCreateContactName(sanitizeLettersOnly(e.target.value))}
+                        placeholder={isEn ? 'e.g. John Doe (letters only)' : 'Ej: Carlos Gómez (solo letras)'}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
                     </div>
@@ -4948,28 +5021,44 @@ export default function LocalStudioPage() {
                         type="tel"
                         value={createContactPhone}
                         onChange={(e) => {
-                          const val = e.target.value;
+                          const val = sanitizePhoneOnly(e.target.value);
                           setCreateContactPhone(val);
                           if (!createPhone || createPhone === createContactPhone) {
                             setCreatePhone(val);
                           }
                         }}
                         placeholder="+57 300 123 4567"
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs font-mono"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Email *' : 'Correo Electrónico *'}
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                        <span>{isEn ? 'Email *' : 'Correo Electrónico *'}</span>
+                        {createContactEmail && (
+                          <span className={`text-[9px] font-bold ${isValidEmailFormat(createContactEmail) ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {isValidEmailFormat(createContactEmail) ? '✓ Válido' : '⚠️ Formato requerido'}
+                          </span>
+                        )}
                       </label>
                       <input
                         type="email"
                         value={createContactEmail}
-                        onChange={(e) => setCreateContactEmail(e.target.value)}
+                        onChange={(e) => setCreateContactEmail(e.target.value.trim())}
                         placeholder={isEn ? 'contact@company.com' : 'contacto@empresa.com'}
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        className={`w-full px-3 py-1.5 rounded-xl bg-slate-900 border text-white placeholder:text-slate-500 focus:outline-none text-xs transition ${
+                          createContactEmail && !isValidEmailFormat(createContactEmail)
+                            ? 'border-rose-500 focus:border-rose-400 ring-1 ring-rose-500/30'
+                            : createContactEmail && isValidEmailFormat(createContactEmail)
+                            ? 'border-emerald-500/50 focus:border-emerald-400'
+                            : 'border-slate-700 focus:border-indigo-400'
+                        }`}
                       />
+                      {createContactEmail && !isValidEmailFormat(createContactEmail) && (
+                        <span className="text-[9px] text-rose-400 block mt-0.5 font-medium">
+                          {isEn ? 'Required format: name@domain.com' : 'Formato requerido: nombre@dominio.com'}
+                        </span>
+                      )}
                     </div>
 
                     <div>
@@ -5181,11 +5270,11 @@ export default function LocalStudioPage() {
                   <div>
                     <label className="block font-bold text-slate-300 mb-1">{t.phone}</label>
                     <input
-                      type="text"
+                      type="tel"
                       value={createPhone}
-                      onChange={(e) => setCreatePhone(e.target.value)}
+                      onChange={(e) => setCreatePhone(sanitizePhoneOnly(e.target.value))}
                       placeholder={t.phonePlaceholder}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 transition font-mono"
                     />
                   </div>
                 </div>
@@ -5206,6 +5295,7 @@ export default function LocalStudioPage() {
                     !createContactCompany.trim() ||
                     !createContactPhone.trim() ||
                     !createContactEmail.trim() ||
+                    !isValidEmailFormat(createContactEmail) ||
                     !createBusinessName.trim() ||
                     !createCity.trim() ||
                     !createNeighborhood.trim() ||
@@ -6347,8 +6437,8 @@ export default function LocalStudioPage() {
                       <input
                         type="text"
                         value={auditContactName}
-                        onChange={(e) => setAuditContactName(e.target.value)}
-                        placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
+                        onChange={(e) => setAuditContactName(sanitizeLettersOnly(e.target.value))}
+                        placeholder={isEn ? 'e.g. John Doe (letters only)' : 'Ej: Carlos Gómez (solo letras)'}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
                     </div>
@@ -6385,23 +6475,39 @@ export default function LocalStudioPage() {
                       <input
                         type="tel"
                         value={auditContactPhone}
-                        onChange={(e) => setAuditContactPhone(e.target.value)}
+                        onChange={(e) => setAuditContactPhone(sanitizePhoneOnly(e.target.value))}
                         placeholder="+57 300 123 4567"
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs font-mono"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Email *' : 'Correo Electrónico *'}
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                        <span>{isEn ? 'Email *' : 'Correo Electrónico *'}</span>
+                        {auditContactEmail && (
+                          <span className={`text-[9px] font-bold ${isValidEmailFormat(auditContactEmail) ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {isValidEmailFormat(auditContactEmail) ? '✓ Válido' : '⚠️ Formato requerido'}
+                          </span>
+                        )}
                       </label>
                       <input
                         type="email"
                         value={auditContactEmail}
-                        onChange={(e) => setAuditContactEmail(e.target.value)}
+                        onChange={(e) => setAuditContactEmail(e.target.value.trim())}
                         placeholder={isEn ? 'contact@company.com' : 'contacto@empresa.com'}
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        className={`w-full px-3 py-1.5 rounded-xl bg-slate-900 border text-white placeholder:text-slate-500 focus:outline-none text-xs transition ${
+                          auditContactEmail && !isValidEmailFormat(auditContactEmail)
+                            ? 'border-rose-500 focus:border-rose-400 ring-1 ring-rose-500/30'
+                            : auditContactEmail && isValidEmailFormat(auditContactEmail)
+                            ? 'border-emerald-500/50 focus:border-emerald-400'
+                            : 'border-slate-700 focus:border-indigo-400'
+                        }`}
                       />
+                      {auditContactEmail && !isValidEmailFormat(auditContactEmail) && (
+                        <span className="text-[9px] text-rose-400 block mt-0.5 font-medium">
+                          {isEn ? 'Required format: name@domain.com' : 'Formato requerido: nombre@dominio.com'}
+                        </span>
+                      )}
                     </div>
 
                     <div>
@@ -6573,6 +6679,7 @@ export default function LocalStudioPage() {
                       !auditContactCompany.trim() ||
                       !auditContactPhone.trim() ||
                       !auditContactEmail.trim() ||
+                      !isValidEmailFormat(auditContactEmail) ||
                       !auditQuery.trim() ||
                       (!isLuismaMaster && monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))
                     }
@@ -7970,8 +8077,8 @@ export default function LocalStudioPage() {
                       <input
                         type="text"
                         value={rescueContactName}
-                        onChange={(e) => setRescueContactName(e.target.value)}
-                        placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
+                        onChange={(e) => setRescueContactName(sanitizeLettersOnly(e.target.value))}
+                        placeholder={isEn ? 'e.g. John Doe (letters only)' : 'Ej: Carlos Gómez (solo letras)'}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
                     </div>
@@ -8008,23 +8115,39 @@ export default function LocalStudioPage() {
                       <input
                         type="tel"
                         value={rescueContactPhone}
-                        onChange={(e) => setRescueContactPhone(e.target.value)}
+                        onChange={(e) => setRescueContactPhone(sanitizePhoneOnly(e.target.value))}
                         placeholder="+57 300 123 4567"
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs font-mono"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Email *' : 'Correo Electrónico *'}
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                        <span>{isEn ? 'Email *' : 'Correo Electrónico *'}</span>
+                        {rescueContactEmail && (
+                          <span className={`text-[9px] font-bold ${isValidEmailFormat(rescueContactEmail) ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {isValidEmailFormat(rescueContactEmail) ? '✓ Válido' : '⚠️ Formato requerido'}
+                          </span>
+                        )}
                       </label>
                       <input
                         type="email"
                         value={rescueContactEmail}
-                        onChange={(e) => setRescueContactEmail(e.target.value)}
+                        onChange={(e) => setRescueContactEmail(e.target.value.trim())}
                         placeholder={isEn ? 'contact@company.com' : 'contacto@empresa.com'}
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        className={`w-full px-3 py-1.5 rounded-xl bg-slate-900 border text-white placeholder:text-slate-500 focus:outline-none text-xs transition ${
+                          rescueContactEmail && !isValidEmailFormat(rescueContactEmail)
+                            ? 'border-rose-500 focus:border-rose-400 ring-1 ring-rose-500/30'
+                            : rescueContactEmail && isValidEmailFormat(rescueContactEmail)
+                            ? 'border-emerald-500/50 focus:border-emerald-400'
+                            : 'border-slate-700 focus:border-indigo-400'
+                        }`}
                       />
+                      {rescueContactEmail && !isValidEmailFormat(rescueContactEmail) && (
+                        <span className="text-[9px] text-rose-400 block mt-0.5 font-medium">
+                          {isEn ? 'Required format: name@domain.com' : 'Formato requerido: nombre@dominio.com'}
+                        </span>
+                      )}
                     </div>
 
                     <div>
@@ -8110,6 +8233,7 @@ export default function LocalStudioPage() {
                       !rescueContactCompany.trim() ||
                       !rescueContactPhone.trim() ||
                       !rescueContactEmail.trim() ||
+                      !isValidEmailFormat(rescueContactEmail) ||
                       !rescueSearchQuery.trim() ||
                       (!isLuismaMaster && monthlyUsage.rescues >= (currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)))
                     }
@@ -8223,9 +8347,9 @@ export default function LocalStudioPage() {
                         {isEn ? 'Official Listing Phone *' : 'Teléfono Oficial de la Ficha en Google Maps *'}
                       </label>
                       <input
-                        type="text"
+                        type="tel"
                         value={rescuePhone}
-                        onChange={(e) => setRescuePhone(e.target.value)}
+                        onChange={(e) => setRescuePhone(sanitizePhoneOnly(e.target.value))}
                         placeholder={isEn ? 'e.g. +1 305 123 4567' : 'Ej: +57 313 227 2123'}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 transition font-mono"
                       />
@@ -9143,8 +9267,8 @@ export default function LocalStudioPage() {
                       <input
                         type="text"
                         value={appealContactName}
-                        onChange={(e) => setAppealContactName(e.target.value)}
-                        placeholder={isEn ? 'e.g. John Doe' : 'Ej: Carlos Gómez'}
+                        onChange={(e) => setAppealContactName(sanitizeLettersOnly(e.target.value))}
+                        placeholder={isEn ? 'e.g. John Doe (letters only)' : 'Ej: Carlos Gómez (solo letras)'}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
                     </div>
@@ -9181,23 +9305,39 @@ export default function LocalStudioPage() {
                       <input
                         type="tel"
                         value={appealContactPhone}
-                        onChange={(e) => setAppealContactPhone(e.target.value)}
+                        onChange={(e) => setAppealContactPhone(sanitizePhoneOnly(e.target.value))}
                         placeholder="+57 300 123 4567"
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs font-mono"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? 'Email *' : 'Correo Electrónico *'}
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                        <span>{isEn ? 'Email *' : 'Correo Electrónico *'}</span>
+                        {appealContactEmail && (
+                          <span className={`text-[9px] font-bold ${isValidEmailFormat(appealContactEmail) ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {isValidEmailFormat(appealContactEmail) ? '✓ Válido' : '⚠️ Formato requerido'}
+                          </span>
+                        )}
                       </label>
                       <input
                         type="email"
                         value={appealContactEmail}
-                        onChange={(e) => setAppealContactEmail(e.target.value)}
+                        onChange={(e) => setAppealContactEmail(e.target.value.trim())}
                         placeholder={isEn ? 'contact@company.com' : 'contacto@empresa.com'}
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                        className={`w-full px-3 py-1.5 rounded-xl bg-slate-900 border text-white placeholder:text-slate-500 focus:outline-none text-xs transition ${
+                          appealContactEmail && !isValidEmailFormat(appealContactEmail)
+                            ? 'border-rose-500 focus:border-rose-400 ring-1 ring-rose-500/30'
+                            : appealContactEmail && isValidEmailFormat(appealContactEmail)
+                            ? 'border-emerald-500/50 focus:border-emerald-400'
+                            : 'border-slate-700 focus:border-indigo-400'
+                        }`}
                       />
+                      {appealContactEmail && !isValidEmailFormat(appealContactEmail) && (
+                        <span className="text-[9px] text-rose-400 block mt-0.5 font-medium">
+                          {isEn ? 'Required format: name@domain.com' : 'Formato requerido: nombre@dominio.com'}
+                        </span>
+                      )}
                     </div>
 
                     <div>
@@ -9244,6 +9384,7 @@ export default function LocalStudioPage() {
                         !appealContactCompany.trim() ||
                         !appealContactPhone.trim() ||
                         !appealContactEmail.trim() ||
+                        !isValidEmailFormat(appealContactEmail) ||
                         !appealSearchQuery.trim()
                       }
                       className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-md shrink-0"
@@ -9330,8 +9471,8 @@ export default function LocalStudioPage() {
                           <input
                             type="text"
                             value={manualAuthor}
-                            onChange={(e) => setManualAuthor(e.target.value)}
-                            placeholder={isEn ? 'e.g. John Doe' : 'Ej: Pedro Pérez'}
+                            onChange={(e) => setManualAuthor(sanitizeLettersOnly(e.target.value))}
+                            placeholder={isEn ? 'e.g. John Doe (letters only)' : 'Ej: Pedro Pérez (solo letras)'}
                             className="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
                           />
                         </div>
@@ -9418,6 +9559,7 @@ export default function LocalStudioPage() {
                           !appealContactCompany.trim() ||
                           !appealContactPhone.trim() ||
                           !appealContactEmail.trim() ||
+                          !isValidEmailFormat(appealContactEmail) ||
                           !manualAuthor.trim() ||
                           !manualText.trim()
                         }
@@ -13005,7 +13147,7 @@ export default function LocalStudioPage() {
                 <input
                   type="text"
                   value={newAdvisorName}
-                  onChange={(e) => setNewAdvisorName(e.target.value)}
+                  onChange={(e) => setNewAdvisorName(sanitizeLettersOnly(e.target.value))}
                   placeholder={
                     newAccountType === 'partner_agency'
                       ? (isEn ? 'e.g. Apex Local Growth Agency' : 'Ej: Agencia Digital Rocket 360')
@@ -13071,9 +13213,9 @@ export default function LocalStudioPage() {
               <div>
                 <label className="block font-bold text-slate-300 mb-1">{tNetwork.phoneLabel}</label>
                 <input
-                  type="text"
+                  type="tel"
                   value={newAdvisorPhone}
-                  onChange={(e) => setNewAdvisorPhone(e.target.value)}
+                  onChange={(e) => setNewAdvisorPhone(sanitizePhoneOnly(e.target.value))}
                   placeholder="+573051234567"
                   className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 font-mono"
                 />
@@ -13279,7 +13421,7 @@ export default function LocalStudioPage() {
                 <input
                   type="text"
                   value={editAdvisorName}
-                  onChange={(e) => setEditAdvisorName(e.target.value)}
+                  onChange={(e) => setEditAdvisorName(sanitizeLettersOnly(e.target.value))}
                   className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
                   required
                 />
@@ -13336,10 +13478,10 @@ export default function LocalStudioPage() {
               <div>
                 <label className="block font-bold text-slate-300 mb-1">{isEn ? 'Phone / WhatsApp' : 'Teléfono / WhatsApp'}</label>
                 <input
-                  type="text"
+                  type="tel"
                   value={editAdvisorPhone}
-                  onChange={(e) => setEditAdvisorPhone(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                  onChange={(e) => setEditAdvisorPhone(sanitizePhoneOnly(e.target.value))}
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 font-mono"
                 />
               </div>
 
