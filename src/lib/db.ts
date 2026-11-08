@@ -1277,11 +1277,21 @@ export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
       const { data, error } = await supabase.from('studio_advisors').select('*');
       if (!error && Array.isArray(data) && data.length > 0) {
         return data.map((a: any) => {
+          let cleanLicenseStatus = a.license_status || a.licenseStatus || 'active';
+          let metaObj: any = {};
+          if (cleanLicenseStatus && typeof cleanLicenseStatus === 'string' && cleanLicenseStatus.includes('::meta::')) {
+            const [status, metaRaw] = cleanLicenseStatus.split('::meta::');
+            cleanLicenseStatus = status;
+            try {
+              metaObj = JSON.parse(metaRaw);
+            } catch {}
+          }
+
           const fee = Number(a.monthly_fee_usd ?? a.monthlyFeeUsd ?? 0);
           const isMaster = a.role === 'admin' || a.id === 'adv-luisma' || a.account_type === 'founder' || a.accountType === 'founder';
           const resolvedTier: 'level_1' | 'level_2' | 'level_3' | 'founder' = isMaster
             ? 'founder'
-            : (a.plan_tier || a.planTier || (fee >= 140 ? 'level_3' : fee >= 90 ? 'level_2' : 'level_1'));
+            : (a.plan_tier || a.planTier || metaObj.planTier || (fee >= 140 ? 'level_3' : fee >= 90 ? 'level_2' : 'level_1'));
           const defaultQuotaByTier = isMaster ? 9999 : (resolvedTier === 'level_3' ? 30 : resolvedTier === 'level_2' ? 20 : 10);
 
           return {
@@ -1296,15 +1306,15 @@ export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
             country: a.country,
             city: a.city,
             monthlyFeeUsd: fee || (resolvedTier === 'level_3' ? 140 : resolvedTier === 'level_2' ? 90 : 49),
-            licenseStatus: a.license_status || a.licenseStatus || 'active',
+            licenseStatus: cleanLicenseStatus,
             active: Boolean(a.active),
-            planStartDate: a.plan_start_date || a.planStartDate || a.created_at || a.createdAt,
-            extraCredits: a.extra_credits || a.extraCredits || {},
-            maxCreatesMonthly: Number(a.max_creates_monthly ?? a.maxCreatesMonthly ?? defaultQuotaByTier),
-            maxAuditsMonthly: Number(a.max_audits_monthly ?? a.maxAuditsMonthly ?? defaultQuotaByTier),
-            maxRescuesMonthly: Number(a.max_rescues_monthly ?? a.maxRescuesMonthly ?? defaultQuotaByTier),
-            maxAppealsMonthly: Number(a.max_appeals_monthly ?? a.maxAppealsMonthly ?? defaultQuotaByTier),
-            maxToolsMonthly: Number(a.max_tools_monthly ?? a.maxToolsMonthly ?? defaultQuotaByTier),
+            planStartDate: a.plan_start_date || a.planStartDate || metaObj.planStartDate || a.created_at || a.createdAt,
+            extraCredits: a.extra_credits || a.extraCredits || metaObj.extraCredits || {},
+            maxCreatesMonthly: Number(a.max_creates_monthly ?? a.maxCreatesMonthly ?? metaObj.maxCreates ?? defaultQuotaByTier),
+            maxAuditsMonthly: Number(a.max_audits_monthly ?? a.maxAuditsMonthly ?? metaObj.maxAudits ?? defaultQuotaByTier),
+            maxRescuesMonthly: Number(a.max_rescues_monthly ?? a.maxRescuesMonthly ?? metaObj.maxRescues ?? defaultQuotaByTier),
+            maxAppealsMonthly: Number(a.max_appeals_monthly ?? a.maxAppealsMonthly ?? metaObj.maxAppeals ?? defaultQuotaByTier),
+            maxToolsMonthly: Number(a.max_tools_monthly ?? a.maxToolsMonthly ?? metaObj.maxTools ?? defaultQuotaByTier),
             createdAt: a.created_at || a.createdAt,
           };
         });
@@ -1392,26 +1402,37 @@ export async function saveStudioAdvisor(advisor: StudioAdvisor): Promise<void> {
   try {
     const supabase = getSupabase();
     if (supabase) {
-      Promise.resolve(
-        supabase.from('studio_advisors').upsert({
-          id: sanitizedAdvisor.id,
-          name: sanitizedAdvisor.name,
-          username: sanitizedAdvisor.username,
-          password: sanitizedAdvisor.password,
-          phone: sanitizedAdvisor.phone,
-          role: sanitizedAdvisor.role,
-          account_type: sanitizedAdvisor.accountType,
-          country: sanitizedAdvisor.country,
-          city: sanitizedAdvisor.city,
-          monthly_fee_usd: sanitizedAdvisor.monthlyFeeUsd,
-          license_status: sanitizedAdvisor.licenseStatus,
-          active: sanitizedAdvisor.active,
-          max_creates_monthly: sanitizedAdvisor.maxCreatesMonthly,
-          max_audits_monthly: sanitizedAdvisor.maxAuditsMonthly,
-          max_rescues_monthly: sanitizedAdvisor.maxRescuesMonthly,
-          updated_at: new Date().toISOString(),
-        })
-      ).catch(() => {});
+      const packedMeta = JSON.stringify({
+        planTier: sanitizedAdvisor.planTier,
+        maxCreates: sanitizedAdvisor.maxCreatesMonthly,
+        maxAudits: sanitizedAdvisor.maxAuditsMonthly,
+        maxRescues: sanitizedAdvisor.maxRescuesMonthly,
+        maxAppeals: sanitizedAdvisor.maxAppealsMonthly,
+        maxTools: sanitizedAdvisor.maxToolsMonthly,
+        extraCredits: sanitizedAdvisor.extraCredits || {},
+        planStartDate: sanitizedAdvisor.planStartDate,
+      });
+      const cleanBaseStatus = (sanitizedAdvisor.licenseStatus || 'active').split('::meta::')[0];
+      const licenseStatusWithMeta = `${cleanBaseStatus}::meta::${packedMeta}`;
+
+      await supabase.from('studio_advisors').upsert({
+        id: sanitizedAdvisor.id,
+        name: sanitizedAdvisor.name,
+        username: sanitizedAdvisor.username,
+        password: sanitizedAdvisor.password,
+        phone: sanitizedAdvisor.phone,
+        role: sanitizedAdvisor.role,
+        account_type: sanitizedAdvisor.accountType,
+        country: sanitizedAdvisor.country,
+        city: sanitizedAdvisor.city,
+        monthly_fee_usd: sanitizedAdvisor.monthlyFeeUsd,
+        license_status: licenseStatusWithMeta,
+        active: sanitizedAdvisor.active,
+        max_creates_monthly: sanitizedAdvisor.maxCreatesMonthly,
+        max_audits_monthly: sanitizedAdvisor.maxAuditsMonthly,
+        max_rescues_monthly: sanitizedAdvisor.maxRescuesMonthly,
+        updated_at: new Date().toISOString(),
+      });
     }
   } catch {}
 }

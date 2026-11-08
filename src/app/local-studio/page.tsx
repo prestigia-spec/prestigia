@@ -12757,52 +12757,65 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       }`}
                     >
                       <div className="space-y-3.5">
-                        {/* Header de Tarjeta: Rol, Estado Encendido/Apagado y Canon en 1 Sola Línea Imposible de Romperse */}
-                        <div className="flex items-center justify-between gap-2 h-7">
-                          <span
-                            className={`text-[9.5px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shrink-0 flex items-center gap-1 ${
-                              isFounder
-                                ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                                : adv.planTier === 'level_3'
-                                ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
-                                : adv.planTier === 'level_2' || adv.accountType === 'partner_agency'
-                                ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
-                                : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
-                            }`}
-                          >
-                            {isFounder
-                              ? (isEn ? '👑 Founder Master' : '👑 Fundador Master')
-                              : adv.planTier === 'level_3'
-                              ? (isEn ? `NIVEL 3 • $${adv.monthlyFeeUsd ?? 140}/mo (150 Cred.)` : `NIVEL 3 • $${adv.monthlyFeeUsd ?? 140} USD/mes (150 Cred.)`)
-                              : adv.planTier === 'level_2' || adv.accountType === 'partner_agency'
-                              ? (isEn ? `NIVEL 2 ★ • $${adv.monthlyFeeUsd ?? 90}/mo (100 Cred.)` : `NIVEL 2 ★ • $${adv.monthlyFeeUsd ?? 90} USD/mes (100 Cred.)`)
-                              : (isEn ? `NIVEL 1 • $${adv.monthlyFeeUsd ?? 49}/mo (50 Cred.)` : `NIVEL 1 • $${adv.monthlyFeeUsd ?? 49} USD/mes (50 Cred.)`)}
-                          </span>
+                        {(() => {
+                          const effCreates = (adv.maxCreatesMonthly ?? 10) + (adv.extraCredits?.creates || 0);
+                          const effAudits = (adv.maxAuditsMonthly ?? 10) + (adv.extraCredits?.audits || 0);
+                          const effRescues = (adv.maxRescuesMonthly ?? 10) + (adv.extraCredits?.rescues || 0);
+                          const effAppeals = (adv.maxAppealsMonthly ?? 10) + (adv.extraCredits?.appeals || 0);
+                          const effTools = (adv.maxToolsMonthly ?? 10) + (adv.extraCredits?.tools || 0);
+                          const totalCardCredits = effCreates + effAudits + effRescues + effAppeals + effTools;
 
-                          <div className="shrink-0 flex items-center">
-                            {/* Badge y Toggle de Estado: Encendida vs Apagada */}
-                            {isFounder ? (
-                              <span className="text-[9px] font-bold px-2 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 inline-flex items-center gap-1">
-                                <span>🟢</span>
-                                <span>{isEn ? 'Always Active' : 'Siempre Activa'}</span>
-                              </span>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => handleToggleAdvisorActive(adv)}
-                                className={`text-[9px] font-bold px-2.5 py-1 rounded-full border transition cursor-pointer flex items-center gap-1 ${
-                                  adv.active
-                                    ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40 hover:bg-rose-950/80 hover:text-rose-300 hover:border-rose-500/40'
-                                    : 'bg-rose-950 text-rose-300 border-rose-500/40 hover:bg-emerald-950/80 hover:text-emerald-300 hover:border-emerald-500/40'
-                                }`}
-                                title={adv.active ? 'Clic para Apagar cuenta' : 'Clic para Encender cuenta'}
-                              >
-                                <Power className="w-2.5 h-2.5" />
-                                <span>{adv.active ? (isEn ? 'Active • Turn Off' : '🟢 Activa • Apagar') : (isEn ? 'Off • Turn On' : '🔴 Apagada • Encender')}</span>
-                              </button>
-                            )}
-                          </div>
-                        </div>
+                          return (
+                            <>
+                              {/* Header de Tarjeta: Rol, Estado Encendido/Apagado y Canon en 1 Sola Línea Imposible de Romperse */}
+                              <div className="flex items-center justify-between gap-2 h-7">
+                                <span
+                                  className={`text-[9.5px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shrink-0 flex items-center gap-1 ${
+                                    isFounder
+                                      ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                      : adv.planTier === 'level_3'
+                                      ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
+                                      : adv.planTier === 'level_2' || adv.accountType === 'partner_agency'
+                                      ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
+                                      : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
+                                  }`}
+                                >
+                                  {isFounder
+                                    ? (isEn ? '👑 Founder Master' : '👑 Fundador Master')
+                                    : adv.planTier === 'level_3'
+                                    ? (isEn ? `NIVEL 3 • $${adv.monthlyFeeUsd ?? 140}/mo (${totalCardCredits} Cred.)` : `NIVEL 3 • $${adv.monthlyFeeUsd ?? 140} USD/mes (${totalCardCredits} Cred.)`)
+                                    : adv.planTier === 'level_2' || adv.accountType === 'partner_agency'
+                                    ? (isEn ? `NIVEL 2 ★ • $${adv.monthlyFeeUsd ?? 90}/mo (${totalCardCredits} Cred.)` : `NIVEL 2 ★ • $${adv.monthlyFeeUsd ?? 90} USD/mes (${totalCardCredits} Cred.)`)
+                                    : (isEn ? `NIVEL 1 • $${adv.monthlyFeeUsd ?? 49}/mo (${totalCardCredits} Cred.)` : `NIVEL 1 • $${adv.monthlyFeeUsd ?? 49} USD/mes (${totalCardCredits} Cred.)`)}
+                                </span>
+
+                                <div className="shrink-0 flex items-center">
+                                  {/* Badge y Toggle de Estado: Encendida vs Apagada */}
+                                  {isFounder ? (
+                                    <span className="text-[9px] font-bold px-2 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 inline-flex items-center gap-1">
+                                      <span>🟢</span>
+                                      <span>{isEn ? 'Always Active' : 'Siempre Activa'}</span>
+                                    </span>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleToggleAdvisorActive(adv)}
+                                      className={`text-[9px] font-bold px-2.5 py-1 rounded-full border transition cursor-pointer flex items-center gap-1 ${
+                                        adv.active
+                                          ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40 hover:bg-rose-950/80 hover:text-rose-300 hover:border-rose-500/40'
+                                          : 'bg-rose-950 text-rose-300 border-rose-500/40 hover:bg-emerald-950/80 hover:text-emerald-300 hover:border-emerald-500/40'
+                                      }`}
+                                      title={adv.active ? 'Clic para Apagar cuenta' : 'Clic para Encender cuenta'}
+                                    >
+                                      <Power className="w-2.5 h-2.5" />
+                                      <span>{adv.active ? (isEn ? 'Active • Turn Off' : '🟢 Activa • Apagar') : (isEn ? 'Off • Turn On' : '🔴 Apagada • Encender')}</span>
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            </>
+                          );
+                        })()}
 
                         {/* Nombre y Ubicación Parejos */}
                         <div className="space-y-1">
@@ -12956,36 +12969,63 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                               )}
                             </div>
                             <div className="grid grid-cols-5 gap-1 pt-1 border-t border-slate-800/60 text-center text-[10px]">
-                              <div className="bg-slate-900/80 py-1 rounded px-0.5">
-                                <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Build' : 'Crea'}</span>
-                                <strong className={`font-mono text-[10px] ${monthCreates >= (adv.maxCreatesMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)) ? 'text-rose-400' : 'text-emerald-400'}`}>
-                                  {monthCreates}/{adv.maxCreatesMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)}
-                                </strong>
-                              </div>
-                              <div className="bg-slate-900/80 py-1 rounded px-0.5">
-                                <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Audit' : 'Audita'}</span>
-                                <strong className={`font-mono text-[10px] ${monthAudits >= (adv.maxAuditsMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)) ? 'text-rose-400' : 'text-amber-400'}`}>
-                                  {monthAudits}/{adv.maxAuditsMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)}
-                                </strong>
-                              </div>
-                              <div className="bg-slate-900/80 py-1 rounded px-0.5">
-                                <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Rescue' : 'Rescata'}</span>
-                                <strong className={`font-mono text-[10px] ${monthRescues >= (adv.maxRescuesMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)) ? 'text-rose-400' : 'text-rose-300'}`}>
-                                  {monthRescues}/{adv.maxRescuesMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)}
-                                </strong>
-                              </div>
-                              <div className="bg-slate-900/80 py-1 rounded px-0.5">
-                                <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Appeal' : 'Apela'}</span>
-                                <strong className={`font-mono text-[10px] ${monthAppeals >= (adv.maxAppealsMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)) ? 'text-rose-400' : 'text-blue-300'}`}>
-                                  {monthAppeals}/{adv.maxAppealsMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)}
-                                </strong>
-                              </div>
-                              <div className="bg-slate-900/80 py-1 rounded px-0.5">
-                                <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Tools' : 'Armas'}</span>
-                                <strong className={`font-mono text-[10px] ${monthTools >= (adv.maxToolsMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)) ? 'text-rose-400' : 'text-amber-300'}`}>
-                                  {monthTools}/{adv.maxToolsMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)}
-                                </strong>
-                              </div>
+                              {(() => {
+                                const effCreates = (adv.maxCreatesMonthly ?? 10) + (adv.extraCredits?.creates || 0);
+                                const effAudits = (adv.maxAuditsMonthly ?? 10) + (adv.extraCredits?.audits || 0);
+                                const effRescues = (adv.maxRescuesMonthly ?? 10) + (adv.extraCredits?.rescues || 0);
+                                const effAppeals = (adv.maxAppealsMonthly ?? 10) + (adv.extraCredits?.appeals || 0);
+                                const effTools = (adv.maxToolsMonthly ?? 10) + (adv.extraCredits?.tools || 0);
+
+                                return (
+                                  <>
+                                    <div className="bg-slate-900/80 py-1 rounded px-0.5">
+                                      <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Build' : 'Crea'}</span>
+                                      <strong className={`font-mono text-[10px] ${monthCreates >= effCreates ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                        {monthCreates}/{effCreates}
+                                      </strong>
+                                      {(adv.extraCredits?.creates || 0) > 0 && (
+                                        <span className="block text-[7px] text-amber-400 font-bold leading-none">+{adv.extraCredits?.creates}</span>
+                                      )}
+                                    </div>
+                                    <div className="bg-slate-900/80 py-1 rounded px-0.5">
+                                      <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Audit' : 'Audita'}</span>
+                                      <strong className={`font-mono text-[10px] ${monthAudits >= effAudits ? 'text-rose-400' : 'text-amber-400'}`}>
+                                        {monthAudits}/{effAudits}
+                                      </strong>
+                                      {(adv.extraCredits?.audits || 0) > 0 && (
+                                        <span className="block text-[7px] text-amber-400 font-bold leading-none">+{adv.extraCredits?.audits}</span>
+                                      )}
+                                    </div>
+                                    <div className="bg-slate-900/80 py-1 rounded px-0.5">
+                                      <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Rescue' : 'Rescata'}</span>
+                                      <strong className={`font-mono text-[10px] ${monthRescues >= effRescues ? 'text-rose-400' : 'text-rose-300'}`}>
+                                        {monthRescues}/{effRescues}
+                                      </strong>
+                                      {(adv.extraCredits?.rescues || 0) > 0 && (
+                                        <span className="block text-[7px] text-amber-400 font-bold leading-none">+{adv.extraCredits?.rescues}</span>
+                                      )}
+                                    </div>
+                                    <div className="bg-slate-900/80 py-1 rounded px-0.5">
+                                      <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Appeal' : 'Apela'}</span>
+                                      <strong className={`font-mono text-[10px] ${monthAppeals >= effAppeals ? 'text-rose-400' : 'text-blue-300'}`}>
+                                        {monthAppeals}/{effAppeals}
+                                      </strong>
+                                      {(adv.extraCredits?.appeals || 0) > 0 && (
+                                        <span className="block text-[7px] text-amber-400 font-bold leading-none">+{adv.extraCredits?.appeals}</span>
+                                      )}
+                                    </div>
+                                    <div className="bg-slate-900/80 py-1 rounded px-0.5">
+                                      <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Tools' : 'Armas'}</span>
+                                      <strong className={`font-mono text-[10px] ${monthTools >= effTools ? 'text-rose-400' : 'text-amber-300'}`}>
+                                        {monthTools}/{effTools}
+                                      </strong>
+                                      {(adv.extraCredits?.tools || 0) > 0 && (
+                                        <span className="block text-[7px] text-amber-400 font-bold leading-none">+{adv.extraCredits?.tools}</span>
+                                      )}
+                                    </div>
+                                  </>
+                                );
+                              })()}
                             </div>
                           </div>
                         )}
