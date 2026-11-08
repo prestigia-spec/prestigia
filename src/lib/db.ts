@@ -1276,29 +1276,38 @@ export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
     if (supabase) {
       const { data, error } = await supabase.from('studio_advisors').select('*');
       if (!error && Array.isArray(data) && data.length > 0) {
-        return data.map((a: any) => ({
-          id: a.id,
-          name: a.name,
-          username: a.username,
-          password: a.password,
-          phone: a.phone,
-          role: a.role,
-          accountType: a.account_type || a.accountType,
-          planTier: a.plan_tier || a.planTier,
-          country: a.country,
-          city: a.city,
-          monthlyFeeUsd: Number(a.monthly_fee_usd ?? a.monthlyFeeUsd ?? 0),
-          licenseStatus: a.license_status || a.licenseStatus || 'active',
-          active: Boolean(a.active),
-          planStartDate: a.plan_start_date || a.planStartDate,
-          extraCredits: a.extra_credits || a.extraCredits,
-          maxCreatesMonthly: Number(a.max_creates_monthly ?? a.maxCreatesMonthly ?? 10),
-          maxAuditsMonthly: Number(a.max_audits_monthly ?? a.maxAuditsMonthly ?? 10),
-          maxRescuesMonthly: Number(a.max_rescues_monthly ?? a.maxRescuesMonthly ?? 10),
-          maxAppealsMonthly: Number(a.max_appeals_monthly ?? a.maxAppealsMonthly ?? 10),
-          maxToolsMonthly: Number(a.max_tools_monthly ?? a.maxToolsMonthly ?? 10),
-          createdAt: a.created_at || a.createdAt,
-        }));
+        return data.map((a: any) => {
+          const fee = Number(a.monthly_fee_usd ?? a.monthlyFeeUsd ?? 0);
+          const isMaster = a.role === 'admin' || a.id === 'adv-luisma' || a.account_type === 'founder' || a.accountType === 'founder';
+          const resolvedTier: 'level_1' | 'level_2' | 'level_3' | 'founder' = isMaster
+            ? 'founder'
+            : (a.plan_tier || a.planTier || (fee >= 140 ? 'level_3' : fee >= 90 ? 'level_2' : 'level_1'));
+          const defaultQuotaByTier = isMaster ? 9999 : (resolvedTier === 'level_3' ? 30 : resolvedTier === 'level_2' ? 20 : 10);
+
+          return {
+            id: a.id,
+            name: a.name,
+            username: a.username,
+            password: a.password,
+            phone: a.phone,
+            role: a.role,
+            accountType: a.account_type || a.accountType,
+            planTier: resolvedTier,
+            country: a.country,
+            city: a.city,
+            monthlyFeeUsd: fee || (resolvedTier === 'level_3' ? 140 : resolvedTier === 'level_2' ? 90 : 49),
+            licenseStatus: a.license_status || a.licenseStatus || 'active',
+            active: Boolean(a.active),
+            planStartDate: a.plan_start_date || a.planStartDate || a.created_at || a.createdAt,
+            extraCredits: a.extra_credits || a.extraCredits || {},
+            maxCreatesMonthly: Number(a.max_creates_monthly ?? a.maxCreatesMonthly ?? defaultQuotaByTier),
+            maxAuditsMonthly: Number(a.max_audits_monthly ?? a.maxAuditsMonthly ?? defaultQuotaByTier),
+            maxRescuesMonthly: Number(a.max_rescues_monthly ?? a.maxRescuesMonthly ?? defaultQuotaByTier),
+            maxAppealsMonthly: Number(a.max_appeals_monthly ?? a.maxAppealsMonthly ?? defaultQuotaByTier),
+            maxToolsMonthly: Number(a.max_tools_monthly ?? a.maxToolsMonthly ?? defaultQuotaByTier),
+            createdAt: a.created_at || a.createdAt,
+          };
+        });
       }
     }
   } catch {}
