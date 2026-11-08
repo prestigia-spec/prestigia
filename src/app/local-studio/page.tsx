@@ -4082,8 +4082,8 @@ export default function LocalStudioPage() {
         if (res.ok && data.success !== false) {
           showToast(
             isPermanentPurge
-              ? (isEn ? '🗑️ Dossier permanently purged from servers' : '🗑️ Expediente purgado definitivamente')
-              : (isEn ? '🗑️ Dossier archived to Forensic Vault' : '🗑️ Expediente retirado y guardado en Bóveda Forense')
+              ? (isEn ? '🗑️ Dossier permanently purged' : '🗑️ Expediente purgado definitivamente')
+              : (isEn ? '🗑️ Dossier deleted successfully' : '🗑️ Expediente eliminado con éxito')
           );
         } else {
           showToast('⚠️ No se pudo eliminar el expediente del servidor.');
@@ -14160,12 +14160,12 @@ export default function LocalStudioPage() {
                       ? 'This action cannot be undone. The dossier will be completely erased from the servers.'
                       : 'Esta acción es irreversible. El expediente se eliminará completamente de los servidores.')
                   : (isEn
-                      ? 'The dossier will be removed from your dashboard and safely preserved in the General Management Forensic Vault.'
-                      : 'El expediente se retirará de tu panel principal y quedará protegido en la Bóveda Forense de Dirección General.')
+                      ? 'Are you sure you want to delete this dossier from your client list? This action cannot be undone.'
+                      : '¿Estás seguro de que deseas eliminar este expediente de tu lista de clientes? Esta acción no se puede deshacer.')
               ) : (
                 isEn
-                  ? 'All historical dossiers and client work associated with this account will remain safely preserved in the database.'
-                  : 'La cuenta será dada de baja. Todo su historial de fichas y expedientes se conservará intacto en la base de datos.'
+                  ? 'Are you sure you want to delete this user account? This action cannot be undone.'
+                  : '¿Estás seguro de que deseas eliminar esta cuenta de usuario? Esta acción no se puede deshacer.'
               )}
             </p>
           </div>
