@@ -20,8 +20,28 @@ export async function GET(request: Request) {
     };
 
     const targetAdvisorId = advisorId || (isLuisma ? 'adv-luisma' : undefined);
+
+    // Determinar inicio del ciclo mensual según la fecha del plan del asesor
+    let cycleStartDate: Date | null = null;
+    if (targetAdvisorId) {
+      const { getAllStudioAdvisors } = await import('@/lib/db');
+      const allAdvisors = await getAllStudioAdvisors();
+      const matchedAdv = allAdvisors.find((a) => a.id === targetAdvisorId);
+      if (matchedAdv?.planStartDate) {
+        cycleStartDate = new Date(matchedAdv.planStartDate);
+      }
+    }
+
+    const isInCurrentCycle = (dateStr: string) => {
+      if (cycleStartDate && !isNaN(cycleStartDate.getTime())) {
+        const d = new Date(dateStr);
+        return d >= cycleStartDate;
+      }
+      return isThisMonth(dateStr);
+    };
+
     const advisorMonthDossiers = targetAdvisorId
-      ? allDossiers.filter((d) => d.advisorId === targetAdvisorId && isThisMonth(d.createdAt))
+      ? allDossiers.filter((d) => d.advisorId === targetAdvisorId && isInCurrentCycle(d.createdAt))
       : [];
 
     const monthlyUsage = {

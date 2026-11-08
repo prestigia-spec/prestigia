@@ -142,11 +142,20 @@ interface StudioAdvisorUser {
   phone: string;
   role: 'admin' | 'advisor';
   accountType?: 'internal_advisor' | 'partner_agency' | 'founder' | 'director';
+  planTier?: 'level_1' | 'level_2' | 'level_3' | 'founder';
   country?: string;
   city?: string;
   monthlyFeeUsd?: number;
   licenseStatus?: 'active' | 'pending_payment' | 'suspended';
   active: boolean;
+  planStartDate?: string;
+  extraCredits?: {
+    creates?: number;
+    audits?: number;
+    rescues?: number;
+    appeals?: number;
+    tools?: number;
+  };
   maxCreatesMonthly?: number;
   maxAuditsMonthly?: number;
   maxRescuesMonthly?: number;
@@ -2069,7 +2078,33 @@ export default function LocalStudioPage() {
   const [editAdvisorMaxRescues, setEditAdvisorMaxRescues] = useState<number>(10);
   const [editAdvisorMaxAppeals, setEditAdvisorMaxAppeals] = useState<number>(15);
   const [editAdvisorMaxTools, setEditAdvisorMaxTools] = useState<number>(30);
+  const [editAdvisorPlanTier, setEditAdvisorPlanTier] = useState<'level_1' | 'level_2' | 'level_3' | 'founder'>('level_1');
+  const [rechargingAdvisor, setRechargingAdvisor] = useState<StudioAdvisorUser | null>(null);
+  const [rechargeSelectedTab, setRechargeSelectedTab] = useState<'creates' | 'audits' | 'rescues' | 'appeals' | 'tools'>('rescues');
+  const [isRechargingCredits, setIsRechargingCredits] = useState<boolean>(false);
   const [isUpdatingAdvisor, setIsUpdatingAdvisor] = useState<boolean>(false);
+
+  // Helper para calcular cupo efectivo mensual: (Cupo base según Nivel o Custom) + (Recargas de +10 activas)
+  const getEffectiveQuota = (tab: 'creates' | 'audits' | 'rescues' | 'appeals' | 'tools'): number => {
+    if (isLuismaMaster) return 999999;
+    const tier = currentUser?.planTier;
+    const baseByTier = tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10;
+    const customQuota =
+      tab === 'creates'
+        ? currentUser?.maxCreatesMonthly
+        : tab === 'audits'
+        ? currentUser?.maxAuditsMonthly
+        : tab === 'rescues'
+        ? currentUser?.maxRescuesMonthly
+        : tab === 'appeals'
+        ? currentUser?.maxAppealsMonthly
+        : currentUser?.maxToolsMonthly;
+    const base = customQuota !== undefined && customQuota !== null ? customQuota : baseByTier;
+    const extra = currentUser?.extraCredits?.[tab] || 0;
+    return base + extra;
+  };
+
+  const isUserSuspended = !isLuismaMaster && (currentUser?.active === false || currentUser?.licenseStatus === 'suspended');
 
   // Live Monthly Quota & Usage Monitor
   const [monthlyUsage, setMonthlyUsage] = useState<{ creates: number; audits: number; rescues: number; appeals: number; tools: number }>({
@@ -2141,6 +2176,7 @@ export default function LocalStudioPage() {
           ? `Hello ${bName}! 👋\n\nTo complete your official Google Business Profile setup on Google Maps, please provide the following materials:\n\n📸 *1. PHOTOS (Clear lighting):*\n- 2 Exterior facade photos (daytime and evening with illuminated sign)\n- 3 Interior customer area photos\n- 4 Photos of your main specialties (${createSpecialties || 'products/services'})\n- 1 Photo of your working team\n- Official logo in high resolution\n\n🎥 *2. CONTINUOUS 60s VERIFICATION VIDEO (Official Google Protocol):*\n- Take 1: Recording the street and exterior permanent sign\n- Take 2: Opening the front door with keys\n- Take 3: Recording the register, POS, and interior operation\n\n📋 *3. OPERATING DATA:*\n- Exact operating hours\n- Accepted payment methods\n- Gmail address for profile ownership\n\nWe will configure your Google Business Profile with verified local SEO categories! 🚀`
           : `¡Hola ${bName}! 👋\n\nPara configurar y verificar la ficha oficial de tu negocio en Google Maps con máxima autoridad, requerimos los siguientes materiales:\n\n📸 *1. FOTOS TÉCNICAS (Con buena iluminación):*\n- 2 Fotos de fachada exterior (de día y de noche con aviso comercial visible)\n- 3 Fotos del local o área de atención a clientes limpia y equipada\n- 4 Fotos de tus especialidades principales (${createSpecialties || 'servicios y tratamientos'})\n- 1 Foto del equipo de trabajo o especialistas uniformados\n- Logo oficial en alta resolución\n\n🎥 *2. VIDEO CONTINUO DE 60 SEGUNDOS (Exigido por Google sin cortes):*\n- Toma 1: Grabando la calle, número de dirección y el aviso de la fachada\n- Toma 2: Abriendo la puerta de entrada con llaves\n- Toma 3: Grabando el mostrador de recepción, datáfono/caja e instalaciones operativas\n\n📋 *3. DATOS OPERATIVOS:*\n- Horarios exactos de atención semanal\n- Medios de pago recibidos (efectivo, tarjetas, transferencias)\n- Correo de Gmail donde deseas recibir la propiedad de la ficha\n\n¡Nos encargamos de toda la arquitectura técnica, palabras clave locales y posicionamiento en Google Maps! 🚀`);
   }, [createGeneratedData?.whatsappOnboardingMessage, createBusinessName, createBusinessModel, createSpecialties, isEn]);
+  const [newPlanTier, setNewPlanTier] = useState<'level_1' | 'level_2' | 'level_3'>('level_1');
   const [newAccountType, setNewAccountType] = useState<'internal_advisor' | 'partner_agency'>('internal_advisor');
   const [newAdvisorName, setNewAdvisorName] = useState('');
   const [newAdvisorUser, setNewAdvisorUser] = useState('');
@@ -2405,12 +2441,14 @@ export default function LocalStudioPage() {
       return;
     }
 
-    const userMaxAppeals = currentUser?.maxAppealsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 25 : currentUser?.accountType === 'director' ? 50 : 15);
-    if (!isLuismaMaster && (monthlyUsage.appeals || 0) >= userMaxAppeals) {
+    const userMaxAppeals = getEffectiveQuota('appeals');
+    if (!isLuismaMaster && ((monthlyUsage.appeals || 0) >= userMaxAppeals || isUserSuspended)) {
       showToast(
-        isEn
-          ? `⚠️ Monthly limit of ${userMaxAppeals} review appeals reached. Contact General Directorate.`
-          : `⚠️ Has alcanzado tu cupo mensual de ${userMaxAppeals} apelaciones de reseñas. Contacta a Dirección General para ampliar tu plan.`
+        isUserSuspended
+          ? (isEn ? '⚠️ Account suspended due to pending payment.' : '⚠️ Cuenta pausada por facturación pendiente.')
+          : (isEn
+              ? `⚠️ Monthly limit of ${userMaxAppeals} review appeals reached.`
+              : `⚠️ Has alcanzado tu cupo mensual de ${userMaxAppeals} apelaciones de reseñas. Adquiere una recarga de +10 créditos.`)
       );
       return;
     }
@@ -2598,9 +2636,9 @@ export default function LocalStudioPage() {
       return;
     }
 
-    const userMaxCreates = currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30);
-    if (!isLuismaMaster && monthlyUsage.creates >= userMaxCreates) {
-      showToast(isEn ? `⚠️ Monthly limit of ${userMaxCreates} creations reached. Contact General Directorate.` : `⚠️ Has alcanzado tu cupo mensual de ${userMaxCreates} creaciones. Contacta a Dirección General para ampliar tu plan.`);
+    const userMaxCreates = getEffectiveQuota('creates');
+    if (!isLuismaMaster && (monthlyUsage.creates >= userMaxCreates || isUserSuspended)) {
+      showToast(isUserSuspended ? (isEn ? '⚠️ Account suspended due to pending payment.' : '⚠️ Cuenta pausada por facturación pendiente.') : (isEn ? `⚠️ Monthly limit of ${userMaxCreates} creations reached.` : `⚠️ Has alcanzado tu cupo mensual de ${userMaxCreates} creaciones. Adquiere una recarga de +10 créditos.`));
       return;
     }
 
@@ -2743,9 +2781,9 @@ export default function LocalStudioPage() {
       return;
     }
 
-    const userMaxAudits = currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30);
-    if (!isLuismaMaster && monthlyUsage.audits >= userMaxAudits) {
-      showToast(isEn ? `⚠️ Monthly limit of ${userMaxAudits} audits reached. Contact General Directorate.` : `⚠️ Has alcanzado tu cupo mensual de ${userMaxAudits} auditorías. Contacta a Dirección General para ampliar tu plan.`);
+    const userMaxAudits = getEffectiveQuota('audits');
+    if (!isLuismaMaster && (monthlyUsage.audits >= userMaxAudits || isUserSuspended)) {
+      showToast(isUserSuspended ? (isEn ? '⚠️ Account suspended due to pending payment.' : '⚠️ Cuenta pausada por facturación pendiente.') : (isEn ? `⚠️ Monthly limit of ${userMaxAudits} audits reached.` : `⚠️ Has alcanzado tu cupo mensual de ${userMaxAudits} auditorías. Adquiere una recarga de +10 créditos.`));
       return;
     }
 
@@ -3000,9 +3038,9 @@ export default function LocalStudioPage() {
       return;
     }
 
-    const userMaxRescues = currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10);
-    if (!isLuismaMaster && monthlyUsage.rescues >= userMaxRescues) {
-      showToast(isEn ? `⚠️ Monthly limit of ${userMaxRescues} rescues reached. Contact General Directorate.` : `⚠️ Has alcanzado tu cupo mensual de ${userMaxRescues} rescates. Contacta a Dirección General para ampliar tu plan.`);
+    const userMaxRescues = getEffectiveQuota('rescues');
+    if (!isLuismaMaster && (monthlyUsage.rescues >= userMaxRescues || isUserSuspended)) {
+      showToast(isUserSuspended ? (isEn ? '⚠️ Account suspended due to pending payment.' : '⚠️ Cuenta pausada por facturación pendiente.') : (isEn ? `⚠️ Monthly limit of ${userMaxRescues} rescues reached.` : `⚠️ Has alcanzado tu cupo mensual de ${userMaxRescues} rescates. Adquiere una recarga de +10 créditos.`));
       return;
     }
 
@@ -3142,12 +3180,14 @@ export default function LocalStudioPage() {
       return;
     }
 
-    const userMaxTools = currentUser?.maxToolsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10);
-    if (!isLuismaMaster && (monthlyUsage.tools || 0) >= userMaxTools) {
+    const userMaxTools = getEffectiveQuota('tools');
+    if (!isLuismaMaster && ((monthlyUsage.tools || 0) >= userMaxTools || isUserSuspended)) {
       showToast(
-        isEn
-          ? `⚠️ Monthly limit of ${userMaxTools} Top 3 Sales Arsenal credits reached. Upgrade your plan or reload credits.`
-          : `⚠️ Has alcanzado tu cupo de ${userMaxTools} créditos de Armas Top 3 de Cierre. Contacta a Dirección General o recarga créditos.`
+        isUserSuspended
+          ? (isEn ? '⚠️ Account suspended due to pending payment.' : '⚠️ Cuenta pausada por facturación pendiente.')
+          : (isEn
+              ? `⚠️ Monthly limit of ${userMaxTools} Top 3 Sales Arsenal credits reached.`
+              : `⚠️ Has alcanzado tu cupo de ${userMaxTools} créditos de Armas Top 3 de Cierre. Adquiere una recarga de +10 créditos.`)
       );
       return;
     }
@@ -4165,15 +4205,16 @@ export default function LocalStudioPage() {
           phone: newAdvisorPhone,
           role: 'advisor',
           accountType: newAccountType,
+          planTier: newPlanTier,
           country: newAdvisorCountry,
           city: newAdvisorCity,
-          monthlyFeeUsd: Number(newAdvisorMonthlyFee) || 0,
+          monthlyFeeUsd: Number(newAdvisorMonthlyFee) || (newPlanTier === 'level_3' ? 140 : newPlanTier === 'level_2' ? 90 : 49),
           licenseStatus: newAdvisorLicenseStatus,
-          maxCreatesMonthly: Number(newAdvisorMaxCreates) || (newAccountType === 'partner_agency' ? 60 : 30),
-          maxAuditsMonthly: Number(newAdvisorMaxAudits) || (newAccountType === 'partner_agency' ? 60 : 30),
-          maxRescuesMonthly: Number(newAdvisorMaxRescues) || (newAccountType === 'partner_agency' ? 20 : 10),
-          maxAppealsMonthly: Number(newAdvisorMaxAppeals) || (newAccountType === 'partner_agency' ? 20 : 15),
-          maxToolsMonthly: Number(newAdvisorMaxTools) || (newAccountType === 'partner_agency' ? 30 : 20),
+          maxCreatesMonthly: Number(newAdvisorMaxCreates) || (newPlanTier === 'level_3' ? 30 : newPlanTier === 'level_2' ? 20 : 10),
+          maxAuditsMonthly: Number(newAdvisorMaxAudits) || (newPlanTier === 'level_3' ? 30 : newPlanTier === 'level_2' ? 20 : 10),
+          maxRescuesMonthly: Number(newAdvisorMaxRescues) || (newPlanTier === 'level_3' ? 30 : newPlanTier === 'level_2' ? 20 : 10),
+          maxAppealsMonthly: Number(newAdvisorMaxAppeals) || (newPlanTier === 'level_3' ? 30 : newPlanTier === 'level_2' ? 20 : 10),
+          maxToolsMonthly: Number(newAdvisorMaxTools) || (newPlanTier === 'level_3' ? 30 : newPlanTier === 'level_2' ? 20 : 10),
           active: true,
           masterKey: adminMasterKey,
         }),
@@ -4204,6 +4245,8 @@ export default function LocalStudioPage() {
   // Open modal to modify advisor or agency partner account
   const handleOpenEditAdvisor = (advisor: StudioAdvisorUser) => {
     setEditingAdvisor(advisor);
+    const tier = advisor.planTier || (advisor.accountType === 'partner_agency' ? 'level_2' : 'level_1');
+    setEditAdvisorPlanTier(tier);
     setEditAdvisorName(advisor.name || '');
     setEditAdvisorUser(advisor.username || '');
     setEditAdvisorPass(''); // Blank means keep unchanged
@@ -4219,13 +4262,13 @@ export default function LocalStudioPage() {
         ? 'founder'
         : 'internal_advisor'
     );
-    setEditAdvisorMonthlyFee(advisor.monthlyFeeUsd ?? 79);
+    setEditAdvisorMonthlyFee(advisor.monthlyFeeUsd ?? (tier === 'level_3' ? 140 : tier === 'level_2' ? 90 : 49));
     setEditAdvisorLicenseStatus(advisor.licenseStatus || 'active');
-    setEditAdvisorMaxCreates(advisor.maxCreatesMonthly ?? (advisor.accountType === 'partner_agency' ? 60 : advisor.accountType === 'director' ? 100 : 30));
-    setEditAdvisorMaxAudits(advisor.maxAuditsMonthly ?? (advisor.accountType === 'partner_agency' ? 60 : advisor.accountType === 'director' ? 100 : 30));
-    setEditAdvisorMaxRescues(advisor.maxRescuesMonthly ?? (advisor.accountType === 'partner_agency' ? 20 : advisor.accountType === 'director' ? 50 : 10));
-    setEditAdvisorMaxAppeals(advisor.maxAppealsMonthly ?? (advisor.accountType === 'partner_agency' ? 20 : advisor.accountType === 'director' ? 50 : 15));
-    setEditAdvisorMaxTools(advisor.maxToolsMonthly ?? (advisor.accountType === 'partner_agency' ? 30 : advisor.accountType === 'director' ? 50 : 20));
+    setEditAdvisorMaxCreates(advisor.maxCreatesMonthly ?? (tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
+    setEditAdvisorMaxAudits(advisor.maxAuditsMonthly ?? (tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
+    setEditAdvisorMaxRescues(advisor.maxRescuesMonthly ?? (tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
+    setEditAdvisorMaxAppeals(advisor.maxAppealsMonthly ?? (tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
+    setEditAdvisorMaxTools(advisor.maxToolsMonthly ?? (tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
     setShowEditAdvisorModal(true);
   };
 
@@ -4247,6 +4290,7 @@ export default function LocalStudioPage() {
         phone: editAdvisorPhone.trim(),
         role: editAdvisorAccountType === 'director' || editAdvisorAccountType === 'founder' ? 'admin' : 'advisor',
         accountType: editAdvisorAccountType,
+        planTier: editAdvisorPlanTier,
         country: editAdvisorCountry.trim(),
         city: editAdvisorCity.trim(),
         monthlyFeeUsd: Number(editAdvisorMonthlyFee) || 0,
@@ -4343,6 +4387,67 @@ export default function LocalStudioPage() {
       }
     } catch {
       showToast('⚠️ Error de conexión');
+    }
+  };
+
+  // Registrar Pago Mensual y Reactivar Cupo
+  const handleMarkAdvisorPaid = async (advisor: StudioAdvisorUser) => {
+    try {
+      const res = await fetch('/api/local-studio/advisors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: advisor.id,
+          action: 'mark_paid_and_activate',
+          masterKey: 'admin',
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`💳 ¡Pago registrado para ${advisor.name}! Ciclo renovado y cupo reactivado a cero consumos.`);
+        fetchAdvisors();
+      } else {
+        showToast('⚠️ Error: ' + (data.error || 'No autorizado'));
+      }
+    } catch {
+      showToast('⚠️ Error al registrar pago');
+    }
+  };
+
+  // Ejecutar Recarga de Paquete Único de +10 Créditos por Pestaña
+  const handleExecuteRecharge = async () => {
+    if (!rechargingAdvisor) return;
+    setIsRechargingCredits(true);
+    try {
+      const res = await fetch('/api/local-studio/advisors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: rechargingAdvisor.id,
+          action: 'recharge_credits',
+          rechargeTab: rechargeSelectedTab,
+          masterKey: 'admin',
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const tabNames: Record<string, string> = {
+          creates: 'Creación de Ficha (Pestaña 1)',
+          audits: 'Auditorías Forenses (Pestaña 2)',
+          rescues: 'Rescate de Ficha (Pestaña 3)',
+          appeals: 'Apelación de Reseñas (Pestaña 4)',
+          tools: 'Armas Top 3 (Pestaña 5)',
+        };
+        showToast(`⚡ ¡+10 Créditos recargados exitosamente en ${tabNames[rechargeSelectedTab]} para ${rechargingAdvisor.name}!`);
+        setRechargingAdvisor(null);
+        fetchAdvisors();
+      } else {
+        showToast('⚠️ Error: ' + (data.error || 'No autorizado'));
+      }
+    } catch {
+      showToast('⚠️ Error al procesar recarga');
+    } finally {
+      setIsRechargingCredits(false);
     }
   };
 
@@ -4885,6 +4990,36 @@ export default function LocalStudioPage() {
           </div>
         </div>
 
+        {/* BANNER DE SUSPENSIÓN POR MENSUALIDAD PENDIENTE */}
+        {isUserSuspended && (
+          <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950/80 border-2 border-rose-500/60 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in duration-200 print:hidden">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-2xl bg-rose-500/20 border border-rose-500/50 flex items-center justify-center text-rose-400 shrink-0">
+                <AlertTriangle className="w-5 h-5 text-rose-400" />
+              </div>
+              <div>
+                <h4 className="text-sm font-black text-rose-200 uppercase tracking-wide">
+                  {isEn ? '⚠️ Account Suspended • Payment Pending' : '⚠️ Cuenta Suspendida • Facturación Pendiente'}
+                </h4>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  {isEn
+                    ? 'Your monthly software license renewal is pending. Generation and AI tools are temporarily locked.'
+                    : 'La mensualidad de tu licencia está pendiente de pago. Las herramientas de generación e inteligencia artificial están en pausa preventiva.'}
+                </p>
+              </div>
+            </div>
+            <a
+              href="https://wa.me/573058314049?text=Hola%20Luisma,%20deseo%20renovar%20mi%20licencia%20de%20Prestigia%20Local%20Studio"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-lg shadow-emerald-500/20 shrink-0 cursor-pointer"
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>{isEn ? 'Contact Management (Luisma)' : 'Contactar a Dirección General (Luisma)'}</span>
+            </a>
+          </div>
+        )}
+
         {/* =============================================================
             TAB 1: CREAR FICHA GANADORA DESDE CERO
             ============================================================= */}
@@ -4916,7 +5051,7 @@ export default function LocalStudioPage() {
                     </div>
                   ) : (
                     <div className={`flex items-center gap-2.5 px-3.5 py-1.5 rounded-2xl border transition ${
-                      monthlyUsage.creates >= (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30))
+                      monthlyUsage.creates >= getEffectiveQuota('creates')
                         ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
                         : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
                     }`}>
@@ -4924,9 +5059,9 @@ export default function LocalStudioPage() {
                       <div className="text-left">
                         <span className="text-[9px] uppercase font-black tracking-wider opacity-80 block">{isEn ? 'Creation Quota' : 'Cupo de Creaciones'}</span>
                         <div className="text-xs font-black flex items-center gap-1">
-                          <span>{monthlyUsage.creates} / {currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)} {isEn ? 'Used' : 'Usadas'}</span>
+                          <span>{monthlyUsage.creates} / {getEffectiveQuota('creates')} {isEn ? 'Used' : 'Usadas'}</span>
                           <span className="text-[10px] font-bold opacity-75">
-                            ({Math.max(0, (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)) - monthlyUsage.creates)} {isEn ? 'avail.)' : 'disp.)'}
+                            ({Math.max(0, getEffectiveQuota('creates') - monthlyUsage.creates)} {isEn ? 'avail.)' : 'disp.)'}
                           </span>
                         </div>
                       </div>
@@ -5279,10 +5414,14 @@ export default function LocalStudioPage() {
                   </div>
                 </div>
 
-                {!isLuismaMaster && monthlyUsage.creates >= (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)) && (
+                {!isLuismaMaster && (monthlyUsage.creates >= getEffectiveQuota('creates') || isUserSuspended) && (
                   <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-                    <span>{isEn ? `Monthly limit of ${currentUser?.maxCreatesMonthly ?? 30} creations reached. Contact Management.` : `Tope mensual de ${currentUser?.maxCreatesMonthly ?? 30} creaciones alcanzado. Contacta a Dirección General.`}</span>
+                    <span>
+                      {isUserSuspended
+                        ? (isEn ? 'Account suspended due to pending payment. Contact Management.' : 'Cuenta pausada / suspendida por facturación pendiente. Contacta a Dirección General.')
+                        : (isEn ? `Monthly limit of ${getEffectiveQuota('creates')} creations reached. Contact Management for a +10 recharge.` : `Tope mensual de ${getEffectiveQuota('creates')} creaciones alcanzado. Adquiere una recarga de +10 créditos.`)}
+                    </span>
                   </div>
                 )}
 
@@ -5290,6 +5429,7 @@ export default function LocalStudioPage() {
                   type="button"
                   onClick={() => handleGenerateCreate()}
                   disabled={
+                    isUserSuspended ||
                     isGeneratingCreate ||
                     !createContactName.trim() ||
                     !createContactCompany.trim() ||
@@ -5302,7 +5442,7 @@ export default function LocalStudioPage() {
                     !createSpecialties.trim() ||
                     !createPhone.trim() ||
                     (createBusinessModel === 'service_area' && !createServiceAreas.trim()) ||
-                    (!isLuismaMaster && monthlyUsage.creates >= (currentUser?.maxCreatesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))
+                    (!isLuismaMaster && monthlyUsage.creates >= getEffectiveQuota('creates'))
                   }
                   className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 cursor-pointer active:scale-98"
                 >
@@ -6371,7 +6511,7 @@ export default function LocalStudioPage() {
                     </div>
                   ) : (
                     <div className={`flex items-center gap-2.5 px-3.5 py-1.5 rounded-2xl border transition ${
-                      monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30))
+                      monthlyUsage.audits >= getEffectiveQuota('audits')
                         ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
                         : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
                     }`}>
@@ -6379,9 +6519,9 @@ export default function LocalStudioPage() {
                       <div className="text-left">
                         <span className="text-[9px] uppercase font-black tracking-wider opacity-80 block">{isEn ? 'Audit Quota' : 'Cupo de Auditorías'}</span>
                         <div className="text-xs font-black flex items-center gap-1">
-                          <span>{monthlyUsage.audits} / {currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)} Usadas</span>
+                          <span>{monthlyUsage.audits} / {getEffectiveQuota('audits')} Usadas</span>
                           <span className="text-[10px] font-bold opacity-75">
-                            ({Math.max(0, (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)) - monthlyUsage.audits)} disp.)
+                            ({Math.max(0, getEffectiveQuota('audits') - monthlyUsage.audits)} disp.)
                           </span>
                         </div>
                       </div>
@@ -6662,10 +6802,14 @@ export default function LocalStudioPage() {
 
                 {/* Primary 1-Click Scan & Audit Button */}
                 <div className="space-y-2">
-                  {!isLuismaMaster && monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)) && (
+                  {!isLuismaMaster && (monthlyUsage.audits >= getEffectiveQuota('audits') || isUserSuspended) && (
                     <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-                      <span>{isEn ? `Monthly limit of ${currentUser?.maxAuditsMonthly ?? 30} audits reached. Contact Management.` : `Tope mensual de ${currentUser?.maxAuditsMonthly ?? 30} auditorías alcanzado. Contacta a Dirección General.`}</span>
+                      <span>
+                        {isUserSuspended
+                          ? (isEn ? 'Account suspended due to pending payment. Contact Management.' : 'Cuenta pausada / suspendida por facturación pendiente. Contacta a Dirección General.')
+                          : (isEn ? `Monthly limit of ${getEffectiveQuota('audits')} audits reached. Contact Management for a +10 recharge.` : `Tope mensual de ${getEffectiveQuota('audits')} auditorías alcanzado. Adquiere una recarga de +10 créditos.`)}
+                      </span>
                     </div>
                   )}
 
@@ -6673,6 +6817,7 @@ export default function LocalStudioPage() {
                     type="button"
                     onClick={handleScanAndAudit}
                     disabled={
+                      isUserSuspended ||
                       isScanningAudit ||
                       isGeneratingAudit ||
                       !auditContactName.trim() ||
@@ -6681,7 +6826,7 @@ export default function LocalStudioPage() {
                       !auditContactEmail.trim() ||
                       !isValidEmailFormat(auditContactEmail) ||
                       !auditQuery.trim() ||
-                      (!isLuismaMaster && monthlyUsage.audits >= (currentUser?.maxAuditsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 60 : currentUser?.accountType === 'director' ? 100 : 30)))
+                      (!isLuismaMaster && monthlyUsage.audits >= getEffectiveQuota('audits'))
                     }
                     className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98"
                   >
@@ -8011,7 +8156,7 @@ export default function LocalStudioPage() {
                     </div>
                   ) : (
                     <div className={`flex items-center gap-2.5 px-3.5 py-1.5 rounded-2xl border transition ${
-                      monthlyUsage.rescues >= (currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10))
+                      monthlyUsage.rescues >= getEffectiveQuota('rescues')
                         ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
                         : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
                     }`}>
@@ -8019,9 +8164,9 @@ export default function LocalStudioPage() {
                       <div className="text-left">
                         <span className="text-[9px] uppercase font-black tracking-wider opacity-80 block">{isEn ? 'Rescue Quota' : 'Cupo de Rescates'}</span>
                         <div className="text-xs font-black flex items-center gap-1">
-                          <span>{monthlyUsage.rescues} / {currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)} Usadas</span>
+                          <span>{monthlyUsage.rescues} / {getEffectiveQuota('rescues')} Usadas</span>
                           <span className="text-[10px] font-bold opacity-75">
-                            ({Math.max(0, (currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)) - monthlyUsage.rescues)} disp.)
+                            ({Math.max(0, getEffectiveQuota('rescues') - monthlyUsage.rescues)} disp.)
                           </span>
                         </div>
                       </div>
@@ -8217,10 +8362,14 @@ export default function LocalStudioPage() {
                     </button>
                   </div>
 
-                  {!isLuismaMaster && monthlyUsage.rescues >= (currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)) && (
+                  {!isLuismaMaster && (monthlyUsage.rescues >= getEffectiveQuota('rescues') || isUserSuspended) && (
                     <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-                      <span>{isEn ? `Monthly limit of ${currentUser?.maxRescuesMonthly ?? 10} rescues reached. Contact Management.` : `Tope mensual de ${currentUser?.maxRescuesMonthly ?? 10} rescates alcanzado. Contacta a Dirección General.`}</span>
+                      <span>
+                        {isUserSuspended
+                          ? (isEn ? 'Account suspended due to pending payment. Contact Management.' : 'Cuenta pausada / suspendida por facturación pendiente. Contacta a Dirección General.')
+                          : (isEn ? `Monthly limit of ${getEffectiveQuota('rescues')} rescues reached. Contact Management for a +10 recharge.` : `Tope mensual de ${getEffectiveQuota('rescues')} rescates alcanzado. Adquiere una recarga de +10 créditos.`)}
+                      </span>
                     </div>
                   )}
 
@@ -8228,6 +8377,7 @@ export default function LocalStudioPage() {
                     type="button"
                     onClick={() => handleRescueScan()}
                     disabled={
+                      isUserSuspended ||
                       isRescueScanning ||
                       !rescueContactName.trim() ||
                       !rescueContactCompany.trim() ||
@@ -8235,7 +8385,7 @@ export default function LocalStudioPage() {
                       !rescueContactEmail.trim() ||
                       !isValidEmailFormat(rescueContactEmail) ||
                       !rescueSearchQuery.trim() ||
-                      (!isLuismaMaster && monthlyUsage.rescues >= (currentUser?.maxRescuesMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)))
+                      (!isLuismaMaster && monthlyUsage.rescues >= getEffectiveQuota('rescues'))
                     }
                     className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 disabled:opacity-50 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-98"
                   >
@@ -9189,7 +9339,7 @@ export default function LocalStudioPage() {
                   ) : (
                     <div
                       className={`flex items-center gap-2.5 px-3.5 py-1.5 rounded-2xl border transition ${
-                        (monthlyUsage.appeals || 0) >= (currentUser?.maxAppealsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 25 : currentUser?.accountType === 'director' ? 50 : 15))
+                        (monthlyUsage.appeals || 0) >= getEffectiveQuota('appeals')
                           ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
                           : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300'
                       }`}
@@ -9199,17 +9349,10 @@ export default function LocalStudioPage() {
                         <span className="text-[9px] uppercase font-black tracking-wider opacity-80 block">{isEn ? 'Appeal Quota' : 'Cupo de Apelaciones'}</span>
                         <div className="text-xs font-black flex items-center gap-1">
                           <span>
-                            {monthlyUsage.appeals || 0} /{' '}
-                            {currentUser?.maxAppealsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 25 : currentUser?.accountType === 'director' ? 50 : 15)} Usadas
+                            {monthlyUsage.appeals || 0} / {getEffectiveQuota('appeals')} Usadas
                           </span>
                           <span className="text-[10px] font-bold opacity-75">
-                            (
-                            {Math.max(
-                              0,
-                              (currentUser?.maxAppealsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 25 : currentUser?.accountType === 'director' ? 50 : 15)) -
-                                (monthlyUsage.appeals || 0)
-                            )}{' '}
-                            disp.)
+                            ({Math.max(0, getEffectiveQuota('appeals') - (monthlyUsage.appeals || 0))} disp.)
                           </span>
                         </div>
                       </div>
@@ -9379,6 +9522,7 @@ export default function LocalStudioPage() {
                     <button
                       type="submit"
                       disabled={
+                        isUserSuspended ||
                         isScanningAppeals ||
                         !appealContactName.trim() ||
                         !appealContactCompany.trim() ||
@@ -9554,6 +9698,7 @@ export default function LocalStudioPage() {
                       <button
                         type="submit"
                         disabled={
+                          isUserSuspended ||
                           isGeneratingAppeal ||
                           !appealContactName.trim() ||
                           !appealContactCompany.trim() ||
@@ -10092,7 +10237,7 @@ export default function LocalStudioPage() {
                     </div>
                   ) : (
                     <div className={`flex items-center gap-2 px-3 py-1.5 rounded-2xl border transition ${
-                      (monthlyUsage.tools || 0) >= (currentUser?.maxToolsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10))
+                      (monthlyUsage.tools || 0) >= getEffectiveQuota('tools')
                         ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
                         : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
                     }`}>
@@ -10100,9 +10245,9 @@ export default function LocalStudioPage() {
                       <div className="text-left">
                         <span className="text-[9px] uppercase font-black tracking-wider opacity-80 block">{isEn ? 'Top 3 Arsenal Quota' : 'Cupo Armas Top 3'}</span>
                         <div className="text-xs font-black flex items-center gap-1">
-                          <span>{(monthlyUsage.tools || 0)} / {currentUser?.maxToolsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)} {isEn ? 'Used' : 'Usadas'}</span>
+                          <span>{(monthlyUsage.tools || 0)} / {getEffectiveQuota('tools')} {isEn ? 'Used' : 'Usadas'}</span>
                           <span className="text-[10px] font-bold opacity-75">
-                            ({Math.max(0, (currentUser?.maxToolsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)) - (monthlyUsage.tools || 0))} {isEn ? 'avail.)' : 'disp.)'}
+                            ({Math.max(0, getEffectiveQuota('tools') - (monthlyUsage.tools || 0))} {isEn ? 'avail.)' : 'disp.)'}
                           </span>
                         </div>
                       </div>
@@ -10161,13 +10306,15 @@ export default function LocalStudioPage() {
                     </button>
                   </div>
 
-                  {!isLuismaMaster && (monthlyUsage.tools || 0) >= (currentUser?.maxToolsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)) && (
+                  {!isLuismaMaster && ((monthlyUsage.tools || 0) >= getEffectiveQuota('tools') || isUserSuspended) && (
                     <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-bold flex items-center justify-center gap-2">
                       <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
                       <span>
-                        {isEn
-                          ? `⚠️ Monthly limit of ${currentUser?.maxToolsMonthly ?? 20} Top 3 Sales Arsenal credits reached. Upgrade your plan or reload credits.`
-                          : `⚠️ Has alcanzado tu cupo de ${currentUser?.maxToolsMonthly ?? 20} créditos de Armas Top 3 de Cierre. Recarga créditos para continuar.`}
+                        {isUserSuspended
+                          ? (isEn ? 'Account suspended due to pending payment. Contact Management.' : 'Cuenta pausada / suspendida por facturación pendiente. Contacta a Dirección General.')
+                          : (isEn
+                            ? `⚠️ Monthly limit of ${getEffectiveQuota('tools')} Top 3 Sales Arsenal credits reached. Upgrade your plan or reload a +10 pack.`
+                            : `⚠️ Has alcanzado tu cupo de ${getEffectiveQuota('tools')} créditos de Armas Top 3 de Cierre. Adquiere una recarga de +10 créditos.`)}
                       </span>
                     </div>
                   )}
@@ -10175,7 +10322,7 @@ export default function LocalStudioPage() {
                   <button
                     type="button"
                     onClick={() => handleToolsScan()}
-                    disabled={isToolsScanning || !toolsSearchQuery.trim() || (!isLuismaMaster && (monthlyUsage.tools || 0) >= (currentUser?.maxToolsMonthly ?? (currentUser?.accountType === 'partner_agency' ? 20 : currentUser?.accountType === 'director' ? 50 : 10)))}
+                    disabled={isUserSuspended || isToolsScanning || !toolsSearchQuery.trim() || (!isLuismaMaster && (monthlyUsage.tools || 0) >= getEffectiveQuota('tools'))}
                     className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98"
                   >
                     {isToolsScanning ? (
@@ -12427,8 +12574,12 @@ export default function LocalStudioPage() {
                   const curNow = new Date();
                   const curY = curNow.getFullYear();
                   const curM = curNow.getMonth();
+                  const cycleStart = adv.planStartDate ? new Date(adv.planStartDate) : null;
                   const advisorMonthDossiers = advisorDossiers.filter((d) => {
                     const cd = new Date(d.createdAt);
+                    if (cycleStart && !isNaN(cycleStart.getTime())) {
+                      return cd >= cycleStart;
+                    }
                     return cd.getFullYear() === curY && cd.getMonth() === curM;
                   });
                   const monthCreates = advisorMonthDossiers.filter((d) => d.mode === 'create').length;
@@ -12454,20 +12605,20 @@ export default function LocalStudioPage() {
                             className={`text-[9.5px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shrink-0 flex items-center gap-1 ${
                               isFounder
                                 ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                                : isDirector
-                                ? 'bg-amber-950/70 text-amber-300 border border-amber-500/40'
-                                : adv.accountType === 'partner_agency'
+                                : adv.planTier === 'level_3'
+                                ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
+                                : adv.planTier === 'level_2' || adv.accountType === 'partner_agency'
                                 ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
                                 : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
                             }`}
                           >
                             {isFounder
-                              ? (isEn ? '👑 Founder & Director' : '👑 Fundador Master')
-                              : isDirector
-                              ? (isEn ? `👑 General Director • $${adv.monthlyFeeUsd ?? 79}/mo` : `👑 Director General • $${adv.monthlyFeeUsd ?? 79} USD/mes`)
-                              : adv.accountType === 'partner_agency'
-                              ? (isEn ? `🏢 Partner Agency • $${adv.monthlyFeeUsd ?? 79}/mo` : `🏢 Agencia Partner • $${adv.monthlyFeeUsd ?? 79} USD/mes`)
-                              : (isEn ? `💼 Sales Advisor • $${adv.monthlyFeeUsd ?? 79}/mo` : `💼 Asesor Comercial • $${adv.monthlyFeeUsd ?? 79} USD/mes`)}
+                              ? (isEn ? '👑 Founder Master' : '👑 Fundador Master')
+                              : adv.planTier === 'level_3'
+                              ? (isEn ? `NIVEL 3 • $${adv.monthlyFeeUsd ?? 140}/mo (150 Cred.)` : `NIVEL 3 • $${adv.monthlyFeeUsd ?? 140} USD/mes (150 Cred.)`)
+                              : adv.planTier === 'level_2' || adv.accountType === 'partner_agency'
+                              ? (isEn ? `NIVEL 2 ★ • $${adv.monthlyFeeUsd ?? 90}/mo (100 Cred.)` : `NIVEL 2 ★ • $${adv.monthlyFeeUsd ?? 90} USD/mes (100 Cred.)`)
+                              : (isEn ? `NIVEL 1 • $${adv.monthlyFeeUsd ?? 49}/mo (50 Cred.)` : `NIVEL 1 • $${adv.monthlyFeeUsd ?? 49} USD/mes (50 Cred.)`)}
                           </span>
 
                           <div className="shrink-0 flex items-center">
@@ -12519,6 +12670,23 @@ export default function LocalStudioPage() {
                             )}
                           </div>
                         </div>
+
+                        {/* Fecha de Ciclo Activo y Recargas */}
+                        {!isFounder && (
+                          <div className="flex items-center justify-between gap-2 text-[10px] bg-slate-950/70 p-2 rounded-xl border border-slate-800">
+                            <span className="text-slate-400 flex items-center gap-1 truncate">
+                              <span>📅 Ciclo Activo:</span>
+                              <strong className="text-amber-300 font-mono">
+                                {adv.planStartDate ? new Date(adv.planStartDate).toLocaleDateString() : 'Activo'}
+                              </strong>
+                            </span>
+                            {adv.extraCredits && Object.values(adv.extraCredits).some((v) => (v || 0) > 0) && (
+                              <span className="text-emerald-400 font-bold bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-500/30 text-[9px] shrink-0">
+                                ⚡ Recargas activas
+                              </span>
+                            )}
+                          </div>
+                        )}
 
                         {/* Box Visual de Credenciales de Entrada al Sistema */}
                         <div className="p-3 rounded-2xl bg-slate-950 border border-amber-500/30 space-y-2">
@@ -12632,32 +12800,32 @@ export default function LocalStudioPage() {
                             <div className="grid grid-cols-5 gap-1 pt-1 border-t border-slate-800/60 text-center text-[10px]">
                               <div className="bg-slate-900/80 py-1 rounded px-0.5">
                                 <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Build' : 'Crea'}</span>
-                                <strong className={`font-mono text-[10px] ${monthCreates >= (adv.maxCreatesMonthly ?? 30) ? 'text-rose-400' : 'text-emerald-400'}`}>
-                                  {monthCreates}/{adv.maxCreatesMonthly ?? (adv.accountType === 'partner_agency' ? 60 : adv.accountType === 'director' ? 100 : 30)}
+                                <strong className={`font-mono text-[10px] ${monthCreates >= (adv.maxCreatesMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)) ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                  {monthCreates}/{adv.maxCreatesMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)}
                                 </strong>
                               </div>
                               <div className="bg-slate-900/80 py-1 rounded px-0.5">
                                 <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Audit' : 'Audita'}</span>
-                                <strong className={`font-mono text-[10px] ${monthAudits >= (adv.maxAuditsMonthly ?? 30) ? 'text-rose-400' : 'text-amber-400'}`}>
-                                  {monthAudits}/{adv.maxAuditsMonthly ?? (adv.accountType === 'partner_agency' ? 60 : adv.accountType === 'director' ? 100 : 30)}
+                                <strong className={`font-mono text-[10px] ${monthAudits >= (adv.maxAuditsMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)) ? 'text-rose-400' : 'text-amber-400'}`}>
+                                  {monthAudits}/{adv.maxAuditsMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)}
                                 </strong>
                               </div>
                               <div className="bg-slate-900/80 py-1 rounded px-0.5">
                                 <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Rescue' : 'Rescata'}</span>
-                                <strong className={`font-mono text-[10px] ${monthRescues >= (adv.maxRescuesMonthly ?? 10) ? 'text-rose-400' : 'text-rose-300'}`}>
-                                  {monthRescues}/{adv.maxRescuesMonthly ?? (adv.accountType === 'partner_agency' ? 20 : adv.accountType === 'director' ? 50 : 10)}
+                                <strong className={`font-mono text-[10px] ${monthRescues >= (adv.maxRescuesMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)) ? 'text-rose-400' : 'text-rose-300'}`}>
+                                  {monthRescues}/{adv.maxRescuesMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)}
                                 </strong>
                               </div>
                               <div className="bg-slate-900/80 py-1 rounded px-0.5">
                                 <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Appeal' : 'Apela'}</span>
-                                <strong className={`font-mono text-[10px] ${monthAppeals >= (adv.maxAppealsMonthly ?? 15) ? 'text-rose-400' : 'text-blue-300'}`}>
-                                  {monthAppeals}/{adv.maxAppealsMonthly ?? (adv.accountType === 'partner_agency' ? 20 : adv.accountType === 'director' ? 50 : 15)}
+                                <strong className={`font-mono text-[10px] ${monthAppeals >= (adv.maxAppealsMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)) ? 'text-rose-400' : 'text-blue-300'}`}>
+                                  {monthAppeals}/{adv.maxAppealsMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)}
                                 </strong>
                               </div>
                               <div className="bg-slate-900/80 py-1 rounded px-0.5">
                                 <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Tools' : 'Armas'}</span>
-                                <strong className={`font-mono text-[10px] ${monthTools >= (adv.maxToolsMonthly ?? 20) ? 'text-rose-400' : 'text-amber-300'}`}>
-                                  {monthTools}/{adv.maxToolsMonthly ?? (adv.accountType === 'partner_agency' ? 30 : adv.accountType === 'director' ? 50 : 20)}
+                                <strong className={`font-mono text-[10px] ${monthTools >= (adv.maxToolsMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)) ? 'text-rose-400' : 'text-amber-300'}`}>
+                                  {monthTools}/{adv.maxToolsMonthly ?? (adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : 10)}
                                 </strong>
                               </div>
                             </div>
@@ -12667,6 +12835,30 @@ export default function LocalStudioPage() {
 
                       {/* Botones de Acción: Ver Trabajos, Modificar y Eliminar */}
                       <div className="pt-2 border-t border-slate-800/80 space-y-2 mt-auto">
+                        {/* Botones de Cobro Mensual y Recarga de +10 Créditos */}
+                        {!isFounder && (
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleMarkAdvisorPaid(adv)}
+                              className="py-2 px-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-[11px] font-black transition cursor-pointer flex items-center justify-center gap-1 shadow-sm active:scale-98"
+                              title="Registrar pago recibido, encender cuenta y reiniciar consumos del mes a 0"
+                            >
+                              <span>💳 Registrar Pago</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setRechargingAdvisor(adv)}
+                              className="py-2 px-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[11px] font-black transition cursor-pointer flex items-center justify-center gap-1 shadow-sm active:scale-98"
+                              title="Inyectar paquete único de 10 créditos para una pestaña"
+                            >
+                              <Zap className="w-3.5 h-3.5 fill-amber-400" />
+                              <span>⚡ +10 Créditos</span>
+                            </button>
+                          </div>
+                        )}
+
                         {/* Botón Principal para Ver sus Trabajos */}
                         <button
                           type="button"
@@ -13085,47 +13277,85 @@ export default function LocalStudioPage() {
               </button>
             </div>
 
-            {/* Toggle Tipo de Cuenta: Asesor o Agencia Partner (Dirección General es exclusiva y única de Luisma) */}
+            {/* Selector de Plan Oficial: Nivel 1 ($49), Nivel 2 ($90), Nivel 3 ($140) */}
             <div className="p-3 bg-slate-950/80 border-b border-slate-800 shrink-0">
-              <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-slate-900 border border-slate-800 text-xs">
+              <label className="block text-[10px] font-black uppercase text-amber-400 tracking-wider mb-2">
+                {isEn ? 'Select Official Plan (Monthly Credits):' : 'Selecciona el Plan Oficial Prestigia (Cupos Mensuales):'}
+              </label>
+              <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => {
+                    setNewPlanTier('level_1');
                     setNewAccountType('internal_advisor');
-                    setNewAdvisorMaxCreates(30);
-                    setNewAdvisorMaxAudits(30);
+                    setNewAdvisorMonthlyFee(49);
+                    setNewAdvisorMaxCreates(10);
+                    setNewAdvisorMaxAudits(10);
                     setNewAdvisorMaxRescues(10);
-                    setNewAdvisorMaxAppeals(15);
-                    setNewAdvisorMaxTools(20);
+                    setNewAdvisorMaxAppeals(10);
+                    setNewAdvisorMaxTools(10);
                   }}
-                  className={`py-2 px-3 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1.5 text-xs ${
-                    newAccountType === 'internal_advisor'
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                      : 'text-slate-400 hover:text-white'
+                  className={`p-2.5 rounded-2xl font-black transition cursor-pointer flex flex-col items-center justify-center text-center border ${
+                    newPlanTier === 'level_1'
+                      ? 'bg-indigo-600/25 border-indigo-500 text-white shadow-lg shadow-indigo-600/20 ring-1 ring-indigo-500'
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
                   }`}
                 >
-                  <Briefcase className="w-3.5 h-3.5 shrink-0" />
-                  <span className="truncate">{isEn ? 'Sales Advisor' : '💼 Asesor Comercial'}</span>
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Nivel 1</span>
+                  <span className="text-sm font-black text-white">$49 <span className="text-[10px] text-slate-400">USD</span></span>
+                  <span className="text-[10px] text-indigo-400 font-bold mt-0.5">50 Créditos</span>
+                  <span className="text-[9px] text-slate-500">(10 por pestaña)</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => {
+                    setNewPlanTier('level_2');
                     setNewAccountType('partner_agency');
-                    setNewAdvisorMaxCreates(60);
-                    setNewAdvisorMaxAudits(60);
+                    setNewAdvisorMonthlyFee(90);
+                    setNewAdvisorMaxCreates(20);
+                    setNewAdvisorMaxAudits(20);
                     setNewAdvisorMaxRescues(20);
                     setNewAdvisorMaxAppeals(20);
-                    setNewAdvisorMaxTools(30);
+                    setNewAdvisorMaxTools(20);
                   }}
-                  className={`py-2 px-3 rounded-xl font-black transition cursor-pointer flex items-center justify-center gap-1.5 text-xs ${
-                    newAccountType === 'partner_agency'
-                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                      : 'text-slate-400 hover:text-white'
+                  className={`p-2.5 rounded-2xl font-black transition cursor-pointer flex flex-col items-center justify-center text-center border relative ${
+                    newPlanTier === 'level_2'
+                      ? 'bg-purple-600/25 border-purple-500 text-white shadow-lg shadow-purple-600/30 ring-1 ring-purple-500'
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
                   }`}
                 >
-                  <Building2 className="w-3.5 h-3.5 shrink-0" />
-                  <span className="truncate">{isEn ? 'Partner Agency' : '🏢 Agencia Partner'}</span>
+                  <span className="absolute -top-2 bg-amber-500 text-slate-950 text-[8px] font-black uppercase px-1.5 py-0.5 rounded-full tracking-wider shadow">
+                    ★ MÁS ELEGIDO
+                  </span>
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-purple-300">Nivel 2</span>
+                  <span className="text-sm font-black text-white">$90 <span className="text-[10px] text-slate-400">USD</span></span>
+                  <span className="text-[10px] text-purple-300 font-bold mt-0.5">100 Créditos</span>
+                  <span className="text-[9px] text-slate-500">(20 por pestaña)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewPlanTier('level_3');
+                    setNewAccountType('partner_agency');
+                    setNewAdvisorMonthlyFee(140);
+                    setNewAdvisorMaxCreates(30);
+                    setNewAdvisorMaxAudits(30);
+                    setNewAdvisorMaxRescues(30);
+                    setNewAdvisorMaxAppeals(30);
+                    setNewAdvisorMaxTools(30);
+                  }}
+                  className={`p-2.5 rounded-2xl font-black transition cursor-pointer flex flex-col items-center justify-center text-center border ${
+                    newPlanTier === 'level_3'
+                      ? 'bg-amber-500/20 border-amber-500 text-white shadow-lg shadow-amber-500/20 ring-1 ring-amber-500'
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                  }`}
+                >
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-amber-400">Nivel 3</span>
+                  <span className="text-sm font-black text-white">$140 <span className="text-[10px] text-slate-400">USD</span></span>
+                  <span className="text-[10px] text-amber-300 font-bold mt-0.5">150 Créditos</span>
+                  <span className="text-[9px] text-slate-500">(30 por pestaña)</span>
                 </button>
               </div>
             </div>
@@ -13537,6 +13767,82 @@ export default function LocalStudioPage() {
                 </div>
               </div>
 
+              {/* Selector de Plan Oficial para Edición */}
+              {editingAdvisor?.accountType !== 'founder' && (
+                <div className="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-1.5">
+                  <label className="block text-[10px] font-black uppercase text-amber-400 tracking-wider">
+                    {isEn ? 'Calibrate to Official Plan Quota:' : 'Recalibrar a Plan Oficial (Cupos Mensuales):'}
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditAdvisorPlanTier('level_1');
+                        setEditAdvisorMonthlyFee(49);
+                        setEditAdvisorMaxCreates(10);
+                        setEditAdvisorMaxAudits(10);
+                        setEditAdvisorMaxRescues(10);
+                        setEditAdvisorMaxAppeals(10);
+                        setEditAdvisorMaxTools(10);
+                      }}
+                      className={`p-2 rounded-xl text-center border font-bold transition cursor-pointer ${
+                        editAdvisorPlanTier === 'level_1'
+                          ? 'bg-indigo-600/30 border-indigo-500 text-white ring-1 ring-indigo-500'
+                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <div className="text-[9px] uppercase font-mono text-slate-400">Nivel 1</div>
+                      <div className="text-xs font-black text-white">$49 USD</div>
+                      <div className="text-[9px] text-indigo-300">10 c/u (50 total)</div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditAdvisorPlanTier('level_2');
+                        setEditAdvisorMonthlyFee(90);
+                        setEditAdvisorMaxCreates(20);
+                        setEditAdvisorMaxAudits(20);
+                        setEditAdvisorMaxRescues(20);
+                        setEditAdvisorMaxAppeals(20);
+                        setEditAdvisorMaxTools(20);
+                      }}
+                      className={`p-2 rounded-xl text-center border font-bold transition cursor-pointer relative ${
+                        editAdvisorPlanTier === 'level_2'
+                          ? 'bg-purple-600/30 border-purple-500 text-white ring-1 ring-purple-500'
+                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <div className="text-[9px] uppercase font-mono text-purple-300">Nivel 2 ★</div>
+                      <div className="text-xs font-black text-white">$90 USD</div>
+                      <div className="text-[9px] text-purple-300">20 c/u (100 total)</div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditAdvisorPlanTier('level_3');
+                        setEditAdvisorMonthlyFee(140);
+                        setEditAdvisorMaxCreates(30);
+                        setEditAdvisorMaxAudits(30);
+                        setEditAdvisorMaxRescues(30);
+                        setEditAdvisorMaxAppeals(30);
+                        setEditAdvisorMaxTools(30);
+                      }}
+                      className={`p-2 rounded-xl text-center border font-bold transition cursor-pointer ${
+                        editAdvisorPlanTier === 'level_3'
+                          ? 'bg-amber-500/30 border-amber-500 text-white ring-1 ring-amber-500'
+                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <div className="text-[9px] uppercase font-mono text-amber-400">Nivel 3</div>
+                      <div className="text-xs font-black text-white">$140 USD</div>
+                      <div className="text-[9px] text-amber-300">30 c/u (150 total)</div>
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {editingAdvisor?.accountType !== 'founder' && (
                 <div>
                   <label className="block font-bold text-purple-300 mb-1">
@@ -13661,6 +13967,140 @@ export default function LocalStudioPage() {
               </button>
             </div>
           </form>
+        </div>
+      </div>
+    )}
+
+    {/* MODAL: RECARGA DE EMERGENCIA (+10 CRÉDITOS ÚNICA OPCIÓN) */}
+    {rechargingAdvisor && (
+      <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 print:hidden animate-in fade-in duration-200">
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full shadow-2xl relative overflow-hidden">
+          {/* Header */}
+          <div className="p-5 border-b border-slate-800 bg-slate-900/95 flex items-start justify-between gap-4">
+            <div>
+              <h3 className="text-base font-black text-white flex items-center gap-2">
+                <Zap className="w-5 h-5 text-amber-400 fill-amber-400" />
+                <span>{isEn ? 'Emergency Recharge (+10 Credits)' : 'Recarga de Emergencia (+10 Créditos)'}</span>
+              </h3>
+              <p className="text-[11px] text-slate-400 mt-1">
+                {isEn ? 'Inject single pack of 10 credits for ' : 'Inyectar paquete único de 10 créditos para '}
+                <strong className="text-white">{rechargingAdvisor.name}</strong> (@{rechargingAdvisor.username})
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setRechargingAdvisor(null)}
+              className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer shrink-0"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Body */}
+          <div className="p-5 space-y-4 text-xs">
+            <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>
+                <strong>{isEn ? 'Prestigia Policy:' : 'Política Prestigia:'}</strong>{' '}
+                {isEn
+                  ? 'Recharges are strictly performed in indivisible packs of +10 credits for the chosen tab.'
+                  : 'Las recargas se realizan exclusivamente en paquetes cerrados de +10 créditos para la herramienta que el asesor requiera.'}
+              </span>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-300 mb-2">
+                {isEn ? 'Select the engine/tab to recharge:' : 'Selecciona la pestaña o motor a recargar:'}
+              </label>
+              <div className="space-y-2">
+                {[
+                  {
+                    id: 'creates',
+                    label: isEn ? '1. New Listing Creation' : '1. Creación de Ficha Nueva',
+                    desc: isEn ? '+10 Listing Generations' : '+10 Creaciones de Ficha Nueva',
+                  },
+                  {
+                    id: 'audits',
+                    label: isEn ? '2. Audit & Optimize' : '2. Auditar & Optimizar',
+                    desc: isEn ? '+10 Forensic Top 3 Audits' : '+10 Auditorías Forenses Top 3',
+                  },
+                  {
+                    id: 'rescues',
+                    label: isEn ? '3. Listing Rescue' : '3. Rescatar Ficha',
+                    desc: isEn ? '+10 72h Rescue Protocols' : '+10 Protocolos de Rescate 72h',
+                  },
+                  {
+                    id: 'appeals',
+                    label: isEn ? '4. Appeal 1★ Reviews' : '4. Apelar Reseñas 1★',
+                    desc: isEn ? '+10 Legal Defenses with Google' : '+10 Defensas Legales Google TOS',
+                  },
+                  {
+                    id: 'tools',
+                    label: isEn ? '5. Top 3 Closing Arsenal' : '5. Armas Top 3 de Cierre',
+                    desc: isEn ? '+10 Geo-Grid / ROI Pitches' : '+10 Prospecciones Geo-Grid / ROI',
+                  },
+                ].map((tab) => (
+                  <label
+                    key={tab.id}
+                    onClick={() => setRechargeSelectedTab(tab.id as any)}
+                    className={`flex items-center justify-between p-3 rounded-2xl border cursor-pointer transition ${
+                      rechargeSelectedTab === tab.id
+                        ? 'bg-amber-500/15 border-amber-500 text-white shadow-md'
+                        : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="rechargeTab"
+                        checked={rechargeSelectedTab === tab.id}
+                        onChange={() => setRechargeSelectedTab(tab.id as any)}
+                        className="w-4 h-4 text-amber-500 accent-amber-500"
+                      />
+                      <div>
+                        <div className="text-xs font-bold text-white">{tab.label}</div>
+                        <div className="text-[10px] text-slate-400">{tab.desc}</div>
+                      </div>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-400 font-mono font-black text-xs border border-amber-500/40">
+                      +10
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-900/95 flex items-center justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setRechargingAdvisor(null)}
+              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer"
+            >
+              {isEn ? 'Cancel' : 'Cancelar'}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleExecuteRecharge}
+              disabled={isRechargingCredits}
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg active:scale-98 flex items-center gap-2"
+            >
+              {isRechargingCredits ? (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  <span>{isEn ? 'Injecting +10 Credits...' : 'Inyectando +10 Créditos...'}</span>
+                </>
+              ) : (
+                <>
+                  <Zap className="w-3.5 h-3.5 fill-slate-950" />
+                  <span>{isEn ? 'Confirm Recharge (+10 Credits)' : 'Confirmar Inyección (+10 Créditos)'}</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     )}

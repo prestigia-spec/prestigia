@@ -47,11 +47,20 @@ export interface StudioAdvisor {
   phone: string;
   role: 'admin' | 'advisor';
   accountType?: 'internal_advisor' | 'partner_agency' | 'founder' | 'director';
+  planTier?: 'level_1' | 'level_2' | 'level_3' | 'founder';
   country?: string;
   city?: string;
   monthlyFeeUsd?: number;
   licenseStatus?: 'active' | 'pending_payment' | 'suspended';
   active: boolean;
+  planStartDate?: string;
+  extraCredits?: {
+    creates?: number;
+    audits?: number;
+    rescues?: number;
+    appeals?: number;
+    tools?: number;
+  };
   maxCreatesMonthly?: number;
   maxAuditsMonthly?: number;
   maxRescuesMonthly?: number;
@@ -1275,14 +1284,19 @@ export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
           phone: a.phone,
           role: a.role,
           accountType: a.account_type || a.accountType,
+          planTier: a.plan_tier || a.planTier,
           country: a.country,
           city: a.city,
           monthlyFeeUsd: Number(a.monthly_fee_usd ?? a.monthlyFeeUsd ?? 0),
           licenseStatus: a.license_status || a.licenseStatus || 'active',
           active: Boolean(a.active),
-          maxCreatesMonthly: Number(a.max_creates_monthly ?? a.maxCreatesMonthly ?? 30),
-          maxAuditsMonthly: Number(a.max_audits_monthly ?? a.maxAuditsMonthly ?? 30),
+          planStartDate: a.plan_start_date || a.planStartDate,
+          extraCredits: a.extra_credits || a.extraCredits,
+          maxCreatesMonthly: Number(a.max_creates_monthly ?? a.maxCreatesMonthly ?? 10),
+          maxAuditsMonthly: Number(a.max_audits_monthly ?? a.maxAuditsMonthly ?? 10),
           maxRescuesMonthly: Number(a.max_rescues_monthly ?? a.maxRescuesMonthly ?? 10),
+          maxAppealsMonthly: Number(a.max_appeals_monthly ?? a.maxAppealsMonthly ?? 10),
+          maxToolsMonthly: Number(a.max_tools_monthly ?? a.maxToolsMonthly ?? 10),
           createdAt: a.created_at || a.createdAt,
         }));
       }

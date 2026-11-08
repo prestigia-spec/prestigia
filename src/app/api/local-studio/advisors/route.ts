@@ -52,17 +52,22 @@ export async function POST(request: Request) {
       phone,
       role = 'advisor',
       accountType = 'internal_advisor',
+      planTier = 'level_1',
       country = 'Colombia',
       city = 'Bogotá',
-      monthlyFeeUsd = 0,
+      monthlyFeeUsd,
       licenseStatus = 'active',
       active = true,
+      planStartDate,
+      extraCredits,
       maxCreatesMonthly,
       maxAuditsMonthly,
       maxRescuesMonthly,
       maxAppealsMonthly,
       maxToolsMonthly,
       masterKey,
+      action,
+      rechargeTab,
     } = body;
 
     const allAdvisors = await getAllStudioAdvisors();
@@ -71,6 +76,52 @@ export async function POST(request: Request) {
     // Security check: master key or existing update
     if (masterKey && masterKey.trim() !== 'admin') {
       return NextResponse.json({ error: 'Clave de Administrador inválida' }, { status: 403 });
+    }
+
+    // Acción rápida 1: Registrar Pago Mensual y Reactivar Cupo
+    if (action === 'mark_paid_and_activate' && existing) {
+      const updated: StudioAdvisor = {
+        ...existing,
+        active: true,
+        licenseStatus: 'active',
+        planStartDate: new Date().toISOString(),
+      };
+      await saveStudioAdvisor(updated);
+      const { password: _, ...safe } = updated;
+      return NextResponse.json({ success: true, advisor: safe, message: 'Pago mensual confirmado. Cupo reactivado para nuevo ciclo.' });
+    }
+
+    // Acción rápida 2: Recargar +10 Créditos en una pestaña específica
+    if (action === 'recharge_credits' && existing && rechargeTab) {
+      const currentExtras = existing.extraCredits || {};
+      const tabKey = rechargeTab as 'creates' | 'audits' | 'rescues' | 'appeals' | 'tools';
+      const updated: StudioAdvisor = {
+        ...existing,
+        extraCredits: {
+          ...currentExtras,
+          [tabKey]: (currentExtras[tabKey] || 0) + 10,
+        },
+      };
+      await saveStudioAdvisor(updated);
+      const { password: _, ...safe } = updated;
+      return NextResponse.json({ success: true, advisor: safe, message: `+10 Créditos recargados exitosamente en ${rechargeTab}.` });
+    }
+
+    // Acción rápida 3: Apagar / Encender Usuario (Toggle Active)
+    if (action === 'toggle_status' && existing) {
+      const nextActive = body.active !== undefined ? Boolean(body.active) : !existing.active;
+      const updated: StudioAdvisor = {
+        ...existing,
+        active: nextActive,
+        licenseStatus: nextActive ? (existing.licenseStatus === 'suspended' ? 'active' : existing.licenseStatus) : 'suspended',
+      };
+      await saveStudioAdvisor(updated);
+      const { password: _, ...safe } = updated;
+      return NextResponse.json({
+        success: true,
+        advisor: safe,
+        message: nextActive ? 'Usuario activado exitosamente.' : 'Usuario apagado / pausado por facturación.',
+      });
     }
 
     if (!name || !username) {
@@ -88,6 +139,14 @@ export async function POST(request: Request) {
       ? 'founder'
       : (accountType === 'partner_agency' ? 'partner_agency' : 'internal_advisor');
 
+    // Calibración de defaults según el Plan Oficial (Nivel 1: $49/10, Nivel 2: $90/20, Nivel 3: $140/30, Master: 9999)
+    const resolvedPlanTier: 'level_1' | 'level_2' | 'level_3' | 'founder' = isLuisma
+      ? 'founder'
+      : (planTier === 'level_3' ? 'level_3' : planTier === 'level_2' ? 'level_2' : 'level_1');
+
+    const defaultFeeByTier = resolvedPlanTier === 'level_3' ? 140 : resolvedPlanTier === 'level_2' ? 90 : 49;
+    const defaultQuotaByTier = resolvedPlanTier === 'level_3' ? 30 : resolvedPlanTier === 'level_2' ? 20 : 10;
+
     const advisorObj: StudioAdvisor = {
       id: isLuisma ? 'adv-luisma' : (id || `adv-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`),
       name: name.trim(),
@@ -96,16 +155,19 @@ export async function POST(request: Request) {
       phone: (phone !== undefined ? phone : (existing?.phone || '+573058314049')).trim(),
       role: isLuisma ? 'admin' : (existing?.role || 'advisor'),
       accountType: resolvedAccountType,
+      planTier: resolvedPlanTier,
       country: (country || existing?.country || 'Colombia').trim(),
       city: (city || existing?.city || 'Bogotá').trim(),
-      monthlyFeeUsd: monthlyFeeUsd !== undefined ? Number(monthlyFeeUsd) : (existing?.monthlyFeeUsd || 0),
+      monthlyFeeUsd: monthlyFeeUsd !== undefined ? Number(monthlyFeeUsd) : (existing?.monthlyFeeUsd ?? defaultFeeByTier),
       licenseStatus: isLuisma ? 'active' : (licenseStatus || existing?.licenseStatus || 'active'),
       active: isLuisma ? true : (active !== undefined ? Boolean(active) : (existing?.active ?? true)),
-      maxCreatesMonthly: maxCreatesMonthly !== undefined ? Number(maxCreatesMonthly) : (existing?.maxCreatesMonthly ?? (resolvedAccountType === 'partner_agency' ? 60 : 30)),
-      maxAuditsMonthly: maxAuditsMonthly !== undefined ? Number(maxAuditsMonthly) : (existing?.maxAuditsMonthly ?? (resolvedAccountType === 'partner_agency' ? 60 : 30)),
-      maxRescuesMonthly: maxRescuesMonthly !== undefined ? Number(maxRescuesMonthly) : (existing?.maxRescuesMonthly ?? (resolvedAccountType === 'partner_agency' ? 20 : 10)),
-      maxAppealsMonthly: maxAppealsMonthly !== undefined ? Number(maxAppealsMonthly) : (existing?.maxAppealsMonthly ?? (resolvedAccountType === 'partner_agency' ? 20 : 15)),
-      maxToolsMonthly: maxToolsMonthly !== undefined ? Number(maxToolsMonthly) : (existing?.maxToolsMonthly ?? (resolvedAccountType === 'partner_agency' ? 30 : 20)),
+      planStartDate: planStartDate || existing?.planStartDate || new Date().toISOString(),
+      extraCredits: extraCredits !== undefined ? extraCredits : (existing?.extraCredits || {}),
+      maxCreatesMonthly: maxCreatesMonthly !== undefined ? Number(maxCreatesMonthly) : (existing?.maxCreatesMonthly ?? defaultQuotaByTier),
+      maxAuditsMonthly: maxAuditsMonthly !== undefined ? Number(maxAuditsMonthly) : (existing?.maxAuditsMonthly ?? defaultQuotaByTier),
+      maxRescuesMonthly: maxRescuesMonthly !== undefined ? Number(maxRescuesMonthly) : (existing?.maxRescuesMonthly ?? defaultQuotaByTier),
+      maxAppealsMonthly: maxAppealsMonthly !== undefined ? Number(maxAppealsMonthly) : (existing?.maxAppealsMonthly ?? defaultQuotaByTier),
+      maxToolsMonthly: maxToolsMonthly !== undefined ? Number(maxToolsMonthly) : (existing?.maxToolsMonthly ?? defaultQuotaByTier),
       createdAt: existing?.createdAt || new Date().toISOString(),
     };
 
