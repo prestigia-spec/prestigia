@@ -2218,13 +2218,13 @@ export default function LocalStudioPage() {
   const [newAdvisorPhone, setNewAdvisorPhone] = useState('+57');
   const [newAdvisorCountry, setNewAdvisorCountry] = useState('');
   const [newAdvisorCity, setNewAdvisorCity] = useState('');
-  const [newAdvisorMonthlyFee, setNewAdvisorMonthlyFee] = useState<number>(79);
+  const [newAdvisorMonthlyFee, setNewAdvisorMonthlyFee] = useState<number>(49);
   const [newAdvisorLicenseStatus, setNewAdvisorLicenseStatus] = useState<'active' | 'pending_payment'>('active');
-  const [newAdvisorMaxCreates, setNewAdvisorMaxCreates] = useState<number>(30);
-  const [newAdvisorMaxAudits, setNewAdvisorMaxAudits] = useState<number>(30);
+  const [newAdvisorMaxCreates, setNewAdvisorMaxCreates] = useState<number>(10);
+  const [newAdvisorMaxAudits, setNewAdvisorMaxAudits] = useState<number>(10);
   const [newAdvisorMaxRescues, setNewAdvisorMaxRescues] = useState<number>(10);
-  const [newAdvisorMaxAppeals, setNewAdvisorMaxAppeals] = useState<number>(15);
-  const [newAdvisorMaxTools, setNewAdvisorMaxTools] = useState<number>(30);
+  const [newAdvisorMaxAppeals, setNewAdvisorMaxAppeals] = useState<number>(10);
+  const [newAdvisorMaxTools, setNewAdvisorMaxTools] = useState<number>(10);
   const [adminMasterKey, setAdminMasterKey] = useState('admin');
   const [isSavingAdvisor, setIsSavingAdvisor] = useState(false);
 
@@ -2278,6 +2278,62 @@ export default function LocalStudioPage() {
     } catch (err) {
       console.warn('Error fetching advisors:', err);
     }
+  };
+
+  // Generador de Mensaje Oficial de Bienvenida con Credenciales y Cupos Dinámicos por WhatsApp
+  const getAdvisorWelcomeWhatsAppUrl = (adv: StudioAdvisorUser): string => {
+    const cleanPhone = (adv.phone || '').replace(/[^0-9]/g, '');
+    if (!cleanPhone) return '#';
+
+    const planName =
+      adv.planTier === 'level_3' ? 'Nivel 3' :
+      adv.planTier === 'level_2' ? 'Nivel 2' :
+      adv.planTier === 'founder' ? 'Dirección General / Master' :
+      'Nivel 1';
+
+    const fee = adv.monthlyFeeUsd !== undefined && adv.monthlyFeeUsd !== null
+      ? adv.monthlyFeeUsd
+      : (adv.planTier === 'level_3' ? 140 : adv.planTier === 'level_2' ? 90 : 49);
+
+    // Lectura dinámica de los cupos exactos y activos configurados para esta cuenta (+ recargas)
+    const quotaCreates = (adv.maxCreatesMonthly ?? 10) + (adv.extraCredits?.creates || 0);
+    const quotaAudits = (adv.maxAuditsMonthly ?? 10) + (adv.extraCredits?.audits || 0);
+    const quotaRescues = (adv.maxRescuesMonthly ?? 10) + (adv.extraCredits?.rescues || 0);
+    const quotaAppeals = (adv.maxAppealsMonthly ?? 10) + (adv.extraCredits?.appeals || 0);
+    const quotaTools = (adv.maxToolsMonthly ?? 10) + (adv.extraCredits?.tools || 0);
+
+    const totalCredits = quotaCreates + quotaAudits + quotaRescues + quotaAppeals + quotaTools;
+
+    const msg = `¡Hola, ${adv.name}! 👋 Bienvenido a la red oficial de *Prestigia Local Studio*.
+
+Tu cuenta comercial ha sido activada con éxito en la plataforma. A continuación encuentras el resumen de tu suscripción activa y tus credenciales oficiales de acceso:
+
+━━━━━━━━━━━━━━━━━━━
+🛡️ *DETALLES DE TU PLAN:*
+━━━━━━━━━━━━━━━━━━━
+• *Plan:* ${planName}
+• *Cuota Mensual:* $${fee} USD/mes
+• *Cupo Total Asignado:* ${totalCredits} Créditos mensuales activos
+• *Distribución por Herramienta:*
+  ✓ Creación de Fichas Top 3: ${quotaCreates} créditos
+  ✓ Auditorías Forenses: ${quotaAudits} créditos
+  ✓ Rescate de Negocios: ${quotaRescues} créditos
+  ✓ Apelación e Impugnación de Reseñas: ${quotaAppeals} créditos
+  ✓ Armas y Estrategias Top 3: ${quotaTools} créditos
+
+⚡ *RECARGAS DE EMERGENCIA (+10 CRÉDITOS):*
+Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerrar clientes, puedes solicitar una recarga inmediata de *+10 créditos a la vez* contactando a Dirección General.
+
+━━━━━━━━━━━━━━━━━━━
+🔑 *TUS CREDENCIALES DE ACCESO:*
+━━━━━━━━━━━━━━━━━━━
+🌐 *Plataforma:* https://prestigia-oficial.vercel.app/local-studio
+👤 *Usuario:* ${adv.username}
+🔒 *Contraseña:* ${adv.password || '1234'}
+
+¡Muchos éxitos prospectando y cerrando negocios con Prestigia! 🚀`;
+
+    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
   };
 
   // Sanitización y Validación Estricta de Entradas (Letras para nombres, + y números para teléfonos, formato de email obligatorio)
@@ -12760,13 +12816,13 @@ export default function LocalStudioPage() {
                             <span>Teléfono: <strong className="text-slate-300 font-mono">{adv.phone || 'No registrado'}</strong></span>
                             {adv.phone && (
                               <a
-                                href={`https://wa.me/${adv.phone.replace(/[^0-9]/g, '')}`}
+                                href={getAdvisorWelcomeWhatsAppUrl(adv)}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-0.5 text-[10px] shrink-0"
-                                title="Abrir WhatsApp directo"
+                                className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 text-[10px] shrink-0 bg-emerald-950/40 border border-emerald-500/30 px-2 py-0.5 rounded-lg hover:bg-emerald-900/50 transition cursor-pointer shadow-sm active:scale-95"
+                                title="Enviar bienvenida oficial con credenciales y cupo por WhatsApp"
                               >
-                                <MessageSquare className="w-2.5 h-2.5" />
+                                <MessageSquare className="w-3 h-3 text-emerald-400" />
                                 <span>WhatsApp</span>
                               </a>
                             )}
