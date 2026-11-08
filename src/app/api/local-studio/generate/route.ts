@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { verifyAdvisorQuota } from '@/lib/studio-auth';
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
@@ -18,6 +19,8 @@ interface GenerateRequest {
   businessModel?: 'storefront' | 'service_area';
   serviceAreas?: string;
   reviewHighlights?: string[];
+  advisorId?: string;
+  advisorUsername?: string;
 }
 
 export async function POST(request: Request) {
@@ -42,6 +45,32 @@ export async function POST(request: Request) {
 
     if (!businessName || !businessName.trim()) {
       return NextResponse.json({ error: 'El nombre del negocio es obligatorio' }, { status: 400 });
+    }
+
+    // -------------------------------------------------------------
+    // SERVER-SIDE SHIELD: Verify Advisor Quota & Active License
+    // -------------------------------------------------------------
+    const callerId =
+      body.advisorId ||
+      body.advisorUsername ||
+      request.headers.get('x-advisor-id') ||
+      'adv-luisma';
+
+    const quotaCheck = await verifyAdvisorQuota(callerId, mode === 'create' ? 'creates' : 'audits');
+    if (!quotaCheck.authorized) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: quotaCheck.error,
+          code: quotaCheck.code,
+          quotaExhausted: quotaCheck.code === 'QUOTA_EXHAUSTED',
+          accountSuspended: quotaCheck.code === 'ACCOUNT_SUSPENDED',
+          effectiveQuota: quotaCheck.effectiveQuota,
+          usedCount: quotaCheck.usedCount,
+          remainingCredits: 0,
+        },
+        { status: quotaCheck.status }
+      );
     }
 
     const cleanName = businessName.trim();

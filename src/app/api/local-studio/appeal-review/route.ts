@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { verifyAdvisorQuota } from '@/lib/studio-auth';
 
 export interface AppealReviewRequest {
   businessName: string;
@@ -14,6 +15,8 @@ export interface AppealReviewRequest {
   contactCompany?: string;
   contactPhone?: string;
   contactEmail?: string;
+  advisorId?: string;
+  advisorUsername?: string;
 }
 
 export async function POST(request: Request) {
@@ -40,6 +43,32 @@ export async function POST(request: Request) {
     }
     if (!reviewText || !reviewText.trim()) {
       return NextResponse.json({ error: 'El texto de la reseña a impugnar es obligatorio.' }, { status: 400 });
+    }
+
+    // -------------------------------------------------------------
+    // SERVER-SIDE SHIELD: Verify Advisor Quota & Active License (Appeals)
+    // -------------------------------------------------------------
+    const callerId =
+      body.advisorId ||
+      body.advisorUsername ||
+      request.headers.get('x-advisor-id') ||
+      'adv-luisma';
+
+    const quotaCheck = await verifyAdvisorQuota(callerId, 'appeals');
+    if (!quotaCheck.authorized) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: quotaCheck.error,
+          code: quotaCheck.code,
+          quotaExhausted: quotaCheck.code === 'QUOTA_EXHAUSTED',
+          accountSuspended: quotaCheck.code === 'ACCOUNT_SUSPENDED',
+          effectiveQuota: quotaCheck.effectiveQuota,
+          usedCount: quotaCheck.usedCount,
+          remainingCredits: 0,
+        },
+        { status: quotaCheck.status }
+      );
     }
 
     const cleanBiz = businessName.trim();

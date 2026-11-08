@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAllStudioDossiers, saveStudioDossier, deleteStudioDossier, restoreStudioDossier, StudioDossier } from '@/lib/db';
+import { verifyAdvisorQuota } from '@/lib/studio-auth';
 
 export async function GET(request: Request) {
   try {
@@ -125,46 +126,29 @@ export async function POST(request: Request) {
           return sameName || samePhone || sameEmail;
         });
 
-    if (!existing && advisorId !== 'adv-luisma' && advisorId !== 'luisma') {
-      const { getAllStudioAdvisors } = await import('@/lib/db');
-      const advisors = await getAllStudioAdvisors();
-      const currentAdv = advisors.find((a) => a.id === advisorId);
-      if (currentAdv && currentAdv.accountType !== 'founder') {
-        const now = new Date();
-        const curYear = now.getFullYear();
-        const curMonth = now.getMonth();
-        const monthDossiers = allDossiers.filter((d) => {
-          if (d.advisorId !== advisorId) return false;
-          const cd = new Date(d.createdAt);
-          return cd.getFullYear() === curYear && cd.getMonth() === curMonth;
-        });
-
-        const used = monthDossiers.filter((d) => d.mode === targetMode).length;
-        const limit = targetMode === 'create'
-          ? (currentAdv.maxCreatesMonthly ?? 30)
+    if (!existing) {
+      const toolTab: 'creates' | 'audits' | 'rescues' | 'appeals' | 'tools' =
+        targetMode === 'create'
+          ? 'creates'
           : targetMode === 'audit'
-          ? (currentAdv.maxAuditsMonthly ?? 30)
+          ? 'audits'
           : targetMode === 'appeal'
-          ? (currentAdv.maxAppealsMonthly ?? 15)
+          ? 'appeals'
           : targetMode === 'tools'
-          ? (currentAdv.maxToolsMonthly ?? 30)
-          : (currentAdv.maxRescuesMonthly ?? 10);
+          ? 'tools'
+          : 'rescues';
 
-        if (used >= limit) {
-          return NextResponse.json({
-            error: `Has alcanzado tu cupo mensual de ${limit} ${
-              targetMode === 'create'
-                ? 'creaciones'
-                : targetMode === 'audit'
-                ? 'auditorías'
-                : targetMode === 'appeal'
-                ? 'apelaciones'
-                : targetMode === 'tools'
-                ? 'escaneos de Armas Top 3'
-                : 'rescates'
-            }. Contacta a Dirección General para ampliar tu plan.`
-          }, { status: 403 });
-        }
+      const quotaCheck = await verifyAdvisorQuota(advisorId, toolTab);
+      if (!quotaCheck.authorized) {
+        return NextResponse.json(
+          {
+            error: quotaCheck.error,
+            code: quotaCheck.code,
+            quotaExhausted: quotaCheck.code === 'QUOTA_EXHAUSTED',
+            accountSuspended: quotaCheck.code === 'ACCOUNT_SUSPENDED',
+          },
+          { status: quotaCheck.status }
+        );
       }
     }
 

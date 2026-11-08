@@ -2245,7 +2245,8 @@ export default function LocalStudioPage() {
 
   const fetchAdvisors = async () => {
     try {
-      const res = await fetch('/api/local-studio/advisors?isAdmin=true');
+      const callerId = currentUser?.id || 'adv-luisma';
+      const res = await fetch(`/api/local-studio/advisors?isAdmin=true&callerId=${encodeURIComponent(callerId)}&masterKey=admin`);
       const data = await res.json();
       if (data.success && Array.isArray(data.advisors)) {
         setAdvisorsList(data.advisors);
@@ -2489,6 +2490,8 @@ export default function LocalStudioPage() {
           contactCompany: appealContactCompany || bizName,
           contactPhone: appealContactPhone,
           contactEmail: appealContactEmail,
+          advisorId: currentUser?.id || 'adv-luisma',
+          advisorUsername: currentUser?.username || 'luisma',
         }),
       });
 
@@ -2533,7 +2536,14 @@ export default function LocalStudioPage() {
             : `⚖️ 1 Crédito descontado. ¡Expediente de rescate/apelación generado para ${review.author}!`
         );
       } else {
-        showToast(resData.error || (isEn ? 'Error generating appeal' : 'Error al generar la apelación'));
+        fetchDossiers();
+        showToast(
+          resData.quotaExhausted
+            ? (isEn ? '🚫 Monthly credit limit reached for this tool.' : '🚫 Cupo mensual agotado para esta herramienta. Solicita una recarga a Dirección General.')
+            : resData.accountSuspended
+            ? (isEn ? '🚫 Account suspended due to pending payment.' : '🚫 Cuenta suspendida o pausada por facturación pendiente.')
+            : ('⚠️ ' + (resData.error || (isEn ? 'Error generating appeal' : 'Error al generar la apelación')))
+        );
       }
     } catch (err: any) {
       showToast(isEn ? 'Connection error generating appeal' : 'Error de conexión al generar la apelación');
@@ -2671,11 +2681,16 @@ export default function LocalStudioPage() {
         businessModel: createBusinessModel,
         serviceAreas: createServiceAreas.trim(),
         reviewHighlights: [],
+        advisorId: currentUser?.id || 'adv-luisma',
+        advisorUsername: currentUser?.username || 'luisma',
       };
 
       const res = await fetch('/api/local-studio/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-advisor-id': currentUser?.id || 'adv-luisma',
+        },
         body: JSON.stringify(payload),
       });
 
@@ -2729,7 +2744,14 @@ export default function LocalStudioPage() {
           console.warn('Auto-save error:', autoErr);
         }
       } else {
-        showToast('⚠️ Error generando el expediente: ' + (resData.error || 'Reintente'));
+        fetchDossiers();
+        showToast(
+          resData.quotaExhausted
+            ? (isEn ? '🚫 Monthly credit limit reached for this tool.' : '🚫 Cupo mensual agotado para esta herramienta. Solicita una recarga a Dirección General.')
+            : resData.accountSuspended
+            ? (isEn ? '🚫 Account suspended due to pending payment.' : '🚫 Cuenta suspendida o pausada por facturación pendiente.')
+            : ('⚠️ ' + (resData.error || 'Error al generar'))
+        );
       }
     } catch (err) {
       showToast('⚠️ Error de conexión con el motor de IA.');
@@ -2824,11 +2846,16 @@ export default function LocalStudioPage() {
         businessModel: 'storefront',
         serviceAreas: '',
         reviewHighlights: overrides?.reviewHighlights || auditScannedListing?.reviewHighlights || [],
+        advisorId: currentUser?.id || 'adv-luisma',
+        advisorUsername: currentUser?.username || 'luisma',
       };
 
       const res = await fetch('/api/local-studio/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-advisor-id': currentUser?.id || 'adv-luisma',
+        },
         body: JSON.stringify(payload),
       });
 
@@ -2880,7 +2907,14 @@ export default function LocalStudioPage() {
           console.warn('Auto-save error:', autoErr);
         }
       } else {
-        showToast('⚠️ Error generando la auditoría: ' + (resData.error || 'Reintente'));
+        fetchDossiers();
+        showToast(
+          resData.quotaExhausted
+            ? (isEn ? '🚫 Monthly credit limit reached for this tool.' : '🚫 Cupo mensual agotado para esta herramienta. Solicita una recarga a Dirección General.')
+            : resData.accountSuspended
+            ? (isEn ? '🚫 Account suspended due to pending payment.' : '🚫 Cuenta suspendida o pausada por facturación pendiente.')
+            : ('⚠️ ' + (resData.error || 'Error al generar la auditoría'))
+        );
       }
     } catch (err) {
       showToast('⚠️ Error de conexión con el motor de IA.');
@@ -4095,7 +4129,8 @@ export default function LocalStudioPage() {
       }
     } else if (type === 'advisor' && advisor) {
       try {
-        const res = await fetch(`/api/local-studio/advisors?id=${advisor.id}&masterKey=admin`, {
+        const callerId = currentUser?.id || 'adv-luisma';
+        const res = await fetch(`/api/local-studio/advisors?id=${advisor.id}&masterKey=admin&callerId=${encodeURIComponent(callerId)}`, {
           method: 'DELETE',
         });
         const data = await res.json();
@@ -4257,6 +4292,7 @@ export default function LocalStudioPage() {
           maxToolsMonthly: Number(newAdvisorMaxTools) || (newPlanTier === 'level_3' ? 30 : newPlanTier === 'level_2' ? 20 : 10),
           active: true,
           masterKey: adminMasterKey,
+          callerId: currentUser?.id || 'adv-luisma',
         }),
       });
 
@@ -4341,6 +4377,7 @@ export default function LocalStudioPage() {
         maxAppealsMonthly: Number(editAdvisorMaxAppeals),
         maxToolsMonthly: Number(editAdvisorMaxTools),
         masterKey: 'admin',
+        callerId: currentUser?.id || 'adv-luisma',
       };
       if (editAdvisorPass.trim()) {
         payload.password = editAdvisorPass.trim();
@@ -4400,6 +4437,7 @@ export default function LocalStudioPage() {
           username: advisor.username,
           active: newActiveState,
           masterKey: 'admin',
+          callerId: currentUser?.id || 'adv-luisma',
         }),
       });
       const data = await res.json();
@@ -4428,6 +4466,7 @@ export default function LocalStudioPage() {
           id: advisor.id,
           action: 'mark_paid_and_activate',
           masterKey: 'admin',
+          callerId: currentUser?.id || 'adv-luisma',
         }),
       });
       const data = await res.json();
@@ -4455,6 +4494,7 @@ export default function LocalStudioPage() {
           action: 'recharge_credits',
           rechargeTab: rechargeSelectedTab,
           masterKey: 'admin',
+          callerId: currentUser?.id || 'adv-luisma',
         }),
       });
       const data = await res.json();

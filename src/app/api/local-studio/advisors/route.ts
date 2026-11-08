@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
 import { getAllStudioAdvisors, saveStudioAdvisor, deleteStudioAdvisor, StudioAdvisor } from '@/lib/db';
+import { verifyMasterAdmin } from '@/lib/studio-auth';
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const username = searchParams.get('username')?.trim().toLowerCase();
     const password = searchParams.get('password')?.trim();
+    const callerId = searchParams.get('callerId') || searchParams.get('advisorId');
+    const masterKey = searchParams.get('masterKey');
 
     const advisors = await getAllStudioAdvisors();
 
@@ -29,10 +32,14 @@ export async function GET(request: Request) {
 
     const isAdmin = searchParams.get('isAdmin') === 'true';
     if (isAdmin) {
-      return NextResponse.json({ success: true, advisors });
+      // Secure Guard: Only Dirección General can inspect raw passwords
+      const auth = await verifyMasterAdmin(callerId, masterKey);
+      if (auth.authorized) {
+        return NextResponse.json({ success: true, advisors });
+      }
     }
 
-    // List all advisors (safe list)
+    // List all advisors (safe list - passwords strictly hidden)
     const safeList = advisors.map(({ password: _, ...a }) => a);
     return NextResponse.json({ success: true, advisors: safeList });
   } catch (error: any) {
@@ -66,6 +73,7 @@ export async function POST(request: Request) {
       maxAppealsMonthly,
       maxToolsMonthly,
       masterKey,
+      callerId,
       action,
       rechargeTab,
     } = body;
@@ -73,9 +81,10 @@ export async function POST(request: Request) {
     const allAdvisors = await getAllStudioAdvisors();
     const existing = id ? allAdvisors.find((a) => a.id === id) : null;
 
-    // Security check: master key or existing update
-    if (masterKey && masterKey.trim() !== 'admin') {
-      return NextResponse.json({ error: 'Clave de Administrador inválida' }, { status: 403 });
+    // Security check: Master privileges required for administrative operations
+    const masterAuth = await verifyMasterAdmin(callerId || id, masterKey);
+    if (!masterAuth.authorized) {
+      return NextResponse.json({ error: 'Autorización denegada: Se requieren privilegios de Dirección General' }, { status: 403 });
     }
 
     // Acción rápida 1: Registrar Pago Mensual y Reactivar Cupo
@@ -186,8 +195,10 @@ export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
     const advisorId = searchParams.get('id');
     const masterKey = searchParams.get('masterKey');
+    const callerId = searchParams.get('callerId');
 
-    if (!masterKey || masterKey.trim() !== 'admin') {
+    const auth = await verifyMasterAdmin(callerId, masterKey);
+    if (!auth.authorized) {
       return NextResponse.json({ error: 'Autorización requerida de Administrador' }, { status: 403 });
     }
 
