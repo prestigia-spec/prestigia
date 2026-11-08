@@ -440,6 +440,30 @@ const COUNTRY_ALIASES: Record<string, string> = {
   portugal: 'Portugal',
 };
 
+const COUNTRY_DIALING_CODES: Record<string, string> = {
+  'Colombia': '+57',
+  'Venezuela': '+58',
+  'México': '+52',
+  'Estados Unidos': '+1',
+  'España': '+34',
+  'Argentina': '+54',
+  'Chile': '+56',
+  'Perú': '+51',
+  'Ecuador': '+593',
+  'Panamá': '+507',
+  'República Dominicana': '+1',
+  'Costa Rica': '+506',
+  'Guatemala': '+502',
+  'Uruguay': '+598',
+  'Canadá': '+1',
+  'Brasil': '+55',
+  'Reino Unido': '+44',
+  'Francia': '+33',
+  'Italia': '+39',
+  'Alemania': '+49',
+  'Portugal': '+351',
+};
+
 function parseAddressGeo(
   rawAddress: string,
   fallbackCountry: string = 'Colombia',
@@ -2192,8 +2216,8 @@ export default function LocalStudioPage() {
   const [newAdvisorUser, setNewAdvisorUser] = useState('');
   const [newAdvisorPass, setNewAdvisorPass] = useState('');
   const [newAdvisorPhone, setNewAdvisorPhone] = useState('+57');
-  const [newAdvisorCountry, setNewAdvisorCountry] = useState('Colombia');
-  const [newAdvisorCity, setNewAdvisorCity] = useState('Bogotá');
+  const [newAdvisorCountry, setNewAdvisorCountry] = useState('');
+  const [newAdvisorCity, setNewAdvisorCity] = useState('');
   const [newAdvisorMonthlyFee, setNewAdvisorMonthlyFee] = useState<number>(79);
   const [newAdvisorLicenseStatus, setNewAdvisorLicenseStatus] = useState<'active' | 'pending_payment'>('active');
   const [newAdvisorMaxCreates, setNewAdvisorMaxCreates] = useState<number>(30);
@@ -4263,8 +4287,8 @@ export default function LocalStudioPage() {
   // Save new advisor or licensed agency partner
   const handleCreateAdvisor = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newAdvisorName || !newAdvisorUser || !newAdvisorPass) {
-      showToast('⚠️ Completa los campos obligatorios');
+    if (!newAdvisorName || !newAdvisorUser || !newAdvisorPass || !newAdvisorCountry || !newAdvisorCity) {
+      showToast(isEn ? '⚠️ Please complete all required fields (*)' : '⚠️ Por favor completa todos los campos obligatorios (*)');
       return;
     }
 
@@ -4306,6 +4330,9 @@ export default function LocalStudioPage() {
         setNewAdvisorName('');
         setNewAdvisorUser('');
         setNewAdvisorPass('');
+        setNewAdvisorCountry('');
+        setNewAdvisorCity('');
+        setShowRegisterAdvisorModal(false);
         fetchAdvisors();
         setNetworkSubView('directory');
       } else {
@@ -12443,7 +12470,14 @@ export default function LocalStudioPage() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setShowRegisterAdvisorModal(true)}
+                  onClick={() => {
+                    setNewAdvisorCountry('');
+                    setNewAdvisorCity('');
+                    setNewAdvisorName('');
+                    setNewAdvisorUser('');
+                    setNewAdvisorPass('');
+                    setShowRegisterAdvisorModal(true);
+                  }}
                   className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer flex items-center gap-1.5 shadow-md active:scale-98"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -13459,26 +13493,56 @@ export default function LocalStudioPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-300 mb-1">{tNetwork.countryLabel} *</label>
-                  <input
-                    type="text"
+                  <select
                     value={newAdvisorCountry}
-                    onChange={(e) => setNewAdvisorCountry(e.target.value)}
-                    placeholder="Colombia, México, Venezuela..."
-                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                    onChange={(e) => {
+                      const selected = e.target.value;
+                      setNewAdvisorCountry(selected);
+                      setNewAdvisorCity('');
+                      if (COUNTRY_DIALING_CODES[selected]) {
+                        const currentPrefix = COUNTRY_DIALING_CODES[newAdvisorCountry] || '+57';
+                        if (!newAdvisorPhone || newAdvisorPhone === currentPrefix || newAdvisorPhone === '+') {
+                          setNewAdvisorPhone(COUNTRY_DIALING_CODES[selected]);
+                        }
+                      }
+                    }}
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 cursor-pointer"
                     required
-                  />
+                  >
+                    <option value="">{isEn ? '-- Select Country --' : '-- Selecciona un País --'}</option>
+                    {Object.keys(WORLD_REGIONS_GEO).map((c) => (
+                      <option key={c} value={c} className="bg-slate-900 text-white">
+                        {c}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
                   <label className="block font-bold text-slate-300 mb-1">{tNetwork.cityLabel} *</label>
-                  <input
-                    type="text"
+                  <select
                     value={newAdvisorCity}
                     onChange={(e) => setNewAdvisorCity(e.target.value)}
-                    placeholder={isEn ? 'Miami, New York, London, Madrid...' : 'Bogotá, Medellín, CDMX, Caracas...'}
-                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                    disabled={!newAdvisorCountry}
+                    className={`w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition ${
+                      !newAdvisorCountry
+                        ? 'opacity-40 cursor-not-allowed border-dashed text-slate-500'
+                        : 'cursor-pointer hover:border-slate-500'
+                    }`}
                     required
-                  />
+                  >
+                    <option value="">
+                      {!newAdvisorCountry
+                        ? (isEn ? '⚠️ Select country first...' : '⚠️ Primero selecciona un país...')
+                        : (isEn ? '-- Select City --' : '-- Selecciona una Ciudad --')}
+                    </option>
+                    {newAdvisorCountry &&
+                      WORLD_REGIONS_GEO[newAdvisorCountry]?.map((city) => (
+                        <option key={city} value={city} className="bg-slate-900 text-white">
+                          {city}
+                        </option>
+                      ))}
+                  </select>
                 </div>
               </div>
 
@@ -13754,22 +13818,61 @@ export default function LocalStudioPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-300 mb-1">{isEn ? 'Country' : 'País'}</label>
-                  <input
-                    type="text"
+                  <select
                     value={editAdvisorCountry}
-                    onChange={(e) => setEditAdvisorCountry(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
-                  />
+                    onChange={(e) => {
+                      const selected = e.target.value;
+                      setEditAdvisorCountry(selected);
+                      setEditAdvisorCity('');
+                    }}
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 cursor-pointer"
+                  >
+                    <option value="">{isEn ? '-- Select Country --' : '-- Selecciona un País --'}</option>
+                    {Object.keys(WORLD_REGIONS_GEO).map((c) => (
+                      <option key={c} value={c} className="bg-slate-900 text-white">
+                        {c}
+                      </option>
+                    ))}
+                    {editAdvisorCountry && !WORLD_REGIONS_GEO[editAdvisorCountry] && (
+                      <option value={editAdvisorCountry} className="bg-slate-900 text-white">
+                        {editAdvisorCountry} (Actual)
+                      </option>
+                    )}
+                  </select>
                 </div>
 
                 <div>
                   <label className="block font-bold text-slate-300 mb-1">{isEn ? 'City' : 'Ciudad'}</label>
-                  <input
-                    type="text"
+                  <select
                     value={editAdvisorCity}
                     onChange={(e) => setEditAdvisorCity(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
-                  />
+                    disabled={!editAdvisorCountry}
+                    className={`w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition ${
+                      !editAdvisorCountry
+                        ? 'opacity-40 cursor-not-allowed border-dashed text-slate-500'
+                        : 'cursor-pointer hover:border-slate-500'
+                    }`}
+                  >
+                    <option value="">
+                      {!editAdvisorCountry
+                        ? (isEn ? '⚠️ Select country first...' : '⚠️ Primero selecciona un país...')
+                        : (isEn ? '-- Select City --' : '-- Selecciona una Ciudad --')}
+                    </option>
+                    {editAdvisorCountry &&
+                      WORLD_REGIONS_GEO[editAdvisorCountry]?.map((city) => (
+                        <option key={city} value={city} className="bg-slate-900 text-white">
+                          {city}
+                        </option>
+                      ))}
+                    {editAdvisorCity &&
+                      editAdvisorCountry &&
+                      WORLD_REGIONS_GEO[editAdvisorCountry] &&
+                      !WORLD_REGIONS_GEO[editAdvisorCountry].includes(editAdvisorCity) && (
+                        <option value={editAdvisorCity} className="bg-slate-900 text-white">
+                          {editAdvisorCity} (Actual)
+                        </option>
+                      )}
+                  </select>
                 </div>
               </div>
 
