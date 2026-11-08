@@ -2084,6 +2084,16 @@ export default function LocalStudioPage() {
   const [isRechargingCredits, setIsRechargingCredits] = useState<boolean>(false);
   const [isUpdatingAdvisor, setIsUpdatingAdvisor] = useState<boolean>(false);
 
+  // Modal de Confirmación Profesional (Eliminar Expediente o Asesor sin alertas feas del navegador)
+  const [confirmDeleteModal, setConfirmDeleteModal] = useState<{
+    isOpen: boolean;
+    type: 'dossier' | 'advisor';
+    id: string;
+    name?: string;
+    isPermanentPurge?: boolean;
+    advisor?: StudioAdvisorUser;
+  } | null>(null);
+
   // Helper para calcular cupo efectivo mensual: (Cupo base según Nivel o Custom) + (Recargas de +10 activas)
   const getEffectiveQuota = (tab: 'creates' | 'audits' | 'rescues' | 'appeals' | 'tools'): number => {
     if (isLuismaMaster) return 999999;
@@ -4036,38 +4046,68 @@ export default function LocalStudioPage() {
     showToast(`Expediente cargado: ${dossier.clientName}`);
   };
 
-  const handleDeleteDossier = async (id: string, isPermanentPurge?: boolean) => {
-    const msg = isPermanentPurge
-      ? (isEn
-          ? '🛡️ PRESTIGIA LOCAL STUDIO:\n\nAre you sure you want to PERMANENTLY purge this dossier from the database? This action is irreversible.'
-          : '🛡️ PRESTIGIA LOCAL STUDIO:\n\n¿Seguro que deseas purgar DEFINITIVAMENTE este expediente de la base de datos? Esta acción es irreversible.')
-      : (isEn
-          ? '🛡️ PRESTIGIA LOCAL STUDIO:\n\nAre you sure you want to delete this dossier?'
-          : '🛡️ PRESTIGIA LOCAL STUDIO:\n\n¿Seguro que deseas eliminar este expediente?');
-    if (typeof window !== 'undefined' && !window.confirm(msg)) return;
+  // Disparar confirmación visual profesional para eliminar expediente
+  const handleDeleteDossier = (id: string, isPermanentPurge?: boolean, name?: string) => {
+    const matched = savedDossiers.find((d) => d.id === id);
+    const displayName = name || matched?.clientName || matched?.contactCompany || (isEn ? 'Dossier' : 'Expediente');
+    setConfirmDeleteModal({
+      isOpen: true,
+      type: 'dossier',
+      id,
+      name: displayName,
+      isPermanentPurge: Boolean(isPermanentPurge),
+    });
+  };
 
-    // Actualización optimista inmediata en la UI
-    setSavedDossiers((prev) =>
-      isPermanentPurge
-        ? prev.filter((d) => d.id !== id)
-        : prev.map((d) => (d.id === id ? { ...d, deletedByAdvisor: true } : d))
-    );
+  // Ejecución definitiva de la eliminación confirmada por el usuario en el modal
+  const executeConfirmedDelete = async () => {
+    if (!confirmDeleteModal) return;
+    const { type, id, isPermanentPurge, advisor } = confirmDeleteModal;
+    setConfirmDeleteModal(null);
 
-    try {
-      const url = isPermanentPurge
-        ? `/api/local-studio/dossiers?id=${id}&purge=true`
-        : `/api/local-studio/dossiers?id=${id}`;
-      const res = await fetch(url, { method: 'DELETE' });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.success !== false) {
-        showToast(isPermanentPurge ? '🗑️ Expediente purgado definitivamente' : '🗑️ Expediente eliminado con éxito');
-      } else {
-        showToast('⚠️ No se pudo eliminar el expediente del servidor.');
+    if (type === 'dossier') {
+      // Actualización optimista inmediata en la UI
+      setSavedDossiers((prev) =>
+        isPermanentPurge
+          ? prev.filter((d) => d.id !== id)
+          : prev.map((d) => (d.id === id ? { ...d, deletedByAdvisor: true } : d))
+      );
+
+      try {
+        const url = isPermanentPurge
+          ? `/api/local-studio/dossiers?id=${id}&purge=true`
+          : `/api/local-studio/dossiers?id=${id}`;
+        const res = await fetch(url, { method: 'DELETE' });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.success !== false) {
+          showToast(
+            isPermanentPurge
+              ? (isEn ? '🗑️ Dossier permanently purged from servers' : '🗑️ Expediente purgado definitivamente')
+              : (isEn ? '🗑️ Dossier archived to Forensic Vault' : '🗑️ Expediente retirado y guardado en Bóveda Forense')
+          );
+        } else {
+          showToast('⚠️ No se pudo eliminar el expediente del servidor.');
+        }
+        await fetchDossiers();
+      } catch {
+        showToast('⚠️ Error de conexión al eliminar.');
+        await fetchDossiers();
       }
-      await fetchDossiers();
-    } catch {
-      showToast('⚠️ Error de conexión al eliminar.');
-      await fetchDossiers();
+    } else if (type === 'advisor' && advisor) {
+      try {
+        const res = await fetch(`/api/local-studio/advisors?id=${advisor.id}&masterKey=admin`, {
+          method: 'DELETE',
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(isEn ? `✓ Account "${advisor.name}" deleted` : `✓ Cuenta "${advisor.name}" eliminada exitosamente`);
+          fetchAdvisors();
+        } else {
+          showToast(`⚠️ Error: ${data.error || 'No se pudo eliminar'}`);
+        }
+      } catch {
+        showToast('⚠️ Error de conexión al eliminar asesor');
+      }
     }
   };
 
@@ -4328,31 +4368,19 @@ export default function LocalStudioPage() {
     }
   };
 
-  // Delete advisor account with confirmation
-  const handleDeleteAdvisor = async (advisor: StudioAdvisorUser) => {
+  // Delete advisor account with professional modal confirmation
+  const handleDeleteAdvisor = (advisor: StudioAdvisorUser) => {
     if (advisor.id === 'adv-luisma' || advisor.id === 'adv-admin') {
       showToast('⚠️ No se puede eliminar la cuenta de Dirección Principal.');
       return;
     }
-    const confirmMsg = isEn
-      ? `🛡️ PRESTIGIA LOCAL STUDIO:\n\nAre you sure you want to delete the account "${advisor.name}" (@${advisor.username})? All their dossiers will remain in the database.`
-      : `🛡️ PRESTIGIA LOCAL STUDIO:\n\n¿Estás seguro de que deseas eliminar la cuenta de "${advisor.name}" (@${advisor.username})? Sus expedientes se conservarán en el sistema.`;
-    if (!window.confirm(confirmMsg)) return;
-
-    try {
-      const res = await fetch(`/api/local-studio/advisors?id=${advisor.id}&masterKey=admin`, {
-        method: 'DELETE',
-      });
-      const data = await res.json();
-      if (data.success) {
-        showToast(isEn ? `✓ Account "${advisor.name}" deleted` : `✓ Cuenta "${advisor.name}" eliminada exitosamente`);
-        fetchAdvisors();
-      } else {
-        showToast(`⚠️ Error: ${data.error || 'No se pudo eliminar'}`);
-      }
-    } catch {
-      showToast('⚠️ Error de conexión al eliminar asesor');
-    }
+    setConfirmDeleteModal({
+      isOpen: true,
+      type: 'advisor',
+      id: advisor.id,
+      name: `${advisor.name} (@${advisor.username})`,
+      advisor,
+    });
   };
 
   // Toggle active/inactive (encender / apagar cuenta de asesor)
@@ -14099,6 +14127,66 @@ export default function LocalStudioPage() {
                   <span>{isEn ? 'Confirm Recharge (+10 Credits)' : 'Confirmar Inyección (+10 Créditos)'}</span>
                 </>
               )}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    {/* MODAL PROFESIONAL DE CONFIRMACIÓN DE ELIMINACIÓN */}
+    {confirmDeleteModal && confirmDeleteModal.isOpen && (
+      <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 print:hidden animate-in fade-in duration-200">
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative text-center space-y-4">
+          <div className="w-14 h-14 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400 shadow-xl">
+            <Trash2 className="w-7 h-7" />
+          </div>
+
+          <div className="space-y-1">
+            <h3 className="text-base font-black text-white">
+              {confirmDeleteModal.type === 'dossier'
+                ? (confirmDeleteModal.isPermanentPurge
+                    ? (isEn ? 'Permanently Purge Dossier?' : '¿Purgar Expediente Definitivamente?')
+                    : (isEn ? 'Remove Dossier from Dashboard?' : '¿Eliminar este Expediente?'))
+                : (isEn ? 'Delete User Account?' : '¿Eliminar Cuenta de Usuario?')}
+            </h3>
+            <p className="text-xs text-slate-300 leading-relaxed pt-1">
+              {confirmDeleteModal.name ? (
+                <strong className="text-amber-300 block font-bold mb-1 truncate">
+                  "{confirmDeleteModal.name}"
+                </strong>
+              ) : null}
+              {confirmDeleteModal.type === 'dossier' ? (
+                confirmDeleteModal.isPermanentPurge
+                  ? (isEn
+                      ? 'This action cannot be undone. The dossier will be completely erased from the servers.'
+                      : 'Esta acción es irreversible. El expediente se eliminará completamente de los servidores.')
+                  : (isEn
+                      ? 'The dossier will be removed from your dashboard and safely preserved in the General Management Forensic Vault.'
+                      : 'El expediente se retirará de tu panel principal y quedará protegido en la Bóveda Forense de Dirección General.')
+              ) : (
+                isEn
+                  ? 'All historical dossiers and client work associated with this account will remain safely preserved in the database.'
+                  : 'La cuenta será dada de baja. Todo su historial de fichas y expedientes se conservará intacto en la base de datos.'
+              )}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setConfirmDeleteModal(null)}
+              className="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer"
+            >
+              {isEn ? 'Cancel' : 'Cancelar'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => executeConfirmedDelete()}
+              className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-black text-xs transition cursor-pointer shadow-lg shadow-rose-600/30 active:scale-98"
+            >
+              {confirmDeleteModal.isPermanentPurge
+                ? (isEn ? 'Yes, Purge Forever' : 'Sí, Purgar Definitivo')
+                : (isEn ? 'Yes, Delete' : 'Sí, Eliminar')}
             </button>
           </div>
         </div>
