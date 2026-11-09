@@ -12790,12 +12790,12 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           return (
                             <>
                               {/* Header de Tarjeta: Rol, Estado Encendido/Apagado y Canon en 1 Sola Línea Imposible de Romperse */}
-                              <div className="flex items-center justify-between gap-2 h-7">
+                              <div className="flex items-center justify-between gap-1.5 min-w-0">
                                 {(() => {
                                   const isCourtesyCard = adv.planTier === 'courtesy' || Number(adv.monthlyFeeUsd) === 0;
                                   return (
                                     <span
-                                      className={`text-[9.5px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shrink-0 flex items-center gap-1 ${
+                                      className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full truncate flex items-center gap-1 min-w-0 ${
                                         isFounder
                                           ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
                                           : isCourtesyCard
@@ -12808,14 +12808,14 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                       }`}
                                     >
                                       {isFounder
-                                        ? (isEn ? '👑 Founder Master' : '👑 Fundador Master')
+                                        ? (isEn ? '👑 Founder' : '👑 Fundador Master')
                                         : isCourtesyCard
-                                        ? (isEn ? `🎁 COURTESY TRIAL • $0 USD/mo (${totalCardCredits} Cred.)` : `🎁 PRUEBA / CORTESÍA • $0 USD/mes (${totalCardCredits} Cred.)`)
+                                        ? (isEn ? `🎁 CORTESÍA • $0 (${totalCardCredits} Cred.)` : `🎁 CORTESÍA • $0 (${totalCardCredits} Cred.)`)
                                         : adv.planTier === 'level_3'
-                                        ? (isEn ? `NIVEL 3 • $${adv.monthlyFeeUsd ?? 140}/mo (${totalCardCredits} Cred.)` : `NIVEL 3 • $${adv.monthlyFeeUsd ?? 140} USD/mes (${totalCardCredits} Cred.)`)
+                                        ? (isEn ? `NIVEL 3 • $${adv.monthlyFeeUsd ?? 140} (${totalCardCredits} Cred.)` : `NIVEL 3 • $${adv.monthlyFeeUsd ?? 140} (${totalCardCredits} Cred.)`)
                                         : adv.planTier === 'level_2' || adv.accountType === 'partner_agency'
-                                        ? (isEn ? `NIVEL 2 ★ • $${adv.monthlyFeeUsd ?? 90}/mo (${totalCardCredits} Cred.)` : `NIVEL 2 ★ • $${adv.monthlyFeeUsd ?? 90} USD/mes (${totalCardCredits} Cred.)`)
-                                        : (isEn ? `NIVEL 1 • $${adv.monthlyFeeUsd ?? 49}/mo (${totalCardCredits} Cred.)` : `NIVEL 1 • $${adv.monthlyFeeUsd ?? 49} USD/mes (${totalCardCredits} Cred.)`)}
+                                        ? (isEn ? `NIVEL 2 ★ • $${adv.monthlyFeeUsd ?? 90} (${totalCardCredits} Cred.)` : `NIVEL 2 ★ • $${adv.monthlyFeeUsd ?? 90} (${totalCardCredits} Cred.)`)
+                                        : (isEn ? `NIVEL 1 • $${adv.monthlyFeeUsd ?? 49} (${totalCardCredits} Cred.)` : `NIVEL 1 • $${adv.monthlyFeeUsd ?? 49} (${totalCardCredits} Cred.)`)}
                                     </span>
                                   );
                                 })()}
@@ -12823,15 +12823,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                 <div className="shrink-0 flex items-center">
                                   {/* Badge y Toggle de Estado: Encendida vs Apagada */}
                                   {isFounder ? (
-                                    <span className="text-[9px] font-bold px-2 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 inline-flex items-center gap-1">
+                                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 inline-flex items-center gap-1">
                                       <span>🟢</span>
-                                      <span>{isEn ? 'Always Active' : 'Siempre Activa'}</span>
+                                      <span>{isEn ? 'Active' : 'Activa'}</span>
                                     </span>
                                   ) : (
                                     <button
                                       type="button"
                                       onClick={() => handleToggleAdvisorActive(adv)}
-                                      className={`text-[9px] font-bold px-2.5 py-1 rounded-full border transition cursor-pointer flex items-center gap-1 ${
+                                      className={`text-[9px] font-bold px-2 py-0.5 rounded-full border transition cursor-pointer flex items-center gap-1 shrink-0 ${
                                         adv.active
                                           ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40 hover:bg-rose-950/80 hover:text-rose-300 hover:border-rose-500/40'
                                           : 'bg-rose-950 text-rose-300 border-rose-500/40 hover:bg-emerald-950/80 hover:text-emerald-300 hover:border-emerald-500/40'
@@ -14218,10 +14218,10 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       <span className="text-[9px] text-slate-500 font-normal">{isEn ? 'Renews every cycle' : 'Se renueva cada ciclo'}</span>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+                    <div className="grid grid-cols-5 gap-2 text-center">
                       <div>
-                        <label className="block text-[10px] font-bold text-emerald-400 mb-1">
-                          {isEn ? 'Creations' : 'Creaciones'}
+                        <label className="h-5 flex items-center justify-center text-[10px] font-bold text-emerald-400 mb-1">
+                          {isEn ? 'Create' : 'Crea'}
                         </label>
                         <input
                           type="number"
@@ -14234,8 +14234,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </div>
 
                       <div>
-                        <label className="block text-[10px] font-bold text-amber-400 mb-1">
-                          {isEn ? 'Audits' : 'Auditorías'}
+                        <label className="h-5 flex items-center justify-center text-[10px] font-bold text-amber-400 mb-1">
+                          {isEn ? 'Audit' : 'Audita'}
                         </label>
                         <input
                           type="number"
@@ -14248,8 +14248,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </div>
 
                       <div>
-                        <label className="block text-[10px] font-bold text-rose-400 mb-1">
-                          {isEn ? 'Rescues' : 'Rescates'}
+                        <label className="h-5 flex items-center justify-center text-[10px] font-bold text-rose-400 mb-1">
+                          {isEn ? 'Rescue' : 'Rescata'}
                         </label>
                         <input
                           type="number"
@@ -14262,8 +14262,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </div>
 
                       <div>
-                        <label className="block text-[10px] font-bold text-blue-400 mb-1">
-                          {isEn ? 'Appeals' : 'Apelaciones'}
+                        <label className="h-5 flex items-center justify-center text-[10px] font-bold text-blue-400 mb-1">
+                          {isEn ? 'Appeal' : 'Apela'}
                         </label>
                         <input
                           type="number"
@@ -14275,9 +14275,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         />
                       </div>
 
-                      <div className="col-span-2 sm:col-span-1">
-                        <label className="block text-[10px] font-bold text-amber-300 mb-1">
-                          {isEn ? 'Top 3 Arms' : 'Armas Top 3'}
+                      <div>
+                        <label className="h-5 flex items-center justify-center text-[10px] font-bold text-amber-300 mb-1">
+                          {isEn ? 'Arms' : 'Armas'}
                         </label>
                         <input
                           type="number"
@@ -14315,10 +14315,10 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       )}
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+                    <div className="grid grid-cols-5 gap-2 text-center">
                       <div>
-                        <label className="block text-[9px] font-bold text-emerald-400/80 mb-1">
-                          {isEn ? '+ Extra Creations' : '+ Extra Creaciones'}
+                        <label className="h-5 flex items-center justify-center text-[9px] font-bold text-emerald-400/90 mb-1">
+                          {isEn ? '+ Create' : '+ Crea'}
                         </label>
                         <input
                           type="number"
@@ -14331,8 +14331,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </div>
 
                       <div>
-                        <label className="block text-[9px] font-bold text-amber-400/80 mb-1">
-                          {isEn ? '+ Extra Audits' : '+ Extra Auditorías'}
+                        <label className="h-5 flex items-center justify-center text-[9px] font-bold text-amber-400/90 mb-1">
+                          {isEn ? '+ Audit' : '+ Audita'}
                         </label>
                         <input
                           type="number"
@@ -14345,8 +14345,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </div>
 
                       <div>
-                        <label className="block text-[9px] font-bold text-rose-400/80 mb-1">
-                          {isEn ? '+ Extra Rescues' : '+ Extra Rescates'}
+                        <label className="h-5 flex items-center justify-center text-[9px] font-bold text-rose-400/90 mb-1">
+                          {isEn ? '+ Rescue' : '+ Rescata'}
                         </label>
                         <input
                           type="number"
@@ -14359,8 +14359,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </div>
 
                       <div>
-                        <label className="block text-[9px] font-bold text-blue-400/80 mb-1">
-                          {isEn ? '+ Extra Appeals' : '+ Extra Apelaciones'}
+                        <label className="h-5 flex items-center justify-center text-[9px] font-bold text-blue-400/90 mb-1">
+                          {isEn ? '+ Appeal' : '+ Apela'}
                         </label>
                         <input
                           type="number"
@@ -14372,9 +14372,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         />
                       </div>
 
-                      <div className="col-span-2 sm:col-span-1">
-                        <label className="block text-[9px] font-bold text-amber-300/80 mb-1">
-                          {isEn ? '+ Extra Arms' : '+ Extra Armas'}
+                      <div>
+                        <label className="h-5 flex items-center justify-center text-[9px] font-bold text-amber-300/90 mb-1">
+                          {isEn ? '+ Arms' : '+ Armas'}
                         </label>
                         <input
                           type="number"
