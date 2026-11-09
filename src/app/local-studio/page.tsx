@@ -2183,8 +2183,8 @@ export default function LocalStudioPage() {
         badgeLabel: isAgency ? 'Agencia Partner B2B' : 'Asesor Comercial Interno',
         hierarchy: isAgency ? '🏢 Licencia de Agencia B2B' : '💼 Consultor Comercial Oficial',
         description: isAgency
-          ? `Licencia de software activa • Cupo: ${match.maxCreatesMonthly ?? 60} creaciones / ${match.maxAuditsMonthly ?? 60} auditorías`
-          : `Asesor comercial habilitado • Cupo: ${match.maxCreatesMonthly ?? 30} creaciones / ${match.maxAuditsMonthly ?? 30} auditorías`,
+          ? (isEn ? 'Active software license • Authorized Partner Agency' : 'Licencia de software activa • Agencia Partner autorizada')
+          : (isEn ? 'Authorized commercial advisor • Verified active account' : 'Asesor comercial habilitado • Cuenta activa verificada'),
       };
     }
     return {
