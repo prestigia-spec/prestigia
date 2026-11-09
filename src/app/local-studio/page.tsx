@@ -142,7 +142,7 @@ interface StudioAdvisorUser {
   phone: string;
   role: 'admin' | 'advisor';
   accountType?: 'internal_advisor' | 'partner_agency' | 'founder' | 'director';
-  planTier?: 'level_1' | 'level_2' | 'level_3' | 'founder';
+  planTier?: 'level_1' | 'level_2' | 'level_3' | 'founder' | 'courtesy';
   country?: string;
   city?: string;
   monthlyFeeUsd?: number;
@@ -2102,7 +2102,7 @@ export default function LocalStudioPage() {
   const [editAdvisorMaxRescues, setEditAdvisorMaxRescues] = useState<number>(10);
   const [editAdvisorMaxAppeals, setEditAdvisorMaxAppeals] = useState<number>(15);
   const [editAdvisorMaxTools, setEditAdvisorMaxTools] = useState<number>(30);
-  const [editAdvisorPlanTier, setEditAdvisorPlanTier] = useState<'level_1' | 'level_2' | 'level_3' | 'founder'>('level_1');
+  const [editAdvisorPlanTier, setEditAdvisorPlanTier] = useState<'level_1' | 'level_2' | 'level_3' | 'founder' | 'courtesy'>('level_1');
   const [rechargingAdvisor, setRechargingAdvisor] = useState<StudioAdvisorUser | null>(null);
   const [rechargeSelectedTab, setRechargeSelectedTab] = useState<'creates' | 'audits' | 'rescues' | 'appeals' | 'tools'>('rescues');
   const [isRechargingCredits, setIsRechargingCredits] = useState<boolean>(false);
@@ -2210,7 +2210,7 @@ export default function LocalStudioPage() {
           ? `Hello ${bName}! 👋\n\nTo complete your official Google Business Profile setup on Google Maps, please provide the following materials:\n\n📸 *1. PHOTOS (Clear lighting):*\n- 2 Exterior facade photos (daytime and evening with illuminated sign)\n- 3 Interior customer area photos\n- 4 Photos of your main specialties (${createSpecialties || 'products/services'})\n- 1 Photo of your working team\n- Official logo in high resolution\n\n🎥 *2. CONTINUOUS 60s VERIFICATION VIDEO (Official Google Protocol):*\n- Take 1: Recording the street and exterior permanent sign\n- Take 2: Opening the front door with keys\n- Take 3: Recording the register, POS, and interior operation\n\n📋 *3. OPERATING DATA:*\n- Exact operating hours\n- Accepted payment methods\n- Gmail address for profile ownership\n\nWe will configure your Google Business Profile with verified local SEO categories! 🚀`
           : `¡Hola ${bName}! 👋\n\nPara configurar y verificar la ficha oficial de tu negocio en Google Maps con máxima autoridad, requerimos los siguientes materiales:\n\n📸 *1. FOTOS TÉCNICAS (Con buena iluminación):*\n- 2 Fotos de fachada exterior (de día y de noche con aviso comercial visible)\n- 3 Fotos del local o área de atención a clientes limpia y equipada\n- 4 Fotos de tus especialidades principales (${createSpecialties || 'servicios y tratamientos'})\n- 1 Foto del equipo de trabajo o especialistas uniformados\n- Logo oficial en alta resolución\n\n🎥 *2. VIDEO CONTINUO DE 60 SEGUNDOS (Exigido por Google sin cortes):*\n- Toma 1: Grabando la calle, número de dirección y el aviso de la fachada\n- Toma 2: Abriendo la puerta de entrada con llaves\n- Toma 3: Grabando el mostrador de recepción, datáfono/caja e instalaciones operativas\n\n📋 *3. DATOS OPERATIVOS:*\n- Horarios exactos de atención semanal\n- Medios de pago recibidos (efectivo, tarjetas, transferencias)\n- Correo de Gmail donde deseas recibir la propiedad de la ficha\n\n¡Nos encargamos de toda la arquitectura técnica, palabras clave locales y posicionamiento en Google Maps! 🚀`);
   }, [createGeneratedData?.whatsappOnboardingMessage, createBusinessName, createBusinessModel, createSpecialties, isEn]);
-  const [newPlanTier, setNewPlanTier] = useState<'level_1' | 'level_2' | 'level_3'>('level_1');
+  const [newPlanTier, setNewPlanTier] = useState<'level_1' | 'level_2' | 'level_3' | 'courtesy'>('level_1');
   const [newAccountType, setNewAccountType] = useState<'internal_advisor' | 'partner_agency'>('internal_advisor');
   const [newAdvisorName, setNewAdvisorName] = useState('');
   const [newAdvisorUser, setNewAdvisorUser] = useState('');
@@ -2285,15 +2285,20 @@ export default function LocalStudioPage() {
     const cleanPhone = (adv.phone || '').replace(/[^0-9]/g, '');
     if (!cleanPhone) return '#';
 
+    const fee = adv.monthlyFeeUsd !== undefined && adv.monthlyFeeUsd !== null
+      ? adv.monthlyFeeUsd
+      : (adv.planTier === 'level_3' ? 140 : adv.planTier === 'level_2' ? 90 : adv.planTier === 'courtesy' ? 0 : 49);
+
+    const isCourtesy = adv.planTier === 'courtesy' || fee === 0;
+
     const planName =
       adv.planTier === 'level_3' ? 'Nivel 3' :
       adv.planTier === 'level_2' ? 'Nivel 2' :
       adv.planTier === 'founder' ? 'Dirección General / Master' :
+      isCourtesy ? 'Licencia de Cortesía / Período de Prueba' :
       'Nivel 1';
 
-    const fee = adv.monthlyFeeUsd !== undefined && adv.monthlyFeeUsd !== null
-      ? adv.monthlyFeeUsd
-      : (adv.planTier === 'level_3' ? 140 : adv.planTier === 'level_2' ? 90 : 49);
+    const feeText = isCourtesy ? '$0 USD/mes (100% Bonificada)' : `$${fee} USD/mes`;
 
     // Lectura dinámica de los cupos exactos y activos configurados para esta cuenta (+ recargas)
     const quotaCreates = (adv.maxCreatesMonthly ?? 10) + (adv.extraCredits?.creates || 0);
@@ -2312,7 +2317,7 @@ Tu cuenta comercial ha sido activada con éxito en la plataforma. A continuació
 🛡️ *DETALLES DE TU PLAN:*
 ━━━━━━━━━━━━━━━━━━━
 • *Plan:* ${planName}
-• *Cuota Mensual:* $${fee} USD/mes
+• *Cuota Mensual:* ${feeText}
 • *Cupo Total Asignado:* ${totalCredits} Créditos mensuales activos
 • *Distribución por Herramienta:*
   ✓ Creación de Fichas Top 3: ${quotaCreates} créditos
@@ -4421,13 +4426,13 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         ? 'founder'
         : 'internal_advisor'
     );
-    setEditAdvisorMonthlyFee(advisor.monthlyFeeUsd ?? (tier === 'level_3' ? 140 : tier === 'level_2' ? 90 : 49));
+    setEditAdvisorMonthlyFee(advisor.monthlyFeeUsd !== undefined ? advisor.monthlyFeeUsd : (tier === 'courtesy' ? 0 : tier === 'level_3' ? 140 : tier === 'level_2' ? 90 : 49));
     setEditAdvisorLicenseStatus(advisor.licenseStatus || 'active');
-    setEditAdvisorMaxCreates(advisor.maxCreatesMonthly ?? (tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
-    setEditAdvisorMaxAudits(advisor.maxAuditsMonthly ?? (tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
-    setEditAdvisorMaxRescues(advisor.maxRescuesMonthly ?? (tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
-    setEditAdvisorMaxAppeals(advisor.maxAppealsMonthly ?? (tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
-    setEditAdvisorMaxTools(advisor.maxToolsMonthly ?? (tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
+    setEditAdvisorMaxCreates(advisor.maxCreatesMonthly ?? (tier === 'courtesy' ? 3 : tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
+    setEditAdvisorMaxAudits(advisor.maxAuditsMonthly ?? (tier === 'courtesy' ? 3 : tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
+    setEditAdvisorMaxRescues(advisor.maxRescuesMonthly ?? (tier === 'courtesy' ? 3 : tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
+    setEditAdvisorMaxAppeals(advisor.maxAppealsMonthly ?? (tier === 'courtesy' ? 3 : tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
+    setEditAdvisorMaxTools(advisor.maxToolsMonthly ?? (tier === 'courtesy' ? 3 : tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
     setShowEditAdvisorModal(true);
   };
 
@@ -12769,25 +12774,34 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             <>
                               {/* Header de Tarjeta: Rol, Estado Encendido/Apagado y Canon en 1 Sola Línea Imposible de Romperse */}
                               <div className="flex items-center justify-between gap-2 h-7">
-                                <span
-                                  className={`text-[9.5px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shrink-0 flex items-center gap-1 ${
-                                    isFounder
-                                      ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                                      : adv.planTier === 'level_3'
-                                      ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
-                                      : adv.planTier === 'level_2' || adv.accountType === 'partner_agency'
-                                      ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
-                                      : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
-                                  }`}
-                                >
-                                  {isFounder
-                                    ? (isEn ? '👑 Founder Master' : '👑 Fundador Master')
-                                    : adv.planTier === 'level_3'
-                                    ? (isEn ? `NIVEL 3 • $${adv.monthlyFeeUsd ?? 140}/mo (${totalCardCredits} Cred.)` : `NIVEL 3 • $${adv.monthlyFeeUsd ?? 140} USD/mes (${totalCardCredits} Cred.)`)
-                                    : adv.planTier === 'level_2' || adv.accountType === 'partner_agency'
-                                    ? (isEn ? `NIVEL 2 ★ • $${adv.monthlyFeeUsd ?? 90}/mo (${totalCardCredits} Cred.)` : `NIVEL 2 ★ • $${adv.monthlyFeeUsd ?? 90} USD/mes (${totalCardCredits} Cred.)`)
-                                    : (isEn ? `NIVEL 1 • $${adv.monthlyFeeUsd ?? 49}/mo (${totalCardCredits} Cred.)` : `NIVEL 1 • $${adv.monthlyFeeUsd ?? 49} USD/mes (${totalCardCredits} Cred.)`)}
-                                </span>
+                                {(() => {
+                                  const isCourtesyCard = adv.planTier === 'courtesy' || Number(adv.monthlyFeeUsd) === 0;
+                                  return (
+                                    <span
+                                      className={`text-[9.5px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shrink-0 flex items-center gap-1 ${
+                                        isFounder
+                                          ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                          : isCourtesyCard
+                                          ? 'bg-emerald-950/90 text-emerald-300 border border-emerald-500/40 ring-1 ring-emerald-500/30'
+                                          : adv.planTier === 'level_3'
+                                          ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
+                                          : adv.planTier === 'level_2' || adv.accountType === 'partner_agency'
+                                          ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
+                                          : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
+                                      }`}
+                                    >
+                                      {isFounder
+                                        ? (isEn ? '👑 Founder Master' : '👑 Fundador Master')
+                                        : isCourtesyCard
+                                        ? (isEn ? `🎁 COURTESY TRIAL • $0 USD/mo (${totalCardCredits} Cred.)` : `🎁 PRUEBA / CORTESÍA • $0 USD/mes (${totalCardCredits} Cred.)`)
+                                        : adv.planTier === 'level_3'
+                                        ? (isEn ? `NIVEL 3 • $${adv.monthlyFeeUsd ?? 140}/mo (${totalCardCredits} Cred.)` : `NIVEL 3 • $${adv.monthlyFeeUsd ?? 140} USD/mes (${totalCardCredits} Cred.)`)
+                                        : adv.planTier === 'level_2' || adv.accountType === 'partner_agency'
+                                        ? (isEn ? `NIVEL 2 ★ • $${adv.monthlyFeeUsd ?? 90}/mo (${totalCardCredits} Cred.)` : `NIVEL 2 ★ • $${adv.monthlyFeeUsd ?? 90} USD/mes (${totalCardCredits} Cred.)`)
+                                        : (isEn ? `NIVEL 1 • $${adv.monthlyFeeUsd ?? 49}/mo (${totalCardCredits} Cred.)` : `NIVEL 1 • $${adv.monthlyFeeUsd ?? 49} USD/mes (${totalCardCredits} Cred.)`)}
+                                    </span>
+                                  );
+                                })()}
 
                                 <div className="shrink-0 flex items-center">
                                   {/* Badge y Toggle de Estado: Encendida vs Apagada */}
@@ -13480,7 +13494,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               <label className="block text-[10px] font-black uppercase text-amber-400 tracking-wider mb-2">
                 {isEn ? 'Select Official Plan (Monthly Credits):' : 'Selecciona el Plan Oficial Prestigia (Cupos Mensuales):'}
               </label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <button
                   type="button"
                   onClick={() => {
@@ -13554,6 +13568,30 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <span className="text-sm font-black text-white">$140 <span className="text-[10px] text-slate-400">USD</span></span>
                   <span className="text-[10px] text-amber-300 font-bold mt-0.5">150 Créditos</span>
                   <span className="text-[9px] text-slate-500">(30 por pestaña)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewPlanTier('courtesy');
+                    setNewAccountType('internal_advisor');
+                    setNewAdvisorMonthlyFee(0);
+                    setNewAdvisorMaxCreates(3);
+                    setNewAdvisorMaxAudits(3);
+                    setNewAdvisorMaxRescues(3);
+                    setNewAdvisorMaxAppeals(3);
+                    setNewAdvisorMaxTools(3);
+                  }}
+                  className={`p-2.5 rounded-2xl font-black transition cursor-pointer flex flex-col items-center justify-center text-center border ${
+                    newPlanTier === 'courtesy'
+                      ? 'bg-emerald-600/25 border-emerald-500 text-white shadow-lg shadow-emerald-600/30 ring-1 ring-emerald-500'
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                  }`}
+                >
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-emerald-400">🎁 Cortesía</span>
+                  <span className="text-sm font-black text-white">$0 <span className="text-[10px] text-slate-400">USD</span></span>
+                  <span className="text-[10px] text-emerald-300 font-bold mt-0.5">15 Créditos</span>
+                  <span className="text-[9px] text-slate-500">(3 por pestaña)</span>
                 </button>
               </div>
             </div>
@@ -14040,7 +14078,29 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <label className="block text-[10px] font-black uppercase text-amber-400 tracking-wider">
                     {isEn ? 'Calibrate to Official Plan Quota:' : 'Recalibrar a Plan Oficial (Cupos Mensuales):'}
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditAdvisorPlanTier('courtesy');
+                        setEditAdvisorMonthlyFee(0);
+                        setEditAdvisorMaxCreates(3);
+                        setEditAdvisorMaxAudits(3);
+                        setEditAdvisorMaxRescues(3);
+                        setEditAdvisorMaxAppeals(3);
+                        setEditAdvisorMaxTools(3);
+                      }}
+                      className={`p-2 rounded-xl text-center border font-bold transition cursor-pointer ${
+                        editAdvisorPlanTier === 'courtesy' || Number(editAdvisorMonthlyFee) === 0
+                          ? 'bg-emerald-600/30 border-emerald-500 text-white ring-1 ring-emerald-500'
+                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <div className="text-[9px] uppercase font-mono text-emerald-400">🎁 Cortesía</div>
+                      <div className="text-xs font-black text-white">$0 USD</div>
+                      <div className="text-[9px] text-emerald-300">3 c/u (15 total)</div>
+                    </button>
+
                     <button
                       type="button"
                       onClick={() => {
@@ -14053,7 +14113,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         setEditAdvisorMaxTools(10);
                       }}
                       className={`p-2 rounded-xl text-center border font-bold transition cursor-pointer ${
-                        editAdvisorPlanTier === 'level_1'
+                        editAdvisorPlanTier === 'level_1' && Number(editAdvisorMonthlyFee) !== 0
                           ? 'bg-indigo-600/30 border-indigo-500 text-white ring-1 ring-indigo-500'
                           : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
                       }`}

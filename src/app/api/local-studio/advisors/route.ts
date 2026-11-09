@@ -148,13 +148,16 @@ export async function POST(request: Request) {
       ? 'founder'
       : (accountType === 'partner_agency' ? 'partner_agency' : 'internal_advisor');
 
-    // Calibración de defaults según el Plan Oficial (Nivel 1: $49/10, Nivel 2: $90/20, Nivel 3: $140/30, Master: 9999)
-    const resolvedPlanTier: 'level_1' | 'level_2' | 'level_3' | 'founder' = isLuisma
+    // Calibración de defaults según el Plan Oficial (Nivel 1: $49/10, Nivel 2: $90/20, Nivel 3: $140/30, Cortesía: $0/3, Master: 9999)
+    const hasExplicitZeroFee = monthlyFeeUsd !== undefined && monthlyFeeUsd !== null && Number(monthlyFeeUsd) === 0;
+    const resolvedPlanTier: 'level_1' | 'level_2' | 'level_3' | 'founder' | 'courtesy' = isLuisma
       ? 'founder'
-      : (planTier === 'level_3' ? 'level_3' : planTier === 'level_2' ? 'level_2' : 'level_1');
+      : (planTier === 'courtesy' || hasExplicitZeroFee
+        ? 'courtesy'
+        : planTier === 'level_3' ? 'level_3' : planTier === 'level_2' ? 'level_2' : 'level_1');
 
-    const defaultFeeByTier = resolvedPlanTier === 'level_3' ? 140 : resolvedPlanTier === 'level_2' ? 90 : 49;
-    const defaultQuotaByTier = resolvedPlanTier === 'level_3' ? 30 : resolvedPlanTier === 'level_2' ? 20 : 10;
+    const defaultFeeByTier = resolvedPlanTier === 'level_3' ? 140 : resolvedPlanTier === 'level_2' ? 90 : resolvedPlanTier === 'courtesy' ? 0 : 49;
+    const defaultQuotaByTier = resolvedPlanTier === 'level_3' ? 30 : resolvedPlanTier === 'level_2' ? 20 : resolvedPlanTier === 'courtesy' ? 3 : 10;
 
     const advisorObj: StudioAdvisor = {
       id: isLuisma ? 'adv-luisma' : (id || `adv-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`),
@@ -167,7 +170,9 @@ export async function POST(request: Request) {
       planTier: resolvedPlanTier,
       country: (country || existing?.country || 'Colombia').trim(),
       city: (city || existing?.city || 'Bogotá').trim(),
-      monthlyFeeUsd: monthlyFeeUsd !== undefined ? Number(monthlyFeeUsd) : (existing?.monthlyFeeUsd ?? defaultFeeByTier),
+      monthlyFeeUsd: (monthlyFeeUsd !== undefined && monthlyFeeUsd !== null && monthlyFeeUsd !== '' && !isNaN(Number(monthlyFeeUsd)))
+        ? Number(monthlyFeeUsd)
+        : (existing?.monthlyFeeUsd ?? defaultFeeByTier),
       licenseStatus: isLuisma ? 'active' : (licenseStatus || existing?.licenseStatus || 'active'),
       active: isLuisma ? true : (active !== undefined ? Boolean(active) : (existing?.active ?? true)),
       planStartDate: planStartDate || existing?.planStartDate || new Date().toISOString(),

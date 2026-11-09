@@ -47,7 +47,7 @@ export interface StudioAdvisor {
   phone: string;
   role: 'admin' | 'advisor';
   accountType?: 'internal_advisor' | 'partner_agency' | 'founder' | 'director';
-  planTier?: 'level_1' | 'level_2' | 'level_3' | 'founder';
+  planTier?: 'level_1' | 'level_2' | 'level_3' | 'founder' | 'courtesy';
   country?: string;
   city?: string;
   monthlyFeeUsd?: number;
@@ -1287,12 +1287,28 @@ export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
             } catch {}
           }
 
-          const fee = Number(a.monthly_fee_usd ?? a.monthlyFeeUsd ?? 0);
+          const rawFee = a.monthly_fee_usd !== undefined && a.monthly_fee_usd !== null
+            ? a.monthly_fee_usd
+            : a.monthlyFeeUsd;
+          const fee = (rawFee !== undefined && rawFee !== null && rawFee !== '' && !isNaN(Number(rawFee)))
+            ? Number(rawFee)
+            : undefined;
+
           const isMaster = a.role === 'admin' || a.id === 'adv-luisma' || a.account_type === 'founder' || a.accountType === 'founder';
-          const resolvedTier: 'level_1' | 'level_2' | 'level_3' | 'founder' = isMaster
+          const rawTier = a.plan_tier || a.planTier || metaObj.planTier;
+          const resolvedTier: 'level_1' | 'level_2' | 'level_3' | 'founder' | 'courtesy' = isMaster
             ? 'founder'
-            : (a.plan_tier || a.planTier || metaObj.planTier || (fee >= 140 ? 'level_3' : fee >= 90 ? 'level_2' : 'level_1'));
-          const defaultQuotaByTier = isMaster ? 9999 : (resolvedTier === 'level_3' ? 30 : resolvedTier === 'level_2' ? 20 : 10);
+            : (rawTier === 'courtesy' || fee === 0
+              ? 'courtesy'
+              : rawTier === 'level_3' || (fee !== undefined && fee >= 140)
+              ? 'level_3'
+              : rawTier === 'level_2' || (fee !== undefined && fee >= 90)
+              ? 'level_2'
+              : 'level_1');
+
+          const defaultQuotaByTier = isMaster ? 9999 : (resolvedTier === 'level_3' ? 30 : resolvedTier === 'level_2' ? 20 : resolvedTier === 'courtesy' ? 3 : 10);
+          const defaultFeeByTier = resolvedTier === 'level_3' ? 140 : resolvedTier === 'level_2' ? 90 : resolvedTier === 'courtesy' ? 0 : 49;
+          const effectiveFee = fee !== undefined ? fee : defaultFeeByTier;
 
           return {
             id: a.id,
@@ -1305,7 +1321,7 @@ export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
             planTier: resolvedTier,
             country: a.country,
             city: a.city,
-            monthlyFeeUsd: fee || (resolvedTier === 'level_3' ? 140 : resolvedTier === 'level_2' ? 90 : 49),
+            monthlyFeeUsd: effectiveFee,
             licenseStatus: cleanLicenseStatus,
             active: Boolean(a.active),
             planStartDate: a.plan_start_date || a.planStartDate || metaObj.planStartDate || a.created_at || a.createdAt,
