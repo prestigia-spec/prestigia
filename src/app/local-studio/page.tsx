@@ -2103,6 +2103,11 @@ export default function LocalStudioPage() {
   const [editAdvisorMaxAppeals, setEditAdvisorMaxAppeals] = useState<number>(15);
   const [editAdvisorMaxTools, setEditAdvisorMaxTools] = useState<number>(30);
   const [editAdvisorPlanTier, setEditAdvisorPlanTier] = useState<'level_1' | 'level_2' | 'level_3' | 'founder' | 'courtesy'>('level_1');
+  const [editAdvisorExtraCreates, setEditAdvisorExtraCreates] = useState<number>(0);
+  const [editAdvisorExtraAudits, setEditAdvisorExtraAudits] = useState<number>(0);
+  const [editAdvisorExtraRescues, setEditAdvisorExtraRescues] = useState<number>(0);
+  const [editAdvisorExtraAppeals, setEditAdvisorExtraAppeals] = useState<number>(0);
+  const [editAdvisorExtraTools, setEditAdvisorExtraTools] = useState<number>(0);
   const [rechargingAdvisor, setRechargingAdvisor] = useState<StudioAdvisorUser | null>(null);
   const [rechargeSelectedTab, setRechargeSelectedTab] = useState<'creates' | 'audits' | 'rescues' | 'appeals' | 'tools'>('rescues');
   const [isRechargingCredits, setIsRechargingCredits] = useState<boolean>(false);
@@ -4433,6 +4438,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     setEditAdvisorMaxRescues(advisor.maxRescuesMonthly ?? (tier === 'courtesy' ? 3 : tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
     setEditAdvisorMaxAppeals(advisor.maxAppealsMonthly ?? (tier === 'courtesy' ? 3 : tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
     setEditAdvisorMaxTools(advisor.maxToolsMonthly ?? (tier === 'courtesy' ? 3 : tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10));
+    setEditAdvisorExtraCreates(advisor.extraCredits?.creates || 0);
+    setEditAdvisorExtraAudits(advisor.extraCredits?.audits || 0);
+    setEditAdvisorExtraRescues(advisor.extraCredits?.rescues || 0);
+    setEditAdvisorExtraAppeals(advisor.extraCredits?.appeals || 0);
+    setEditAdvisorExtraTools(advisor.extraCredits?.tools || 0);
     setShowEditAdvisorModal(true);
   };
 
@@ -4464,6 +4474,13 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         maxRescuesMonthly: Number(editAdvisorMaxRescues),
         maxAppealsMonthly: Number(editAdvisorMaxAppeals),
         maxToolsMonthly: Number(editAdvisorMaxTools),
+        extraCredits: {
+          creates: Math.max(0, Number(editAdvisorExtraCreates) || 0),
+          audits: Math.max(0, Number(editAdvisorExtraAudits) || 0),
+          rescues: Math.max(0, Number(editAdvisorExtraRescues) || 0),
+          appeals: Math.max(0, Number(editAdvisorExtraAppeals) || 0),
+          tools: Math.max(0, Number(editAdvisorExtraTools) || 0),
+        },
         masterKey: 'admin',
         callerId: currentUser?.id || 'adv-luisma',
       };
@@ -14185,88 +14202,215 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               )}
 
               {editingAdvisor?.accountType !== 'founder' && (
-                <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
+                <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5 text-amber-300 font-bold text-xs">
                       <Zap className="w-4 h-4 text-amber-400" />
-                      <span>{isEn ? 'Monthly AI Usage Limits (Reload Uses):' : 'Topes de Consumo Mensual de IA (Cargar más Usos):'}</span>
+                      <span>{isEn ? 'Monthly AI Usage Limits & Extra Credits:' : 'Topes de Consumo Mensual de IA & Créditos Extras:'}</span>
                     </div>
                     <span className="text-[10px] text-slate-400 font-mono">Cupos / mes</span>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
-                    <div>
-                      <label className="block text-[10px] font-bold text-emerald-400 mb-1">
-                        {isEn ? 'Creations' : 'Creaciones'}
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="1000"
-                        value={editAdvisorMaxCreates}
-                        onChange={(e) => setEditAdvisorMaxCreates(Number(e.target.value))}
-                        className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-emerald-400"
-                      />
+                  {/* Fila 1: Cupo Base Mensual del Plan */}
+                  <div className="space-y-1.5">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                      <span>{isEn ? '1. Base Monthly Quota (Recurring):' : '1. Cupo Base Mensual del Plan (Recurrente):'}</span>
+                      <span className="text-[9px] text-slate-500 font-normal">{isEn ? 'Renews every cycle' : 'Se renueva cada ciclo'}</span>
                     </div>
 
-                    <div>
-                      <label className="block text-[10px] font-bold text-amber-400 mb-1">
-                        {isEn ? 'Audits' : 'Auditorías'}
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="1000"
-                        value={editAdvisorMaxAudits}
-                        onChange={(e) => setEditAdvisorMaxAudits(Number(e.target.value))}
-                        className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-amber-400"
-                      />
-                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+                      <div>
+                        <label className="block text-[10px] font-bold text-emerald-400 mb-1">
+                          {isEn ? 'Creations' : 'Creaciones'}
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="1000"
+                          value={editAdvisorMaxCreates}
+                          onChange={(e) => setEditAdvisorMaxCreates(Number(e.target.value))}
+                          className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-emerald-400"
+                        />
+                      </div>
 
-                    <div>
-                      <label className="block text-[10px] font-bold text-rose-400 mb-1">
-                        {isEn ? 'Rescues' : 'Rescates'}
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="1000"
-                        value={editAdvisorMaxRescues}
-                        onChange={(e) => setEditAdvisorMaxRescues(Number(e.target.value))}
-                        className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-rose-400"
-                      />
-                    </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-amber-400 mb-1">
+                          {isEn ? 'Audits' : 'Auditorías'}
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="1000"
+                          value={editAdvisorMaxAudits}
+                          onChange={(e) => setEditAdvisorMaxAudits(Number(e.target.value))}
+                          className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
 
-                    <div>
-                      <label className="block text-[10px] font-bold text-blue-400 mb-1">
-                        {isEn ? 'Appeals' : 'Apelaciones'}
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="1000"
-                        value={editAdvisorMaxAppeals}
-                        onChange={(e) => setEditAdvisorMaxAppeals(Number(e.target.value))}
-                        className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-blue-400"
-                      />
-                    </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-rose-400 mb-1">
+                          {isEn ? 'Rescues' : 'Rescates'}
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="1000"
+                          value={editAdvisorMaxRescues}
+                          onChange={(e) => setEditAdvisorMaxRescues(Number(e.target.value))}
+                          className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-rose-400"
+                        />
+                      </div>
 
-                    <div className="col-span-2 sm:col-span-1">
-                      <label className="block text-[10px] font-bold text-amber-300 mb-1">
-                        {isEn ? 'Top 3 Arms' : 'Armas Top 3'}
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="1000"
-                        value={editAdvisorMaxTools}
-                        onChange={(e) => setEditAdvisorMaxTools(Number(e.target.value))}
-                        className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-amber-400"
-                      />
+                      <div>
+                        <label className="block text-[10px] font-bold text-blue-400 mb-1">
+                          {isEn ? 'Appeals' : 'Apelaciones'}
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="1000"
+                          value={editAdvisorMaxAppeals}
+                          onChange={(e) => setEditAdvisorMaxAppeals(Number(e.target.value))}
+                          className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-blue-400"
+                        />
+                      </div>
+
+                      <div className="col-span-2 sm:col-span-1">
+                        <label className="block text-[10px] font-bold text-amber-300 mb-1">
+                          {isEn ? 'Top 3 Arms' : 'Armas Top 3'}
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="1000"
+                          value={editAdvisorMaxTools}
+                          onChange={(e) => setEditAdvisorMaxTools(Number(e.target.value))}
+                          className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono font-bold text-center focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
                     </div>
                   </div>
+
+                  {/* Fila 2: Créditos Extras / Recargas de Emergencia Activas */}
+                  <div className="space-y-1.5 pt-2.5 border-t border-slate-800/80">
+                    <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        <Zap className="w-3 h-3 text-amber-400 fill-amber-400" />
+                        <span>{isEn ? '2. Emergency Extra Credits (Active Recharges):' : '2. Créditos Extras de Emergencia (Recargas Activas):'}</span>
+                      </span>
+                      {(editAdvisorExtraCreates > 0 || editAdvisorExtraAudits > 0 || editAdvisorExtraRescues > 0 || editAdvisorExtraAppeals > 0 || editAdvisorExtraTools > 0) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditAdvisorExtraCreates(0);
+                            setEditAdvisorExtraAudits(0);
+                            setEditAdvisorExtraRescues(0);
+                            setEditAdvisorExtraAppeals(0);
+                            setEditAdvisorExtraTools(0);
+                          }}
+                          className="text-[9px] text-rose-400 hover:text-rose-300 font-bold underline cursor-pointer"
+                        >
+                          {isEn ? 'Reset extras to 0' : 'Poner extras en 0'}
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+                      <div>
+                        <label className="block text-[9px] font-bold text-emerald-400/80 mb-1">
+                          {isEn ? '+ Extra Creations' : '+ Extra Creaciones'}
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="1000"
+                          value={editAdvisorExtraCreates}
+                          onChange={(e) => setEditAdvisorExtraCreates(Math.max(0, Number(e.target.value) || 0))}
+                          className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-emerald-300 font-mono font-bold text-center focus:outline-none focus:border-emerald-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[9px] font-bold text-amber-400/80 mb-1">
+                          {isEn ? '+ Extra Audits' : '+ Extra Auditorías'}
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="1000"
+                          value={editAdvisorExtraAudits}
+                          onChange={(e) => setEditAdvisorExtraAudits(Math.max(0, Number(e.target.value) || 0))}
+                          className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-amber-500/40 text-amber-300 font-mono font-bold text-center focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[9px] font-bold text-rose-400/80 mb-1">
+                          {isEn ? '+ Extra Rescues' : '+ Extra Rescates'}
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="1000"
+                          value={editAdvisorExtraRescues}
+                          onChange={(e) => setEditAdvisorExtraRescues(Math.max(0, Number(e.target.value) || 0))}
+                          className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-rose-500/40 text-rose-300 font-mono font-bold text-center focus:outline-none focus:border-rose-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[9px] font-bold text-blue-400/80 mb-1">
+                          {isEn ? '+ Extra Appeals' : '+ Extra Apelaciones'}
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="1000"
+                          value={editAdvisorExtraAppeals}
+                          onChange={(e) => setEditAdvisorExtraAppeals(Math.max(0, Number(e.target.value) || 0))}
+                          className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-blue-500/40 text-blue-300 font-mono font-bold text-center focus:outline-none focus:border-blue-400"
+                        />
+                      </div>
+
+                      <div className="col-span-2 sm:col-span-1">
+                        <label className="block text-[9px] font-bold text-amber-300/80 mb-1">
+                          {isEn ? '+ Extra Arms' : '+ Extra Armas'}
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="1000"
+                          value={editAdvisorExtraTools}
+                          onChange={(e) => setEditAdvisorExtraTools(Math.max(0, Number(e.target.value) || 0))}
+                          className="w-full px-2 py-1.5 rounded-xl bg-slate-900 border border-amber-500/40 text-amber-200 font-mono font-bold text-center focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Fila 3: Total Activo en Tiempo Real */}
+                  <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[10px]">
+                    <span className="font-bold text-slate-300">
+                      {isEn ? '⚡ Total Active Credits (Base + Extras):' : '⚡ Créditos Totales Activos (Base + Extras):'}
+                    </span>
+                    <div className="flex items-center gap-2 font-mono font-bold text-white">
+                      <span className="text-emerald-400">C: {Number(editAdvisorMaxCreates) + Number(editAdvisorExtraCreates)}</span>
+                      <span className="text-amber-400">A: {Number(editAdvisorMaxAudits) + Number(editAdvisorExtraAudits)}</span>
+                      <span className="text-rose-400">R: {Number(editAdvisorMaxRescues) + Number(editAdvisorExtraRescues)}</span>
+                      <span className="text-blue-400">AP: {Number(editAdvisorMaxAppeals) + Number(editAdvisorExtraAppeals)}</span>
+                      <span className="text-amber-300">T: {Number(editAdvisorMaxTools) + Number(editAdvisorExtraTools)}</span>
+                      <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        {Number(editAdvisorMaxCreates) + Number(editAdvisorExtraCreates) +
+                         Number(editAdvisorMaxAudits) + Number(editAdvisorExtraAudits) +
+                         Number(editAdvisorMaxRescues) + Number(editAdvisorExtraRescues) +
+                         Number(editAdvisorMaxAppeals) + Number(editAdvisorExtraAppeals) +
+                         Number(editAdvisorMaxTools) + Number(editAdvisorExtraTools)} Total
+                      </span>
+                    </div>
+                  </div>
+
                   <p className="text-[10px] text-slate-500 italic">
-                    {isEn ? '* You can increase the limit of any engine to grant more credits to this partner in real time.' : '* Puedes aumentar el cupo de cualquiera de los 5 motores para otorgar más créditos al asesor o agencia en tiempo real.'}
+                    {isEn ? '* Modifying base quotas changes the monthly limit. Extra credits are emergency recharges that sum to the base.' : '* Modificar los cupos base cambia el límite mensual recurrente. Los créditos extras son recargas de emergencia que se suman al cupo base.'}
                   </p>
                 </div>
               )}
