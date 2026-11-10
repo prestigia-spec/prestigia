@@ -134,7 +134,9 @@ export async function verifyAdvisorQuota(
       d.advisorId === advisor.id ||
       (d.advisorName && d.advisorName.toLowerCase() === advisor.name.toLowerCase());
     if (!isAdvisorMatch) return false;
-    if (d.mode !== modeTarget) return false;
+    const isTargetMode =
+      d.mode === modeTarget || (modeTarget === 'tools' && (d.mode === 'tools' || d.mode === 'prospect'));
+    if (!isTargetMode) return false;
 
     if (!d.createdAt) return false;
     const createdAtTime = new Date(d.createdAt).getTime();

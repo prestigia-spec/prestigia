@@ -68,6 +68,8 @@ import {
   Scale,
   Gavel,
   FileText,
+  Target,
+  Send,
 } from 'lucide-react';
 import type { GooglePlaceData, NegativeReviewItem, ReviewDistribution } from '@/app/api/auditor/google-lookup/route';
 
@@ -253,7 +255,7 @@ interface StudioDossierRecord {
   city: string;
   neighborhood?: string;
   googleUrl?: string;
-  mode: 'create' | 'audit' | 'rescue' | 'appeal' | 'tools';
+  mode: 'create' | 'audit' | 'rescue' | 'appeal' | 'tools' | 'prospect';
   businessModel?: 'storefront' | 'service_area';
   status: 'draft' | 'presented' | 'closed';
   closingStatus?: 'prestigia_subscriber' | 'setup_paid' | 'proposal_sent' | 'negotiating' | 'lead_draft';
@@ -763,7 +765,7 @@ const UI_TEXT = {
     tabAudit: '2. Auditar & Optimizar',
     tabRescue: '3. Rescatar Ficha',
     tabAppeals: '4. Apelar Reseñas 1-3★',
-    tabTools: '5. Armas Top 3',
+    tabTools: '5. Prospectar & Cerrar',
     tabDossiers: '6. Mis Clientes',
     tabGuide: '7. Guía Google',
     tabPitch: '8. Guion Comercial',
@@ -849,7 +851,7 @@ const UI_TEXT = {
     tabAudit: '2. Audit & Optimize',
     tabRescue: '3. Rescue Listing',
     tabAppeals: '4. Appeal 1-3★ Reviews',
-    tabTools: '5. Top 3 Weapons',
+    tabTools: '5. Prospect & Close',
     tabDossiers: '6. My Clients',
     tabGuide: '7. Google Guide',
     tabPitch: '8. Sales Pitch',
@@ -1744,6 +1746,21 @@ export default function LocalStudioPage() {
   const [roiCurrentRank, setRoiCurrentRank] = useState<number>(8);
   const [roiMonthlySearches, setRoiMonthlySearches] = useState<number>(1200);
 
+  // TAB 5: PROSPECTA (Generador de Propuestas Comerciales de Cierre)
+  const [prospectBusinessName, setProspectBusinessName] = useState<string>('');
+  const [prospectCategory, setProspectCategory] = useState<string>(CATEGORY_OPTIONS_ES[0]);
+  const [prospectCountry, setProspectCountry] = useState<string>('Colombia');
+  const [prospectCity, setProspectCity] = useState<string>('Bogotá');
+  const [prospectNeighborhood, setProspectNeighborhood] = useState<string>('');
+  const [prospectBusinessModel, setProspectBusinessModel] = useState<'storefront' | 'service_area'>('storefront');
+  const [prospectOwnerName, setProspectOwnerName] = useState<string>('');
+  const [prospectOwnerPhone, setProspectOwnerPhone] = useState<string>('+57');
+  const [prospectServices, setProspectServices] = useState<string>('');
+  const [prospectSuggestedBudget, setProspectSuggestedBudget] = useState<string>('$150 USD');
+  const [isGeneratingProspect, setIsGeneratingProspect] = useState<boolean>(false);
+  const [prospectGeneratedProposal, setProspectGeneratedProposal] = useState<any | null>(null);
+  const [activeProspectDossierId, setActiveProspectDossierId] = useState<string | null>(null);
+
   // Rival Spy (Head-to-Head Competitor Radar) State
   const [rivalSearchQuery, setRivalSearchQuery] = useState('');
   const [isRivalScanning, setIsRivalScanning] = useState(false);
@@ -2057,13 +2074,13 @@ export default function LocalStudioPage() {
 
   const [isLoadingDossiers, setIsLoadingDossiers] = useState(false);
   const [dossierSearch, setDossierSearch] = useState('');
-  const [dossierModeFilter, setDossierModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue' | 'appeal' | 'tools'>('all');
+  const [dossierModeFilter, setDossierModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue' | 'appeal' | 'tools' | 'prospect'>('all');
   const [dossierCountryFilter, setDossierCountryFilter] = useState<string>('all');
   const [dossierCityFilter, setDossierCityFilter] = useState<string>('all');
   const [dossierNeighborhoodFilter, setDossierNeighborhoodFilter] = useState<string>('all');
   const [dossierClosingFilter, setDossierClosingFilter] = useState<string>('all');
   const [editingDossierClosing, setEditingDossierClosing] = useState<StudioDossierRecord | null>(null);
-  const [closingFormMode, setClosingFormMode] = useState<'create' | 'audit' | 'rescue' | 'appeal' | 'tools'>('audit');
+  const [closingFormMode, setClosingFormMode] = useState<'create' | 'audit' | 'rescue' | 'appeal' | 'tools' | 'prospect'>('audit');
   const [closingFormStatus, setClosingFormStatus] = useState<'prestigia_subscriber' | 'setup_paid' | 'proposal_sent' | 'negotiating' | 'lead_draft'>('prestigia_subscriber');
   const [closingFormSetupFee, setClosingFormSetupFee] = useState<number>(0);
   const [closingFormMonthlyPlan, setClosingFormMonthlyPlan] = useState<number>(199);
@@ -2690,6 +2707,88 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     setShowManualReviewForm(false);
     showToast(isEn ? '✅ Negative review added to radar' : '✅ Reseña crítica añadida al radar de impugnaciones');
     handleGenerateAppealForReview(newRev, manualNotes);
+  };
+
+  // -------------------------------------------------------------
+  // TAB 5 GENERATION: PROSPECTAR & GENERAR PROPUESTA COMERCIAL
+  // -------------------------------------------------------------
+  const handleGenerateProspectProposal = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!prospectBusinessName.trim()) {
+      showToast(isEn ? '⚠️ Business name is required (*)' : '⚠️ El nombre del negocio o profesional es obligatorio (*)');
+      return;
+    }
+    if (!prospectCountry) {
+      showToast(isEn ? '⚠️ Select country (*)' : '⚠️ Debes seleccionar un país (*)');
+      return;
+    }
+    if (!prospectCity) {
+      showToast(isEn ? '⚠️ Select city (*)' : '⚠️ Debes seleccionar una ciudad (*)');
+      return;
+    }
+    if (!prospectNeighborhood.trim()) {
+      showToast(isEn ? '⚠️ Neighborhood / Zone is required (*)' : '⚠️ El barrio, zona o sector es obligatorio (*)');
+      return;
+    }
+
+    const effectiveLimit = isLuismaMaster ? 9999 : getEffectiveQuota('tools');
+    const usedTools = monthlyUsage.tools || 0;
+    if (!isLuismaMaster && usedTools >= effectiveLimit) {
+      showToast(
+        isUserSuspended
+          ? (isEn ? '⚠️ Account suspended due to pending payment.' : '⚠️ Cuenta pausada por facturación pendiente.')
+          : (isEn ? `⚠️ Monthly limit of ${effectiveLimit} proposals reached.` : `⚠️ Has alcanzado tu cupo mensual de ${effectiveLimit} propuestas. Adquiere una recarga de +10 créditos.`)
+      );
+      return;
+    }
+
+    setIsGeneratingProspect(true);
+    setProspectGeneratedProposal(null);
+
+    try {
+      const res = await fetch('/api/local-studio/prospect-proposal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          businessName: prospectBusinessName.trim(),
+          category: prospectCategory,
+          country: prospectCountry,
+          city: prospectCity,
+          neighborhood: prospectNeighborhood.trim(),
+          businessModel: prospectBusinessModel,
+          targetOwnerName: prospectOwnerName.trim(),
+          ownerPhone: prospectOwnerPhone.trim(),
+          targetServices: prospectServices.trim(),
+          suggestedBudget: prospectSuggestedBudget.trim(),
+          advisorId: currentUser?.id,
+          advisorUsername: currentUser?.username,
+          advisorName: currentUser?.name,
+          lang,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success && data.proposal) {
+        setProspectGeneratedProposal(data.proposal);
+        setActiveProspectDossierId(data.dossierId || null);
+        showToast(isEn ? '✅ Pitch proposal created & saved!' : '✅ ¡Propuesta de prospección generada con éxito!');
+        fetchDossiers();
+        fetchAdvisors();
+      } else {
+        showToast(data.error || (isEn ? 'Error creating proposal' : 'Error al generar la propuesta'));
+      }
+    } catch (err) {
+      showToast(isEn ? 'Connection error generating proposal' : 'Error de conexión al procesar propuesta');
+    } finally {
+      setIsGeneratingProspect(false);
+    }
+  };
+
+  const getProspectWhatsAppUrl = () => {
+    if (!prospectGeneratedProposal?.whatsappPitchMessage) return '#';
+    const cleanPhone = (prospectOwnerPhone || '').replace(/[^0-9]/g, '');
+    if (!cleanPhone) return '#';
+    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(prospectGeneratedProposal.whatsappPitchMessage)}`;
   };
 
   // -------------------------------------------------------------
@@ -4109,25 +4208,21 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         setRescueScenario(dossier.data.scenario);
       }
       setActiveTab('rescue');
-    } else if (dossier.mode === 'tools') {
-      setActiveToolsDossierId(dossier.id);
-      setToolsBusinessName(dossier.clientName);
-      setToolsCategory(category);
-      setToolsCity(city);
-      setToolsSearchQuery(dossier.googleUrl || dossier.clientName || '');
-      const toolsPlace = dossier.data?.placeData || dossier.data?.scannedListing;
-      if (toolsPlace) {
-        setToolsScannedListing(toolsPlace);
-      } else if (dossier.clientName) {
-        setToolsScannedListing({
-          name: dossier.clientName,
-          rating: 4.8,
-          reviewsCount: 25,
-          category: category,
-          address: `${city}, ${country}`,
-          googleMapsUrl: dossier.googleUrl || '',
-          extractedFrom: 'smart_detect',
-        });
+    } else if (dossier.mode === 'prospect' || dossier.mode === 'tools') {
+      setActiveProspectDossierId(dossier.id);
+      setProspectBusinessName(dossier.clientName);
+      setProspectCategory(category);
+      setProspectCountry(country);
+      setProspectCity(city);
+      setProspectNeighborhood(dossier.neighborhood || dossier.data?.neighborhood || '');
+      setProspectBusinessModel(dossier.businessModel === 'service_area' ? 'service_area' : 'storefront');
+      setProspectOwnerName(dossier.contactName || dossier.data?.ownerName || '');
+      setProspectOwnerPhone(dossier.contactPhone || dossier.data?.ownerPhone || '');
+      setProspectServices(dossier.data?.services || '');
+      setProspectSuggestedBudget(dossier.data?.suggestedBudget || '$150 - $300 USD');
+      const prop = dossier.data?.prospectProposal || dossier.data?.proposal;
+      if (prop) {
+        setProspectGeneratedProposal(prop);
       }
       setActiveTab('tools');
     } else if (dossier.mode === 'appeal') {
@@ -10381,25 +10476,28 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         )}
 
         {/* =============================================================
-            TAB: 4 ARMAS DE ÉLITE LOCAL SEO (GEO-GRID, ROI, GEOTAG, CITAS)
+            TAB 5: PROSPECTA & CERRAR CLIENTES SIN FICHA (PROPUESTA COMERCIAL)
             ============================================================= */}
         {activeTab === 'tools' && (
-          <div className="space-y-6 print:hidden">
+          <div className="space-y-6">
             {/* Header intro */}
-            <div className="bg-gradient-to-r from-amber-500/10 via-slate-900 to-indigo-950/40 border border-amber-500/40 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+            <div className="bg-gradient-to-r from-amber-500/10 via-slate-900 to-indigo-950/40 border border-amber-500/40 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden print:hidden">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
-                    {tTools.badge}
+                    {isEn ? 'MODULE 5: LEAD PROSPECTING & SALES PROPOSALS' : 'MÓDULO 5: PROSPECCIÓN & PROPUESTAS DE CIERRE'}
                   </span>
-                  <h1 className="text-xl sm:text-2xl font-black text-white">
-                    {tTools.title}
+                  <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+                    <Target className="w-6 h-6 text-amber-400" />
+                    <span>{isEn ? 'Prospecting & Closing Proposal Generator' : 'Generador de Propuestas Comerciales & Prospección Local'}</span>
                   </h1>
-                  <p className="text-xs text-slate-300 max-w-2xl">
-                    {tTools.desc}
+                  <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                    {isEn
+                      ? 'Generate a forensic, high-converting commercial proposal for businesses or independent professionals without a Google Maps listing. Demonstrate their lost client volume and close them with an irresistible offer.'
+                      : 'Genera una propuesta comercial persuasiva y forense para negocios o profesionales independientes que aún no tienen ficha en Google Maps. Demuéstrales el volumen de clientes que pierden cada mes y ciérralos con una oferta lista para firmar.'}
                   </p>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
                   {isLuismaMaster ? (
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
                       <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
@@ -10416,7 +10514,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     }`}>
                       <Zap className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                       <div className="text-left">
-                        <span className="text-[9px] uppercase font-black tracking-wider opacity-80 block">{isEn ? 'Top 3 Arsenal Quota' : 'Cupo Armas Top 3'}</span>
+                        <span className="text-[9px] uppercase font-black tracking-wider opacity-80 block">{isEn ? 'Proposals Quota' : 'Cupo Propuestas'}</span>
                         <div className="text-xs font-black flex items-center gap-1">
                           <span>{(monthlyUsage.tools || 0)} / {getEffectiveQuota('tools')} {isEn ? 'Used' : 'Usadas'}</span>
                           <span className="text-[10px] font-bold opacity-75">
@@ -10426,1089 +10524,532 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </div>
                     </div>
                   )}
-                  <span className="text-xs text-emerald-400 font-bold bg-emerald-950/80 border border-emerald-500/30 px-3 py-1.5 rounded-xl">
-                    {tTools.activeAlgo}
+                  <span className="text-xs text-amber-300 font-bold bg-amber-950/80 border border-amber-500/30 px-3 py-1.5 rounded-xl">
+                    ⚡ 1 {isEn ? 'Credit / Proposal' : 'Crédito / Propuesta'}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* If no listing is loaded or active, show the Activation Screen */}
-            {!Boolean(toolsBusinessName.trim() || toolsScannedListing || isDemoMode) ? (
-              <div className="p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-center space-y-6 shadow-2xl">
-                <div className="w-16 h-16 rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400 shadow-lg">
-                  <Crosshair className="w-8 h-8" />
-                </div>
-
-                <div className="max-w-xl mx-auto space-y-2">
-                  <h3 className="text-xl sm:text-2xl font-black text-white">
-                    {tTools.toolsEmptyTitle}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                    {tTools.toolsEmptyDesc}
-                  </p>
-                </div>
-
-                {/* Central 1-Click Search Input */}
-                <div className="max-w-lg mx-auto space-y-3">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={toolsSearchQuery}
-                      onChange={(e) => setToolsSearchQuery(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !isToolsScanning && toolsSearchQuery.trim()) {
-                          e.preventDefault();
-                          handleToolsScan();
-                        }
-                      }}
-                      placeholder={tTools.toolsScannerPlaceholder}
-                      className="w-full pl-4 pr-20 py-3.5 rounded-2xl bg-slate-950 border border-amber-500/40 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 text-xs sm:text-sm transition font-medium"
-                    />
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        try {
-                          const text = await navigator.clipboard.readText();
-                          if (text) setToolsSearchQuery(text.trim());
-                        } catch {}
-                      }}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-amber-400 transition cursor-pointer"
-                    >
-                      {t.pasteBtn}
-                    </button>
+            {/* FORMULARIO DE ENTRADA O VISTA DE PROPUESTA GENERADA */}
+            {!prospectGeneratedProposal ? (
+              <form onSubmit={handleGenerateProspectProposal} className="space-y-6 print:hidden">
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                        <Building2 className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h2 className="text-base font-black text-white">
+                          {isEn ? 'Target Prospect Data' : '1. Datos del Negocio o Profesional a Prospectar'}
+                        </h2>
+                        <p className="text-[11px] text-slate-400">
+                          {isEn ? 'Enter the details of the business that lacks a Google Maps presence' : 'Ingresa los datos del cliente que no tiene presencia en Google Maps'}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-slate-500 font-mono">* {isEn ? 'Required fields' : 'Campos obligatorios'}</span>
                   </div>
 
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    {/* Nombre del Negocio */}
+                    <div className="sm:col-span-2">
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {isEn ? 'Business / Professional Commercial Name *' : 'Nombre Comercial del Negocio o Profesional Independiente *'}
+                      </label>
+                      <input
+                        type="text"
+                        value={prospectBusinessName}
+                        onChange={(e) => setProspectBusinessName(e.target.value)}
+                        placeholder={isEn ? 'e.g. Los Andes Dental Clinic, Mario Mechanic Workshop...' : 'Ej: Clínica Dental Los Andes, Taller Mecánico Mario, Dra. Sofía Pérez...'}
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-medium"
+                        required
+                      />
+                    </div>
+
+                    {/* Nicho o Categoría */}
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {isEn ? 'Niche / Industry Category *' : 'Nicho o Categoría de Negocio *'}
+                      </label>
+                      <select
+                        value={prospectCategory}
+                        onChange={(e) => setProspectCategory(e.target.value)}
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 cursor-pointer font-medium"
+                      >
+                        {categoryOptions.map((cat) => (
+                          <option key={cat} value={cat} className="bg-slate-900 text-white">
+                            {cat}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Modelo de Negocio */}
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {isEn ? 'Business Operation Model *' : 'Modelo de Operación *'}
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setProspectBusinessModel('storefront')}
+                          className={`py-2 px-3 rounded-xl border text-center font-bold text-xs transition cursor-pointer ${
+                            prospectBusinessModel === 'storefront'
+                              ? 'bg-amber-500/20 border-amber-500 text-amber-300'
+                              : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          🏬 {isEn ? 'Physical Storefront' : 'Local Físico'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setProspectBusinessModel('service_area')}
+                          className={`py-2 px-3 rounded-xl border text-center font-bold text-xs transition cursor-pointer ${
+                            prospectBusinessModel === 'service_area'
+                              ? 'bg-amber-500/20 border-amber-500 text-amber-300'
+                              : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          🛵 {isEn ? 'Mobile / Service Area' : 'A Domicilio / SAB'}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* País Condicionado */}
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {isEn ? 'Country of Operation *' : 'País de Operación *'}
+                      </label>
+                      <select
+                        value={prospectCountry}
+                        onChange={(e) => {
+                          const selected = e.target.value;
+                          setProspectCountry(selected);
+                          const cities = WORLD_REGIONS_GEO[selected] || [];
+                          setProspectCity(cities[0] || '');
+                          if (COUNTRY_DIALING_CODES[selected]) {
+                            setProspectOwnerPhone(COUNTRY_DIALING_CODES[selected]);
+                          }
+                        }}
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 cursor-pointer font-medium"
+                        required
+                      >
+                        {Object.keys(WORLD_REGIONS_GEO).map((c) => (
+                          <option key={c} value={c} className="bg-slate-900 text-white">
+                            {c}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Ciudad Condicionada (Dependiente del país) */}
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {isEn ? 'City *' : 'Ciudad Principal *'}
+                      </label>
+                      <select
+                        value={prospectCity}
+                        onChange={(e) => setProspectCity(e.target.value)}
+                        disabled={!prospectCountry}
+                        className={`w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition font-medium ${
+                          !prospectCountry
+                            ? 'opacity-40 cursor-not-allowed border-dashed text-slate-500'
+                            : 'cursor-pointer hover:border-slate-500'
+                        }`}
+                        required
+                      >
+                        <option value="">
+                          {!prospectCountry
+                            ? (isEn ? '⚠️ Select country first...' : '⚠️ Selecciona primero un país...')
+                            : (isEn ? '-- Select City --' : '-- Selecciona una Ciudad --')}
+                        </option>
+                        {(WORLD_REGIONS_GEO[prospectCountry] || []).map((city) => (
+                          <option key={city} value={city} className="bg-slate-900 text-white">
+                            {city}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Barrio o Sector */}
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {isEn ? 'Neighborhood / District / Sector *' : 'Barrio, Zona o Sector de Operación *'}
+                      </label>
+                      <input
+                        type="text"
+                        value={prospectNeighborhood}
+                        onChange={(e) => setProspectNeighborhood(e.target.value)}
+                        placeholder={isEn ? 'e.g. Downtown, North Zone, Chapinero...' : 'Ej: Chapinero, Poblado, San Isidro, Zona Rosa...'}
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-medium"
+                        required
+                      />
+                    </div>
+
+                    {/* Teléfono / WhatsApp del Dueño */}
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {isEn ? 'Client WhatsApp / Phone (For 1-Click Send)' : 'WhatsApp o Teléfono del Cliente (Para envío en 1 clic)'}
+                      </label>
+                      <input
+                        type="text"
+                        value={prospectOwnerPhone}
+                        onChange={(e) => setProspectOwnerPhone(sanitizePhoneOnly(e.target.value))}
+                        placeholder="+573001234567"
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-medium font-mono"
+                      />
+                    </div>
+
+                    {/* Nombre del Dueño / Decisor */}
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {isEn ? 'Owner / Manager Name (Optional)' : 'Nombre del Dueño o Encargado (Opcional)'}
+                      </label>
+                      <input
+                        type="text"
+                        value={prospectOwnerName}
+                        onChange={(e) => setProspectOwnerName(sanitizeLettersOnly(e.target.value))}
+                        placeholder={isEn ? 'e.g. Dr. Felipe or Carlos' : 'Ej: Dr. Felipe, Ing. Mario, Doña Claudia...'}
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-medium"
+                      />
+                    </div>
+
+                    {/* Presupuesto o Cotización Sugerida */}
+                    <div>
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {isEn ? 'Suggested Setup Fee (Optional)' : 'Tarifa / Cotización Sugerida (Opcional)'}
+                      </label>
+                      <input
+                        type="text"
+                        value={prospectSuggestedBudget}
+                        onChange={(e) => setProspectSuggestedBudget(e.target.value)}
+                        placeholder="$150 USD o $500.000 COP"
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-medium"
+                      />
+                    </div>
+
+                    {/* Especialidades o Servicios Estrella */}
+                    <div className="sm:col-span-2">
+                      <label className="block font-bold text-slate-300 mb-1">
+                        {isEn ? 'Star Specialties / Core Services (To personalize the pitch)' : 'Servicios Estrella o Especialidades (Para personalizar la propuesta)'}
+                      </label>
+                      <input
+                        type="text"
+                        value={prospectServices}
+                        onChange={(e) => setProspectServices(e.target.value)}
+                        placeholder={isEn ? 'e.g. Root canals, Invisalign, Dental Implants, 24h Emergencies' : 'Ej: Ortodoncia invisible, implantes dentales, cambio de aceite rápido, frenos ABS...'}
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Warning de Saldo o Suspensión */}
                   {!isLuismaMaster && ((monthlyUsage.tools || 0) >= getEffectiveQuota('tools') || isUserSuspended) && (
-                    <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-bold flex items-center justify-center gap-2">
+                    <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-bold flex items-center justify-center gap-2">
                       <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
                       <span>
                         {isUserSuspended
                           ? (isEn ? 'Account suspended due to pending payment. Contact Management.' : 'Cuenta pausada / suspendida por facturación pendiente. Contacta a Dirección General.')
                           : (isEn
-                            ? `⚠️ Monthly limit of ${getEffectiveQuota('tools')} Top 3 Sales Arsenal credits reached. Upgrade your plan or reload a +10 pack.`
-                            : `⚠️ Has alcanzado tu cupo de ${getEffectiveQuota('tools')} créditos de Armas Top 3 de Cierre. Adquiere una recarga de +10 créditos.`)}
+                            ? `⚠️ Monthly limit of ${getEffectiveQuota('tools')} proposals reached. Request a +10 credit pack.`
+                            : `⚠️ Has alcanzado tu cupo de ${getEffectiveQuota('tools')} propuestas comerciales de este ciclo. Solicita una recarga de +10 créditos.`)}
                       </span>
                     </div>
                   )}
 
-                  <button
-                    type="button"
-                    onClick={() => handleToolsScan()}
-                    disabled={isUserSuspended || isToolsScanning || !toolsSearchQuery.trim() || (!isLuismaMaster && (monthlyUsage.tools || 0) >= getEffectiveQuota('tools'))}
-                    className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98"
-                  >
-                    {isToolsScanning ? (
-                      <>
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                        <span>{tTools.toolsScannerScanning}</span>
-                      </>
-                    ) : (
-                      <>
-                        <Zap className="w-4 h-4 fill-slate-950" />
-                        <span>{tTools.toolsEmptyScanBtn} ({isEn ? '1 Credit' : '1 Crédito'})</span>
-                      </>
-                    )}
-                  </button>
-
+                  {/* Botón Submit */}
                   <div className="pt-2">
                     <button
-                      type="button"
-                      onClick={() => {
-                        setIsDemoMode(true);
-                        setToolsBusinessName('Negocio de Ejemplo');
-                        setToolsCity('Bogotá');
-                        setGeoGridKeyword(getDefaultKeywordByNiche(toolsCategory, 'Bogotá', isEn));
-                      }}
-                      className="text-xs text-slate-500 hover:text-amber-400 transition cursor-pointer underline underline-offset-4"
+                      type="submit"
+                      disabled={isGeneratingProspect || isUserSuspended || (!isLuismaMaster && (monthlyUsage.tools || 0) >= getEffectiveQuota('tools'))}
+                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm transition flex items-center justify-center gap-2.5 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98 disabled:opacity-50"
                     >
-                      {tTools.toolsEmptyDemoBtn}
+                      {isGeneratingProspect ? (
+                        <>
+                          <RefreshCw className="w-5 h-5 animate-spin" />
+                          <span>{isEn ? 'Generating High-Converting Proposal...' : 'Analizando Mercado Local & Generando Propuesta...'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Target className="w-5 h-5" />
+                          <span>{isEn ? 'Generate Closing Proposal (1 Credit)' : '⚡ Generar Propuesta Comercial de Alto Cierre (1 Crédito)'}</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
-              </div>
+              </form>
             ) : (
-              <>
-                {/* Active Listing Profile Card & Controls */}
-                <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-3 shadow-xl">
-                  <div className="p-3.5 rounded-2xl bg-slate-950 border border-emerald-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
-                    <div className="space-y-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                          <span>{tTools.toolsDetectedBadge}</span>
-                        </span>
-                        <span className="text-[10px] font-mono text-slate-400">{toolsCategory}</span>
-                        {isDemoMode && (
-                          <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/30">
-                            {isEn ? 'Demo Mode' : 'Modo Demostración'}
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="font-black text-white text-sm">{toolsBusinessName || toolsScannedListing?.name}</h3>
-                      {(toolsScannedListing?.address || toolsCity) && (
-                        <p className="text-[11px] text-slate-400 truncate">{toolsScannedListing?.address || toolsCity}</p>
-                      )}
+              /* VISTA DE LA PROPUESTA GENERADA */
+              <div className="space-y-6">
+                {/* Barra de Acciones y Botonera Superior */}
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 print:hidden">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-950 border border-emerald-500/40 text-emerald-300 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        <span>{isEn ? 'PROPOSAL GENERATED' : 'PROPUESTA GENERADA CON ÉXITO'}</span>
+                      </span>
+                      <span className="text-xs text-slate-400 font-mono">ID: {activeProspectDossierId}</span>
                     </div>
+                    <h3 className="text-lg font-black text-white">
+                      {prospectBusinessName} • {prospectNeighborhood}, {prospectCity}
+                    </h3>
+                  </div>
 
-                    <div className="flex items-center gap-3 shrink-0">
-                      <div className="text-right text-[11px] font-mono">
-                        <span className="text-amber-400 font-black text-sm">★ {toolsScannedListing?.rating?.toFixed(1) || toolsExistingRating.toFixed(1)}</span>
-                        <span className="text-slate-400 block">{toolsScannedListing?.reviewsCount || toolsExistingReviews} {isEn ? 'reviews' : 'reseñas'}</span>
-                      </div>
-                      {toolsScannedListing?.googleMapsUrl && (
-                        <a
-                          href={toolsScannedListing?.googleMapsUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold transition flex items-center gap-1 border border-slate-700 cursor-pointer"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                          <span>Google Maps</span>
-                        </a>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setToolsBusinessName('');
-                          setToolsCity('');
-                          setToolsScannedListing(null);
-                          setIsDemoMode(false);
-                          setToolsSearchQuery('');
-                          setGeoGridKeyword('');
-                        }}
-                        className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-bold transition border border-rose-500/30 cursor-pointer"
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Botón WhatsApp */}
+                    {prospectOwnerPhone && (
+                      <a
+                        href={getProspectWhatsAppUrl()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg shadow-emerald-600/30 cursor-pointer active:scale-95"
                       >
-                        {tTools.toolsChangeListing}
-                      </button>
-                    </div>
+                        <MessageSquare className="w-4 h-4 fill-white" />
+                        <span>{isEn ? 'Send via WhatsApp' : '💬 Enviar por WhatsApp'}</span>
+                      </a>
+                    )}
+
+                    {/* Botón Copiar Pitch */}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        copyToClipboard(
+                          prospectGeneratedProposal.whatsappPitchMessage,
+                          isEn ? 'WhatsApp pitch message' : 'Mensaje para WhatsApp'
+                        )
+                      }
+                      className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer border border-slate-700"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>{isEn ? 'Copy Pitch' : 'Copiar Pitch'}</span>
+                    </button>
+
+                    {/* Botón Imprimir / PDF */}
+                    <button
+                      type="button"
+                      onClick={() => window.print()}
+                      className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-lg shadow-amber-500/20 cursor-pointer active:scale-95"
+                    >
+                      <Printer className="w-4 h-4" />
+                      <span>{isEn ? 'Print / PDF' : '📄 Imprimir / PDF'}</span>
+                    </button>
+
+                    {/* Botón Nueva Prospección */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProspectGeneratedProposal(null);
+                        setProspectBusinessName('');
+                        setProspectNeighborhood('');
+                        setProspectOwnerName('');
+                        setProspectServices('');
+                      }}
+                      className="px-3.5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white font-bold text-xs transition cursor-pointer"
+                    >
+                      {isEn ? 'New Prospect' : 'Nueva Prospección'}
+                    </button>
                   </div>
                 </div>
 
-                {/* Sub-tools Navigation */}
-                <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-3">
-              <button
-                type="button"
-                onClick={() => setToolsActiveTab('geogrid')}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
-                  toolsActiveTab === 'geogrid'
-                    ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                }`}
-              >
-                <Crosshair className="w-3.5 h-3.5" />
-                <span>{tTools.tab1}</span>
-              </button>
+                {/* EL DOSSIER EJECUTIVO IMPRESO / VISUAL */}
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 space-y-8 shadow-2xl relative overflow-hidden">
+                  {/* Membrete Oficial */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-lg">
+                        <PrestigiaIcon className="w-7 h-7 text-amber-400" />
+                      </div>
+                      <div>
+                        <div className="text-[10px] font-black uppercase tracking-widest text-amber-400">
+                          PRESTIGIA LOCAL STUDIO • FORENSIC PROPOSAL
+                        </div>
+                        <h2 className="text-xl sm:text-2xl font-black text-white">
+                          {prospectGeneratedProposal.headline || `Plan de Activación & Dominación en Google Maps`}
+                        </h2>
+                      </div>
+                    </div>
 
-              <button
-                type="button"
-                onClick={() => setToolsActiveTab('roicalc')}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
-                  toolsActiveTab === 'roicalc'
-                    ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                }`}
-              >
-                <Calculator className="w-3.5 h-3.5" />
-                <span>{tTools.tab2}</span>
-              </button>
+                    <div className="text-left sm:text-right text-xs space-y-0.5 font-mono">
+                      <div className="text-slate-400">{isEn ? 'Prepared For:' : 'Preparado para:'} <strong className="text-white">{prospectBusinessName}</strong></div>
+                      <div className="text-slate-400">{isEn ? 'Location:' : 'Zona:'} <span className="text-amber-300 font-bold">{prospectNeighborhood}, {prospectCity}</span></div>
+                      <div className="text-slate-500 text-[10px]">{new Date().toLocaleDateString()}</div>
+                    </div>
+                  </div>
 
-              <button
-                type="button"
-                onClick={() => setToolsActiveTab('rivalspy')}
-                className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
-                  toolsActiveTab === 'rivalspy'
-                    ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
-                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                }`}
-              >
-                <Eye className="w-3.5 h-3.5" />
-                <span>{tTools.tab3}</span>
-              </button>
-            </div>
-
-            {/* TOOL 1: SIMULADOR VISUAL GEO-GRID 3X3 */}
-            {toolsActiveTab === 'geogrid' && (
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-                  <div>
-                    <h3 className="text-base font-black text-white flex items-center gap-2">
-                      <span>{tTools.geogridTitle}</span>
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      {tTools.geogridDesc}
+                  {/* Resumen Ejecutivo de Impacto */}
+                  <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-100 text-xs sm:text-sm leading-relaxed space-y-1">
+                    <div className="flex items-center gap-1.5 font-black text-amber-400 uppercase text-[10px] tracking-wider">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>{isEn ? 'EXECUTIVE SUMMARY' : 'DIAGNÓSTICO EJECUTIVO DE OPORTUNIDAD'}</span>
+                    </div>
+                    <p className="text-slate-200">
+                      {prospectGeneratedProposal.executiveSummary}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    {(['1km', '3km', '5km'] as const).map((rad) => (
-                      <button
-                        key={rad}
-                        type="button"
-                        onClick={() => setGeoGridRadius(rad)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                          geoGridRadius === rad
-                            ? 'bg-amber-500 text-slate-950 font-black'
-                            : 'bg-slate-950 text-slate-400 border border-slate-800 hover:text-white'
-                        }`}
-                      >
-                        {tTools.radiusLabel} {rad}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                  {/* Grilla: Radiografía de Búsquedas vs Costo de la Invisibilidad */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Tarjeta 1: Demanda Local Oculta */}
+                    <div className="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-4">
+                      <div className="flex items-center gap-2 text-emerald-400 font-black text-sm uppercase tracking-wide">
+                        <TrendingUp className="w-5 h-5 text-emerald-400" />
+                        <span>{isEn ? 'Local Monthly Demand in Zone' : '1. Demanda Mensual en tu Zona'}</span>
+                      </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                  {/* Left: Interactive 3x3 Geo-Grid Heatmap */}
-                  <div className="md:col-span-7 bg-slate-950 p-6 rounded-3xl border border-slate-800 relative">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-800 text-xs">
-                      <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                        {tTools.satMap} ({toolsCity || (isEn ? 'Your City' : 'Tu Ciudad')})
-                      </span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-amber-400 font-bold text-[10px] shrink-0">{tTools.keyword}</span>
-                        <input
-                          type="text"
-                          value={geoGridKeyword !== '' ? geoGridKeyword : getDefaultKeywordByNiche(toolsCategory, toolsCity, isEn)}
-                          onChange={(e) => setGeoGridKeyword(e.target.value)}
-                          placeholder={tTools.toolsKeywordPlaceholder}
-                          className="px-2.5 py-1 rounded-lg bg-slate-900 border border-amber-500/40 text-amber-300 font-black text-xs focus:outline-none focus:border-amber-400 w-52 sm:w-64"
-                        />
+                      <div className="p-4 rounded-xl bg-slate-900 border border-emerald-500/30 text-center space-y-1">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                          {isEn ? 'Estimated Searches in Sector' : 'Búsquedas Mensuales Estimadas en Sector'}
+                        </span>
+                        <div className="text-2xl font-black text-emerald-400 font-mono">
+                          {prospectGeneratedProposal.monthlySearchStats?.estimatedSearchesInZone || '3.500+ búsquedas / mes'}
+                        </div>
+                        <span className="text-[10px] text-emerald-300 font-bold block pt-1">
+                          {prospectGeneratedProposal.monthlySearchStats?.intentLevel || '86% de usuarios contactan en menos de 24h'}
+                        </span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                          {isEn ? 'Top Local Search Terms:' : 'Palabras clave con las que buscan tu servicio:'}
+                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {(prospectGeneratedProposal.monthlySearchStats?.searchKeywords || []).map((kw: string, idx: number) => (
+                            <span key={idx} className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-[11px] font-mono">
+                              🔍 {kw}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-3.5 max-w-sm mx-auto aspect-square">
-                      {[
-                        { pin: 'P1', rank: geoGridRadius === '1km' ? 2 : 7, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: isEn ? 'Northwest' : 'Noroeste' },
-                        { pin: 'P2', rank: geoGridRadius === '1km' ? 1 : 5, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: isEn ? 'North' : 'Norte' },
-                        { pin: 'P3', rank: geoGridRadius === '5km' ? 14 : 9, color: 'bg-rose-600 text-white', note: isEn ? 'Northeast' : 'Noreste' },
-                        { pin: 'P4', rank: geoGridRadius === '1km' ? 1 : 4, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: isEn ? 'West' : 'Oeste' },
-                        { pin: 'CENTRO', rank: 1, color: 'bg-emerald-400 text-slate-950 ring-4 ring-emerald-500/30', note: isEn ? 'Main Location' : 'Sede Central' },
-                        { pin: 'P6', rank: geoGridRadius === '5km' ? 16 : 8, color: 'bg-rose-600 text-white', note: isEn ? 'East' : 'Este' },
-                        { pin: 'P7', rank: geoGridRadius === '5km' ? 18 : 11, color: 'bg-rose-600 text-white', note: isEn ? 'Southwest' : 'Suroeste' },
-                        { pin: 'P8', rank: geoGridRadius === '1km' ? 3 : 8, color: geoGridRadius === '1km' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950', note: isEn ? 'South' : 'Sur' },
-                        { pin: 'P9', rank: geoGridRadius === '5km' ? 21 : 15, color: 'bg-rose-600 text-white', note: isEn ? 'Southeast' : 'Sureste' },
-                      ].map((item, idx) => (
-                        <div
-                          key={idx}
-                          className={`rounded-2xl p-3 flex flex-col items-center justify-center font-black transition-all transform hover:scale-105 shadow-lg ${item.color}`}
-                        >
-                          <span className="text-[9px] opacity-75 uppercase">{item.note}</span>
-                          <span className="text-2xl font-black">#{item.rank}</span>
-                          <span className="text-[8px] font-bold uppercase">{item.rank <= 3 ? 'TOP 3' : (isEn ? 'DROPPED' : 'FUERA')}</span>
+                    {/* Tarjeta 2: Costo de la Invisibilidad */}
+                    <div className="p-6 rounded-2xl bg-slate-950/80 border border-rose-950/60 space-y-4">
+                      <div className="flex items-center gap-2 text-rose-400 font-black text-sm uppercase tracking-wide">
+                        <AlertTriangle className="w-5 h-5 text-rose-400" />
+                        <span>{isEn ? 'Cost of Invisibility (Lost Revenue)' : '2. El Costo Oculto de la Invisibilidad'}</span>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-rose-950/30 border border-rose-500/30 text-center space-y-1">
+                        <span className="text-[10px] uppercase font-bold text-rose-300 block">
+                          {isEn ? 'Estimated Clients Lost to Competitors' : 'Clientes que hoy se lleva tu competencia directa'}
+                        </span>
+                        <div className="text-xl sm:text-2xl font-black text-rose-400 font-mono">
+                          {prospectGeneratedProposal.invisibilityDiagnosis?.estimatedLostClientsMonthly || '25 a 40 clientes / mes'}
+                        </div>
+                        <span className="text-[10px] text-rose-300 font-bold block pt-1">
+                          Fuga estimada: {prospectGeneratedProposal.invisibilityDiagnosis?.estimatedLostRevenueMonthly || '$1.200 USD / mes'}
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-slate-300 leading-relaxed italic bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                        {prospectGeneratedProposal.invisibilityDiagnosis?.competitorImpact ||
+                          'Los negocios que ya están posicionados en el mapa se están repartiendo el 100% de los clientes que buscan en tu barrio.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Plan de Implementación en 4 Pasos */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-white font-black text-base uppercase tracking-wide">
+                      <ShieldCheck className="w-5 h-5 text-amber-400" />
+                      <span>{isEn ? 'Prestigia 4-Step Local Launch Strategy' : '3. Plan de Lanzamiento & Posicionamiento Prestigia'}</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {(prospectGeneratedProposal.solutionRoadmap || []).map((step: any, idx: number) => (
+                        <div key={idx} className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-2">
+                          <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 font-black text-xs flex items-center justify-center font-mono">
+                            {idx + 1}
+                          </div>
+                          <h4 className="font-black text-white text-xs">
+                            {step.title}
+                          </h4>
+                          <p className="text-[11px] text-slate-400 leading-relaxed">
+                            {step.description}
+                          </p>
                         </div>
                       ))}
                     </div>
+                  </div>
 
-                    <div className="flex items-center justify-center gap-4 mt-5 text-[11px] font-bold">
-                      <div className="flex items-center gap-1.5 text-emerald-400">
-                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                        <span>{tTools.legendTop3}</span>
+                  {/* Entregables Oficiales & Propuesta Económica */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                    {/* Entregables */}
+                    <div className="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+                      <div className="flex items-center gap-2 text-amber-400 font-black text-sm uppercase">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <span>{isEn ? 'Official Deliverables Package' : '4. Lo que entregamos llave en mano:'}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-rose-400">
-                        <span className="w-2.5 h-2.5 rounded-full bg-rose-600" />
-                        <span>{tTools.legendDropped}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right: Pitch Breakdown */}
-                  <div className="md:col-span-5 space-y-4 text-xs">
-                    <div className="p-4 rounded-2xl bg-amber-950/30 border border-amber-500/40 space-y-2">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-300 block">
-                        {tTools.diagAdvisor}
-                      </span>
-                      <p className="text-slate-200 leading-relaxed text-xs">
-                        {tTools.diagAdvisorBody(
-                          toolsBusinessName,
-                          geoGridRadius,
-                          geoGridKeyword !== '' ? geoGridKeyword : getDefaultKeywordByNiche(toolsCategory, toolsCity, isEn)
-                        )}
-                      </p>
+                      <ul className="space-y-2 text-xs text-slate-300">
+                        {(prospectGeneratedProposal.deliverablesList || []).map((del: string, idx: number) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className="text-emerald-400 font-bold shrink-0">✓</span>
+                            <span>{del}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
 
-                    <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">
-                        {tTools.solutionPrestigia}
-                      </span>
-                      <p className="text-slate-300 text-xs leading-relaxed">
-                        {tTools.solutionPrestigiaBody}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TOOL 2: CALCULADORA DE PÉRDIDA FINANCIERA (ROI CALCULATOR) */}
-            {toolsActiveTab === 'roicalc' && (
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
-                <div>
-                  <h3 className="text-base font-black text-white flex items-center gap-2">
-                    <Calculator className="w-4 h-4 text-emerald-400" />
-                    <span>{tTools.roiTitle}</span>
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    {tTools.roiDesc}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-                    <label className="block font-bold text-slate-300">{tTools.avgTicket}</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-emerald-400 font-bold">$</span>
-                      <input
-                        type="number"
-                        value={roiAverageTicket}
-                        onChange={(e) => setRoiAverageTicket(Number(e.target.value) || 0)}
-                        className="w-full pl-7 pr-3 py-2.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-emerald-300 font-black text-base focus:outline-none"
-                      />
-                    </div>
-                    <span className="text-[10px] text-slate-500 block leading-tight">{tTools.avgTicketSub}</span>
-                  </div>
-
-                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-                    <label className="block font-bold text-slate-300">{tTools.avgFrequency}</label>
-                    <select
-                      value={roiCustomerFrequency}
-                      onChange={(e) => setRoiCustomerFrequency(Number(e.target.value))}
-                      className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-bold text-xs focus:outline-none"
-                    >
-                      <option value="1">{tTools.freqOpt1}</option>
-                      <option value="3">{tTools.freqOpt2}</option>
-                      <option value="6">{tTools.freqOpt3}</option>
-                      <option value="12">{tTools.freqOpt4}</option>
-                    </select>
-                    <span className="text-[10px] text-slate-500 block leading-tight">{tTools.avgFrequencySub}</span>
-                  </div>
-
-                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-                    <label className="block font-bold text-slate-300">{tTools.currentRank}</label>
-                    <select
-                      value={roiCurrentRank}
-                      onChange={(e) => setRoiCurrentRank(Number(e.target.value))}
-                      className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-bold text-xs focus:outline-none"
-                    >
-                      <option value="4">{tTools.rankOpt1}</option>
-                      <option value="8">{tTools.rankOpt2}</option>
-                      <option value="15">{tTools.rankOpt3}</option>
-                    </select>
-                    <span className="text-[10px] text-slate-500 block leading-tight">{tTools.currentRankSub}</span>
-                  </div>
-
-                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-                    <label className="block font-bold text-slate-300">{tTools.searches}</label>
-                    <input
-                      type="number"
-                      value={roiMonthlySearches}
-                      onChange={(e) => setRoiMonthlySearches(Number(e.target.value) || 0)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-black text-base focus:outline-none"
-                    />
-                    <span className="text-[10px] text-slate-500 block leading-tight">{tTools.searchesSub}</span>
-                  </div>
-                </div>
-
-                {/* Calculation Output: Dual-Balance Matrix (Fuga Actual vs Beneficio con Prestigia) */}
-                {(() => {
-                  // 1. Pérdida / Fuga sin Prestigia
-                  const lossRate = roiCurrentRank > 10 ? 0.85 : roiCurrentRank > 5 ? 0.60 : 0.35;
-                  const lostClicks = Math.round(roiMonthlySearches * lossRate);
-                  const lostClients = Math.max(1, Math.round(lostClicks * 0.20));
-                  const monthlyLoss = lostClients * roiAverageTicket;
-                  const yearlyLoss = monthlyLoss * 12;
-                  const yearlyLtvLoss = lostClients * (roiAverageTicket * roiCustomerFrequency) * 12;
-
-                  // 2. Ganancia con Prestigia (Al ingresar al Top 3)
-                  const gainRate = 0.45;
-                  const gainedClicks = Math.round(roiMonthlySearches * gainRate);
-                  const gainedClients = Math.max(1, Math.round(gainedClicks * 0.20));
-                  const monthlyGain = gainedClients * roiAverageTicket;
-                  const yearlyGain = monthlyGain * 12;
-                  const yearlyLtvGain = gainedClients * (roiAverageTicket * roiCustomerFrequency) * 12;
-
-                  // 3. Balance Neto Comercial & Amortización
-                  const totalAnnualAdvantage = yearlyLoss + yearlyGain;
-                  const totalAnnualLtvAdvantage = yearlyLtvLoss + yearlyLtvGain;
-                  const estimatedPrestigiaFee = 200;
-                  const breakEvenClients = Math.max(1, Math.ceil(estimatedPrestigiaFee / (roiAverageTicket || 1)));
-
-                  return (
-                    <div className="space-y-4">
-                      {/* 2-Column High Contrast Matrix */}
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        {/* CARD 1: Fuga de Facturación (Rojo) */}
-                        <div className="p-6 rounded-3xl bg-gradient-to-br from-rose-950/70 via-slate-950 to-slate-900 border-2 border-rose-500/50 space-y-4 shadow-xl">
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-rose-300 bg-rose-950 px-2.5 py-0.5 rounded-full border border-rose-500/40">
-                                <TrendingDown className="w-3 h-3 text-rose-400" />
-                                {tTools.leakDetected}
-                              </span>
-                              <h4 className="text-sm font-bold text-slate-200 mt-2">
-                                {tTools.leakHeading}
-                              </h4>
-                            </div>
-                            <div className="text-right">
-                              <span className="text-3xl font-black text-rose-400 block tracking-tight">
-                                -${monthlyLoss.toLocaleString()} USD
-                              </span>
-                              <span className="text-[11px] text-slate-400 font-bold block">{tTools.lostPer30Days}</span>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-rose-500/20 text-xs">
-                            <div className="p-3 rounded-xl bg-slate-900/90 border border-rose-900/40">
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.lostCalls}</span>
-                              <strong className="text-sm font-black text-white">~{lostClicks.toLocaleString()} {tTools.searchesPerMonth}</strong>
-                            </div>
-                            <div className="p-3 rounded-xl bg-slate-900/90 border border-rose-900/40">
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.lostClientsLabel}</span>
-                              <strong className="text-sm font-black text-rose-300">~{lostClients.toLocaleString()} {tTools.newClientsPerMonth}</strong>
-                            </div>
-                            <div className="p-3 rounded-xl bg-slate-900/90 border border-rose-900/40 col-span-2 sm:col-span-1">
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.loss12Months}</span>
-                              <strong className="text-sm font-black text-rose-400">-${yearlyLoss.toLocaleString()} USD/{isEn ? 'yr' : 'año'}</strong>
-                            </div>
-                            <div className="p-3 rounded-xl bg-slate-900/90 border border-rose-900/40 col-span-2 sm:col-span-1">
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.lossLtv12Months}</span>
-                              <strong className="text-sm font-black text-rose-300">-${yearlyLtvLoss.toLocaleString()} USD/{isEn ? 'yr' : 'año'}</strong>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* CARD 2: Expansión Comercial con Prestigia (Verde Esmeralda) */}
-                        <div className="p-6 rounded-3xl bg-gradient-to-br from-emerald-950/70 via-slate-950 to-slate-900 border-2 border-emerald-500/50 space-y-4 shadow-xl">
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-300 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-500/40">
-                                <TrendingUp className="w-3 h-3 text-emerald-400" />
-                                {tTools.gainDetected}
-                              </span>
-                              <h4 className="text-sm font-bold text-slate-200 mt-2">
-                                {tTools.gainHeading}
-                              </h4>
-                            </div>
-                            <div className="text-right">
-                              <span className="text-3xl font-black text-emerald-400 block tracking-tight">
-                                +${monthlyGain.toLocaleString()} USD
-                              </span>
-                              <span className="text-[11px] text-slate-400 font-bold block">{tTools.gainPer30Days}</span>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-emerald-500/20 text-xs">
-                            <div className="p-3 rounded-xl bg-slate-900/90 border border-emerald-900/40">
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.gainCalls}</span>
-                              <strong className="text-sm font-black text-white">~{gainedClicks.toLocaleString()} {tTools.searchesPerMonth}</strong>
-                            </div>
-                            <div className="p-3 rounded-xl bg-slate-900/90 border border-emerald-900/40">
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.gainClientsLabel}</span>
-                              <strong className="text-sm font-black text-emerald-300">+{gainedClients.toLocaleString()} {tTools.gainNewClientsPerMonth}</strong>
-                            </div>
-                            <div className="p-3 rounded-xl bg-slate-900/90 border border-emerald-900/40 col-span-2 sm:col-span-1">
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.gain12Months}</span>
-                              <strong className="text-sm font-black text-emerald-400">+${yearlyGain.toLocaleString()} USD/{isEn ? 'yr' : 'año'}</strong>
-                            </div>
-                            <div className="p-3 rounded-xl bg-slate-900/90 border border-emerald-900/40 col-span-2 sm:col-span-1">
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.gainLtv12Months}</span>
-                              <strong className="text-sm font-black text-emerald-300">+${yearlyLtvGain.toLocaleString()} USD/{isEn ? 'yr' : 'año'}</strong>
-                            </div>
-                          </div>
-                        </div>
+                    {/* Inversión y Garantía */}
+                    <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-500/15 via-slate-950 to-slate-950 border border-amber-500/40 space-y-4">
+                      <div className="flex items-center gap-2 text-amber-300 font-black text-sm uppercase">
+                        <DollarSign className="w-5 h-5 text-amber-400" />
+                        <span>{isEn ? 'Investment & Activation Guarantee' : '5. Inversión & Garantía de Entrega:'}</span>
                       </div>
 
-                      {/* BANNER UNIFICADO: Balance Neto Comercial & Cierre del Asesor */}
-                      <div className="p-5 rounded-3xl bg-slate-950 border border-amber-500/40 space-y-3">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
-                          <div>
-                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-500/30">
-                              {tTools.netImpactBadge}
-                            </span>
-                            <p className="text-xs text-slate-300 mt-1">
-                              {tTools.breakEvenText(breakEvenClients)}
-                            </p>
-                          </div>
-                          <div className="text-left sm:text-right shrink-0">
-                            <span className="text-[10px] text-slate-400 uppercase font-bold block">{tTools.netImpactTotalAnnual}</span>
-                            <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-emerald-300 to-cyan-300">
-                              +${totalAnnualAdvantage.toLocaleString()} USD/{isEn ? 'yr' : 'año'}
-                            </span>
-                            {roiCustomerFrequency > 1 && (
-                              <span className="text-[10px] text-slate-400 block font-medium">
-                                (Hasta +${totalAnnualLtvAdvantage.toLocaleString()} USD/año con fidelización LTV)
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="p-3 rounded-2xl bg-slate-900/90 border border-amber-500/20 text-xs text-amber-100/90 leading-relaxed">
-                          <strong className="text-amber-400 block mb-1 font-black flex items-center gap-1.5">
-                            <Sparkles className="w-3.5 h-3.5" />
-                            {tTools.advisorClose}
-                          </strong>
-                          {tTools.advisorCloseBody(toolsBusinessName, monthlyLoss, monthlyGain, breakEvenClients)}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
-            )}
-
-            {/* TOOL 3: RIVAL SPY - RADAR DE ESPIONAJE CARA A CARA */}
-            {toolsActiveTab === 'rivalspy' && (
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 animate-in fade-in duration-200">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-                  <div>
-                    <h3 className="text-base font-black text-white flex items-center gap-2">
-                      <span>{tTools.spyTitle}</span>
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      {tTools.spyDesc}
-                    </p>
-                  </div>
-                  <span className="text-[10px] font-black uppercase text-rose-300 bg-rose-950 px-2.5 py-1 rounded-full border border-rose-500/40">
-                    {isEn ? '⚔️ Head-to-Head Battle' : '⚔️ Batalla Cara a Cara'}
-                  </span>
-                </div>
-
-                {/* Dual Business Setup (Client vs Competitor) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                  {/* Left: Your Client (Bloqueado & Sincronizado de Ficha Activa) */}
-                  <div className="p-5 rounded-2xl bg-slate-950 border border-emerald-500/40 space-y-3 relative overflow-hidden">
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">
-                          {tTools.spyClientCol}
+                      <div className="flex items-baseline justify-between border-b border-slate-800 pb-3">
+                        <span className="text-xs text-slate-400">{isEn ? 'Implementation Fee:' : 'Tarifa de Implementación:'}</span>
+                        <span className="text-xl font-black text-amber-300 font-mono">
+                          {prospectGeneratedProposal.investmentOffer?.setupFee || '$150 USD'}
                         </span>
                       </div>
-                      <span className="inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/30">
-                        <Lock className="w-2.5 h-2.5 text-emerald-400" />
-                        <span>{isEn ? 'Verified Listing (Locked)' : 'Ficha Verificada (Bloqueada)'}</span>
-                      </span>
-                    </div>
 
-                    {/* Auto-synced Listing Status Banner */}
-                    <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center gap-2.5 text-xs">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-900/60 border border-emerald-500/40 flex items-center justify-center shrink-0">
-                        <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <strong className="text-white text-[11px] block truncate">
-                          {toolsBusinessName || (isEn ? 'Active Client Profile' : 'Ficha Activa del Cliente')}
-                        </strong>
-                        <span className="text-[10px] text-emerald-300/80 block">
-                          {toolsCity ? `${toolsCity} • ` : ''}{isEn ? 'Data auto-synced from Google Maps' : 'Datos sincronizados de Google Maps'}
+                      <div className="flex items-baseline justify-between border-b border-slate-800 pb-3 text-xs">
+                        <span className="text-slate-400">{isEn ? 'Estimated Delivery Time:' : 'Plazo de Entrega:'}</span>
+                        <span className="text-emerald-400 font-bold font-mono">
+                          {prospectGeneratedProposal.investmentOffer?.deliveryDays || '3 a 5 días hábiles'}
                         </span>
                       </div>
-                    </div>
 
-                    <div className="space-y-2.5">
-                      <div>
-                        <label className="block text-slate-400 font-bold mb-1">
-                          {isEn ? 'Client Business Name' : 'Nombre del Posible Cliente'}
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={toolsBusinessName}
-                            readOnly
-                            className="w-full pl-3 pr-8 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-emerald-300 font-bold text-xs cursor-not-allowed select-none focus:outline-none"
-                          />
-                          <Lock className="w-3.5 h-3.5 text-emerald-500/60 absolute right-3 top-1/2 -translate-y-1/2" />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block text-slate-400 font-bold mb-1">
-                            {tTools.spyMetricRating}
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="text"
-                              value={`${toolsExistingRating} ★`}
-                              readOnly
-                              className="w-full pl-3 pr-8 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-amber-300 font-black text-xs cursor-not-allowed select-none focus:outline-none"
-                            />
-                            <Lock className="w-3.5 h-3.5 text-emerald-500/60 absolute right-3 top-1/2 -translate-y-1/2" />
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-slate-400 font-bold mb-1">
-                            {tTools.spyMetricReviews}
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="text"
-                              value={`${toolsExistingReviews.toLocaleString()} ${isEn ? 'reviews' : 'opiniones'}`}
-                              readOnly
-                              className="w-full pl-3 pr-8 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-white font-black text-xs cursor-not-allowed select-none focus:outline-none"
-                            />
-                            <Lock className="w-3.5 h-3.5 text-emerald-500/60 absolute right-3 top-1/2 -translate-y-1/2" />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block text-slate-400 font-bold mb-1">
-                            {tTools.spyMetricWeekly}
-                          </label>
-                          <div className="px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300 font-bold text-xs flex items-center justify-between">
-                            <span>+1 / sem</span>
-                            <span className="text-[9px] text-slate-500 font-normal">{isEn ? 'Organic' : 'Orgánico'}</span>
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-slate-400 font-bold mb-1">
-                            {tTools.spyMetricPhotos}
-                          </label>
-                          <div className="px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300 font-bold text-xs flex items-center justify-between">
-                            <span>14 {isEn ? 'photos' : 'fotos'}</span>
-                            <span className="text-[9px] text-slate-500 font-normal">{isEn ? 'Current' : 'Actuales'}</span>
-                          </div>
-                        </div>
+                      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-300 leading-relaxed">
+                        🛡️ <strong>{isEn ? 'Ownership Guarantee:' : 'Garantía de Propiedad:'}</strong> {prospectGeneratedProposal.investmentOffer?.ownershipGuarantee || 'Propiedad total entregada a tu cuenta de Gmail sin ataduras.'}
                       </div>
                     </div>
                   </div>
 
-                  {/* Right: The Target Rival */}
-                  <div className="p-5 rounded-2xl bg-slate-950 border border-rose-500/40 space-y-3 relative overflow-hidden">
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <span className="text-[10px] font-black uppercase text-rose-400 tracking-wider">
-                        {tTools.spyRivalCol}
-                      </span>
-                      <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/30">
-                        {isEn ? 'Current #1 in Maps' : 'Actual #1 en Maps'}
-                      </span>
-                    </div>
-
-                    {/* 1-Click Google Maps Competitor Scanner */}
-                    <div className="p-2.5 rounded-xl bg-slate-900 border border-rose-500/30 space-y-1.5">
-                      <label className="block text-[10px] font-bold text-rose-300 flex items-center justify-between">
-                        <span>{tTools.rivalScannerLabel}</span>
-                        {rivalSearchQuery && (
-                          <button
-                            type="button"
-                            onClick={() => setRivalSearchQuery('')}
-                            className="text-[9px] text-slate-400 hover:text-rose-400 transition cursor-pointer"
-                          >
-                            {isEn ? 'Clear' : 'Limpiar'}
-                          </button>
-                        )}
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          value={rivalSearchQuery}
-                          onChange={(e) => setRivalSearchQuery(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !isRivalScanning && rivalSearchQuery.trim()) {
-                              e.preventDefault();
-                              handleRivalScan();
-                            }
-                          }}
-                          placeholder={tTools.rivalScannerPlaceholder}
-                          className="w-full pl-2.5 pr-16 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 text-[11px]"
-                        />
-                        <button
-                          type="button"
-                          onClick={async () => {
-                            try {
-                              const text = await navigator.clipboard.readText();
-                              if (text) setRivalSearchQuery(text.trim());
-                            } catch {}
-                          }}
-                          className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded-md bg-slate-800 text-[9px] font-bold text-rose-400 hover:bg-slate-700 transition cursor-pointer"
-                        >
-                          {t.pasteBtn}
-                        </button>
+                  {/* Caja de WhatsApp para el Asesor (Oculta en Impresión) */}
+                  <div className="p-6 rounded-2xl bg-slate-950 border border-emerald-500/40 space-y-3 print:hidden">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-emerald-400 font-black text-xs uppercase tracking-wider">
+                        <MessageSquare className="w-4 h-4 fill-emerald-400" />
+                        <span>{isEn ? 'High-Converting WhatsApp Pitch for Owner' : 'Mensaje de WhatsApp para Enviar al Propietario:'}</span>
                       </div>
                       <button
                         type="button"
-                        onClick={handleRivalScan}
-                        disabled={isRivalScanning || !rivalSearchQuery.trim()}
-                        className="w-full py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white font-bold text-[11px] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                        onClick={() =>
+                          copyToClipboard(
+                            prospectGeneratedProposal.whatsappPitchMessage,
+                            isEn ? 'WhatsApp message' : 'Mensaje de WhatsApp'
+                          )
+                        }
+                        className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 cursor-pointer"
                       >
-                        {isRivalScanning ? (
-                          <>
-                            <RefreshCw className="w-3 h-3 animate-spin" />
-                            <span>{tTools.rivalScannerScanning}</span>
-                          </>
-                        ) : (
-                          <>
-                            <Search className="w-3 h-3" />
-                            <span>{tTools.rivalScannerBtn}</span>
-                          </>
-                        )}
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>{isEn ? 'Copy Text' : 'Copiar Texto'}</span>
                       </button>
                     </div>
 
-                    <div className="space-y-2.5">
-                      <div>
-                        <label className="block text-slate-400 font-bold mb-1">
-                          {isEn ? 'Rival Name' : 'Nombre del Rival'}
-                        </label>
-                        <input
-                          type="text"
-                          value={rivalName}
-                          onChange={(e) => setRivalName(e.target.value)}
-                          placeholder={tTools.spyRivalPlaceholder}
-                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-rose-200 font-bold text-xs focus:outline-none focus:border-rose-400"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block text-slate-400 font-bold mb-1">
-                            {tTools.spyMetricRating}
-                          </label>
-                          <input
-                            type="number"
-                            step="0.1"
-                            min="1"
-                            max="5"
-                            value={rivalRating}
-                            onChange={(e) => setRivalRating(Number(e.target.value))}
-                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-amber-300 font-black text-xs focus:outline-none focus:border-rose-400"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-slate-400 font-bold mb-1">
-                            {tTools.spyMetricReviews}
-                          </label>
-                          <input
-                            type="number"
-                            min="0"
-                            value={rivalReviews}
-                            onChange={(e) => setRivalReviews(Number(e.target.value))}
-                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-black text-xs focus:outline-none focus:border-rose-400"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block text-slate-400 font-bold mb-1">
-                            {tTools.spyMetricWeekly}
-                          </label>
-                          <input
-                            type="number"
-                            min="0"
-                            value={rivalWeeklyPace}
-                            onChange={(e) => setRivalWeeklyPace(Number(e.target.value))}
-                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-rose-300 font-black text-xs focus:outline-none focus:border-rose-400"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-slate-400 font-bold mb-1">
-                            {tTools.spyMetricPhotos}
-                          </label>
-                          <input
-                            type="number"
-                            min="0"
-                            value={rivalPhotos}
-                            onChange={(e) => setRivalPhotos(Number(e.target.value))}
-                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-200 font-black text-xs focus:outline-none focus:border-rose-400"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                    <p className="text-xs text-emerald-100/90 whitespace-pre-line leading-relaxed bg-slate-900/90 p-4 rounded-xl border border-emerald-500/20 font-mono">
+                      {prospectGeneratedProposal.whatsappPitchMessage}
+                    </p>
                   </div>
                 </div>
-
-                {/* Head-to-Head Comparison & Algorithm Metrics */}
-                {(() => {
-                  const clientReviews = toolsExistingReviews || 0;
-                  const isClientHigherInReviews = clientReviews >= rivalReviews;
-                  const absReviewGap = Math.abs(rivalReviews - clientReviews);
-                  const photoGap = Math.max(0, rivalPhotos - 14);
-                  const clientWeekly = 1;
-                  const rivalWeekly = rivalWeeklyPace || 3;
-                  const prestigiaWeekly = 8;
-                  const netWeeklyAdvantage = Math.max(1, prestigiaWeekly - rivalWeekly);
-                  const weeksToSurpass = isClientHigherInReviews
-                    ? 4
-                    : Math.max(3, Math.ceil(absReviewGap / netWeeklyAdvantage));
-                  const organicYearsToOvertake = Math.max(1, Math.round((absReviewGap / 52) * 10) / 10);
-
-                  return (
-                    <div className="space-y-4">
-                      {/* 1. AGGRESSIVE DIAGNOSTIC BANNER */}
-                      {isClientHigherInReviews ? (
-                        <div className="p-5 rounded-3xl bg-gradient-to-r from-amber-950/70 via-slate-950 to-slate-900 border-2 border-amber-500/60 space-y-3 shadow-xl">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-amber-500/20">
-                            <div className="flex items-center gap-2">
-                              <span className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400">
-                                <AlertTriangle className="w-4 h-4 text-amber-400" />
-                              </span>
-                              <span className="text-[10px] font-black uppercase tracking-wider text-amber-300 bg-amber-950 px-2.5 py-0.5 rounded-full border border-amber-500/40">
-                                {isEn ? '⚠️ 2026 ALGORITHMIC PARADOX DETECTED' : '🚨 PARADOJA ALGORÍTMICA DE GOOGLE 2026 DETECTADA'}
-                              </span>
-                            </div>
-                            <span className="text-xs font-bold text-amber-300">
-                              {isEn ? 'Rival dominates Top 3 with FEWER reviews' : `El rival domina el Top 3 teniendo ${Math.max(2, Math.round(clientReviews / Math.max(1, rivalReviews)))}x MENOS reseñas`}
-                            </span>
-                          </div>
-
-                          <div className="space-y-1.5">
-                            <h4 className="text-base font-black text-white">
-                              {isEn 
-                                ? `You have ${clientReviews.toLocaleString()} reviews vs. ${rivalReviews} from ${rivalName || 'your rival'}, yet they are taking your Top 3 clients.` 
-                                : `Tienes ${clientReviews.toLocaleString()} reseñas vs. ${rivalReviews} de ${rivalName || 'tu rival'}, y aun así ellos se quedan con los clientes del Top 3.`}
-                            </h4>
-                            <p className="text-xs text-slate-300 leading-relaxed">
-                              {isEn
-                                ? `Why does this happen? Google's 2026 local algorithm penalizes stagnant listings. Your ${clientReviews.toLocaleString()} reviews are historical, but today your profile receives only +1 review/week. Meanwhile, ${rivalName || 'your competitor'} has active weekly momentum (+${rivalWeekly}/wk) and +${photoGap} more photos. To Google's AI, your business is asleep.`
-                                : `¿Por qué ocurre esto? El Algoritmo 2026 de Google castiga fichas dormidas. Tus ${clientReviews.toLocaleString()} reseñas son del pasado, pero hoy tu ficha recibe apenas +1 reseña/semana. Tu rival mantiene actividad constante (+${rivalWeekly}/sem) y te supera en fotos (+${photoGap} fotos). Para la IA de Google, tu negocio está estancado.`}
-                            </p>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="p-5 rounded-3xl bg-gradient-to-r from-rose-950/70 via-slate-950 to-slate-900 border-2 border-rose-500/60 space-y-3 shadow-xl">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-rose-500/20">
-                            <div className="flex items-center gap-2">
-                              <span className="p-1.5 rounded-lg bg-rose-500/20 text-rose-400">
-                                <Flame className="w-4 h-4 text-rose-400" />
-                              </span>
-                              <span className="text-[10px] font-black uppercase tracking-wider text-rose-300 bg-rose-950 px-2.5 py-0.5 rounded-full border border-rose-500/40">
-                                {isEn ? '⚔️ CRITICAL COMPETITIVE THREAT' : '⚔️ ALERTA DE AMENAZA COMPETITIVA DIRECTA'}
-                              </span>
-                            </div>
-                            <span className="text-xs font-bold text-rose-300">
-                              {isEn ? `Rival leads by +${absReviewGap.toLocaleString()} reviews` : `El rival te supera por +${absReviewGap.toLocaleString()} reseñas`}
-                            </span>
-                          </div>
-
-                          <div className="space-y-1.5">
-                            <h4 className="text-base font-black text-white">
-                              {isEn
-                                ? `${rivalName || 'Your Competitor'} leads by +${absReviewGap.toLocaleString()} reviews and captures 70% of local searches.`
-                                : `${rivalName || 'Tu Competidor'} te lleva +${absReviewGap.toLocaleString()} reseñas de ventaja y acapara el 70% de las llamadas de la zona.`}
-                            </h4>
-                            <p className="text-xs text-slate-300 leading-relaxed">
-                              {isEn
-                                ? `At your current organic pace of +1 review/week, it would take you ${organicYearsToOvertake} YEARS to catch them. With Prestigia Software 5★ (+8/wk), you break their lead and dethrone them in just ${weeksToSurpass} weeks.`
-                                : `A tu velocidad orgánica actual de +1 reseña/semana, tardarías ${organicYearsToOvertake} AÑOS en alcanzarlos por tu cuenta. Con Prestigia Software 5★ (+8/sem), quiebras su ventaja y los destronas en solo ${weeksToSurpass} semanas.`}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* 2. FOUR HIGH-IMPACT METRIC CARDS */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
-                        <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800">
-                          <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
-                            {isClientHigherInReviews ? (isEn ? 'Historical Lead' : 'Ventaja Histórica') : (isEn ? 'Review Gap' : 'Brecha de Reseñas')}
-                          </span>
-                          <strong className={`text-xl font-black ${isClientHigherInReviews ? 'text-amber-400' : 'text-rose-400'}`}>
-                            {isClientHigherInReviews ? `+${absReviewGap.toLocaleString()}` : `-${absReviewGap.toLocaleString()}`}
-                          </strong>
-                          <span className="text-[10px] text-slate-500 block mt-0.5">
-                            {isClientHigherInReviews ? (isEn ? 'wasted without velocity' : 'desperdiciada sin velocidad') : (isEn ? 'in favor of rival' : 'a favor del rival')}
-                          </span>
-                        </div>
-
-                        <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800">
-                          <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
-                            {isEn ? 'Current Organic Pace' : 'Velocidad Sin Prestigia'}
-                          </span>
-                          <strong className="text-xl font-black text-rose-400">
-                            +1 / sem
-                          </strong>
-                          <span className="text-[10px] text-slate-500 block mt-0.5">
-                            {isEn ? `vs +${rivalWeekly} rival pace` : `vs +${rivalWeekly} del rival (en riesgo)`}
-                          </span>
-                        </div>
-
-                        <div className="p-3.5 rounded-2xl bg-slate-950 border border-emerald-500/40 bg-emerald-950/20">
-                          <span className="text-[10px] text-emerald-400 uppercase font-bold block mb-1">
-                            {isEn ? 'Prestigia Software Pace' : 'Velocidad con Prestigia'}
-                          </span>
-                          <strong className="text-xl font-black text-emerald-400">
-                            +8 / sem
-                          </strong>
-                          <span className="text-[10px] text-emerald-300/80 block mt-0.5">
-                            {isEn ? '+800% acceleration' : '+800% aceleración algorítmica'}
-                          </span>
-                        </div>
-
-                        <div className="p-3.5 rounded-2xl bg-slate-950 border border-amber-500/40 bg-amber-950/20">
-                          <span className="text-[10px] text-amber-400 uppercase font-bold block mb-1">
-                            {isClientHigherInReviews ? (isEn ? 'Time to Reclaim #1' : 'Tiempo para Recuperar #1') : (isEn ? 'Time to Dethrone' : 'Tiempo para Destronar')}
-                          </span>
-                          <strong className="text-xl font-black text-amber-400">
-                            {weeksToSurpass} {isEn ? 'weeks' : 'semanas'}
-                          </strong>
-                          <span className="text-[10px] text-amber-300/80 block mt-0.5">
-                            {isClientHigherInReviews 
-                              ? (isEn ? 'freshness reactivation' : 'reactivación de frescura') 
-                              : (isEn ? `vs ${organicYearsToOvertake} yrs organic` : `vs ${organicYearsToOvertake} años orgánicos`)}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* 3. HEAD-TO-HEAD BATTLE MATRIX (5 CRITICAL FACTORS) */}
-                      <div className="p-5 rounded-3xl bg-slate-950 border border-slate-800 space-y-3">
-                        <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                          <div className="flex items-center gap-2">
-                            <Trophy className="w-4 h-4 text-amber-400" />
-                            <h4 className="font-black text-white text-sm">
-                              {isEn ? 'Head-to-Head Algorithmic Battle Matrix' : 'Matriz de Combate Algorítmico: Cara a Cara'}
-                            </h4>
-                          </div>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase">
-                            {isEn ? 'Google Maps 2026 Factors' : 'Factores Clave Google Maps 2026'}
-                          </span>
-                        </div>
-
-                        <div className="space-y-2 text-xs">
-                          {/* Factor 1: Velocidad Semanal */}
-                          <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-2.5 items-center">
-                            <div>
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{isEn ? '1. Velocity & Freshness' : '1. Velocidad & Frescura'}</span>
-                              <strong className="text-white text-xs">{isEn ? 'Algorithm Impact' : 'Impacto en el Algoritmo'}</strong>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
-                              <span className="text-[10px] text-rose-400 block font-bold">{isEn ? 'Your Business Today:' : 'Tu Negocio Hoy:'}</span>
-                              <span className="text-slate-300 font-medium">{isEn ? '+1 review/week (Stagnant)' : '+1 reseña/semana (Dormida)'}</span>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
-                              <span className="text-[10px] text-emerald-400 block font-bold">{isEn ? 'With Prestigia 5★ Software:' : 'Con Prestigia Software 5★:'}</span>
-                              <span className="text-emerald-300 font-bold">{isEn ? '+8 to +12 5★ reviews/wk' : '+8 a +12 reseñas 5★/sem'}</span>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
-                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || (isEn ? 'Your Rival' : 'Tu Rival')}:</span>
-                              <span className="text-slate-300">+{rivalWeekly} {isEn ? 'reviews/wk' : 'reseñas/sem'}</span>
-                            </div>
-                          </div>
-
-                          {/* Factor 2: Galería de Fotos */}
-                          <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-2.5 items-center">
-                            <div>
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{isEn ? '2. Visual Arsenal (Photos)' : '2. Arsenal Visual (Fotos)'}</span>
-                              <strong className="text-white text-xs">{isEn ? 'Trust & Google Lens' : 'Confianza & Google Lens'}</strong>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
-                              <span className="text-[10px] text-rose-400 block font-bold">{isEn ? 'Your Business Today:' : 'Tu Negocio Hoy:'}</span>
-                              <span className="text-slate-300 font-medium">{isEn ? '14 photos (Critical deficit)' : '14 fotos (Déficit crítico)'}</span>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
-                              <span className="text-[10px] text-emerald-400 block font-bold">{isEn ? 'With Prestigia:' : 'Con Prestigia:'}</span>
-                              <span className="text-emerald-300 font-bold">{isEn ? '50+ geotagged photos' : '50+ fotos geolocalizadas'}</span>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
-                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || (isEn ? 'Your Rival' : 'Tu Rival')}:</span>
-                              <span className="text-slate-300">{rivalPhotos} {isEn ? 'photos' : 'fotos'}</span>
-                            </div>
-                          </div>
-
-                          {/* Factor 3: Palabras Clave en Reseñas */}
-                          <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-2.5 items-center">
-                            <div>
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{isEn ? '3. SEO Keywords' : '3. Palabras Clave SEO'}</span>
-                              <strong className="text-white text-xs">{isEn ? 'Term Indexation' : 'Indexación por Términos'}</strong>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
-                              <span className="text-[10px] text-rose-400 block font-bold">{isEn ? 'Your Business Today:' : 'Tu Negocio Hoy:'}</span>
-                              <span className="text-slate-300 font-medium">{isEn ? 'Generic ("tasty", "good")' : 'Genéricas ("rico", "bueno")'}</span>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
-                              <span className="text-[10px] text-emerald-400 block font-bold">{isEn ? 'With Prestigia:' : 'Con Prestigia:'}</span>
-                              <span className="text-emerald-300 font-bold">{isEn ? 'Guided with buyer intent keywords' : 'Guiadas con palabras de compra'}</span>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
-                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || (isEn ? 'Your Rival' : 'Tu Rival')}:</span>
-                              <span className="text-slate-300">{isEn ? 'Unguided organic' : 'Orgánicas sin guiar'}</span>
-                            </div>
-                          </div>
-
-                          {/* Factor 4: Filtro de Reseñas Negativas */}
-                          <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-2.5 items-center">
-                            <div>
-                              <span className="text-[10px] text-slate-400 uppercase font-bold block">{isEn ? '4. Reputation Shield' : '4. Blindaje de Reputación'}</span>
-                              <strong className="text-white text-xs">{isEn ? 'Anti-Negative Filter' : 'Filtro Anti-Negativas'}</strong>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-950 border border-rose-500/30">
-                              <span className="text-[10px] text-rose-400 block font-bold">{isEn ? 'Your Business Today:' : 'Tu Negocio Hoy:'}</span>
-                              <span className="text-slate-300 font-medium">{isEn ? 'Go straight to Google Maps' : 'Van directo a Google Maps'}</span>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-950 border border-emerald-500/40">
-                              <span className="text-[10px] text-emerald-400 block font-bold">{isEn ? 'With Prestigia:' : 'Con Prestigia:'}</span>
-                              <span className="text-emerald-300 font-bold">{isEn ? 'Private redirect to WhatsApp' : 'Desvío privado a WhatsApp'}</span>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-950 border border-slate-700">
-                              <span className="text-[10px] text-slate-400 block font-bold">{rivalName || (isEn ? 'Your Rival' : 'Tu Rival')}:</span>
-                              <span className="text-slate-300">{isEn ? 'No review protection' : 'Sin protección de reseñas'}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 4. TACTICAL ATTACK PLAN */}
-                      <div className="p-5 rounded-3xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/40 space-y-3">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                          <h4 className="font-black text-white text-sm">
-                            {tTools.spyAttackPlan}
-                          </h4>
-                        </div>
-                        <div className="space-y-2 text-xs">
-                          <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-2.5">
-                            <span className="font-black text-emerald-400">1.</span>
-                            <span className="text-slate-300">
-                              {isEn ? <><strong>Intelligent Review System Activation:</strong> We inject +8 to +12 5★ reviews per week via Smart QR codes and WhatsApp automation to break your competitor's lead.</> : <><strong>Activación del Sistema Inteligente de Reseñas Digitales:</strong> Inyectamos de +8 a +12 reseñas 5★ por semana mediante códigos QR inteligentes y automatización WhatsApp para quebrar la ventaja del competidor.</>}
-                            </span>
-                          </div>
-                          <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-2.5">
-                            <span className="font-black text-amber-400">2.</span>
-                            <span className="text-slate-300">
-                              {isEn ? <><strong>Upload of 35+ Geotagged Photos with EXIF Attributes:</strong> We nullify the visual gap by uploading dishes, facilities, and services optimized for Google Lens indexing.</> : <><strong>Carga de 35+ Fotos Geolocalizadas con Atributos:</strong> Anulamos el déficit visual subiendo platos, instalaciones y servicios optimizados para Google Lens.</>}
-                            </span>
-                          </div>
-                          <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-2.5">
-                            <span className="font-black text-indigo-400">3.</span>
-                            <span className="text-slate-300">
-                              {isEn ? <><strong>Reputation Shield & AI Review Response:</strong> We route dissatisfied customers to internal private support and reply to every review via AI within 2 hours to cement the #1 podium spot.</> : <><strong>Blindaje Anti-Reseñas Negativas & Respuestas con IA:</strong> Filtramos clientes insatisfechos a soporte interno y respondemos todas las opiniones con IA en menos de 2 horas para sellar el podio #1.</>}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 5. AGGRESSIVE ADVISOR CLOSING PITCH */}
-                      <div className="p-5 rounded-3xl bg-slate-950 border-2 border-amber-500/50 space-y-3 shadow-xl">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
-                            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                            {tTools.spyPitchBox}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              copyToClipboard(
-                                tTools.spyPitchText(toolsBusinessName, rivalName, weeksToSurpass, clientReviews, rivalReviews),
-                                isEn ? 'Closing Pitch' : 'Argumento de Cierre'
-                              )
-                            }
-                            className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-500/30 transition"
-                          >
-                            <Copy className="w-3.5 h-3.5" />
-                            <span>{tTools.spyBtnCopyPitch}</span>
-                          </button>
-                        </div>
-                        <p className="text-xs text-amber-100/90 italic leading-relaxed bg-slate-900/80 p-3.5 rounded-2xl border border-amber-500/20">
-                          {tTools.spyPitchText(toolsBusinessName, rivalName, weeksToSurpass, clientReviews, rivalReviews)}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })()}
               </div>
             )}
-            </>
-          )}
           </div>
         )}
         {activeTab === 'dossiers' && (
@@ -11702,6 +11243,17 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     }`}
                   >
                     {tDossiers.filterAppeal} ({luismaBaseDossiers.filter((d) => d.mode === 'appeal').length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDossierModeFilter('prospect')}
+                    className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
+                      dossierModeFilter === 'prospect'
+                        ? 'bg-amber-500 text-slate-950 font-black'
+                        : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                    }`}
+                  >
+                    🎯 {isEn ? 'Prospects' : 'Propuestas'} ({luismaBaseDossiers.filter((d) => d.mode === 'prospect').length})
                   </button>
                 </div>
 
@@ -11897,6 +11449,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                               ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
                               : d.mode === 'appeal'
                               ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                              : d.mode === 'prospect' || d.mode === 'tools'
+                              ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
                               : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
                           }`}
                         >
@@ -11906,6 +11460,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             ? tDossiers.badgeRescue
                             : d.mode === 'appeal'
                             ? (isEn ? '⚖️ 1-3★ Appeal' : '⚖️ Apelación 1-3★')
+                            : d.mode === 'prospect' || d.mode === 'tools'
+                            ? (isEn ? '🎯 Prospect & Pitch' : '🎯 Prospección & Cierre')
                             : tDossiers.badgeAudit}
                         </span>
 
@@ -12748,7 +12304,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   const auditsCount = advisorDossiers.filter((d) => d.mode === 'audit').length;
                   const rescuesCount = advisorDossiers.filter((d) => d.mode === 'rescue').length;
                   const appealsCount = advisorDossiers.filter((d) => d.mode === 'appeal').length;
-                  const toolsCount = advisorDossiers.filter((d) => d.mode === 'tools').length;
+                  const toolsCount = advisorDossiers.filter((d) => d.mode === 'tools' || d.mode === 'prospect').length;
                   const isRevealed = Boolean(revealedPasswords[adv.id]);
 
                   const curNow = new Date();
@@ -12766,7 +12322,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   const monthAudits = advisorMonthDossiers.filter((d) => d.mode === 'audit').length;
                   const monthRescues = advisorMonthDossiers.filter((d) => d.mode === 'rescue').length;
                   const monthAppeals = advisorMonthDossiers.filter((d) => d.mode === 'appeal').length;
-                  const monthTools = advisorMonthDossiers.filter((d) => d.mode === 'tools').length;
+                  const monthTools = advisorMonthDossiers.filter((d) => d.mode === 'tools' || d.mode === 'prospect').length;
                   const deletedCountForAdv = advisorDossiers.filter((d) => d.deletedByAdvisor).length;
 
                   return (
@@ -13202,7 +12758,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[10.5px] flex items-center justify-between">
                         <span className="text-slate-400">Modalidad:</span>
                         <span className="font-bold text-amber-300 uppercase">
-                          {d.mode === 'create' ? '🏗️ Creación' : d.mode === 'rescue' ? '🛡️ Rescate' : '🔬 Auditoría'}
+                          {d.mode === 'create'
+                            ? '🏗️ Creación'
+                            : d.mode === 'rescue'
+                            ? '🛡️ Rescate'
+                            : d.mode === 'appeal'
+                            ? '⚖️ Apelación'
+                            : d.mode === 'prospect' || d.mode === 'tools'
+                            ? '🎯 Prospección'
+                            : '🔬 Auditoría'}
                         </span>
                       </div>
                     </div>
@@ -13286,9 +12850,10 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               const auditsCount = advisorDossiers.filter((d) => d.mode === 'audit').length;
               const rescuesCount = advisorDossiers.filter((d) => d.mode === 'rescue').length;
               const appealsCount = advisorDossiers.filter((d) => d.mode === 'appeal').length;
+              const prospectsCount = advisorDossiers.filter((d) => d.mode === 'tools' || d.mode === 'prospect').length;
 
               return (
-                <div className="p-4 border-b border-slate-800 bg-slate-950/60 grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs shrink-0">
+                <div className="p-4 border-b border-slate-800 bg-slate-950/60 grid grid-cols-2 sm:grid-cols-6 gap-2 text-center text-xs shrink-0">
                   <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 col-span-2 sm:col-span-1">
                     <span className="text-[10px] text-slate-400 font-bold block uppercase">{isEn ? 'Total Profiles' : 'Total Fichas'}</span>
                     <strong className="text-lg font-black text-white">{advisorDossiers.length}</strong>
@@ -13308,6 +12873,10 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <div className="p-2 rounded-xl bg-purple-950/40 border border-purple-500/30">
                     <span className="text-[10px] text-purple-400 font-bold block uppercase truncate">{isEn ? '⚖️ Appeals' : '⚖️ Apelaciones'}</span>
                     <strong className="text-lg font-black text-purple-300">{appealsCount}</strong>
+                  </div>
+                  <div className="p-2 rounded-xl bg-indigo-950/40 border border-indigo-500/30">
+                    <span className="text-[10px] text-indigo-400 font-bold block uppercase truncate">{isEn ? '🎯 Pitch' : '🎯 Propuestas'}</span>
+                    <strong className="text-lg font-black text-indigo-300">{prospectsCount}</strong>
                   </div>
                 </div>
               );
@@ -13346,10 +12915,22 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                   ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
                                   : d.mode === 'rescue'
                                   ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                                  : d.mode === 'appeal'
+                                  ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
+                                  : d.mode === 'prospect' || d.mode === 'tools'
+                                  ? 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
                                   : 'bg-amber-950 text-amber-300 border border-amber-500/40'
                               }`}
                             >
-                              {d.mode === 'create' ? (isEn ? '🏗️ New Listing' : '🏗️ Ficha Nueva') : d.mode === 'rescue' ? (isEn ? '🛡️ 72h Rescue' : '🛡️ Rescate 72h') : d.mode === 'appeal' ? (isEn ? '⚖️ 1-3★ Appeal' : '⚖️ Apelación 1-3★') : (isEn ? '🔬 Top 3 Audit' : '🔬 Auditoría Top 3')}
+                              {d.mode === 'create'
+                                ? (isEn ? '🏗️ New Listing' : '🏗️ Ficha Nueva')
+                                : d.mode === 'rescue'
+                                ? (isEn ? '🛡️ 72h Rescue' : '🛡️ Rescate 72h')
+                                : d.mode === 'appeal'
+                                ? (isEn ? '⚖️ 1-3★ Appeal' : '⚖️ Apelación 1-3★')
+                                : d.mode === 'prospect' || d.mode === 'tools'
+                                ? (isEn ? '🎯 Prospect & Pitch' : '🎯 Prospección & Cierre')
+                                : (isEn ? '🔬 Top 3 Audit' : '🔬 Auditoría Top 3')}
                             </span>
 
                             <span className="text-[10px] text-slate-500 font-mono">
