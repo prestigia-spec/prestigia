@@ -83,74 +83,82 @@ export async function POST(request: Request) {
 
     if (geminiKey) {
       try {
-        const prompt = `You are Prestigia's Senior Commercial Director and Local Market Forensics Specialist.
-Generate a high-converting, professional, and convincing COMMERCIAL PROPOSAL / PITCH for a business or independent professional who currently DOES NOT have an optimized Google Maps Business Profile (or is completely invisible on the local map).
+        const prompt = `You are Prestigia's Chief Commercial Officer & Senior Local Market Intelligence Forensics Director.
+Generate a high-converting, authoritative, and persuasive COMMERCIAL PROPOSAL / PITCH for a business or independent professional who currently DOES NOT have an optimized Google Maps Business Profile (or is completely invisible on the local map).
+
+CONTEXT & COMPETITIVE AUDIT SIMULATION:
+The proposal must be framed AS IF Prestigia's AI engine has just conducted a rigorous competitive benchmark study of the local businesses operating in "${cleanNeighborhood || cleanCity}, ${cleanCity}".
+You must prove to the business owner that their local competitors are currently capturing 75% to 85% of all high-ticket phone calls, appointments, and walk-ins solely because they appear on Google Maps, even when their service may be inferior.
+Show them how having a perfectly crafted, verified, and authoritative Google Maps profile built by Prestigia will make them SELL SIGNIFICANTLY MORE THAN THEIR COMPETITORS, capturing market share and establishing them as the #1 undisputed trusted choice in their zone.
 
 INPUT DATA:
 - Target Business/Professional Name: "${cleanName}"
 - Owner/Decision Maker: "${cleanOwner}"
 - Niche/Industry: "${cleanCategory}"
 - Country & City: "${cleanCity}, ${cleanCountry}"
-- Specific Neighborhood/District: "${cleanNeighborhood || 'Zona central / comercial'}"
+- Specific Neighborhood/District: "${cleanNeighborhood || 'Zona comercial y residencial'}"
 - Flagship Specialties/Services: "${cleanServices}"
 - Business Model: ${isSAB ? 'Independent / Service Area Business (At-home or mobile services)' : 'Storefront with Physical Location'}
 - Target Phone/WhatsApp: "${cleanPhone || 'Línea de contacto'}"
 - Language: ${isEn ? 'ENGLISH' : 'SPANISH'}
 
-OBJECTIVE:
-The proposal must convince the owner why having an official, optimized Google Maps listing will directly increase their daily phone calls, customers, and monthly revenue, while demonstrating the high cost of remaining invisible.
+CORE SALES PSYCHOLOGY PILLARS TO HIGHLIGHT:
+1. "Sell More Than Competitors": Clearly state how a superior Google Maps architecture (exact secondary categories, Geo-tagging, keywords, and trust badges) will outrank and outperform local competitors.
+2. "High-Intent Buyers": In Google Maps, customers don't browse for fun; they search with immediate purchase intent (emergency, appointment, immediate visit).
+3. "The Cost of Invisibility": Quantify in local currency the revenue leaking directly into competitor bank accounts each month.
+4. "Absolute Asset Ownership": Deliver 100% full ownership directly to the client's Gmail with zero mandatory retainers.
 
 STRUCTURE TO PRODUCE (STRICT VALID JSON ONLY, NO MARKDOWN WRAPPERS):
 {
   "headline": "...",
-  "executiveSummary": "...",
+  "executiveSummary": "Deep analysis citing the competitive benchmark conducted in the zone, proving the massive demand and how this listing will outperform nearby competitors.",
   "monthlySearchStats": {
-    "estimatedSearchesInZone": "ej: 3.400 - 5.200 búsquedas al mes",
+    "estimatedSearchesInZone": "ej: 3.800 - 5.600 búsquedas mensuales de alta intención en la zona",
     "searchKeywords": ["...", "...", "..."],
-    "intentLevel": "Alta Intención de Compra (82% de personas llaman en menos de 24h)"
+    "intentLevel": "Alta Intención de Compra Inmediata (Más del 84% de usuarios llama o visita en menos de 24h)"
   },
   "invisibilityDiagnosis": {
     "currentSituation": "...",
-    "estimatedLostClientsMonthly": "ej: 25 a 45 clientes potenciales cada mes",
-    "estimatedLostRevenueMonthly": "ej: $3.500.000 a $6.000.000 COP (o $1.200 - $2.000 USD)",
-    "competitorImpact": "..."
+    "estimatedLostClientsMonthly": "ej: 25 a 45 clientes calificados mensuales desviados a competidores",
+    "estimatedLostRevenueMonthly": "ej: Facturación estimada que hoy absorben competidores cercanos",
+    "competitorImpact": "Detailed forensic diagnosis of how local competitors in ${cleanNeighborhood || cleanCity} are currently monopolizing calls simply by having an active pin, and how an optimized listing will capture those customers back."
   },
   "solutionRoadmap": [
     {
       "step": 1,
-      "title": "...",
+      "title": "Arquitectura de Dominio Local & Verificación Oficial",
       "description": "..."
     },
     {
       "step": 2,
-      "title": "...",
+      "title": "Ingeniería de Categorías & Palabras Clave de Conversión",
       "description": "..."
     },
     {
       "step": 3,
-      "title": "...",
+      "title": "Catálogo de Servicios de Alta Conversión & Geotagging",
       "description": "..."
     },
     {
       "step": 4,
-      "title": "...",
+      "title": "Activación de Botones de Compra Rápida & Embudo de Reseñas 5★",
       "description": "..."
     }
   ],
   "deliverablesList": [
-    "...",
-    "...",
-    "...",
-    "...",
-    "..."
+    "Ficha oficial verificada y optimizada bajo el estándar de autoridad Prestigia.",
+    "Traspaso del 100% de la propiedad legal y directa a tu correo Gmail sin ataduras.",
+    "Optimización de palabras clave para superar a los competidores locales de tu sector.",
+    "Botones de contacto inmediato (Llamada directa, WhatsApp y ubicación en tiempo real).",
+    "Kit estratégico de bienvenida con QR oficial para mostrador y guía de captación de reseñas 5 estrellas."
   ],
   "investmentOffer": {
     "setupFee": "${suggestedBudget || (isEn ? '$180 USD' : '$150 - $250 USD')}",
     "deliveryDays": "3 a 5 días hábiles",
-    "ownershipGuarantee": "Propiedad total y directa entregada en el correo Gmail del cliente sin ataduras.",
-    "callToAction": "..."
+    "ownershipGuarantee": "Propiedad total y definitiva entregada a tu nombre. Tu ficha es un activo digital permanente que trabajará 24/7 para tu negocio.",
+    "callToAction": "Activa tu ficha esta semana, supera a los competidores de tu sector y convierte cada búsqueda local en llamadas y clientes reales."
   },
-  "whatsappPitchMessage": "A ready-to-send polite, compelling, high-converting WhatsApp pitch for the advisor to send directly to ${cleanOwner} (${cleanPhone || ''}). Must be respectful, mentioning their exact location in ${cleanNeighborhood || cleanCity}, the search volume of clients they are missing, and inviting to a 5-minute call or showing a live demonstration."
+  "whatsappPitchMessage": "A natural, polite, and persuasive WhatsApp message from the advisor to ${cleanOwner} (${cleanPhone || ''}). Mentions that Prestigia conducted a local search study for ${cleanCategory} in ${cleanNeighborhood || cleanCity}, discovered that competitors are absorbing dozens of calls every week, and offers to share this 1-page executive summary so ${cleanName} can capture those clients immediately."
 }`;
 
         const geminiRes = await fetch(
@@ -184,67 +192,67 @@ STRUCTURE TO PRODUCE (STRICT VALID JSON ONLY, NO MARKDOWN WRAPPERS):
     if (!generatedProposal) {
       const locText = cleanNeighborhood ? `${cleanNeighborhood}, ${cleanCity}` : cleanCity;
       generatedProposal = {
-        headline: `Propuesta de Activación & Posicionamiento en Google Maps para ${cleanName}`,
-        executiveSummary: `Actualmente, cientos de clientes en ${locText} buscan activamente "${cleanCategory}" desde sus teléfonos móviles. Al no contar con una ficha verificada y optimizada en Google Maps, el 100% de esta demanda se está desviando directamente hacia tus competidores visibles en el mapa.`,
+        headline: `Auditoría de Demanda & Plan de Captación para ${cleanName}`,
+        executiveSummary: `Tras realizar un estudio forense de la demanda local en ${locText}, confirmamos que más del 82% de las llamadas y citas de "${cleanCategory}" se las están repartiendo actualmente los competidores que ya cuentan con un pin activo en Google Maps. Con la arquitectura estratégica de Prestigia, implementaremos una ficha superior que posicionará a ${cleanName} como la opción #1 en confianza y volumen de clientes de la zona.`,
         monthlySearchStats: {
-          estimatedSearchesInZone: '2.800 a 4.500 búsquedas mensuales',
+          estimatedSearchesInZone: '3.600 a 5.400 búsquedas mensuales con intención de compra',
           searchKeywords: [
             `${cleanCategory} en ${locText}`,
             `${cleanCategory} cerca de mí`,
             `Mejor ${cleanCategory} ${cleanCity}`,
           ],
-          intentLevel: 'Alta Intención Comercial (86% de usuarios llaman o visitan en menos de 24 horas)',
+          intentLevel: 'Alta Intención Comercial Inmediata (86% de los usuarios llama o acude en menos de 24 horas)',
         },
         invisibilityDiagnosis: {
-          currentSituation: `Tu negocio o actividad profesional no aparece en el mapa local cuando los clientes necesitan ${cleanServices}.`,
-          estimatedLostClientsMonthly: '20 a 35 clientes calificados al mes',
-          estimatedLostRevenueMonthly: 'Aproximadamente $800 - $1.500 USD en facturación perdida',
-          competitorImpact: 'Los 3 negocios ubicados en el Top 3 local se están quedando con más del 70% de las llamadas y citas de la zona.',
+          currentSituation: `Tu actividad comercial permanece invisible en el mapa satelital de Google mientras tus clientes potenciales buscan activamente ${cleanServices}.`,
+          estimatedLostClientsMonthly: '25 a 45 clientes calificados mensuales desviados a competidores',
+          estimatedLostRevenueMonthly: 'Aproximadamente $900 - $2.200 USD en facturación que hoy absorbe tu competencia directa',
+          competitorImpact: `Los negocios de tu categoría en ${locText} están absorbiendo el flujo diario de llamadas únicamente porque aparecen en el mapa, a pesar de que tu calidad y atención pueden ser muy superiores. Al activar una ficha optimizada, recuperarás esa cuota de mercado.`,
         },
         solutionRoadmap: [
           {
             step: 1,
-            title: 'Creación & Verificación Oficial',
-            description: 'Estructuración técnica de tu ficha comercial con el protocolo oficial de Google Business Profile.',
+            title: 'Verificación Oficial & Blindaje de Perfil',
+            description: 'Configuración técnica bajo el protocolo oficial de Google Business Profile para garantizar máxima autoridad desde el día 1.',
           },
           {
             step: 2,
-            title: 'Arquitectura de Categorías & Palabras Clave',
-            description: `Configuración de categoría principal y secundarias exactas para dominar búsquedas de "${cleanCategory}".`,
+            title: 'Ingeniería de Categorías para Superar Rivales',
+            description: `Configuración precisa de categoría principal y secundarias para interceptar las búsquedas que hoy captan tus competidores en "${cleanCategory}".`,
           },
           {
             step: 3,
-            title: 'Catálogo de Servicios & Geotagging',
-            description: 'Redacción persuasiva de tus servicios destacados con optimización visual de autoridad local.',
+            title: 'Catálogo de Servicios de Alta Conversión & Geotagging',
+            description: 'Estructuración persuasiva de servicios, fotos optimizadas con coordenadas locales y textos enfocados en cerrar llamadas.',
           },
           {
             step: 4,
-            title: 'Activación de Canales de Contacto Directo',
-            description: 'Botones inmediatos de llamada telefónica, WhatsApp y enlace a Google Maps para recibir clientes.',
+            title: 'Canales de Contacto Rápido & Embudo 5★',
+            description: 'Botones directos de llamada y WhatsApp, más el protocolo automatizado para acumular reseñas positivas y generar confianza inmediata.',
           },
         ],
         deliverablesList: [
-          'Ficha oficial de Google Maps 100% configurada y lista.',
-          'Entrega de propiedad total en tu propia cuenta de Gmail.',
-          'Catálogo de servicios y especialidades estructurado con SEO local.',
-          'Guía de 10 fotos estratégicas y protocolo para recibir 5 estrellas.',
-          'QR oficial para mostrador o tarjetas de presentación.',
+          'Ficha oficial de Google Maps 100% verificada, configurada y optimizada para dominar tu zona.',
+          'Entrega del 100% de la propiedad legal y directa en tu cuenta personal de Gmail (sin contratos forzosos ni mensualidades).',
+          'Catálogo comercial de especialidades con optimización SEO para superar a la competencia de tu sector.',
+          'Botones de contacto inmediato para recibir llamadas telefónicas y mensajes de WhatsApp directamente en tu móvil.',
+          'QR oficial listo para imprimir y guía práctica para recolectar reseñas 5 estrellas de tus clientes satisfechos.',
         ],
         investmentOffer: {
           setupFee: suggestedBudget || '$150 USD (Pago Único de Implementación)',
           deliveryDays: '3 a 5 días hábiles',
-          ownershipGuarantee: '100% de propiedad entregada a tu nombre, sin mensualidades obligatorias ni contratos forzosos.',
-          callToAction: 'Activa tu presencia comercial en Google Maps esta semana y comienza a captar los clientes que hoy se lleva tu competencia.',
+          ownershipGuarantee: '100% de propiedad entregada a tu nombre sin cláusulas de permanencia ni cobros mensuales obligatorios.',
+          callToAction: 'Activa tu ficha en Google Maps esta misma semana, supera a los competidores de tu zona y empieza a recibir las llamadas de los clientes que hoy no te ven.',
         },
         whatsappPitchMessage: `¡Hola, ${cleanOwner}! 👋 Te escribe ${advisorName || 'un consultor de Prestigia'}.
 
-Estuve revisando las búsquedas en Google de *${cleanCategory}* en la zona de *${locText}*, y detecté una oportunidad enorme para *${cleanName}*:
+Estuvimos realizando un estudio de mercado sobre búsquedas en Google de *${cleanCategory}* en la zona de *${locText}*, y detectamos un dato muy importante para *${cleanName}*:
 
-📊 En tu sector se realizan más de *3.000 búsquedas al mes* de clientes que necesitan exactamente tus servicios, pero hoy tu negocio no aparece en el mapa de Google, lo que significa que esos clientes están llamando directamente a tu competencia.
+📊 En tu sector se realizan más de *3.500 búsquedas al mes* de clientes con urgencia de compra, pero la gran mayoría de esas llamadas se las están llevando los mismos 2 o 3 competidores de tu calle simplemente porque ellos sí aparecen en Google Maps.
 
-Hemos preparado una propuesta ejecutiva de 1 página para activar y posicionar tu ficha oficial en Google Maps en tiempo récord, para que cada persona que busque en tu zona te encuentre de primero.
+Hemos preparado un breve informe ejecutivo de 1 página que muestra cómo activar tu ficha oficial con un posicionamiento superior para que comiences a captar esas llamadas esta misma semana.
 
-¿Te comparto el documento resumen por aquí para que lo revises en 2 minutos? 🚀`,
+¿Te comparto el documento resumen por aquí para que lo mires en 2 minutos? 🚀`,
       };
     }
 
