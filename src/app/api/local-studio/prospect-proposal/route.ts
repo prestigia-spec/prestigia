@@ -83,13 +83,17 @@ export async function POST(request: Request) {
 
     if (geminiKey) {
       try {
-        const prompt = `You are Prestigia's Chief Commercial Officer & Senior Local Market Intelligence Forensics Director.
+        const cleanAdvisor = advisorName && !advisorName.toLowerCase().includes('luisma') ? advisorName : 'tu consultor especialista en Google Maps';
+        const prompt = `You are a Senior Local Market Intelligence Forensics Director and Commercial Specialist.
 Generate a high-converting, authoritative, and persuasive COMMERCIAL PROPOSAL / PITCH for a business or independent professional who currently DOES NOT have an optimized Google Maps Business Profile (or is completely invisible on the local map).
 
 CONTEXT & COMPETITIVE AUDIT SIMULATION:
-The proposal must be framed AS IF Prestigia's AI engine has just conducted a rigorous competitive benchmark study of the local businesses operating in "${cleanNeighborhood || cleanCity}, ${cleanCity}".
+The proposal must be framed AS IF our local market intelligence engine has just conducted a rigorous competitive benchmark study of the local businesses operating in "${cleanNeighborhood || cleanCity}, ${cleanCity}".
 You must prove to the business owner that their local competitors are currently capturing 75% to 85% of all high-ticket phone calls, appointments, and walk-ins solely because they appear on Google Maps, even when their service may be inferior.
-Show them how having a perfectly crafted, verified, and authoritative Google Maps profile built by Prestigia will make them SELL SIGNIFICANTLY MORE THAN THEIR COMPETITORS, capturing market share and establishing them as the #1 undisputed trusted choice in their zone.
+Show them how having a perfectly crafted, verified, and authoritative Google Maps profile built under our professional architecture will make them SELL SIGNIFICANTLY MORE THAN THEIR COMPETITORS, capturing market share and establishing them as the #1 undisputed trusted choice in their zone.
+
+CRITICAL WHITE-LABEL RULE:
+DO NOT mention "Prestigia" anywhere in the proposal or WhatsApp pitch. It must be 100% WHITE-LABEL so any digital agency, independent consultant, or sales partner can deliver it as their own proprietary service.
 
 INPUT DATA:
 - Target Business/Professional Name: "${cleanName}"
@@ -146,7 +150,7 @@ STRUCTURE TO PRODUCE (STRICT VALID JSON ONLY, NO MARKDOWN WRAPPERS):
     }
   ],
   "deliverablesList": [
-    "Ficha oficial verificada y optimizada bajo el estándar de autoridad Prestigia.",
+    "Ficha oficial verificada y optimizada bajo el estándar oficial de Google Business Profile.",
     "Traspaso del 100% de la propiedad legal y directa a tu correo Gmail sin ataduras.",
     "Optimización de palabras clave para superar a los competidores locales de tu sector.",
     "Botones de contacto inmediato (Llamada directa, WhatsApp y ubicación en tiempo real).",
@@ -158,7 +162,7 @@ STRUCTURE TO PRODUCE (STRICT VALID JSON ONLY, NO MARKDOWN WRAPPERS):
     "ownershipGuarantee": "Propiedad total y definitiva entregada a tu nombre. Tu ficha es un activo digital permanente que trabajará 24/7 para tu negocio.",
     "callToAction": "Activa tu ficha esta semana, supera a los competidores de tu sector y convierte cada búsqueda local en llamadas y clientes reales."
   },
-  "whatsappPitchMessage": "A natural, polite, and persuasive WhatsApp message from the advisor to ${cleanOwner} (${cleanPhone || ''}). Mentions that Prestigia conducted a local search study for ${cleanCategory} in ${cleanNeighborhood || cleanCity}, discovered that competitors are absorbing dozens of calls every week, and offers to share this 1-page executive summary so ${cleanName} can capture those clients immediately."
+  "whatsappPitchMessage": "A natural, polite, and persuasive WhatsApp message from the commercial specialist to ${cleanOwner} (${cleanPhone || ''}). MUST BE 100% WHITE-LABEL (NEVER say 'de Prestigia' or any third-party brand). Introduce as: 'Te escribe ${cleanAdvisor}'. Mentions that an executive market study for ${cleanCategory} in ${cleanNeighborhood || cleanCity} was completed, showing that local competitors are absorbing dozens of urgent calls every week, and offers to share this 1-page summary so ${cleanName} can capture those clients immediately."
 }`;
 
         const geminiRes = await fetch(
@@ -193,7 +197,7 @@ STRUCTURE TO PRODUCE (STRICT VALID JSON ONLY, NO MARKDOWN WRAPPERS):
       const locText = cleanNeighborhood ? `${cleanNeighborhood}, ${cleanCity}` : cleanCity;
       generatedProposal = {
         headline: `Auditoría de Demanda & Plan de Captación para ${cleanName}`,
-        executiveSummary: `Tras realizar un estudio forense de la demanda local en ${locText}, confirmamos que más del 82% de las llamadas y citas de "${cleanCategory}" se las están repartiendo actualmente los competidores que ya cuentan con un pin activo en Google Maps. Con la arquitectura estratégica de Prestigia, implementaremos una ficha superior que posicionará a ${cleanName} como la opción #1 en confianza y volumen de clientes de la zona.`,
+        executiveSummary: `Tras realizar un estudio forense de la demanda local en ${locText}, confirmamos que más del 82% de las llamadas y citas de "${cleanCategory}" se las están repartiendo actualmente los competidores que ya cuentan con un pin activo en Google Maps. Con nuestra arquitectura estratégica de posicionamiento local, implementaremos una ficha superior que posicionará a ${cleanName} como la opción #1 en confianza y volumen de clientes de la zona.`,
         monthlySearchStats: {
           estimatedSearchesInZone: '3.600 a 5.400 búsquedas mensuales con intención de compra',
           searchKeywords: [
@@ -244,7 +248,7 @@ STRUCTURE TO PRODUCE (STRICT VALID JSON ONLY, NO MARKDOWN WRAPPERS):
           ownershipGuarantee: '100% de propiedad entregada a tu nombre sin cláusulas de permanencia ni cobros mensuales obligatorios.',
           callToAction: 'Activa tu ficha en Google Maps esta misma semana, supera a los competidores de tu zona y empieza a recibir las llamadas de los clientes que hoy no te ven.',
         },
-        whatsappPitchMessage: `¡Hola, ${cleanOwner}! 👋 Te escribe ${advisorName || 'un consultor de Prestigia'}.
+        whatsappPitchMessage: `¡Hola, ${cleanOwner}! 👋 Te escribe ${advisorName || 'un consultor especialista en Google Maps'}.
 
 Estuvimos realizando un estudio de mercado sobre búsquedas en Google de *${cleanCategory}* en la zona de *${locText}*, y detectamos un dato muy importante para *${cleanName}*:
 
