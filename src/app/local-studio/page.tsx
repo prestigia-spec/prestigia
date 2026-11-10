@@ -4704,7 +4704,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
           audits: 'Auditorías Forenses (Pestaña 2)',
           rescues: 'Rescate de Ficha (Pestaña 3)',
           appeals: 'Apelación de Reseñas (Pestaña 4)',
-          tools: 'Armas Top 3 (Pestaña 5)',
+          tools: 'Prospección & Cierre (Pestaña 5)',
         };
         showToast(`⚡ ¡+10 Créditos recargados exitosamente en ${tabNames[rechargeSelectedTab]} para ${rechargingAdvisor.name}!`);
         setRechargingAdvisor(null);
@@ -11817,7 +11817,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         <option value="audit">🔬 {isEn ? 'Forensic Audit & Top 3 Optimization (Benchmark: $200 – $350 USD)' : 'Auditoría Forense & Optimización Top 3 (Benchmark: $200 – $350 USD)'}</option>
                         <option value="rescue">🛡️ {isEn ? 'Hijacked Profile Rescue / 72h Claim (Benchmark: $250 – $450 USD)' : 'Rescate de Ficha Secuestrada / Reclamación 72h (Benchmark: $250 – $450 USD)'}</option>
                         <option value="appeal">⚖️ {isEn ? 'Legal Review Appeal 1-3★ (Benchmark: $100 – $250 USD)' : 'Apelación Legal de Reseñas 1-3★ (Benchmark: $100 – $250 USD)'}</option>
-                        <option value="tools">🎯 {isEn ? 'Top 3 Commercial Closing Weapons' : 'Armas Top 3 de Cierre Comercial'}</option>
+                        <option value="tools">🎯 {isEn ? 'Prospecting & Closing Proposal (Tab 5)' : 'Propuesta de Prospección & Cierre (Pestaña 5)'}</option>
                       </select>
                     </div>
 
@@ -12535,7 +12535,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                               <strong className="text-purple-400 font-mono text-[10.5px]">{appealsCount}</strong>
                             </div>
                             <div className="bg-slate-900/80 py-0.5 rounded px-0.5">
-                              <span className="text-slate-400 block text-[8px] uppercase font-semibold">{isEn ? 'Tools' : 'Armas'}</span>
+                              <span className="text-slate-400 block text-[8px] uppercase font-semibold">{isEn ? 'Prospect' : 'Prospec'}</span>
                               <strong className="text-amber-300 font-mono text-[10.5px]">{toolsCount}</strong>
                             </div>
                           </div>
@@ -12602,7 +12602,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                       )}
                                     </div>
                                     <div className="bg-slate-900/80 py-1 rounded px-0.5">
-                                      <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Tools' : 'Armas'}</span>
+                                      <span className="text-slate-400 block text-[7.5px] uppercase font-semibold">{isEn ? 'Prospect' : 'Prospec'}</span>
                                       <strong className={`font-mono text-[10px] ${monthTools >= effTools ? 'text-rose-400' : 'text-amber-300'}`}>
                                         {monthTools}/{effTools}
                                       </strong>
@@ -13418,7 +13418,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                   <div className="col-span-2 sm:col-span-1">
                     <label className="block text-[10px] font-bold text-amber-300 mb-1">
-                      {isEn ? 'Top 3 Arms' : 'Armas Top 3'}
+                      {isEn ? 'Prospecting' : 'Prospección'}
                     </label>
                     <input
                       type="number"
@@ -13858,7 +13858,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                       <div>
                         <label className="h-5 flex items-center justify-center text-[10px] font-bold text-amber-300 mb-1">
-                          {isEn ? 'Arms' : 'Armas'}
+                          {isEn ? 'Prospect' : 'Prospec'}
                         </label>
                         <input
                           type="number"
@@ -13955,7 +13955,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                       <div>
                         <label className="h-5 flex items-center justify-center text-[9px] font-bold text-amber-300/90 mb-1">
-                          {isEn ? '+ Arms' : '+ Armas'}
+                          {isEn ? '+ Prospect' : '+ Prospec'}
                         </label>
                         <input
                           type="number"
@@ -14089,8 +14089,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   },
                   {
                     id: 'tools',
-                    label: isEn ? '5. Top 3 Closing Arsenal' : '5. Armas Top 3 de Cierre',
-                    desc: isEn ? '+10 Geo-Grid / ROI Pitches' : '+10 Prospecciones Geo-Grid / ROI',
+                    label: isEn ? '5. Prospect & Close' : '5. Prospección & Cierre',
+                    desc: isEn ? '+10 Forensic Proposals & WhatsApp Pitches' : '+10 Propuestas Forenses & Pitch WhatsApp',
                   },
                 ].map((tab) => (
                   <label

@@ -308,7 +308,7 @@ export default function MasterclassPlanesPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span><strong>10</strong> {isEn ? 'Top 3 Closing Weapons: Geo-Grid, ROI & Spy (Tab 5)' : 'Armas Top 3 de Cierre: Geo-Grid, ROI & Spy (Pestaña 5)'}</span>
+                    <span><strong>10</strong> {isEn ? 'Prospect & Close: Forensic Pitch & Search Volume (Tab 5)' : 'Prospección & Cierre: Propuesta Forense y Volumen de Búsqueda (Pestaña 5)'}</span>
                   </li>
                   <li className="flex items-center gap-2 text-emerald-300 font-medium">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -381,7 +381,7 @@ export default function MasterclassPlanesPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                    <span><strong>20</strong> {isEn ? 'Top 3 Closing Weapons: Geo-Grid, ROI & Spy (Tab 5)' : 'Armas Top 3 de Cierre: Geo-Grid, ROI & Spy (Pestaña 5)'}</span>
+                    <span><strong>20</strong> {isEn ? 'Prospect & Close: Forensic Pitch & Search Volume (Tab 5)' : 'Prospección & Cierre: Propuesta Forense y Volumen de Búsqueda (Pestaña 5)'}</span>
                   </li>
                   <li className="flex items-center gap-2 text-amber-300 font-medium">
                     <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
@@ -450,7 +450,7 @@ export default function MasterclassPlanesPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                    <span><strong>30</strong> {isEn ? 'Top 3 Closing Weapons: Geo-Grid, ROI & Spy (Tab 5)' : 'Armas Top 3 de Cierre: Geo-Grid, ROI & Spy (Pestaña 5)'}</span>
+                    <span><strong>30</strong> {isEn ? 'Prospect & Close: Forensic Pitch & Search Volume (Tab 5)' : 'Prospección & Cierre: Propuesta Forense y Volumen de Búsqueda (Pestaña 5)'}</span>
                   </li>
                   <li className="flex items-center gap-2 text-cyan-300 font-medium">
                     <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
@@ -559,19 +559,19 @@ export default function MasterclassPlanesPage() {
               </p>
             </div>
 
-            {/* Engine 5: ARMAS TOP 3 */}
+            {/* Engine 5: PROSPECCIÓN & CIERRE */}
             <div className="p-4 rounded-xl bg-slate-900/80 border border-amber-500/30 space-y-2 sm:col-span-2">
               <div className="flex items-center justify-between">
                 <span className="text-amber-400 font-bold flex items-center gap-1.5">
                   <Zap className="w-4 h-4 text-amber-400" />
-                  <span>{isEn ? 'Tab 5: Top 3 Sales Arsenal (3x3 Geo-Grid, ROI Balance & Rival Spy)' : 'Pestaña 5: Armas Top 3 de Cierre (Geo-Grid 3x3, Balanza ROI & Rival Spy)'}</span>
+                  <span>{isEn ? 'Tab 5: Prospect & Close (Competitor Audit & 1-Click WhatsApp Pitch)' : 'Pestaña 5: Prospección & Cierre Comercial (Auditoría de Zona & Pitch en 1 Clic)'}</span>
                 </span>
-                <span className="text-[10px] font-mono text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">{isEn ? 'RRP: $100 - $250 USD' : 'PVP: $100 - $250 USD'}</span>
+                <span className="text-[10px] font-mono text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">{isEn ? 'RRP: $150 - $300 USD' : 'PVP: $150 - $300 USD'}</span>
               </div>
               <p className="text-slate-300 text-[11px] leading-relaxed">
                 {isEn
-                  ? 'The ultimate visual closing weapon. Generates real-time 3x3 Geo-Grid heatmaps (green vs. red ranking pins), calculates exact monthly revenue lost from being outside the Top 3, and conducts live competitor espionage (reviews, age, and keyword gaps) to close clients on the spot.'
-                  : 'El arma definitiva de prospección visual y cierre en frío. Genera el mapa de calor Geo-Grid 3x3 (pines verdes vs rojos), calcula el dinero exacto que el negocio pierde al mes por no estar en el Top 3, y ejecuta la radiografía espía cara a cara frente a su rival #1 para cerrar contratos al instante.'}
+                  ? 'The ultimate sales engine for businesses without a Google Maps listing or invisible on the map. Simulates a local competitor benchmark in their neighborhood, calculates monthly high-intent search demand, demonstrates revenue currently leaking to competitors, and writes an executive proposal with a 1-click WhatsApp pitch to close $150–$300 USD setup contracts immediately.'
+                  : 'El motor de ventas definitivo para monetizar negocios que no tienen ficha o están invisibles en Google Maps. Simula una auditoría forense de competidores de la zona, calcula cuántas personas buscan ese servicio al mes con urgencia de compra, demuestra el dinero que hoy absorben sus rivales y redacta una propuesta comercial ejecutiva con pitch de WhatsApp de 1 clic para cerrar contratos de $150 a $300 USD al instante.'}
               </p>
             </div>
           </div>
