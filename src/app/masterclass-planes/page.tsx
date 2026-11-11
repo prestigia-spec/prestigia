@@ -322,8 +322,8 @@ export default function MasterclassPlanesPage() {
                   <strong>{isEn ? 'Breakeven:' : 'Retorno:'}</strong> {isEn ? '1 client at $100–$250 USD = 204% to 510% recovered.' : 'Vendes 1 cliente a $100-$250 USD y recuperas del 204% al 510% de tu inversión.'}
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400">{isEn ? 'Annual Software Commission:' : 'Comisión Plan Anual:'}</span>
-                  <span className="text-cyan-400 font-black">{isEn ? '10% Cash Upfront' : '10% de Contado'}</span>
+                  <span className="text-slate-400">{isEn ? 'Prestigia Recurring Commission:' : 'Comisión Prestigia Recurrente:'}</span>
+                  <span className="text-cyan-400 font-black">{isEn ? '10% (Monthly & Prepaid)' : '10% (Mensual & Contado)'}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
@@ -395,8 +395,8 @@ export default function MasterclassPlanesPage() {
                   <strong>{isEn ? 'Breakeven:' : 'Retorno:'}</strong> {isEn ? '1 single $100–$250 USD client pays the plan (111% to 277% return).' : 'Con 1 solo cliente ($100-$250 USD) pagas el plan y ganas del 111% al 277%.'}
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400">{isEn ? 'Annual Software Commission:' : 'Comisión Plan Anual:'}</span>
-                  <span className="text-cyan-400 font-black text-sm">{isEn ? '20% Cash Upfront' : '20% de Contado'}</span>
+                  <span className="text-slate-400">{isEn ? 'Prestigia Recurring Commission:' : 'Comisión Prestigia Recurrente:'}</span>
+                  <span className="text-cyan-400 font-black text-sm">{isEn ? '20% (Monthly & Prepaid)' : '20% (Mensual & Contado)'}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
@@ -464,8 +464,8 @@ export default function MasterclassPlanesPage() {
                   <strong>{isEn ? 'Breakeven:' : 'Retorno:'}</strong> {isEn ? '1 single $140–$250 USD client recovers 100% to 178% of your investment.' : 'Con 1 solo cliente de $140-$250 USD recuperas del 100% al 178% de la inversión.'}
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400">{isEn ? 'Annual Software Commission:' : 'Comisión Plan Anual:'}</span>
-                  <span className="text-cyan-400 font-black text-sm">{isEn ? '25% Cash Upfront' : '25% de Contado'}</span>
+                  <span className="text-slate-400">{isEn ? 'Prestigia Recurring Commission:' : 'Comisión Prestigia Recurrente:'}</span>
+                  <span className="text-cyan-400 font-black text-sm">{isEn ? '30% (Monthly & Prepaid)' : '30% (Mensual & Contado)'}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
@@ -643,58 +643,148 @@ export default function MasterclassPlanesPage() {
           </div>
         </section>
 
-        {/* SECTION 3: COMMISSIONS ON ANNUAL PACKAGES */}
-        <section className="space-y-4 print-card p-6 rounded-2xl bg-[#090D17] border border-cyan-500/30">
-          <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs uppercase tracking-wider">
-            <Percent className="w-4 h-4" />
-            <span>{isEn ? '3. High-Ticket Cash Commissions: Annual Software Packages' : '3. Comisiones de Alto Valor: Paquetes Anuales Prestigia'}</span>
+        {/* SECTION 3: THE DOUBLE MONETIZATION MODEL & RECURRING COMMISSIONS */}
+        <section className="space-y-5 print-card p-6 sm:p-7 rounded-3xl bg-gradient-to-b from-[#0B1120] to-[#070B14] border-2 border-cyan-500/40 shadow-2xl relative overflow-hidden">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs uppercase tracking-wider">
+              <Percent className="w-4 h-4 text-cyan-400" />
+              <span>{isEn ? '3. The Double Monetization Model: Upfront Setup + Lifetime Recurring Prestigia MRR' : '3. El Modelo de Doble Monetización: Setup Inmediato + Renta Recurrente Mensual Prestigia'}</span>
+            </div>
+            <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+              {isEn ? 'Active Retention Policy' : 'Regla de Clientes Activos'}
+            </span>
           </div>
-          <h3 className="text-lg sm:text-xl font-black text-white">
-            {isEn
-              ? 'Zero Monthly Micromanagement: Earn Lump-Sum Upfront Commissions'
-              : 'Cero Complicaciones Contables: Cobra Comisiones Grandes de Contado'}
-          </h3>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            {isEn
-              ? 'When your clients experience the power of Google Maps optimization, pitch the Prestigia Smart QR & Private Containment Suite under an annual prepaid agreement. You receive a direct, lump-sum cash commission paid immediately on the full contract value:'
-              : 'Cuando optimizas la ficha de tu cliente en Google Maps, el paso natural es instalarle el software de Blindaje y Smart QR de Prestigia bajo un paquete anual. Al cobrar el año completo por adelantado, Prestigia te liquida tu comisión de inmediato en una sola transferencia:'}
-          </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-xs">
-            <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
-              <span className="text-slate-400 font-mono text-[10px] uppercase">
-                {isEn ? 'Independent Advisor Plan' : 'Plan Asesor Independiente'}
-              </span>
-              <div className="text-2xl font-black text-cyan-400">
-                10% <span className="text-xs text-white font-normal">{isEn ? 'Cash Upfront' : 'de Contado'}</span>
+          <div>
+            <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              {isEn
+                ? 'Charge Upfront for the Setup & Build a Passive Monthly Income in USD'
+                : 'Cobra de Inmediato por el Setup y Construye una Renta Mensual en Dólares Todos los Meses'}
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mt-1.5">
+              {isEn
+                ? 'When you optimize a client with Local Studio, the natural next step is connecting them to Prestigia for automated weekly posts, review defense, and local Top 3 maintenance. You earn 10%, 20%, or 30% commission across ALL Prestigia plans (Monthly, 3-Month, 6-Month, and Annual) as long as the client and your advisor account remain active:'
+                : 'Al optimizar la ficha de un cliente con Local Studio, el paso natural es conectarlo a Prestigia para su mantenimiento, blindaje reputacional y posicionamiento continuo. Ganas el 10%, 20% o 30% de comisión en TODOS los planes (Mensuales, Trimestrales, Semestrales y Anuales) mientras el cliente y tu cuenta de asesor permanezcan activos en las plataformas:'}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1 text-xs">
+            {/* Box 1: Plan Asesor */}
+            <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3.5 flex flex-col justify-between hover:border-cyan-500/30 transition">
+              <div className="space-y-2">
+                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-bold">
+                  {isEn ? 'Independent Advisor ($49 USD)' : 'Plan Asesor ($49 USD)'}
+                </span>
+                <div className="text-3xl font-black text-cyan-400">
+                  10% <span className="text-xs text-white font-normal">{isEn ? 'Recurring & Prepaid' : 'Recurrente & Contado'}</span>
+                </div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">
+                  {isEn
+                    ? 'Earn ~ $10 USD/mo per client. Across Monthly, 3M, 6M, and Annual plans.'
+                    : 'Ganas un aprox. de ~$10 USD/mes por cliente en planes mensuales, trimestrales, semestrales o anuales.'}
+                </p>
               </div>
-              <p className="text-[11px] text-slate-300">
-                {isEn ? 'In a $600 USD annual agreement, you receive $60 USD upfront.' : 'En un contrato anual de $600 USD, recibes $60 USD de contado (¡ya pagaste tu plan de $49!).'}
-              </p>
+
+              <div className="space-y-2 pt-2 border-t border-slate-800">
+                <div className="p-2.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30">
+                  <span className="text-[10px] text-cyan-300 font-bold block uppercase">{isEn ? 'With only 20 active clients:' : 'Con solo 20 clientes activos:'}</span>
+                  <strong className="text-base font-black text-cyan-200">+$200 USD / {isEn ? 'month' : 'mes'}</strong>
+                  <span className="text-[10px] text-slate-400 block">{isEn ? 'in 100% passive recurring income.' : 'de renta pasiva mes a mes.'}</span>
+                </div>
+                <p className="text-[10px] text-emerald-400 font-medium">
+                  {isEn
+                    ? '⚡ PLUS: $3,000–$5,000 USD upfront cash already collected from Google Maps setups ($150–$250/each).'
+                    : '⚡ MÁS: $3.000 a $5.000 USD cobrados de contado de inmediato por los Setups ($150–$250 c/u).'}
+                </p>
+              </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-indigo-950/30 border border-indigo-500/30 space-y-2">
-              <span className="text-indigo-400 font-mono text-[10px] uppercase">
-                {isEn ? 'Digital Agency Plan' : 'Plan Agencias'}
-              </span>
-              <div className="text-2xl font-black text-cyan-400">
-                20% <span className="text-xs text-white font-normal">{isEn ? 'Cash Upfront' : 'de Contado'}</span>
+            {/* Box 2: Plan Agencias */}
+            <div className="p-5 rounded-2xl bg-indigo-950/40 border-2 border-indigo-500/60 space-y-3.5 flex flex-col justify-between relative shadow-lg shadow-indigo-950/40">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">
+                    {isEn ? 'Digital Agency ($90 USD)' : 'Plan Agencias ($90 USD)'}
+                  </span>
+                  <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500 text-slate-950">
+                    {isEn ? '★ Recommended' : '★ Más Elegido'}
+                  </span>
+                </div>
+                <div className="text-3xl font-black text-cyan-400">
+                  20% <span className="text-xs text-white font-normal">{isEn ? 'Recurring & Prepaid' : 'Recurrente & Contado'}</span>
+                </div>
+                <p className="text-[11px] text-slate-200 leading-relaxed">
+                  {isEn
+                    ? 'Earn ~ $20 USD/mo per client. Double the recurring income on every single account.'
+                    : 'Ganas un aprox. de ~$20 USD/mes por cliente. Duplicas tu renta en cada cuenta cerrada.'}
+                </p>
               </div>
-              <p className="text-[11px] text-slate-300">
-                {isEn ? 'In a $600 USD annual agreement, you receive $120 USD upfront.' : 'En un contrato anual de $600 USD, recibes $120 USD de contado (más de lo que invertiste en tu plan).'}
-              </p>
+
+              <div className="space-y-2 pt-2 border-t border-indigo-800/60">
+                <div className="p-2.5 rounded-xl bg-indigo-900/40 border border-indigo-500/40">
+                  <span className="text-[10px] text-indigo-300 font-bold block uppercase">{isEn ? 'With only 20 active clients:' : 'Con solo 20 clientes activos:'}</span>
+                  <strong className="text-base font-black text-indigo-200">+$400 a $600 USD / {isEn ? 'month' : 'mes'}</strong>
+                  <span className="text-[10px] text-slate-300 block">{isEn ? 'in 100% passive recurring income.' : 'de renta pasiva mes a mes.'}</span>
+                </div>
+                <p className="text-[10px] text-emerald-300 font-medium">
+                  {isEn
+                    ? '⚡ PLUS: $4,000–$6,000 USD upfront cash already in your pocket from initial client setups.'
+                    : '⚡ MÁS: $4.000 a $6.000 USD cobrados de contado de inmediato por los Setups iniciales.'}
+                </p>
+              </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-cyan-950/30 border border-cyan-500/30 space-y-2">
-              <span className="text-cyan-400 font-mono text-[10px] uppercase">
-                {isEn ? 'Super Agency Plan' : 'Plan Súper Agencias'}
-              </span>
-              <div className="text-2xl font-black text-cyan-400">
-                25% <span className="text-xs text-white font-normal">{isEn ? 'Cash Upfront' : 'de Contado'}</span>
+            {/* Box 3: Plan Súper Agencias */}
+            <div className="p-5 rounded-2xl bg-gradient-to-b from-amber-950/30 to-slate-900 border-2 border-amber-500/60 space-y-3.5 flex flex-col justify-between relative shadow-xl shadow-amber-950/30">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40">
+                    {isEn ? 'Super Agency ($140 USD)' : 'Plan Súper Agencias ($140 USD)'}
+                  </span>
+                  <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 font-black">
+                    {isEn ? '👑 Max Yield' : '👑 Máximo Retorno'}
+                  </span>
+                </div>
+                <div className="text-3xl font-black text-amber-300">
+                  30% <span className="text-xs text-white font-normal">{isEn ? 'Recurring & Prepaid' : 'Recurrente & Contado'}</span>
+                </div>
+                <p className="text-[11px] text-slate-200 leading-relaxed">
+                  {isEn
+                    ? 'Earn ~ $30 USD/mo per client. Maximum partnership tier with highest revenue share.'
+                    : 'Ganas un aprox. de ~$30 USD/mes por cliente. Máxima jerarquía y el porcentaje más alto.'}
+                </p>
               </div>
-              <p className="text-[11px] text-slate-300">
-                {isEn ? 'In a $600 USD annual agreement, you receive $150 USD upfront.' : 'En un contrato anual de $600 USD, recibes $150 USD de contado en una sola transacción.'}
+
+              <div className="space-y-2 pt-2 border-t border-amber-800/60">
+                <div className="p-2.5 rounded-xl bg-amber-950/50 border border-amber-500/40">
+                  <span className="text-[10px] text-amber-300 font-bold block uppercase">{isEn ? 'With only 20 active clients:' : 'Con solo 20 clientes activos:'}</span>
+                  <strong className="text-base font-black text-amber-200">+$600 a $900 USD / {isEn ? 'month' : 'mes'}</strong>
+                  <span className="text-[10px] text-slate-300 block">{isEn ? 'in 100% passive recurring income.' : 'de renta pasiva mensual permanente.'}</span>
+                </div>
+                <p className="text-[10px] text-emerald-300 font-medium">
+                  {isEn
+                    ? '⚡ PLUS: $5,000–$7,000 USD upfront cash already in your pocket from initial client setups.'
+                    : '⚡ MÁS: $5.000 a $7.000 USD cobrados de contado de inmediato por los Setups iniciales.'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* THE BIG CONVERSION HOOK BANNER */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-cyan-950/60 via-slate-950 to-amber-950/40 border border-cyan-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+            <div className="space-y-1">
+              <strong className="text-white text-sm font-black flex items-center gap-2">
+                <span>🧲 {isEn ? 'Why Local Studio Is The Most Profitable Tool In The Market:' : 'Por Qué Local Studio es la Herramienta Más Rentable del Mercado:'}</span>
+              </strong>
+              <p className="text-slate-300 text-[11px] leading-relaxed max-w-3xl">
+                {isEn
+                  ? 'Local Studio is NOT an expense: you recover 100% of your investment with your very first client ($150–$300 USD). From there, every single profile you create becomes a candidate to connect into Prestigia, turning cold local businesses into recurring monthly income in USD that deposits into your account automatically.'
+                  : 'Local Studio NO es un gasto: recuperas el 100% de tu inversión con tu primer cliente ($150–$300 USD). A partir de ahí, cada negocio que optimizas se convierte en un candidato para conectarlo a Prestigia, transformando clientes de tu ciudad en una renta mensual en dólares que entra a tu cuenta de forma automática mientras la plataforma trabaja por ti.'}
               </p>
+            </div>
+            <div className="text-right shrink-0">
+              <span className="text-[10px] uppercase font-bold text-slate-400 block">{isEn ? 'Zero Risk' : 'Cero Riesgo'}</span>
+              <strong className="text-cyan-300 text-sm font-black">{isEn ? '100% Breakeven in 1 Client' : 'Recuperas con 1 Solo Cliente'}</strong>
             </div>
           </div>
         </section>
