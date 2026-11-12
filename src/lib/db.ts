@@ -2123,5 +2123,78 @@ export async function fulfillBoldPaymentOrder(
   if (boldMeta?.paymentMethod) order.paymentMethod = boldMeta.paymentMethod;
 
   await saveBoldPaymentOrder(order);
+
+  // Notificación automática al correo oficial de Prestigia vía Resend
+  try {
+    const { sendTransactionalEmail } = await import('@/lib/notifications');
+    const adminEmail = process.env.ADMIN_ALERT_EMAIL || 'prestigiaprincipal@gmail.com';
+    const planName =
+      order.orderType === 'credit_reload'
+        ? `Recarga +10 Créditos (${order.reloadTab || 'pestaña'})`
+        : order.planTier === 'level_3'
+        ? 'Plan Súper Agencias ($140 USD)'
+        : order.planTier === 'level_2'
+        ? 'Plan Agencias Partner ($90 USD)'
+        : 'Plan Asesor Independiente ($49 USD)';
+
+    const amountFormatted =
+      order.currency === 'COP'
+        ? `$${Number(order.chargedAmount || 0).toLocaleString('es-CO')} COP`
+        : `$${order.amountUsd} USD`;
+
+    await sendTransactionalEmail({
+      to: adminEmail,
+      subject: `🚨 ¡NUEVA VENTA CONFIRMADA BOLD! ${order.buyerName} • ${amountFormatted}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; background-color: #0B0F19; color: #FFFFFF; padding: 24px; border-radius: 16px;">
+          <h2 style="color: #10B981; margin-top: 0;">⚡ ¡Nueva Venta Aprobada en Prestigia!</h2>
+          <p style="color: #94A3B8; font-size: 14px;">Bold acaba de procesar y confirmar un pago con éxito:</p>
+          
+          <table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: #131B2E; border-radius: 12px; overflow: hidden;">
+            <tr style="border-bottom: 1px solid #1E293B;">
+              <td style="padding: 12px 16px; color: #94A3B8; font-size: 13px;">Cliente:</td>
+              <td style="padding: 12px 16px; color: #FFFFFF; font-weight: bold; font-size: 14px;">${order.buyerName}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #1E293B;">
+              <td style="padding: 12px 16px; color: #94A3B8; font-size: 13px;">Plan / Producto:</td>
+              <td style="padding: 12px 16px; color: #38BDF8; font-weight: bold;">${planName}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #1E293B;">
+              <td style="padding: 12px 16px; color: #94A3B8; font-size: 13px;">Monto Cobrado:</td>
+              <td style="padding: 12px 16px; color: #10B981; font-weight: bold; font-size: 16px;">${amountFormatted}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #1E293B;">
+              <td style="padding: 12px 16px; color: #94A3B8; font-size: 13px;">WhatsApp del Cliente:</td>
+              <td style="padding: 12px 16px; color: #F59E0B; font-weight: bold;">${order.buyerPhone}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #1E293B;">
+              <td style="padding: 12px 16px; color: #94A3B8; font-size: 13px;">Correo del Cliente:</td>
+              <td style="padding: 12px 16px; color: #FFFFFF;">${order.buyerEmail}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #1E293B;">
+              <td style="padding: 12px 16px; color: #94A3B8; font-size: 13px;">Usuario Asignado:</td>
+              <td style="padding: 12px 16px; color: #A78BFA; font-family: monospace; font-weight: bold;">@${order.provisionedUsername || 'n/a'}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px 16px; color: #94A3B8; font-size: 13px;">ID Orden:</td>
+              <td style="padding: 12px 16px; color: #64748B; font-family: monospace; font-size: 11px;">${order.orderId}</td>
+            </tr>
+          </table>
+
+          <div style="margin-top: 24px; text-align: center;">
+            <a href="https://wa.me/${order.buyerPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+              `¡Hola ${order.buyerName}! Te saluda Luisma de Prestigia. Veo que acabas de activar tu ${planName}. ¡Bienvenido a la red oficial! Aquí estoy para ayudarte a configurar tus primeros clientes.`
+            )}" 
+               style="background: #10B981; color: #022C22; font-weight: bold; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">
+              💬 Enviar Bienvenida por WhatsApp al Cliente
+            </a>
+          </div>
+        </div>
+      `,
+    });
+  } catch (notifyErr) {
+    console.warn('[fulfillBoldPaymentOrder] Email notification skip:', notifyErr);
+  }
+
   return { ok: true, alreadyFulfilled: false, order };
 }

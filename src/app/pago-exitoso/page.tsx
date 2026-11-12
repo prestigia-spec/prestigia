@@ -12,6 +12,7 @@ import {
   Clock,
   Copy,
   KeyRound,
+  MessageSquare,
   RefreshCw,
   ShieldCheck,
   Sparkles,
@@ -262,6 +263,24 @@ function PagoExitosoContent() {
                   </span>
                 </div>
               )}
+
+              {/* Botón directo para que el comprador le avise a Luisma por WhatsApp */}
+              <a
+                href={`https://wa.me/573058314049?text=${encodeURIComponent(
+                  `¡Hola Luisma! Acabo de activar mi cuenta en Prestigia Local Studio 🚀\n\n` +
+                  `• Nombre: ${order.buyerName}\n` +
+                  `• Usuario: @${order.provisionedUsername || 'n/a'}\n` +
+                  `• Plan: ${order.description}\n` +
+                  `• Orden: ${order.orderId}\n\n` +
+                  `¿Me das acceso al grupo de WhatsApp y siguientes pasos?`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-3 px-4 rounded-2xl bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/40 text-[#25D366] font-bold text-xs flex items-center justify-center gap-2 transition"
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>Avisar al WhatsApp de Prestigia (+57 305 831 4049)</span>
+              </a>
 
               <Link
                 href="/local-studio"
