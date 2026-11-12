@@ -173,6 +173,34 @@ export interface StudioLandingPage {
   updatedAt: string;
 }
 
+export interface BoldPaymentOrder {
+  orderId: string;
+  orderType: 'new_plan' | 'credit_reload';
+  planTier?: 'level_1' | 'level_2' | 'level_3';
+  reloadTab?: 'creates' | 'audits' | 'rescues' | 'appeals' | 'tools';
+  advisorId?: string;
+  advisorUsername?: string;
+  desiredUsername?: string;
+  buyerName: string;
+  buyerEmail: string;
+  buyerPhone: string;
+  buyerCountry?: string;
+  currency: 'USD' | 'COP';
+  amountUsd: number;
+  chargedAmount: number;
+  exchangeRateUsed?: number;
+  description: string;
+  status: 'pending' | 'approved' | 'rejected' | 'failed' | 'voided';
+  boldTransactionId?: string;
+  paymentMethod?: string;
+  provisionedAdvisorId?: string;
+  provisionedUsername?: string;
+  provisionedPassword?: string;
+  fulfilledAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface DatabaseSchema {
   businesses: Business[];
   feedbacks: Feedback[];
@@ -187,6 +215,7 @@ interface DatabaseSchema {
   studioAdvisors?: StudioAdvisor[];
   studioDossiers?: StudioDossier[];
   studioLandingPages?: StudioLandingPage[];
+  boldOrders?: BoldPaymentOrder[];
 }
 
 export interface ExchangeRatesRecord {
@@ -1914,4 +1943,185 @@ export async function deleteStudioLandingPage(idOrSlug: string): Promise<boolean
   db.studioLandingPages = db.studioLandingPages.filter((p) => p.id !== idOrSlug && p.slug !== idOrSlug);
   writeDbFile(db);
   return true;
+}
+
+// =========================================================================
+// BOLD PAYMENT GATEWAY: ORDERS & AUTOMATIC FULFILLMENT
+// =========================================================================
+
+export async function saveBoldPaymentOrder(order: BoldPaymentOrder): Promise<void> {
+  const updatedOrder: BoldPaymentOrder = {
+    ...order,
+    updatedAt: new Date().toISOString(),
+  };
+
+  try {
+    const db = ensureDbFile();
+    if (!db.boldOrders) db.boldOrders = [];
+    const idx = db.boldOrders.findIndex((o) => o.orderId === updatedOrder.orderId);
+    if (idx >= 0) {
+      db.boldOrders[idx] = updatedOrder;
+    } else {
+      db.boldOrders.unshift(updatedOrder);
+    }
+    writeDbFile(db);
+  } catch (e) {
+    console.warn('[saveBoldPaymentOrder] local db fallback skip:', e);
+  }
+
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      await supabase.from('commercial_leads').upsert({
+        id: updatedOrder.orderId,
+        created_at: updatedOrder.createdAt,
+        full_name: updatedOrder.buyerName,
+        business_name: 'BOLD_CHECKOUT_ORDER',
+        category: updatedOrder.planTier || updatedOrder.reloadTab || 'bold_payment',
+        city: 'Bold Checkout',
+        country: updatedOrder.buyerCountry || 'Colombia',
+        phone: updatedOrder.buyerPhone,
+        email: updatedOrder.buyerEmail,
+        branch_count: updatedOrder.chargedAmount,
+        preferred_time: updatedOrder.currency,
+        primary_goal: updatedOrder.orderType,
+        status: updatedOrder.status,
+        notes: JSON.stringify(updatedOrder),
+      });
+    }
+  } catch (err) {
+    console.error('[saveBoldPaymentOrder] Supabase upsert error:', err);
+  }
+}
+
+export async function getBoldPaymentOrderById(orderId: string): Promise<BoldPaymentOrder | null> {
+  if (!orderId) return null;
+
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('commercial_leads')
+        .select('notes')
+        .eq('id', orderId)
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && data?.notes) {
+        try {
+          const parsed = JSON.parse(data.notes) as BoldPaymentOrder;
+          if (parsed && parsed.orderId === orderId) {
+            return parsed;
+          }
+        } catch {}
+      }
+    }
+  } catch (err) {
+    console.error('[getBoldPaymentOrderById] Supabase lookup error:', err);
+  }
+
+  try {
+    const db = ensureDbFile();
+    const localMatch = (db.boldOrders || []).find((o) => o.orderId === orderId);
+    return localMatch || null;
+  } catch {
+    return null;
+  }
+}
+
+export async function fulfillBoldPaymentOrder(
+  orderId: string,
+  boldMeta?: { transactionId?: string; paymentMethod?: string }
+): Promise<{ ok: boolean; alreadyFulfilled?: boolean; order?: BoldPaymentOrder; error?: string }> {
+  const order = await getBoldPaymentOrderById(orderId);
+  if (!order) {
+    return { ok: false, error: 'Order not found' };
+  }
+
+  if (order.fulfilledAt && order.status === 'approved') {
+    return { ok: true, alreadyFulfilled: true, order };
+  }
+
+  const advisors = await getAllStudioAdvisors();
+  const now = new Date().toISOString();
+
+  if (order.orderType === 'new_plan') {
+    const tier: 'level_1' | 'level_2' | 'level_3' = order.planTier || 'level_1';
+    const quotaByTier = tier === 'level_3' ? 30 : tier === 'level_2' ? 20 : 10;
+    const feeByTier = tier === 'level_3' ? 140 : tier === 'level_2' ? 90 : 49;
+
+    const rawUsername = (order.desiredUsername || order.buyerEmail.split('@')[0] || order.buyerName || 'asesor')
+      .toLowerCase()
+      .replace(/[^a-z0-9._-]/g, '');
+    let finalUsername = rawUsername.length >= 3 ? rawUsername : `asesor_${Date.now().toString().slice(-4)}`;
+
+    const existingWithUsername = advisors.find((a) => a.username.toLowerCase() === finalUsername);
+    if (existingWithUsername && existingWithUsername.id !== order.provisionedAdvisorId) {
+      finalUsername = `${finalUsername}_${Math.floor(100 + Math.random() * 899)}`;
+    }
+
+    const generatedPassword =
+      order.provisionedPassword || `Prg$${Math.floor(100000 + Math.random() * 899999)}`;
+    const advisorId = order.provisionedAdvisorId || `adv-${Date.now()}`;
+
+    const newAdvisor: StudioAdvisor = {
+      id: advisorId,
+      name: order.buyerName,
+      username: finalUsername,
+      password: generatedPassword,
+      phone: order.buyerPhone,
+      role: 'advisor',
+      accountType: tier === 'level_1' ? 'internal_advisor' : 'partner_agency',
+      planTier: tier,
+      country: order.buyerCountry || 'Colombia',
+      monthlyFeeUsd: feeByTier,
+      licenseStatus: 'active',
+      active: true,
+      planStartDate: now,
+      maxCreatesMonthly: quotaByTier,
+      maxAuditsMonthly: quotaByTier,
+      maxRescuesMonthly: quotaByTier,
+      maxAppealsMonthly: quotaByTier,
+      maxToolsMonthly: quotaByTier,
+      extraCredits: { creates: 0, audits: 0, rescues: 0, appeals: 0, tools: 0 },
+      createdAt: now,
+    };
+
+    await saveStudioAdvisor(newAdvisor);
+
+    order.provisionedAdvisorId = advisorId;
+    order.provisionedUsername = finalUsername;
+    order.provisionedPassword = generatedPassword;
+  } else if (order.orderType === 'credit_reload') {
+    const targetTab = order.reloadTab || 'creates';
+    const targetAdvisor = advisors.find(
+      (a) =>
+        (order.advisorId && a.id === order.advisorId) ||
+        (order.advisorUsername && a.username.toLowerCase() === order.advisorUsername.toLowerCase())
+    );
+
+    if (!targetAdvisor) {
+      return { ok: false, error: 'Target advisor account not found for credit reload' };
+    }
+
+    const currentExtra = targetAdvisor.extraCredits || {};
+    const updatedAdvisor: StudioAdvisor = {
+      ...targetAdvisor,
+      extraCredits: {
+        ...currentExtra,
+        [targetTab]: (currentExtra[targetTab] || 0) + 10,
+      },
+    };
+    await saveStudioAdvisor(updatedAdvisor);
+    order.provisionedAdvisorId = targetAdvisor.id;
+    order.provisionedUsername = targetAdvisor.username;
+  }
+
+  order.status = 'approved';
+  order.fulfilledAt = now;
+  if (boldMeta?.transactionId) order.boldTransactionId = boldMeta.transactionId;
+  if (boldMeta?.paymentMethod) order.paymentMethod = boldMeta.paymentMethod;
+
+  await saveBoldPaymentOrder(order);
+  return { ok: true, alreadyFulfilled: false, order };
 }

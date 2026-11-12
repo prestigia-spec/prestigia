@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PrestigiaIcon } from '@/components/PrestigiaIcon';
 import { TechnologicalSolutionsLogo } from '@/components/TechnologicalSolutionsLogo';
+import BoldCheckoutModal, { BoldPlanTier } from '@/components/BoldCheckoutModal';
 import {
   CheckCircle2,
   Download,
@@ -27,10 +28,18 @@ import {
   Scale,
   MessageCircle,
   Coins,
+  CreditCard,
 } from 'lucide-react';
 
 export default function MasterclassPlanesPage() {
   const [lang, setLang] = useState<'es' | 'en'>('es');
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [checkoutPlanTier, setCheckoutPlanTier] = useState<BoldPlanTier>('level_2');
+
+  const openPlanCheckout = (tier: BoldPlanTier) => {
+    setCheckoutPlanTier(tier);
+    setCheckoutOpen(true);
+  };
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -329,6 +338,14 @@ export default function MasterclassPlanesPage() {
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
                   <span className="text-amber-400 font-black">{isEn ? '$5,000 to $12,500 USD' : '$5.000 a $12.500 USD'}</span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => openPlanCheckout('level_1')}
+                  className="no-print mt-3 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:brightness-110 text-slate-950 font-black text-xs flex items-center justify-center gap-2 transition cursor-pointer shadow-lg shadow-emerald-500/20"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  <span>{isEn ? 'Activate Plan • $49 USD' : 'Adquirir con Bold • $49 USD'}</span>
+                </button>
               </div>
             </div>
 
@@ -402,6 +419,14 @@ export default function MasterclassPlanesPage() {
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
                   <span className="text-amber-400 font-black">{isEn ? '$10,000 to $25,000 USD' : '$10.000 a $25.000 USD'}</span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => openPlanCheckout('level_2')}
+                  className="no-print mt-3 w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 hover:brightness-110 text-slate-950 font-black text-xs flex items-center justify-center gap-2 transition cursor-pointer shadow-xl shadow-amber-500/25"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  <span>{isEn ? 'Activate Partner Plan • $90 USD' : 'Adquirir con Bold • $90 USD'}</span>
+                </button>
               </div>
             </div>
 
@@ -471,6 +496,14 @@ export default function MasterclassPlanesPage() {
                   <span className="text-slate-400">{isEn ? 'Revenue Potential:' : 'Potencial de Venta:'}</span>
                   <span className="text-amber-400 font-black">{isEn ? '$15,000 to $37,500 USD' : '$15.000 a $37.500 USD'}</span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => openPlanCheckout('level_3')}
+                  className="no-print mt-3 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-cyan-400 to-indigo-500 hover:brightness-110 text-slate-950 font-black text-xs flex items-center justify-center gap-2 transition cursor-pointer shadow-lg shadow-cyan-500/20"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  <span>{isEn ? 'Activate Super Agency • $140 USD' : 'Adquirir con Bold • $140 USD'}</span>
+                </button>
               </div>
             </div>
 
@@ -854,7 +887,15 @@ export default function MasterclassPlanesPage() {
             <span>
               Prestigia &copy; 2026 &bull; {isEn ? 'All rights reserved.' : 'Todos los derechos reservados.'}
             </span>
-            <div className="flex items-center gap-3 font-bold">
+            <div className="flex flex-wrap items-center gap-3 font-bold no-print">
+              <button
+                type="button"
+                onClick={() => openPlanCheckout('level_2')}
+                className="flex items-center gap-1.5 text-white bg-gradient-to-r from-rose-600 to-pink-600 hover:brightness-110 px-3.5 py-1.5 rounded-lg transition cursor-pointer shadow-md"
+              >
+                <CreditCard className="w-3.5 h-3.5" />
+                <span>{isEn ? 'Pay Online with Bold (PSE / Cards)' : 'Pagar en Línea con Bold (PSE / Tarjetas)'}</span>
+              </button>
               <a
                 href={isEn ? "https://wa.me/573058314049?text=Hello%20Prestigia,%20I%20want%20to%20activate%20my%20Local%20Studio%20Partner%20Plan" : "https://wa.me/573058314049?text=Hola%20Prestigia,%20deseo%20activar%20mi%20Plan%20de%20Partner%20en%20Local%20Studio"}
                 target="_blank"
@@ -869,6 +910,14 @@ export default function MasterclassPlanesPage() {
         </section>
 
       </main>
+
+      <BoldCheckoutModal
+        isOpen={checkoutOpen}
+        onClose={() => setCheckoutOpen(false)}
+        orderType="new_plan"
+        planTier={checkoutPlanTier}
+        lang={lang}
+      />
     </div>
   );
 }

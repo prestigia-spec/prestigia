@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { PrestigiaIcon } from '@/components/PrestigiaIcon';
+import BoldCheckoutModal, { BoldReloadTab } from '@/components/BoldCheckoutModal';
 import {
   MapPin,
   Sparkles,
@@ -70,6 +71,7 @@ import {
   FileText,
   Target,
   Send,
+  CreditCard,
 } from 'lucide-react';
 import type { GooglePlaceData, NegativeReviewItem, ReviewDistribution } from '@/app/api/auditor/google-lookup/route';
 
@@ -2128,6 +2130,12 @@ export default function LocalStudioPage() {
   const [rechargingAdvisor, setRechargingAdvisor] = useState<StudioAdvisorUser | null>(null);
   const [rechargeSelectedTab, setRechargeSelectedTab] = useState<'creates' | 'audits' | 'rescues' | 'appeals' | 'tools'>('rescues');
   const [isRechargingCredits, setIsRechargingCredits] = useState<boolean>(false);
+  const [boldReloadOpen, setBoldReloadOpen] = useState<boolean>(false);
+  const [boldReloadTab, setBoldReloadTab] = useState<BoldReloadTab>('creates');
+  const openAdvisorBoldReload = (tab: BoldReloadTab) => {
+    setBoldReloadTab(tab);
+    setBoldReloadOpen(true);
+  };
   const [isUpdatingAdvisor, setIsUpdatingAdvisor] = useState<boolean>(false);
 
   // Modal de Confirmación Profesional (Eliminar Expediente o Asesor sin alertas feas del navegador)
@@ -5333,6 +5341,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           </span>
                         </div>
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => openAdvisorBoldReload('creates')}
+                        className="ml-1 px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] flex items-center gap-1 transition cursor-pointer shadow-sm shrink-0"
+                        title={isEn ? 'Buy +10 Credits with Bold ($50 USD)' : 'Comprar +10 Créditos con Bold ($50 USD)'}
+                      >
+                        <CreditCard className="w-3 h-3" />
+                        <span>+10</span>
+                      </button>
                     </div>
                   )}
 
@@ -6793,6 +6810,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           </span>
                         </div>
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => openAdvisorBoldReload('audits')}
+                        className="ml-1 px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] flex items-center gap-1 transition cursor-pointer shadow-sm shrink-0"
+                        title={isEn ? 'Buy +10 Credits with Bold ($50 USD)' : 'Comprar +10 Créditos con Bold ($50 USD)'}
+                      >
+                        <CreditCard className="w-3 h-3" />
+                        <span>+10</span>
+                      </button>
                     </div>
                   )}
 
@@ -8438,6 +8464,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           </span>
                         </div>
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => openAdvisorBoldReload('rescues')}
+                        className="ml-1 px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] flex items-center gap-1 transition cursor-pointer shadow-sm shrink-0"
+                        title={isEn ? 'Buy +10 Credits with Bold ($50 USD)' : 'Comprar +10 Créditos con Bold ($50 USD)'}
+                      >
+                        <CreditCard className="w-3 h-3" />
+                        <span>+10</span>
+                      </button>
                     </div>
                   )}
 
@@ -9624,6 +9659,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           </span>
                         </div>
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => openAdvisorBoldReload('appeals')}
+                        className="ml-1 px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] flex items-center gap-1 transition cursor-pointer shadow-sm shrink-0"
+                        title={isEn ? 'Buy +10 Credits with Bold ($50 USD)' : 'Comprar +10 Créditos con Bold ($50 USD)'}
+                      >
+                        <CreditCard className="w-3 h-3" />
+                        <span>+10</span>
+                      </button>
                     </div>
                   )}
 
@@ -10522,6 +10566,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           </span>
                         </div>
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => openAdvisorBoldReload('tools')}
+                        className="ml-1 px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] flex items-center gap-1 transition cursor-pointer shadow-sm shrink-0"
+                        title={isEn ? 'Buy +10 Credits with Bold ($50 USD)' : 'Comprar +10 Créditos con Bold ($50 USD)'}
+                      >
+                        <CreditCard className="w-3 h-3" />
+                        <span>+10</span>
+                      </button>
                     </div>
                   )}
                   <span className="text-xs text-amber-300 font-bold bg-amber-950/80 border border-amber-500/30 px-3 py-1.5 rounded-xl">
@@ -14570,6 +14623,20 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
           </div>
         </div>
       )}
+
+      {/* Modal de Recarga Instantánea con Bold (+10 Créditos = $50 USD) */}
+      <BoldCheckoutModal
+        isOpen={boldReloadOpen}
+        onClose={() => setBoldReloadOpen(false)}
+        orderType="credit_reload"
+        reloadTab={boldReloadTab}
+        advisorId={currentUser?.id}
+        advisorUsername={currentUser?.username}
+        defaultBuyerName={currentUser?.name || ''}
+        defaultBuyerPhone={currentUser?.phone || ''}
+        defaultBuyerCountry={currentUser?.country || 'Colombia'}
+        lang={isEn ? 'en' : 'es'}
+      />
 
       {/* Footer */}
       <footer className="border-t border-slate-800/80 py-4 px-4 text-center text-xs text-slate-500 print:hidden">
