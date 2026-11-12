@@ -160,20 +160,41 @@ export default function BoldCheckoutModal({
   );
   const [buyerName, setBuyerName] = useState(defaultBuyerName);
   const [buyerEmail, setBuyerEmail] = useState(defaultBuyerEmail);
-  const [buyerPhone, setBuyerPhone] = useState(defaultBuyerPhone);
+  const [buyerPhone, setBuyerPhone] = useState(defaultBuyerPhone || '+57');
   const [buyerCountry, setBuyerCountry] = useState(defaultBuyerCountry || 'Colombia');
   const [desiredUsername, setDesiredUsername] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [missingKeysWarning, setMissingKeysWarning] = useState(false);
 
+  // Formateador estricto de teléfono: inicia obligatoriamente con '+' y luego solo números
+  const handlePhoneChange = (val: string) => {
+    let raw = val.trim();
+    if (!raw.startsWith('+')) {
+      raw = '+' + raw.replace(/[^0-9]/g, '');
+    } else {
+      raw = '+' + raw.slice(1).replace(/[^0-9]/g, '');
+    }
+    setBuyerPhone(raw);
+  };
+
+  // Sanitizador de nombre: solo letras, espacios, acentos y signos habituales de nombres (sin números ni símbolos raros)
+  const handleNameChange = (val: string) => {
+    const clean = val.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.'-]/g, '');
+    setBuyerName(clean);
+  };
+
   useEffect(() => {
     if (isOpen) {
       setSelectedPlan(planTier);
       setSelectedTab(reloadTab);
-      if (defaultBuyerName) setBuyerName(defaultBuyerName);
+      if (defaultBuyerName) setBuyerName(defaultBuyerName.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.'-]/g, ''));
       if (defaultBuyerEmail) setBuyerEmail(defaultBuyerEmail);
-      if (defaultBuyerPhone) setBuyerPhone(defaultBuyerPhone);
+      if (defaultBuyerPhone) {
+        handlePhoneChange(defaultBuyerPhone);
+      } else {
+        setBuyerPhone('+57');
+      }
       if (defaultBuyerCountry) {
         setBuyerCountry(defaultBuyerCountry);
         setCurrency(defaultBuyerCountry.toLowerCase().includes('colombia') ? 'COP' : 'USD');
@@ -198,16 +219,44 @@ export default function BoldCheckoutModal({
   const amountUsd = orderType === 'credit_reload' ? 50 : PLAN_DETAILS[selectedPlan].priceUsd;
   const approxCop = Math.round(amountUsd * (exchangeRateCop || 4150));
 
+  const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
   const handleProceedToBold = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     setMissingKeysWarning(false);
 
-    if (!buyerName.trim() || !buyerEmail.trim() || !buyerPhone.trim()) {
+    const cleanName = buyerName.trim();
+    const cleanEmail = buyerEmail.trim().toLowerCase();
+    const cleanPhone = buyerPhone.trim();
+
+    // 1. Validación estricta de Nombre (solo texto y al menos 3 caracteres)
+    if (!cleanName || cleanName.length < 3) {
       setErrorMsg(
         isEn
-          ? 'Please enter your full name, email and WhatsApp number.'
-          : 'Por favor completa tu Nombre completo, Correo electrónico y WhatsApp.'
+          ? 'Please enter a valid full name (letters only).'
+          : 'Por favor ingresa un nombre y apellido válido (solo letras).'
+      );
+      return;
+    }
+
+    // 2. Validación estricta de Correo (debe tener @ y extensión de dominio real como .com, .co, .net, etc.)
+    if (!cleanEmail || !EMAIL_REGEX.test(cleanEmail)) {
+      setErrorMsg(
+        isEn
+          ? 'Please enter a valid email address with @ and domain extension (e.g. name@domain.com).'
+          : 'Por favor ingresa un correo electrónico real y completo (con @ y extensión de dominio, ej. tunombre@dominio.com).'
+      );
+      return;
+    }
+
+    // 3. Validación estricta de Teléfono (debe iniciar con '+' y tener código de país + número, mínimo 9 dígitos en total)
+    const phoneDigits = cleanPhone.replace(/[^0-9]/g, '');
+    if (!cleanPhone.startsWith('+') || phoneDigits.length < 8) {
+      setErrorMsg(
+        isEn
+          ? 'Please enter a valid WhatsApp number starting with + and country code (e.g. +573001234567).'
+          : 'Por favor ingresa tu número con formato internacional iniciando con + y código de país (ej. +573001234567).'
       );
       return;
     }
@@ -443,21 +492,23 @@ export default function BoldCheckoutModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div>
               <label className="block text-[11px] font-bold text-slate-300 mb-1">
-                {isEn ? 'Full Name *' : 'Nombre completo *'}
+                {isEn ? 'Full Name (Letters only) *' : 'Nombre completo (Solo letras) *'}
               </label>
               <input
                 type="text"
                 required
                 value={buyerName}
-                onChange={(e) => setBuyerName(e.target.value)}
+                onChange={(e) => handleNameChange(e.target.value)}
                 placeholder="Ej. Carlos Mendoza"
+                pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.'-]{3,}$"
+                title="Ingresa tu nombre y apellido usando únicamente letras"
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:border-emerald-500 outline-none"
               />
             </div>
 
             <div>
               <label className="block text-[11px] font-bold text-slate-300 mb-1">
-                {isEn ? 'Email (for receipt & credentials) *' : 'Correo electrónico *'}
+                {isEn ? 'Email (with @ and domain) *' : 'Correo electrónico (con @ y .com) *'}
               </label>
               <input
                 type="email"
@@ -465,21 +516,25 @@ export default function BoldCheckoutModal({
                 value={buyerEmail}
                 onChange={(e) => setBuyerEmail(e.target.value)}
                 placeholder="carlos@agencia.com"
+                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                title="Ingresa un correo real con @ y extensión (ej: nombre@dominio.com)"
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:border-emerald-500 outline-none"
               />
             </div>
 
             <div>
               <label className="block text-[11px] font-bold text-slate-300 mb-1">
-                {isEn ? 'WhatsApp *' : 'WhatsApp / Celular *'}
+                {isEn ? 'WhatsApp (+ followed by numbers) *' : 'WhatsApp (+ seguido del número) *'}
               </label>
               <input
                 type="tel"
                 required
                 value={buyerPhone}
-                onChange={(e) => setBuyerPhone(e.target.value)}
-                placeholder="+57 300 123 4567"
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:border-emerald-500 outline-none"
+                onChange={(e) => handlePhoneChange(e.target.value)}
+                placeholder="+573001234567"
+                pattern="^\+[0-9]{8,15}$"
+                title="Debe iniciar obligatoriamente con + y contener solo números (ej: +573001234567)"
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:border-emerald-500 outline-none font-mono"
               />
             </div>
 
