@@ -253,6 +253,8 @@ interface StudioDossierRecord {
   contactPhone?: string;
   contactEmail?: string;
   contactRole?: string;
+  clientCountry?: string;
+  clientCity?: string;
   category: string;
   city: string;
   neighborhood?: string;
@@ -1638,6 +1640,8 @@ export default function LocalStudioPage() {
   const [createContactPhone, setCreateContactPhone] = useState<string>('');
   const [createContactEmail, setCreateContactEmail] = useState<string>('');
   const [createContactRole, setCreateContactRole] = useState<string>('Dueño / Propietario');
+  const [createContactCountry, setCreateContactCountry] = useState<string>('Colombia');
+  const [createContactCity, setCreateContactCity] = useState<string>('Bogotá');
   const [createBusinessName, setCreateBusinessName] = useState('');
   const [createCategory, setCreateCategory] = useState(CATEGORY_OPTIONS[0]);
   const [createCountry, setCreateCountry] = useState<string>('Colombia');
@@ -1659,6 +1663,8 @@ export default function LocalStudioPage() {
   const [auditContactPhone, setAuditContactPhone] = useState<string>('');
   const [auditContactEmail, setAuditContactEmail] = useState<string>('');
   const [auditContactRole, setAuditContactRole] = useState<string>('Dueño / Propietario');
+  const [auditContactCountry, setAuditContactCountry] = useState<string>('Colombia');
+  const [auditContactCity, setAuditContactCity] = useState<string>('Bogotá');
   const [auditQuery, setAuditQuery] = useState('');
   const [isScanningAudit, setIsScanningAudit] = useState(false);
   const [auditScannedListing, setAuditScannedListing] = useState<GooglePlaceData | null>(null);
@@ -1685,6 +1691,8 @@ export default function LocalStudioPage() {
   const [rescueContactPhone, setRescueContactPhone] = useState<string>('');
   const [rescueContactEmail, setRescueContactEmail] = useState<string>('');
   const [rescueContactRole, setRescueContactRole] = useState<string>('Dueño / Propietario');
+  const [rescueContactCountry, setRescueContactCountry] = useState<string>('Colombia');
+  const [rescueContactCity, setRescueContactCity] = useState<string>('Bogotá');
   const [rescueSearchQuery, setRescueSearchQuery] = useState('');
   const [isRescueScanning, setIsRescueScanning] = useState(false);
   const [rescueScannedListing, setRescueScannedListing] = useState<GooglePlaceData | null>(null);
@@ -1707,6 +1715,8 @@ export default function LocalStudioPage() {
   const [appealContactPhone, setAppealContactPhone] = useState<string>('');
   const [appealContactEmail, setAppealContactEmail] = useState<string>('');
   const [appealContactRole, setAppealContactRole] = useState<string>('Dueño / Propietario');
+  const [appealContactCountry, setAppealContactCountry] = useState<string>('Colombia');
+  const [appealContactCity, setAppealContactCity] = useState<string>('Bogotá');
   const [appealSearchQuery, setAppealSearchQuery] = useState('');
   const [isScanningAppeals, setIsScanningAppeals] = useState(false);
   const [scannedAppealBiz, setScannedAppealBiz] = useState<GooglePlaceData | null>(null);
@@ -2394,6 +2404,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     setCreateContactPhone('');
     setCreateContactEmail('');
     setCreateContactRole('Dueño / Propietario');
+    setCreateContactCountry('Colombia');
+    setCreateContactCity('Bogotá');
     setCreateBusinessName('');
     setCreateNeighborhood('');
     setCreateSpecialties('');
@@ -2414,6 +2426,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     setAuditContactPhone('');
     setAuditContactEmail('');
     setAuditContactRole('Dueño / Propietario');
+    setAuditContactCountry('Colombia');
+    setAuditContactCity('Bogotá');
     setAuditQuery('');
     setAuditScannedListing(null);
     setAuditBusinessName('');
@@ -2438,6 +2452,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     setRescueContactPhone('');
     setRescueContactEmail('');
     setRescueContactRole('Dueño / Propietario');
+    setRescueContactCountry('Colombia');
+    setRescueContactCity('Bogotá');
     setRescueSearchQuery('');
     setRescueScannedListing(null);
     setRescueBusinessName('');
@@ -2460,6 +2476,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     setAppealContactPhone('');
     setAppealContactEmail('');
     setAppealContactRole('Dueño / Propietario');
+    setAppealContactCountry('Colombia');
+    setAppealContactCity('Bogotá');
     setAppealSearchQuery('');
     setScannedAppealBiz(null);
     setAppealReviewsList([]);
@@ -2632,6 +2650,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               contactPhone: appealContactPhone,
               contactEmail: appealContactEmail,
               contactRole: appealContactRole,
+              clientCountry: appealContactCountry || 'Colombia',
+              clientCity: appealContactCity || 'Bogotá',
               category: bizCategory,
               city: bizCity,
               googleUrl: scannedAppealBiz?.googleMapsUrl || '',
@@ -2910,6 +2930,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             contactPhone: createContactPhone.trim(),
             contactEmail: createContactEmail.trim(),
             contactRole: createContactRole.trim(),
+            clientCountry: createContactCountry.trim() || 'Colombia',
+            clientCity: createContactCity.trim() || 'Bogotá',
             category: createCategory,
             country: createCountry.trim() || 'Colombia',
             city: createCity.trim(),
@@ -3075,6 +3097,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             contactPhone: auditContactPhone.trim(),
             contactEmail: auditContactEmail.trim(),
             contactRole: auditContactRole.trim(),
+            clientCountry: auditContactCountry.trim() || 'Colombia',
+            clientCity: auditContactCity.trim() || 'Bogotá',
             category: finalCategory,
             country: auditCountry.trim() || 'Colombia',
             city: finalCity,
@@ -3377,6 +3401,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             contactPhone: rescueContactPhone,
             contactEmail: rescueContactEmail,
             contactRole: rescueContactRole,
+            clientCountry: rescueContactCountry || 'Colombia',
+            clientCity: rescueContactCity || 'Bogotá',
             category: matchedCategory,
             city: parsedCity,
             neighborhood: parsedNeighborhood,
@@ -4099,6 +4125,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       setCreateContactPhone(contactPhone);
       setCreateContactEmail(contactEmail);
       setCreateContactRole(contactRole);
+      setCreateContactCountry(dossier.clientCountry || country || 'Colombia');
+      setCreateContactCity(dossier.clientCity || city || 'Bogotá');
       setCreateCategory(category);
       setCreateCountry(country);
       setCreateCity(city);
@@ -4140,6 +4168,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       setAuditContactPhone(contactPhone);
       setAuditContactEmail(contactEmail);
       setAuditContactRole(contactRole);
+      setAuditContactCountry(dossier.clientCountry || country || 'Colombia');
+      setAuditContactCity(dossier.clientCity || city || 'Bogotá');
       setAuditCategory(category);
       setAuditCountry(country);
       setAuditCity(city);
@@ -4176,6 +4206,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       setRescueContactPhone(contactPhone);
       setRescueContactEmail(contactEmail);
       setRescueContactRole(contactRole);
+      setRescueContactCountry(dossier.clientCountry || country || 'Colombia');
+      setRescueContactCity(dossier.clientCity || city || 'Bogotá');
       setRescueCategory(category);
       setRescueCountry(country);
       setRescueCity(city);
@@ -4239,6 +4271,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       setAppealContactPhone(contactPhone);
       setAppealContactEmail(contactEmail);
       setAppealContactRole(contactRole);
+      setAppealContactCountry(dossier.clientCountry || country || 'Colombia');
+      setAppealContactCity(dossier.clientCity || city || 'Bogotá');
       setAppealSearchQuery(dossier.googleUrl || dossier.clientName || '');
       if (!scannedAppealBiz && dossier.clientName) {
         setScannedAppealBiz({
@@ -5497,6 +5531,47 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
                         <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
                       </select>
+                    </div>
+                  </div>
+
+                  {/* País y Ciudad de Residencia del Cliente / Contratante */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-indigo-500/15">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? '🌍 Client Country (Billing/Residence) *' : '🌍 País del Cliente (Residencia/Cobro) *'}
+                      </label>
+                      <select
+                        value={createContactCountry}
+                        onChange={(e) => {
+                          const newC = e.target.value;
+                          setCreateContactCountry(newC);
+                          const avCities = getCitiesForCountry(newC);
+                          if (!avCities.includes(createContactCity) && avCities.length > 0) {
+                            setCreateContactCity(avCities[0]);
+                          }
+                          if (COUNTRY_DIALING_CODES[newC] && (!createContactPhone || createContactPhone === '+57')) {
+                            setCreateContactPhone(COUNTRY_DIALING_CODES[newC]);
+                          }
+                        }}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs cursor-pointer"
+                      >
+                        {allCountriesList.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? `🏙️ Client City (${createContactCountry}) *` : `🏙️ Ciudad del Cliente (${createContactCountry}) *`}
+                      </label>
+                      <input
+                        type="text"
+                        value={createContactCity}
+                        onChange={(e) => setCreateContactCity(e.target.value)}
+                        placeholder={isEn ? 'e.g. Miami, Madrid, Bogotá...' : 'Ej: Bogotá, Medellín, Miami...'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
                     </div>
                   </div>
                 </div>
@@ -6960,6 +7035,47 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
                         <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
                       </select>
+                    </div>
+                  </div>
+
+                  {/* País y Ciudad de Residencia del Cliente / Contratante */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-indigo-500/15">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? '🌍 Client Country (Billing/Residence) *' : '🌍 País del Cliente (Residencia/Cobro) *'}
+                      </label>
+                      <select
+                        value={auditContactCountry}
+                        onChange={(e) => {
+                          const newC = e.target.value;
+                          setAuditContactCountry(newC);
+                          const avCities = getCitiesForCountry(newC);
+                          if (!avCities.includes(auditContactCity) && avCities.length > 0) {
+                            setAuditContactCity(avCities[0]);
+                          }
+                          if (COUNTRY_DIALING_CODES[newC] && (!auditContactPhone || auditContactPhone === '+57')) {
+                            setAuditContactPhone(COUNTRY_DIALING_CODES[newC]);
+                          }
+                        }}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs cursor-pointer"
+                      >
+                        {allCountriesList.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? `🏙️ Client City (${auditContactCountry}) *` : `🏙️ Ciudad del Cliente (${auditContactCountry}) *`}
+                      </label>
+                      <input
+                        type="text"
+                        value={auditContactCity}
+                        onChange={(e) => setAuditContactCity(e.target.value)}
+                        placeholder={isEn ? 'e.g. Miami, Madrid, Bogotá...' : 'Ej: Bogotá, Medellín, Miami...'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
                     </div>
                   </div>
                 </div>
@@ -8616,6 +8732,47 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </select>
                     </div>
                   </div>
+
+                  {/* País y Ciudad de Residencia del Cliente / Contratante */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-indigo-500/15">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? '🌍 Client Country (Billing/Residence) *' : '🌍 País del Cliente (Residencia/Cobro) *'}
+                      </label>
+                      <select
+                        value={rescueContactCountry}
+                        onChange={(e) => {
+                          const newC = e.target.value;
+                          setRescueContactCountry(newC);
+                          const avCities = getCitiesForCountry(newC);
+                          if (!avCities.includes(rescueContactCity) && avCities.length > 0) {
+                            setRescueContactCity(avCities[0]);
+                          }
+                          if (COUNTRY_DIALING_CODES[newC] && (!rescueContactPhone || rescueContactPhone === '+57')) {
+                            setRescueContactPhone(COUNTRY_DIALING_CODES[newC]);
+                          }
+                        }}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs cursor-pointer"
+                      >
+                        {allCountriesList.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? `🏙️ Client City (${rescueContactCountry}) *` : `🏙️ Ciudad del Cliente (${rescueContactCountry}) *`}
+                      </label>
+                      <input
+                        type="text"
+                        value={rescueContactCity}
+                        onChange={(e) => setRescueContactCity(e.target.value)}
+                        placeholder={isEn ? 'e.g. Miami, Madrid, Bogotá...' : 'Ej: Bogotá, Medellín, Miami...'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* 1-Click Google Maps Scanner for Rescue */}
@@ -9811,6 +9968,47 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
                         <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
                       </select>
+                    </div>
+                  </div>
+
+                  {/* País y Ciudad de Residencia del Cliente / Contratante */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-indigo-500/15">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? '🌍 Client Country (Billing/Residence) *' : '🌍 País del Cliente (Residencia/Cobro) *'}
+                      </label>
+                      <select
+                        value={appealContactCountry}
+                        onChange={(e) => {
+                          const newC = e.target.value;
+                          setAppealContactCountry(newC);
+                          const avCities = getCitiesForCountry(newC);
+                          if (!avCities.includes(appealContactCity) && avCities.length > 0) {
+                            setAppealContactCity(avCities[0]);
+                          }
+                          if (COUNTRY_DIALING_CODES[newC] && (!appealContactPhone || appealContactPhone === '+57')) {
+                            setAppealContactPhone(COUNTRY_DIALING_CODES[newC]);
+                          }
+                        }}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs cursor-pointer"
+                      >
+                        {allCountriesList.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? `🏙️ Client City (${appealContactCountry}) *` : `🏙️ Ciudad del Cliente (${appealContactCountry}) *`}
+                      </label>
+                      <input
+                        type="text"
+                        value={appealContactCity}
+                        onChange={(e) => setAppealContactCity(e.target.value)}
+                        placeholder={isEn ? 'e.g. Miami, Madrid, Bogotá...' : 'Ej: Bogotá, Medellín, Miami...'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
                     </div>
                   </div>
                 </div>
@@ -11564,6 +11762,17 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             <p className="text-[10px] text-slate-400 flex items-center gap-1">
                               <Building2 className="w-3 h-3 text-slate-500" />
                               <span>{d.contactCompany}</span>
+                            </p>
+                          )}
+                          {(d.clientCountry || d.clientCity) && (
+                            <p className="text-[10px] text-indigo-300/90 flex items-center gap-1">
+                              <Globe className="w-3 h-3 text-indigo-400 shrink-0" />
+                              <span>
+                                {isEn ? 'Client Residence:' : 'Ubicación Cliente:'}{' '}
+                                <strong className="text-white">
+                                  {d.clientCity || ''}{d.clientCity && d.clientCountry ? ', ' : ''}{d.clientCountry || ''}
+                                </strong>
+                              </span>
                             </p>
                           )}
                           <div className="flex items-center gap-2.5 pt-0.5 text-[10px]">

@@ -83,6 +83,8 @@ export interface StudioDossier {
   contactPhone?: string;
   contactEmail?: string;
   contactRole?: string;
+  clientCountry?: string;
+  clientCity?: string;
   category: string;
   city: string;
   neighborhood?: string;
