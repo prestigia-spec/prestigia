@@ -8601,10 +8601,13 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               </div>
             </div>
 
-            {/* =========================================================
-                INTEGRATED: GUÍA PASO A PASO DÓNDE DAR CLIC (AUDITORÍA TOP 3)
-                ========================================================= */}
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl print:hidden">
+            {/* Paso a Paso y Guión Revelados Únicamente Tras Generar Auditoría Forense con IA */}
+            {auditGeneratedData && (
+              <>
+                {/* =========================================================
+                    INTEGRATED: GUÍA PASO A PASO DÓNDE DAR CLIC (AUDITORÍA TOP 3)
+                    ========================================================= */}
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl print:hidden">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
                 <div className="space-y-1">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
@@ -8718,8 +8721,20 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                 <button
                   type="button"
                   onClick={() => {
-                    const script = `Hola ${auditBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos minuciosamente su perfil de Google Maps en ${auditCity || 'su ciudad'} y descubrimos la razón exacta por la cual no está apareciendo en los primeros 3 lugares: su ficha tiene 3 fugas algorítmicas críticas (carece de categorías secundarias de búsqueda transaccional, su catálogo de servicios no tiene precios y su flujo de opiniones está estancado). Nuestros cálculos muestran que está perdiendo aproximadamente entre $1,000 y $3,000 USD mensuales en clientes que se van con sus competidores del Top 3. En Prestigia reestructuramos el 100% de su perfil y le activamos nuestro software inteligente de reseñas para inyectar 5 estrellas semanales y superar a sus rivales. Al activar hoy su Plan Prestigia a la medida para su negocio, nosotros absorbemos el 100% del setup técnico de optimización ($0 costo de implementación bonificado). ¿Le gustaría ver la comparativa directa frente a su competidor más fuerte?`;
-                    copyToClipboard(script, 'Guión de Venta de Auditoría');
+                    const clientPersonName = auditContactName.trim() ? auditContactName.trim() : (auditBusinessName.trim() || (isEn ? 'Business Owner' : 'propietario'));
+                    const senderIdentity = isLuismaMaster
+                      ? 'Luisma de Prestigia'
+                      : currentUser?.agencyName
+                      ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}`
+                      : currentUser?.name
+                      ? `${currentUser.name} de Local Prestigia`
+                      : (isEn ? 'the Local Prestigia team' : 'el equipo de Local Prestigia');
+
+                    const script = isEn
+                      ? `Hello *${clientPersonName}*, this is *${senderIdentity}*.\n\nWe audited your Google Maps profile for *${auditBusinessName || 'your business'}* in *${auditCity || 'your city'}* and identified the exact reasons keeping you outside the Top 3: your profile has critical algorithmic leaks costing you dozens of local buyers daily.\n\nWe restructured the 100% technical blueprint to outrank podium competitors, and activate the official *Prestigia (5★ Reviews + Digital Shield)* software suite.\n\nBy activating your *Tailored Prestigia Plan* today, we *WAIVE 100% of the optimization setup fee ($0 USD)*.\n\nWould you like to review the direct head-to-head comparison against your top rival?`
+                      : `Hola *${clientPersonName}*, le saluda *${senderIdentity}*.\n\nAuditamos minuciosamente el perfil de Google Maps de *${auditBusinessName || 'su negocio'}* en *${auditCity || 'su ciudad'}* y descubrimos la razón exacta por la cual no está en los primeros 3 lugares: su ficha tiene fugas algorítmicas críticas que le regalan clientes a su competencia a diario.\n\nEn Prestigia reestructuramos el 100% de su perfil para desbancar a los líderes del podio y le activamos la suite oficial de *Prestigia (Reseñas 5★ + Blindaje Digital)* para inyectar opiniones 5 estrellas continuas.\n\nAl activar hoy su *Plan Prestigia a la medida*, nosotros le *BONIFICAMOS el 100% del setup técnico de optimización ($0 costo de implementación)*.\n\n¿Tiene 2 minutos para ver la comparativa directa frente a su competidor más fuerte?`;
+
+                    copyToClipboard(script, isEn ? 'Audit Pitch (WhatsApp)' : 'Guión de Venta de Auditoría (WhatsApp)');
                   }}
                   className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer shrink-0 active:scale-98"
                 >
@@ -8730,20 +8745,25 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
               {/* Pitch Display Card */}
               <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 text-xs text-slate-200 leading-relaxed italic space-y-2">
-                <span className="font-bold text-amber-300 not-italic block text-xs">
-                  {isEn ? '🎙️ Forensic Audit Closing Pitch:' : '🎙️ Speech de Cierre de Auditoría Forense:'}
-                </span>
+                <div className="flex items-center justify-between not-italic">
+                  <span className="font-bold text-amber-300 block text-xs">
+                    {isEn ? '🎙️ Forensic Audit Closing Pitch:' : '🎙️ Speech de Cierre de Auditoría Forense:'}
+                  </span>
+                  <span className="text-[10px] text-amber-400/80 font-mono">
+                    {isLuismaMaster ? '👑 Prestigia Direct' : currentUser?.agencyName ? `🏢 Marca Blanca: ${currentUser.agencyName}` : '🛡️ Local Prestigia'}
+                  </span>
+                </div>
                 <p>
                   {isEn ? (
-                    <>"Hello <strong>{auditBusinessName || 'Business Owner'}</strong>, this is the Prestigia team. We audited your Google profile in <strong>{auditCity || 'your area'}</strong> and pinpointed exactly why you aren\'t ranking in the Top 3: your listing suffers from <strong>3 critical algorithmic flaws</strong> leaking clients daily. Your podium competitors capture 68% of all searches due to secondary category indexing and fresh weekly reviews. We structured the exact 5-step blueprint to dethrone them."</>
+                    <>"Hello <strong>{auditContactName || auditBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}</strong>. We audited your Google profile in <strong>{auditCity || 'your area'}</strong> and pinpointed exactly why you aren\'t ranking in the Top 3: your listing suffers from <strong>3 critical algorithmic flaws</strong> leaking clients daily. We structured the exact blueprint to dethrone podium rivals and activate the official <strong>Prestigia 5★ Review Acceleration & Digital Shield</strong> platform with 100% waived setup."</>
                   ) : (
-                    <>"Hola <strong>{auditBusinessName || 'propietario'}</strong>, le saluda el equipo de Prestigia. Auditamos su ficha en <strong>{auditCity || 'su zona'}</strong> y detectamos por qué no está en el Top 3: su perfil tiene <strong>3 fallas algorítmicas graves</strong> que le están costando clientes todos los días. Sus competidores líderes tienen flujo activo semanal y catálogo completo, mientras que su ficha pierde el 68% de las búsquedas por falta de categorías secundarias. Hemos estructurado el plan técnico para desbancar a los líderes y activar la plataforma digital de reseñas de Prestigia."</>
+                    <>"Hola <strong>{auditContactName || auditBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}</strong>. Auditamos su ficha en <strong>{auditCity || 'su zona'}</strong> y detectamos por qué no está en el Top 3: su perfil tiene <strong>3 fallas algorítmicas graves</strong> que le están costando clientes todos los días frente a sus competidores líderes. Hemos estructurado el plan técnico para desbancar a los rivales y activar la suite oficial de <strong>Prestigia (Reseñas 5★ + Blindaje Digital)</strong> con setup 100% bonificado."</>
                   )}
                 </p>
               </div>
 
-              {/* Objections & Closing Offer Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              {/* Objections & Closing Offer Grid (3 Columns) */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                 <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
                   <strong className="text-amber-300 block text-xs">
                     {isEn ? '⚠️ Objection: "I already have more reviews than my rival, why optimize?"' : '⚠️ Objeción: "Yo ya tengo más reseñas que mi competidor, ¿para qué optimizar?"'}
@@ -8759,6 +8779,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   </strong>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
                     <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"No agency owns Google. What we do guarantee is the exact mathematical SEO compliance and digital review acceleration engine to shatter competitor moats and capture the Local 3-Pack where 70% of buyer calls happen."' : '"Google no le pertenece a ninguna agencia en el mundo. Lo que sí garantizamos es la arquitectura SEO exacta que exige Google y la tecnología de captura digital de reseñas para quebrar la ventaja de sus rivales y adueñarse de los 3 lugares que se llevan el 70% de las ventas."'}
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 space-y-1.5 bg-gradient-to-b from-slate-900 to-amber-950/20">
+                  <strong className="text-amber-400 block text-xs">
+                    {isEn ? '⚠️ Objection: "How much does optimization cost?"' : '⚠️ Objeción: "¿Y cuánto me cuesta esta optimización?"'}
+                  </strong>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"The forensic audit and Top 3 upgrade is normally $200 to $350 USD. However, by activating your tailored Prestigia 5★ Plan, we WAIVE 100% of the setup ($0 fee). You only cover the monthly software and your listing is fully upgraded for free."' : '"El setup de auditoría y optimización forense vale normalmente de $200 a $350 USD. Sin embargo, al activar hoy su Plan Prestigia de Reseñas 5★ a la medida, le BONIFICAMOS el 100% del setup ($0 costo). Solo cubre su software mensual y su ficha queda optimizada gratis."'}
                   </p>
                 </div>
               </div>
@@ -8789,6 +8818,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                 </button>
               </div>
             </div>
+          </>
+        )}
 
           </div>
         )}
