@@ -3140,6 +3140,10 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     existingReviews?: number;
     phone?: string;
     reviewHighlights?: string[];
+    address?: string;
+    website?: string;
+    detectedCategories?: string[];
+    negativeReviews?: any[];
   }) => {
     if (!auditContactName.trim()) {
       showToast(isEn ? '⚠️ Contact Person / Owner is required (*)' : '⚠️ La Persona de Contacto / Dueño es obligatoria (*)');
@@ -3196,6 +3200,10 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     const finalGoogleUrl = (overrides?.googleUrl ?? auditGoogleUrl).trim();
     const finalRating = Number(overrides?.existingRating ?? auditExistingRating) || 4.5;
     const finalReviews = Number(overrides?.existingReviews ?? auditExistingReviews) || 0;
+    const finalAddress = (overrides?.address || auditScannedListing?.address || '').trim();
+    const finalWebsite = (overrides?.website || auditScannedListing?.website || '').trim();
+    const finalDetectedCategories = overrides?.detectedCategories || auditScannedListing?.detectedCategories || [];
+    const finalNegativeReviews = overrides?.negativeReviews || auditScannedListing?.negativeReviews || [];
 
     try {
       const payload = {
@@ -3212,6 +3220,10 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         lang,
         businessModel: 'storefront',
         serviceAreas: '',
+        address: finalAddress,
+        website: finalWebsite,
+        detectedCategories: finalDetectedCategories,
+        negativeReviews: finalNegativeReviews,
         reviewHighlights: overrides?.reviewHighlights || auditScannedListing?.reviewHighlights || [],
         advisorId: currentUser?.id || 'adv-luisma',
         advisorUsername: currentUser?.username || 'luisma',
@@ -3392,6 +3404,10 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
           existingReviews: place.reviewsCount,
           phone: place.phone || auditPhone,
           reviewHighlights: place.reviewHighlights || [],
+          address: place.address,
+          website: place.website,
+          detectedCategories: place.detectedCategories,
+          negativeReviews: place.negativeReviews,
         });
       } else {
         const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;

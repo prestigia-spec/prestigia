@@ -18,6 +18,10 @@ interface GenerateRequest {
   lang?: 'es' | 'en';
   businessModel?: 'storefront' | 'service_area';
   serviceAreas?: string;
+  address?: string;
+  website?: string;
+  detectedCategories?: string[];
+  negativeReviews?: any[];
   reviewHighlights?: string[];
   advisorId?: string;
   advisorUsername?: string;
@@ -40,6 +44,10 @@ export async function POST(request: Request) {
       lang = 'es',
       businessModel = 'storefront',
       serviceAreas = '',
+      address = '',
+      website = '',
+      detectedCategories = [],
+      negativeReviews = [],
       reviewHighlights = [],
     } = body;
 
@@ -78,10 +86,16 @@ export async function POST(request: Request) {
     const cleanNeighborhood = neighborhood.trim();
     const cleanSpecialties = specialties.trim();
     const cleanPhone = phone.trim();
+    const cleanAddress = typeof address === 'string' ? address.trim() : '';
+    const cleanWebsite = typeof website === 'string' ? website.trim() : '';
     const cleanServiceAreas = serviceAreas.trim();
     const isEn = lang === 'en';
     const isSAB = businessModel === 'service_area';
     const cleanReviewHighlights = Array.isArray(reviewHighlights) ? reviewHighlights.filter(Boolean) : [];
+    const cleanDetectedCategories = Array.isArray(detectedCategories) ? detectedCategories.filter(Boolean) : [];
+    const cleanNegativeReviews = Array.isArray(negativeReviews)
+      ? negativeReviews.map((r: any) => (typeof r === 'string' ? r : r?.text || '')).filter(Boolean).slice(0, 5)
+      : [];
 
     const effectiveReviews = mode === 'create' ? 0 : (Number(existingReviews) || 0);
     const targetTop3Reviews = mode === 'create' ? 100 : Math.max(120, effectiveReviews + 80);
@@ -96,42 +110,53 @@ export async function POST(request: Request) {
     if (geminiKey) {
       try {
         const prompt = `You are Prestigia's Elite Google Maps Local SEO & Local 3-Pack Algorithm Architect.
-Analyze the business data below with deep vertical rigor and produce a winning technical profile in ${isEn ? 'ENGLISH' : 'SPANISH'}.
+Analyze ALL the real-world business data extracted from this Google Maps profile with deep vertical rigor and produce a winning technical profile in ${isEn ? 'ENGLISH' : 'SPANISH'}.
 
 DATA INPUTS:
 - Mode: ${mode === 'create' ? 'NEW LISTING SETUP' : 'FORENSIC AUDIT & TOP 3 UPGRADE'}
 - Business Model: ${isSAB ? 'Service Area Business / Independent Professional (No physical storefront)' : 'Storefront with Physical Address (Walk-in customer location)'}
 - Brand Name: "${cleanName}"
 - Dropdown Niche: "${category}"
+${cleanAddress ? `- Verified Physical Street Address: "${cleanAddress}"` : ''}
 - Exact City & Neighborhood: "${cleanNeighborhood ? cleanNeighborhood + ', ' : ''}${cleanCity}"
+${cleanWebsite ? `- Official Website: "${cleanWebsite}"` : ''}
+${cleanDetectedCategories.length > 0 ? `- Live Google Maps Categories Detected: "${cleanDetectedCategories.join(', ')}"` : ''}
 - Service Areas (if SAB): "${cleanServiceAreas || cleanCity}"
 - Star Specialties & Flagship Services: "${cleanSpecialties || 'High-demand local services'}"
 - Commercial WhatsApp/Phone: "${cleanPhone || 'Direct line'}"
 - Existing Rating: ${existingRating}★ (${existingReviews} reviews)
-${cleanReviewHighlights.length > 0 ? `- Real Customer Feedback Highlights: "${cleanReviewHighlights.join(' | ')}"` : ''}
+${cleanReviewHighlights.length > 0 ? `- Real Customer Feedback & Praise: "${cleanReviewHighlights.join(' | ')}"` : ''}
+${cleanNegativeReviews.length > 0 ? `- Detected Negative Review Friction / Algorithmic Threats: "${cleanNegativeReviews.join(' | ')}"` : ''}
 
 ANALYTICAL DIRECTIVES:
-1. OPERATIONAL ACCURACY: Deduce the EXACT industry from the Niche ("${category}"), Brand ("${cleanName}"), and Specialties ("${cleanSpecialties}"). Never confuse beauty/spa with food, medical with retail, etc.
+1. OPERATIONAL & NICHE RIGOR:
+   - Deduce the EXACT industry and operations from the Brand ("${cleanName}"), Physical Address ("${cleanAddress}"), Dropdown Niche ("${category}"), and Live Detected Categories ("${cleanDetectedCategories.join(', ')}").
+   - If the business is an international courier/shipping/logistics company, real estate, healthcare clinic, legal, automotive workshop, etc., tailormake 100% of the audit, services, and SEO categories strictly to its genuine trade. NEVER default to food/restaurant terminology for non-food businesses.
+   - Ground the audit in its actual physical location (${cleanAddress || (cleanNeighborhood ? cleanNeighborhood + ', ' + cleanCity : cleanCity)}).
 2. COMMERCIAL DESCRIPTION (STRICT: 620-740 CHARACTERS):
-   Craft an engaging, high-converting commercial text. Highlight the atmosphere, signature craft/services in "${cleanSpecialties}", location in ${cleanNeighborhood ? cleanNeighborhood + ', ' : ''}${cleanCity}, and a warm call-to-action with WhatsApp (${cleanPhone}). Grounded, professional, and authentic (no generic spam).
+   Craft an engaging, high-converting commercial text. Highlight the atmosphere, signature craft/services in "${cleanSpecialties || category}", physical location at ${cleanAddress || (cleanNeighborhood ? cleanNeighborhood + ', ' + cleanCity : cleanCity)}, social proof from ${existingReviews} reviews, and a warm call-to-action with WhatsApp (${cleanPhone}). Grounded, professional, and authentic (no generic spam).
 3. CATEGORIES: Primary category must be the precise official Google Maps category. Provide exactly 4-5 strictly relevant secondary categories.
 4. OPTIMIZED TITLE: Formula: "${cleanName} | [Primary Specialty/Category] ${isEn ? 'in' : 'en'} ${cleanNeighborhood || cleanCity}".
-5. SERVICE CATALOG: 4-6 services directly derived from "${cleanSpecialties}", with commercial name, benefit description, and local search tag.
-6. PROTOCOLS & MEDIA: 5 specific photo guidelines tailored to this business, 5 preventive FAQs, and a 60-90s video verification guide tailored to ${isSAB ? 'SAB' : 'storefront'}.
+5. SERVICE CATALOG: 4-6 services directly derived from its real business operations and "${cleanSpecialties || category}", with commercial name, benefit description, and local search tag.
+6. PROTOCOLS & MEDIA: 5 specific photo guidelines tailored to this business (e.g. packages, scales, fleet, reception for shipping; dental suites for clinics), 5 preventive FAQs, and a 60-90s video verification guide tailored to ${isSAB ? 'SAB' : 'storefront'}.
 7. WHATSAPP MEDIA REQUEST KIT ("whatsappOnboardingMessage"):
    The exact, ready-to-copy WhatsApp message for the agency to send directly to the owner/manager of "${cleanName}".
-   CRITICAL REQUIREMENT: This is NOT a customer greeting or chatbot response for consumers. This is an agency onboarding message asking the BUSINESS OWNER to provide their media and materials to build and verify their Google Maps profile.
+   CRITICAL REQUIREMENT: This is an agency onboarding message asking the BUSINESS OWNER to provide their media and materials to build and verify their Google Maps profile.
    MUST strictly include this structure with clear bullet points and emojis:
    - Greeting to the owner: "${isEn ? `Hello ${cleanName}! 👋 To configure and verify your official Google Maps profile with maximum authority, please send us the following materials:` : `¡Hola ${cleanName}! 👋 Para configurar y verificar la ficha oficial de tu negocio en Google Maps con máxima autoridad, requerimos que nos compartas los siguientes materiales:`}"
    - 📸 *1. FOTOS TÉCNICAS (Con buena iluminación):*
-     4-5 specific photo instructions tailored to "${cleanName}" (${cleanSpecialties || 'facade with sign, reception, clean service stations, products, team in uniform, high-res logo'}).
+     4-5 specific photo instructions tailored to "${cleanName}" at ${cleanAddress || cleanCity}.
    - 🎥 *2. VIDEO CONTINUO DE 60 SEGUNDOS (Verificación oficial de Google sin cortes):*
      Toma 1: Calle, número exterior y letrero comercial. Toma 2: Abriendo la puerta con llaves. Toma 3: Mostrador de recepción, datáfono/caja y herramientas de trabajo operativas.
    - 📋 *3. DATOS OPERATIVOS:*
      Horarios exactos de atención, medios de pago recibidos y correo Gmail para transferir la propiedad de la ficha.
    - Closing: "${isEn ? 'We will handle all technical architecture, SEO categories, and Google Maps local rankings! 🚀' : '¡Nosotros nos encargamos de toda la arquitectura técnica, palabras clave locales y posicionamiento en Google Maps! 🚀'}"
 8. POSTS & VELOCITY: 4 weekly Google update posts and a review velocity schedule (target: ${targetTop3Reviews} reviews, ${reviewsPerWeek}/week).
-${mode === 'audit' ? `9. AUDIT FORENSICS: Realistic healthScore (45-70), 4 critical profile gaps, Top 3 competitive insights, and a 5-step prioritized action roadmap.` : ''}
+${mode === 'audit' ? `9. AUDIT FORENSICS & REPUTATION ENGINE:
+   - Realistic healthScore (45-75) based on its ${existingRating}★ and ${existingReviews} reviews.
+   - 4 critical profile gaps addressing its real operational weak points at ${cleanAddress || cleanCity} (e.g., missing secondary categories, vulnerability from negative reviews: "${cleanNegativeReviews.slice(0, 2).join('; ') || 'unanswered complaints'}", unoptimized photo metadata, or absent local keywords).
+   - Top 3 competitive insights comparing "${cleanName}" with local competitors in ${cleanCity}.
+   - 5-step prioritized action roadmap to dominate Google Maps 3-pack.` : ''}
 
 RETURN STRICTLY A COMPACT VALID JSON OBJECT (NO MARKDOWN WRAPPERS):
 {
@@ -298,6 +323,40 @@ function detectTaxonomy(params: {
   const name = (params.businessName || '').toLowerCase();
   const combined = `${cat} ${spec} ${name}`;
   const isEn = params.isEn;
+
+  // PRIORIDAD 0: LOGÍSTICA / ENVÍOS INTERNACIONALES / COURIER / MUDANZAS / CARGA
+  if (
+    cat.includes('logístic') ||
+    cat.includes('logistic') ||
+    cat.includes('envío') ||
+    cat.includes('envio') ||
+    cat.includes('courier') ||
+    cat.includes('shipping') ||
+    combined.includes('envio') ||
+    combined.includes('envío') ||
+    combined.includes('courier') ||
+    combined.includes('shipping') ||
+    combined.includes('freight') ||
+    combined.includes('logist') ||
+    combined.includes('paquet') ||
+    combined.includes('mensajer') ||
+    combined.includes('transporte') ||
+    combined.includes('carga') ||
+    combined.includes('mudanza') ||
+    combined.includes('cargo') ||
+    combined.includes('postal') ||
+    combined.includes('casillero') ||
+    combined.includes('aduan') ||
+    combined.includes('flete') ||
+    combined.includes('embarque')
+  ) {
+    return {
+      primaryCategory: isEn ? 'Shipping and Mailing Service' : 'Servicio de envíos',
+      secondaryCategories: isEn
+        ? ['Courier Service', 'Freight Forwarding Service', 'Logistics Service', 'Moving Company', 'Mailbox Rental Service']
+        : ['Servicio de mensajería', 'Agencia de envíos internacionales', 'Empresa de logística y transporte', 'Servicio de fletes y carga', 'Casillero internacional'],
+    };
+  }
 
   // PRIORIDAD 1: BELLEZA / SPA / ESTÉTICA / BARBERÍA / PELUQUERÍA
   // (Debe evaluarse ANTES que gastronomía para evitar que "barbería" se confunda con "bar")
@@ -715,9 +774,26 @@ function generateNicheCommercialDescription(params: {
   const rawSpecialties = specialties.trim() || (isEn ? 'our flagship specialties' : 'nuestras especialidades principales');
   const catCombined = `${primaryCategory} ${category} ${businessName}`.toLowerCase();
 
-  let niche: 'gastro' | 'health' | 'veterinary' | 'beauty' | 'events' | 'automotive' | 'fitness' | 'retail' | 'general' = 'general';
+  let niche: 'gastro' | 'health' | 'veterinary' | 'beauty' | 'events' | 'automotive' | 'fitness' | 'retail' | 'general' | 'logistics' = 'general';
 
   if (
+    catCombined.includes('envi') ||
+    catCombined.includes('envío') ||
+    catCombined.includes('courier') ||
+    catCombined.includes('shipping') ||
+    catCombined.includes('freight') ||
+    catCombined.includes('logist') ||
+    catCombined.includes('paquet') ||
+    catCombined.includes('mensajer') ||
+    catCombined.includes('transporte') ||
+    catCombined.includes('carga') ||
+    catCombined.includes('mudanza') ||
+    catCombined.includes('cargo') ||
+    catCombined.includes('postal') ||
+    catCombined.includes('casillero')
+  ) {
+    niche = 'logistics';
+  } else if (
     catCombined.includes('barber') ||
     catCombined.includes('peluquer') ||
     catCombined.includes('salon') ||
