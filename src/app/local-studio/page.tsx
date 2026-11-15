@@ -72,6 +72,8 @@ import {
   Target,
   Send,
   CreditCard,
+  Bot,
+  Settings,
 } from 'lucide-react';
 import type { GooglePlaceData, NegativeReviewItem, ReviewDistribution } from '@/app/api/auditor/google-lookup/route';
 
@@ -1853,6 +1855,7 @@ export default function LocalStudioPage() {
   const [rescueScenario, setRescueScenario] = useState<'orphan' | 'third_party' | 'rejected'>('third_party');
   const [rescueMaskedEmail, setRescueMaskedEmail] = useState('');
   const [activeRescueDossierId, setActiveRescueDossierId] = useState<string | null>(null);
+  const [showManualRescueFields, setShowManualRescueFields] = useState(false);
 
   // -------------------------------------------------------------
   // TAB 4: APELACIÓN Y RESCATE LEGAL DE RESEÑAS 1-3★ DEDICATED STATE
@@ -2610,6 +2613,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     setRescueScenario('third_party');
     setRescueMaskedEmail('');
     setActiveRescueDossierId(null);
+    setShowManualRescueFields(false);
     showToast(isEn ? '✨ Ready to run a new rescue' : '✨ Formulario listo para un nuevo rescate');
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3561,6 +3565,13 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         );
         setRescueCategory(matchedCategory);
 
+        // AI Automated Scenario Detection:
+        if (place.reviewsCount === 0 && (!place.phone || !place.website)) {
+          setRescueScenario('orphan');
+        } else {
+          setRescueScenario('third_party');
+        }
+
         showToast(
           isEn
             ? `✓ Listing Recognized: ${extractedName} (${place.rating}★ · ${place.reviewsCount} reviews). Rescue protocol ready!`
@@ -3570,6 +3581,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
         extractedName = fallbackName;
         setRescueBusinessName(fallbackName);
+        setRescueScenario('third_party');
         showToast(isEn ? `✓ Listing set to "${fallbackName}". Rescue protocol ready!` : `✓ Ficha asignada a "${fallbackName}". ¡Protocolo de rescate listo!`);
       }
 
@@ -9314,265 +9326,235 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   </div>
                 )}
 
-                {/* Verified Listing Card (Recognized from Google) */}
-                {rescueScannedListing && (
-                  <div className="p-3.5 rounded-2xl bg-slate-950/90 border border-emerald-500/40 space-y-2 animate-in fade-in">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                        <span>{tTools.rescueDetectedBadge}</span>
-                      </span>
-                      {rescueScannedListing.googleMapsUrl && (
-                        <a
-                          href={rescueScannedListing.googleMapsUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[10px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
-                        >
-                          <span>Google Maps</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      )}
+                {/* Verified Listing Card (Recognized from Google) + AI Ownership Diagnosis */}
+                {rescueScannedListing ? (
+                  <div className="space-y-3 animate-in fade-in">
+                    {/* Tarjeta de Ficha Reconocida en Google Maps */}
+                    <div className="p-3.5 rounded-2xl bg-slate-950/90 border border-emerald-500/40 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                          <span>{isEn ? 'Verified Listing Recognized' : 'Ficha Reconocida en Google Maps'}</span>
+                        </span>
+                        {rescueScannedListing.googleMapsUrl && (
+                          <a
+                            href={rescueScannedListing.googleMapsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                          >
+                            <span>Google Maps</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
+                      </div>
+
+                      <div>
+                        <h4 className="font-black text-white text-sm">{rescueBusinessName || rescueScannedListing.name}</h4>
+                        <p className="text-[11px] text-slate-300 pt-0.5">
+                          📍 {rescueAddress || rescueScannedListing.address || `${rescueCity}, ${rescueCountry}`}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-300 font-mono pt-1 border-t border-slate-800/80">
+                        <span className="text-amber-400 font-bold">★ {rescueScannedListing.rating?.toFixed(1) || '0.0'}</span>
+                        <span>·</span>
+                        <span>{rescueScannedListing.reviewsCount || 0} {isEn ? 'reviews' : 'reseñas'}</span>
+                        {(rescuePhone || rescueScannedListing.phone) && (
+                          <>
+                            <span>·</span>
+                            <span className="text-emerald-400 font-bold">📞 {rescuePhone || rescueScannedListing.phone}</span>
+                          </>
+                        )}
+                        {rescueCategory && (
+                          <>
+                            <span>·</span>
+                            <span className="text-indigo-300">{rescueCategory}</span>
+                          </>
+                        )}
+                      </div>
                     </div>
 
-                    <div>
-                      <h4 className="font-black text-white text-xs">{rescueScannedListing.name}</h4>
-                      {rescueScannedListing.address && (
-                        <p className="text-[10px] text-slate-400 truncate">{rescueScannedListing.address}</p>
-                      )}
+                    {/* Diagnóstico Algorítmico IA de Titularidad & Caso Asignado */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-950/60 via-slate-950 to-slate-900 border border-indigo-500/40 space-y-3">
+                      <div className="flex items-center justify-between pb-2 border-b border-indigo-500/20">
+                        <div className="flex items-center gap-2">
+                          <Bot className="w-4 h-4 text-indigo-400" />
+                          <span className="text-xs font-black text-indigo-300">
+                            {isEn ? 'AI Ownership Diagnostic & Action Route' : 'Diagnóstico IA de Titularidad & Ruta de Rescate'}
+                          </span>
+                        </div>
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-500/40">
+                          {isEn ? 'Automatic Decision' : 'Decisión Algorítmica'}
+                        </span>
+                      </div>
+
+                      <div className="text-xs text-slate-200 leading-relaxed space-y-1">
+                        {rescueScenario === 'orphan' ? (
+                          <p>
+                            {isEn
+                              ? <>⚡ <strong>AI Diagnostic:</strong> The listing has no active primary manager or presents unmanaged signals. <strong>Case 1 (Immediate Direct Claim)</strong> active. Verifiable via call/SMS or 60s video without waiting 72 hours.</>
+                              : <>⚡ <strong>Diagnóstico de la IA:</strong> La ficha no cuenta con gestor verificado activo o presenta señales de ficha sin reclamar. <strong>Caso 1 (Reclamación Inmediata)</strong> activo. Reclamable vía llamada/SMS o video de 60s sin esperar 72 horas.</>}
+                          </p>
+                        ) : rescueScenario === 'rejected' ? (
+                          <p>
+                            {isEn
+                              ? <>⚖️ <strong>AI Diagnostic:</strong> Previous claim was denied or refused by the third party. <strong>Case 3 (Evidentiary Legal Appeal)</strong> active. File certified evidentiary dossier with Google Trust & Safety.</>
+                              : <>⚖️ <strong>Diagnóstico de la IA:</strong> La solicitud previa fue rechazada o denegada por el tercero. <strong>Caso 3 (Apelación Probatoria Legal)</strong> activo. Radicar expediente probatorio ante Google Trust & Safety para restitución forzosa.</>}
+                          </p>
+                        ) : (
+                          <p>
+                            {isEn
+                              ? <>⏳ <strong>AI Diagnostic:</strong> Profile is active with customer reviews and commercial seniority, indicating it is held by a third party (former agency/ex-employee). <strong>Case 2 (Official 72-Hour Legal Protocol)</strong> active.</>
+                              : <>⏳ <strong>Diagnóstico de la IA:</strong> La ficha está activa con reseñas y antigüedad comercial, indicando posesión por un tercero (agencia anterior o ex-empleado). <strong>Caso 2 (Protocolo Oficial de 72 Horas de Google)</strong> activo.</>}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Selector Rápido de 3 Píldoras (1-Clic) */}
+                      <div className="pt-2 border-t border-slate-800">
+                        <span className="text-[10px] font-bold text-slate-400 block mb-1.5">
+                          {isEn ? 'Switch Strategy / Case (1-Click):' : 'Cambiar Estrategia / Caso (1-Clic):'}
+                        </span>
+                        <div className="grid grid-cols-3 gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setRescueScenario('orphan')}
+                            className={`px-2 py-2 rounded-xl text-[10.5px] font-bold transition flex flex-col items-center justify-center text-center cursor-pointer ${
+                              rescueScenario === 'orphan'
+                                ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/20 ring-1 ring-amber-400'
+                                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800'
+                            }`}
+                          >
+                            <span>⚡ {isEn ? 'Case 1' : 'Caso 1'}</span>
+                            <span className="text-[9px] font-normal opacity-90">{isEn ? 'Orphan' : 'Huérfana'}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setRescueScenario('third_party')}
+                            className={`px-2 py-2 rounded-xl text-[10.5px] font-bold transition flex flex-col items-center justify-center text-center cursor-pointer ${
+                              rescueScenario === 'third_party'
+                                ? 'bg-indigo-600 text-white font-black shadow-md shadow-indigo-600/30 ring-1 ring-indigo-400'
+                                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800'
+                            }`}
+                          >
+                            <span>⏳ {isEn ? 'Case 2' : 'Caso 2'}</span>
+                            <span className="text-[9px] font-normal opacity-90">{isEn ? '72h Rule' : 'Regla 72h'}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setRescueScenario('rejected')}
+                            className={`px-2 py-2 rounded-xl text-[10.5px] font-bold transition flex flex-col items-center justify-center text-center cursor-pointer ${
+                              rescueScenario === 'rejected'
+                                ? 'bg-rose-600 text-white font-black shadow-md shadow-rose-600/30 ring-1 ring-rose-400'
+                                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800'
+                            }`}
+                          >
+                            <span>⚖️ {isEn ? 'Case 3' : 'Caso 3'}</span>
+                            <span className="text-[9px] font-normal opacity-90">{isEn ? 'Appeal' : 'Apelación'}</span>
+                          </button>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-300 font-mono">
-                      <span className="text-amber-400 font-bold">★ {rescueScannedListing.rating?.toFixed(1) || '0.0'}</span>
-                      <span>·</span>
-                      <span>{rescueScannedListing.reviewsCount || 0} {isEn ? 'reviews' : 'reseñas'}</span>
-                      {rescueScannedListing.phone && (
-                        <>
-                          <span>·</span>
-                          <span className="text-slate-400">{rescueScannedListing.phone}</span>
-                        </>
+                    {/* Acordeón Opcional de Ajustes Manuales (Discreto y cerrado por defecto) */}
+                    <div className="pt-1">
+                      <button
+                        type="button"
+                        onClick={() => setShowManualRescueFields((prev) => !prev)}
+                        className="text-[10px] text-slate-400 hover:text-slate-300 font-bold flex items-center gap-1 transition cursor-pointer py-1"
+                      >
+                        <Settings className="w-3 h-3 text-slate-400" />
+                        <span>{showManualRescueFields ? (isEn ? 'Hide manual adjustments' : 'Ocultar ajustes manuales') : (isEn ? 'Edit detected data (Optional)' : 'Modificar datos detectados de la ficha (Opcional)')}</span>
+                      </button>
+
+                      {showManualRescueFields && (
+                        <div className="mt-2 p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5 animate-in fade-in text-xs">
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-300 mb-1">{isEn ? 'Business Name' : 'Nombre de la Ficha'}</label>
+                            <input
+                              type="text"
+                              value={rescueBusinessName}
+                              onChange={(e) => setRescueBusinessName(e.target.value)}
+                              className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[10px] font-bold text-slate-300 mb-1">{isEn ? 'Address' : 'Dirección Física'}</label>
+                              <input
+                                type="text"
+                                value={rescueAddress}
+                                onChange={(e) => setRescueAddress(e.target.value)}
+                                className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-slate-300 mb-1">{isEn ? 'Phone' : 'Teléfono Oficial'}</label>
+                              <input
+                                type="tel"
+                                value={rescuePhone}
+                                onChange={(e) => setRescuePhone(sanitizePhoneOnly(e.target.value))}
+                                className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs font-mono"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[10px] font-bold text-slate-300 mb-1">{isEn ? 'City' : 'Ciudad'}</label>
+                              <input
+                                type="text"
+                                value={rescueCity}
+                                onChange={(e) => setRescueCity(e.target.value)}
+                                className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-slate-300 mb-1">{isEn ? 'Neighborhood' : 'Barrio o Localidad'}</label>
+                              <input
+                                type="text"
+                                value={rescueNeighborhood}
+                                onChange={(e) => setRescueNeighborhood(e.target.value)}
+                                className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                              {isEn ? 'Masked Email (if observed on Google, optional)' : 'Correo Enmascarado (si se observó en Google, opcional)'}
+                            </label>
+                            <input
+                              type="text"
+                              value={rescueMaskedEmail}
+                              onChange={(e) => setRescueMaskedEmail(e.target.value)}
+                              placeholder="Ej: c*****@gmail.com"
+                              className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs font-mono"
+                            />
+                          </div>
+                        </div>
                       )}
                     </div>
+                  </div>
+                ) : (
+                  <div className="p-5 sm:p-6 rounded-2xl bg-slate-950/70 border border-slate-800 text-center space-y-2.5">
+                    <div className="w-10 h-10 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400">
+                      <Sparkles className="w-5 h-5" />
+                    </div>
+                    <strong className="text-white text-xs block">
+                      {isEn ? 'Automatic AI Recovery Ready' : 'Detección Automática por IA'}
+                    </strong>
+                    <p className="text-[11px] text-slate-400 leading-relaxed max-w-sm mx-auto">
+                      {isEn
+                        ? 'Paste the Google Maps link or business name above. Our AI engine extracts all physical data, analyzes the ownership status, and assigns the legal rescue route automatically.'
+                        : 'Ingresa el enlace o nombre en Google Maps arriba. La IA de Prestigia extraerá todos los datos físicos, auditará el estado de titularidad y asignará la ruta legal exacta sin formularios manuales.'}
+                    </p>
                   </div>
                 )}
-
-                <div className="space-y-3 text-xs">
-                  <div>
-                    <label className="block font-bold text-slate-300 mb-1">{isEn ? 'Business Name on Google Maps *' : 'Nombre de la Ficha en Google Maps *'}</label>
-                    <input
-                      type="text"
-                      value={rescueBusinessName}
-                      onChange={(e) => setRescueBusinessName(e.target.value)}
-                      placeholder={isEn ? 'e.g. Apex Dental Center' : 'Ej: Clínica Dental Sanitas'}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 transition"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {isEn ? 'Registered Physical Address *' : 'Dirección Física Registrada en Google Maps *'}
-                      </label>
-                      <input
-                        type="text"
-                        value={rescueAddress}
-                        onChange={(e) => setRescueAddress(e.target.value)}
-                        placeholder={isEn ? 'e.g. 123 Main St, Suite 400' : 'Ej: Cra. 8 Bis #155b-26'}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 transition"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {isEn ? 'Official Listing Phone *' : 'Teléfono Oficial de la Ficha en Google Maps *'}
-                      </label>
-                      <input
-                        type="tel"
-                        value={rescuePhone}
-                        onChange={(e) => setRescuePhone(sanitizePhoneOnly(e.target.value))}
-                        placeholder={isEn ? 'e.g. +1 305 123 4567' : 'Ej: +57 313 227 2123'}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 transition font-mono"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Localización Enlazada en Cascada: País -> Ciudad -> Barrio */}
-                  <div className="space-y-2.5 p-3 rounded-2xl bg-slate-900/60 border border-slate-800">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <Globe className="w-3.5 h-3.5 text-rose-400" />
-                        <span>{isEn ? 'Linked Geographic Location (Americas & Europe)' : 'Ubicación Geográfica Enlazada (América y Europa)'}</span>
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {/* 1º Selector de País con botón + */}
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-xs font-bold text-slate-300">
-                            {isEn ? '1st Country *' : '1º País *'}
-                          </label>
-                          <button
-                            type="button"
-                            onClick={() => setShowAddCountryModal(true)}
-                            className="text-[10px] text-rose-400 hover:text-rose-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
-                            title={isEn ? 'Add another Country to catalog' : 'Agregar otro País al catálogo'}
-                          >
-                            <Plus className="w-3 h-3" />
-                            <span>{isEn ? 'Add Country' : 'Agregar País'}</span>
-                          </button>
-                        </div>
-                        <select
-                          value={rescueCountry}
-                          onChange={(e) => handleSelectRescueCountry(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-rose-400 transition text-sm cursor-pointer"
-                        >
-                          {allCountriesList.map((c) => (
-                            <option key={c} value={c}>
-                              {c}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* 2º Selector de Ciudad condicionado con botón + */}
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-xs font-bold text-slate-300">
-                            {isEn ? `2nd City (${rescueCountry}) *` : `2º Ciudad (${rescueCountry}) *`}
-                          </label>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setTargetCountryForNewCity(rescueCountry);
-                              setShowAddCityModal(true);
-                            }}
-                            className="text-[10px] text-rose-400 hover:text-rose-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
-                            title={isEn ? `Add another City to ${rescueCountry}` : `Agregar otra Ciudad a ${rescueCountry}`}
-                          >
-                            <Plus className="w-3 h-3" />
-                            <span>{isEn ? 'Add City' : 'Agregar Ciudad'}</span>
-                          </button>
-                        </div>
-                        <select
-                          value={rescueCity}
-                          onChange={(e) => setRescueCity(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-rose-400 transition text-sm cursor-pointer"
-                        >
-                          {getCitiesForCountry(rescueCountry).map((cty) => (
-                            <option key={cty} value={cty}>
-                              {cty}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* 3º Barrio / Localidad */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-300 mb-1">
-                        3º Barrio o Localidad *
-                      </label>
-                      <input
-                        type="text"
-                        value={rescueNeighborhood}
-                        onChange={(e) => setRescueNeighborhood(e.target.value)}
-                        placeholder="Ej: Chapinero, Poblado, Polanco, Brickell, Centro..."
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-400 transition text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  {rescueScenario === 'third_party' && (
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {isEn ? 'Masked Owner Email Displayed on Google' : 'Correo Enmascarado que Muestra Google'}
-                      </label>
-                      <input
-                        type="text"
-                        value={rescueMaskedEmail}
-                        onChange={(e) => setRescueMaskedEmail(e.target.value)}
-                        placeholder={isEn ? 'e.g. Masked email shown by Google' : 'Ej: Correo que muestre Google al solicitar acceso'}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 transition"
-                      />
-                      <span className="text-[10px] text-slate-400 mt-1 block">
-                        {isEn ? 'Shown when attempting to claim: "Managed by ..."' : 'Aparece al intentar reclamar: "Esta empresa está gestionada por..."'}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Scenario Selector */}
-                  <div className="pt-2">
-                    <label className="block font-bold text-slate-300 mb-2">{tTools.rescueScenarioLabel}</label>
-                    <div className="space-y-2">
-                      {/* Case 1: Orphan */}
-                      <button
-                        type="button"
-                        onClick={() => setRescueScenario('orphan')}
-                        className={`w-full p-3.5 rounded-2xl text-left border transition cursor-pointer flex flex-col space-y-1 ${
-                          rescueScenario === 'orphan'
-                            ? 'bg-amber-500/10 border-amber-500 text-white shadow-lg ring-1 ring-amber-500/30'
-                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between pb-0.5">
-                          <span className="text-[10px] font-black uppercase text-amber-400">{isEn ? 'Case 1' : 'Caso 1'}</span>
-                          <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/40">
-                            {isEn ? 'Unclaimed / Orphan' : 'Sin Dueño Reclamado'}
-                          </span>
-                        </div>
-                        <strong className="text-white text-xs block leading-snug">{tTools.scenario1Title}</strong>
-                        <p className="text-[11px] text-slate-400 leading-relaxed">{tTools.scenario1Subtitle}</p>
-                      </button>
-
-                      {/* Case 2: Third Party */}
-                      <button
-                        type="button"
-                        onClick={() => setRescueScenario('third_party')}
-                        className={`w-full p-3.5 rounded-2xl text-left border transition cursor-pointer flex flex-col space-y-1 ${
-                          rescueScenario === 'third_party'
-                            ? 'bg-indigo-500/10 border-indigo-500 text-white shadow-lg ring-1 ring-indigo-500/30'
-                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between pb-0.5">
-                          <span className="text-[10px] font-black uppercase text-indigo-400">{isEn ? 'Case 2' : 'Caso 2'}</span>
-                          <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
-                            {isEn ? '72-Hour Rule' : 'Regla de 72h'}
-                          </span>
-                        </div>
-                        <strong className="text-white text-xs block leading-snug">{tTools.scenario2Title}</strong>
-                        <p className="text-[11px] text-slate-400 leading-relaxed">
-                          {rescueMaskedEmail.trim()
-                            ? (isEn
-                                ? `Managed by "${rescueMaskedEmail.trim()}". Activates Google 72-Hour Legal Transfer Protocol.`
-                                : `Gestionada por "${rescueMaskedEmail.trim()}". Activación del Protocolo Oficial de 72 Horas de Google.`)
-                            : tTools.scenario2Subtitle}
-                        </p>
-                      </button>
-
-                      {/* Case 3: Rejected */}
-                      <button
-                        type="button"
-                        onClick={() => setRescueScenario('rejected')}
-                        className={`w-full p-3.5 rounded-2xl text-left border transition cursor-pointer flex flex-col space-y-1 ${
-                          rescueScenario === 'rejected'
-                            ? 'bg-rose-500/10 border-rose-500 text-white shadow-lg ring-1 ring-rose-500/30'
-                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between pb-0.5">
-                          <span className="text-[10px] font-black uppercase text-rose-400">{isEn ? 'Case 3' : 'Caso 3'}</span>
-                          <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/40">
-                            {isEn ? 'Legal Appeal' : 'Apelación Legal'}
-                          </span>
-                        </div>
-                        <strong className="text-white text-xs block leading-snug">{tTools.scenario3Title}</strong>
-                        <p className="text-[11px] text-slate-400 leading-relaxed">{tTools.scenario3Subtitle}</p>
-                      </button>
-                    </div>
-                  </div>
-                </div>
 
                 {/* Commercial Strategy: Setup Fee & 100% Annual Plan Waiver */}
                 <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-slate-900 to-teal-500/10 border border-emerald-500/30 space-y-3">
