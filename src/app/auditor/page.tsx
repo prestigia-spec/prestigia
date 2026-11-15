@@ -2888,7 +2888,7 @@ _Asesor Comercial: Luisma • Director de Crecimiento & Blindaje Reputacional �
                         <div className="p-2.5 rounded-xl bg-emerald-950/40 print:bg-white border border-emerald-500/30 print:border-slate-200 flex items-center gap-2">
                           <span className="w-5 h-5 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-xs shrink-0">2</span>
                           <p className="text-[11px] print:text-slate-800">
-                            <strong>Respuesta IA en 1-Clic:</strong> Responde reseñas públicas con Gemini y recupera al 25% de clientes perdidos.
+                            <strong>Respuesta IA en 1-Clic:</strong> Responde reseñas públicas con IA Prestigia y recupera al 25% de clientes perdidos.
                           </p>
                         </div>
                         <div className="p-2.5 rounded-xl bg-emerald-950/40 print:bg-white border border-emerald-500/30 print:border-slate-200 flex items-center gap-2">

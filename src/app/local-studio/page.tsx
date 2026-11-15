@@ -808,14 +808,14 @@ const UI_TEXT = {
     saveDossier: 'Guardar en Cartera',
     mod2Badge: 'Módulo 2: Reconocimiento API de Google & Auditoría Forense',
     mod2Title: 'Auditoría Forense de Brechas & Upgrade al Top 3',
-    mod2Desc: 'Solo ingresa la ficha (enlace o nombre de Google Maps). Prestigia reconocerá todos los datos en tiempo real con la API de Google (calificación, reseñas, categoría, dirección) y Gemini ejecutará la auditoría forense al instante.',
+    mod2Desc: 'Solo ingresa la ficha (enlace o nombre de Google Maps). Prestigia reconocerá todos los datos en tiempo real con la API de Google (calificación, reseñas, categoría, dirección) y el Motor de Inteligencia Artificial de Prestigia ejecutará la auditoría forense al instante.',
     mod2Target: 'Objetivo de Ascenso',
     mod2TargetVal: 'Conquista Top 3',
     auditFormHeader: '1. Reconocimiento de Ficha en Google Maps',
     auditInputLabel: 'Enlace de Google Maps o Nombre Comercial',
     auditInputPlaceholder: 'Pega el enlace (maps.app.goo.gl/...) o escribe Nombre Comercial + Ciudad',
     btnScanAndAudit: 'Reconocer Ficha con API de Google & Auditar en 1-Clic',
-    btnScanningAndAuditing: 'Reconociendo Ficha en Google Maps & Auditando con Gemini...',
+    btnScanningAndAuditing: 'Reconociendo Ficha en Google Maps & Auditando con IA Prestigia...',
     verifiedListingBadge: 'Ficha Reconocida en Vivo por Google Maps',
     adjustManuallyLabel: 'Ajustar datos detectados manualmente',
     adjustManuallyHide: 'Ocultar ajustes manuales',
@@ -832,7 +832,7 @@ const UI_TEXT = {
     btnAuditing: 'Analizando Brechas frente al Top 3...',
     readyAuditTitle: 'Listo para Auditar la Ficha en Google Maps',
     readyAuditDesc: 'Pega el enlace de Google Maps a la izquierda y presiona el botón. La API de Google extraerá las métricas reales y la IA generará el diagnóstico forense, brechas y hoja de ruta al Top 3.',
-    consultingAuditAi: 'Auditando Ficha con Algoritmo Google Maps & Gemini',
+    consultingAuditAi: 'Auditando Ficha con Algoritmo Google Maps & IA Prestigia',
     consultingAuditDesc: 'Calculando brechas de visibilidad, analizando el Top 3 local de la zona y estructurando la hoja de ruta de 5 pasos...',
     healthScore: 'Puntaje de Salud SEO Local',
     vulnerableBadge: 'Ficha Vulnerable (-45% visibilidad)',
@@ -892,14 +892,14 @@ const UI_TEXT = {
     saveDossier: 'Save to Portfolio',
     mod2Badge: 'Module 2: Google API Live Recognition & Forensic Audit',
     mod2Title: 'Forensic Gap Audit & Top 3 Upgrade',
-    mod2Desc: 'Simply provide the Google Maps listing (URL or business name). Prestigia will recognize all real-time metrics with Google Maps API (rating, reviews, category, address) and Gemini will execute the forensic audit instantly.',
+    mod2Desc: 'Simply provide the Google Maps listing (URL or business name). Prestigia will recognize all real-time metrics with Google Maps API (rating, reviews, category, address) and Prestigia AI Engine will execute the forensic audit instantly.',
     mod2Target: 'Ranking Goal',
     mod2TargetVal: 'Conquering Top 3',
     auditFormHeader: '1. Google Maps Listing Recognition',
     auditInputLabel: 'Google Maps Link or Business Name',
     auditInputPlaceholder: 'Paste Google Maps link (maps.app.goo.gl/...) or type Business Name + City',
     btnScanAndAudit: 'Recognize Listing with Google API & Audit in 1-Click',
-    btnScanningAndAuditing: 'Recognizing Profile & Auditing with Gemini...',
+    btnScanningAndAuditing: 'Recognizing Profile & Auditing with Prestigia AI...',
     verifiedListingBadge: 'Live Verified Google Maps Profile',
     adjustManuallyLabel: 'Manually adjust detected listing data',
     adjustManuallyHide: 'Hide manual adjustments',
@@ -916,7 +916,7 @@ const UI_TEXT = {
     btnAuditing: 'Analyzing Gaps Against Top 3 Leaders...',
     readyAuditTitle: 'Ready to Audit Google Maps Profile',
     readyAuditDesc: 'Paste the Google Maps link on the left and click the button. Google Maps API will pull live metrics and AI will generate the forensic score, critical gaps, and 5-step roadmap to the Top 3.',
-    consultingAuditAi: 'Auditing Profile with Google Maps Algorithm & Gemini',
+    consultingAuditAi: 'Auditing Profile with Google Maps Algorithm & Prestigia AI',
     consultingAuditDesc: 'Calculating visibility gaps, benchmarking against local Top 3 leaders, and structuring the 5-step action roadmap...',
     healthScore: 'Local SEO Health Score',
     vulnerableBadge: 'Vulnerable Profile (-45% visibility)',
@@ -3080,7 +3080,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       if (resData.success && resData.data) {
         setAuditGeneratedData(resData.data);
         setMonthlyUsage((prev) => ({ ...prev, audits: (prev.audits || 0) + 1 }));
-        showToast(isEn ? '✨ Forensic Audit completed with Gemini AI!' : '✨ ¡Auditoría Forense completada con IA Gemini!');
+        showToast(isEn ? '✨ Forensic Audit completed with Prestigia AI!' : '✨ ¡Auditoría Forense completada con IA Prestigia!');
 
         // AUTO-SAVE to database
         try {
