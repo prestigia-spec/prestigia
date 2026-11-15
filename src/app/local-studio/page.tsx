@@ -5072,9 +5072,10 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">Local Studio • Top 3 Engine</span>
             </div>
           </Link>
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-950/80 border border-indigo-500/40 text-indigo-300 text-[11px] font-bold">
-            <Sparkles className="w-3 h-3 text-amber-400" />
-            <span>{t.tagline}</span>
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 -ml-2.5" />
+            <span>{isEn ? 'Google Maps AI Engine v2026 • Live' : 'Motor IA Google Maps v2026 • En Línea'}</span>
           </span>
         </div>
 
@@ -5084,26 +5085,60 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             <div
               className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs border transition shadow-sm ${
                 currentUser.role === 'admin'
-                  ? 'bg-gradient-to-r from-amber-950/60 to-slate-900 border-amber-500/40 text-amber-200'
-                  : 'bg-gradient-to-r from-indigo-950/60 to-slate-900 border-indigo-500/40 text-indigo-200'
+                  ? 'bg-gradient-to-r from-amber-950/60 via-slate-900 to-slate-950 border-amber-500/40 text-amber-200'
+                  : currentUser.planTier === 'level_2' || currentUser.accountType === 'partner_agency'
+                  ? 'bg-gradient-to-r from-indigo-950/60 via-slate-900 to-slate-950 border-indigo-500/40 text-indigo-200'
+                  : currentUser.planTier === 'level_3'
+                  ? 'bg-gradient-to-r from-cyan-950/60 via-slate-900 to-slate-950 border-cyan-500/40 text-cyan-200'
+                  : 'bg-gradient-to-r from-slate-900 to-slate-950 border-slate-700 text-slate-200'
               }`}
             >
               <div
-                className={`w-2 h-2 rounded-full animate-pulse ${
-                  currentUser.role === 'admin' ? 'bg-amber-400' : 'bg-emerald-400'
+                className={`w-2 h-2 rounded-full animate-pulse shrink-0 ${
+                  currentUser.role === 'admin'
+                    ? 'bg-amber-400'
+                    : currentUser.planTier === 'level_2'
+                    ? 'bg-indigo-400'
+                    : currentUser.planTier === 'level_3'
+                    ? 'bg-cyan-400'
+                    : 'bg-emerald-400'
                 }`}
               />
               <div className="flex flex-col text-left">
                 <div className="flex items-center gap-1.5">
                   <span className="font-extrabold text-white text-[11px] leading-tight">{currentUser.name}</span>
                   <span
-                    className={`text-[9px] font-black uppercase px-1.5 py-0.2 rounded ${
+                    className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded flex items-center gap-1 ${
                       currentUser.role === 'admin'
                         ? 'bg-amber-500 text-slate-950'
-                        : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
+                        : currentUser.planTier === 'level_3'
+                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                        : currentUser.planTier === 'level_2' || currentUser.accountType === 'partner_agency'
+                        ? 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
+                        : 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
                     }`}
                   >
-                    {currentUser.role === 'admin' ? (lang === 'en' ? 'DIRECTOR' : 'DIRECTOR') : (lang === 'en' ? 'ADVISOR' : 'ASESOR')}
+                    {currentUser.role === 'admin' ? (
+                      <>
+                        <Crown className="w-2.5 h-2.5 fill-slate-950" />
+                        <span>DIRECTOR</span>
+                      </>
+                    ) : currentUser.planTier === 'level_3' ? (
+                      <>
+                        <Building2 className="w-2.5 h-2.5 text-cyan-400" />
+                        <span>SÚPER AGENCIA</span>
+                      </>
+                    ) : currentUser.planTier === 'level_2' || currentUser.accountType === 'partner_agency' ? (
+                      <>
+                        <Building2 className="w-2.5 h-2.5 text-indigo-400" />
+                        <span>AGENCIA</span>
+                      </>
+                    ) : (
+                      <>
+                        <User className="w-2.5 h-2.5 text-emerald-400" />
+                        <span>ASESOR</span>
+                      </>
+                    )}
                   </span>
                 </div>
                 <span className="text-[9px] text-slate-400 font-mono">{currentUser.phone}</span>
@@ -5151,15 +5186,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             </button>
           </div>
 
-          {/* Salir Button Solo en la Esquina Superior Derecha */}
+          {/* Salir Button Elegante y Sutil (se ilumina en rojo al hover) */}
           {currentUser && (
             <button
               type="button"
               onClick={handleLogout}
               title={isEn ? 'Log out of Prestigia Local Studio' : 'Cerrar sesión y salir del sistema'}
-              className="px-3 py-1.5 rounded-xl bg-rose-950/80 hover:bg-rose-900 border border-rose-500/50 text-rose-300 hover:text-white transition cursor-pointer text-xs font-black flex items-center gap-1.5 shadow-md active:scale-95 print:hidden"
+              className="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-rose-950/80 border border-slate-800 hover:border-rose-500/50 text-slate-400 hover:text-rose-200 transition-colors duration-200 cursor-pointer text-xs font-bold flex items-center gap-1.5 shadow-sm active:scale-95 print:hidden group"
             >
-              <LogOut className="w-3.5 h-3.5 text-rose-400" />
+              <LogOut className="w-3.5 h-3.5 text-slate-500 group-hover:text-rose-400 transition-colors" />
               <span>{t.logoutBtn}</span>
             </button>
           )}
