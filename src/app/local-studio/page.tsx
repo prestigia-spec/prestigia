@@ -5562,16 +5562,34 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? `🏙️ Client City (${createContactCountry}) *` : `🏙️ Ciudad del Cliente (${createContactCountry}) *`}
-                      </label>
-                      <input
-                        type="text"
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-slate-300">
+                          {isEn ? `🏙️ Client City (${createContactCountry}) *` : `🏙️ Ciudad del Cliente (${createContactCountry}) *`}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTargetCountryForNewCity(createContactCountry);
+                            setShowAddCityModal(true);
+                          }}
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          title={isEn ? `Add another City to ${createContactCountry}` : `Agregar otra Ciudad a ${createContactCountry}`}
+                        >
+                          <Plus className="w-2.5 h-2.5" />
+                          <span>{isEn ? 'Add' : '+ Ciudad'}</span>
+                        </button>
+                      </div>
+                      <select
                         value={createContactCity}
                         onChange={(e) => setCreateContactCity(e.target.value)}
-                        placeholder={isEn ? 'e.g. Miami, Madrid, Bogotá...' : 'Ej: Bogotá, Medellín, Miami...'}
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                      />
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs cursor-pointer"
+                      >
+                        {getCitiesForCountry(createContactCountry).map((cty) => (
+                          <option key={cty} value={cty}>
+                            {cty}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -7066,16 +7084,34 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? `🏙️ Client City (${auditContactCountry}) *` : `🏙️ Ciudad del Cliente (${auditContactCountry}) *`}
-                      </label>
-                      <input
-                        type="text"
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-slate-300">
+                          {isEn ? `🏙️ Client City (${auditContactCountry}) *` : `🏙️ Ciudad del Cliente (${auditContactCountry}) *`}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTargetCountryForNewCity(auditContactCountry);
+                            setShowAddCityModal(true);
+                          }}
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          title={isEn ? `Add another City to ${auditContactCountry}` : `Agregar otra Ciudad a ${auditContactCountry}`}
+                        >
+                          <Plus className="w-2.5 h-2.5" />
+                          <span>{isEn ? 'Add' : '+ Ciudad'}</span>
+                        </button>
+                      </div>
+                      <select
                         value={auditContactCity}
                         onChange={(e) => setAuditContactCity(e.target.value)}
-                        placeholder={isEn ? 'e.g. Miami, Madrid, Bogotá...' : 'Ej: Bogotá, Medellín, Miami...'}
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                      />
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs cursor-pointer"
+                      >
+                        {getCitiesForCountry(auditContactCountry).map((cty) => (
+                          <option key={cty} value={cty}>
+                            {cty}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -8761,16 +8797,34 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? `🏙️ Client City (${rescueContactCountry}) *` : `🏙️ Ciudad del Cliente (${rescueContactCountry}) *`}
-                      </label>
-                      <input
-                        type="text"
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-slate-300">
+                          {isEn ? `🏙️ Client City (${rescueContactCountry}) *` : `🏙️ Ciudad del Cliente (${rescueContactCountry}) *`}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTargetCountryForNewCity(rescueContactCountry);
+                            setShowAddCityModal(true);
+                          }}
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          title={isEn ? `Add another City to ${rescueContactCountry}` : `Agregar otra Ciudad a ${rescueContactCountry}`}
+                        >
+                          <Plus className="w-2.5 h-2.5" />
+                          <span>{isEn ? 'Add' : '+ Ciudad'}</span>
+                        </button>
+                      </div>
+                      <select
                         value={rescueContactCity}
                         onChange={(e) => setRescueContactCity(e.target.value)}
-                        placeholder={isEn ? 'e.g. Miami, Madrid, Bogotá...' : 'Ej: Bogotá, Medellín, Miami...'}
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                      />
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs cursor-pointer"
+                      >
+                        {getCitiesForCountry(rescueContactCountry).map((cty) => (
+                          <option key={cty} value={cty}>
+                            {cty}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -9999,16 +10053,34 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? `🏙️ Client City (${appealContactCountry}) *` : `🏙️ Ciudad del Cliente (${appealContactCountry}) *`}
-                      </label>
-                      <input
-                        type="text"
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-slate-300">
+                          {isEn ? `🏙️ Client City (${appealContactCountry}) *` : `🏙️ Ciudad del Cliente (${appealContactCountry}) *`}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTargetCountryForNewCity(appealContactCountry);
+                            setShowAddCityModal(true);
+                          }}
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          title={isEn ? `Add another City to ${appealContactCountry}` : `Agregar otra Ciudad a ${appealContactCountry}`}
+                        >
+                          <Plus className="w-2.5 h-2.5" />
+                          <span>{isEn ? 'Add' : '+ Ciudad'}</span>
+                        </button>
+                      </div>
+                      <select
                         value={appealContactCity}
                         onChange={(e) => setAppealContactCity(e.target.value)}
-                        placeholder={isEn ? 'e.g. Miami, Madrid, Bogotá...' : 'Ej: Bogotá, Medellín, Miami...'}
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
-                      />
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs cursor-pointer"
+                      >
+                        {getCitiesForCountry(appealContactCountry).map((cty) => (
+                          <option key={cty} value={cty}>
+                            {cty}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 </div>
