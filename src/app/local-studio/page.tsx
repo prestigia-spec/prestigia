@@ -6806,10 +6806,13 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               </div>
             </div>
 
-            {/* =========================================================
-                INTEGRATED: GUÍA PASO A PASO DÓNDE DAR CLIC (CREACIÓN)
-                ========================================================= */}
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl print:hidden">
+            {/* Paso a Paso y Guión Revelados Únicamente Tras Generar con IA */}
+            {createGeneratedData && (
+              <>
+                {/* =========================================================
+                    INTEGRATED: GUÍA PASO A PASO DÓNDE DAR CLIC (CREACIÓN)
+                    ========================================================= */}
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl print:hidden">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
                 <div className="space-y-1">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-950 border border-emerald-500/40 text-emerald-300">
@@ -7062,6 +7065,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                 </button>
               </div>
             </div>
+          </>
+        )}
 
           </div>
         )}
