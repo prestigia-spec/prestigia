@@ -5591,11 +5591,20 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           const newC = e.target.value;
                           setCreateContactCountry(newC);
                           const avCities = getCitiesForCountry(newC);
+                          const defaultCity = avCities[0] || '';
                           if (!avCities.includes(createContactCity) && avCities.length > 0) {
-                            setCreateContactCity(avCities[0]);
+                            setCreateContactCity(defaultCity);
                           }
                           if (COUNTRY_DIALING_CODES[newC] && (!createContactPhone || createContactPhone === '+57')) {
                             setCreateContactPhone(COUNTRY_DIALING_CODES[newC]);
+                          }
+                          // Sincronización automática anti-tontos con la ubicación del negocio en Google Maps
+                          setCreateCountry(newC);
+                          if (defaultCity) {
+                            setCreateCity(defaultCity);
+                          }
+                          if (COUNTRY_DIALING_CODES[newC] && (!createPhone || createPhone === '+57')) {
+                            setCreatePhone(COUNTRY_DIALING_CODES[newC]);
                           }
                         }}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs cursor-pointer"
@@ -5626,7 +5635,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </div>
                       <select
                         value={createContactCity}
-                        onChange={(e) => setCreateContactCity(e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCreateContactCity(val);
+                          setCreateCity(val);
+                        }}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs cursor-pointer"
                       >
                         {getCitiesForCountry(createContactCountry).map((cty) => (
@@ -5639,7 +5652,19 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   </div>
                 </div>
 
-                <div className="space-y-3 text-xs">
+                {/* Tarjeta de Datos del Negocio en Google Maps (Lo que verá Google y los Clientes) */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-950/30 via-slate-950 to-slate-900 border border-emerald-500/30 space-y-3 text-xs">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-emerald-500/20">
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="text-xs font-black text-emerald-300">
+                        {isEn ? '📍 Google Maps Business Info (Public Listing)' : '📍 Datos del Negocio en Google Maps (Público)'}
+                      </span>
+                    </div>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                      PERFIL GOOGLE
+                    </span>
+                  </div>
                   {/* Business Model Selector */}
                   <div>
                     <label className="block font-bold text-slate-300 mb-1.5">
@@ -5826,7 +5851,19 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-300 mb-1">{t.phone}</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-bold text-slate-300">{t.phone}</label>
+                      {createContactPhone && createPhone !== createContactPhone && (
+                        <button
+                          type="button"
+                          onClick={() => setCreatePhone(createContactPhone)}
+                          className="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold transition cursor-pointer flex items-center gap-1"
+                          title={isEn ? 'Copy client contact WhatsApp' : 'Copiar WhatsApp del cliente contratante'}
+                        >
+                          <span>📞 Copiar WhatsApp cliente</span>
+                        </button>
+                      )}
+                    </div>
                     <input
                       type="tel"
                       value={createPhone}
@@ -5848,39 +5885,67 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   </div>
                 )}
 
-                <button
-                  type="button"
-                  onClick={() => handleGenerateCreate()}
-                  disabled={
-                    isUserSuspended ||
-                    isGeneratingCreate ||
-                    !createContactName.trim() ||
-                    !createContactCompany.trim() ||
-                    !createContactPhone.trim() ||
-                    !createContactEmail.trim() ||
-                    !isValidEmailFormat(createContactEmail) ||
-                    !createBusinessName.trim() ||
-                    !createCity.trim() ||
-                    !createNeighborhood.trim() ||
-                    !createSpecialties.trim() ||
-                    !createPhone.trim() ||
-                    (createBusinessModel === 'service_area' && !createServiceAreas.trim()) ||
-                    (!isLuismaMaster && monthlyUsage.creates >= getEffectiveQuota('creates'))
+                {/* Botón Generador con Indicador de Campos Faltantes Anti-Tontos */}
+                {(() => {
+                  const missingCreateFields: string[] = [];
+                  if (!createContactName.trim()) missingCreateFields.push(isEn ? 'Owner Name' : 'Nombre del Dueño');
+                  if (!createContactCompany.trim()) missingCreateFields.push(isEn ? 'Company' : 'Empresa / Razón Social');
+                  if (!createContactPhone.trim()) missingCreateFields.push(isEn ? 'WhatsApp' : 'WhatsApp');
+                  if (!createContactEmail.trim() || !isValidEmailFormat(createContactEmail)) {
+                    missingCreateFields.push(isEn ? 'Valid Email' : 'Correo Válido');
                   }
-                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 cursor-pointer active:scale-98"
-                >
-                  {isGeneratingCreate ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>{t.btnGenerating}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 fill-slate-950" />
-                      <span>{t.btnGenerate}</span>
-                    </>
-                  )}
-                </button>
+                  if (!createBusinessName.trim()) missingCreateFields.push(isEn ? 'Business Name' : 'Nombre Comercial');
+                  if (!createCity.trim()) missingCreateFields.push(isEn ? 'City' : 'Ciudad');
+                  if (!createNeighborhood.trim()) missingCreateFields.push(isEn ? 'Neighborhood' : 'Barrio o Localidad');
+                  if (!createSpecialties.trim()) missingCreateFields.push(isEn ? 'Specialties' : 'Especialidades');
+                  if (!createPhone.trim()) missingCreateFields.push(isEn ? 'Business Phone' : 'Teléfono del Negocio');
+                  if (createBusinessModel === 'service_area' && !createServiceAreas.trim()) {
+                    missingCreateFields.push(isEn ? 'Coverage Areas' : 'Zonas de Cobertura');
+                  }
+
+                  const isFormIncomplete = missingCreateFields.length > 0;
+
+                  return (
+                    <div className="space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => handleGenerateCreate()}
+                        disabled={
+                          isUserSuspended ||
+                          isGeneratingCreate ||
+                          isFormIncomplete ||
+                          (!isLuismaMaster && monthlyUsage.creates >= getEffectiveQuota('creates'))
+                        }
+                        className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 cursor-pointer active:scale-98"
+                      >
+                        {isGeneratingCreate ? (
+                          <>
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            <span>{t.btnGenerating}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4 fill-slate-950" />
+                            <span>{t.btnGenerate}</span>
+                          </>
+                        )}
+                      </button>
+
+                      {isFormIncomplete && !isGeneratingCreate && (
+                        <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] text-center font-medium space-y-0.5">
+                          <div className="flex items-center justify-center gap-1.5 font-bold text-amber-200">
+                            <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <span>{isEn ? 'Complete these fields to enable AI:' : 'Para activar la IA, completa los campos requeridos:'}</span>
+                          </div>
+                          <div className="text-[10px] text-amber-400/90 font-mono">
+                            {missingCreateFields.slice(0, 3).join(' • ')}
+                            {missingCreateFields.length > 3 ? ` • (+${missingCreateFields.length - 3} más)` : ''}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {/* Botón rápido Crear Nueva Ficha cuando ya hay una generada */}
                 {createGeneratedData && (
@@ -5953,14 +6018,58 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               {/* Right Column: Output Blueprint (7 cols) */}
               <div className="lg:col-span-7 space-y-5">
                 {!createGeneratedData && !isGeneratingCreate && (
-                  <div className="p-8 rounded-3xl bg-slate-900/50 border border-slate-800 text-center space-y-3">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
-                      <Sparkles className="w-6 h-6 text-amber-400" />
+                  <div className="p-8 sm:p-10 rounded-3xl bg-slate-900/50 border border-slate-800 text-center space-y-4">
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400 shadow-lg shadow-emerald-500/10">
+                      <Sparkles className="w-7 h-7 text-emerald-400" />
                     </div>
-                    <h3 className="text-base font-bold text-white">{t.readyTitle}</h3>
-                    <p className="text-xs text-slate-400 max-w-md mx-auto">
-                      {t.readyDesc}
-                    </p>
+                    <div className="space-y-1">
+                      <h3 className="text-base sm:text-lg font-black text-white">{t.readyTitle}</h3>
+                      <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                        {t.readyDesc}
+                      </p>
+                    </div>
+
+                    {/* Preview 3-Pilares Entregables */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 text-left max-w-xl mx-auto">
+                      <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-base">🏷️</span>
+                          <span className="text-xs font-black text-slate-200">{isEn ? 'Google Taxonomy' : 'Categorías Secretas'}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-snug">
+                          {isEn ? 'Primary & secondary high-converting categories' : 'Categoría primaria oficial y secundarias para posicionar en el Top 3'}
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-base">📝</span>
+                          <span className="text-xs font-black text-slate-200">{isEn ? 'Anti-Ban Copy' : 'Copy 745 Caracteres'}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-snug">
+                          {isEn ? 'SEO-optimized description with local keywords' : 'Descripción persuasiva con palabras clave de compra local sin penalizaciones'}
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-base">📑</span>
+                          <span className="text-xs font-black text-slate-200">{isEn ? 'Client PDF Dossier' : 'Dossier PDF Cliente'}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-snug">
+                          {isEn ? 'White-label technical brief ready to print or send' : 'Expediente técnico con tu logo listo para imprimir o enviar por WhatsApp'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 text-[11px] text-slate-400 font-medium flex items-center justify-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span>{isEn ? '1. Complete form' : '1. Llena los datos a la izquierda'}</span>
+                      <span className="text-slate-600">➔</span>
+                      <span>{isEn ? '2. Generate in 1-Click' : '2. Genera con 1 clic'}</span>
+                      <span className="text-slate-600">➔</span>
+                      <span>{isEn ? '3. Deliver to Client' : '3. Entrega al cliente'}</span>
+                    </div>
                   </div>
                 )}
 
