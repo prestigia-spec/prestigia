@@ -285,11 +285,16 @@ const CATEGORY_OPTIONS_ES = [
   'Estética / Spa / Belleza / Barbería',
   'Automotriz / Taller Mecánico / Lavadero',
   'Fitness / Gimnasio / Centro de Entrenamiento',
+  'Logística / Envíos Internacionales / Courier / Mudanzas',
   'Servicios Profesionales / B2B / Legal / Contable',
+  'Inmobiliaria / Bienes Raíces / Arquitectura',
+  'Hogar / Construcción / Remodelación / Mantenimiento',
+  'Tecnología / Software / Reparación Celulares & PC',
   'Retail / Tienda de Moda / Comercio',
   'Veterinaria / Cuidado de Mascotas',
   'Hotelería / Hospedaje / Turismo',
   'Educación / Academia / Cursos',
+  'Eventos / Recepciones / Fotografía / Producción',
 ];
 
 const CATEGORY_OPTIONS_EN = [
@@ -300,11 +305,16 @@ const CATEGORY_OPTIONS_EN = [
   'Beauty Salon / Spa / Barber Shop',
   'Automotive / Mechanic Shop / Detailing',
   'Fitness Center / Gym / Personal Training',
+  'Logistics / International Shipping / Courier / Freight',
   'Professional Services / Legal / Accounting',
+  'Real Estate / Architecture / Property',
+  'Home Services / Construction / Remodeling',
+  'Technology / Software / Device Repair',
   'Retail / Fashion Boutique / Store',
   'Veterinary Clinic / Pet Care',
   'Hospitality / Hotel / Tourism',
   'Education / Academy / Training Courses',
+  'Events / Catering / Photography / Production',
 ];
 
 const CATEGORY_OPTIONS = CATEGORY_OPTIONS_ES;
@@ -573,14 +583,163 @@ function parseAddressGeo(
 function mapDetectedCategoryToPrestigia(
   primaryCategory: string,
   detectedCategories: string[] = [],
-  isEn: boolean = false
+  isEn: boolean = false,
+  businessName?: string
 ): string {
-  const combined = (primaryCategory + ' ' + (detectedCategories || []).join(' ')).toLowerCase();
+  const combined = (
+    (primaryCategory || '') + ' ' +
+    (detectedCategories || []).join(' ') + ' ' +
+    (businessName || '')
+  ).toLowerCase();
   const options = isEn ? CATEGORY_OPTIONS_EN : CATEGORY_OPTIONS_ES;
 
+  // 1. Logística / Envíos Internacionales / Courier / Mudanzas / Carga
+  if (
+    combined.includes('envi') ||
+    combined.includes('envío') ||
+    combined.includes('courier') ||
+    combined.includes('shipping') ||
+    combined.includes('freight') ||
+    combined.includes('logist') ||
+    combined.includes('paquet') ||
+    combined.includes('mensajer') ||
+    combined.includes('transporte') ||
+    combined.includes('carga') ||
+    combined.includes('mudanza') ||
+    combined.includes('cargo') ||
+    combined.includes('postal') ||
+    combined.includes('casillero') ||
+    combined.includes('aduan') ||
+    combined.includes('flete') ||
+    combined.includes('embarque') ||
+    combined.includes('dhl') ||
+    combined.includes('fedex') ||
+    combined.includes('servientrega') ||
+    combined.includes('interrapidisimo') ||
+    combined.includes('coordinadora')
+  ) {
+    return options.find((o) => o.includes('Logística') || o.includes('Logistics')) || options[4];
+  }
+
+  // 2. Salud / Clínica / Medicina
+  if (
+    combined.includes('salud') ||
+    combined.includes('medic') ||
+    combined.includes('clinic') ||
+    combined.includes('doctor') ||
+    combined.includes('hospital') ||
+    combined.includes('pediatr') ||
+    combined.includes('dermatolog') ||
+    combined.includes('oftalmolog') ||
+    combined.includes('psicolog') ||
+    combined.includes('terapia')
+  ) {
+    return options.find((o) => o.includes('Salud') || o.includes('Health')) || options[2];
+  }
+
+  // 3. Odontología / Dental
+  if (
+    combined.includes('odont') ||
+    combined.includes('dental') ||
+    combined.includes('dentist') ||
+    combined.includes('ortodon') ||
+    combined.includes('implante dental')
+  ) {
+    return options.find((o) => o.includes('Odontología') || o.includes('Dental')) || options[3];
+  }
+
+  // 4. Estética / Belleza / Barbería / Spa
+  if (
+    combined.includes('belleza') ||
+    combined.includes('spa') ||
+    combined.includes('barber') ||
+    combined.includes('estetica') ||
+    combined.includes('estética') ||
+    combined.includes('salon') ||
+    combined.includes('salón') ||
+    combined.includes('unas') ||
+    combined.includes('uñas') ||
+    combined.includes('hair') ||
+    combined.includes('peluquer') ||
+    combined.includes('manicur') ||
+    combined.includes('pestanas') ||
+    combined.includes('pestañas')
+  ) {
+    return options.find((o) => o.includes('Estética') || o.includes('Beauty')) || options[4];
+  }
+
+  // 5. Automotriz / Taller Mecánico
+  if (
+    combined.includes('auto') ||
+    combined.includes('taller') ||
+    combined.includes('mecanic') ||
+    combined.includes('mecánic') ||
+    combined.includes('lavadero') ||
+    combined.includes('detailing') ||
+    combined.includes('car') ||
+    combined.includes('llanta') ||
+    combined.includes('frenos') ||
+    combined.includes('moto')
+  ) {
+    return options.find((o) => o.includes('Automotriz') || o.includes('Automotive')) || options[5];
+  }
+
+  // 6. Fitness / Gimnasio
+  if (
+    combined.includes('gym') ||
+    combined.includes('gimnasio') ||
+    combined.includes('fitness') ||
+    combined.includes('crossfit') ||
+    combined.includes('entren') ||
+    combined.includes('pilates') ||
+    combined.includes('yoga')
+  ) {
+    return options.find((o) => o.includes('Fitness') || o.includes('Gym')) || options[6];
+  }
+
+  // 7. Inmobiliaria / Bienes Raíces
+  if (
+    combined.includes('inmobili') ||
+    combined.includes('bienes raices') ||
+    combined.includes('bienes raíces') ||
+    combined.includes('real estate') ||
+    combined.includes('propiedad') ||
+    combined.includes('arriendo') ||
+    combined.includes('finca raiz') ||
+    combined.includes('finca raíz')
+  ) {
+    return options.find((o) => o.includes('Inmobiliaria') || o.includes('Real Estate')) || options[7];
+  }
+
+  // 8. Servicios Profesionales / B2B / Legal / Contable
+  if (
+    combined.includes('abogad') ||
+    combined.includes('legal') ||
+    combined.includes('contab') ||
+    combined.includes('consult') ||
+    combined.includes('asesor') ||
+    combined.includes('notar') ||
+    combined.includes('tributar')
+  ) {
+    return options.find((o) => o.includes('Profesionales') || o.includes('Professional')) || options[7];
+  }
+
+  // 9. Cafetería / Panadería
+  if (
+    combined.includes('caf') ||
+    combined.includes('panader') ||
+    combined.includes('pasteler') ||
+    combined.includes('bakery') ||
+    combined.includes('coffee') ||
+    combined.includes('reposter')
+  ) {
+    return options.find((o) => o.includes('Cafetería') || o.includes('Coffee')) || options[1];
+  }
+
+  // 10. Restaurante / Gastronomía / Gastrobar
+  // NOTA CRÍTICA: NO usar substring "bar" a secas para no capturar "embarque", "barrio", etc.
   if (
     combined.includes('restauran') ||
-    combined.includes('bar') ||
     combined.includes('comida') ||
     combined.includes('pizza') ||
     combined.includes('burger') ||
@@ -588,75 +747,19 @@ function mapDetectedCategoryToPrestigia(
     combined.includes('parrilla') ||
     combined.includes('pasta') ||
     combined.includes('gastro') ||
-    combined.includes('asador')
+    combined.includes('asador') ||
+    combined.includes('taco') ||
+    combined.includes('sushi') ||
+    combined.includes('marisco') ||
+    combined.includes('ceviche') ||
+    combined.includes('arepa') ||
+    combined.includes('gastrobar') ||
+    /\b(bar|bares|pub|cantina|cervecer[ií]a|licorera)\b/i.test(combined)
   ) {
     return options[0];
   }
-  if (
-    combined.includes('caf') ||
-    combined.includes('panader') ||
-    combined.includes('pasteler') ||
-    combined.includes('bakery') ||
-    combined.includes('coffee')
-  ) {
-    return options[1];
-  }
-  if (
-    combined.includes('odont') ||
-    combined.includes('dental') ||
-    combined.includes('dentist')
-  ) {
-    return options[3];
-  }
-  if (
-    combined.includes('salud') ||
-    combined.includes('medic') ||
-    combined.includes('clinic') ||
-    combined.includes('doctor') ||
-    combined.includes('hospital')
-  ) {
-    return options[2];
-  }
-  if (
-    combined.includes('belleza') ||
-    combined.includes('spa') ||
-    combined.includes('barber') ||
-    combined.includes('estetica') ||
-    combined.includes('salon') ||
-    combined.includes('unas') ||
-    combined.includes('hair')
-  ) {
-    return options[4];
-  }
-  if (
-    combined.includes('auto') ||
-    combined.includes('taller') ||
-    combined.includes('mecanic') ||
-    combined.includes('lavadero') ||
-    combined.includes('detailing') ||
-    combined.includes('car')
-  ) {
-    return options[5];
-  }
-  if (
-    combined.includes('gym') ||
-    combined.includes('gimnasio') ||
-    combined.includes('fitness') ||
-    combined.includes('crossfit') ||
-    combined.includes('entren')
-  ) {
-    return options[6];
-  }
-  if (
-    combined.includes('abogad') ||
-    combined.includes('legal') ||
-    combined.includes('contab') ||
-    combined.includes('consult') ||
-    combined.includes('inmobili') ||
-    combined.includes('real estate')
-  ) {
-    return options[7];
-  }
+
+  // 11. Retail / Tienda
   if (
     combined.includes('tienda') ||
     combined.includes('retail') ||
@@ -664,10 +767,13 @@ function mapDetectedCategoryToPrestigia(
     combined.includes('ropa') ||
     combined.includes('boutique') ||
     combined.includes('zapater') ||
-    combined.includes('joyer')
+    combined.includes('joyer') ||
+    combined.includes('calzado')
   ) {
-    return options[8];
+    return options.find((o) => o.includes('Retail') || o.includes('Store')) || options[8];
   }
+
+  // 12. Veterinaria / Mascotas
   if (
     combined.includes('veterinar') ||
     combined.includes('mascot') ||
@@ -675,17 +781,35 @@ function mapDetectedCategoryToPrestigia(
     combined.includes('perro') ||
     combined.includes('gato')
   ) {
-    return options[9];
+    return options.find((o) => o.includes('Veterinaria') || o.includes('Veterinary')) || options[9];
   }
+
+  // 13. Hotelería / Hospedaje / Turismo
   if (
     combined.includes('hotel') ||
     combined.includes('hospedaj') ||
     combined.includes('hostal') ||
     combined.includes('turismo') ||
-    combined.includes('resort')
+    combined.includes('resort') ||
+    combined.includes('glamping')
   ) {
-    return options[10];
+    return options.find((o) => o.includes('Hotelería') || o.includes('Hospitality')) || options[10];
   }
+
+  // 14. Hogar / Construcción / Remodelación
+  if (
+    combined.includes('construc') ||
+    combined.includes('remodel') ||
+    combined.includes('plomer') ||
+    combined.includes('electricis') ||
+    combined.includes('pintor') ||
+    combined.includes('cerraj') ||
+    combined.includes('mantenimiento')
+  ) {
+    return options.find((o) => o.includes('Hogar') || o.includes('Home')) || options[0];
+  }
+
+  // 15. Educación / Cursos
   if (
     combined.includes('escuela') ||
     combined.includes('colegio') ||
@@ -694,14 +818,28 @@ function mapDetectedCategoryToPrestigia(
     combined.includes('educacion') ||
     combined.includes('universidad')
   ) {
-    return options[11];
+    return options.find((o) => o.includes('Educación') || o.includes('Education')) || options[11];
   }
 
-  return options[0];
+  // 16. Tecnología / Software / Reparación
+  if (
+    combined.includes('tecnolog') ||
+    combined.includes('software') ||
+    combined.includes('computador') ||
+    combined.includes('celular') ||
+    combined.includes('reparacion') ||
+    combined.includes('apple')
+  ) {
+    return options.find((o) => o.includes('Tecnología') || o.includes('Technology')) || options[0];
+  }
+
+  // Fallback seguro: Servicios Profesionales / B2B en lugar de asumir Restaurante
+  return options.find((o) => o.includes('Profesionales') || o.includes('Professional')) || options[0];
 }
 
 function getAverageTicketByNiche(categoryOrName: string): number {
   const c = categoryOrName.toLowerCase();
+  if (c.includes('logístic') || c.includes('logistic') || c.includes('envío') || c.includes('envio') || c.includes('courier') || c.includes('shipping') || c.includes('flete') || c.includes('carga') || c.includes('mudanza')) return 120;
   if (c.includes('médic') || c.includes('medic') || c.includes('salud') || c.includes('doctor') || c.includes('hospital')) return 180;
   if (c.includes('odont') || c.includes('dental') || c.includes('dentist')) return 250;
   if (c.includes('estétic') || c.includes('spa') || c.includes('dermatolog')) return 95;
@@ -710,9 +848,12 @@ function getAverageTicketByNiche(categoryOrName: string): number {
   if (c.includes('taller') || c.includes('mecánic') || c.includes('automot') || c.includes('auto')) return 160;
   if (c.includes('peluquer') || c.includes('barber') || c.includes('belleza') || c.includes('salon')) return 35;
   if (c.includes('gimnasio') || c.includes('gym') || c.includes('fitness') || c.includes('crossfit')) return 55;
+  if (c.includes('inmobili') || c.includes('real estate') || c.includes('bienes raices')) return 1200;
   if (c.includes('legal') || c.includes('abogad') || c.includes('consultor') || c.includes('contad') || c.includes('b2b')) return 350;
   if (c.includes('hotel') || c.includes('hospedaje') || c.includes('resort')) return 150;
   if (c.includes('tienda') || c.includes('retail') || c.includes('boutique') || c.includes('comercio')) return 45;
+  if (c.includes('hogar') || c.includes('construc') || c.includes('remodel')) return 220;
+  if (c.includes('tecnolog') || c.includes('software') || c.includes('celular')) return 85;
   if (c.includes('caf') || c.includes('panader') || c.includes('bakery') || c.includes('coffee')) return 15;
   // Standard restaurant / gastronomy
   return 30;
@@ -721,6 +862,9 @@ function getAverageTicketByNiche(categoryOrName: string): number {
 function getDefaultKeywordByNiche(cat: string, cityName?: string, isEn: boolean = false): string {
   const c = cat.toLowerCase();
   const cty = cityName ? (isEn ? ` in ${cityName}` : ` en ${cityName}`) : '';
+  if (c.includes('logístic') || c.includes('logistic') || c.includes('envío') || c.includes('envio') || c.includes('courier') || c.includes('shipping') || c.includes('flete') || c.includes('carga') || c.includes('mudanza')) {
+    return isEn ? `International Shipping / Courier Service${cty}` : `Agencia de Envíos Internacionales / Courier${cty}`;
+  }
   if (c.includes('odont') || c.includes('dental') || c.includes('dentist')) {
     return isEn ? `Dental Clinic / Dentist${cty}` : `Clínica Dental / Odontología${cty}`;
   }
@@ -745,11 +889,17 @@ function getDefaultKeywordByNiche(cat: string, cityName?: string, isEn: boolean 
   if (c.includes('gimnasio') || c.includes('gym') || c.includes('fitness')) {
     return isEn ? `Gym / Fitness Center${cty}` : `Gimnasio / Centro Fitness${cty}`;
   }
+  if (c.includes('inmobili') || c.includes('real estate') || c.includes('bienes raices')) {
+    return isEn ? `Real Estate Agency${cty}` : `Agencia Inmobiliaria / Bienes Raíces${cty}`;
+  }
   if (c.includes('legal') || c.includes('abogad') || c.includes('b2b')) {
     return isEn ? `Law Firm / Professional Services${cty}` : `Bufete de Abogados / Asesoría Legal${cty}`;
   }
   if (c.includes('hotel') || c.includes('hospedaje')) {
     return isEn ? `Boutique Hotel / Accommodation${cty}` : `Hotel / Alojamiento${cty}`;
+  }
+  if (c.includes('hogar') || c.includes('construc') || c.includes('remodel')) {
+    return isEn ? `Home Remodeling / Contractor${cty}` : `Servicios para el Hogar / Remodelación${cty}`;
   }
   if (c.includes('caf') || c.includes('panader')) {
     return isEn ? `Coffee Shop / Bakery${cty}` : `Cafetería / Panadería Especializada${cty}`;
@@ -3221,7 +3371,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         const matchedCategory = mapDetectedCategoryToPrestigia(
           place.category || '',
           place.detectedCategories || [],
-          isEn
+          isEn,
+          extractedName
         );
         setAuditCategory(matchedCategory);
 
@@ -3363,7 +3514,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         matchedCategory = mapDetectedCategoryToPrestigia(
           place.category || '',
           place.detectedCategories || [],
-          isEn
+          isEn,
+          extractedName
         );
         setRescueCategory(matchedCategory);
 
@@ -3497,7 +3649,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         matchedCategory = mapDetectedCategoryToPrestigia(
           place.category || '',
           place.detectedCategories || [],
-          isEn
+          isEn,
+          extractedName
         );
         setToolsCategory(matchedCategory);
 
@@ -7604,18 +7757,18 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           {/* 1º Selector de País con botón + */}
                           <div>
-                            <div className="flex items-center justify-between mb-1">
-                              <label className="text-xs font-bold text-slate-300">
+                            <div className="flex items-center justify-between gap-1 mb-1">
+                              <label className="text-xs font-bold text-slate-300 truncate">
                                 {isEn ? '1st Country *' : '1º País *'}
                               </label>
                               <button
                                 type="button"
                                 onClick={() => setShowAddCountryModal(true)}
-                                className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                                className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-1 font-bold transition cursor-pointer shrink-0 whitespace-nowrap bg-amber-500/10 hover:bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-500/30"
                                 title={isEn ? 'Add another Country to catalog' : 'Agregar otro País al catálogo'}
                               >
                                 <Plus className="w-3 h-3" />
-                                <span>{isEn ? 'Add Country' : 'Agregar País'}</span>
+                                <span>{isEn ? 'Country' : 'País'}</span>
                               </button>
                             </div>
                             <select
@@ -7633,21 +7786,21 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                           {/* 2º Selector de Ciudad condicionado con botón + */}
                           <div>
-                            <div className="flex items-center justify-between mb-1">
-                              <label className="text-xs font-bold text-slate-300">
+                            <div className="flex items-center justify-between gap-1 mb-1">
+                              <label className="text-xs font-bold text-slate-300 truncate">
                                 2º Ciudad ({auditCountry}) *
                               </label>
                               <button
                                 type="button"
                                 onClick={() => {
-                              setTargetCountryForNewCity(auditCountry);
-                              setShowAddCityModal(true);
-                            }}
-                            className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                                  setTargetCountryForNewCity(auditCountry);
+                                  setShowAddCityModal(true);
+                                }}
+                                className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-1 font-bold transition cursor-pointer shrink-0 whitespace-nowrap bg-amber-500/10 hover:bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-500/30"
                                 title={`Agregar otra Ciudad a ${auditCountry}`}
                               >
                                 <Plus className="w-3 h-3" />
-                                <span>Agregar Ciudad</span>
+                                <span>Ciudad</span>
                               </button>
                             </div>
                             <select

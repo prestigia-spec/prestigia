@@ -162,12 +162,34 @@ function buildGoogleSeoAudit(params: {
 
   // 1. Determine Industry Niche
   const lowerName = (name + ' ' + (categories[0] || '')).toLowerCase();
-  let niche: 'gastro' | 'health' | 'beauty' | 'auto' | 'hotel' | 'retail' | 'general' = 'general';
+  let niche: 'gastro' | 'health' | 'beauty' | 'auto' | 'hotel' | 'retail' | 'general' | 'logistics' = 'general';
 
   if (
+    lowerName.includes('envi') ||
+    lowerName.includes('envío') ||
+    lowerName.includes('courier') ||
+    lowerName.includes('shipping') ||
+    lowerName.includes('freight') ||
+    lowerName.includes('logist') ||
+    lowerName.includes('paquet') ||
+    lowerName.includes('mensajer') ||
+    lowerName.includes('transporte') ||
+    lowerName.includes('carga') ||
+    lowerName.includes('mudanza') ||
+    lowerName.includes('cargo') ||
+    lowerName.includes('postal') ||
+    lowerName.includes('casillero') ||
+    lowerName.includes('aduan') ||
+    lowerName.includes('embarque') ||
+    lowerName.includes('dhl') ||
+    lowerName.includes('fedex') ||
+    lowerName.includes('servientrega') ||
+    lowerName.includes('interrapidisimo') ||
+    lowerName.includes('coordinadora')
+  ) {
+    niche = 'logistics';
+  } else if (
     lowerName.includes('restauran') ||
-    lowerName.includes('bar') ||
-    lowerName.includes('caf') ||
     lowerName.includes('comida') ||
     lowerName.includes('pizza') ||
     lowerName.includes('burger') ||
@@ -177,7 +199,8 @@ function buildGoogleSeoAudit(params: {
     lowerName.includes('parrilla') ||
     lowerName.includes('gastro') ||
     lowerName.includes('taco') ||
-    lowerName.includes('mondongo')
+    lowerName.includes('mondongo') ||
+    /\b(bar|bares|pub|cantina|cervecer[ií]a|licorera|gastrobar)\b/i.test(lowerName)
   ) {
     niche = 'gastro';
   } else if (
@@ -285,6 +308,15 @@ function buildGoogleSeoAudit(params: {
       'Tienda de artículos para el hogar',
       'Comercio local',
     ],
+    logistics: [
+      'Agencia de envíos internacionales',
+      'Servicio de mensajería y paquetería',
+      'Empresa de logística y transporte',
+      'Casillero internacional',
+      'Servicio de carga aérea y marítima',
+      'Empresa de mudanzas y fletes',
+      'Agencia de aduanas y comercio exterior',
+    ],
     general: [
       'Servicio profesional',
       'Atención personalizada',
@@ -298,13 +330,15 @@ function buildGoogleSeoAudit(params: {
     categories.length > 0
       ? categories
       : [
-          niche === 'gastro'
+          niche === 'logistics'
+            ? 'Agencia de Envíos Internacionales & Logística'
+            : niche === 'gastro'
             ? lowerName.includes('hamburg') || lowerName.includes('burger')
               ? 'Hamburguesería'
               : 'Restaurante'
             : niche === 'health'
             ? 'Clínica'
-            : 'Negocio Local',
+            : 'Servicios Profesionales',
         ];
 
   const missingCategories = pool
@@ -473,8 +507,29 @@ function buildCustomerReviewHighlights(params: {
   const combined = cat + ' ' + name;
 
   if (
+    combined.includes('envi') ||
+    combined.includes('envío') ||
+    combined.includes('courier') ||
+    combined.includes('shipping') ||
+    combined.includes('freight') ||
+    combined.includes('logist') ||
+    combined.includes('paquet') ||
+    combined.includes('mensajer') ||
+    combined.includes('transporte') ||
+    combined.includes('carga') ||
+    combined.includes('mudanza') ||
+    combined.includes('postal') ||
+    combined.includes('casillero')
+  ) {
+    return [
+      'Clientes destacan la puntualidad en entregas internacionales y el rastreo en tiempo real',
+      'Excelente embalaje y cuidado absoluto de paquetería y mercancía delicada',
+      'Asesoría clara en trámites aduaneros, tarifas transparentes y soporte permanente por WhatsApp',
+    ];
+  }
+
+  if (
     combined.includes('restauran') ||
-    combined.includes('bar') ||
     combined.includes('comida') ||
     combined.includes('pizza') ||
     combined.includes('burger') ||
@@ -482,7 +537,8 @@ function buildCustomerReviewHighlights(params: {
     combined.includes('pasta') ||
     combined.includes('cafe') ||
     combined.includes('café') ||
-    combined.includes('panader')
+    combined.includes('panader') ||
+    /\b(bar|bares|pub|cantina|cervecer[ií]a|licorera|gastrobar)\b/i.test(combined)
   ) {
     return [
       'Opiniones elogian el exquisito sabor y la frescura de sus platos',
@@ -580,7 +636,80 @@ function buildCandidateNegativeReviews(params: {
 
   let pool: NegativeReviewItem[] = [];
 
-  if (c.includes('restauran') || c.includes('gastro') || c.includes('bar') || c.includes('caf') || c.includes('comida') || c.includes('pizza') || c.includes('burger')) {
+  if (
+    c.includes('envi') ||
+    c.includes('courier') ||
+    c.includes('shipping') ||
+    c.includes('logist') ||
+    c.includes('paquet') ||
+    c.includes('transporte') ||
+    c.includes('carga') ||
+    c.includes('mudanza') ||
+    c.includes('cargo') ||
+    c.includes('postal') ||
+    c.includes('casillero')
+  ) {
+    pool = [
+      {
+        id: 'rev-neg-1',
+        author: 'Carlos E. Restrepo',
+        rating: 1,
+        timeAgo: 'Hace 2 semanas',
+        text: `Retuvieron mi paquete en aduanas y no me dieron solución rápida en ${name}. Pésimo servicio de envío, no responden llamadas.`,
+        contextFlag: 'off_topic',
+        detectedReason: 'Demora atribuible a retención e inspección aduanera fiscal externa (DIAN/Aduana) ajena a la transportadora (TOS Sec 1.4)',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-2',
+        author: 'Courier Express Competidor',
+        rating: 1,
+        timeAgo: 'Hace 3 semanas',
+        text: `Tarifas infladas en ${name}. Mucho mejor enviar por las agencias del centro que cobran por kilo real y entregan al día siguiente.`,
+        contextFlag: 'competitor',
+        detectedReason: 'Mención y promoción explícita de empresa de envíos competidora • Conflicto de Intereses directo (TOS Sec 4.1)',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-3',
+        author: 'Guillermo V.',
+        rating: 1,
+        timeAgo: 'Hace 1 mes',
+        text: `Dijeron que entregarían un sábado festivo y la oficina estaba cerrada. Una falta de respeto en ${name}.`,
+        contextFlag: 'general_bad_faith',
+        detectedReason: 'Queja punitiva por día no hábil oficial legalmente publicado en los horarios comerciales',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-4',
+        author: 'Sandra Milena H.',
+        rating: 2,
+        timeAgo: 'Hace 2 meses',
+        text: `La caja llegó un poco abollada por fuera aunque el producto interno venía intacto. Deberían mejorar el embalaje en ${name}.`,
+        contextFlag: 'general_bad_faith',
+        detectedReason: 'Mercancía entregada a satisfacción sin siniestro declarado ni afectación al contenido (TOS Sec 1.2)',
+        viability: 'ALTA',
+      },
+      {
+        id: 'rev-neg-5',
+        author: 'Julián Andrés M.',
+        rating: 1,
+        timeAgo: 'Hace 3 meses',
+        text: `Amenacé al asesor con poner 1 estrella si no me exoneraban el impuesto de importación y no aceptó. Aquí tienen su reseña en ${name}.`,
+        contextFlag: 'extortion',
+        detectedReason: 'Intento confeso de coacción para evasión arancelaria externa • Prohibido por Google TOS Sec 3.2',
+        viability: 'ALTA',
+      },
+    ];
+  } else if (
+    c.includes('restauran') ||
+    c.includes('gastro') ||
+    c.includes('caf') ||
+    c.includes('comida') ||
+    c.includes('pizza') ||
+    c.includes('burger') ||
+    /\b(bar|bares|pub|cantina|cervecer[ií]a|licorera|gastrobar)\b/i.test(c)
+  ) {
     pool = [
       {
         id: 'rev-neg-1',
@@ -955,6 +1084,16 @@ function extractDataFromGoogleMapsHtml(html: string): {
     for (const part of parts) {
       const lower = part.toLowerCase();
       if (
+        lower.includes('envi') ||
+        lower.includes('courier') ||
+        lower.includes('shipping') ||
+        lower.includes('logist') ||
+        lower.includes('paquet') ||
+        lower.includes('transporte') ||
+        lower.includes('carga') ||
+        lower.includes('mudanza') ||
+        lower.includes('postal') ||
+        lower.includes('casillero') ||
         lower.includes('hamburg') ||
         lower.includes('restauran') ||
         lower.includes('caf') ||
