@@ -9717,8 +9717,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       type="button"
                       onClick={() => {
                         const claimLetter = isEn
-                          ? `OFFICIAL DEMAND OF BUSINESS PROFILE RESTITUTION (GOOGLE MAPS)\n\nTo Google Business Profile Support & Current Profile Manager,\n\nSubject: Formal Claim of Ownership for "${rescueBusinessName}" located at ${rescueAddress || rescueScannedListing?.address || rescueCity}, ${rescueCountry}.\n\nI, ${rescueContactName}, acting as ${rescueContactRole} and legitimate commercial representative of ${rescueContactCompany || rescueBusinessName}, hereby formally request the immediate transfer and restitution of full ownership of the Google Business Profile "${rescueBusinessName}".\n\nPursuant to Section 4 of Google Business Profile Terms of Service, third-party agencies, contractors, or unauthorized individuals may not withhold or refuse transfer of an official business profile to its legal commercial owner.\n\nRegistered Business Data:\n- Trade Name: ${rescueBusinessName}\n- Physical Address: ${rescueAddress || rescueScannedListing?.address || 'Registered Location'}\n- Official Phone: ${rescuePhone || rescueScannedListing?.phone || rescueContactPhone}\n- Legal Owner Email for Ownership Transfer: ${rescueContactEmail}\n\nWe require the transfer to be executed within 72 business hours. Failure to comply will result in evidentiary escalation directly through Google Support Legal Concierge.\n\nSincerely,\n${rescueContactName}\n${rescueContactCompany || rescueBusinessName}\n${rescueContactPhone}`
-                          : `CARTA FORMAL DE RECLAMACIÓN Y RESTITUCIÓN DE TITULARIDAD EN GOOGLE MAPS\n\nPara: Soporte Oficial de Google Business Profile y Administrador Actual de la Ficha,\n\nAsunto: Reclamación Legal de Propiedad y Titularidad Comercial de "${rescueBusinessName}" ubicada en ${rescueAddress || rescueScannedListing?.address || rescueCity}, ${rescueCountry}.\n\nYo, ${rescueContactName}, en mi calidad de ${rescueContactRole} y legítimo titular de ${rescueContactCompany || rescueBusinessName}, por medio de la presente solicito la RESTITUCIÓN INMEDIATA de la titularidad de la ficha oficial de Google Maps de "${rescueBusinessName}".\n\nDe conformidad con las Políticas Oficiales de Google Business Profile (Sección 4: Terceros y Propiedad de Empresas), se prohíbe taxativamente que una agencia anterior, contratista o tercero retenga la propiedad de una ficha contra la voluntad del titular comercial legítimo.\n\nDatos de la Empresa en Disputa:\n- Nombre Comercial: ${rescueBusinessName}\n- Dirección Física Registrada: ${rescueAddress || rescueScannedListing?.address || 'Dirección registrada en Google Maps'}\n- Teléfono Oficial: ${rescuePhone || rescueScannedListing?.phone || rescueContactPhone}\n- Correo del Titular Legítimo para la Transferencia: ${rescueContactEmail}\n\nSolicitamos proceder con la transferencia en un plazo máximo de 72 horas hábiles. En caso de no obtener respuesta o rechazo injustificado, elevaremos este expediente ante el canal legal probatorio de Google.\n\nAtentamente,\n${rescueContactName}\n${rescueContactCompany || rescueBusinessName}\n${rescueContactPhone}`;
+                          ? `OFFICIAL DEMAND FOR BUSINESS PROFILE RESTITUTION (GOOGLE BUSINESS PROFILE)\n\nDate: ${new Date().toLocaleDateString()}\nTo: Current Profile Manager & Google Business Profile Trust & Safety\n\nSubject: Formal Claim of Primary Ownership for "${rescueBusinessName}" located at ${rescueAddress || rescueScannedListing?.address || rescueCity}, ${rescueCountry}.\n\nI, ${rescueContactName}, acting as ${rescueContactRole} and legitimate legal representative of ${rescueContactCompany || rescueBusinessName}, hereby formally notify and demand the IMMEDIATE TRANSFER of Primary Ownership of the Google Business Profile corresponding to "${rescueBusinessName}".\n\nLEGAL BASIS & GOOGLE POLICIES:\nPursuant to Google Business Profile Third-Party Policies (Fair Treatment & Ownership Guidelines) and Google Terms of Service Section 4:\n1. An unauthorized third party, ex-employee, or marketing agency is strictly prohibited from holding commercial profile ownership against the will of the legitimate business entity.\n2. The merchant has an inalienable right to Primary Ownership over their digital storefront on Google Search and Google Maps.\n\nCOMMERCIAL ASSET IDENTIFICATION:\n- Registered Business Name: ${rescueBusinessName}\n- Official Physical Address: ${rescueAddress || rescueScannedListing?.address || 'Registered Location'}\n- Direct Phone Line: ${rescuePhone || rescueScannedListing?.phone || rescueContactPhone}\n- Legal Claimant Email for Ownership Transfer: ${rescueContactEmail}\n${rescueScannedListing?.googleMapsUrl ? `- Official Maps URL: ${rescueScannedListing.googleMapsUrl}\n` : ''}\nPEREMPTORY DEADLINE:\nIn accordance with Google's Official 72-Hour Legal Arbitration Rule (3 business days), we request that you accept the ownership request currently in your inbox or manually transfer Primary Ownership to ${rescueContactEmail}.\n\nFailure to transfer ownership within 72 business hours will result in immediate escalation to Google Trust & Safety with our certified forensic dossier (Tax ID/EIN, official utility bill, commercial lease, and geocoded video evidence), which will result in forced revocation and potential penalties against your Google account.\n\nSincerely,\n${rescueContactName}\n${rescueContactCompany || rescueBusinessName}\n${rescueContactPhone} · ${rescueContactEmail}`
+                          : `REQUERIMIENTO FORMAL DE RESTITUCIÓN DE TITULARIDAD EN GOOGLE BUSINESS PROFILE\n\nFecha: ${new Date().toLocaleDateString()}\nPara: Administrador Actual de la Ficha & Google Trust & Safety\n\nAsunto: Reclamación Formal de Titularidad y Propiedad Principal de "${rescueBusinessName}" ubicada en ${rescueAddress || rescueScannedListing?.address || rescueCity}, ${rescueCountry}.\n\nYo, ${rescueContactName}, en mi calidad de ${rescueContactRole} y representante legal legítimo de ${rescueContactCompany || rescueBusinessName}, por medio del presente instrumento notifico y exijo la TRANSFERENCIA INMEDIATA de la titularidad de Propietario Principal de la ficha de Google Business Profile correspondiente a "${rescueBusinessName}".\n\nFUNDAMENTO LEGAL & DIRECTRICES OFICIALES DE GOOGLE:\nDe conformidad con las Directrices Oficiales de Google sobre Representación de Terceros (Políticas de Perfil de Empresa sobre Socios y Agencias) y las Condiciones de Servicio de Google (Sección 4):\n1. Queda estrictamente prohibido que una agencia anterior, diseñador web, ex-empleado o tercero retenga, secuestre o bloquee la titularidad de un Perfil de Empresa contra la voluntad de su legítimo propietario comercial.\n2. El comerciante o empresa titular posee el derecho inalienable de ostentar el rol de Propietario Principal (Primary Owner) sobre su presencia en Google Maps y Google Search.\n\nIDENTIFICACIÓN DEL ACTIVO COMERCIAL EN DISPUTA:\n- Nombre Comercial / Razón Social: ${rescueBusinessName}\n- Dirección Física Registrada: ${rescueAddress || rescueScannedListing?.address || 'Dirección registrada en Google Maps'}\n- Línea Telefónica Directa: ${rescuePhone || rescueScannedListing?.phone || rescueContactPhone}\n- Correo del Titular Legítimo para la Transferencia: ${rescueContactEmail}\n${rescueScannedListing?.googleMapsUrl ? `- Enlace Oficial de Google Maps: ${rescueScannedListing.googleMapsUrl}\n` : ''}\nPLAZO PERENTORIO DE RESOLUCIÓN (REGLA DE 72 HORAS DE GOOGLE):\nEn concordancia con el Protocolo Oficial de Disputas de 72 Horas (3 días hábiles) de Google, solicitamos que apruebe de inmediato la solicitud de titularidad que reposa en su bandeja de entrada o transfiera directamente el rol de Propietario Principal a la cuenta: ${rescueContactEmail}.\n\nDe no ejecutarse la transferencia dentro del plazo de 72 horas hábiles o en caso de rechazo infundado, radicaremos el Expediente Probatorio Forense ante el canal de arbitraje de Google Trust & Safety (con RUT/Certificado Fiscal, factura de servicios domiciliarios, contrato de arrendamiento y video-auditoría continua), solicitando la revocación forzosa del tercero y la restitución coactiva de la titularidad.\n\nAtentamente,\n${rescueContactName}\n${rescueContactCompany || rescueBusinessName}\n${rescueContactPhone} · ${rescueContactEmail}`;
                         copyToClipboard(claimLetter, isEn ? 'Legal Restitution Letter' : 'Carta Formal de Reclamación Legal');
                       }}
                       className="py-1.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md active:scale-98"
@@ -9730,8 +9730,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                   <p className="text-[11px] text-slate-300 leading-relaxed bg-slate-950 p-3.5 rounded-2xl border border-slate-800 font-mono">
                     {isEn
-                      ? `Formal legal letter citing Google Terms of Service Sec. 4 ready to submit to Google Legal Support or send via email/WhatsApp to the unauthorized third party withholding the profile.`
-                      : `Carta jurídica redactada bajo las políticas oficiales de Google TOS Sec. 4, lista para adjuntar en la apelación ante el soporte de Google o notificar a la agencia/tercero que tiene retenida la ficha.`}
+                      ? `Formal legal demand citing Google Business Profile Third-Party Policies & TOS Sec. 4. Ready to file with Google Legal Concierge or serve to the unauthorized manager via email/WhatsApp.`
+                      : `Requerimiento legal vinculante sustentado en las Directrices de Terceros de Google Business Profile y TOS Sec. 4, listo para radicar ante Google Trust & Safety o notificar por email/WhatsApp al ocupante no autorizado.`}
                   </p>
                 </div>
 
@@ -9745,33 +9745,33 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           <span>{isEn ? 'Action Plan for Unclaimed Orphan Listing' : 'Plan de Acción Inmediato para Ficha Huérfana'}</span>
                         </span>
                         <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">
-                          {isEn ? '⚡ 5-Minute Resolution' : '⚡ Resolución Inmediata'}
+                          {isEn ? '⚡ 5-Minute Direct Claim' : '⚡ Reclamación Directa en 5 Min'}
                         </span>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                          <span className="font-black text-amber-400 block text-xs">{isEn ? 'Step 1: Open Official Link' : 'Paso 1: Abrir Enlace Oficial'}</span>
-                          <p className="text-[11px] text-slate-300">
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+                          <span className="font-black text-amber-400 block text-xs">{isEn ? 'Step 1: Locate Listing in Google NMX' : 'Paso 1: Localizar Ficha en Google Maps/Search'}</span>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">
                             {isEn
-                              ? 'Search the business on Google Maps and click "Own this business?" or enter Google Business Profile.'
-                              : 'Buscar el negocio en Google Maps y dar clic en "¿Eres el propietario?" o entrar a Google Business Profile.'}
+                              ? 'Open an incognito window with the owner’s Google Workspace or Gmail account. Search the business on Google Maps and click "¿Own this business?" or "Claim this business".'
+                              : 'Abre el navegador con la cuenta Google definitiva del negocio. Busca la ficha en Google Maps o Search y haz clic en "¿Eres el propietario de esta empresa?" o "Reclamar este negocio".'}
                           </p>
                         </div>
-                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                          <span className="font-black text-amber-400 block text-xs">{isEn ? 'Step 2: Choose Verification' : 'Paso 2: Elegir Verificación'}</span>
-                          <p className="text-[11px] text-slate-300">
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+                          <span className="font-black text-amber-400 block text-xs">{isEn ? 'Step 2: Instant Phone or Video Verification' : 'Paso 2: Verificación Telefónica o Video de 60s'}</span>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">
                             {isEn
-                              ? 'Select verification by automated call or SMS directly to the business phone line.'
-                              : 'Seleccionar la verificación por llamada automatizada o SMS al teléfono del establecimiento.'}
+                              ? 'Google presents the available methods: automated call/SMS code to the business phone line (fastest, 60s) or mobile video walkthrough showing street facade, signage, and POS/office.'
+                              : 'Google habilitará llamada o SMS con código de 6 dígitos al teléfono del establecimiento (el más rápido) o Video Verificación móvil grabando fachada, aviso exterior e interior operativo.'}
                           </p>
                         </div>
-                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                          <span className="font-black text-emerald-400 block text-xs">{isEn ? 'Step 3: Shield Ownership' : 'Paso 3: Blindar Titularidad'}</span>
-                          <p className="text-[11px] text-slate-300">
+                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+                          <span className="font-black text-emerald-400 block text-xs">{isEn ? 'Step 3: Primary Ownership Shield' : 'Paso 3: Blindaje de Propietario Principal'}</span>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">
                             {isEn
-                              ? 'Enter the 6-digit code. The listing is immediately transferred to the legitimate owner.'
-                              : 'Digitar el código de 6 dígitos. La ficha pasa de inmediato a ser del dueño, asegurando reseñas y fotos.'}
+                              ? 'Upon entering the 6-digit code or video review (instant to 24h), you become Primary Owner. All reviews and ranking seniority are permanently secured.'
+                              : 'Al ingresar el código o validarse el video, quedas registrado como Propietario Principal. Todas las reseñas, antigüedad y fotos quedan blindadas bajo tu control.'}
                           </p>
                         </div>
                       </div>
@@ -9786,41 +9786,41 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           <span>{isEn ? 'Official 72-Hour Legal Ownership Transfer Protocol' : 'Protocolo Oficial de Transferencia Legal de 72 Horas'}</span>
                         </span>
                         <span className="text-[10px] font-mono text-indigo-300 bg-indigo-950/80 px-2 py-0.5 rounded border border-indigo-500/30">
-                          {isEn ? '⏳ 3 Business Days' : '⏳ 3 Días Hábiles'}
+                          {isEn ? '⏳ 3 Business Days Rule' : '⏳ Regla Oficial de 3 Días Hábiles'}
                         </span>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                          <span className="font-black text-indigo-400 block text-xs">{isEn ? 'Day 1: Submission' : 'Día 1: Radicación'}</span>
-                          <p className="text-[11px] text-slate-300">
+                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+                          <span className="font-black text-indigo-400 block text-xs">{isEn ? 'Day 1: Form Filing (NMX)' : 'Día 1: Radicación Formal en Google'}</span>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">
                             {isEn
-                              ? 'Enter business.google.com/create, search the listing, click "Request Access", and choose Owner role.'
-                              : 'Entrar a business.google.com/create, buscar la ficha y dar clic en "Solicitar Acceso" como Propietario.'}
+                              ? 'Enter business.google.com/create, locate listing, click "Request Access". Select Level: "Owner" (NEVER Manager) and Relationship: "Business Owner". Authorize contact data sharing.'
+                              : 'Entra a business.google.com/create o Maps, pulsa "Solicitar acceso". Nivel: "Propietario" (¡Nunca Administrador!), Relación: "Propietario de la empresa". Autoriza compartir datos.'}
                           </p>
                         </div>
-                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                          <span className="font-black text-indigo-400 block text-xs">{isEn ? 'Days 1-3: Waiting Period' : 'Días 1-3: Espera'}</span>
-                          <p className="text-[11px] text-slate-300">
+                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+                          <span className="font-black text-indigo-400 block text-xs">{isEn ? 'Days 1-3: 72h Clock' : 'Días 1-3: Temporizador de 72 Horas'}</span>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">
                             {isEn
-                              ? 'Google emails the third party. They have exactly 72 hours to accept or transfer.'
-                              : 'Google notifica al correo anterior con un plazo improrrogable de 72 horas para responder o transferir.'}
+                              ? 'Google emails high-priority notification to current holder giving them 3 business days to reply. Send them the Prestigia Legal Demand Letter via email/WhatsApp as commercial pressure.'
+                              : 'Google notifica al correo del ocupante dándole exactamente 3 días hábiles. Envíale la Carta Formal Legal Prestigia por email/WhatsApp para forzar el traspaso voluntario.'}
                           </p>
                         </div>
-                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                          <span className="font-black text-amber-400 block text-xs">{isEn ? 'Day 4: Unlocking' : 'Día 4: Desbloqueo'}</span>
-                          <p className="text-[11px] text-slate-300">
+                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+                          <span className="font-black text-amber-400 block text-xs">{isEn ? 'Day 4: Abandonment Release' : 'Día 4: Desbloqueo por Abandono'}</span>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">
                             {isEn
-                              ? 'If third party does not reply within 72h, Google unlocks the "Claim & Verify" button for the client.'
-                              : 'Si el tercero no responde en 3 días, Google da por abandonada la ficha y desbloquea el reclamo al cliente.'}
+                              ? 'If third party remains silent for 72h, Google rules the profile abandoned. An automated email unlocks the blue "Claim & Verify Profile" button directly in Search and Maps.'
+                              : 'Si el tercero no responde en 72h, Google declara el perfil en abandono y envía un correo oficial liberando el botón azul "Reclamar / Verificar Perfil" en Google Search y Maps.'}
                           </p>
                         </div>
-                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                          <span className="font-black text-emerald-400 block text-xs">{isEn ? 'Day 5: Full Control' : 'Día 5: Control Total'}</span>
-                          <p className="text-[11px] text-slate-300">
+                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+                          <span className="font-black text-emerald-400 block text-xs">{isEn ? 'Day 5: Verification & Eviction' : 'Día 5: Verificación & Expulsión'}</span>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">
                             {isEn
-                              ? 'The owner verifies via SMS, phone call or 60s video and takes 100% legal control.'
-                              : 'El cliente realiza la verificación final por llamada o video de 60s y la ficha queda bajo su control.'}
+                              ? 'Execute verification (60s video or SMS). Once verified as Primary Owner, go to "Business Profile Settings" → "People and access" and immediately remove the unauthorized third party.'
+                              : 'Completa la verificación (Video de 60s o llamada). Como Propietario Principal, entra a "Ajustes del Perfil" → "Personas y acceso" y expulsa definitivamente al secuestrador.'}
                           </p>
                         </div>
                       </div>
@@ -9835,19 +9835,43 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           <span>{isEn ? 'Evidentiary Legal Appeal Protocol (When Third Party Denies Access)' : 'Protocolo de Apelación Legal Probatoria (Cuando el Tercero Niega el Acceso)'}</span>
                         </span>
                         <span className="text-[10px] font-mono text-rose-300 bg-rose-950/80 px-2 py-0.5 rounded border border-rose-500/30">
-                          {isEn ? '⚖️ Google Support Escalation' : '⚖️ Escalamiento Legal con Soporte Google'}
+                          {isEn ? '⚖️ Google Trust & Safety Arbitration' : '⚖️ Arbitraje Directo Google Trust & Safety'}
                         </span>
                       </div>
 
-                      <div className="p-4 rounded-xl bg-rose-950/30 border border-rose-500/30 space-y-2">
-                        <strong className="text-rose-300 block text-xs">
-                          {isEn ? '⚠️ Bad-Faith Third Party Defense:' : '⚠️ Cómo anular la negativa del tercero de mala fe:'}
-                        </strong>
-                        <p className="text-[11px] text-slate-300 leading-relaxed">
-                          {isEn
-                            ? 'Google’s Official Terms of Service clearly state that a marketing agency, contractor, or former employee cannot withhold an official Google Business Profile from the registered business entity. In the rejection email, click "Appeal Decision" and submit the 4 evidentiary documents below. Google will revoke the third party and grant ownership to the client.'
-                            : 'Las políticas oficiales de Google prohíben expresamente que una agencia anterior o un ex-empleado retenga una ficha contra la voluntad del titular comercial. En el correo de rechazo se hace clic en "Apelar Decisión" y se adjuntan las 4 pruebas oficiales. Google revocará al tercero por infracción de políticas.'}
-                        </p>
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+                          <span className="font-black text-rose-400 block text-xs">{isEn ? 'Step 1: Denial Notice' : 'Paso 1: Notificación de Rechazo'}</span>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">
+                            {isEn
+                              ? 'If the third party clicks "Reject", Google emails you immediately. Do not panic: this officially unlocks the Google Trust & Safety evidentiary mediation channel.'
+                              : 'Si el ocupante da clic en "Rechazar", Google te notifica por correo. No te alarmes: esto activa el canal directo de resolución de disputas ante Google Trust & Safety.'}
+                          </p>
+                        </div>
+                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+                          <span className="font-black text-rose-400 block text-xs">{isEn ? 'Step 2: Appeal Trigger' : 'Paso 2: Apertura de Apelación'}</span>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">
+                            {isEn
+                              ? 'In the rejection email, click "Appeal Decision" or enter support.google.com/business/gethelp. Select: "Profile ownership & access" → "Third party denied ownership transfer".'
+                              : 'En el correo de rechazo pulsa "Apelar decisión" o entra a support.google.com/business/gethelp. Elige: "Propiedad y acceso" → "El gestor actual denegó el traspaso".'}
+                          </p>
+                        </div>
+                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+                          <span className="font-black text-amber-400 block text-xs">{isEn ? 'Step 3: Forensic Dossier Upload' : 'Paso 3: Carga de Expediente Probatorio'}</span>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">
+                            {isEn
+                              ? 'Attach the 6 certified documents: Tax ID/EIN, official utility bill (<60d), commercial lease, facade photos with street numbers, and the 60s uncut video walkthrough.'
+                              : 'Adjunta las 6 pruebas oficiales: RUT/Certificado Fiscal, factura de servicios fijos (<60d), contrato de arrendamiento, fotos de fachada con placa y video de 60s sin cortes.'}
+                          </p>
+                        </div>
+                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+                          <span className="font-black text-emerald-400 block text-xs">{isEn ? 'Step 4: Forced Restitution' : 'Paso 4: Restitución Coactiva (24-48h)'}</span>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">
+                            {isEn
+                              ? 'Google Trust & Safety verifies tax identity and physical possession, revokes the bad-faith holder for TOS violation, and reassigns Primary Ownership directly to you.'
+                              : 'Google Trust & Safety valida la personería jurídica y la posesión física, revoca al tercero por violar directrices comerciales y transfiere la ficha coactivamente a tu cuenta.'}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -9856,22 +9880,22 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <div className="pt-2 p-4 sm:p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
                     <div>
                       <strong className="text-white block text-xs">
-                        {isEn ? 'Direct Official Google Business Profile Entry:' : 'Acceso Directo Oficial a Google Business Profile:'}
+                        {isEn ? 'Official Google Business Profile & Dispute Endpoints:' : 'Accesos Directos Oficiales a Servidores de Google Business:'}
                       </strong>
                       <span className="text-[11px] text-slate-400 block mt-0.5">
                         {isEn
-                          ? 'Starts the ownership claim flow directly on Google’s secure servers.'
-                          : 'Inicia el flujo de reclamación de propiedad directamente en los servidores de Google.'}
+                          ? 'Execute the ownership claim, access request, or evidentiary dispute directly on Google’s secure infrastructure.'
+                          : 'Ejecuta la reclamación de propiedad, solicitud de acceso o mediación probatoria directamente en la infraestructura segura de Google.'}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                       {rescueScannedListing?.googleMapsUrl && (
                         <a
                           href={rescueScannedListing.googleMapsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition flex items-center justify-center gap-2 border border-slate-700 cursor-pointer text-center"
+                          className="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition flex items-center justify-center gap-1.5 border border-slate-700 cursor-pointer text-center"
                         >
                           <Globe className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                           <span className="truncate">{tTools.rescueClaimViaMaps}</span>
@@ -9881,10 +9905,19 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         href="https://business.google.com/create"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer text-center"
+                        className="w-full py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20 cursor-pointer text-center"
                       >
                         <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                         <span className="truncate">{tTools.rescueBtnDirectClaim}</span>
+                      </a>
+                      <a
+                        href="https://support.google.com/business/gethelp"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition flex items-center justify-center gap-1.5 shadow-lg shadow-rose-600/20 cursor-pointer text-center"
+                      >
+                        <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">{isEn ? 'Google Dispute Portal' : 'Portal de Apelaciones Google'}</span>
                       </a>
                     </div>
                   </div>
@@ -9898,17 +9931,17 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       <span>{tTools.rescueDocsTitle}</span>
                     </span>
                     <span className="text-[10px] text-slate-400 font-mono">
-                      {isEn ? 'Required for Escalation' : 'Requerido para Escalamiento ante Google'}
+                      {isEn ? 'Google Trust & Safety Certified Checklist' : 'Checklist Oficial Certificado Google Trust & Safety'}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                       <div>
-                        <strong className="text-white block text-xs">{isEn ? '1. Incorporation Certificate / Tax Registration' : '1. Documento de Constitución / Registro Tributario'}</strong>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
-                          {isEn ? 'EIN / Articles of Incorporation (USA), CIF (Spain), RFC (Mexico), or RUT (Colombia).' : 'RUT (Colombia), RFC / Constancia SAT (México), CIF (España) o EIN / Articles of Incorporation (USA).'}
+                        <strong className="text-white block text-xs">{isEn ? '1. Tax ID / Legal Registration' : '1. Registro Tributario & Personería Jurídica'}</strong>
+                        <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                          {isEn ? 'RUT (Colombia), RFC / SAT (Mexico), CIF / Mod. 036 (Spain), or Articles of Org / EIN (USA). Business name and physical address must match Maps 100%.' : 'RUT con personería jurídica (Colombia), Constancia Fiscal SAT (México), CIF/Modelo 036 (España), o EIN/Articles (USA). Razón social y dirección deben ser idénticas a la ficha.'}
                         </p>
                       </div>
                     </div>
@@ -9916,9 +9949,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                       <div>
-                        <strong className="text-white block text-xs">{isEn ? '2. Utility Bill or Commercial Lease' : '2. Factura de Servicios Públicos o Contrato'}</strong>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
-                          {isEn ? 'Recent electricity, water, gas or internet bill with business name and address identical to Google Maps.' : 'Recibo reciente de energía, agua, gas o internet con el nombre comercial y dirección idéntica a Google Maps.'}
+                        <strong className="text-white block text-xs">{isEn ? '2. Fixed Utility Bill (<60-90 Days)' : '2. Factura de Servicios Públicos Fijos (<60d)'}</strong>
+                        <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                          {isEn ? 'Recent electricity, water, gas or business fiber internet bill showing business name and exact street address (mobile prepaid bills rejected).' : 'Recibo reciente de energía eléctrica, agua, gas o internet corporativo de fibra óptica a nombre de la empresa y con la dirección del inmueble (no telefonía celular prepago).'}
                         </p>
                       </div>
                     </div>
@@ -9926,9 +9959,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                       <div>
-                        <strong className="text-white block text-xs">{isEn ? '3. Exterior Facade Photo with Visible Signage' : '3. Foto Exterior de Fachada con Aviso Visible'}</strong>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
-                          {isEn ? 'Street-view photo showing the permanent commercial sign and street address numbers.' : 'Fotografía tomada desde la calle mostrando el letrero comercial permanente y el número de nomenclatura.'}
+                        <strong className="text-white block text-xs">{isEn ? '3. Commercial Lease or Property Deed' : '3. Contrato de Arrendamiento o Escritura'}</strong>
+                        <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                          {isEn ? 'Current signed commercial lease contract or official property deed certifying legal possession and authorized occupancy of the physical premises.' : 'Contrato vigente de arrendamiento comercial con firmas reconocidas o escritura pública que certifique la posesión legal y ocupación autorizada del establecimiento físico.'}
                         </p>
                       </div>
                     </div>
@@ -9936,9 +9969,29 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                       <div>
-                        <strong className="text-white block text-xs">{isEn ? '4. Continuous 60-Second Video Walkthrough' : '4. Video Continuo de 60 Segundos del Local'}</strong>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
-                          {isEn ? 'One continuous uncut take: Exterior facade (0-15s) → Reception desk (15-40s) → POS terminal or tax document (40-60s).' : 'Grabación continua sin cortes: Fachada exterior (0-15s) → Mostrador de recepción (15-40s) → Software o datáfono (40-60s).'}
+                        <strong className="text-white block text-xs">{isEn ? '4. Geotagged Photo Trilogy (GPS Metadata)' : '4. Trilogía Fotográfica con Metadatos GPS'}</strong>
+                        <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                          {isEn ? 'High-res photos: 1) Exterior facade from across the street with permanent signage & street number; 2) Entrance with business hours; 3) Operating POS/checkout area.' : 'Fotos reales en alta resolución: 1) Fachada completa desde la calle con letrero permanente y placa de nomenclatura; 2) Entrada con horario; 3) Caja o datáfono POS imprimiendo ticket.'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-white block text-xs">{isEn ? '5. 60–90s Continuous Video Walkthrough' : '5. Video Continuo de 60 a 90 Segundos sin Cortes'}</strong>
+                        <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                          {isEn ? 'Single uncut take: 0-20s Street sign & facade → 20-50s Walk in through entrance showing service area → 50-80s Employee-only zone, POS/system on, Tax ID → 80-90s Keys opening lock.' : 'Toma continua sin cortes: 0-20s Calle, placa y fachada → 20-50s Entrada al local e instalaciones → 50-80s Área privada, datáfono/software encendido y RUT físico → 80-90s Llaves en puerta.'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-white block text-xs">{isEn ? '6. Official Custom Domain Email' : '6. Correo Corporativo con Dominio Propio'}</strong>
+                        <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                          {isEn ? 'Filing the dispute from a Google Workspace email on the listing’s website domain (e.g. name@company.com) validates DNS ownership and boosts instant approval by 95%.' : 'Radicar la disputa desde un correo corporativo Google Workspace con el mismo dominio de la web (ej: gerencia@tuempresa.com) valida el DNS y acelera la restitución en un 95%.'}
                         </p>
                       </div>
                     </div>
@@ -10055,60 +10108,60 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                       <div className="flex items-center gap-2">
                         <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">1</span>
-                        <strong className="text-white text-xs">{isEn ? 'Locate Profile on Maps' : 'Localizar Ficha en Maps'}</strong>
+                        <strong className="text-white text-xs">{isEn ? 'Locate Profile in Google Maps / Search' : 'Localizar Ficha en Google Maps o Search'}</strong>
                       </div>
                       <p className="text-slate-300 text-[11px] leading-relaxed">
-                        {isEn ? <>Open an incognito browser window. Search for the exact business name on Google Maps and open the public profile.</> : <>Abre el navegador en modo incógnito. Busca el nombre comercial exacto del negocio en Google Maps y abre el perfil público.</>}
+                        {isEn ? <>Open an incognito browser window logged into the owner’s Google Workspace/Gmail account. Search the exact trade name on Google Maps or Search to open the official knowledge panel.</> : <>Abre una ventana de incógnito en tu navegador iniciada con la cuenta Google definitiva del negocio. Busca el nombre comercial exacto en Google Maps o en Google Search para abrir el panel de conocimiento de la empresa.</>}
                       </p>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                       <div className="flex items-center gap-2">
                         <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">2</span>
-                        <strong className="text-white text-xs">{isEn ? 'Click "Claim this Business"' : 'Clic en "Reclamar Empresa"'}</strong>
+                        <strong className="text-white text-xs">{isEn ? 'Click "Own this business?" / "Claim"' : 'Clic en "¿Eres el propietario de esta empresa?"'}</strong>
                       </div>
                       <p className="text-slate-300 text-[11px] leading-relaxed">
-                        {isEn ? <>Below the address, click the link: <strong>"Own this business?"</strong> or <strong>"Claim this business"</strong>.</> : <>Debajo de la dirección, haz clic en el enlace azul: <strong>"¿Eres el propietario de esta empresa?"</strong> o <strong>"Reclamar este negocio"</strong>.</>}
+                        {isEn ? <>Below the address, hours, and phone, locate and click the blue link: <strong>"Own this business?"</strong> or the button <strong>"Claim this business"</strong> to trigger Google’s verification engine.</> : <>Debajo del horario, dirección y teléfono, haz clic en el enlace azul: <strong>"¿Eres el propietario de esta empresa?"</strong> o en el botón <strong>"Reclamar este negocio"</strong> (Claim this business) para activar el motor de verificación de Google.</>}
                       </p>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                       <div className="flex items-center gap-2">
                         <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">3</span>
-                        <strong className="text-white text-xs">{isEn ? 'Click "Request Access"' : 'Clic en "Solicitar Acceso"'}</strong>
+                        <strong className="text-white text-xs">{isEn ? 'View Current Manager & Click "Request Access"' : 'Identificar Ocupante & Clic en "Solicitar Acceso"'}</strong>
                       </div>
                       <p className="text-slate-300 text-[11px] leading-relaxed">
-                        {isEn ? <>If Google indicates the profile belongs to an external email (e.g. <em>c*****@gmail.com</em>), click the blue <strong>"Request Access"</strong> button.</> : <>Si Google muestra que la ficha pertenece a un correo externo (ej: <em>c*****@gmail.com</em>), haz clic en el botón azul <strong>"Solicitar acceso"</strong> (Request Access).</>}
+                        {isEn ? <>Google displays security screen: <em>"This profile is already managed by [e.g. c*****@gmail.com]"</em>. Click the central blue button: <strong>"Request access"</strong> (Solicitar acceso).</> : <>Google mostrará la pantalla de seguridad: <em>"Este perfil ya lo gestiona el usuario [ej: c*****@gmail.com]"</em>. Haz clic en el botón azul central: <strong>"Solicitar acceso"</strong> (Request Access) para abrir el formulario legal de disputa.</>}
                       </p>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                       <div className="flex items-center gap-2">
                         <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">4</span>
-                        <strong className="text-white text-xs">{isEn ? 'Role "Owner" & 72-Hour Window' : 'Nivel "Propietario" & Plazo 72h'}</strong>
+                        <strong className="text-white text-xs">{isEn ? 'Select "Owner" & Start 72-Hour Timer' : 'Elegir "Propietario" & Activar Plazo 72h'}</strong>
                       </div>
                       <p className="text-slate-300 text-[11px] leading-relaxed">
-                        {isEn ? <>Select level <strong>"Owner"</strong>. Google notifies the holder with a mandatory <strong>3-day (72 hours)</strong> window. If they don\'t answer, Google releases direct verification to you.</> : <>Elige nivel <strong>"Propietario"</strong>. Google notifica al secuestrador dándole <strong>3 días (72 horas)</strong> obligatorios. Si no responde, Google libera la verificación directa para ti.</>}
+                        {isEn ? <>Select Level: <strong>"Owner"</strong> (NEVER Manager, or you cannot evict third parties!). Select Relationship: <strong>"Business Owner"</strong>. Enter contact info, check authorization box, and submit.</> : <>Selecciona obligatoriamente Nivel de acceso: <strong>"Propietario"</strong> (¡NUNCA Administrador, o no podrás expulsar al secuestrador!). Relación: <strong>"Propietario de la empresa"</strong>. Ingresa nombre y teléfono, marca autorizar compartir datos y pulsa <strong>"Enviar"</strong>.</>}
                       </p>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                       <div className="flex items-center gap-2">
                         <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">5</span>
-                        <strong className="text-white text-xs">{isEn ? 'Formal Appeal if Rejected' : 'Apelación Formal si Rechazan'}</strong>
+                        <strong className="text-white text-xs">{isEn ? 'Wait 3 Days: Silent Abandonment Release' : 'Plazo 72h: Desbloqueo por Abandono'}</strong>
                       </div>
                       <p className="text-slate-300 text-[11px] leading-relaxed">
-                        {isEn ? <>If the current manager denies or the listing is suspended, access the <strong>Official Google Appeals Tool</strong> and file a formal reinstatement claim.</> : <>Si el secuestrador rechaza o el perfil está suspendido, ingresa a la <strong>Herramienta Oficial de Apelaciones</strong> y abre un caso formal de restitución.</>}
+                        {isEn ? <>Google gives holder <strong>3 business days (72 hours)</strong>. If they fail to reply, Google marks profile abandoned and sends email: <em>"3 days have passed with no response"</em>, unlocking the <strong>"Claim & Verify"</strong> button.</> : <>Google notifica al gestor dándole <strong>3 días hábiles (72 horas)</strong>. Si no responde, Google declara abandono de ficha y te enviará un correo con el asunto <em>"Han pasado 3 días sin respuesta"</em>, desbloqueando el botón <strong>"Reclamar / Verificar Perfil"</strong>.</>}
                       </p>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                       <div className="flex items-center gap-2">
                         <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">6</span>
-                        <strong className="text-white text-xs">{isEn ? 'Evidentiary Dossier Upload' : 'Carga de Expediente Probatorio'}</strong>
+                        <strong className="text-white text-xs">{isEn ? '60s Video Verification or Support Appeal' : 'Verificación Final (Video 60s) o Apelación'}</strong>
                       </div>
                       <p className="text-slate-300 text-[11px] leading-relaxed">
-                        {isEn ? <>Attach the 4 official records: Tax ID / Business license, recent utility bill, facade photo, and POS terminal to Google Trust & Safety to revoke unauthorized holders.</> : <>Adjunta los 4 documentos oficiales: RUT / Tax ID, factura de energía reciente, foto de fachada y datáfono en caja ante Google Trust & Safety para revocar al secuestrador.</>}
+                        {isEn ? <>If released: complete the 60s continuous video walkthrough to become Primary Owner and remove the third party. If rejected: click <strong>"Appeal Decision"</strong> in Google email and upload the 6-document Evidentiary Dossier to revoke unauthorized holders.</> : <>Si quedó libre: completa la Video Verificación continua de 60-90s para asumir como Propietario Principal y expulsar al tercero en "Personas y acceso". Si rechazó: pulsa <strong>"Apelar decisión"</strong> en el correo de Google y adjunta el Expediente Probatorio de 6 documentos.</>}
                       </p>
                     </div>
                   </div>
