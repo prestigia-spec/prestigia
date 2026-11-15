@@ -6842,7 +6842,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <strong className="text-white text-xs">{isEn ? 'Open & Sign In' : 'Abrir e Iniciar Sesión'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    {isEn ? <>Go to <strong>business.google.com</strong>. Sign in with the official business Gmail account (or yours temporarily to transfer later).</> : <>Entra a <strong>business.google.com</strong>. Inicia sesión con el correo Gmail oficial del negocio (o el tuyo temporalmente para luego transferirlo).</>}
+                    {isEn ? (
+                      <>Go to <strong>business.google.com</strong>. Sign in with the official business Gmail account with 2FA active (older than 7 days; avoid newly created accounts).</>
+                    ) : (
+                      <>Entra a <strong>business.google.com</strong>. Inicia sesión con el Gmail oficial del negocio (con al menos 7 días de creado y 2FA activo; evita correos creados hoy).</>
+                    )}
                   </p>
                 </div>
 
@@ -6882,7 +6886,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <strong className="text-white text-xs">{isEn ? '60s Video Verification' : 'Video de Verificación de 60s'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    {isEn ? <>Record one continuous take on mobile:<br/><strong>0-15s:</strong> Street & exterior signage • <strong>15-40s:</strong> Unlocking door & interior • <strong>40-60s:</strong> POS terminal & tax certificate / business license.</> : <>Graba continuo sin cortes con el móvil:<br/><strong>0-15s:</strong> Calle y aviso exterior • <strong>15-40s:</strong> Abrir puerta con llave física e interior • <strong>40-60s:</strong> Datáfono en caja y RUT / documento fiscal.</>}
+                    {isEn ? (
+                      <>Graba <strong>EN VIVO</strong> desde el enlace móvil de Google con GPS activo (no permite galería):<br/><strong>0-15s:</strong> Calle y fachada • <strong>15-40s:</strong> Llave abriendo puerta • <strong>40-60s:</strong> Datáfono, caja y RUT fiscal.</>
+                    ) : (
+                      <>Graba <strong>EN VIVO</strong> desde el enlace móvil de Google con GPS activo (no permite galería):<br/><strong>0-15s:</strong> Calle y aviso exterior • <strong>15-40s:</strong> Llave abriendo puerta • <strong>40-60s:</strong> Datáfono, caja y RUT fiscal.</>
+                    )}
                   </p>
                 </div>
 
@@ -6894,6 +6902,23 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <p className="text-slate-300 text-[11px] leading-relaxed">
                     {isEn ? <>Once verification is submitted, go to "Edit Services" and upload the 6 services and 15 photos generated in this blueprint to trigger the algorithm.</> : <>Una vez enviada la verificación, ve a "Editar servicios" y carga los 6 servicios y 15 fotografías generadas en este expediente para activar el algoritmo.</>}
                   </p>
+                </div>
+              </div>
+
+              {/* Banner de Operación Remota vs Presencial */}
+              <div className="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 text-xs text-slate-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-start gap-2">
+                  <span className="text-base shrink-0">💡</span>
+                  <div>
+                    <strong className="text-indigo-300 text-xs block font-bold">
+                      {isEn ? '¿Working Remotely from your Office? You do NOT need to be at the client store' : '¿Trabajas en Remoto desde tu Oficina? NO necesitas estar en el local'}
+                    </strong>
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      {isEn
+                        ? 'Fill out Steps 1 through 4 from your computer. When Google requests the Video, it gives you a QR code or direct link: copy it and send it via WhatsApp to the business owner so they record the 60 seconds with their phone from the store.'
+                        : 'Llena los Pasos 1 al 4 desde tu computador. Cuando Google pida el Video, te entrega un código QR o enlace directo: cópialo y envíaselo por WhatsApp al dueño del negocio para que él grabe los 60 segundos con su celular dentro del local.'}
+                    </p>
+                  </div>
                 </div>
               </div>
 
