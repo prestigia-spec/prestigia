@@ -50,6 +50,8 @@ export interface StudioAdvisor {
   planTier?: 'level_1' | 'level_2' | 'level_3' | 'founder' | 'courtesy';
   country?: string;
   city?: string;
+  agencyName?: string;
+  customLogoUrl?: string;
   monthlyFeeUsd?: number;
   licenseStatus?: 'active' | 'pending_payment' | 'suspended';
   active: boolean;

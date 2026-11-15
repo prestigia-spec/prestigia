@@ -149,6 +149,8 @@ interface StudioAdvisorUser {
   planTier?: 'level_1' | 'level_2' | 'level_3' | 'founder' | 'courtesy';
   country?: string;
   city?: string;
+  agencyName?: string;
+  customLogoUrl?: string;
   monthlyFeeUsd?: number;
   licenseStatus?: 'active' | 'pending_payment' | 'suspended';
   active: boolean;
@@ -4790,7 +4792,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             <PrestigiaIcon className="w-8 h-8 drop-shadow-md shrink-0" />
             <div className="flex flex-col">
               <span className="text-xs font-black tracking-widest text-white">PRESTIGIA</span>
-              <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">Local Studio • Top 3 Engine</span>
+              <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">Local Prestigia • División Google Maps</span>
             </div>
           </div>
 
@@ -5065,7 +5067,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   5★ SUITE
                 </span>
               </div>
-              <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">Local Studio • Top 3 Engine</span>
+              <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">Local Prestigia • División Google Maps</span>
             </div>
           </Link>
           <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold">
@@ -6962,8 +6964,20 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                 <button
                   type="button"
                   onClick={() => {
-                    const script = `Hola ${createBusinessName || 'Emprendedor'}, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de ${createCategory || 'su sector'} en ${createCity || 'su ciudad'} y notamos una situación crítica: su negocio sencillamente NO existe en Google Maps. Hoy en día, el 70% de las personas que van a comprar o contratar un servicio eligen entre los 3 primeros perfiles que aparecen en el mapa. Cada día que pasa sin ficha, son decenas de clientes que terminan comprándole a su competencia más cercana. En Prestigia no solo creamos y verificamos su ficha oficial ante Google sin riesgo de suspensión, sino que le instalamos la arquitectura para posicionarlo en el Top 3 y le activamos nuestro software inteligente de reseñas para capturar 5 estrellas en su negocio. Al activar hoy su Plan Prestigia a la medida para su negocio, le bonificamos el 100% del setup técnico ($0 costo de creación) y le entregamos la ficha lista para facturar. ¿Agendamos la grabación del video de 60 segundos hoy mismo?`;
-                    copyToClipboard(script, 'Guión de Venta de Creación');
+                    const clientPersonName = createContactName.trim() ? createContactName.trim() : (createBusinessName.trim() || (isEn ? 'Business Owner' : 'propietario'));
+                    const senderIdentity = isLuismaMaster
+                      ? 'Luisma de Prestigia'
+                      : currentUser?.agencyName
+                      ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}`
+                      : currentUser?.name
+                      ? `${currentUser.name} de Local Prestigia`
+                      : (isEn ? 'the Local Prestigia team' : 'el equipo de Local Prestigia');
+
+                    const script = isEn
+                      ? `Hello *${clientPersonName}*, this is *${senderIdentity}*.\n\nWe were analyzing customer searches for *${createCategory || 'your sector'}* in *${createCity || 'your city'}* and identified a critical situation: *${createBusinessName || 'your business'} simply DOES NOT exist on Google Maps*.\n\nToday, 70% of local buyers choose directly from the Top 3 map listings. Every day without a verified profile represents dozens of paying clients lost to your competitors.\n\nWe handle 100% of the technical setup, Top 3 ranking SEO, and official Google verification without suspension risk. Plus, we activate the official *Prestigia (5★ Reviews + Digital Shield)* software suite.\n\nBy activating your *Tailored Prestigia Plan* today, we *WAIVE 100% of the setup fee ($0 creation cost)*.\n\nDo you have 2 minutes to coordinate and send you the 60-second video verification link?`
+                      : `Hola *${clientPersonName}*, le saluda *${senderIdentity}*.\n\nEstuvimos analizando las búsquedas comerciales de *${createCategory || 'su sector'}* en *${createCity || 'su ciudad'}* y notamos una situación crítica: *${createBusinessName || 'su negocio'} sencillamente NO existe en Google Maps*.\n\nHoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha verificada son decenas de ventas que le regala a su competencia más cercana.\n\nNosotros nos encargamos del 100% de la creación técnica, posicionamiento Top 3 y verificación oficial ante Google sin riesgo de suspensión. Además, le activamos la suite de software oficial de *Prestigia (Reseñas 5★ + Blindaje Digital)* para capturar clientes en automático.\n\nAl activar hoy su *Plan Prestigia a la medida*, le *BONIFICAMOS el 100% del setup técnico ($0 costo de creación)* y le entregamos la ficha lista para facturar.\n\n¿Tiene 2 minutos para coordinar la activación y enviarle el enlace del video de 60 segundos?`;
+
+                    copyToClipboard(script, isEn ? 'Creation Pitch (WhatsApp)' : 'Guión de Venta de Creación (WhatsApp)');
                   }}
                   className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer shrink-0 active:scale-98"
                 >
@@ -6974,26 +6988,31 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
               {/* Pitch Display Card */}
               <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-500/30 text-xs text-slate-200 leading-relaxed italic space-y-2">
-                <span className="font-bold text-emerald-300 not-italic block text-xs">
-                  {isEn ? '🎙️ Outreach & Opening Pitch (Call, On-Site or WhatsApp):' : '🎙️ Speech de Prospección & Apertura (Llamada, Visita o WhatsApp):'}
-                </span>
+                <div className="flex items-center justify-between not-italic">
+                  <span className="font-bold text-emerald-300 block text-xs">
+                    {isEn ? '🎙️ Outreach & Opening Pitch (Call, On-Site or WhatsApp):' : '🎙️ Speech de Prospección & Apertura (Llamada, Visita o WhatsApp):'}
+                  </span>
+                  <span className="text-[10px] text-emerald-400/80 font-mono">
+                    {isLuismaMaster ? '👑 Prestigia Direct' : currentUser?.agencyName ? `🏢 Marca Blanca: ${currentUser.agencyName}` : '🛡️ Local Prestigia'}
+                  </span>
+                </div>
                 <p>
                   {isEn ? (
-                    <>"Hello <strong>{createBusinessName || 'Business Owner'}</strong>, this is the Prestigia team. We were analyzing customer searches for <strong>{createCategory || 'your industry'}</strong> in <strong>{createCity || 'your area'}</strong> and noticed a critical gap: your business simply <strong>DOES NOT exist on Google Maps</strong>. Today, 70% of local buyers choose directly from the top 3 map profiles. Every single day without a verified listing represents dozens of paying clients handed to your closest rivals. At Prestigia, we build and verify your official Google profile with Top 3 architecture, and activate our digital 5-star review acceleration platform from week one."</>
+                    <>"Hello <strong>{createContactName || createBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}</strong>. We were analyzing customer searches for <strong>{createCategory || 'your industry'}</strong> in <strong>{createCity || 'your area'}</strong> and noticed a critical gap: <strong>{createBusinessName || 'your business'} simply DOES NOT exist on Google Maps</strong>. Today, 70% of local buyers choose directly from the top 3 map profiles. Every single day without a verified listing represents dozens of paying clients handed to your closest rivals. We build and verify your official Google profile with Top 3 architecture, and activate the official <strong>Prestigia 5★ Review Acceleration & Digital Shield</strong> software suite with 100% waived setup."</>
                   ) : (
-                    <>"Hola <strong>{createBusinessName || 'Emprendedor'}</strong>, le saluda el equipo de Prestigia. Estuvimos analizando las búsquedas comerciales de <strong>{createCategory || 'su sector'}</strong> en <strong>{createCity || 'su ciudad'}</strong> y notamos una situación crítica: su negocio sencillamente <strong>NO existe en Google Maps</strong>. Hoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha son decenas de ventas que le regala a su competencia. Nosotros creamos y verificamos su perfil oficial ante Google con arquitectura Top 3, y le activamos el sistema digital Prestigia para disparar sus reseñas 5★ desde la primera semana."</>
+                    <>"Hola <strong>{createContactName || createBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}</strong>. Estuvimos analizando las búsquedas comerciales de <strong>{createCategory || 'su sector'}</strong> en <strong>{createCity || 'su ciudad'}</strong> y notamos una situación crítica: <strong>{createBusinessName || 'su negocio'} sencillamente NO existe en Google Maps</strong>. Hoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha son decenas de ventas que le regala a su competencia. Nosotros creamos y verificamos su perfil oficial ante Google con arquitectura Top 3, y le activamos la suite oficial de <strong>Prestigia (Reseñas 5★ + Blindaje Digital)</strong> con setup 100% bonificado."</>
                   )}
                 </p>
               </div>
 
-              {/* Objections & Closing Offer Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              {/* Objections & Closing Offer Grid (3 Columns) */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                 <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
                   <strong className="text-amber-300 block text-xs">
                     {isEn ? '⚠️ Objection: "Why pay you if creating a Google listing is free?"' : '⚠️ Objeción: "¿Por qué pagarles si crear una ficha en Google es gratis?"'}
                   </strong>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"Google is free, but 80% of unassisted listings get immediately suspended on video verification or buried on page 4 without receiving a single call. With Prestigia, you don\'t pay for the listing—you invest in the technical architecture that prevents suspensions, locks winning keywords, and propels you into the Top 3 to generate real revenue from month one."' : '"Google es gratis, pero el 80% de los negocios son suspendidos en el video de verificación o quedan sepultados en la página 4 sin recibir una sola llamada. Con Prestigia no paga por la ficha, paga por la arquitectura técnica que evita suspensiones, optimiza categorías y posiciona en el Top 3 para que la ficha facture clientes reales desde el primer mes."'}
+                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"Google is free, but 80% of unassisted listings get immediately suspended on video verification or buried on page 4 without receiving a single call. With us, you don\'t pay for the listing—you invest in the technical architecture that prevents suspensions, locks winning keywords, and propels you into the Top 3 to generate real revenue from month one."' : '"Google es gratis, pero el 80% de los negocios son suspendidos en el video de verificación o quedan sepultados en la página 4 sin recibir una sola llamada. Con nosotros no paga por la ficha, paga por la arquitectura técnica que evita suspensiones, optimiza categorías y posiciona en el Top 3 para que la ficha facture clientes reales desde el primer mes."'}
                   </p>
                 </div>
 
@@ -7002,7 +7021,16 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     {isEn ? '⚠️ Objection: "I don\'t have time to deal with photos and paperwork."' : '⚠️ Objeción: "No tengo tiempo para ocuparme de fotos ni trámites."'}
                   </strong>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"That is the beauty of our turnkey service: we only need a 60-second walkthrough video recorded together on-site, and our team manages 100% of the SEO copywriting, documentation, and official Google verification."' : '"Esa es la ventaja de nuestro servicio llave en mano: solo necesitamos 60 segundos de video que grabamos juntos desde su local y nosotros nos encargamos del 100% de la radicación, redacción SEO y verificación con Google."'}
+                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"That is the beauty of our turnkey service: you only need 60 seconds to open a link on your mobile and record the verification video inside the store (or we accompany you if nearby). Our team manages 100% of the SEO copywriting, Google filing, and official verification."' : '"Esa es la ventaja de nuestro servicio llave en mano: solo necesita 60 segundos para abrir un enlace en su celular y grabar el video dentro del local (o lo acompañamos si estamos cerca). Nosotros nos encargamos del 100% de la radicación, redacción SEO y verificación con Google."'}
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-500/30 space-y-1.5 bg-gradient-to-b from-slate-900 to-emerald-950/20">
+                  <strong className="text-emerald-400 block text-xs">
+                    {isEn ? '⚠️ Objection: "How much does this service cost?"' : '⚠️ Objeción: "¿Y cuánto me cuesta este servicio?"'}
+                  </strong>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"The technical setup and anti-suspension architecture is normally $150 to $250 USD. However, by activating your tailored Prestigia 5★ Review Plan today, we WAIVE 100% of the setup ($0 implementation fee). You only cover the monthly software and your verified listing is built for free."' : '"El setup técnico y blindaje anti-suspensión vale normalmente de $150 a $250 USD. Sin embargo, al activar hoy su Plan Prestigia de Reseñas 5★ a la medida, le BONIFICAMOS el 100% del setup ($0 costo de creación). Solo cubre su software mensual y su ficha le queda creada y verificada gratis."'}
                   </p>
                 </div>
               </div>
