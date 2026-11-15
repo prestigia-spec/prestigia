@@ -11479,6 +11479,64 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     </div>
                   </div>
 
+                  {/* NUEVA MINI-CALCULADORA DE RETORNO ALTO VALOR ($9,000 A $25,000 USD/AÑO) */}
+                  <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-950 to-emerald-950/20 border-2 border-emerald-500/40 space-y-4 shadow-xl">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-emerald-500/20">
+                      <div className="flex items-center gap-2 text-emerald-400 font-black text-xs uppercase tracking-wider">
+                        <TrendingUp className="w-4 h-4" />
+                        <span>{isEn ? 'High-Impact Financial Return Projection' : '💰 Proyección de Retorno Financiero en Google Maps Top 3'}</span>
+                      </div>
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black border border-emerald-500/40 w-fit">
+                        {isEn ? 'Break-Even: 2-3 Clients' : 'Punto de Equilibrio: 2 a 3 Clientes'}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
+                        <span className="text-[10px] text-slate-400 uppercase font-bold block">
+                          {isEn ? 'New Clients Captured:' : 'Captura Mensual Estimada:'}
+                        </span>
+                        <div className="text-lg font-black text-white font-mono mt-0.5">
+                          15 a 35 {isEn ? 'clients/mo' : 'clientes/mes'}
+                        </div>
+                        <span className="text-[10px] text-slate-500 block mt-0.5">
+                          {isEn ? 'From Google Maps Top 3 calls & visits' : 'Por llamadas y rutas directas'}
+                        </span>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-slate-900/90 border border-emerald-500/30">
+                        <span className="text-[10px] text-emerald-400 uppercase font-black block">
+                          {isEn ? 'Annual Added Revenue:' : 'Facturación Extra Estimada:'}
+                        </span>
+                        <div className="text-xl font-black text-emerald-300 font-mono mt-0.5">
+                          $9,000 a $25,000 USD
+                        </div>
+                        <span className="text-[10px] text-emerald-400/80 block mt-0.5 font-bold">
+                          {isEn ? 'Annual business revenue expansion' : 'Al año para tu negocio'}
+                        </span>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-slate-900/90 border border-amber-500/30">
+                        <span className="text-[10px] text-amber-400 uppercase font-bold block">
+                          {isEn ? 'Break-Even Speed:' : 'Retorno de tu Inversión:'}
+                        </span>
+                        <div className="text-lg font-black text-amber-300 font-mono mt-0.5">
+                          {isEn ? '100% in Month 1' : '100% en Mes 1'}
+                        </div>
+                        <span className="text-[10px] text-slate-400 block mt-0.5">
+                          {isEn ? 'With your first 2 to 3 customers' : 'Con los primeros 2 a 3 clientes'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/20 text-xs text-emerald-200 leading-relaxed">
+                      💡 <strong>{isEn ? 'Immediate ROI Truth:' : 'Conclusión de Rentabilidad:'}</strong>{' '}
+                      {isEn
+                        ? 'Recovering your setup fee requires only 2 to 3 new clients during the first month. Every single customer after that is pure recurring net profit.'
+                        : 'Recuperas el 100% de la tarifa de setup con los primeros 2 a 3 clientes que te llamen en el primer mes. A partir del cliente número 4, toda la facturación adicional es ganancia neta para tu empresa.'}
+                    </div>
+                  </div>
+
                   {/* Caja de WhatsApp para el Asesor (Oculta en Impresión) */}
                   <div className="p-6 rounded-2xl bg-slate-950 border border-emerald-500/40 space-y-3 print:hidden">
                     <div className="flex items-center justify-between">
