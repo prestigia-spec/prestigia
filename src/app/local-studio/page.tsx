@@ -3373,9 +3373,26 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
           parsedCountry = parsedGeo.country;
           parsedCity = parsedGeo.city;
           parsedNeighborhood = parsedGeo.neighborhood;
-          if (parsedGeo.country) setAuditCountry(parsedGeo.country);
-          if (parsedGeo.city) setAuditCity(parsedGeo.city);
-          if (parsedGeo.neighborhood) setAuditNeighborhood(parsedGeo.neighborhood);
+          if (parsedGeo.country) {
+            setAuditCountry(parsedGeo.country);
+            if (!auditContactCountry || auditContactCountry === 'Colombia') {
+              setAuditContactCountry(parsedGeo.country);
+              if (COUNTRY_DIALING_CODES[parsedGeo.country] && (!auditContactPhone || auditContactPhone === '+57')) {
+                setAuditContactPhone(COUNTRY_DIALING_CODES[parsedGeo.country]);
+              }
+            }
+          }
+          if (parsedGeo.city) {
+            parsedCity = parsedGeo.city;
+            setAuditCity(parsedGeo.city);
+            if (!auditContactCity || auditContactCity === 'Bogotá') {
+              setAuditContactCity(parsedGeo.city);
+            }
+          }
+          if (parsedGeo.neighborhood) {
+            parsedNeighborhood = parsedGeo.neighborhood;
+            setAuditNeighborhood(parsedGeo.neighborhood);
+          }
         }
 
         const matchedCategory = mapDetectedCategoryToPrestigia(
@@ -7368,14 +7385,27 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
                         <span>{isEn ? 'Direct WhatsApp *' : 'WhatsApp Directo *'}</span>
                         {auditContactPhone && (
-                          <a
-                            href={`https://wa.me/${auditContactPhone.replace(/[^0-9]/g, '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
-                          >
-                            Chat
-                          </a>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(auditContactPhone, isEn ? 'Phone' : 'Teléfono')}
+                              className="text-[9px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
+                              title={isEn ? 'Copy phone' : 'Copiar teléfono'}
+                            >
+                              <Copy className="w-2.5 h-2.5" />
+                              <span>{isEn ? 'Copy' : 'Copiar'}</span>
+                            </button>
+                            <span className="text-slate-600">•</span>
+                            <a
+                              href={`https://wa.me/${auditContactPhone.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-0.5"
+                            >
+                              <span>Chat</span>
+                              <ExternalLink className="w-2.5 h-2.5" />
+                            </a>
+                          </div>
                         )}
                       </label>
                       <input
@@ -7559,11 +7589,27 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </button>
                     </div>
 
-                    <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
-                      {isEn
-                        ? '💡 Supports short links (maps.app.goo.gl/...), full Google Maps URLs, or "Business Name + City".'
-                        : '💡 Soporta enlaces cortos (maps.app.goo.gl/...), enlaces web largos o "Nombre Comercial + Ciudad".'}
-                    </p>
+                    {auditQuery.trim() ? (
+                      <div className="mt-2 flex items-center gap-1.5 text-[11px] font-bold">
+                        {auditQuery.includes('google.com') || auditQuery.includes('goo.gl') ? (
+                          <span className="text-emerald-400 flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-md">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                            <span>{isEn ? '✓ Official Google Maps URL detected' : '✓ Enlace Oficial de Google Maps detectado'}</span>
+                          </span>
+                        ) : (
+                          <span className="text-amber-400 flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-md">
+                            <Search className="w-3 h-3 text-amber-400" />
+                            <span>{isEn ? '🔍 Recognition by Business Name & City' : '🔍 Reconocimiento por Nombre Comercial & Ciudad'}</span>
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+                        {isEn
+                          ? '💡 Supports short links (maps.app.goo.gl/...), full Google Maps URLs, or "Business Name + City".'
+                          : '💡 Soporta enlaces cortos (maps.app.goo.gl/...), enlaces web largos o "Nombre Comercial + Ciudad".'}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -7755,30 +7801,59 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   </div>
                 )}
 
-                {/* State 2: Ready to Audit (Empty State) */}
+                {/* State 2: Ready to Audit (Empty State with 3 Pillars Preview) */}
                 {!auditGeneratedData?.healthScore && !isScanningAudit && !isGeneratingAudit && (
-                  <div className="p-8 sm:p-12 rounded-3xl bg-slate-900/60 border border-slate-800 text-center space-y-4">
-                    <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+                  <div className="p-8 sm:p-10 rounded-3xl bg-slate-900/50 border border-slate-800 text-center space-y-4">
+                    <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400 shadow-lg shadow-amber-500/10">
                       <Search className="w-7 h-7 text-amber-400" />
                     </div>
-                    <div className="space-y-1.5">
-                      <h3 className="text-base font-bold text-white">
-                        {t.readyAuditTitle}
-                      </h3>
+                    <div className="space-y-1">
+                      <h3 className="text-base sm:text-lg font-black text-white">{t.readyAuditTitle}</h3>
                       <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
                         {t.readyAuditDesc}
                       </p>
                     </div>
-                    <div className="pt-2 flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-400">
-                      <span className="px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700/60">
-                        ⚡ {isEn ? 'Live Recognition' : 'Reconocimiento en Vivo'}
-                      </span>
-                      <span className="px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700/60">
-                        ★ {isEn ? 'Live Rating & Reviews' : 'Calificación Real & Reseñas'}
-                      </span>
-                      <span className="px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700/60">
-                        🎯 {isEn ? 'Top 3 Gap Analysis' : 'Brechas frente al Top 3'}
-                      </span>
+
+                    {/* Preview 3-Pilares Entregables de la Auditoría */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 text-left max-w-xl mx-auto">
+                      <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-base">🔬</span>
+                          <span className="text-xs font-black text-slate-200">{isEn ? 'Algorithm Health' : 'Salud Algorítmica'}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-snug">
+                          {isEn ? 'Score 0-100, missing subcategories, and SEO gap detection' : 'Puntaje 0-100, categorías omitidas y brechas frente a los líderes del podio'}
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-base">📊</span>
+                          <span className="text-xs font-black text-slate-200">{isEn ? 'Reputation Rescue' : 'Rescate de Reseñas'}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-snug">
+                          {isEn ? 'Star distribution, required 5★ reviews, and 1★ appeal gains' : 'Fórmula matemática de 5★ requeridas y salto al apelar las 1★ tóxicas'}
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-base">💼</span>
+                          <span className="text-xs font-black text-slate-200">{isEn ? 'Closing Playbook' : 'Guión & Cierre'}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-snug">
+                          {isEn ? 'Step-by-step click guide and closing pitch with waived setup' : 'Paso a paso dónde dar clic y speech de venta con setup bonificado'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 text-[11px] text-slate-400 font-medium flex items-center justify-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span>{isEn ? '1. Enter Maps link' : '1. Pega el enlace de Maps'}</span>
+                      <span className="text-slate-600">➔</span>
+                      <span>{isEn ? '2. Scan & Audit' : '2. Clic en Escanear & Auditar'}</span>
+                      <span className="text-slate-600">➔</span>
+                      <span>{isEn ? '3. Close with Report' : '3. Presenta y cierra el plan'}</span>
                     </div>
                   </div>
                 )}
@@ -7809,13 +7884,27 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           </div>
                         </div>
 
-                        <div className="text-left sm:text-right">
-                          <span className="text-[9px] uppercase font-mono font-bold tracking-wider text-slate-400 block">
-                            {isEn ? 'Category Analyzed:' : 'Categoría Analizada:'}
-                          </span>
-                          <span className="text-xs font-bold text-amber-300">
-                            {auditCategory}
-                          </span>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 text-left sm:text-right">
+                          <div>
+                            <span className="text-[9px] uppercase font-mono font-bold tracking-wider text-slate-400 block">
+                              {isEn ? 'Category Analyzed:' : 'Categoría Analizada:'}
+                            </span>
+                            <span className="text-xs font-bold text-amber-300">
+                              {auditCategory}
+                            </span>
+                          </div>
+                          {(auditGoogleUrl || auditScannedListing?.googleMapsUrl) && (
+                            <a
+                              href={auditGoogleUrl || auditScannedListing?.googleMapsUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/40 text-amber-300 hover:text-amber-200 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shrink-0 shadow-sm"
+                              title={isEn ? 'Open listing on Google Maps' : 'Ver ficha oficial en Google Maps (nueva pestaña)'}
+                            >
+                              <span>{isEn ? 'View in Maps' : 'Ver en Maps'}</span>
+                              <ExternalLink className="w-3.5 h-3.5 text-amber-400" />
+                            </a>
+                          )}
                         </div>
                       </div>
 
