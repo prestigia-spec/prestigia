@@ -10815,6 +10815,97 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </p>
                     </div>
 
+                    {/* =========================================================
+                        INTEGRATED: GUÍA PASO A PASO DÓNDE DAR CLIC (APELACIÓN DE RESEÑAS)
+                        ========================================================= */}
+                    <div className="bg-slate-900 border border-indigo-500/40 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl print:hidden">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300">
+                            {isEn ? 'Technical Walkthrough • Case 4: Review Removal Protocol' : 'Paso a Paso Técnico • Caso 4: Protocolo de Supresión de Reseñas'}
+                          </span>
+                          <h3 className="text-lg font-black text-white flex items-center gap-2">
+                            <HelpCircle className="w-5 h-5 text-rose-400" />
+                            <span>{isEn ? 'Where to Click on Google to Report & Remove this Review' : 'Guía Paso a Paso: Dónde dar Clic en Google para Eliminar la Reseña'}</span>
+                          </h3>
+                          <p className="text-xs text-slate-400">
+                            {isEn
+                              ? 'Follow these 3 exact steps in Google Maps or Google Business to submit your legal defense without technical mistakes.'
+                              : 'Sigue estos 3 pasos exactos en Google Maps o en la consola de Google Business para radicar la defensa legal sin errores técnicos.'}
+                          </p>
+                        </div>
+                        <a
+                          href="https://business.google.com/reviews"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg shadow-rose-600/20 cursor-pointer shrink-0"
+                        >
+                          <span>{isEn ? 'Open Google Reviews Console' : 'Abrir Consola de Reseñas de Google'}</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Paso 1 */}
+                        <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2 relative overflow-hidden">
+                          <div className="w-7 h-7 rounded-xl bg-rose-500/20 text-rose-400 font-mono font-black text-xs flex items-center justify-center border border-rose-500/40">
+                            1
+                          </div>
+                          <h4 className="text-xs font-black text-white">
+                            {isEn ? 'Locate the Negative Review' : 'Localiza la Reseña Dañina'}
+                          </h4>
+                          <p className="text-[11px] text-slate-400 leading-relaxed">
+                            {isEn
+                              ? 'Open Google Maps or your Google Business Profile. Search for the review written by '
+                              : 'Ingresa a Google Maps o a tu perfil de Google Business. Busca la reseña de '}
+                            <strong className="text-white">"{activeAppealDossier.authorName}"</strong>.
+                          </p>
+                          <div className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-[10px] text-slate-300 font-mono">
+                            📍 {isEn ? 'Action: Find review & view details' : 'Acción: Ubicar la reseña en la ficha'}
+                          </div>
+                        </div>
+
+                        {/* Paso 2 */}
+                        <div className="p-4 rounded-2xl bg-slate-950/80 border border-indigo-500/40 space-y-2 relative overflow-hidden">
+                          <div className="w-7 h-7 rounded-xl bg-indigo-500/20 text-indigo-400 font-mono font-black text-xs flex items-center justify-center border border-indigo-500/40">
+                            2
+                          </div>
+                          <h4 className="text-xs font-black text-white">
+                            {isEn ? 'Click the 3 Dots (⋮) → Report' : 'Haz Clic en los 3 Puntos (⋮) → Denunciar'}
+                          </h4>
+                          <p className="text-[11px] text-slate-400 leading-relaxed">
+                            {isEn
+                              ? 'At the top-right corner of the review card, click the three dots icon (⋮) and choose "Flag as inappropriate" or "Report review".'
+                              : 'En la esquina superior derecha de la tarjeta de la reseña, haz clic en los tres puntitos (⋮) y selecciona "Denunciar reseña".'}
+                          </p>
+                          <div className="p-2 rounded-lg bg-indigo-950/40 border border-indigo-500/30 text-[10px] text-indigo-300 font-mono">
+                            ⚡ {isEn ? 'Select exact category:' : 'Selecciona la opción exacta:'}{' '}
+                            <strong className="text-white block mt-0.5">
+                              «{activeAppealDossier.googleConsoleWorkflow.exactCategoryToSelect}»
+                            </strong>
+                          </div>
+                        </div>
+
+                        {/* Paso 3 */}
+                        <div className="p-4 rounded-2xl bg-slate-950/80 border border-emerald-500/40 space-y-2 relative overflow-hidden">
+                          <div className="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 font-mono font-black text-xs flex items-center justify-center border border-emerald-500/40">
+                            3
+                          </div>
+                          <h4 className="text-xs font-black text-white">
+                            {isEn ? 'Paste Legal Defense & Submit' : 'Pega la Defensa Legal y Radica'}
+                          </h4>
+                          <p className="text-[11px] text-slate-400 leading-relaxed">
+                            {isEn
+                              ? 'Copy the Legal Memorial generated above in Card 3, paste it in the justification box and click Submit. Response SLA: 3 to 5 business days.'
+                              : 'Copia el Memorial Legal generado arriba (Tarjeta 3), pégalo en el cuadro de justificación de Google y dale Enviar. Tiempo de respuesta: 3 a 5 días hábiles.'}
+                          </p>
+                          <div className="p-2 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-[10px] text-emerald-300 font-mono">
+                            ⏱️ {isEn ? 'Resolution SLA: 72h - 5 days' : 'Plazo resolución Google: 72h a 5 días'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Bottom Action: New Appeal */}
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3 pb-2 print:hidden">
                       <button
