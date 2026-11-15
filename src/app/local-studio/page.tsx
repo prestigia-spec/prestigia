@@ -768,12 +768,10 @@ const UI_TEXT = {
     tabCreate: '1. Crear Ficha',
     tabAudit: '2. Auditar & Optimizar',
     tabRescue: '3. Rescatar Ficha',
-    tabAppeals: '4. Apelar Reseñas 1-3★',
+    tabAppeals: '4. Apelar Reseñas',
     tabTools: '5. Prospectar & Cerrar',
     tabDossiers: '6. Mis Clientes',
-    tabGuide: '7. Guía Google',
-    tabPitch: '8. Guion Comercial',
-    tabNetwork: '9. Red Asesores B2B',
+    tabNetwork: '7. Red Asesores B2B',
     mod1Badge: 'Módulo 1: Para Negocios sin Google Maps',
     mod1Title: 'Constructor de Ficha Ganadora (Arquitectura Top 3)',
     mod1Desc: 'Ingresa los datos básicos del negocio. La inteligencia artificial de Prestigia generará el expediente técnico exacto (categorías secretas, título optimizado, copy de 745 caracteres, catálogo y guía de verificación) para configurar la ficha en Google en menos de 10 minutos.',
@@ -854,12 +852,10 @@ const UI_TEXT = {
     tabCreate: '1. Build Listing',
     tabAudit: '2. Audit & Optimize',
     tabRescue: '3. Rescue Listing',
-    tabAppeals: '4. Appeal 1-3★ Reviews',
+    tabAppeals: '4. Appeal Reviews',
     tabTools: '5. Prospect & Close',
     tabDossiers: '6. My Clients',
-    tabGuide: '7. Google Guide',
-    tabPitch: '8. Sales Pitch',
-    tabNetwork: '9. B2B Network',
+    tabNetwork: '7. B2B Network',
     mod1Badge: 'Module 1: For Businesses Without Google Maps',
     mod1Title: 'Winning Listing Builder (Top 3 Architecture)',
     mod1Desc: 'Enter the basic business details. Prestigia AI will generate the exact technical blueprint (secret categories, optimized title, 745-char copy, catalog, and verification guide) to set up on Google in under 10 minutes.',
@@ -5279,6 +5275,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="truncate">{t.tabTools}</span>
             </button>
+
+            {/* Separador Visual sutil: Módulos Motores IA (1-5) vs Gestión CRM & Red (6-7) */}
+            <div className="hidden lg:block w-px h-6 bg-slate-800 shrink-0 mx-0.5" />
 
             <button
               type="button"
