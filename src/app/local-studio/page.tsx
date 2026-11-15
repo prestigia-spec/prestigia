@@ -5537,9 +5537,20 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   {/* País y Ciudad de Residencia del Cliente / Contratante */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-indigo-500/15">
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? '🌍 Client Country (Billing/Residence) *' : '🌍 País del Cliente (Residencia/Cobro) *'}
-                      </label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-slate-300">
+                          {isEn ? '🌍 Client Country (Billing/Residence) *' : '🌍 País del Cliente (Residencia/Cobro) *'}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowAddCountryModal(true)}
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          title={isEn ? 'Add another Country to catalog' : 'Agregar otro País al catálogo'}
+                        >
+                          <Plus className="w-2.5 h-2.5" />
+                          <span>{isEn ? 'Add' : '+ País'}</span>
+                        </button>
+                      </div>
                       <select
                         value={createContactCountry}
                         onChange={(e) => {
@@ -7059,9 +7070,20 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   {/* País y Ciudad de Residencia del Cliente / Contratante */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-indigo-500/15">
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? '🌍 Client Country (Billing/Residence) *' : '🌍 País del Cliente (Residencia/Cobro) *'}
-                      </label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-slate-300">
+                          {isEn ? '🌍 Client Country (Billing/Residence) *' : '🌍 País del Cliente (Residencia/Cobro) *'}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowAddCountryModal(true)}
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          title={isEn ? 'Add another Country to catalog' : 'Agregar otro País al catálogo'}
+                        >
+                          <Plus className="w-2.5 h-2.5" />
+                          <span>{isEn ? 'Add' : '+ País'}</span>
+                        </button>
+                      </div>
                       <select
                         value={auditContactCountry}
                         onChange={(e) => {
@@ -8772,9 +8794,20 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   {/* País y Ciudad de Residencia del Cliente / Contratante */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-indigo-500/15">
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? '🌍 Client Country (Billing/Residence) *' : '🌍 País del Cliente (Residencia/Cobro) *'}
-                      </label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-slate-300">
+                          {isEn ? '🌍 Client Country (Billing/Residence) *' : '🌍 País del Cliente (Residencia/Cobro) *'}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowAddCountryModal(true)}
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          title={isEn ? 'Add another Country to catalog' : 'Agregar otro País al catálogo'}
+                        >
+                          <Plus className="w-2.5 h-2.5" />
+                          <span>{isEn ? 'Add' : '+ País'}</span>
+                        </button>
+                      </div>
                       <select
                         value={rescueContactCountry}
                         onChange={(e) => {
@@ -10028,9 +10061,20 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   {/* País y Ciudad de Residencia del Cliente / Contratante */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-indigo-500/15">
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                        {isEn ? '🌍 Client Country (Billing/Residence) *' : '🌍 País del Cliente (Residencia/Cobro) *'}
-                      </label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-slate-300">
+                          {isEn ? '🌍 Client Country (Billing/Residence) *' : '🌍 País del Cliente (Residencia/Cobro) *'}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowAddCountryModal(true)}
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          title={isEn ? 'Add another Country to catalog' : 'Agregar otro País al catálogo'}
+                        >
+                          <Plus className="w-2.5 h-2.5" />
+                          <span>{isEn ? 'Add' : '+ País'}</span>
+                        </button>
+                      </div>
                       <select
                         value={appealContactCountry}
                         onChange={(e) => {
