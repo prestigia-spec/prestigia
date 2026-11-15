@@ -5578,11 +5578,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         <button
                           type="button"
                           onClick={() => setShowAddCountryModal(true)}
-                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-bold transition cursor-pointer shrink-0 whitespace-nowrap"
                           title={isEn ? 'Add another Country to catalog' : 'Agregar otro País al catálogo'}
                         >
-                          <Plus className="w-2.5 h-2.5" />
-                          <span>{isEn ? 'Add' : '+ País'}</span>
+                          <Plus className="w-2.5 h-2.5 shrink-0" />
+                          <span>{isEn ? 'Country' : 'País'}</span>
                         </button>
                       </div>
                       <select
@@ -5626,11 +5626,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             setTargetCountryForNewCity(createContactCountry);
                             setShowAddCityModal(true);
                           }}
-                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-bold transition cursor-pointer shrink-0 whitespace-nowrap"
                           title={isEn ? `Add another City to ${createContactCountry}` : `Agregar otra Ciudad a ${createContactCountry}`}
                         >
-                          <Plus className="w-2.5 h-2.5" />
-                          <span>{isEn ? 'Add' : '+ Ciudad'}</span>
+                          <Plus className="w-2.5 h-2.5 shrink-0" />
+                          <span>{isEn ? 'City' : 'Ciudad'}</span>
                         </button>
                       </div>
                       <select
@@ -7220,11 +7220,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         <button
                           type="button"
                           onClick={() => setShowAddCountryModal(true)}
-                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-bold transition cursor-pointer shrink-0 whitespace-nowrap"
                           title={isEn ? 'Add another Country to catalog' : 'Agregar otro País al catálogo'}
                         >
-                          <Plus className="w-2.5 h-2.5" />
-                          <span>{isEn ? 'Add' : '+ País'}</span>
+                          <Plus className="w-2.5 h-2.5 shrink-0" />
+                          <span>{isEn ? 'Country' : 'País'}</span>
                         </button>
                       </div>
                       <select
@@ -7259,11 +7259,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             setTargetCountryForNewCity(auditContactCountry);
                             setShowAddCityModal(true);
                           }}
-                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-bold transition cursor-pointer shrink-0 whitespace-nowrap"
                           title={isEn ? `Add another City to ${auditContactCountry}` : `Agregar otra Ciudad a ${auditContactCountry}`}
                         >
-                          <Plus className="w-2.5 h-2.5" />
-                          <span>{isEn ? 'Add' : '+ Ciudad'}</span>
+                          <Plus className="w-2.5 h-2.5 shrink-0" />
+                          <span>{isEn ? 'City' : 'Ciudad'}</span>
                         </button>
                       </div>
                       <select
@@ -8944,11 +8944,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         <button
                           type="button"
                           onClick={() => setShowAddCountryModal(true)}
-                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-bold transition cursor-pointer shrink-0 whitespace-nowrap"
                           title={isEn ? 'Add another Country to catalog' : 'Agregar otro País al catálogo'}
                         >
-                          <Plus className="w-2.5 h-2.5" />
-                          <span>{isEn ? 'Add' : '+ País'}</span>
+                          <Plus className="w-2.5 h-2.5 shrink-0" />
+                          <span>{isEn ? 'Country' : 'País'}</span>
                         </button>
                       </div>
                       <select
@@ -8983,11 +8983,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             setTargetCountryForNewCity(rescueContactCountry);
                             setShowAddCityModal(true);
                           }}
-                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-bold transition cursor-pointer shrink-0 whitespace-nowrap"
                           title={isEn ? `Add another City to ${rescueContactCountry}` : `Agregar otra Ciudad a ${rescueContactCountry}`}
                         >
-                          <Plus className="w-2.5 h-2.5" />
-                          <span>{isEn ? 'Add' : '+ Ciudad'}</span>
+                          <Plus className="w-2.5 h-2.5 shrink-0" />
+                          <span>{isEn ? 'City' : 'Ciudad'}</span>
                         </button>
                       </div>
                       <select
@@ -10211,11 +10211,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         <button
                           type="button"
                           onClick={() => setShowAddCountryModal(true)}
-                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-bold transition cursor-pointer shrink-0 whitespace-nowrap"
                           title={isEn ? 'Add another Country to catalog' : 'Agregar otro País al catálogo'}
                         >
-                          <Plus className="w-2.5 h-2.5" />
-                          <span>{isEn ? 'Add' : '+ País'}</span>
+                          <Plus className="w-2.5 h-2.5 shrink-0" />
+                          <span>{isEn ? 'Country' : 'País'}</span>
                         </button>
                       </div>
                       <select
@@ -10250,11 +10250,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             setTargetCountryForNewCity(appealContactCountry);
                             setShowAddCityModal(true);
                           }}
-                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5 font-bold transition cursor-pointer"
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-bold transition cursor-pointer shrink-0 whitespace-nowrap"
                           title={isEn ? `Add another City to ${appealContactCountry}` : `Agregar otra Ciudad a ${appealContactCountry}`}
                         >
-                          <Plus className="w-2.5 h-2.5" />
-                          <span>{isEn ? 'Add' : '+ Ciudad'}</span>
+                          <Plus className="w-2.5 h-2.5 shrink-0" />
+                          <span>{isEn ? 'City' : 'Ciudad'}</span>
                         </button>
                       </div>
                       <select
