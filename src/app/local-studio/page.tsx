@@ -3521,7 +3521,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         setRescueBusinessName(extractedName);
         if (place.phone) {
           setRescuePhone(place.phone);
-          if (!rescueContactPhone) {
+          if (!rescueContactPhone || rescueContactPhone === '+57') {
             setRescueContactPhone(place.phone);
           }
         }
@@ -3531,10 +3531,21 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
         if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
           const parsedGeo = parseAddressGeo(place.address, rescueCountry, rescueCity, rescueNeighborhood);
-          if (parsedGeo.country) setRescueCountry(parsedGeo.country);
+          if (parsedGeo.country) {
+            setRescueCountry(parsedGeo.country);
+            if (!rescueContactCountry || rescueContactCountry === 'Colombia') {
+              setRescueContactCountry(parsedGeo.country);
+              if (COUNTRY_DIALING_CODES[parsedGeo.country] && (!rescueContactPhone || rescueContactPhone === '+57')) {
+                setRescueContactPhone(COUNTRY_DIALING_CODES[parsedGeo.country]);
+              }
+            }
+          }
           if (parsedGeo.city) {
             parsedCity = parsedGeo.city;
             setRescueCity(parsedGeo.city);
+            if (!rescueContactCity || rescueContactCity === 'Bogotá') {
+              setRescueContactCity(parsedGeo.city);
+            }
           }
           if (parsedGeo.neighborhood) {
             parsedNeighborhood = parsedGeo.neighborhood;
@@ -9021,14 +9032,27 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
                         <span>{isEn ? 'Direct WhatsApp *' : 'WhatsApp Directo *'}</span>
                         {rescueContactPhone && (
-                          <a
-                            href={`https://wa.me/${rescueContactPhone.replace(/[^0-9]/g, '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold"
-                          >
-                            Chat
-                          </a>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(rescueContactPhone, isEn ? 'Phone' : 'Teléfono')}
+                              className="text-[9px] text-rose-400 hover:text-rose-300 font-bold flex items-center gap-0.5 cursor-pointer"
+                              title={isEn ? 'Copy phone' : 'Copiar teléfono'}
+                            >
+                              <Copy className="w-2.5 h-2.5" />
+                              <span>{isEn ? 'Copy' : 'Copiar'}</span>
+                            </button>
+                            <span className="text-slate-600">•</span>
+                            <a
+                              href={`https://wa.me/${rescueContactPhone.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-0.5"
+                            >
+                              <span>Chat</span>
+                              <ExternalLink className="w-2.5 h-2.5" />
+                            </a>
+                          </div>
                         )}
                       </label>
                       <input
@@ -9205,6 +9229,28 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       {t.pasteBtn}
                     </button>
                   </div>
+
+                  {rescueSearchQuery.trim() ? (
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold">
+                      {rescueSearchQuery.includes('google.com') || rescueSearchQuery.includes('goo.gl') ? (
+                        <span className="text-emerald-400 flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-md">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                          <span>{isEn ? '✓ Official Google Maps URL detected' : '✓ Enlace Oficial de Google Maps detectado'}</span>
+                        </span>
+                      ) : (
+                        <span className="text-amber-400 flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-md">
+                          <Search className="w-3 h-3 text-amber-400" />
+                          <span>{isEn ? '🔍 Recognition by Business Name & City' : '🔍 Reconocimiento por Nombre Comercial & Ciudad'}</span>
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      {isEn
+                        ? '💡 Supports short links (maps.app.goo.gl/...), full Google Maps URLs, or "Business Name + City".'
+                        : '💡 Soporta enlaces cortos (maps.app.goo.gl/...), enlaces web largos o "Nombre Comercial + Ciudad".'}
+                    </p>
+                  )}
 
                   {!isLuismaMaster && (monthlyUsage.rescues >= getEffectiveQuota('rescues') || isUserSuspended) && (
                     <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
@@ -9916,17 +9962,35 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           ? '(an external unauthorized email)'
                           : '(un correo externo no autorizado)';
 
+                        const senderIdentity = isLuismaMaster
+                          ? 'Luisma de Prestigia'
+                          : currentUser?.agencyName
+                          ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}`
+                          : currentUser?.name
+                          ? `${currentUser.name} de Local Prestigia`
+                          : 'el equipo de Local Prestigia';
+
+                        const senderIdentityEn = isLuismaMaster
+                          ? 'Luisma from Prestigia'
+                          : currentUser?.agencyName
+                          ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}`
+                          : currentUser?.name
+                          ? `${currentUser.name} from Local Prestigia`
+                          : 'the Local Prestigia team';
+
+                        const clientPerson = rescueContactName.trim() || rescueBusinessName.trim() || (isEn ? 'Business Owner' : 'propietario');
+
                         const scriptText = isEn
                           ? rescueScenario === 'orphan'
-                            ? `Hello ${rescueBusinessName || 'Business Owner'}, this is the Prestigia team. We audited your Google Maps presence and discovered a critical vulnerability: your business listing exists but is currently 'Unclaimed / Orphan'. Any third party or competitor can suggest edits or claim ownership. At Prestigia, we can process your official ownership claim today and secure full legal control without altering your existing reviews or SEO ranking. Shall we start your protection protocol?`
+                            ? `Hello ${clientPerson}, this is ${senderIdentityEn}. We audited your Google Maps presence and discovered a critical vulnerability: your business listing exists but is currently 'Unclaimed / Orphan'. Any third party or competitor can suggest edits or claim ownership. With our team, we can process your official ownership claim today and secure full legal control without altering your existing reviews or SEO ranking. Shall we start your protection protocol?`
                             : rescueScenario === 'third_party'
-                            ? `Hello ${rescueBusinessName || 'Business Owner'}, this is the Prestigia team. Upon auditing your business on Google Maps, we noticed your official listing is linked to an external email ${emailSnippet} and you lack Primary Owner access. Do not worry: creating a new listing is NOT necessary (doing so causes duplicate listing penalties). We execute Google's Official 72-Hour Legal Ownership Protocol to request ownership and transfer complete control directly to your personal account within a week, preserving all reviews and photos. Shall we initiate the protocol today?`
-                            : `Hello ${rescueBusinessName || 'Business Owner'}, this is the Prestigia team. If a previous agency or ex-employee refused to transfer your Google Maps profile, Google's official policies protect your legitimate ownership. We submit an evidentiary appeal dossier with your corporate tax documentation and storefront evidence so Google Support revokes the third party and restores complete ownership to you. Would you like us to draft the official appeal?`
+                            ? `Hello ${clientPerson}, this is ${senderIdentityEn}. Upon auditing your business on Google Maps, we noticed your official listing is linked to an external email ${emailSnippet} and you lack Primary Owner access. Do not worry: creating a new listing is NOT necessary (doing so causes duplicate listing penalties). We execute Google's Official 72-Hour Legal Ownership Protocol to request ownership and transfer complete control directly to your personal account within a week, preserving all reviews and photos. Shall we initiate the protocol today?`
+                            : `Hello ${clientPerson}, this is ${senderIdentityEn}. If a previous agency or ex-employee refused to transfer your Google Maps profile, Google's official policies protect your legitimate ownership. We submit an evidentiary appeal dossier with your corporate tax documentation and storefront evidence so Google Support revokes the third party and restores complete ownership to you. Would you like us to draft the official appeal?`
                           : rescueScenario === 'orphan'
-                          ? `Hola estimado/a ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. En Prestigia podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?`
+                          ? `Hola estimado/a ${clientPerson}, le saluda ${senderIdentity}. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. Con nuestro equipo podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?`
                           : rescueScenario === 'third_party'
-                          ? `Hola estimado/a ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${emailSnippet} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?`
-                          : `Hola estimado/a ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?`;
+                          ? `Hola estimado/a ${clientPerson}, le saluda ${senderIdentity}. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${emailSnippet} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?`
+                          : `Hola estimado/a ${clientPerson}, le saluda ${senderIdentity}. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?`;
                         copyToClipboard(scriptText, isEn ? 'WhatsApp Script' : 'Guion de WhatsApp');
                       }}
                       className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold transition flex items-center gap-1.5 cursor-pointer border border-amber-500/40"
@@ -9939,211 +10003,238 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <p className="text-xs text-slate-300 italic leading-relaxed p-4 rounded-xl bg-slate-950 border border-slate-800">
                     {isEn
                       ? rescueScenario === 'orphan'
-                        ? `"Hello ${rescueBusinessName || 'Business Owner'}, this is the Prestigia team. We audited your Google Maps presence and discovered a critical vulnerability: your business listing exists but is currently 'Unclaimed / Orphan'. Any third party or competitor can suggest edits or claim ownership. At Prestigia, we can process your official ownership claim today and secure full legal control without altering your existing reviews or SEO ranking. Shall we start your protection protocol?"`
+                        ? `"Hello ${rescueContactName || rescueBusinessName || 'Business Owner'}, this is ${isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}. We audited your Google Maps presence and discovered a critical vulnerability: your business listing exists but is currently 'Unclaimed / Orphan'. Any third party or competitor can suggest edits or claim ownership. With our team, we can process your official ownership claim today and secure full legal control without altering your existing reviews or SEO ranking. Shall we start your protection protocol?"`
                         : rescueScenario === 'third_party'
-                        ? `"Hello ${rescueBusinessName || 'Business Owner'}, this is the Prestigia team. Upon auditing your business on Google Maps, we noticed your official listing is linked to an external email ${rescueMaskedEmail.trim() ? `(${rescueMaskedEmail.trim()})` : '(an external unauthorized email)'} and you lack Primary Owner access. Do not worry: creating a new listing is NOT necessary (doing so causes duplicate listing penalties). We execute Google's Official 72-Hour Legal Ownership Protocol to request ownership and transfer complete control directly to your personal account within a week, preserving all reviews and photos. Shall we initiate the protocol today?"`
-                        : `"Hello ${rescueBusinessName || 'Business Owner'}, this is the Prestigia team. If a previous agency or ex-employee refused to transfer your Google Maps profile, Google's official policies protect your legitimate ownership. We submit an evidentiary appeal dossier with your corporate tax documentation and storefront evidence so Google Support revokes the third party and restores complete ownership to you. Would you like us to draft the official appeal?"`
+                        ? `"Hello ${rescueContactName || rescueBusinessName || 'Business Owner'}, this is ${isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}. Upon auditing your business on Google Maps, we noticed your official listing is linked to an external email ${rescueMaskedEmail.trim() ? `(${rescueMaskedEmail.trim()})` : '(an external unauthorized email)'} and you lack Primary Owner access. Do not worry: creating a new listing is NOT necessary (doing so causes duplicate listing penalties). We execute Google's Official 72-Hour Legal Ownership Protocol to request ownership and transfer complete control directly to your personal account within a week, preserving all reviews and photos. Shall we initiate the protocol today?"`
+                        : `"Hello ${rescueContactName || rescueBusinessName || 'Business Owner'}, this is ${isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}. If a previous agency or ex-employee refused to transfer your Google Maps profile, Google's official policies protect your legitimate ownership. We submit an evidentiary appeal dossier with your corporate tax documentation and storefront evidence so Google Support revokes the third party and restores complete ownership to you. Would you like us to draft the official appeal?"`
                       : rescueScenario === 'orphan'
-                      ? `"Hola estimado/a ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. En Prestigia podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?"`
+                      ? `"Hola estimado/a ${rescueContactName || rescueBusinessName || 'propietario'}, le saluda ${isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. Con nuestro equipo podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?"`
                       : rescueScenario === 'third_party'
-                      ? `"Hola estimado/a ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${rescueMaskedEmail.trim() ? `(${rescueMaskedEmail.trim()})` : '(un correo externo no autorizado)'} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?"`
-                      : `"Hola estimado/a ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?"`}
+                      ? `"Hola estimado/a ${rescueContactName || rescueBusinessName || 'propietario'}, le saluda ${isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${rescueMaskedEmail.trim() ? `(${rescueMaskedEmail.trim()})` : '(un correo externo no autorizado)'} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?"`
+                      : `"Hola estimado/a ${rescueContactName || rescueBusinessName || 'propietario'}, le saluda ${isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?"`}
                   </p>
                 </div>
               </div>
             </div>
 
             {/* =========================================================
-                INTEGRATED: GUÍA PASO A PASO DÓNDE DAR CLIC (RESCATE 72H)
+                INTEGRATED: GUÍA PASO A PASO & GUIÓN DE CIERRE (RESCATE 72H)
+                (Ocultos hasta que la ficha es reconocida o activa)
                 ========================================================= */}
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl print:hidden">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300">
-                    {isEn ? 'Technical Walkthrough • Case 3: Listing Rescue & Appeal' : 'Paso a Paso Técnico • Caso 3: Rescate de Ficha Secuestrada o Huérfana'}
-                  </span>
-                  <h3 className="text-lg font-black text-white flex items-center gap-2">
-                    <ShieldAlert className="w-5 h-5 text-rose-400" />
-                    <span>{isEn ? 'Where to Click on Google to Reclaim or Appeal Listing Ownership' : 'Guía Paso a Paso: Dónde dar Clic en Google para Reclamar o Apelar Titularidad'}</span>
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    {isEn
-                      ? 'Legal 72-hour protocol to revoke third parties and submit evidentiary dossiers to Google Trust & Safety.'
-                      : 'Protocolo legal de 72 horas para revocar a terceros y radicar el expediente probatorio ante Google Trust & Safety.'}
-                  </p>
-                </div>
-                <a
-                  href="https://support.google.com/business/workflow/12825603"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg shadow-rose-600/20 cursor-pointer shrink-0"
-                >
-                  <span>{isEn ? 'Google Appeal Tool' : 'Herramienta de Apelación Google'}</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </div>
-
-              {/* 6 Steps Grid for Rescue */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
-                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">1</span>
-                    <strong className="text-white text-xs">{isEn ? 'Locate Profile on Maps' : 'Localizar Ficha en Maps'}</strong>
+            {Boolean(rescueScannedListing || activeRescueDossierId || rescueBusinessName.trim()) && (
+              <>
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl print:hidden">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300">
+                        {isEn ? 'Technical Walkthrough • Case 3: Listing Rescue & Appeal' : 'Paso a Paso Técnico • Caso 3: Rescate de Ficha Secuestrada o Huérfana'}
+                      </span>
+                      <h3 className="text-lg font-black text-white flex items-center gap-2">
+                        <ShieldAlert className="w-5 h-5 text-rose-400" />
+                        <span>{isEn ? 'Where to Click on Google to Reclaim or Appeal Listing Ownership' : 'Guía Paso a Paso: Dónde dar Clic en Google para Reclamar o Apelar Titularidad'}</span>
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        {isEn
+                          ? 'Legal 72-hour protocol to revoke third parties and submit evidentiary dossiers to Google Trust & Safety.'
+                          : 'Protocolo legal de 72 horas para revocar a terceros y radicar el expediente probatorio ante Google Trust & Safety.'}
+                      </p>
+                    </div>
+                    <a
+                      href="https://support.google.com/business/workflow/12825603"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg shadow-rose-600/20 cursor-pointer shrink-0"
+                    >
+                      <span>{isEn ? 'Google Appeal Tool' : 'Herramienta de Apelación Google'}</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
                   </div>
-                  <p className="text-slate-300 text-[11px] leading-relaxed">
-                    {isEn ? <>Open an incognito browser window. Search for the exact business name on Google Maps and open the public profile.</> : <>Abre el navegador en modo incógnito. Busca el nombre comercial exacto del negocio en Google Maps y abre el perfil público.</>}
-                  </p>
-                </div>
 
-                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">2</span>
-                    <strong className="text-white text-xs">{isEn ? 'Click "Claim this Business"' : 'Clic en "Reclamar Empresa"'}</strong>
+                  {/* 6 Steps Grid for Rescue */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+                    <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">1</span>
+                        <strong className="text-white text-xs">{isEn ? 'Locate Profile on Maps' : 'Localizar Ficha en Maps'}</strong>
+                      </div>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        {isEn ? <>Open an incognito browser window. Search for the exact business name on Google Maps and open the public profile.</> : <>Abre el navegador en modo incógnito. Busca el nombre comercial exacto del negocio en Google Maps y abre el perfil público.</>}
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">2</span>
+                        <strong className="text-white text-xs">{isEn ? 'Click "Claim this Business"' : 'Clic en "Reclamar Empresa"'}</strong>
+                      </div>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        {isEn ? <>Below the address, click the link: <strong>"Own this business?"</strong> or <strong>"Claim this business"</strong>.</> : <>Debajo de la dirección, haz clic en el enlace azul: <strong>"¿Eres el propietario de esta empresa?"</strong> o <strong>"Reclamar este negocio"</strong>.</>}
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">3</span>
+                        <strong className="text-white text-xs">{isEn ? 'Click "Request Access"' : 'Clic en "Solicitar Acceso"'}</strong>
+                      </div>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        {isEn ? <>If Google indicates the profile belongs to an external email (e.g. <em>c*****@gmail.com</em>), click the blue <strong>"Request Access"</strong> button.</> : <>Si Google muestra que la ficha pertenece a un correo externo (ej: <em>c*****@gmail.com</em>), haz clic en el botón azul <strong>"Solicitar acceso"</strong> (Request Access).</>}
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">4</span>
+                        <strong className="text-white text-xs">{isEn ? 'Role "Owner" & 72-Hour Window' : 'Nivel "Propietario" & Plazo 72h'}</strong>
+                      </div>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        {isEn ? <>Select level <strong>"Owner"</strong>. Google notifies the holder with a mandatory <strong>3-day (72 hours)</strong> window. If they don\'t answer, Google releases direct verification to you.</> : <>Elige nivel <strong>"Propietario"</strong>. Google notifica al secuestrador dándole <strong>3 días (72 horas)</strong> obligatorios. Si no responde, Google libera la verificación directa para ti.</>}
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">5</span>
+                        <strong className="text-white text-xs">{isEn ? 'Formal Appeal if Rejected' : 'Apelación Formal si Rechazan'}</strong>
+                      </div>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        {isEn ? <>If the current manager denies or the listing is suspended, access the <strong>Official Google Appeals Tool</strong> and file a formal reinstatement claim.</> : <>Si el secuestrador rechaza o el perfil está suspendido, ingresa a la <strong>Herramienta Oficial de Apelaciones</strong> y abre un caso formal de restitución.</>}
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">6</span>
+                        <strong className="text-white text-xs">{isEn ? 'Evidentiary Dossier Upload' : 'Carga de Expediente Probatorio'}</strong>
+                      </div>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        {isEn ? <>Attach the 4 official records: Tax ID / Business license, recent utility bill, facade photo, and POS terminal to Google Trust & Safety to revoke unauthorized holders.</> : <>Adjunta los 4 documentos oficiales: RUT / Tax ID, factura de energía reciente, foto de fachada y datáfono en caja ante Google Trust & Safety para revocar al secuestrador.</>}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-slate-300 text-[11px] leading-relaxed">
-                    {isEn ? <>Below the address, click the link: <strong>"Own this business?"</strong> or <strong>"Claim this business"</strong>.</> : <>Debajo de la dirección, haz clic en el enlace azul: <strong>"¿Eres el propietario de esta empresa?"</strong> o <strong>"Reclamar este negocio"</strong>.</>}
-                  </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">3</span>
-                    <strong className="text-white text-xs">{isEn ? 'Click "Request Access"' : 'Clic en "Solicitar Acceso"'}</strong>
+                {/* =========================================================
+                    INTEGRATED: GUIÓN COMERCIAL DE CIERRE (RESCATE 72H)
+                    ========================================================= */}
+                <div className="bg-slate-950 border-2 border-rose-500/50 rounded-3xl p-6 sm:p-7 space-y-5 shadow-2xl print:hidden">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300">
+                        {isEn ? 'Sales Playbook • Case 3: Listing Rescue Closing Pitch' : 'Guión Comercial & Cierre • Caso 3: Venta de Rescate & Recuperación 72h'}
+                      </span>
+                      <h3 className="text-lg font-black text-white flex items-center gap-2">
+                        <MessageSquare className="w-5 h-5 text-rose-400" />
+                        <span>{isEn ? 'High-Urgency Crisis Rescue Closing Script' : 'Speech de Crisis & Urgencia Extrema: Rescate de Titularidad Google'}</span>
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        {isEn
+                          ? 'Prevent clients from creating duplicate listings and close the $250-$450 USD rescue fee or bundle with Prestigia plans.'
+                          : 'Evita que el cliente cree fichas duplicadas sancionables y cierra el servicio de rescate ($350 USD) o bonifícalo con el Plan Prestigia.'}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const clientPersonName = rescueContactName.trim() ? rescueContactName.trim() : (rescueBusinessName.trim() || (isEn ? 'Business Owner' : 'propietario'));
+                        const senderIdentity = isLuismaMaster
+                          ? 'Luisma de Prestigia'
+                          : currentUser?.agencyName
+                          ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}`
+                          : currentUser?.name
+                          ? `${currentUser.name} de Local Prestigia`
+                          : 'el equipo de Local Prestigia';
+
+                        const senderIdentityEn = isLuismaMaster
+                          ? 'Luisma from Prestigia'
+                          : currentUser?.agencyName
+                          ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}`
+                          : currentUser?.name
+                          ? `${currentUser.name} from Local Prestigia`
+                          : 'the Local Prestigia team';
+
+                        const script = isEn
+                          ? `Hello *${clientPersonName}*, this is *${senderIdentityEn}* with an urgent advisory regarding your Google Maps listing. We detected that your official profile is currently compromised by a third party or suspended by Google. Customers searching for your business in *${rescueCity || 'your city'}* may be calling outdated numbers or unable to find your address. Please DO NOT make the serious mistake of creating a new profile: Google will penalize both listings for duplicity and you will lose all reviews, photos, and years of commercial seniority. At Prestigia, we are certified listing recovery specialists and execute Google's Official 72-Hour Legal Ownership Protocol to submit the evidentiary dossier and return absolute legal control to you. When you activate your tailored *Prestigia Plan* today to protect your reputation, we absorb 100% of the technical and legal recovery fee (*$0 waived*) and shield your listing from future takeovers. Would you authorize us to submit the ownership claim today?`
+                          : `Hola *${clientPersonName}*, le saluda *${senderIdentity}* con una alerta prioritaria de su negocio en Google Maps. Detectamos que su ficha oficial se encuentra actualmente secuestrada por un tercero / suspendida por Google. Los clientes que buscan su negocio en *${rescueCity || 'su ciudad'}* están llamando a números que no le pertenecen o no pueden encontrar su dirección. Por favor NO cometa el grave error de crear una ficha nueva: Google la suspenderá por duplicidad y usted perderá todas sus reseñas, fotos y años de antigüedad comercial. Nosotros somos especialistas certificados en rescates de titularidad y ejecutamos el Protocolo Oficial de 72 Horas de Google para radicar el expediente probatorio y devolverle el control legal absoluto de su perfil. Al activar hoy su *Plan Prestigia a la medida* para blindar su reputación, nosotros absorbemos el 100% del costo legal y técnico de rescate (*$0 bonificado*) y blindamos su ficha para que nunca nadie vuelva a quitársela. ¿Nos autoriza a radicar la solicitud de titularidad hoy mismo?`;
+                        copyToClipboard(script, isEn ? 'Listing Rescue Pitch' : 'Guión de Rescate de Ficha');
+                      }}
+                      className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg shadow-rose-600/20 cursor-pointer shrink-0 active:scale-98"
+                    >
+                      <Copy className="w-4 h-4" />
+                      <span>{isEn ? 'Copy Rescue Pitch' : 'Copiar Guión de Rescate'}</span>
+                    </button>
                   </div>
-                  <p className="text-slate-300 text-[11px] leading-relaxed">
-                    {isEn ? <>If Google indicates the profile belongs to an external email (e.g. <em>c*****@gmail.com</em>), click the blue <strong>"Request Access"</strong> button.</> : <>Si Google muestra que la ficha pertenece a un correo externo (ej: <em>c*****@gmail.com</em>), haz clic en el botón azul <strong>"Solicitar acceso"</strong> (Request Access).</>}
-                  </p>
-                </div>
 
-                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">4</span>
-                    <strong className="text-white text-xs">{isEn ? 'Role "Owner" & 72-Hour Window' : 'Nivel "Propietario" & Plazo 72h'}</strong>
+                  {/* Pitch Display Card */}
+                  <div className="p-4 rounded-2xl bg-slate-900 border border-rose-500/30 text-xs text-slate-200 leading-relaxed italic space-y-2">
+                    <div className="flex items-center justify-between not-italic">
+                      <span className="font-bold text-rose-300 block text-xs">
+                        {isEn ? '🎙️ High-Urgency Ownership Rescue Pitch:' : '🎙️ Speech de Urgencia & Rescate de Titularidad:'}
+                      </span>
+                      <span className="text-[10px] text-rose-400/80 font-mono">
+                        {isLuismaMaster ? '👑 Prestigia Direct' : currentUser?.agencyName ? `🏢 Marca Blanca: ${currentUser.agencyName}` : '🛡️ Local Prestigia'}
+                      </span>
+                    </div>
+                    <p>
+                      {isEn ? (
+                        <>"Hello <strong>{rescueContactName || rescueBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}</strong> with an urgent advisory. Your official Google Maps profile is currently <strong>compromised / suspended by Google</strong>. Potential clients searching your business are calling outdated numbers. <strong>DO NOT create a duplicate profile</strong>: Google will penalize both listings and you will lose all reviews and domain history. We execute the official 72-Hour Legal Protocol with Google Trust & Safety to restore full ownership."</>
+                      ) : (
+                        <>"Hola <strong>{rescueContactName || rescueBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}</strong> con una alerta urgente. Su ficha en Google Maps está actualmente <strong>secuestrada por un tercero / suspendida</strong>. Clientes que buscan su negocio están llamando a números ajenos. <strong>NO cree una ficha nueva</strong>: Google la sancionará por duplicidad y perderá todas sus reseñas. Nosotros ejecutamos el protocolo legal de 72h con Google Trust & Safety para restituirle la titularidad legítima."</>
+                      )}
+                    </p>
                   </div>
-                  <p className="text-slate-300 text-[11px] leading-relaxed">
-                    {isEn ? <>Select level <strong>"Owner"</strong>. Google notifies the holder with a mandatory <strong>3-day (72 hours)</strong> window. If they don\'t answer, Google releases direct verification to you.</> : <>Elige nivel <strong>"Propietario"</strong>. Google notifica al secuestrador dándole <strong>3 días (72 horas)</strong> obligatorios. Si no responde, Google libera la verificación directa para ti.</>}
-                  </p>
-                </div>
 
-                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">5</span>
-                    <strong className="text-white text-xs">{isEn ? 'Formal Appeal if Rejected' : 'Apelación Formal si Rechazan'}</strong>
+                  {/* Objections & Closing Offer Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
+                      <strong className="text-amber-300 block text-xs">
+                        {isEn ? '⚠️ Objection: "A former agency or ex-employee wants money to release it."' : '⚠️ Objeción: "Una agencia anterior o ex-empleado me pide dinero para entregármela."'}
+                      </strong>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"Never pay extortion fees. Google strictly prohibits third parties from withholding commercial listings. Through our official evidentiary claim (tax ID, utility bill, and point-of-sale receipt), Google Trust & Safety revokes the unauthorized holder directly and reassigns ownership to you."' : '"No les pague un solo centavo. Las directrices de Google sancionan penalmente la extorsión de perfiles comerciales. Con nuestro expediente legal (RUT, facturas de servicios y datáfono), Google revoca al tercero de inmediato y le transfiere la titularidad a usted sin depender de ellos."'}
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
+                      <strong className="text-amber-300 block text-xs">
+                        {isEn ? '⚠️ Objection: "How long does it take and what are the guarantees?"' : '⚠️ Objeción: "¿Cuánto tiempo demora y qué garantías tengo?"'}
+                      </strong>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"Google\'s 72-Hour protocol gives unauthorized managers exactly 3 business days to reply. If they fail to answer, the verification trigger releases automatically. Over 95% of evidentiary rescues are resolved within 7 business days."' : '"El protocolo de 72 horas de Google da un plazo perentorio de 3 días hábiles. Si no responden, el botón de verificación se libera inmediatamente. Más del 95% de los rescates probatorios con documentación legal se resuelven con éxito en menos de una semana."'}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-slate-300 text-[11px] leading-relaxed">
-                    {isEn ? <>If the current manager denies or the listing is suspended, access the <strong>Official Google Appeals Tool</strong> and file a formal reinstatement claim.</> : <>Si el secuestrador rechaza o el perfil está suspendido, ingresa a la <strong>Herramienta Oficial de Apelaciones</strong> y abre un caso formal de restitución.</>}
-                  </p>
-                </div>
 
-                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-xs shrink-0">6</span>
-                    <strong className="text-white text-xs">{isEn ? 'Evidentiary Dossier Upload' : 'Carga de Expediente Probatorio'}</strong>
+                  {/* Closing Hook Box */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-950/80 via-slate-900 to-slate-900 border border-rose-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                    <div>
+                      <span className="font-black text-rose-300 uppercase tracking-wide block text-xs">
+                        {isEn ? '🎁 The Prestigia Closing Hook ($0 Setup Waiver):' : '🎁 El Gancho de Cierre Prestigia ($0 Setup):'}
+                      </span>
+                      <p className="text-slate-300 text-[11px] mt-0.5">
+                        {isEn ? <>"When you activate your tailored <strong>Prestigia Plan</strong> today, we absorb 100% of the technical and legal rescue fee (<strong>$0 cost waived</strong>) and shield your listing from future hijackings."</> : <>"Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, nosotros asumimos el 100% del costo técnico y legal del rescate (<strong>$0 bonificado</strong>) y blindamos tu ficha."</>}
+                      </p>
+                    </div>
+                    <span className="shrink-0 px-3 py-1.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-black text-xs">
+                      {isEn ? 'Tailored Plan' : 'Plan a la Medida'}
+                    </span>
                   </div>
-                  <p className="text-slate-300 text-[11px] leading-relaxed">
-                    {isEn ? <>Attach the 4 official records: Tax ID / Business license, recent utility bill, facade photo, and POS terminal to Google Trust & Safety to revoke unauthorized holders.</> : <>Adjunta los 4 documentos oficiales: RUT / Tax ID, factura de energía reciente, foto de fachada y datáfono en caja ante Google Trust & Safety para revocar al secuestrador.</>}
-                  </p>
+
+                  {/* Bottom Quick Action: Nuevo Rescate */}
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 pb-2 print:hidden">
+                    <button
+                      type="button"
+                      onClick={handleResetRescueForm}
+                      className="px-6 py-3 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-slate-950 font-black text-sm transition flex items-center gap-2 shadow-xl shadow-rose-500/25 cursor-pointer active:scale-95"
+                    >
+                      <Plus className="w-4 h-4 text-slate-950" />
+                      <span>{isEn ? 'Run Another Rescue' : 'Nuevo Rescate'}</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            {/* =========================================================
-                INTEGRATED: GUIÓN COMERCIAL DE CIERRE (RESCATE 72H)
-                ========================================================= */}
-            <div className="bg-slate-950 border-2 border-rose-500/50 rounded-3xl p-6 sm:p-7 space-y-5 shadow-2xl print:hidden">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-950 border border-rose-500/40 text-rose-300">
-                    {isEn ? 'Sales Playbook • Case 3: Listing Rescue Closing Pitch' : 'Guión Comercial & Cierre • Caso 3: Venta de Rescate & Recuperación 72h'}
-                  </span>
-                  <h3 className="text-lg font-black text-white flex items-center gap-2">
-                    <MessageSquare className="w-5 h-5 text-rose-400" />
-                    <span>{isEn ? 'High-Urgency Crisis Rescue Closing Script' : 'Speech de Crisis & Urgencia Extrema: Rescate de Titularidad Google'}</span>
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    {isEn
-                      ? 'Prevent clients from creating duplicate listings and close the $250-$450 USD rescue fee or bundle with Prestigia plans.'
-                      : 'Evita que el cliente cree fichas duplicadas sancionables y cierra el servicio de rescate ($350 USD) o bonifícalo con el Plan Prestigia.'}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const script = isEn
-                      ? `Hello ${rescueBusinessName || 'Business Owner'}, this is the Prestigia team with an urgent advisory regarding your Google Maps listing. We detected that your official profile is currently compromised by a third party or suspended by Google. Customers searching for your business in ${rescueCity || 'your city'} may be calling outdated numbers or unable to find your address. Please DO NOT make the serious mistake of creating a new profile: Google will penalize both listings for duplicity and you will lose all reviews, photos, and years of commercial seniority. At Prestigia, we are certified listing recovery specialists and execute Google's Official 72-Hour Legal Ownership Protocol to submit the evidentiary dossier and return absolute legal control to you. When you activate your tailored Prestigia Plan today to protect your reputation, we absorb 100% of the technical and legal recovery fee ($0 waived) and shield your listing from future takeovers. Would you authorize us to submit the ownership claim today?`
-                      : `Hola ${rescueBusinessName || 'propietario'}, le saluda el equipo de Prestigia con una alerta prioritaria de su negocio en Google Maps. Detectamos que su ficha oficial se encuentra actualmente secuestrada por un tercero / suspendida por Google. Los clientes que buscan su negocio en ${rescueCity || 'su ciudad'} están llamando a números que no le pertenecen o no pueden encontrar su dirección. Por favor NO cometa el grave error de crear una ficha nueva: Google la suspenderá por duplicidad y usted perderá todas sus reseñas, fotos y años de antigüedad comercial. En Prestigia somos especialistas certificados en rescates de titularidad y ejecutamos el Protocolo Oficial de 72 Horas de Google para radicar el expediente probatorio y devolverle el control legal absoluto de su perfil. Al activar hoy su Plan Prestigia a la medida para blindar su reputación, nosotros absorbemos el 100% del costo legal y técnico de rescate ($0 bonificado) y blindamos su ficha para que nunca nadie vuelva a quitársela. ¿Nos autoriza a radicar la solicitud de titularidad hoy mismo?`;
-                    copyToClipboard(script, isEn ? 'Listing Rescue Pitch' : 'Guión de Rescate de Ficha');
-                  }}
-                  className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg shadow-rose-600/20 cursor-pointer shrink-0 active:scale-98"
-                >
-                  <Copy className="w-4 h-4" />
-                  <span>{isEn ? 'Copy Rescue Pitch' : 'Copiar Guión de Rescate'}</span>
-                </button>
-              </div>
-
-              {/* Pitch Display Card */}
-              <div className="p-4 rounded-2xl bg-slate-900 border border-rose-500/30 text-xs text-slate-200 leading-relaxed italic space-y-2">
-                <span className="font-bold text-rose-300 not-italic block text-xs">
-                  {isEn ? '🎙️ High-Urgency Ownership Rescue Pitch:' : '🎙️ Speech de Urgencia & Rescate de Titularidad:'}
-                </span>
-                <p>
-                  {isEn ? (
-                    <>"Hello <strong>{rescueBusinessName || 'Business Owner'}</strong>, this is the Prestigia team with an urgent advisory. Your official Google Maps profile is currently <strong>compromised / suspended by Google</strong>. Potential clients searching your business are calling outdated numbers. <strong>DO NOT create a duplicate profile</strong>: Google will penalize both listings and you will lose all reviews and domain history. We execute the official 72-Hour Legal Protocol with Google Trust & Safety to restore full ownership."</>
-                  ) : (
-                    <>"Hola <strong>{rescueBusinessName || 'propietario'}</strong>, le saluda el equipo de Prestigia con una alerta urgente. Su ficha en Google Maps está actualmente <strong>secuestrada por un tercero / suspendida</strong>. Clientes que buscan su negocio están llamando a números ajenos. <strong>NO cree una ficha nueva</strong>: Google la sancionará por duplicidad y perderá todas sus reseñas. Nosotros ejecutamos el protocolo legal de 72h con Google Trust & Safety para restituirle la titularidad legítima."</>
-                  )}
-                </p>
-              </div>
-
-              {/* Objections & Closing Offer Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
-                  <strong className="text-amber-300 block text-xs">
-                    {isEn ? '⚠️ Objection: "A former agency or ex-employee wants money to release it."' : '⚠️ Objeción: "Una agencia anterior o ex-empleado me pide dinero para entregármela."'}
-                  </strong>
-                  <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"Never pay extortion fees. Google strictly prohibits third parties from withholding commercial listings. Through our official evidentiary claim (tax ID, utility bill, and point-of-sale receipt), Google Trust & Safety revokes the unauthorized holder directly and reassigns ownership to you."' : '"No les pague un solo centavo. Las directrices de Google sancionan penalmente la extorsión de perfiles comerciales. Con nuestro expediente legal (RUT, facturas de servicios y datáfono), Google revoca al tercero de inmediato y le transfiere la titularidad a usted sin depender de ellos."'}
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
-                  <strong className="text-amber-300 block text-xs">
-                    {isEn ? '⚠️ Objection: "How long does it take and what are the guarantees?"' : '⚠️ Objeción: "¿Cuánto tiempo demora y qué garantías tengo?"'}
-                  </strong>
-                  <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"Google\'s 72-Hour protocol gives unauthorized managers exactly 3 business days to reply. If they fail to answer, the verification trigger releases automatically. Over 95% of evidentiary rescues are resolved within 7 business days."' : '"El protocolo de 72 horas de Google da un plazo perentorio de 3 días hábiles. Si no responden, el botón de verificación se libera inmediatamente. Más del 95% de los rescates probatorios con documentación legal se resuelven con éxito en menos de una semana."'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Closing Hook Box */}
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-950/80 via-slate-900 to-slate-900 border border-rose-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-                <div>
-                  <span className="font-black text-rose-300 uppercase tracking-wide block text-xs">
-                    {isEn ? '🎁 The Prestigia Closing Hook ($0 Setup Waiver):' : '🎁 El Gancho de Cierre Prestigia ($0 Setup):'}
-                  </span>
-                  <p className="text-slate-300 text-[11px] mt-0.5">
-                    {isEn ? <>"When you activate your tailored <strong>Prestigia Plan</strong> today, we absorb 100% of the technical and legal rescue fee (<strong>$0 cost waived</strong>) and shield your listing from future hijackings."</> : <>"Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, nosotros asumimos el 100% del costo técnico y legal del rescate (<strong>$0 bonificado</strong>) y blindamos tu ficha."</>}
-                  </p>
-                </div>
-                <span className="shrink-0 px-3 py-1.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-black text-xs">
-                  {isEn ? 'Tailored Plan' : (isEn ? 'Tailored Plan' : 'Plan a la Medida')}
-                </span>
-              </div>
-
-              {/* Bottom Quick Action: Nuevo Rescate */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 pb-2 print:hidden">
-                <button
-                  type="button"
-                  onClick={handleResetRescueForm}
-                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-slate-950 font-black text-sm transition flex items-center gap-2 shadow-xl shadow-rose-500/25 cursor-pointer active:scale-95"
-                >
-                  <Plus className="w-4 h-4 text-slate-950" />
-                  <span>{isEn ? 'Run Another Rescue' : 'Nuevo Rescate'}</span>
-                </button>
-              </div>
-            </div>
+              </>
+            )}
 
           </div>
         )}
