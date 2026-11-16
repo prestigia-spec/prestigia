@@ -1877,6 +1877,8 @@ export default function LocalStudioPage() {
   const [selectedAppealReview, setSelectedAppealReview] = useState<NegativeReviewItem | null>(null);
   const [isGeneratingAppeal, setIsGeneratingAppeal] = useState(false);
   const [activeAppealDossier, setActiveAppealDossier] = useState<any | null>(null);
+  const [appealCaseStatus, setAppealCaseStatus] = useState<'in_progress' | 'won' | 'second_instance'>('in_progress');
+  const [appealEvidenceChecks, setAppealEvidenceChecks] = useState<Record<string, boolean>>({});
   const [appealSuccessCopied, setAppealSuccessCopied] = useState<string | null>(null);
 
   // Manual Review Form State
@@ -2784,6 +2786,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     setAppealReviewsList([]);
     setSelectedAppealReview(null);
     setActiveAppealDossier(null);
+    setAppealCaseStatus('in_progress');
+    setAppealEvidenceChecks({});
     setShowManualReviewForm(false);
     setManualAuthor('');
     setManualRating(1);
@@ -2794,6 +2798,80 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     showToast(isEn ? '✨ Ready to scan or appeal another review' : '✨ Formulario listo para una nueva apelación');
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const toggleAppealEvidenceCheck = (key: string) => {
+    setAppealEvidenceChecks((prev) => {
+      const updated = { ...prev, [key]: !prev[key] };
+      if (typeof window !== 'undefined' && activeAppealDossier?.id) {
+        try {
+          localStorage.setItem(`prestigia_appeal_ev_${activeAppealDossier.id}`, JSON.stringify(updated));
+        } catch {}
+      }
+      return updated;
+    });
+  };
+
+  const handleMarkAppealWon = async () => {
+    setAppealCaseStatus('won');
+    showToast(
+      isEn
+        ? '🎉 Review Successfully Removed by Google! Marked as WON in Prestigia CRM.'
+        : '🎉 ¡Reseña Dañina Eliminada por Google! Marcado como CASO GANADO en el CRM de Prestigia.'
+    );
+
+    if (activeAppealDossier?.id) {
+      try {
+        await fetch('/api/local-studio/dossiers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: activeAppealDossier.id,
+            closingStatus: 'setup_paid',
+            status: 'completed',
+            data: {
+              ...activeAppealDossier,
+              appealCaseStatus: 'won',
+              evidenceChecks: appealEvidenceChecks,
+              resolvedAt: new Date().toISOString(),
+            },
+          }),
+        });
+        fetchDossiers();
+      } catch (e) {
+        console.warn('Error updating appeal won status:', e);
+      }
+    }
+  };
+
+  const handleEscalateAppealToSecondInstance = async () => {
+    setAppealCaseStatus('second_instance');
+    showToast(
+      isEn
+        ? '⚖️ Escalated to 2nd Instance: Human arbitration memorial & evidentiary pack activated.'
+        : '⚖️ Escalado a 2ª Instancia: Memorial probatorio de arbitraje humano ante Google activado.'
+    );
+
+    if (activeAppealDossier?.id) {
+      try {
+        await fetch('/api/local-studio/dossiers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: activeAppealDossier.id,
+            data: {
+              ...activeAppealDossier,
+              appealCaseStatus: 'second_instance',
+              evidenceChecks: appealEvidenceChecks,
+              escalatedAt: new Date().toISOString(),
+            },
+          }),
+        });
+        fetchDossiers();
+      } catch (e) {
+        console.warn('Error updating appeal 2nd instance status:', e);
+      }
     }
   };
 
@@ -2932,6 +3010,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       const resData = await res.json();
       if (resData.success && resData.dossier) {
         setActiveAppealDossier(resData.dossier);
+        setAppealCaseStatus('in_progress');
+        setAppealEvidenceChecks({});
         setMonthlyUsage((prev) => ({ ...prev, appeals: (prev.appeals || 0) + 1 }));
 
         try {
@@ -2958,7 +3038,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               googleUrl: scannedAppealBiz?.googleMapsUrl || '',
               mode: 'appeal',
               status: 'draft',
-              data: resData.dossier,
+              data: { ...resData.dossier, appealCaseStatus: 'in_progress' },
             }),
           });
           fetchDossiers();
@@ -11601,6 +11681,130 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </p>
                     </div>
 
+                    {/* Appeal CRM Lifecycle Resolution Panel */}
+                    <div className="p-4 rounded-3xl bg-slate-950/90 border border-slate-800 space-y-3 shadow-xl print:hidden">
+                      {appealCaseStatus === 'won' ? (
+                        <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-emerald-950/40 border border-emerald-500/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                              <Trophy className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">
+                                {isEn ? 'Status: Case Resolved & Won' : 'Estado: Caso Resuelto & Ganado'}
+                              </span>
+                              <h4 className="text-sm font-black text-white">
+                                {isEn ? '🎉 Review Expunged by Google Maps' : '🎉 Reseña Eliminada por Google Maps'}
+                              </h4>
+                              <p className="text-xs text-slate-300">
+                                {isEn
+                                  ? 'Listing reputation restored. The rating was successfully increased and marked in CRM.'
+                                  : 'Reputación restaurada. El puntaje promedio fue elevado con éxito y registrado en el CRM.'}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setAppealCaseStatus('in_progress')}
+                            className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 text-xs font-bold transition cursor-pointer shrink-0"
+                          >
+                            {isEn ? 'Reopen Case' : 'Reabrir Caso'}
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                              <Gavel className="w-3.5 h-3.5 text-rose-400" />
+                              <span>{isEn ? 'Tracking & Legal Outcome in CRM:' : 'Seguimiento & Resolución Legal en CRM:'}</span>
+                            </span>
+                            <span className={'text-[10px] font-bold px-2 py-0.5 rounded-md ' + (
+                              appealCaseStatus === 'second_instance'
+                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                            )}>
+                              {appealCaseStatus === 'second_instance' ? (isEn ? '⚖️ In 2nd Instance (Arbitration)' : '⚖️ En 2ª Instancia (Arbitraje)') : (isEn ? '⏳ In 1st Instance Review' : '⏳ En Trámite 1ª Instancia')}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <button
+                              type="button"
+                              onClick={handleMarkAppealWon}
+                              className="p-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 cursor-pointer active:scale-98"
+                            >
+                              <CheckCircle2 className="w-4 h-4 text-white" />
+                              <span>{isEn ? '✓ Review Expunged by Google (Case Won)' : '✓ Reseña Eliminada por Google (Caso Ganado)'}</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={handleEscalateAppealToSecondInstance}
+                              disabled={appealCaseStatus === 'second_instance'}
+                              className={'p-3 rounded-2xl font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer ' + (
+                                appealCaseStatus === 'second_instance'
+                                  ? 'bg-amber-950/60 border border-amber-500/40 text-amber-300 cursor-default'
+                                  : 'bg-gradient-to-r from-amber-600 to-rose-600 hover:from-amber-500 hover:to-rose-500 text-white shadow-lg shadow-amber-600/20 active:scale-98'
+                              )}
+                            >
+                              <Scale className="w-4 h-4" />
+                              <span>
+                                {appealCaseStatus === 'second_instance'
+                                  ? (isEn ? '⚖️ Escalated to 2nd Instance' : '⚖️ Escalado a 2ª Instancia')
+                                  : (isEn ? '⚖️ Denied in 1st Instance → Escalate to 2nd' : '⚖️ Rechazo en 1ª Instancia → Escalar a 2ª')}
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Rating Impact Simulator (Mathematical Sales Argument) */}
+                    {(() => {
+                      const currentAvg = scannedAppealBiz?.rating || 4.2;
+                      const currentCount = Math.max(1, scannedAppealBiz?.reviewsCount || 15);
+                      const reviewScore = selectedAppealReview?.rating || activeAppealDossier?.rating || 1;
+                      const newCount = Math.max(1, currentCount - 1);
+                      const projectedAvg = currentCount > 1
+                        ? Math.min(5.0, Math.max(1.0, ((currentAvg * currentCount) - reviewScore) / newCount))
+                        : 5.0;
+                      const ratingGain = Math.max(0, projectedAvg - currentAvg);
+
+                      return (
+                        <div className="p-4 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950/30 to-slate-900 border border-indigo-500/30 space-y-3 shadow-xl">
+                          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                            <div className="flex items-center gap-2">
+                              <Zap className="w-4 h-4 text-amber-400" />
+                              <h4 className="text-xs font-black text-white uppercase tracking-wider">
+                                {isEn ? 'Rating Impact Simulator (Mathematical Conversion Gain)' : 'Simulador de Impacto en la Nota (Argumento Matemático)'}
+                              </h4>
+                            </div>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                              +{Math.round(ratingGain * 20)}% {isEn ? 'Local Conversion' : 'Conversión Local'}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-2 text-center">
+                            <div className="p-2.5 rounded-2xl bg-slate-950 border border-slate-800">
+                              <span className="text-[10px] text-slate-400 block font-mono">{isEn ? 'Current Rating' : 'Nota Actual'}</span>
+                              <strong className="text-sm font-black text-rose-400">{currentAvg.toFixed(1)} ★</strong>
+                              <span className="text-[9px] text-slate-500 block">({currentCount} {isEn ? 'reviews' : 'reseñas'})</span>
+                            </div>
+                            <div className="p-2.5 rounded-2xl bg-slate-950 border border-slate-800">
+                              <span className="text-[10px] text-slate-400 block font-mono">{isEn ? 'Expunged Review' : 'Reseña a Retirar'}</span>
+                              <strong className="text-sm font-black text-amber-400">-{reviewScore} ★</strong>
+                              <span className="text-[9px] text-slate-500 block">({activeAppealDossier.authorName})</span>
+                            </div>
+                            <div className="p-2.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/40">
+                              <span className="text-[10px] text-emerald-300 block font-mono">{isEn ? 'Projected Rating' : 'Nota Proyectada'}</span>
+                              <strong className="text-sm font-black text-emerald-400">{projectedAvg.toFixed(1)} ★</strong>
+                              <span className="text-[9px] text-emerald-300 font-bold block">(+{ratingGain.toFixed(2)} ★)</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
                     {/* Card 1: Google Policy Violation */}
                     <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 shadow-xl">
                       <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
@@ -11717,34 +11921,49 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                     {/* Card 4: Public Mitigation Response */}
                     <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 shadow-xl">
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-800">
                         <div className="flex items-center gap-2">
                           <MessageSquare className="w-4 h-4 text-emerald-400" />
                           <h4 className="text-xs font-black text-white uppercase tracking-wider">
                             {isEn ? '4. Immediate Public Mitigation Response (Publish on Maps)' : '4. Respuesta Pública de Mitigación Inmediata (Publicar en Maps)'}
                           </h4>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            navigator.clipboard.writeText(activeAppealDossier.publicMitigationResponse.responseText);
-                            setAppealSuccessCopied('mitigation');
-                            setTimeout(() => setAppealSuccessCopied(null), 2500);
-                          }}
-                          className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
-                        >
-                          {appealSuccessCopied === 'mitigation' ? (
-                            <>
-                              <Check className="w-3.5 h-3.5 text-slate-950" />
-                              <span>{isEn ? 'Copied!' : '¡Copiado!'}</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3.5 h-3.5 text-slate-950" />
-                              <span>{isEn ? 'Copy Response' : 'Copiar Respuesta'}</span>
-                            </>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(activeAppealDossier.publicMitigationResponse.responseText);
+                              setAppealSuccessCopied('mitigation');
+                              setTimeout(() => setAppealSuccessCopied(null), 2500);
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
+                          >
+                            {appealSuccessCopied === 'mitigation' ? (
+                              <>
+                                <Check className="w-3.5 h-3.5 text-slate-950" />
+                                <span>{isEn ? 'Copied!' : '¡Copiado!'}</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3.5 h-3.5 text-slate-950" />
+                                <span>{isEn ? 'Copy Response' : 'Copiar Respuesta'}</span>
+                              </>
+                            )}
+                          </button>
+                          {appealContactPhone && (
+                            <a
+                              href={'https://wa.me/' + appealContactPhone.replace(/[^0-9]/g, '') + '?text=' + encodeURIComponent(
+                                'Hola ' + (appealContactName || '') + ', te comparto la respuesta pública redactada para publicar en Google Maps frente a la reseña negativa:\n\n"' + activeAppealDossier.publicMitigationResponse.responseText + '"'
+                              )}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+                            >
+                              <span>💬 {isEn ? 'WhatsApp' : 'WhatsApp'}</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
                           )}
-                        </button>
+                        </div>
                       </div>
 
                       <p className="text-xs text-slate-400">
@@ -11759,41 +11978,133 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                     {/* Card 5: Recommended Evidence Pack */}
                     <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 shadow-xl">
-                      <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
-                        <ShieldCheck className="w-4 h-4 text-amber-400" />
-                        <h4 className="text-xs font-black text-white uppercase tracking-wider">
-                          {isEn ? '5. Recommended Supporting Evidence to Attach' : '5. Pruebas de Soporte Recomendadas para Adjuntar'}
-                        </h4>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <ShieldCheck className="w-4 h-4 text-amber-400" />
+                          <h4 className="text-xs font-black text-white uppercase tracking-wider">
+                            {isEn ? '5. Recommended Supporting Evidence to Attach' : '5. Pruebas de Soporte Recomendadas para Adjuntar'}
+                          </h4>
+                        </div>
+                        {/* Live Evidence Strength Bar */}
+                        {(() => {
+                          const evList = activeAppealDossier.recommendedEvidence || [];
+                          const checkedCount = evList.filter((_: any, idx: number) => appealEvidenceChecks[idx.toString()]).length;
+                          const percent = evList.length > 0 ? Math.round((checkedCount / evList.length) * 100) : 0;
+                          return (
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] text-slate-400 font-mono">
+                                {isEn ? 'Evidence Strength:' : 'Fuerza Probatoria:'}
+                              </span>
+                              <div className="w-24 h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                                <div
+                                  className={'h-full transition-all duration-500 ' + (
+                                    percent >= 75 ? 'bg-emerald-400' : percent >= 40 ? 'bg-amber-400' : 'bg-rose-400'
+                                  )}
+                                  style={{ width: percent + '%' }}
+                                />
+                              </div>
+                              <span className={'text-xs font-black ' + (
+                                percent >= 75 ? 'text-emerald-400' : percent >= 40 ? 'text-amber-400' : 'text-rose-400'
+                              )}>
+                                {percent}%
+                              </span>
+                            </div>
+                          );
+                        })()}
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        {activeAppealDossier.recommendedEvidence.map((ev: any, idx: number) => (
-                          <div key={idx} className="p-3 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-black text-white truncate">{ev.item}</span>
-                              <span
-                                className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                                  ev.importance === 'Crítica'
-                                    ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
-                                    : 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                                }`}
-                              >
-                                {ev.importance}
-                              </span>
+                        {(activeAppealDossier.recommendedEvidence || []).map((ev: any, idx: number) => {
+                          const isChecked = !!appealEvidenceChecks[idx.toString()];
+                          return (
+                            <div
+                              key={idx}
+                              onClick={() => toggleAppealEvidenceCheck(idx.toString())}
+                              className={'p-3 rounded-2xl border transition cursor-pointer select-none space-y-1 ' + (
+                                isChecked
+                                  ? 'bg-emerald-950/30 border-emerald-500/50 shadow-sm shadow-emerald-500/10'
+                                  : 'bg-slate-950 border-slate-800 hover:border-slate-700'
+                              )}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2 truncate">
+                                  <div className={'w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition ' + (
+                                    isChecked ? 'bg-emerald-500 border-emerald-400 text-slate-950' : 'border-slate-700 bg-slate-900 text-transparent'
+                                  )}>
+                                    <Check className="w-3 h-3 stroke-[3]" />
+                                  </div>
+                                  <span className={'text-xs font-black truncate ' + (isChecked ? 'text-emerald-200 line-through opacity-85' : 'text-white')}>
+                                    {ev.item}
+                                  </span>
+                                </div>
+                                <span
+                                  className={'text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0 ' + (
+                                    ev.importance === 'Crítica'
+                                      ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                                      : 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                  )}
+                                >
+                                  {ev.importance}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-400 leading-normal pl-6">{ev.description}</p>
                             </div>
-                            <p className="text-[11px] text-slate-400 leading-normal">{ev.description}</p>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
 
                     {/* Card 6: Advisor Sales Script & Closing */}
                     <div className="p-5 rounded-3xl bg-gradient-to-br from-indigo-950/60 via-slate-900 to-slate-900 border border-indigo-500/40 space-y-3 shadow-xl">
-                      <div className="flex items-center gap-2 pb-2 border-b border-indigo-500/30">
-                        <Trophy className="w-4 h-4 text-indigo-400" />
-                        <h4 className="text-xs font-black text-indigo-300 uppercase tracking-wider">
-                          {isEn ? '6. Commercial Sales Script for Prestigia Advisor' : '6. Guion Comercial para el Asesor de Prestigia'}
-                        </h4>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-indigo-500/30">
+                        <div className="flex items-center gap-2">
+                          <Trophy className="w-4 h-4 text-indigo-400" />
+                          <h4 className="text-xs font-black text-indigo-300 uppercase tracking-wider">
+                            {isEn ? '6. Commercial Sales Script for Prestigia Advisor' : '6. Guion Comercial para el Asesor de Prestigia'}
+                          </h4>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                '*PROPUESTA DE BLINDAJE & RETIRO DE RESEÑA NEGATIVA*\n\n' +
+                                '*Diagnóstico:* ' + activeAppealDossier.probabilityDiagnosis + '\n\n' +
+                                '*Cláusula Infringida:* ' + activeAppealDossier.googlePolicy.clauseTitle + '\n\n' +
+                                '*Propuesta:* ' + activeAppealDossier.commercialScript.closingPitch + '\n\n' +
+                                '*Garantía & Proceso:* ' + activeAppealDossier.commercialScript.clientObjectionHandling
+                              );
+                              setAppealSuccessCopied('commercial');
+                              setTimeout(() => setAppealSuccessCopied(null), 2500);
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
+                          >
+                            {appealSuccessCopied === 'commercial' ? (
+                              <>
+                                <Check className="w-3.5 h-3.5" />
+                                <span>{isEn ? 'Copied!' : '¡Copiado!'}</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3.5 h-3.5" />
+                                <span>{isEn ? 'Copy Pitch' : 'Copiar Propuesta'}</span>
+                              </>
+                            )}
+                          </button>
+                          {appealContactPhone && (
+                            <a
+                              href={'https://wa.me/' + appealContactPhone.replace(/[^0-9]/g, '') + '?text=' + encodeURIComponent(
+                                'Hola ' + (appealContactName || '') + ', te comparto la propuesta técnica para el retiro legal de la reseña negativa en Google Maps:\n\n' + activeAppealDossier.commercialScript.closingPitch
+                              )}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+                            >
+                              <span>💬 {isEn ? 'WhatsApp' : 'WhatsApp'}</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          )}
+                        </div>
                       </div>
 
                       <div className="space-y-2">
