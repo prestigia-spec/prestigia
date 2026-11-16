@@ -4662,55 +4662,82 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     const bName = d.clientName || (isEnglish ? 'your business' : 'tu negocio');
     const city = d.city || (isEnglish ? 'your city' : 'tu ciudad');
 
-    // Identificación dinámica del remitente: Luisma, Asesor Comercial o Agencia Aliada
-    const rawAdvisor = d.advisorName || currentUser?.name || 'Luisma';
-    const isAgency = d.advisorType === 'partner_agency' || (currentUser as any)?.accountType === 'agency';
-    const cleanAdvisorName = rawAdvisor.split('•')[0].trim() || 'Luisma';
+    // Identificación de Marca Blanca Estricta:
+    // SOLO para Luisma (Cuenta Principal) se menciona "Prestigia".
+    // Para asesores comerciales y agencias aliadas es 100% MARCA BLANCA (cero mención de Prestigia).
+    const isLuisma = Boolean(
+      (isLuismaMaster && (d.advisorId === 'adv-luisma' || !d.advisorId)) ||
+      d.advisorId === 'adv-luisma'
+    );
 
-    const senderIntro = isAgency
-      ? (isEnglish ? `the team at ${cleanAdvisorName} with Prestigia` : `el equipo de ${cleanAdvisorName} de Prestigia`)
-      : (isEnglish ? `${cleanAdvisorName} from Prestigia` : `${cleanAdvisorName} de Prestigia`);
+    const isAgency = d.advisorType === 'partner_agency' || (currentUser as any)?.accountType === 'agency' || Boolean((currentUser as any)?.agencyName);
+    const agencyName = (currentUser as any)?.agencyName || (d.advisorType === 'partner_agency' ? d.advisorName?.split('•')[0].trim() : '') || 'nuestra agencia';
+    const advisorName = d.advisorName?.split('•')[0].trim() || currentUser?.name?.split('•')[0].trim() || (isEnglish ? 'your local consultant' : 'tu consultor local');
+
+    let senderIntro = '';
+    let serviceHeaderTag = '';
+
+    if (isLuisma) {
+      senderIntro = isEnglish ? 'Luisma from Prestigia' : 'Luisma de Prestigia';
+      serviceHeaderTag = 'PRESTIGIA LOCAL STUDIO';
+    } else if (isAgency) {
+      // 100% Marca Blanca para Agencia Aliada
+      senderIntro = isEnglish ? `the team at ${agencyName}` : `el equipo de ${agencyName}`;
+      serviceHeaderTag = isEnglish
+        ? `${agencyName.toUpperCase()} — LOCAL SEO & GOOGLE MAPS`
+        : `${agencyName.toUpperCase()} — POSICIONAMIENTO EN GOOGLE MAPS`;
+    } else {
+      // 100% Marca Blanca para Asesor Comercial Independiente
+      senderIntro = isEnglish
+        ? `${advisorName}, your local SEO & Google Maps specialist`
+        : `${advisorName}, tu especialista en posicionamiento local en Google Maps`;
+      serviceHeaderTag = isEnglish
+        ? 'LOCAL SEO & GOOGLE MAPS OPTIMIZATION'
+        : 'CONSULTORÍA & POSICIONAMIENTO LOCAL EN GOOGLE MAPS';
+    }
 
     let text = '';
-    let tooltip = isEnglish ? 'Send Prestigia Report via WhatsApp' : 'Enviar Notificación de Servicio por WhatsApp';
+    let tooltip = isLuisma
+      ? (isEnglish ? 'Send Prestigia Service Report via WhatsApp' : 'Enviar Reporte de Servicio Prestigia por WhatsApp')
+      : (isEnglish ? 'Send Service Report via WhatsApp' : 'Enviar Reporte de Servicio por WhatsApp');
 
     if (d.mode === 'create') {
       tooltip = isEnglish
         ? 'Send Listing Creation Service Report via WhatsApp'
         : 'Enviar Reporte de Ficha Creada por WhatsApp';
       text = isEnglish
-        ? `${greeting} This is ${senderIntro}.\n\nWe have completed the technical setup of your new Google Maps Business Profile for *${bName}* in ${city}.\n\n🏗️ *DELIVERED SERVICE — PRESTIGIA LOCAL STUDIO:*\n- Official profile creation optimized for Google Maps local ranking algorithms.\n- High-converting primary & secondary categories, local keywords, and commercial attributes.\n- Google anti-suspension protocol and verification guide.\n- Local positioning blueprint to capture calls and customers from day one.\n\nI remain at your service for the final handover and profile ownership transfer. Great success with your new Google presence! 🚀`
-        : `${greeting} Te saluda ${senderIntro}.\n\nTe informo que hemos completado la estructuración técnica de la nueva ficha en Google Maps para *${bName}* en ${city}.\n\n🏗️ *SERVICIO REALIZADO — PRESTIGIA LOCAL STUDIO:*\n- Creación de ficha oficial optimizada para el algoritmo de posicionamiento de Google Maps.\n- Arquitectura de categorías de alta conversión, palabras clave locales y atributos comerciales.\n- Protocolo antibloqueo y guía técnica de verificación ante Google.\n- Configuración orientada a captar llamadas y clientes directos en tu zona desde el primer día.\n\nQuedo a tu disposición para la entrega formal y transferencia de propiedad de la ficha. ¡Muchos éxitos con tu nuevo perfil en Google! 🚀`;
+        ? `${greeting} This is ${senderIntro}.\n\nWe have completed the technical setup of your new Google Maps Business Profile for *${bName}* in ${city}.\n\n🏗️ *DELIVERED SERVICE — ${serviceHeaderTag}:*\n- Official profile creation optimized for Google Maps local ranking algorithms.\n- High-converting primary & secondary categories, local keywords, and commercial attributes.\n- Google anti-suspension protocol and verification guide.\n- Local positioning blueprint to capture calls and customers from day one.\n\nI remain at your service for the final handover and profile ownership transfer. Great success with your new Google presence! 🚀`
+        : `${greeting} Te saluda ${senderIntro}.\n\nTe informo que hemos completado la estructuración técnica de la nueva ficha en Google Maps para *${bName}* en ${city}.\n\n🏗️ *SERVICIO REALIZADO — ${serviceHeaderTag}:*\n- Creación de ficha oficial optimizada para el algoritmo de posicionamiento de Google Maps.\n- Arquitectura de categorías de alta conversión, palabras clave locales y atributos comerciales.\n- Protocolo antibloqueo y guía técnica de verificación ante Google.\n- Configuración orientada a captar llamadas y clientes directos en tu zona desde el primer día.\n\nQuedo a tu disposición para la entrega formal y transferencia de propiedad de la ficha. ¡Muchos éxitos con tu nuevo perfil en Google! 🚀`;
     } else if (d.mode === 'audit') {
       tooltip = isEnglish
         ? 'Send Top 3 Forensic Audit Service Report via WhatsApp'
         : 'Enviar Reporte de Auditoría Top 3 por WhatsApp';
       const scoreText = d.data?.healthScore !== undefined ? ` (Score: ${d.data.healthScore}/100)` : '';
       text = isEnglish
-        ? `${greeting} This is ${senderIntro}.\n\nWe have finalized the Forensic Audit & Local SEO Diagnosis on Google Maps for *${bName}* in ${city}${scoreText}.\n\n🔬 *DELIVERED SERVICE — PRESTIGIA LOCAL STUDIO:*\n- Algorithmic health and visibility diagnosis benchmarked against the Top 3 in your zone.\n- Detection of critical optimization gaps (categories, review velocity, authority, geocoding).\n- Step-by-step strategic action plan to outrank local competitors and attract high-value clients.\n\nDo you have 5 minutes today to review the diagnosis and next action steps? Best regards! 🚀`
-        : `${greeting} Te saluda ${senderIntro}.\n\nTe informo que hemos finalizado la Auditoría Forense de Posicionamiento Local en Google Maps para *${bName}* en ${city}${scoreText}.\n\n🔬 *SERVICIO REALIZADO — PRESTIGIA LOCAL STUDIO:*\n- Diagnóstico técnico de visibilidad y salud algorítmica frente al Top 3 de tu zona.\n- Detección de brechas críticas (categorías, reseñas, autoridad y geolocalización).\n- Plan estratégico paso a paso para superar a tu competencia directa y captar los clientes que hoy se llevan ellos.\n\n¿Tienes 5 minutos hoy para revisar juntos el diagnóstico y dar el siguiente paso? Quedo muy atento. 🚀`;
+        ? `${greeting} This is ${senderIntro}.\n\nWe have finalized the Forensic Audit & Local SEO Diagnosis on Google Maps for *${bName}* in ${city}${scoreText}.\n\n🔬 *DELIVERED SERVICE — ${serviceHeaderTag}:*\n- Algorithmic health and visibility diagnosis benchmarked against the Top 3 in your zone.\n- Detection of critical optimization gaps (categories, review velocity, authority, geocoding).\n- Step-by-step strategic action plan to outrank local competitors and attract high-value clients.\n\nDo you have 5 minutes today to review the diagnosis and next action steps? Best regards! 🚀`
+        : `${greeting} Te saluda ${senderIntro}.\n\nTe informo que hemos finalizado la Auditoría Forense de Posicionamiento Local en Google Maps para *${bName}* en ${city}${scoreText}.\n\n🔬 *SERVICIO REALIZADO — ${serviceHeaderTag}:*\n- Diagnóstico técnico de visibilidad y salud algorítmica frente al Top 3 de tu zona.\n- Detección de brechas críticas (categorías, reseñas, autoridad y geolocalización).\n- Plan estratégico paso a paso para superar a tu competencia directa y captar los clientes que hoy se llevan ellos.\n\n¿Tienes 5 minutos hoy para revisar juntos el diagnóstico y dar el siguiente paso? Quedo muy atento. 🚀`;
     } else if (d.mode === 'rescue') {
       tooltip = isEnglish
         ? 'Send 72h Listing Rescue Service Report via WhatsApp'
         : 'Enviar Reporte de Rescate de Ficha 72h por WhatsApp';
       text = isEnglish
-        ? `${greeting} This is ${senderIntro} regarding the technical recovery of your Google Maps listing for *${bName}*.\n\n🛡️ *DELIVERED SERVICE — PRESTIGIA LOCAL STUDIO:*\n- 72h Emergency Rescue Protocol activated with Google Support.\n- Commercial legitimacy dossier and technical evidence submitted.\n- Priority appeal processed to lift suspension and restore profile ownership.\n\nPlease confirm if you have your tax registration document (RUT/LLC) and utility bill ready to follow up with Google Support. We are on it. 🏛️`
-        : `${greeting} Te saluda ${senderIntro} respecto al Servicio de Rescate Técnico & Reclamación 72h para la ficha de Google Maps de *${bName}*.\n\n🛡️ *SERVICIO REALIZADO — PRESTIGIA LOCAL STUDIO:*\n- Protocolo de emergencia activado ante el equipo de soporte técnico de Google.\n- Expediente probatorio de legitimidad comercial y descargos técnicos estructurado.\n- Radicación prioritaria para el levantamiento de la suspensión y recuperación de propiedad.\n\nPor favor confírmame si tienes a mano los soportes de registro mercantil (RUT/LLC) y recibo de servicios públicos para dar seguimiento al caso con Google. Estamos sobre el caso. 🏛️`;
+        ? `${greeting} This is ${senderIntro} regarding the technical recovery of your Google Maps listing for *${bName}*.\n\n🛡️ *DELIVERED SERVICE — ${serviceHeaderTag}:*\n- 72h Emergency Rescue Protocol activated with Google Support.\n- Commercial legitimacy dossier and technical evidence submitted.\n- Priority appeal processed to lift suspension and restore profile ownership.\n\nPlease confirm if you have your tax registration document (RUT/LLC) and utility bill ready to follow up with Google Support. We are on it. 🏛️`
+        : `${greeting} Te saluda ${senderIntro} respecto al Servicio de Rescate Técnico & Reclamación 72h para la ficha de Google Maps de *${bName}*.\n\n🛡️ *SERVICIO REALIZADO — ${serviceHeaderTag}:*\n- Protocolo de emergencia activado ante el equipo de soporte técnico de Google.\n- Expediente probatorio de legitimidad comercial y descargos técnicos estructurado.\n- Radicación prioritaria para el levantamiento de la suspensión y recuperación de propiedad.\n\nPor favor confírmame si tienes a mano los soportes de registro mercantil (RUT/LLC) y recibo de servicios públicos para dar seguimiento al caso con Google. Estamos sobre el caso. 🏛️`;
     } else if (d.mode === 'appeal') {
       tooltip = isEnglish
         ? 'Send Review Legal Appeal Service Report via WhatsApp'
         : 'Enviar Reporte de Apelación de Reseñas por WhatsApp';
       text = isEnglish
-        ? `${greeting} This is ${senderIntro} regarding the legal defense and removal of unfair reviews for *${bName}* on Google Maps.\n\n⚖️ *DELIVERED SERVICE — PRESTIGIA LOCAL STUDIO:*\n- Forensic breakdown of unfair 1-3★ reviews against Google's Prohibited & Restricted Content policies.\n- Legal categorization of violations (Conflict of Interest, Deceptive Content, Harassment).\n- Formal legal appeal ready for filing and review removal.\n\nWould you like us to proceed with the formal filing with Google's trust and safety team today? Best regards.`
-        : `${greeting} Te saluda ${senderIntro} sobre la defensa de reputación y eliminación de reseñas injustas para *${bName}* en Google Maps.\n\n⚖️ *SERVICIO REALIZADO — PRESTIGIA LOCAL STUDIO:*\n- Análisis forense de cada reseña maliciosa (1-3★) frente a las Políticas Oficiales de Google.\n- Tipificación jurídica de infracciones (Contenido Engañoso, Conflicto de Interés y Hostigamiento).\n- Escrito formal de impugnación listo para radicación y solicitud de remoción definitiva.\n\n¿Procedemos con la radicación formal ante el equipo técnico de Google hoy? Quedo a tu disposición.`;
+        ? `${greeting} This is ${senderIntro} regarding the legal defense and removal of unfair reviews for *${bName}* on Google Maps.\n\n⚖️ *DELIVERED SERVICE — ${serviceHeaderTag}:*\n- Forensic breakdown of unfair 1-3★ reviews against Google's Prohibited & Restricted Content policies.\n- Legal categorization of violations (Conflict of Interest, Deceptive Content, Harassment).\n- Formal legal appeal ready for filing and review removal.\n\nWould you like us to proceed with the formal filing with Google's trust and safety team today? Best regards.`
+        : `${greeting} Te saluda ${senderIntro} sobre la defensa de reputación y eliminación de reseñas injustas para *${bName}* en Google Maps.\n\n⚖️ *SERVICIO REALIZADO — ${serviceHeaderTag}:*\n- Análisis forense de cada reseña maliciosa (1-3★) frente a las Políticas Oficiales de Google.\n- Tipificación jurídica de infracciones (Contenido Engañoso, Conflicto de Interés y Hostigamiento).\n- Escrito formal de impugnación listo para radicación y solicitud de remoción definitiva.\n\n¿Procedemos con la radicación formal ante el equipo técnico de Google hoy? Quedo a tu disposición.`;
     } else {
       // mode === 'prospect' || mode === 'tools'
       tooltip = isEnglish
         ? 'Send Forensic Prospecting & Closing Pitch via WhatsApp'
         : 'Enviar Propuesta de Prospección & Cierre por WhatsApp';
       text = isEnglish
-        ? `${greeting} This is ${senderIntro}.\n\nI am contacting you to inform you that we completed a Forensic Visibility Study on Google Maps for *${bName}* in ${city}.\n\n🎯 *DELIVERED SERVICE — PRESTIGIA LOCAL STUDIO:*\n- High-intent local customers in your area search for your services daily and end up contacting competitors due to lack of local SEO infrastructure.\n- We structured a tailored technical and commercial plan to rank your business in the Top 3 of Google Maps.\n\nI have the detailed proposal ready with key findings and projected ROI. Can we schedule a brief call today to walk you through it? Best regards! 🚀`
-        : `${greeting} Te saluda ${senderIntro}.\n\nTe contacto para informarte que hemos realizado un Estudio Forense de Visibilidad Comercial en Google Maps para *${bName}* en ${city}.\n\n🎯 *SERVICIO REALIZADO — PRESTIGIA LOCAL STUDIO:*\n- Clientes potenciales en tu zona están buscando tus servicios diariamente en Google y terminan contratando a tus competidores por falta de estructura en Google Maps.\n- Estructuramos un plan comercial y técnico personalizado para posicionar a tu negocio en el Top 3 de Google Maps.\n\nTengo lista la propuesta detallada con los hallazgos y el retorno estimado. ¿Podemos coordinar una breve llamada hoy para mostrártela? Saludos cordiales. 🚀`;
+        ? `${greeting} This is ${senderIntro}.\n\nI am contacting you to inform you that we completed a Forensic Visibility Study on Google Maps for *${bName}* in ${city}.\n\n🎯 *DELIVERED SERVICE — ${serviceHeaderTag}:*\n- High-intent local customers in your area search for your services daily and end up contacting competitors due to lack of local SEO infrastructure.\n- We structured a tailored technical and commercial plan to rank your business in the Top 3 of Google Maps.\n\nI have the detailed proposal ready with key findings and projected ROI. Can we schedule a brief call today to walk you through it? Best regards! 🚀`
+        : `${greeting} Te saluda ${senderIntro}.\n\nTe contacto para informarte que hemos realizado un Estudio Forense de Visibilidad Comercial en Google Maps para *${bName}* en ${city}.\n\n🎯 *SERVICIO REALIZADO — ${serviceHeaderTag}:*\n- Clientes potenciales en tu zona están buscando tus servicios diariamente en Google y terminan contratando a tus competidores por falta de estructura en Google Maps.\n- Estructuramos un plan comercial y técnico personalizado para posicionar a tu negocio en el Top 3 de Google Maps.\n\nTengo lista la propuesta detallada con los hallazgos y el retorno estimado. ¿Podemos coordinar una breve llamada hoy para mostrártela? Saludos cordiales. 🚀`;
     }
 
     const base = cleanPhone ? `https://wa.me/${cleanPhone}` : 'https://wa.me/';
