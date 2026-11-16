@@ -5025,9 +5025,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         clientCountry: closingContactCountry.trim() || 'Colombia',
         clientCity: closingContactCity.trim() || 'Bogotá',
         category: editingDossierClosing.category,
-        city: closingFormCity.trim() || editingDossierClosing.city,
-        neighborhood: closingFormNeighborhood.trim(),
-        country: closingFormCountry.trim() || editingDossierClosing.country || 'Colombia',
+        city: editingDossierClosing.city,
+        neighborhood: editingDossierClosing.neighborhood || '',
+        country: editingDossierClosing.country || 'Colombia',
         mode: editingDossierClosing.mode, // Servicio técnico inmutable
         businessModel: editingDossierClosing.businessModel,
         data: editingDossierClosing.data,
@@ -14441,7 +14441,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </div>
                     </div>
 
-                    {/* 3. Ubicación Física de la Ficha en Google Maps (Negocio Local / SAB) */}
+                    {/* 3. Ubicación Física de la Ficha en Google Maps (Negocio Local / SAB - Solo Informativa) */}
                     <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 shadow-md">
                       <div className="flex items-center justify-between pb-2 border-b border-slate-800">
                         <div className="flex items-center gap-2">
@@ -14454,99 +14454,42 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             </h4>
                             <span className="text-[10px] text-slate-400 block">
                               {isEn
-                                ? 'City and neighborhood where the physical business competes in Google Maps (can differ from client residence)'
-                                : 'Ciudad, barrio y país donde opera físicamente la ficha en Google Maps (puede diferir de la residencia del cliente)'}
+                                ? 'Fixed technical location on Google Maps. Editable by loading the listing directly.'
+                                : 'Ubicación técnica fijada en Google Maps. Para modificarla, entra a la ficha con "Cargar y Ver".'}
                             </span>
                           </div>
                         </div>
-                        <span className="text-[10px] font-mono text-amber-300/80 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/30">
-                          📍 Google Maps
+                        <span className="text-[10px] font-mono text-amber-300/80 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">
+                          🔒 {isEn ? 'Read-only' : 'Solo informativa'}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <label className="text-[10px] font-bold text-slate-300 uppercase">
-                              {isEn ? 'Business Country (Google Maps):' : 'País de la Ficha en Maps:'}
-                            </label>
-                            <button
-                              type="button"
-                              onClick={() => setShowAddCountryModal(true)}
-                              className="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
-                            >
-                              <Plus className="w-2.5 h-2.5" />
-                              <span>País</span>
-                            </button>
-                          </div>
-                          <select
-                            value={closingFormCountry}
-                            onChange={(e) => {
-                              if (e.target.value === '__add_new__') {
-                                setShowAddCountryModal(true);
-                              } else {
-                                const newC = e.target.value;
-                                setClosingFormCountry(newC);
-                                const available = getCitiesForCountry(newC);
-                                if (!available.includes(closingFormCity) && available.length > 0) {
-                                  setClosingFormCity(available[0]);
-                                }
-                              }
-                            }}
-                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
-                          >
-                            {allCountriesList.map((c) => (
-                              <option key={c} value={c}>{c}</option>
-                            ))}
-                          </select>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                        <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                          <span className="text-[10px] font-bold text-slate-400 block uppercase">
+                            {isEn ? 'Country (Maps):' : 'País en Maps:'}
+                          </span>
+                          <strong className="text-xs font-black text-white block mt-0.5 flex items-center gap-1">
+                            🌎 {editingDossierClosing.country || 'Colombia'}
+                          </strong>
                         </div>
 
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <label className="text-[10px] font-bold text-slate-300 uppercase">
-                              {isEn ? `Business City (${closingFormCountry}):` : `Ciudad de la Ficha (${closingFormCountry}):`}
-                            </label>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setTargetCountryForNewCity(closingFormCountry);
-                                setShowAddCityModal(true);
-                              }}
-                              className="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
-                            >
-                              <Plus className="w-2.5 h-2.5" />
-                              <span>Ciudad</span>
-                            </button>
-                          </div>
-                          <select
-                            value={closingFormCity}
-                            onChange={(e) => {
-                              if (e.target.value === '__add_new__') {
-                                setTargetCountryForNewCity(closingFormCountry);
-                                setShowAddCityModal(true);
-                              } else {
-                                setClosingFormCity(e.target.value);
-                              }
-                            }}
-                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
-                          >
-                            {getCitiesForCountry(closingFormCountry).map((cty) => (
-                              <option key={cty} value={cty}>{cty}</option>
-                            ))}
-                          </select>
+                        <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                          <span className="text-[10px] font-bold text-slate-400 block uppercase">
+                            {isEn ? 'City (Maps):' : 'Ciudad en Maps:'}
+                          </span>
+                          <strong className="text-xs font-black text-white block mt-0.5 flex items-center gap-1">
+                            🏙️ {editingDossierClosing.city || 'Bogotá'}
+                          </strong>
                         </div>
 
-                        <div className="sm:col-span-2">
-                          <label className="block text-[10px] font-bold text-slate-300 uppercase mb-1">
-                            {isEn ? 'Neighborhood / District (Google Maps Ranking Area):' : 'Barrio o Localidad (Zona de Posicionamiento en Maps):'}
-                          </label>
-                          <input
-                            type="text"
-                            value={closingFormNeighborhood}
-                            onChange={(e) => setClosingFormNeighborhood(e.target.value)}
-                            placeholder="Ej: Chapinero, Usaquén, Poblado, Polanco, Brickell..."
-                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
-                          />
+                        <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                          <span className="text-[10px] font-bold text-slate-400 block uppercase">
+                            {isEn ? 'Neighborhood / District:' : 'Barrio o Localidad:'}
+                          </span>
+                          <strong className="text-xs font-black text-amber-300 block mt-0.5 flex items-center gap-1 truncate">
+                            📍 {editingDossierClosing.neighborhood || (isEn ? 'Not specified' : 'Sin especificar')}
+                          </strong>
                         </div>
                       </div>
                     </div>
