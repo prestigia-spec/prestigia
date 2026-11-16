@@ -1375,13 +1375,15 @@ const TXT_DOSSIERS = {
   es: {
     privateBadge: '⭐ Cartera Personal Privada',
     accountOwner: '• Luisma (Cuenta Principal)',
-    title: 'Mis Clientes & Auditorías Privadas',
-    desc: 'Expedientes creados, auditados y rescatados personalmente por ti. Métricas de cobro, suscripciones activas y 100% aislados de la red.',
+    title: 'Mis Clientes & Expedientes Comerciales',
+    desc: 'Expedientes creados, auditados, rescatados, apelados y prospectados personalmente por ti. Métricas de cobro, suscripciones activas y 100% aislados de la red.',
     searchPlaceholder: 'Buscar por cliente, categoría, ciudad...',
     kpiDossiers: 'Mis Expedientes',
     kpiCreated: 'Fichas Desde Cero',
     kpiAudited: 'Auditorías Top 3',
     kpiRescued: 'Fichas Rescatadas',
+    kpiAppeals: 'Apelaciones 1-3★',
+    kpiProspects: 'Propuestas Cierre',
     kpiRevenue: 'Total Facturado Setup',
     kpiMrr: 'MRR Prestigia',
     kpiPrivacy: 'Privacidad',
@@ -1419,18 +1421,20 @@ const TXT_DOSSIERS = {
     statusNegotiating: '🤝 En Negociación',
     statusLeadDraft: '📝 Prospección',
     btnManageClosing: '⚙️ Cierre & Cobro',
-    pricingBenchmarkNotice: 'Baremos de Mercado: Creación $150-$250 | Auditoría $200-$350 | Rescate $250-$450 USD | Planes Prestigia: A la Medida',
+    pricingBenchmarkNotice: 'Baremos de Mercado: Creación $150-$250 | Auditoría $200-$350 | Rescate $250-$450 | Apelación $25-$40 rad. + $75-$110 éxito | Prospección $120-$200 USD | Planes Prestigia: A la Medida',
   },
   en: {
     privateBadge: '⭐ Private Client Portfolio',
     accountOwner: '• Luisma (Main Account)',
-    title: 'My Clients & Private Audits',
-    desc: 'Dossiers created, audited and rescued personally by you. Revenue tracking, active subscriptions and 100% isolated.',
+    title: 'My Clients & Commercial Dossiers',
+    desc: 'Dossiers created, audited, rescued, appealed and prospected personally by you. Revenue tracking, active subscriptions and 100% isolated.',
     searchPlaceholder: 'Search by client, category, city...',
     kpiDossiers: 'My Dossiers',
     kpiCreated: 'Built From Scratch',
     kpiAudited: 'Top 3 Audits',
     kpiRescued: 'Rescued Listings',
+    kpiAppeals: '1-3★ Appeals',
+    kpiProspects: 'Closing Pitches',
     kpiRevenue: 'Total Setup Revenue',
     kpiMrr: 'Prestigia MRR',
     kpiPrivacy: 'Privacy',
@@ -1468,7 +1472,7 @@ const TXT_DOSSIERS = {
     statusNegotiating: '🤝 In Negotiation',
     statusLeadDraft: '📝 Lead / Draft',
     btnManageClosing: '⚙️ Closing & Monetization',
-    pricingBenchmarkNotice: 'Market Benchmarks: Setup $150-$250 | Audit $200-$350 | Rescue $250-$450 USD | Prestigia Plans: Custom Tailored',
+    pricingBenchmarkNotice: 'Market Benchmarks: Setup $150-$250 | Audit $200-$350 | Rescue $250-$450 | Appeals $25-$40 filing + $75-$110 success | Pitch $120-$200 USD | Prestigia Plans: Custom Tailored',
   },
 };
 
@@ -13560,11 +13564,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <span className="font-black text-amber-300 text-xs uppercase tracking-wide block">
                     {isEn ? 'Official Agency Pricing Benchmarks & Prestigia Closing Strategy' : 'Baremos Reales de Mercado de Agencias & Estrategia de Cierre Prestigia'}
                   </span>
-                  <p className="text-[11px] text-slate-300 mt-0.5">
+                  <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
                     {isEn ? (
-                      <><strong>Creation:</strong> $150–$250 USD (3–5h) • <strong>Top 3 Audit:</strong> $200–$350 USD (4–6h) • <strong>72h Rescue:</strong> $250–$450 USD (5–8h) • <strong>Prestigia Plans:</strong> 100% custom-tailored per client (Technical Setup $0 waived).</>
+                      <>
+                        <strong className="text-white">Creation:</strong> $150–$250 USD (3–5h) • <strong className="text-white">Top 3 Audit:</strong> $200–$350 USD (4–6h) • <strong className="text-white">72h Rescue:</strong> $250–$450 USD (5–8h) • <strong className="text-white">1-3★ Appeals:</strong> $25–$40 filing + $75–$110 on removal • <strong className="text-white">Forensic Pitch:</strong> $120–$200 USD • <strong className="text-amber-300">Prestigia Plans:</strong> 100% custom-tailored per client (Technical Setup $0 waived).
+                      </>
                     ) : (
-                      <><strong>Creación:</strong> $150–$250 USD (3–5h) • <strong>Auditoría Top 3:</strong> $200–$350 USD (4–6h) • <strong>Rescate 72h:</strong> $250–$450 USD (5–8h) • <strong>Planes Prestigia:</strong> 100% a la medida de cada cliente (Setup Técnico $0 bonificado).</>
+                      <>
+                        <strong className="text-white">Creación:</strong> $150–$250 USD (3–5h) • <strong className="text-white">Auditoría Top 3:</strong> $200–$350 USD (4–6h) • <strong className="text-white">Rescate 72h:</strong> $250–$450 USD (5–8h) • <strong className="text-white">Apelaciones 1-3★:</strong> $25–$40 USD radicación + $75–$110 USD contra éxito • <strong className="text-white">Prospección Forense:</strong> $120–$200 USD • <strong className="text-amber-300">Planes Prestigia:</strong> 100% a la medida de cada cliente (Setup Técnico $0 bonificado).
+                      </>
                     )}
                   </p>
                 </div>
@@ -13577,73 +13585,97 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               </div>
             </div>
 
-            {/* Executive KPI Summary Cards (Real totals computed over all Luisma base clients) */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
-              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+            {/* Executive KPI Summary Cards (Real totals computed over all Luisma base clients: All 5 Modules + Financials) */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5 text-xs">
+              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
                   <Layers className="w-4 h-4" />
                 </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 block font-medium">{tDossiers.kpiDossiers}</span>
-                  <strong className="text-lg font-black text-white">{luismaBaseDossiers.length}</strong>
+                <div className="min-w-0">
+                  <span className="text-[10px] text-slate-400 block font-medium truncate">{tDossiers.kpiDossiers}</span>
+                  <strong className="text-base sm:text-lg font-black text-white">{luismaBaseDossiers.length}</strong>
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
-                <div className="w-9 h-9 rounded-xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
+                <div className="w-8 h-8 rounded-xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
                   <Building2 className="w-4 h-4" />
                 </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 block font-medium">{tDossiers.kpiCreated}</span>
-                  <strong className="text-lg font-black text-emerald-400">
+                <div className="min-w-0">
+                  <span className="text-[10px] text-slate-400 block font-medium truncate">{tDossiers.kpiCreated}</span>
+                  <strong className="text-base sm:text-lg font-black text-emerald-400">
                     {luismaBaseDossiers.filter((d) => d.mode === 'create').length}
                   </strong>
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
-                <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0">
+              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
+                <div className="w-8 h-8 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0">
                   <Search className="w-4 h-4" />
                 </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 block font-medium">{tDossiers.kpiAudited}</span>
-                  <strong className="text-lg font-black text-indigo-300">
+                <div className="min-w-0">
+                  <span className="text-[10px] text-slate-400 block font-medium truncate">{tDossiers.kpiAudited}</span>
+                  <strong className="text-base sm:text-lg font-black text-indigo-300">
                     {luismaBaseDossiers.filter((d) => d.mode === 'audit').length}
                   </strong>
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
-                <div className="w-9 h-9 rounded-xl bg-amber-600/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
+                <div className="w-8 h-8 rounded-xl bg-amber-600/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 block font-medium">{tDossiers.kpiRescued}</span>
-                  <strong className="text-lg font-black text-amber-300">
+                <div className="min-w-0">
+                  <span className="text-[10px] text-slate-400 block font-medium truncate">{tDossiers.kpiRescued}</span>
+                  <strong className="text-base sm:text-lg font-black text-amber-300">
                     {luismaBaseDossiers.filter((d) => d.mode === 'rescue').length}
                   </strong>
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
-                  <Sparkles className="w-4 h-4" />
+              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
+                <div className="w-8 h-8 rounded-xl bg-rose-600/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0">
+                  <Scale className="w-4 h-4" />
                 </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 block font-medium">{tDossiers.kpiMrr}</span>
-                  <strong className="text-lg font-black text-emerald-300">
-                    ${totalLuismaMrr}<span className="text-[10px] font-normal text-slate-400">/mes</span>
+                <div className="min-w-0">
+                  <span className="text-[10px] text-slate-400 block font-medium truncate">{tDossiers.kpiAppeals}</span>
+                  <strong className="text-base sm:text-lg font-black text-rose-400">
+                    {luismaBaseDossiers.filter((d) => d.mode === 'appeal').length}
                   </strong>
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
-                <div className="w-9 h-9 rounded-xl bg-cyan-600/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shrink-0">
+              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                  <Target className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[10px] text-slate-400 block font-medium truncate">{tDossiers.kpiProspects}</span>
+                  <strong className="text-base sm:text-lg font-black text-amber-400">
+                    {luismaBaseDossiers.filter((d) => d.mode === 'prospect' || d.mode === 'tools').length}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[10px] text-slate-400 block font-medium truncate">{tDossiers.kpiMrr}</span>
+                  <strong className="text-base sm:text-lg font-black text-emerald-300">
+                    ${totalLuismaMrr}<span className="text-[9px] font-normal text-slate-400">/m</span>
+                  </strong>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
+                <div className="w-8 h-8 rounded-xl bg-cyan-600/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shrink-0">
                   <DollarSign className="w-4 h-4" />
                 </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 block font-medium">{tDossiers.kpiRevenue}</span>
-                  <strong className="text-lg font-black text-cyan-300">
+                <div className="min-w-0">
+                  <span className="text-[10px] text-slate-400 block font-medium truncate">{tDossiers.kpiRevenue}</span>
+                  <strong className="text-base sm:text-lg font-black text-cyan-300">
                     ${totalLuismaSetupRevenue}
                   </strong>
                 </div>
