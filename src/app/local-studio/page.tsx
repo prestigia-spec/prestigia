@@ -4642,7 +4642,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     showToast(isEn ? `📂 Viewing dossiers for ${advisor.name}` : `📂 Visualizando cuentas de ${advisor.name}`);
   };
 
-  // Helper para generar el enlace y mensaje formal de WhatsApp para los 5 módulos de servicio
+  // Helper para generar el enlace y mensaje formal de Prestigia Local Studio informando sobre el servicio técnico realizado
   const getDossierWhatsappData = (d: StudioDossierRecord, isEnglish: boolean): { url: string; tooltip: string } => {
     const raw: any = d;
     const targetPhone =
@@ -4657,59 +4657,51 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     const cleanPhone = targetPhone.replace(/[^0-9]/g, '');
     const contactName = d.contactName || raw.contact_name || d.data?.contactName || '';
     const greeting = contactName
-      ? (isEnglish ? `Hello ${contactName}! 👋` : `¡Hola ${contactName}! 👋`)
+      ? (isEnglish ? `¡Hola ${contactName}! 👋` : `¡Hola ${contactName}! 👋`)
       : (isEnglish ? 'Hello! 👋' : '¡Hola! 👋');
     const bName = d.clientName || (isEnglish ? 'your business' : 'tu negocio');
     const city = d.city || (isEnglish ? 'your city' : 'tu ciudad');
 
     let text = '';
-    let tooltip = isEnglish ? 'Send via WhatsApp' : 'Enviar por WhatsApp';
+    let tooltip = isEnglish ? 'Send Prestigia Report via WhatsApp' : 'Enviar Notificación de Servicio por WhatsApp';
 
     if (d.mode === 'create') {
       tooltip = isEnglish
-        ? 'Send Verification & Onboarding Kit via WhatsApp'
-        : 'Enviar Kit de Verificación & Onboarding por WhatsApp';
-      if (d.data?.whatsappOnboardingMessage) {
-        text = d.data.whatsappOnboardingMessage;
-      } else {
-        text = isEnglish
-          ? `${greeting}\n\nThis is Luisma from Prestigia. We are configuring and optimizing the official Google Maps profile for *${bName}*.\n\n📋 To ensure fast verification with Google, please share:\n1. Clear photos of facade with commercial signage and interior client area.\n2. 60-second continuous continuous video showing the street, opening the door, and front desk.\n3. Operating hours and official contact details.\n\nWe will take care of the entire local SEO architecture and ranking! 🚀`
-          : `${greeting}\n\nTe saluda Luisma de Prestigia. Estamos configurando y optimizando la ficha oficial de Google Maps para *${bName}*.\n\n📋 Para completar la verificación con Google con máxima autoridad, requerimos:\n1. Fotos claras de fachada con aviso comercial e instalaciones interiores.\n2. Video continuo de 60 segundos mostrando dirección exterior, apertura de puerta y área de atención.\n3. Horarios oficiales y datos operativos.\n\n¡Nos encargamos de toda la arquitectura técnica y posicionamiento local! 🚀`;
-      }
+        ? 'Send Listing Creation Service Report via WhatsApp'
+        : 'Enviar Reporte de Ficha Creada por WhatsApp';
+      text = isEnglish
+        ? `${greeting} This is Luisma from Prestigia.\n\nWe have completed the technical setup of your new Google Maps Business Profile for *${bName}* in ${city}.\n\n🏗️ *DELIVERED SERVICE — PRESTIGIA LOCAL STUDIO:*\n- Official profile creation optimized for Google Maps local ranking algorithms.\n- High-converting primary & secondary categories, local keywords, and commercial attributes.\n- Google anti-suspension protocol and verification guide.\n- Local positioning blueprint to capture calls and customers from day one.\n\nI remain at your service for the final handover and profile ownership transfer. Great success with your new Google presence! 🚀`
+        : `${greeting} Te saluda Luisma de Prestigia.\n\nTe informo que hemos completado la estructuración técnica de la nueva ficha en Google Maps para *${bName}* en ${city}.\n\n🏗️ *SERVICIO REALIZADO — PRESTIGIA LOCAL STUDIO:*\n- Creación de ficha oficial optimizada para el algoritmo de posicionamiento de Google Maps.\n- Arquitectura de categorías de alta conversión, palabras clave locales y atributos comerciales.\n- Protocolo antibloqueo y guía técnica de verificación ante Google.\n- Configuración orientada a captar llamadas y clientes directos en tu zona desde el primer día.\n\nQuedo a tu disposición para la entrega formal y transferencia de propiedad de la ficha. ¡Muchos éxitos con tu nuevo perfil en Google! 🚀`;
     } else if (d.mode === 'audit') {
       tooltip = isEnglish
-        ? 'Send Top 3 Forensic Audit via WhatsApp'
-        : 'Enviar Auditoría Forense Top 3 por WhatsApp';
+        ? 'Send Top 3 Forensic Audit Service Report via WhatsApp'
+        : 'Enviar Reporte de Auditoría Top 3 por WhatsApp';
       const scoreText = d.data?.healthScore !== undefined ? ` (Score: ${d.data.healthScore}/100)` : '';
       text = isEnglish
-        ? `${greeting}\n\nThis is Luisma from Prestigia. We have completed the Forensic Local SEO Audit on Google Maps for *${bName}* in ${city}${scoreText}.\n\n🔍 We detected critical visibility gaps and have the technical strategy ready to capture customers looking for your services in Google.\n\nDo you have 5 minutes today to review the diagnosis and action plan? Best regards! 🚀`
-        : `${greeting}\n\nTe saluda Luisma de Prestigia. Ya completamos la Auditoría Forense de Google Maps para *${bName}* en ${city}${scoreText}.\n\n🔍 Identificamos brechas críticas de visibilidad frente al Top 3 de tu zona y tenemos lista la estrategia técnica para captar los clientes que hoy se llevan tus competidores.\n\n¿Tienes 5 minutos hoy para revisar el diagnóstico y el plan de acción? Saludos. 🚀`;
+        ? `${greeting} This is Luisma from Prestigia.\n\nWe have finalized the Forensic Audit & Local SEO Diagnosis on Google Maps for *${bName}* in ${city}${scoreText}.\n\n🔬 *DELIVERED SERVICE — PRESTIGIA LOCAL STUDIO:*\n- Algorithmic health and visibility diagnosis benchmarked against the Top 3 in your zone.\n- Detection of critical optimization gaps (categories, review velocity, authority, geocoding).\n- Step-by-step strategic action plan to outrank local competitors and attract high-value clients.\n\nDo you have 5 minutes today to review the diagnosis and next action steps? Best regards! 🚀`
+        : `${greeting} Te saluda Luisma de Prestigia.\n\nTe informo que hemos finalizado la Auditoría Forense de Posicionamiento Local en Google Maps para *${bName}* en ${city}${scoreText}.\n\n🔬 *SERVICIO REALIZADO — PRESTIGIA LOCAL STUDIO:*\n- Diagnóstico técnico de visibilidad y salud algorítmica frente al Top 3 de tu zona.\n- Detección de brechas críticas (categorías, reseñas, autoridad y geolocalización).\n- Plan estratégico paso a paso para superar a tu competencia directa y captar los clientes que hoy se llevan ellos.\n\n¿Tienes 5 minutos hoy para revisar juntos el diagnóstico y dar el siguiente paso? Quedo muy atento. 🚀`;
     } else if (d.mode === 'rescue') {
       tooltip = isEnglish
-        ? 'Send 72h Listing Rescue Dossier via WhatsApp'
-        : 'Enviar Dossier de Rescate 72h por WhatsApp';
+        ? 'Send 72h Listing Rescue Service Report via WhatsApp'
+        : 'Enviar Reporte de Rescate de Ficha 72h por WhatsApp';
       text = isEnglish
-        ? `${greeting}\n\nThis is Luisma from Prestigia regarding the technical recovery of your Google Maps listing for *${bName}*.\n\n🛡️ The 72h Emergency Rescue Protocol is ready. Please have your tax registration document (RUT/LLC) and utility bill ready to submit the priority appeal to Google Support.\n\nLet me know when you are available to finalize the submission. 🏛️`
-        : `${greeting}\n\nTe saluda Luisma de Prestigia respecto a la recuperación técnica de la ficha de Google Maps para *${bName}*.\n\n🛡️ El Protocolo de Rescate 72h está listo. Por favor ten a mano el RUT o registro mercantil y un recibo de servicios públicos para radicar la apelación formal con máxima prioridad ante Google Support.\n\nConfírmame si tienes los soportes para proceder de inmediato. 🏛️`;
+        ? `${greeting} This is Luisma from Prestigia regarding the technical recovery of your Google Maps listing for *${bName}*.\n\n🛡️ *DELIVERED SERVICE — PRESTIGIA LOCAL STUDIO:*\n- 72h Emergency Rescue Protocol activated with Google Support.\n- Commercial legitimacy dossier and technical evidence submitted.\n- Priority appeal processed to lift suspension and restore profile ownership.\n\nPlease confirm if you have your tax registration document (RUT/LLC) and utility bill ready to follow up with Google Support. We are on it. 🏛️`
+        : `${greeting} Te saluda Luisma de Prestigia respecto al Servicio de Rescate Técnico & Reclamación 72h para la ficha de Google Maps de *${bName}*.\n\n🛡️ *SERVICIO REALIZADO — PRESTIGIA LOCAL STUDIO:*\n- Protocolo de emergencia activado ante el equipo de soporte técnico de Google.\n- Expediente probatorio de legitimidad comercial y descargos técnicos estructurado.\n- Radicación prioritaria para el levantamiento de la suspensión y recuperación de propiedad.\n\nPor favor confírmame si tienes a mano los soportes de registro mercantil (RUT/LLC) y recibo de servicios públicos para dar seguimiento al caso con Google. Estamos sobre el caso. 🏛️`;
     } else if (d.mode === 'appeal') {
       tooltip = isEnglish
-        ? 'Send Review Legal Appeal Defense via WhatsApp'
-        : 'Enviar Impugnación Legal de Reseñas por WhatsApp';
+        ? 'Send Review Legal Appeal Service Report via WhatsApp'
+        : 'Enviar Reporte de Apelación de Reseñas por WhatsApp';
       text = isEnglish
-        ? `${greeting}\n\nThis is Luisma from Prestigia regarding the legal removal and defense against unfair 1-3★ reviews for *${bName}* on Google Maps.\n\n⚖️ The legal appeal dossier has been prepared under Google's Prohibited Content policies (Conflict of Interest / Defamation).\n\nWould you like us to proceed with the formal filing with Google's legal review team today? Best regards.`
-        : `${greeting}\n\nTe saluda Luisma de Prestigia sobre la defensa de reputación y eliminación de reseñas maliciosas para *${bName}* en Google Maps.\n\n⚖️ Hemos preparado el escrito legal de impugnación fundamentado en las Políticas de Google (Conflicto de interés / Contenido difamatorio).\n\n¿Procedemos con la radicación formal ante el equipo técnico de Google hoy? Quedo a tu disposición.`;
+        ? `${greeting} This is Luisma from Prestigia regarding the legal defense and removal of unfair reviews for *${bName}* on Google Maps.\n\n⚖️ *DELIVERED SERVICE — PRESTIGIA LOCAL STUDIO:*\n- Forensic breakdown of unfair 1-3★ reviews against Google's Prohibited & Restricted Content policies.\n- Legal categorization of violations (Conflict of Interest, Deceptive Content, Harassment).\n- Formal legal appeal ready for filing and review removal.\n\nWould you like us to proceed with the formal filing with Google's trust and safety team today? Best regards.`
+        : `${greeting} Te saluda Luisma de Prestigia sobre la defensa de reputación y eliminación de reseñas injustas para *${bName}* en Google Maps.\n\n⚖️ *SERVICIO REALIZADO — PRESTIGIA LOCAL STUDIO:*\n- Análisis forense de cada reseña maliciosa (1-3★) frente a las Políticas Oficiales de Google.\n- Tipificación jurídica de infracciones (Contenido Engañoso, Conflicto de Interés y Hostigamiento).\n- Escrito formal de impugnación listo para radicación y solicitud de remoción definitiva.\n\n¿Procedemos con la radicación formal ante el equipo técnico de Google hoy? Quedo a tu disposición.`;
     } else {
       // mode === 'prospect' || mode === 'tools'
       tooltip = isEnglish
-        ? 'Send Commercial Prospecting Pitch via WhatsApp'
+        ? 'Send Forensic Prospecting & Closing Pitch via WhatsApp'
         : 'Enviar Propuesta de Prospección & Cierre por WhatsApp';
-      if (d.data?.whatsappPitchMessage) {
-        text = d.data.whatsappPitchMessage;
-      } else {
-        text = isEnglish
-          ? `${greeting}\n\nThis is Luisma from Prestigia. I analyzed the Google Maps visibility of *${bName}* in ${city}.\n\n🎯 High-intent customers in your area are searching for your services daily and choosing competitors simply due to local SEO positioning. We prepared a tailored strategic plan to position your business in the Top 3.\n\nCan we schedule a brief call today to walk you through it? Best regards! 🚀`
-          : `${greeting}\n\nTe saluda Luisma de Prestigia. Analicé el posicionamiento de *${bName}* en Google Maps en ${city}.\n\n🎯 Clientes de alto valor en tu zona están buscando tus servicios a diario y terminan contactando a tu competencia por falta de estructura en Google Maps. Preparé una propuesta a la medida para posicionar tu negocio en el Top 3.\n\n¿Podemos coordinar una breve llamada hoy para mostrártela? Saludos cordiales. 🚀`;
-      }
+      text = isEnglish
+        ? `${greeting} This is Luisma from Prestigia.\n\nI am contacting you to inform you that we completed a Forensic Visibility Study on Google Maps for *${bName}* in ${city}.\n\n🎯 *DELIVERED SERVICE — PRESTIGIA LOCAL STUDIO:*\n- High-intent local customers in your area search for your services daily and end up contacting competitors due to lack of local SEO infrastructure.\n- We structured a tailored technical and commercial plan to rank your business in the Top 3 of Google Maps.\n\nI have the detailed proposal ready with key findings and projected ROI. Can we schedule a brief call today to walk you through it? Best regards! 🚀`
+        : `${greeting} Te saluda Luisma de Prestigia.\n\nTe contacto para informarte que hemos realizado un Estudio Forense de Visibilidad Comercial en Google Maps para *${bName}* en ${city}.\n\n🎯 *SERVICIO REALIZADO — PRESTIGIA LOCAL STUDIO:*\n- Clientes potenciales en tu zona están buscando tus servicios diariamente en Google y terminan contratando a tus competidores por falta de estructura en Google Maps.\n- Estructuramos un plan comercial y técnico personalizado para posicionar a tu negocio en el Top 3 de Google Maps.\n\nTengo lista la propuesta detallada con los hallazgos y el retorno estimado. ¿Podemos coordinar una breve llamada hoy para mostrártela? Saludos cordiales. 🚀`;
     }
 
     const base = cleanPhone ? `https://wa.me/${cleanPhone}` : 'https://wa.me/';
