@@ -4642,6 +4642,81 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     showToast(isEn ? `📂 Viewing dossiers for ${advisor.name}` : `📂 Visualizando cuentas de ${advisor.name}`);
   };
 
+  // Helper para generar el enlace y mensaje formal de WhatsApp para los 5 módulos de servicio
+  const getDossierWhatsappData = (d: StudioDossierRecord, isEnglish: boolean): { url: string; tooltip: string } => {
+    const raw: any = d;
+    const targetPhone =
+      d.contactPhone ||
+      raw.contact_phone ||
+      d.data?.contactPhone ||
+      d.data?.phone ||
+      d.data?.commercialPhone ||
+      d.data?.placeData?.phone ||
+      d.data?.scannedListing?.phone ||
+      '';
+    const cleanPhone = targetPhone.replace(/[^0-9]/g, '');
+    const contactName = d.contactName || raw.contact_name || d.data?.contactName || '';
+    const greeting = contactName
+      ? (isEnglish ? `Hello ${contactName}! 👋` : `¡Hola ${contactName}! 👋`)
+      : (isEnglish ? 'Hello! 👋' : '¡Hola! 👋');
+    const bName = d.clientName || (isEnglish ? 'your business' : 'tu negocio');
+    const city = d.city || (isEnglish ? 'your city' : 'tu ciudad');
+
+    let text = '';
+    let tooltip = isEnglish ? 'Send via WhatsApp' : 'Enviar por WhatsApp';
+
+    if (d.mode === 'create') {
+      tooltip = isEnglish
+        ? 'Send Verification & Onboarding Kit via WhatsApp'
+        : 'Enviar Kit de Verificación & Onboarding por WhatsApp';
+      if (d.data?.whatsappOnboardingMessage) {
+        text = d.data.whatsappOnboardingMessage;
+      } else {
+        text = isEnglish
+          ? `${greeting}\n\nThis is Luisma from Prestigia. We are configuring and optimizing the official Google Maps profile for *${bName}*.\n\n📋 To ensure fast verification with Google, please share:\n1. Clear photos of facade with commercial signage and interior client area.\n2. 60-second continuous continuous video showing the street, opening the door, and front desk.\n3. Operating hours and official contact details.\n\nWe will take care of the entire local SEO architecture and ranking! 🚀`
+          : `${greeting}\n\nTe saluda Luisma de Prestigia. Estamos configurando y optimizando la ficha oficial de Google Maps para *${bName}*.\n\n📋 Para completar la verificación con Google con máxima autoridad, requerimos:\n1. Fotos claras de fachada con aviso comercial e instalaciones interiores.\n2. Video continuo de 60 segundos mostrando dirección exterior, apertura de puerta y área de atención.\n3. Horarios oficiales y datos operativos.\n\n¡Nos encargamos de toda la arquitectura técnica y posicionamiento local! 🚀`;
+      }
+    } else if (d.mode === 'audit') {
+      tooltip = isEnglish
+        ? 'Send Top 3 Forensic Audit via WhatsApp'
+        : 'Enviar Auditoría Forense Top 3 por WhatsApp';
+      const scoreText = d.data?.healthScore !== undefined ? ` (Score: ${d.data.healthScore}/100)` : '';
+      text = isEnglish
+        ? `${greeting}\n\nThis is Luisma from Prestigia. We have completed the Forensic Local SEO Audit on Google Maps for *${bName}* in ${city}${scoreText}.\n\n🔍 We detected critical visibility gaps and have the technical strategy ready to capture customers looking for your services in Google.\n\nDo you have 5 minutes today to review the diagnosis and action plan? Best regards! 🚀`
+        : `${greeting}\n\nTe saluda Luisma de Prestigia. Ya completamos la Auditoría Forense de Google Maps para *${bName}* en ${city}${scoreText}.\n\n🔍 Identificamos brechas críticas de visibilidad frente al Top 3 de tu zona y tenemos lista la estrategia técnica para captar los clientes que hoy se llevan tus competidores.\n\n¿Tienes 5 minutos hoy para revisar el diagnóstico y el plan de acción? Saludos. 🚀`;
+    } else if (d.mode === 'rescue') {
+      tooltip = isEnglish
+        ? 'Send 72h Listing Rescue Dossier via WhatsApp'
+        : 'Enviar Dossier de Rescate 72h por WhatsApp';
+      text = isEnglish
+        ? `${greeting}\n\nThis is Luisma from Prestigia regarding the technical recovery of your Google Maps listing for *${bName}*.\n\n🛡️ The 72h Emergency Rescue Protocol is ready. Please have your tax registration document (RUT/LLC) and utility bill ready to submit the priority appeal to Google Support.\n\nLet me know when you are available to finalize the submission. 🏛️`
+        : `${greeting}\n\nTe saluda Luisma de Prestigia respecto a la recuperación técnica de la ficha de Google Maps para *${bName}*.\n\n🛡️ El Protocolo de Rescate 72h está listo. Por favor ten a mano el RUT o registro mercantil y un recibo de servicios públicos para radicar la apelación formal con máxima prioridad ante Google Support.\n\nConfírmame si tienes los soportes para proceder de inmediato. 🏛️`;
+    } else if (d.mode === 'appeal') {
+      tooltip = isEnglish
+        ? 'Send Review Legal Appeal Defense via WhatsApp'
+        : 'Enviar Impugnación Legal de Reseñas por WhatsApp';
+      text = isEnglish
+        ? `${greeting}\n\nThis is Luisma from Prestigia regarding the legal removal and defense against unfair 1-3★ reviews for *${bName}* on Google Maps.\n\n⚖️ The legal appeal dossier has been prepared under Google's Prohibited Content policies (Conflict of Interest / Defamation).\n\nWould you like us to proceed with the formal filing with Google's legal review team today? Best regards.`
+        : `${greeting}\n\nTe saluda Luisma de Prestigia sobre la defensa de reputación y eliminación de reseñas maliciosas para *${bName}* en Google Maps.\n\n⚖️ Hemos preparado el escrito legal de impugnación fundamentado en las Políticas de Google (Conflicto de interés / Contenido difamatorio).\n\n¿Procedemos con la radicación formal ante el equipo técnico de Google hoy? Quedo a tu disposición.`;
+    } else {
+      // mode === 'prospect' || mode === 'tools'
+      tooltip = isEnglish
+        ? 'Send Commercial Prospecting Pitch via WhatsApp'
+        : 'Enviar Propuesta de Prospección & Cierre por WhatsApp';
+      if (d.data?.whatsappPitchMessage) {
+        text = d.data.whatsappPitchMessage;
+      } else {
+        text = isEnglish
+          ? `${greeting}\n\nThis is Luisma from Prestigia. I analyzed the Google Maps visibility of *${bName}* in ${city}.\n\n🎯 High-intent customers in your area are searching for your services daily and choosing competitors simply due to local SEO positioning. We prepared a tailored strategic plan to position your business in the Top 3.\n\nCan we schedule a brief call today to walk you through it? Best regards! 🚀`
+          : `${greeting}\n\nTe saluda Luisma de Prestigia. Analicé el posicionamiento de *${bName}* en Google Maps en ${city}.\n\n🎯 Clientes de alto valor en tu zona están buscando tus servicios a diario y terminan contactando a tu competencia por falta de estructura en Google Maps. Preparé una propuesta a la medida para posicionar tu negocio en el Top 3.\n\n¿Podemos coordinar una breve llamada hoy para mostrártela? Saludos cordiales. 🚀`;
+      }
+    }
+
+    const base = cleanPhone ? `https://wa.me/${cleanPhone}` : 'https://wa.me/';
+    const url = `${base}?text=${encodeURIComponent(text)}`;
+    return { url, tooltip };
+  };
+
   // Load a dossier from list into workspace
   const handleLoadDossier = (dossier: StudioDossierRecord) => {
     const raw: any = dossier;
@@ -14173,17 +14248,20 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           <span>{isEn ? 'Billing' : 'Cobro'}</span>
                         </button>
 
-                        {d.data?.whatsappOnboardingMessage && (
-                          <a
-                            href={`https://wa.me/?text=${encodeURIComponent(d.data.whatsappOnboardingMessage)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title={tDossiers.sendWhatsappKit}
-                            className="p-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 transition cursor-pointer"
-                          >
-                            <MessageSquare className="w-4 h-4" />
-                          </a>
-                        )}
+                        {(() => {
+                          const wa = getDossierWhatsappData(d, isEn);
+                          return (
+                            <a
+                              href={wa.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={wa.tooltip}
+                              className="p-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 transition cursor-pointer flex items-center justify-center shrink-0 active:scale-95 shadow-sm"
+                            >
+                              <MessageSquare className="w-4 h-4" />
+                            </a>
+                          );
+                        })()}
 
                         <button
                           type="button"
