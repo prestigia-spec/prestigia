@@ -5833,6 +5833,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             <span className="text-amber-700 font-extrabold text-xs">
               {activeTab === 'rescue'
                 ? (isEn ? 'OFFICIAL GOOGLE MAPS OWNERSHIP RESTITUTION DOSSIER' : 'EXPEDIENTE OFICIAL DE RESTITUCIÓN DE TITULARIDAD GOOGLE MAPS')
+                : activeTab === 'appeals'
+                ? (isEn ? 'OFFICIAL GOOGLE MAPS REVIEW REMOVAL & LEGAL APPEAL DOSSIER' : 'EXPEDIENTE OFICIAL DE IMPUGNACIÓN & RETIRO DE RESEÑAS GOOGLE MAPS')
                 : (isEn ? 'MASTER TOP 3 LOCAL RANKING DOSSIER' : 'EXPEDIENTE MAESTRO DE POSICIONAMIENTO LOCAL TOP 3')}
             </span>
           </div>
@@ -11993,6 +11995,61 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                               </span>
                             </button>
                           </div>
+
+                          {/* Gabinete Forense de 2ª Instancia (Arbitraje Humano ante Google) */}
+                          {appealCaseStatus === 'second_instance' && (
+                            <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-500/40 space-y-2.5 animate-in fade-in">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                  <Scale className="w-4 h-4 text-amber-400" />
+                                  <span className="text-xs font-black text-amber-300">
+                                    {isEn ? '⚖️ 2nd Instance: Human Arbitration Memorial for Google' : '⚖️ 2ª Instancia: Memorial de Arbitraje Humano ante Google'}
+                                  </span>
+                                </div>
+                                <a
+                                  href="https://support.google.com/business/workflow/9945796"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-[10px] font-black transition flex items-center gap-1 cursor-pointer shrink-0"
+                                >
+                                  <span>{isEn ? 'Open Appeal Tool' : 'Abrir Recurso de Alzada en Google'}</span>
+                                  <ExternalLink className="w-3 h-3" />
+                                </a>
+                              </div>
+                              <p className="text-[11px] text-slate-300 leading-relaxed">
+                                {isEn
+                                  ? 'Since the 1st instance algorithm rejected the automatic report, copy this specialized forensic memorial to request human review by Google Trust & Safety officers.'
+                                  : 'Al ser rechazada la denuncia inicial por el algoritmo automático de Google, radica este memorial técnico en la herramienta de apelaciones para forzar arbitraje por un revisor humano:'}
+                              </p>
+                              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                                <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
+                                  <span>RECURSO DE ALZADA • ARBITRAJE HUMANO</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(
+                                        `SOLICITUD FORMAL DE REVISIÓN ADICIONAL EN SEGUNDA INSTANCIA (ARBITRAJE HUMANO)\n\n` +
+                                        `EXPEDIENTE PRESTIGIA: ${activeAppealDossier.id}\n` +
+                                        `EMPRESA AFECTADA: ${scannedAppealBiz?.name || activeAppealDossier.authorName}\n` +
+                                        `RESEÑA IMPUGNADA: Autor "${activeAppealDossier.authorName}" (${activeAppealDossier.rating}★)\n` +
+                                        `CLÁUSULA DE GOOGLE INFRINGIDA: ${activeAppealDossier.googlePolicy.clauseTitle} (${activeAppealDossier.googlePolicy.tosSection})\n\n` +
+                                        `FUNDAMENTOS FÁCTICOS & PROBATORIOS:\n${activeAppealDossier.googlePolicy.infringementAnalysis}\n\n` +
+                                        `PETICIÓN CONCRETA:\nSolicitamos formalmente a la gerencia humana de Google Trust & Safety revocar la decisión automatizada de primera instancia y proceder con la supresión definitiva de la reseña por flagrante vulneración a las Políticas de Contenido de Google Maps.`
+                                      );
+                                      setAppealSuccessCopied('arbitration');
+                                      setTimeout(() => setAppealSuccessCopied(null), 2500);
+                                    }}
+                                    className="px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] cursor-pointer transition shadow-sm"
+                                  >
+                                    {appealSuccessCopied === 'arbitration' ? '¡Copiado!' : 'Copiar Memorial 2ª Instancia'}
+                                  </button>
+                                </div>
+                                <p className="text-xs text-slate-300 italic font-mono max-h-32 overflow-y-auto leading-relaxed bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                                  «Solicitamos formalmente a la gerencia humana de Google Trust & Safety revocar la decisión automatizada de primera instancia y proceder con la supresión definitiva de la reseña de "${activeAppealDossier.authorName}" por flagrante vulneración a ${activeAppealDossier.googlePolicy.clauseTitle} (${activeAppealDossier.googlePolicy.tosSection})...»
+                                </p>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
