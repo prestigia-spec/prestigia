@@ -2297,6 +2297,11 @@ export default function LocalStudioPage() {
   const [dossierNeighborhoodFilter, setDossierNeighborhoodFilter] = useState<string>('all');
   const [dossierClosingFilter, setDossierClosingFilter] = useState<string>('all');
   const [editingDossierClosing, setEditingDossierClosing] = useState<StudioDossierRecord | null>(null);
+  const [closingContactName, setClosingContactName] = useState<string>('');
+  const [closingContactCompany, setClosingContactCompany] = useState<string>('');
+  const [closingContactPhone, setClosingContactPhone] = useState<string>('');
+  const [closingContactEmail, setClosingContactEmail] = useState<string>('');
+  const [closingContactRole, setClosingContactRole] = useState<string>('');
   const [closingFormMode, setClosingFormMode] = useState<'create' | 'audit' | 'rescue' | 'appeal' | 'tools' | 'prospect'>('audit');
   const [closingFormStatus, setClosingFormStatus] = useState<'prestigia_subscriber' | 'setup_paid' | 'proposal_sent' | 'negotiating' | 'lead_draft'>('prestigia_subscriber');
   const [closingFormSetupFee, setClosingFormSetupFee] = useState<number>(0);
@@ -4973,6 +4978,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
   const handleOpenEditClosing = (dossier: StudioDossierRecord) => {
     setEditingDossierClosing(dossier);
+    setClosingContactName(dossier.contactName || '');
+    setClosingContactCompany(dossier.contactCompany || dossier.clientName || '');
+    setClosingContactPhone(dossier.contactPhone || '');
+    setClosingContactEmail(dossier.contactEmail || '');
+    setClosingContactRole(dossier.contactRole || 'Dueño / Propietario');
     setClosingFormCountry(dossier.country || 'Colombia');
     setClosingFormCity(dossier.city || 'Bogotá');
     setClosingFormNeighborhood(dossier.neighborhood || '');
@@ -4998,45 +5008,29 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
   const handleSaveDossierClosing = async () => {
     if (!editingDossierClosing) return;
-    if (!closingFormCountry.trim()) {
-      showToast(isEn ? '⚠️ Client Country is required (*)' : '⚠️ El País del cliente es obligatorio (*)');
-      return;
-    }
-    if (!closingFormCity.trim()) {
-      showToast(isEn ? '⚠️ Client City is required (*)' : '⚠️ La Ciudad del cliente es obligatoria (*)');
-      return;
-    }
-    if (!closingFormNeighborhood.trim()) {
-      showToast(isEn ? '⚠️ Neighborhood / District is required (*)' : '⚠️ El Barrio o Localidad es obligatorio (*)');
-      return;
-    }
-    if (!closingFormPaymentMethod.trim()) {
-      showToast(isEn ? '⚠️ Payment Method / Billing Detail is required (*)' : '⚠️ El Método de Pago o Detalle de Cobro es obligatorio (*)');
-      return;
-    }
     setIsSavingClosing(true);
     try {
       const payload = {
         id: editingDossierClosing.id,
         clientName: editingDossierClosing.clientName,
-        contactName: editingDossierClosing.contactName,
-        contactCompany: editingDossierClosing.contactCompany,
-        contactPhone: editingDossierClosing.contactPhone,
-        contactEmail: editingDossierClosing.contactEmail,
-        contactRole: editingDossierClosing.contactRole,
+        contactName: closingContactName.trim(),
+        contactCompany: closingContactCompany.trim(),
+        contactPhone: closingContactPhone.trim(),
+        contactEmail: closingContactEmail.trim(),
+        contactRole: closingContactRole.trim() || 'Dueño / Propietario',
         category: editingDossierClosing.category,
         city: closingFormCity.trim() || editingDossierClosing.city,
         neighborhood: closingFormNeighborhood.trim(),
         country: closingFormCountry.trim() || editingDossierClosing.country || 'Colombia',
-        mode: closingFormMode || editingDossierClosing.mode,
+        mode: editingDossierClosing.mode, // Servicio técnico inmutable
         businessModel: editingDossierClosing.businessModel,
         data: editingDossierClosing.data,
         closingStatus: closingFormStatus,
         setupFeeChargedUsd: Number(closingFormSetupFee) || 0,
         monthlyPlanUsd: Number(closingFormMonthlyPlan) || 0,
         prestigiaPlan: (closingFormMonthlyPlan >= 199 ? 'elite' : closingFormMonthlyPlan > 0 ? 'standard' : 'none') as 'standard' | 'elite' | 'enterprise' | 'none',
-        paymentMethod: closingFormPaymentMethod,
-        closingNotes: closingFormNotes,
+        paymentMethod: closingFormPaymentMethod.trim(),
+        closingNotes: closingFormNotes.trim(),
       };
 
       const res = await fetch('/api/local-studio/dossiers', {
@@ -14230,13 +14224,151 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <div className="p-5 sm:p-6 pt-4 overflow-y-auto space-y-4 text-xs flex-1">
 
                   {/* Form fields */}
-                  <div className="space-y-3.5 text-xs">
-                    {/* Location fields in closing modal */}
+                  <div className="space-y-4 text-xs">
+                    {/* 1. Tarjeta Modificable de Datos del Cliente Contratante (Quién Solicita y Paga) */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-950/60 via-slate-950 to-slate-950 border border-indigo-500/40 space-y-3 shadow-md">
+                      <div className="flex items-center justify-between pb-2 border-b border-indigo-500/20">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-lg bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+                            <User className="w-3.5 h-3.5" />
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-black text-white">
+                              {isEn ? 'Client & Decision Maker Details (Payer)' : 'Datos del Cliente Contratante (Quién Paga)'}
+                            </h4>
+                            <span className="text-[10px] text-indigo-300 block">
+                              {isEn ? 'Editable contact info for proposals, contracts and billing' : 'Información modificable por si cambian los datos del cliente'}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-950 border border-indigo-500/40 text-indigo-300">
+                          ✏️ {isEn ? 'Editable' : 'Modificable'}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-300 uppercase mb-1">
+                            {isEn ? 'Client / Contact Name:' : 'Nombre del Cliente / Contacto:'}
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={closingContactName}
+                              onChange={(e) => setClosingContactName(e.target.value)}
+                              placeholder="Ej: Yeny Marquez"
+                              className="w-full pl-8 pr-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-semibold text-xs focus:outline-none focus:border-indigo-400 transition"
+                            />
+                            <User className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-300 uppercase mb-1">
+                            {isEn ? 'Role / Title:' : 'Cargo o Rol:'}
+                          </label>
+                          <input
+                            type="text"
+                            value={closingContactRole}
+                            onChange={(e) => setClosingContactRole(e.target.value)}
+                            placeholder="Ej: Dueño / Propietario, Gerente..."
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-indigo-400 transition"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-300 uppercase mb-1">
+                            {isEn ? 'Company / Business Legal Name:' : 'Empresa / Negocio Contratante:'}
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={closingContactCompany}
+                              onChange={(e) => setClosingContactCompany(e.target.value)}
+                              placeholder="Ej: Boutique Spa"
+                              className="w-full pl-8 pr-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-indigo-400 transition"
+                            />
+                            <Building2 className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-300 uppercase mb-1">
+                            {isEn ? 'WhatsApp / Phone:' : 'WhatsApp / Teléfono Directo:'}
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={closingContactPhone}
+                              onChange={(e) => setClosingContactPhone(e.target.value)}
+                              placeholder="Ej: +58 311 8524735"
+                              className="w-full pl-8 pr-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-emerald-400 font-mono text-xs focus:outline-none focus:border-emerald-400 transition"
+                            />
+                            <Phone className="w-3.5 h-3.5 text-emerald-500 absolute left-2.5 top-2.5" />
+                          </div>
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <label className="block text-[10px] font-bold text-slate-300 uppercase mb-1">
+                            {isEn ? 'Billing / Proposal Email:' : 'Correo Electrónico (Para Factura / Propuesta):'}
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="email"
+                              value={closingContactEmail}
+                              onChange={(e) => setClosingContactEmail(e.target.value)}
+                              placeholder="Ej: yenymarquez19@gmail.com"
+                              className="w-full pl-8 pr-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-indigo-400 transition"
+                            />
+                            <Mail className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2. Servicio Técnico Realizado (Fijo • Sin Precios) */}
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                        {isEn ? 'Technical Service Delivered (Fixed):' : 'Servicio Técnico Realizado (Inmutable):'}
+                      </label>
+                      <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-lg ${
+                              editingDossierClosing.mode === 'create'
+                                ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                                : editingDossierClosing.mode === 'rescue'
+                                ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                : editingDossierClosing.mode === 'appeal'
+                                ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                                : editingDossierClosing.mode === 'prospect' || editingDossierClosing.mode === 'tools'
+                                ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
+                                : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
+                            }`}
+                          >
+                            {editingDossierClosing.mode === 'create'
+                              ? '🏗️ 1. Ficha Creada Desde Cero'
+                              : editingDossierClosing.mode === 'audit'
+                              ? '🔬 2. Auditoría Top 3 & Optimización'
+                              : editingDossierClosing.mode === 'rescue'
+                              ? '🛡️ 3. Rescate de Ficha 72h'
+                              : editingDossierClosing.mode === 'appeal'
+                              ? '⚖️ 4. Apelación Legal de Reseñas 1-3★'
+                              : '🎯 5. Propuesta de Prospección & Cierre'}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
+                          🔒 {isEn ? 'Fixed record' : 'Servicio técnico realizado'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 3. Location fields in closing modal */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-3 rounded-2xl bg-slate-950 border border-slate-800">
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <label className="text-slate-300 font-bold">
-                            {isEn ? 'Client Country:' : 'País del Cliente:'}
+                            {isEn ? 'Client Country:' : 'País del Negocio / Cliente:'}
                           </label>
                           <button
                             type="button"
@@ -14266,7 +14398,6 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           {allCountriesList.map((c) => (
                             <option key={c} value={c}>{c}</option>
                           ))}
-                          
                         </select>
                       </div>
 
@@ -14302,45 +14433,21 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           {getCitiesForCountry(closingFormCountry).map((cty) => (
                             <option key={cty} value={cty}>{cty}</option>
                           ))}
-                          
                         </select>
                       </div>
 
                       <div className="sm:col-span-2">
                         <label className="block text-slate-300 font-bold mb-1">
-                          {isEn ? 'Neighborhood / District *:' : 'Barrio o Localidad *:'}
+                          {isEn ? 'Neighborhood / District:' : 'Barrio o Localidad:'}
                         </label>
                         <input
                           type="text"
                           value={closingFormNeighborhood}
                           onChange={(e) => setClosingFormNeighborhood(e.target.value)}
-                          placeholder="Ej: Chapinero, Poblado, Polanco, Brickell..."
+                          placeholder="Ej: Chapinero, Usaquén, Poblado, Polanco, Brickell..."
                           className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
                         />
                       </div>
-                    </div>
-
-                    {/* Service Type (Editable Selector) */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="block text-slate-300 font-bold">
-                          {isEn ? 'Technical Service Delivered:' : 'Tipo de Servicio Técnico Realizado:'}
-                        </label>
-                        <span className="text-[10px] text-amber-400 font-bold flex items-center gap-1">
-                          ✏️ {isEn ? 'Editable' : 'Editable'}
-                        </span>
-                      </div>
-                      <select
-                        value={closingFormMode}
-                        onChange={(e) => setClosingFormMode(e.target.value as any)}
-                        className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-semibold focus:outline-none focus:border-amber-400 transition cursor-pointer"
-                      >
-                        <option value="create">🏗️ {isEn ? 'Profile Created From Scratch (Benchmark: $150 – $250 USD)' : 'Ficha Creada Desde Cero (Benchmark: $150 – $250 USD)'}</option>
-                        <option value="audit">🔬 {isEn ? 'Forensic Audit & Top 3 Optimization (Benchmark: $200 – $350 USD)' : 'Auditoría Forense & Optimización Top 3 (Benchmark: $200 – $350 USD)'}</option>
-                        <option value="rescue">🛡️ {isEn ? 'Hijacked Profile Rescue / 72h Claim (Benchmark: $250 – $450 USD)' : 'Rescate de Ficha Secuestrada / Reclamación 72h (Benchmark: $250 – $450 USD)'}</option>
-                        <option value="appeal">⚖️ {isEn ? 'Legal Review Appeal 1-3★ (Benchmark: $100 – $250 USD)' : 'Apelación Legal de Reseñas 1-3★ (Benchmark: $100 – $250 USD)'}</option>
-                        <option value="tools">🎯 {isEn ? 'Prospecting & Closing Proposal (Tab 5)' : 'Propuesta de Prospección & Cierre (Pestaña 5)'}</option>
-                      </select>
                     </div>
 
                     {/* Closing Status */}
@@ -14453,13 +14560,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     </button>
                     <button
                       type="button"
-                      disabled={
-                        isSavingClosing ||
-                        !closingFormCountry.trim() ||
-                        !closingFormCity.trim() ||
-                        !closingFormNeighborhood.trim() ||
-                        !closingFormPaymentMethod.trim()
-                      }
+                      disabled={isSavingClosing}
                       onClick={handleSaveDossierClosing}
                       className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-98 disabled:opacity-50"
                     >
