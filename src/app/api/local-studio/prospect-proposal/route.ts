@@ -14,6 +14,13 @@ interface ProspectRequest {
   businessModel?: 'storefront' | 'service_area';
   targetOwnerName?: string;
   ownerPhone?: string;
+  contactName?: string;
+  contactCompany?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  contactRole?: string;
+  contactCountry?: string;
+  contactCity?: string;
   targetServices?: string;
   suggestedBudget?: string;
   advisorId?: string;
@@ -271,8 +278,8 @@ Hemos preparado un breve informe ejecutivo de 1 página que muestra cómo activa
       advisorPhone: cleanPhone,
       country: cleanCountry,
       clientName: cleanName,
-      contactName: cleanOwner,
-      contactPhone: cleanPhone,
+      contactName: body.contactName || cleanOwner,
+      contactPhone: body.contactPhone || cleanPhone,
       category: cleanCategory,
       city: cleanCity,
       neighborhood: cleanNeighborhood,
@@ -287,6 +294,13 @@ Hemos preparado un breve informe ejecutivo de 1 página que muestra cómo activa
         city: cleanCity,
         neighborhood: cleanNeighborhood,
         businessName: cleanName,
+        contactName: body.contactName || cleanOwner,
+        contactCompany: body.contactCompany || cleanName,
+        contactPhone: body.contactPhone || cleanPhone,
+        contactEmail: body.contactEmail || '',
+        contactRole: body.contactRole || 'Dueño / Propietario',
+        contactCountry: body.contactCountry || cleanCountry,
+        contactCity: body.contactCity || cleanCity,
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

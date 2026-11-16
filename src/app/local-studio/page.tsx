@@ -1947,6 +1947,13 @@ export default function LocalStudioPage() {
   const [roiMonthlySearches, setRoiMonthlySearches] = useState<number>(1200);
 
   // TAB 5: PROSPECTA (Generador de Propuestas Comerciales de Cierre)
+  const [prospectContactName, setProspectContactName] = useState<string>('');
+  const [prospectContactCompany, setProspectContactCompany] = useState<string>('');
+  const [prospectContactPhone, setProspectContactPhone] = useState<string>('+57');
+  const [prospectContactEmail, setProspectContactEmail] = useState<string>('');
+  const [prospectContactRole, setProspectContactRole] = useState<string>('Dueño / Propietario');
+  const [prospectContactCountry, setProspectContactCountry] = useState<string>('Colombia');
+  const [prospectContactCity, setProspectContactCity] = useState<string>('Bogotá');
   const [prospectBusinessName, setProspectBusinessName] = useState<string>('');
   const [prospectCategory, setProspectCategory] = useState<string>(CATEGORY_OPTIONS_ES[0]);
   const [prospectCountry, setProspectCountry] = useState<string>('Colombia');
@@ -3161,8 +3168,51 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
   // -------------------------------------------------------------
   // TAB 5 GENERATION: PROSPECTAR & GENERAR PROPUESTA COMERCIAL
   // -------------------------------------------------------------
+  const handleResetProspectForm = () => {
+    setProspectContactName('');
+    setProspectContactCompany('');
+    setProspectContactPhone('+57');
+    setProspectContactEmail('');
+    setProspectContactRole('Dueño / Propietario');
+    setProspectContactCountry('Colombia');
+    setProspectContactCity('Bogotá');
+    setProspectBusinessName('');
+    setProspectCategory(CATEGORY_OPTIONS_ES[0]);
+    setProspectCountry('Colombia');
+    setProspectCity('Bogotá');
+    setProspectNeighborhood('');
+    setProspectBusinessModel('storefront');
+    setProspectOwnerName('');
+    setProspectOwnerPhone('+57');
+    setProspectServices('');
+    setProspectSuggestedBudget('$150 USD');
+    setProspectGeneratedProposal(null);
+    setActiveProspectDossierId(null);
+    showToast(isEn ? '✨ Ready for a new prospect proposal' : '✨ Formulario listo para una nueva prospección');
+  };
+
   const handleGenerateProspectProposal = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (!prospectContactName.trim()) {
+      showToast(isEn ? '⚠️ Contact Person / Owner is required (*)' : '⚠️ La Persona de Contacto / Dueño es obligatoria (*)');
+      return;
+    }
+    if (!prospectContactCompany.trim()) {
+      showToast(isEn ? '⚠️ Contracting Company / Business is required (*)' : '⚠️ La Empresa / Razón Social Contratante es obligatoria (*)');
+      return;
+    }
+    if (!prospectContactPhone.trim()) {
+      showToast(isEn ? '⚠️ Direct WhatsApp is required (*)' : '⚠️ El WhatsApp Directo del cliente es obligatorio (*)');
+      return;
+    }
+    if (prospectContactPhone.replace(/[^\d]/g, '').length < 7) {
+      showToast(isEn ? '⚠️ Direct WhatsApp must contain at least 7 digits (*)' : '⚠️ El WhatsApp Directo debe contener al menos 7 números (*)');
+      return;
+    }
+    if (prospectContactEmail.trim() && !isValidEmailFormat(prospectContactEmail)) {
+      showToast(isEn ? '⚠️ Client Email must have a valid email format (e.g. name@company.com) (*)' : '⚠️ El Correo Electrónico debe tener un formato válido (ej: nombre@empresa.com) (*)');
+      return;
+    }
     if (!prospectBusinessName.trim()) {
       showToast(isEn ? '⚠️ Business name is required (*)' : '⚠️ El nombre del negocio o profesional es obligatorio (*)');
       return;
@@ -3205,8 +3255,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
           city: prospectCity,
           neighborhood: prospectNeighborhood.trim(),
           businessModel: prospectBusinessModel,
-          targetOwnerName: prospectOwnerName.trim(),
-          ownerPhone: prospectOwnerPhone.trim(),
+          targetOwnerName: (prospectContactName || prospectOwnerName).trim(),
+          ownerPhone: (prospectContactPhone || prospectOwnerPhone).trim(),
+          contactName: prospectContactName.trim(),
+          contactCompany: prospectContactCompany.trim(),
+          contactPhone: prospectContactPhone.trim(),
+          contactEmail: prospectContactEmail.trim(),
+          contactRole: prospectContactRole,
+          contactCountry: prospectContactCountry,
+          contactCity: prospectContactCity,
           targetServices: prospectServices.trim(),
           suggestedBudget: prospectSuggestedBudget.trim(),
           advisorId: currentUser?.id,
@@ -3235,7 +3292,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
   const getProspectWhatsAppUrl = () => {
     if (!prospectGeneratedProposal?.whatsappPitchMessage) return '#';
-    const cleanPhone = (prospectOwnerPhone || '').replace(/[^0-9]/g, '');
+    const cleanPhone = (prospectContactPhone || prospectOwnerPhone || '').replace(/[^0-9]/g, '');
     if (!cleanPhone) return '#';
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(prospectGeneratedProposal.whatsappPitchMessage)}`;
   };
@@ -5835,6 +5892,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                 ? (isEn ? 'OFFICIAL GOOGLE MAPS OWNERSHIP RESTITUTION DOSSIER' : 'EXPEDIENTE OFICIAL DE RESTITUCIÓN DE TITULARIDAD GOOGLE MAPS')
                 : activeTab === 'appeals'
                 ? (isEn ? 'OFFICIAL GOOGLE MAPS REVIEW REMOVAL & LEGAL APPEAL DOSSIER' : 'EXPEDIENTE OFICIAL DE IMPUGNACIÓN & RETIRO DE RESEÑAS GOOGLE MAPS')
+                : activeTab === 'tools'
+                ? (isEn ? 'OFFICIAL GOOGLE MAPS PROSPECTING & SALES CLOSING DOSSIER' : 'EXPEDIENTE OFICIAL DE PROSPECCIÓN & CIERRE COMERCIAL GOOGLE MAPS')
                 : (isEn ? 'MASTER TOP 3 LOCAL RANKING DOSSIER' : 'EXPEDIENTE MAESTRO DE POSICIONAMIENTO LOCAL TOP 3')}
             </span>
           </div>
@@ -12601,263 +12660,537 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <span className="text-xs text-amber-300 font-bold bg-amber-950/80 border border-amber-500/30 px-3 py-1.5 rounded-xl">
                     ⚡ 1 {isEn ? 'Credit / Proposal' : 'Crédito / Propuesta'}
                   </span>
+                  <button
+                    type="button"
+                    onClick={handleResetProspectForm}
+                    className="px-3.5 py-2 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-amber-500/20 cursor-pointer shrink-0 active:scale-95"
+                    title={isEn ? 'Clear form to run a new prospect proposal' : 'Realizar una nueva propuesta desde cero'}
+                  >
+                    <Plus className="w-4 h-4 text-slate-950" />
+                    <span>{isEn ? 'New Prospect' : 'Nueva Prospección'}</span>
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* FORMULARIO DE ENTRADA O VISTA DE PROPUESTA GENERADA */}
-            {!prospectGeneratedProposal ? (
-              <form onSubmit={handleGenerateProspectProposal} className="space-y-6 print:hidden">
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
-                  <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                        <Building2 className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h2 className="text-base font-black text-white">
-                          {isEn ? 'Target Prospect Data' : '1. Datos del Negocio o Profesional a Prospectar'}
-                        </h2>
-                        <p className="text-[11px] text-slate-400">
-                          {isEn ? 'Enter the details of the business that lacks a Google Maps presence' : 'Ingresa los datos del cliente que no tiene presencia en Google Maps'}
-                        </p>
-                      </div>
+                        {/* 2-Column Grid Workspace: Left (5 cols) Inputs / Right (7 cols) Result */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column: Client Data & Business Parameters (5 cols) */}
+              <div className="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl print:hidden">
+                <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
+                  <KeyRound className="w-4 h-4 text-amber-400" />
+                  <h2 className="text-sm font-black text-white">
+                    {isEn ? '1. Client Data & Target Business' : '1. Datos del Cliente & Negocio a Prospectar'}
+                  </h2>
+                </div>
+
+                {/* Tarjeta 1: Datos del Cliente / Decisor (Quién Recibe y Paga el Servicio - CRM) */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-slate-950 to-slate-900 border border-indigo-500/30 space-y-2.5">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
+                    <div className="flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-indigo-400" />
+                      <span className="text-xs font-black text-indigo-300">
+                        {isEn ? '👤 Client / Decision Maker (CRM)' : '👤 Datos del Cliente / Decisor (Quién Recibe la Propuesta y Paga)'}
+                      </span>
                     </div>
-                    <span className="text-[10px] text-slate-500 font-mono">* {isEn ? 'Required fields' : 'Campos obligatorios'}</span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/40">
+                      CRM
+                    </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                    {/* Nombre del Negocio */}
-                    <div className="sm:col-span-2">
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {isEn ? 'Business / Professional Commercial Name *' : 'Nombre Comercial del Negocio o Profesional Independiente *'}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Contact Person / Owner *' : 'Persona de Contacto / Dueño *'}
                       </label>
                       <input
                         type="text"
-                        value={prospectBusinessName}
-                        onChange={(e) => setProspectBusinessName(e.target.value)}
-                        placeholder={isEn ? 'e.g. Los Andes Dental Clinic, Mario Mechanic Workshop...' : 'Ej: Clínica Dental Los Andes, Taller Mecánico Mario, Dra. Sofía Pérez...'}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-medium"
-                        required
+                        value={prospectContactName}
+                        onChange={(e) => {
+                          const val = sanitizeLettersOnly(e.target.value);
+                          setProspectContactName(val);
+                          setProspectOwnerName(val);
+                        }}
+                        placeholder={isEn ? 'e.g. Carlos Gómez' : 'Ej: Carlos Gómez (solo letras)'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
                       />
                     </div>
 
-                    {/* Nicho o Categoría */}
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {isEn ? 'Niche / Industry Category *' : 'Nicho o Categoría de Negocio *'}
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Contracting Company / Legal Entity *' : 'Empresa / Razón Social *'}
+                      </label>
+                      <input
+                        type="text"
+                        value={prospectContactCompany}
+                        onChange={(e) => setProspectContactCompany(e.target.value)}
+                        placeholder={isEn ? 'e.g. Inversiones Gómez SAS / Individual' : 'Ej: Inversiones Gómez SAS / Particular'}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                        <span>{isEn ? 'Direct WhatsApp *' : 'WhatsApp Directo *'}</span>
+                        {prospectContactPhone && (
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(prospectContactPhone, isEn ? 'Phone' : 'Teléfono')}
+                              className="text-[9px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
+                              title={isEn ? 'Copy phone' : 'Copiar teléfono'}
+                            >
+                              <Copy className="w-2.5 h-2.5" />
+                              <span>{isEn ? 'Copy' : 'Copiar'}</span>
+                            </button>
+                            <span className="text-slate-600">•</span>
+                            <a
+                              href={`https://wa.me/${prospectContactPhone.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-0.5"
+                            >
+                              <span>Chat</span>
+                              <ExternalLink className="w-2.5 h-2.5" />
+                            </a>
+                          </div>
+                        )}
+                      </label>
+                      <input
+                        type="tel"
+                        value={prospectContactPhone}
+                        onChange={(e) => {
+                          const val = sanitizePhoneOnly(e.target.value);
+                          setProspectContactPhone(val);
+                          setProspectOwnerPhone(val);
+                        }}
+                        placeholder="+57 300 123 4567"
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 text-xs font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                        <span>{isEn ? 'Email (Optional)' : 'Correo Electrónico (Opcional)'}</span>
+                        {prospectContactEmail && (
+                          <span className={`text-[9px] font-bold ${isValidEmailFormat(prospectContactEmail) ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {isValidEmailFormat(prospectContactEmail) ? '✓ Válido' : '⚠️ Inválido'}
+                          </span>
+                        )}
+                      </label>
+                      <input
+                        type="email"
+                        value={prospectContactEmail}
+                        onChange={(e) => setProspectContactEmail(e.target.value.trim())}
+                        placeholder={isEn ? 'contact@company.com' : 'contacto@empresa.com'}
+                        className={`w-full px-3 py-1.5 rounded-xl bg-slate-900 border text-white placeholder:text-slate-500 focus:outline-none text-xs transition ${
+                          prospectContactEmail && !isValidEmailFormat(prospectContactEmail)
+                            ? 'border-rose-500 focus:border-rose-400 ring-1 ring-rose-500/30'
+                            : prospectContactEmail && isValidEmailFormat(prospectContactEmail)
+                            ? 'border-emerald-500/50 focus:border-emerald-400'
+                            : 'border-slate-700 focus:border-indigo-400'
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Role *' : 'Cargo / Relación *'}
                       </label>
                       <select
-                        value={prospectCategory}
-                        onChange={(e) => setProspectCategory(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 cursor-pointer font-medium"
+                        value={prospectContactRole}
+                        onChange={(e) => setProspectContactRole(e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs cursor-pointer"
                       >
-                        {categoryOptions.map((cat) => (
-                          <option key={cat} value={cat} className="bg-slate-900 text-white">
-                            {cat}
-                          </option>
+                        <option value="Dueño / Propietario">{isEn ? '👑 Owner / Founder' : '👑 Dueño / Propietario'}</option>
+                        <option value="Gerente General">{isEn ? '💼 General Manager' : '💼 Gerente General'}</option>
+                        <option value="Director Comercial">{isEn ? '📈 Commercial Dir.' : '📈 Dir. Comercial'}</option>
+                        <option value="Administrador">{isEn ? '🏢 Branch Admin' : '🏢 Administrador'}</option>
+                        <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
+                        <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* País y Ciudad del Cliente (Facturación/Residencia) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-indigo-500/15">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-slate-300">
+                          {isEn ? '🌍 Client Country (Billing/Residence) *' : '🌍 País del Cliente (Residencia/Cobro) *'}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowAddCountryModal(true)}
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-bold transition cursor-pointer shrink-0 whitespace-nowrap"
+                          title={isEn ? 'Add another Country to catalog' : 'Agregar otro País al catálogo'}
+                        >
+                          <Plus className="w-2.5 h-2.5 shrink-0" />
+                          <span>{isEn ? 'Country' : 'País'}</span>
+                        </button>
+                      </div>
+                      <select
+                        value={prospectContactCountry}
+                        onChange={(e) => {
+                          const newC = e.target.value;
+                          setProspectContactCountry(newC);
+                          const avCities = getCitiesForCountry(newC);
+                          if (!avCities.includes(prospectContactCity) && avCities.length > 0) {
+                            setProspectContactCity(avCities[0]);
+                          }
+                          if (COUNTRY_DIALING_CODES[newC] && (!prospectContactPhone || prospectContactPhone === '+57')) {
+                            setProspectContactPhone(COUNTRY_DIALING_CODES[newC]);
+                            setProspectOwnerPhone(COUNTRY_DIALING_CODES[newC]);
+                          }
+                        }}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs cursor-pointer"
+                      >
+                        {allCountriesList.map((c) => (
+                          <option key={c} value={c}>{c}</option>
                         ))}
                       </select>
                     </div>
 
-                    {/* Modelo de Negocio */}
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {isEn ? 'Business Operation Model *' : 'Modelo de Operación *'}
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-slate-300">
+                          {isEn ? `🏙️ Client City (${prospectContactCountry}) *` : `🏙️ Ciudad del Cliente (${prospectContactCountry}) *`}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTargetCountryForNewCity(prospectContactCountry);
+                            setShowAddCityModal(true);
+                          }}
+                          className="text-[9px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-bold transition cursor-pointer shrink-0 whitespace-nowrap"
+                          title={isEn ? `Add another City to ${prospectContactCountry}` : `Agregar otra Ciudad a ${prospectContactCountry}`}
+                        >
+                          <Plus className="w-2.5 h-2.5 shrink-0" />
+                          <span>{isEn ? 'City' : 'Ciudad'}</span>
+                        </button>
+                      </div>
+                      <select
+                        value={prospectContactCity}
+                        onChange={(e) => setProspectContactCity(e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs cursor-pointer"
+                      >
+                        {getCitiesForCountry(prospectContactCountry).map((cty) => (
+                          <option key={cty} value={cty}>{cty}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tarjeta 2: Datos del Negocio o Profesional a Prospectar */}
+                <div className="p-3.5 rounded-2xl bg-slate-950 border border-amber-500/30 space-y-3">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-slate-800">
+                    <div className="flex items-center gap-1.5">
+                      <Building2 className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="text-xs font-black text-amber-300">
+                        {isEn ? '🏢 Business / Professional Details to Prospect' : '🏢 Datos del Negocio o Profesional a Prospectar'}
+                      </span>
+                    </div>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/30">
+                      Objetivo
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                      {isEn ? 'Commercial Name *' : 'Nombre Comercial del Negocio o Profesional *'}
+                    </label>
+                    <input
+                      type="text"
+                      value={prospectBusinessName}
+                      onChange={(e) => {
+                        setProspectBusinessName(e.target.value);
+                        if (!prospectContactCompany) {
+                          setProspectContactCompany(e.target.value);
+                        }
+                      }}
+                      placeholder="Ej: Clínica Dental Los Andes, Taller Mecánico Mario, Dra. Sofía Pérez..."
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 text-xs font-medium"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Niche / Category *' : 'Nicho o Categoría *'}
                       </label>
-                      <div className="grid grid-cols-2 gap-2">
+                      <select
+                        value={prospectCategory}
+                        onChange={(e) => setProspectCategory(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 text-xs cursor-pointer font-medium"
+                      >
+                        {categoryOptions.map((cat) => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Operation Model *' : 'Modelo de Operación *'}
+                      </label>
+                      <div className="grid grid-cols-2 gap-1.5">
                         <button
                           type="button"
                           onClick={() => setProspectBusinessModel('storefront')}
-                          className={`py-2 px-3 rounded-xl border text-center font-bold text-xs transition cursor-pointer ${
+                          className={`py-1.5 px-2 rounded-xl border text-center font-bold text-[11px] transition cursor-pointer ${
                             prospectBusinessModel === 'storefront'
-                              ? 'bg-amber-500/20 border-amber-500 text-amber-300'
-                              : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                              ? 'bg-amber-500/20 border-amber-500 text-amber-300 font-black'
+                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
                           }`}
                         >
-                          🏬 {isEn ? 'Physical Storefront' : 'Local Físico'}
+                          🏬 {isEn ? 'Storefront' : 'Local Físico'}
                         </button>
                         <button
                           type="button"
                           onClick={() => setProspectBusinessModel('service_area')}
-                          className={`py-2 px-3 rounded-xl border text-center font-bold text-xs transition cursor-pointer ${
+                          className={`py-1.5 px-2 rounded-xl border text-center font-bold text-[11px] transition cursor-pointer ${
                             prospectBusinessModel === 'service_area'
-                              ? 'bg-amber-500/20 border-amber-500 text-amber-300'
-                              : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                              ? 'bg-amber-500/20 border-amber-500 text-amber-300 font-black'
+                              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
                           }`}
                         >
-                          🛵 {isEn ? 'Mobile / Service Area' : 'A Domicilio / SAB'}
+                          🛵 {isEn ? 'Delivery / SAB' : 'A Domicilio / SAB'}
                         </button>
                       </div>
                     </div>
+                  </div>
 
-                    {/* País Condicionado */}
+                  {/* Ubicación Geográfica del Negocio (País -> Ciudad -> Barrio) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-slate-800">
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {isEn ? 'Country of Operation *' : 'País de Operación *'}
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Business Country *' : 'País del Negocio *'}
                       </label>
                       <select
                         value={prospectCountry}
                         onChange={(e) => {
                           const selected = e.target.value;
                           setProspectCountry(selected);
-                          const cities = WORLD_REGIONS_GEO[selected] || [];
-                          setProspectCity(cities[0] || '');
-                          if (COUNTRY_DIALING_CODES[selected]) {
+                          const cities = getCitiesForCountry(selected);
+                          if (cities.length > 0) setProspectCity(cities[0]);
+                          if (COUNTRY_DIALING_CODES[selected] && (!prospectContactPhone || prospectContactPhone === '+57')) {
+                            setProspectContactPhone(COUNTRY_DIALING_CODES[selected]);
                             setProspectOwnerPhone(COUNTRY_DIALING_CODES[selected]);
                           }
                         }}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 cursor-pointer font-medium"
-                        required
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 text-xs cursor-pointer font-medium"
                       >
-                        {Object.keys(WORLD_REGIONS_GEO).map((c) => (
-                          <option key={c} value={c} className="bg-slate-900 text-white">
-                            {c}
-                          </option>
+                        {allCountriesList.map((c) => (
+                          <option key={c} value={c}>{c}</option>
                         ))}
                       </select>
                     </div>
 
-                    {/* Ciudad Condicionada (Dependiente del país) */}
                     <div>
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {isEn ? 'City *' : 'Ciudad Principal *'}
+                      <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                        {isEn ? 'Business City *' : 'Ciudad del Negocio *'}
                       </label>
                       <select
                         value={prospectCity}
                         onChange={(e) => setProspectCity(e.target.value)}
-                        disabled={!prospectCountry}
-                        className={`w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 transition font-medium ${
-                          !prospectCountry
-                            ? 'opacity-40 cursor-not-allowed border-dashed text-slate-500'
-                            : 'cursor-pointer hover:border-slate-500'
-                        }`}
-                        required
+                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 text-xs cursor-pointer font-medium"
                       >
-                        <option value="">
-                          {!prospectCountry
-                            ? (isEn ? '⚠️ Select country first...' : '⚠️ Selecciona primero un país...')
-                            : (isEn ? '-- Select City --' : '-- Selecciona una Ciudad --')}
-                        </option>
-                        {(WORLD_REGIONS_GEO[prospectCountry] || []).map((city) => (
-                          <option key={city} value={city} className="bg-slate-900 text-white">
-                            {city}
-                          </option>
+                        {getCitiesForCountry(prospectCountry).map((city) => (
+                          <option key={city} value={city}>{city}</option>
                         ))}
                       </select>
                     </div>
-
-                    {/* Barrio o Sector */}
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {isEn ? 'Neighborhood / District / Sector *' : 'Barrio, Zona o Sector de Operación *'}
-                      </label>
-                      <input
-                        type="text"
-                        value={prospectNeighborhood}
-                        onChange={(e) => setProspectNeighborhood(e.target.value)}
-                        placeholder={isEn ? 'e.g. Downtown, North Zone, Chapinero...' : 'Ej: Chapinero, Poblado, San Isidro, Zona Rosa...'}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-medium"
-                        required
-                      />
-                    </div>
-
-                    {/* Teléfono / WhatsApp del Dueño */}
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {isEn ? 'Client WhatsApp / Phone (For 1-Click Send)' : 'WhatsApp o Teléfono del Cliente (Para envío en 1 clic)'}
-                      </label>
-                      <input
-                        type="text"
-                        value={prospectOwnerPhone}
-                        onChange={(e) => setProspectOwnerPhone(sanitizePhoneOnly(e.target.value))}
-                        placeholder="+573001234567"
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-medium font-mono"
-                      />
-                    </div>
-
-                    {/* Nombre del Dueño / Decisor */}
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {isEn ? 'Owner / Manager Name (Optional)' : 'Nombre del Dueño o Encargado (Opcional)'}
-                      </label>
-                      <input
-                        type="text"
-                        value={prospectOwnerName}
-                        onChange={(e) => setProspectOwnerName(sanitizeLettersOnly(e.target.value))}
-                        placeholder={isEn ? 'e.g. Dr. Felipe or Carlos' : 'Ej: Dr. Felipe, Ing. Mario, Doña Claudia...'}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-medium"
-                      />
-                    </div>
-
-                    {/* Presupuesto o Cotización Sugerida */}
-                    <div>
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {isEn ? 'Suggested Setup Fee (Optional)' : 'Tarifa / Cotización Sugerida (Opcional)'}
-                      </label>
-                      <input
-                        type="text"
-                        value={prospectSuggestedBudget}
-                        onChange={(e) => setProspectSuggestedBudget(e.target.value)}
-                        placeholder="$150 USD o $500.000 COP"
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-medium"
-                      />
-                    </div>
-
-                    {/* Especialidades o Servicios Estrella */}
-                    <div className="sm:col-span-2">
-                      <label className="block font-bold text-slate-300 mb-1">
-                        {isEn ? 'Star Specialties / Core Services (To personalize the pitch)' : 'Servicios Estrella o Especialidades (Para personalizar la propuesta)'}
-                      </label>
-                      <input
-                        type="text"
-                        value={prospectServices}
-                        onChange={(e) => setProspectServices(e.target.value)}
-                        placeholder={isEn ? 'e.g. Root canals, Invisalign, Dental Implants, 24h Emergencies' : 'Ej: Ortodoncia invisible, implantes dentales, cambio de aceite rápido, frenos ABS...'}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-medium"
-                      />
-                    </div>
                   </div>
 
-                  {/* Warning de Saldo o Suspensión */}
-                  {!isLuismaMaster && ((monthlyUsage.tools || 0) >= getEffectiveQuota('tools') || isUserSuspended) && (
-                    <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-bold flex items-center justify-center gap-2">
-                      <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
-                      <span>
-                        {isUserSuspended
-                          ? (isEn ? 'Account suspended due to pending payment. Contact Management.' : 'Cuenta pausada / suspendida por facturación pendiente. Contacta a Dirección General.')
-                          : (isEn
-                            ? `⚠️ Monthly limit of ${getEffectiveQuota('tools')} proposals reached. Request a +10 credit pack.`
-                            : `⚠️ Has alcanzado tu cupo de ${getEffectiveQuota('tools')} propuestas comerciales de este ciclo. Solicita una recarga de +10 créditos.`)}
-                      </span>
-                    </div>
-                  )}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                      {isEn ? 'Neighborhood / District / Sector *' : 'Barrio, Zona o Sector de Operación *'}
+                    </label>
+                    <input
+                      type="text"
+                      value={prospectNeighborhood}
+                      onChange={(e) => setProspectNeighborhood(e.target.value)}
+                      placeholder="Ej: Chapinero, Poblado, San Isidro, Zona Rosa, Polanco, Brickell..."
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 text-xs font-medium"
+                    />
+                  </div>
 
-                  {/* Botón Submit */}
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      disabled={isGeneratingProspect || isUserSuspended || (!isLuismaMaster && (monthlyUsage.tools || 0) >= getEffectiveQuota('tools'))}
-                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm transition flex items-center justify-center gap-2.5 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98 disabled:opacity-50"
-                    >
-                      {isGeneratingProspect ? (
-                        <>
-                          <RefreshCw className="w-5 h-5 animate-spin" />
-                          <span>{isEn ? 'Generating High-Converting Proposal...' : 'Analizando Mercado Local & Generando Propuesta...'}</span>
-                        </>
-                      ) : (
-                        <>
-                          <Target className="w-5 h-5" />
-                          <span>{isEn ? 'Generate Closing Proposal (1 Credit)' : '⚡ Generar Propuesta Comercial de Alto Cierre (1 Crédito)'}</span>
-                        </>
-                      )}
-                    </button>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                      {isEn ? 'Star Specialties / Core Services (Optional)' : 'Servicios Estrella o Especialidades (Para personalizar el pitch)'}
+                    </label>
+                    <input
+                      type="text"
+                      value={prospectServices}
+                      onChange={(e) => setProspectServices(e.target.value)}
+                      placeholder="Ej: Ortodoncia invisible, implantes dentales, cambio de aceite rápido, frenos ABS..."
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 text-xs font-medium"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-300 mb-1">
+                      {isEn ? 'Suggested Setup Fee (Optional)' : 'Tarifa / Cotización Sugerida en la Propuesta (Opcional)'}
+                    </label>
+                    <input
+                      type="text"
+                      value={prospectSuggestedBudget}
+                      onChange={(e) => setProspectSuggestedBudget(e.target.value)}
+                      placeholder="Ej: $150 USD o $500.000 COP"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 text-xs font-medium font-mono"
+                    />
                   </div>
                 </div>
-              </form>
-            ) : (
-              /* VISTA DE LA PROPUESTA GENERADA */
-              <div className="space-y-6">
+
+                {/* Quota / Suspension Warning */}
+                {!isLuismaMaster && ((monthlyUsage.tools || 0) >= getEffectiveQuota('tools') || isUserSuspended) && (
+                  <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                    <span>
+                      {isUserSuspended
+                        ? (isEn ? 'Account suspended due to pending payment. Contact Management.' : 'Cuenta pausada / suspendida por facturación pendiente. Contacta a Dirección General.')
+                        : (isEn
+                          ? `Monthly limit of ${getEffectiveQuota('tools')} proposals reached. Request a +10 credit pack.`
+                          : `Has alcanzado tu cupo de ${getEffectiveQuota('tools')} propuestas comerciales de este ciclo. Solicita una recarga de +10 créditos.`)}
+                    </span>
+                  </div>
+                )}
+
+                {/* Submit Action Button */}
+                <button
+                  type="button"
+                  onClick={() => handleGenerateProspectProposal()}
+                  disabled={
+                    isGeneratingProspect ||
+                    isUserSuspended ||
+                    !prospectContactName.trim() ||
+                    !prospectContactCompany.trim() ||
+                    !prospectContactPhone.trim() ||
+                    (prospectContactEmail.trim() ? !isValidEmailFormat(prospectContactEmail) : false) ||
+                    !prospectBusinessName.trim() ||
+                    !prospectCountry ||
+                    !prospectCity ||
+                    !prospectNeighborhood.trim() ||
+                    (!isLuismaMaster && (monthlyUsage.tools || 0) >= getEffectiveQuota('tools'))
+                  }
+                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 cursor-pointer active:scale-98 disabled:opacity-50"
+                >
+                  {isGeneratingProspect ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>{isEn ? 'Analyzing Market & Generating Proposal...' : 'Analizando Mercado Local & Generando Propuesta...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Target className="w-4 h-4" />
+                      <span>{isEn ? 'Generate Closing Proposal (1 Credit)' : '⚡ Generar Propuesta Comercial de Alto Cierre (1 Crédito)'}</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Bottom Quick Action */}
+                <button
+                  type="button"
+                  onClick={handleResetProspectForm}
+                  className="w-full py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border-2 border-amber-500/40 hover:border-amber-400 text-amber-300 font-black text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-lg active:scale-98"
+                >
+                  <Plus className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{isEn ? 'New Prospect' : 'Nueva Prospección'}</span>
+                </button>
+              </div>
+
+              {/* Right Column: Proposal Result or Empty State (7 cols) */}
+              <div className="lg:col-span-7 space-y-4">
+                {!prospectGeneratedProposal && !isGeneratingProspect && (
+                  <div className="p-8 sm:p-10 rounded-3xl bg-slate-900 border border-slate-800 text-center space-y-6 shadow-xl">
+                    <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-amber-500/20 via-indigo-500/20 to-slate-800 border border-amber-500/40 flex items-center justify-center mx-auto shadow-lg text-amber-400">
+                      <Target className="w-8 h-8" />
+                    </div>
+
+                    <div className="space-y-2 max-w-lg mx-auto">
+                      <h3 className="text-lg font-black text-white">
+                        {isEn ? 'Forensic Prospecting & Closing Proposal Engine' : 'Generador Forense de Propuestas Comerciales & Cierre Local'}
+                      </h3>
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        {isEn
+                          ? 'Enter client and business details on the left to structure a high-converting commercial proposal backed by local market data.'
+                          : 'Completa los datos del cliente y del negocio a prospectar a la izquierda para estructurar una propuesta persuasiva de alto impacto respaldada con datos del mercado local.'}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                      <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+                        <div className="flex items-center gap-2 text-amber-400 font-bold text-xs">
+                          <Search className="w-4 h-4 shrink-0" />
+                          <span>{isEn ? 'Hidden Local Demand' : '1. Demanda Local Oculta'}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                          {isEn
+                            ? 'Quantifies estimated local monthly searches in Google Maps that the business is losing.'
+                            : 'Cuantifica el volumen de búsquedas mensuales en Google Maps que el cliente pierde en su sector.'}
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+                        <div className="flex items-center gap-2 text-rose-400 font-bold text-xs">
+                          <TrendingDown className="w-4 h-4 shrink-0" />
+                          <span>{isEn ? 'Cost of Invisibility' : '2. Costo de la Invisibilidad'}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                          {isEn
+                            ? 'Demonstrates the exact revenue being gifted to competitors every 30 days.'
+                            : 'Demuestra con números claros cuánta facturación se le está regalando a la competencia cada mes.'}
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+                        <div className="flex items-center gap-2 text-indigo-400 font-bold text-xs">
+                          <Users className="w-4 h-4 shrink-0" />
+                          <span>{isEn ? 'Competitor Radar' : '3. Radar de Competidores'}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                          {isEn
+                            ? 'Identifies local competitors currently absorbing calls, appointments, and store visits.'
+                            : 'Mapea los competidores directos en su zona que hoy están absorbiendo llamadas y clientes.'}
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+                        <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
+                          <MessageSquare className="w-4 h-4 shrink-0" />
+                          <span>{isEn ? 'WhatsApp Sales Pitch' : '4. Guion para WhatsApp'}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                          {isEn
+                            ? 'Generates a ready-to-send WhatsApp pitch message formatted for 1-click closing.'
+                            : 'Genera el mensaje persuasivo listo para disparar por WhatsApp en 1 clic y agendar la llamada.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {isGeneratingProspect && (
+                  <div className="p-12 rounded-3xl bg-slate-900 border border-amber-500/40 text-center space-y-4 shadow-xl">
+                    <RefreshCw className="w-10 h-10 text-amber-400 animate-spin mx-auto" />
+                    <div className="space-y-1">
+                      <h3 className="text-base font-black text-white">
+                        {isEn ? 'Generating Forensic Prospecting Dossier...' : 'Generando Propuesta Forense de Prospección...'}
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        {isEn
+                          ? `Analyzing local search volume, competitors in ${prospectCity}, and crafting closing offer...`
+                          : `Analizando volumen de búsquedas, competidores en ${prospectCity} y estructurando la oferta de cierre...`}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {prospectGeneratedProposal && !isGeneratingProspect && (
+                  <div className="space-y-6">
                 {/* Barra de Acciones y Botonera Superior */}
                 <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 print:hidden">
                   <div className="space-y-1">
@@ -13181,7 +13514,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   </div>
                 </div>
               </div>
-            )}
+                )}
+              </div>
+            </div>
           </div>
         )}
         {activeTab === 'dossiers' && (
