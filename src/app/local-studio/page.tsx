@@ -2302,6 +2302,8 @@ export default function LocalStudioPage() {
   const [closingContactPhone, setClosingContactPhone] = useState<string>('');
   const [closingContactEmail, setClosingContactEmail] = useState<string>('');
   const [closingContactRole, setClosingContactRole] = useState<string>('');
+  const [closingContactCountry, setClosingContactCountry] = useState<string>('Colombia');
+  const [closingContactCity, setClosingContactCity] = useState<string>('Bogotá');
   const [closingFormMode, setClosingFormMode] = useState<'create' | 'audit' | 'rescue' | 'appeal' | 'tools' | 'prospect'>('audit');
   const [closingFormStatus, setClosingFormStatus] = useState<'prestigia_subscriber' | 'setup_paid' | 'proposal_sent' | 'negotiating' | 'lead_draft'>('prestigia_subscriber');
   const [closingFormSetupFee, setClosingFormSetupFee] = useState<number>(0);
@@ -4983,6 +4985,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     setClosingContactPhone(dossier.contactPhone || '');
     setClosingContactEmail(dossier.contactEmail || '');
     setClosingContactRole(dossier.contactRole || 'Dueño / Propietario');
+    setClosingContactCountry(dossier.clientCountry || dossier.country || 'Colombia');
+    setClosingContactCity(dossier.clientCity || dossier.city || 'Bogotá');
     setClosingFormCountry(dossier.country || 'Colombia');
     setClosingFormCity(dossier.city || 'Bogotá');
     setClosingFormNeighborhood(dossier.neighborhood || '');
@@ -5018,6 +5022,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         contactPhone: closingContactPhone.trim(),
         contactEmail: closingContactEmail.trim(),
         contactRole: closingContactRole.trim() || 'Dueño / Propietario',
+        clientCountry: closingContactCountry.trim() || 'Colombia',
+        clientCity: closingContactCity.trim() || 'Bogotá',
         category: editingDossierClosing.category,
         city: closingFormCity.trim() || editingDossierClosing.city,
         neighborhood: closingFormNeighborhood.trim(),
@@ -14323,6 +14329,78 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             <Mail className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" />
                           </div>
                         </div>
+
+                        {/* País y Ciudad donde reside el Cliente Contratante (Mismo esquema que Pestañas 1-5) */}
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-[10px] font-bold text-slate-300 uppercase">
+                              {isEn ? 'Client Residence Country:' : 'País de Residencia del Cliente:'}
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => setShowAddCountryModal(true)}
+                              className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-0.5 cursor-pointer"
+                            >
+                              <Plus className="w-2.5 h-2.5" />
+                              <span>País</span>
+                            </button>
+                          </div>
+                          <select
+                            value={closingContactCountry}
+                            onChange={(e) => {
+                              if (e.target.value === '__add_new__') {
+                                setShowAddCountryModal(true);
+                              } else {
+                                const newC = e.target.value;
+                                setClosingContactCountry(newC);
+                                const available = getCitiesForCountry(newC);
+                                if (!available.includes(closingContactCity) && available.length > 0) {
+                                  setClosingContactCity(available[0]);
+                                }
+                              }
+                            }}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-indigo-400 transition"
+                          >
+                            {allCountriesList.map((c) => (
+                              <option key={c} value={c}>{c}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-[10px] font-bold text-slate-300 uppercase">
+                              {isEn ? `Client City (${closingContactCountry}):` : `Ciudad del Cliente (${closingContactCountry}):`}
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setTargetCountryForNewCity(closingContactCountry);
+                                setShowAddCityModal(true);
+                              }}
+                              className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-0.5 cursor-pointer"
+                            >
+                              <Plus className="w-2.5 h-2.5" />
+                              <span>Ciudad</span>
+                            </button>
+                          </div>
+                          <select
+                            value={closingContactCity}
+                            onChange={(e) => {
+                              if (e.target.value === '__add_new__') {
+                                setTargetCountryForNewCity(closingContactCountry);
+                                setShowAddCityModal(true);
+                              } else {
+                                setClosingContactCity(e.target.value);
+                              }
+                            }}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-indigo-400 transition"
+                          >
+                            {getCitiesForCountry(closingContactCountry).map((cty) => (
+                              <option key={cty} value={cty}>{cty}</option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                     </div>
 
@@ -14363,90 +14441,113 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </div>
                     </div>
 
-                    {/* 3. Location fields in closing modal */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-3 rounded-2xl bg-slate-950 border border-slate-800">
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-slate-300 font-bold">
-                            {isEn ? 'Client Country:' : 'País del Negocio / Cliente:'}
-                          </label>
-                          <button
-                            type="button"
-                            onClick={() => setShowAddCountryModal(true)}
-                            className="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
-                          >
-                            <Plus className="w-2.5 h-2.5" />
-                            <span>País</span>
-                          </button>
+                    {/* 3. Ubicación Física de la Ficha en Google Maps (Negocio Local / SAB) */}
+                    <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 shadow-md">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+                            <MapPin className="w-3.5 h-3.5" />
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-black text-white">
+                              {isEn ? 'Physical Listing Location on Google Maps (Local Business)' : 'Ubicación Física de la Ficha en Google Maps (Negocio Local)'}
+                            </h4>
+                            <span className="text-[10px] text-slate-400 block">
+                              {isEn
+                                ? 'City and neighborhood where the physical business competes in Google Maps (can differ from client residence)'
+                                : 'Ciudad, barrio y país donde opera físicamente la ficha en Google Maps (puede diferir de la residencia del cliente)'}
+                            </span>
+                          </div>
                         </div>
-                        <select
-                          value={closingFormCountry}
-                          onChange={(e) => {
-                            if (e.target.value === '__add_new__') {
-                              setShowAddCountryModal(true);
-                            } else {
-                              const newC = e.target.value;
-                              setClosingFormCountry(newC);
-                              const available = getCitiesForCountry(newC);
-                              if (!available.includes(closingFormCity) && available.length > 0) {
-                                setClosingFormCity(available[0]);
+                        <span className="text-[10px] font-mono text-amber-300/80 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/30">
+                          📍 Google Maps
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-[10px] font-bold text-slate-300 uppercase">
+                              {isEn ? 'Business Country (Google Maps):' : 'País de la Ficha en Maps:'}
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => setShowAddCountryModal(true)}
+                              className="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
+                            >
+                              <Plus className="w-2.5 h-2.5" />
+                              <span>País</span>
+                            </button>
+                          </div>
+                          <select
+                            value={closingFormCountry}
+                            onChange={(e) => {
+                              if (e.target.value === '__add_new__') {
+                                setShowAddCountryModal(true);
+                              } else {
+                                const newC = e.target.value;
+                                setClosingFormCountry(newC);
+                                const available = getCitiesForCountry(newC);
+                                if (!available.includes(closingFormCity) && available.length > 0) {
+                                  setClosingFormCity(available[0]);
+                                }
                               }
-                            }
-                          }}
-                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
-                        >
-                          {allCountriesList.map((c) => (
-                            <option key={c} value={c}>{c}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-slate-300 font-bold">
-                            Ciudad ({closingFormCountry}):
-                          </label>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setTargetCountryForNewCity(closingFormCountry);
-                              setShowAddCityModal(true);
                             }}
-                            className="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
                           >
-                            <Plus className="w-2.5 h-2.5" />
-                            <span>Ciudad</span>
-                          </button>
+                            {allCountriesList.map((c) => (
+                              <option key={c} value={c}>{c}</option>
+                            ))}
+                          </select>
                         </div>
-                        <select
-                          value={closingFormCity}
-                          onChange={(e) => {
-                            if (e.target.value === '__add_new__') {
-                              setTargetCountryForNewCity(closingFormCountry);
-                              setShowAddCityModal(true);
-                            } else {
-                              setClosingFormCity(e.target.value);
-                            }
-                          }}
-                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
-                        >
-                          {getCitiesForCountry(closingFormCountry).map((cty) => (
-                            <option key={cty} value={cty}>{cty}</option>
-                          ))}
-                        </select>
-                      </div>
 
-                      <div className="sm:col-span-2">
-                        <label className="block text-slate-300 font-bold mb-1">
-                          {isEn ? 'Neighborhood / District:' : 'Barrio o Localidad:'}
-                        </label>
-                        <input
-                          type="text"
-                          value={closingFormNeighborhood}
-                          onChange={(e) => setClosingFormNeighborhood(e.target.value)}
-                          placeholder="Ej: Chapinero, Usaquén, Poblado, Polanco, Brickell..."
-                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
-                        />
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-[10px] font-bold text-slate-300 uppercase">
+                              {isEn ? `Business City (${closingFormCountry}):` : `Ciudad de la Ficha (${closingFormCountry}):`}
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setTargetCountryForNewCity(closingFormCountry);
+                                setShowAddCityModal(true);
+                              }}
+                              className="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
+                            >
+                              <Plus className="w-2.5 h-2.5" />
+                              <span>Ciudad</span>
+                            </button>
+                          </div>
+                          <select
+                            value={closingFormCity}
+                            onChange={(e) => {
+                              if (e.target.value === '__add_new__') {
+                                setTargetCountryForNewCity(closingFormCountry);
+                                setShowAddCityModal(true);
+                              } else {
+                                setClosingFormCity(e.target.value);
+                              }
+                            }}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                          >
+                            {getCitiesForCountry(closingFormCountry).map((cty) => (
+                              <option key={cty} value={cty}>{cty}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <label className="block text-[10px] font-bold text-slate-300 uppercase mb-1">
+                            {isEn ? 'Neighborhood / District (Google Maps Ranking Area):' : 'Barrio o Localidad (Zona de Posicionamiento en Maps):'}
+                          </label>
+                          <input
+                            type="text"
+                            value={closingFormNeighborhood}
+                            onChange={(e) => setClosingFormNeighborhood(e.target.value)}
+                            placeholder="Ej: Chapinero, Usaquén, Poblado, Polanco, Brickell..."
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+                          />
+                        </div>
                       </div>
                     </div>
 
