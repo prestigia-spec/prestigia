@@ -1853,6 +1853,7 @@ export default function LocalStudioPage() {
   const [rescueCity, setRescueCity] = useState<string>('Bogotá');
   const [rescueNeighborhood, setRescueNeighborhood] = useState<string>('');
   const [rescueScenario, setRescueScenario] = useState<'orphan' | 'third_party' | 'rejected'>('third_party');
+  const [rescueCaseStatus, setRescueCaseStatus] = useState<'in_progress' | 'completed' | 'appealing'>('in_progress');
   const [rescueMaskedEmail, setRescueMaskedEmail] = useState('');
   const [activeRescueDossierId, setActiveRescueDossierId] = useState<string | null>(null);
   const [showManualRescueFields, setShowManualRescueFields] = useState(false);
@@ -2611,12 +2612,82 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     setRescueNeighborhood('');
     setRescueCategory(categoryOptions[0] || CATEGORY_OPTIONS[0]);
     setRescueScenario('third_party');
+    setRescueCaseStatus('in_progress');
     setRescueMaskedEmail('');
     setActiveRescueDossierId(null);
     setShowManualRescueFields(false);
     showToast(isEn ? '✨ Ready to run a new rescue' : '✨ Formulario listo para un nuevo rescate');
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleMarkRescueResolved = async () => {
+    setRescueCaseStatus('completed');
+    showToast(
+      isEn
+        ? '🎉 Listing Successfully Recovered! Dossier marked as SOLVED in Prestigia CRM.'
+        : '🎉 ¡Ficha Recuperada con Éxito! Expediente marcado como SOLUCIONADO en el CRM de Prestigia.'
+    );
+
+    if (activeRescueDossierId) {
+      try {
+        await fetch('/api/local-studio/dossiers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: activeRescueDossierId,
+            clientName: rescueBusinessName || rescueScannedListing?.name || 'Ficha Recuperada',
+            closingStatus: 'setup_paid',
+            status: 'completed',
+            data: {
+              placeData: rescueScannedListing,
+              scenario: rescueScenario,
+              caseStatus: 'completed',
+              resolvedAt: new Date().toISOString(),
+              address: rescueAddress,
+              phone: rescuePhone,
+            },
+          }),
+        });
+        fetchDossiers();
+      } catch (e) {
+        console.warn('Error updating rescue resolved status:', e);
+      }
+    }
+  };
+
+  const handleEscalateToCase3 = async () => {
+    setRescueScenario('rejected');
+    setRescueCaseStatus('appealing');
+    showToast(
+      isEn
+        ? '⚖️ Escalated to Case 3: Google Trust & Safety Legal Evidentiary Appeal Protocol activated.'
+        : '⚖️ Escalado a Caso 3: Protocolo de Apelación Legal y Expediente Probatorio Google Trust & Safety activado.'
+    );
+
+    if (activeRescueDossierId) {
+      try {
+        await fetch('/api/local-studio/dossiers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: activeRescueDossierId,
+            clientName: rescueBusinessName || rescueScannedListing?.name || 'Ficha en Apelación',
+            data: {
+              placeData: rescueScannedListing,
+              scenario: 'rejected',
+              caseStatus: 'appealing',
+              escalatedAt: new Date().toISOString(),
+              address: rescueAddress,
+              phone: rescuePhone,
+            },
+          }),
+        });
+        fetchDossiers();
+      } catch (e) {
+        console.warn('Error updating rescue escalation to case 3:', e);
+      }
     }
   };
 
@@ -3565,12 +3636,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         );
         setRescueCategory(matchedCategory);
 
+        let detectedScenario: 'orphan' | 'third_party' = 'third_party';
         // AI Automated Scenario Detection:
         if (place.reviewsCount === 0 && (!place.phone || !place.website)) {
-          setRescueScenario('orphan');
+          detectedScenario = 'orphan';
         } else {
-          setRescueScenario('third_party');
+          detectedScenario = 'third_party';
         }
+        setRescueScenario(detectedScenario);
+        setRescueCaseStatus('in_progress');
 
         showToast(
           isEn
@@ -3581,7 +3655,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         const fallbackName = rawInput.replace(/https?:\/\/[^\s]+/g, '').trim() || rawInput;
         extractedName = fallbackName;
         setRescueBusinessName(fallbackName);
-        setRescueScenario('third_party');
+        let detectedScenario: 'orphan' | 'third_party' = 'third_party';
+        setRescueScenario(detectedScenario);
+        setRescueCaseStatus('in_progress');
         showToast(isEn ? `✓ Listing set to "${fallbackName}". Rescue protocol ready!` : `✓ Ficha asignada a "${fallbackName}". ¡Protocolo de rescate listo!`);
       }
 
@@ -3616,7 +3692,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             setupFeeChargedUsd: 150,
             data: {
               placeData,
-              scenario: rescueScenario,
+              scenario: placeData ? ((placeData.reviewsCount === 0 && (!placeData.phone || !placeData.website)) ? 'orphan' : 'third_party') : 'third_party',
+              caseStatus: 'in_progress',
               address: placeData?.address || rescueAddress,
               phone: placeData?.phone || rescuePhone,
               scannedAt: new Date().toISOString(),
@@ -4451,6 +4528,20 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       }
       if (dossier.data?.scenario) {
         setRescueScenario(dossier.data.scenario);
+      }
+      if (
+        dossier.closingStatus === 'setup_paid' ||
+        dossier.closingStatus === 'prestigia_subscriber' ||
+        (dossier.data as any)?.caseStatus === 'completed'
+      ) {
+        setRescueCaseStatus('completed');
+      } else if (
+        dossier.data?.scenario === 'rejected' ||
+        (dossier.data as any)?.caseStatus === 'appealing'
+      ) {
+        setRescueCaseStatus('appealing');
+      } else {
+        setRescueCaseStatus('in_progress');
       }
       setActiveTab('rescue');
     } else if (dossier.mode === 'prospect' || dossier.mode === 'tools') {
@@ -9609,7 +9700,106 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
               {/* Right Column: Interactive Protocol & Evidentiary Dossier (7 cols) */}
               <div className="lg:col-span-7 space-y-4">
-                {/* Expediente Oficial de Ficha en Disputa */}
+                {Boolean(rescueScannedListing || activeRescueDossierId) ? (
+                  <div className="space-y-4 animate-in fade-in">
+                    {/* Banner de Resolución si está completed */}
+                    {rescueCaseStatus === 'completed' && (
+                      <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-teal-950/80 border-2 border-emerald-500/60 shadow-lg shadow-emerald-500/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                            <CheckCircle2 className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                                {isEn ? 'Status: SOLVED & RECOVERED' : 'Estado: RESUELTO & FICHA RECUPERADA'}
+                              </span>
+                              <span className="text-[10px] text-emerald-400/80 font-mono">
+                                ✓ CRM Prestigia Actualizado
+                              </span>
+                            </div>
+                            <h4 className="text-sm font-black text-white mt-0.5">
+                              {isEn ? 'Ownership Restitution Successfully Completed' : '¡Restitución de Titularidad Exitosa!'}
+                            </h4>
+                            <p className="text-[11px] text-slate-300">
+                              {isEn
+                                ? 'The primary ownership was transferred to the legitimate owner. Proceed with reputation acceleration & 5★ review software.'
+                                : 'El control de Propietario Principal fue restituido al legítimo dueño. Pasa ahora a blindar su reputación con el software de reseñas 5★.'}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('audit')}
+                          className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shrink-0 cursor-pointer shadow-md"
+                        >
+                          <Zap className="w-3.5 h-3.5" />
+                          <span>{isEn ? 'Audit & Boost Reviews' : 'Auditar & Acelerar Reseñas'}</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Panel de Ciclo de Vida y Resolución del Caso (CRM) */}
+                    <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950/40 border border-indigo-500/40 shadow-md space-y-2.5">
+                      <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
+                        <div className="flex items-center gap-1.5">
+                          <ShieldCheck className="w-4 h-4 text-amber-400" />
+                          <span className="text-xs font-black text-white">
+                            {isEn ? 'Case Lifecycle & Resolution Actions (CRM)' : 'Acciones de Resolución del Caso (CRM)'}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {rescueScenario === 'orphan'
+                            ? (isEn ? 'Case 1: Direct Claim' : 'Caso 1: Reclamación Directa')
+                            : rescueScenario === 'third_party'
+                            ? (isEn ? 'Case 2: 72h Rule in Progress' : 'Caso 2: Regla de 72h en Curso')
+                            : (isEn ? 'Case 3: Appeal in Progress' : 'Caso 3: Apelación en Curso')}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        {/* Botón Solucionado */}
+                        <button
+                          type="button"
+                          onClick={handleMarkRescueResolved}
+                          className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-emerald-600/20 active:scale-98"
+                          title={isEn ? 'Mark as successfully recovered' : 'Marcar como ficha recuperada y caso solucionado'}
+                        >
+                          <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+                          <span>{isEn ? '✓ Listing Recovered (Solved)' : '✓ Ficha Recuperada (Solucionado)'}</span>
+                        </button>
+
+                        {/* Botón Escalar a Caso 3 */}
+                        {rescueScenario === 'third_party' && (
+                          <button
+                            type="button"
+                            onClick={handleEscalateToCase3}
+                            className="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-rose-600/20 active:scale-98"
+                            title={isEn ? 'Escalate to Case 3 if third party refused access' : 'Escalar a Caso 3 si el tercero denegó o rechazó el acceso'}
+                          >
+                            <Scale className="w-4 h-4 text-rose-200" />
+                            <span>{isEn ? '⚖️ Third Party Denied Access → Escalate to Case 3' : '⚖️ El Tercero Negó Acceso → Escalar a Caso 3'}</span>
+                          </button>
+                        )}
+
+                        {/* Si ya está en Caso 3 pero quiere volver al Caso 2 */}
+                        {rescueScenario === 'rejected' && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setRescueScenario('third_party');
+                              setRescueCaseStatus('in_progress');
+                            }}
+                            className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer border border-slate-700"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                            <span>{isEn ? 'Return to Case 2' : 'Volver a Caso 2'}</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Expediente Oficial de Ficha en Disputa */}
                 <div className="p-5 sm:p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 text-xs shadow-xl relative overflow-hidden">
                   <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
                     <div className="flex items-center gap-2">
@@ -10050,13 +10240,101 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   </p>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/90 to-slate-950 border border-slate-800 text-center space-y-6 shadow-2xl relative overflow-hidden animate-in fade-in">
+                {/* Decorative background glow */}
+                <div className="absolute -top-24 -right-24 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-            {/* =========================================================
-                INTEGRATED: GUÍA PASO A PASO & GUIÓN DE CIERRE (RESCATE 72H)
-                (Ocultos hasta que la ficha es reconocida o activa)
-                ========================================================= */}
-            {Boolean(rescueScannedListing || activeRescueDossierId || rescueBusinessName.trim()) && (
+                <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-rose-500/20 to-amber-500/20 border border-rose-500/40 flex items-center justify-center mx-auto text-rose-400 shadow-lg shadow-rose-500/10">
+                  <Lock className="w-8 h-8" />
+                </div>
+
+                <div className="space-y-2 max-w-lg mx-auto">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-rose-950/90 text-rose-300 border border-rose-500/40 inline-flex items-center gap-1.5">
+                    <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+                    <span>{isEn ? '🔒 Protected Forensic Strategy • 1 Credit Required' : '🔒 Estrategia Forense Protegida • Consume 1 Crédito'}</span>
+                  </span>
+                  <h3 className="text-xl font-black text-white">
+                    {isEn ? 'Official Legal Restitution Dossier & Roadmap Locked' : 'Expediente Oficial de Rescate & Metodología Blindada'}
+                  </h3>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    {isEn
+                      ? 'To protect agency proprietary methodology and credit monetization, the full dispute dossier, legal restitution letter (Google TOS Sec. 4), step-by-step roadmap, and sales scripts are unlocked upon scanning the listing.'
+                      : 'Para blindar la propiedad intelectual de Prestigia y la monetización de créditos de los asesores, el expediente oficial, la carta formal de requerimiento legal, el paso a paso en Google Maps y el guion de venta se desbloquean al escanear la ficha.'}
+                  </p>
+                </div>
+
+                {/* What unlocks with 1 credit */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left max-w-xl mx-auto pt-2">
+                  <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-1">
+                    <div className="flex items-center gap-1.5 text-amber-400 font-bold text-xs">
+                      <Bot className="w-4 h-4" />
+                      <span>{isEn ? 'Automated AI Diagnosis' : 'Diagnóstico Algorítmico IA'}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400">
+                      {isEn
+                        ? 'Detects if listing is Case 1 (Orphan, 5 min) or Case 2 (Third-party hold, 72h rule).'
+                        : 'Detecta en segundos si es Caso 1 (Huérfana en 5 min) o Caso 2 (Secuestrada por 72h).'}
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-1">
+                    <div className="flex items-center gap-1.5 text-rose-400 font-bold text-xs">
+                      <Scale className="w-4 h-4" />
+                      <span>{isEn ? 'Formal Restitution Letter' : 'Carta Legal con Google TOS'}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400">
+                      {isEn
+                        ? 'Ready-to-serve legal demand citing Google Third-Party Policies for immediate release.'
+                        : 'Requerimiento legal listo para notificar al tercero o radicar ante soporte de Google.'}
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-1">
+                    <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs">
+                      <Clock className="w-4 h-4" />
+                      <span>{isEn ? '72h Protocol & Escalation' : 'Protocolo 72h & Escalado'}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400">
+                      {isEn
+                        ? 'Exact timeline with 1-click resolution buttons: Solved or Escalate to Case 3 Appeal.'
+                        : 'Ruta con botones de acción rápida: Ficha Recuperada o Escalar a Caso 3 (Apelación).'}
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-1">
+                    <div className="flex items-center gap-1.5 text-indigo-400 font-bold text-xs">
+                      <MessageSquare className="w-4 h-4" />
+                      <span>{isEn ? 'WhatsApp Sales Script' : 'Guion de Venta & WhatsApp'}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400">
+                      {isEn
+                        ? 'Commercial hook waiving rescue fees when the client contracts the Prestigia plan.'
+                        : 'Guion persuasivo para bonificar los honorarios y cerrar el Plan Prestigia de reseñas.'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Instructions indicator */}
+                <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-bold inline-flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-rose-400 animate-pulse" />
+                  <span>
+                    {isEn
+                      ? 'Fill the client details on the left, paste the listing link and click "Scan Listing" to unlock.'
+                      : 'Diligencia los datos del cliente a la izquierda, pega el enlace y haz clic en "Escanear Ficha" para desbloquear.'}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* =========================================================
+            INTEGRATED: GUÍA PASO A PASO & GUIÓN DE CIERRE (RESCATE 72H)
+            (Ocultos hasta que la ficha es reconocida o activa)
+            ========================================================= */}
+        {Boolean(rescueScannedListing || activeRescueDossierId) && (
               <>
                 <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl print:hidden">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
