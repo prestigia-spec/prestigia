@@ -14273,13 +14273,18 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           <label className="block text-[10px] font-bold text-slate-300 uppercase mb-1">
                             {isEn ? 'Role / Title:' : 'Cargo o Rol:'}
                           </label>
-                          <input
-                            type="text"
+                          <select
                             value={closingContactRole}
                             onChange={(e) => setClosingContactRole(e.target.value)}
-                            placeholder="Ej: Dueño / Propietario, Gerente..."
-                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-indigo-400 transition"
-                          />
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-semibold text-xs focus:outline-none focus:border-indigo-400 transition cursor-pointer"
+                          >
+                            <option value="Dueño / Propietario">{isEn ? '👑 Owner' : '👑 Dueño / Propietario'}</option>
+                            <option value="Gerente General">{isEn ? '💼 General Manager' : '💼 Gerente General'}</option>
+                            <option value="Director de Marketing">{isEn ? '📈 Marketing Dir.' : '📈 Dir. Marketing'}</option>
+                            <option value="Administrador">{isEn ? '🏢 Branch Admin' : '🏢 Administrador'}</option>
+                            <option value="Encargado">{isEn ? '🔑 Shift Manager' : '🔑 Encargado'}</option>
+                            <option value="Particular">{isEn ? '👤 Private Client' : '👤 Particular'}</option>
+                          </select>
                         </div>
 
                         <div>
