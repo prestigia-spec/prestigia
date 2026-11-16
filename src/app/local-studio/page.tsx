@@ -1911,6 +1911,7 @@ export default function LocalStudioPage() {
   const [appealSuccessCopied, setAppealSuccessCopied] = useState<string | null>(null);
   const [appealStarFilter, setAppealStarFilter] = useState<'all' | 1 | 2 | 3>('all');
   const [appealSortBy, setAppealSortBy] = useState<'probability' | 'rating' | 'recent'>('probability');
+  const [appealCustomFee, setAppealCustomFee] = useState<string>('$100 USD (400.000 COP) cobrables solo al ser eliminada');
 
   // Manual Review Form State
   const [showManualReviewForm, setShowManualReviewForm] = useState(false);
@@ -2821,6 +2822,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     setAppealEvidenceChecks({});
     setAppealStarFilter('all');
     setAppealSortBy('probability');
+    setAppealCustomFee('$100 USD (400.000 COP) cobrables solo al ser eliminada');
     setShowManualReviewForm(false);
     setManualAuthor('');
     setManualRating(1);
@@ -11577,53 +11579,74 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         </div>
                       </div>
 
-                      {/* Paquetes Comerciales de Blindaje Multi-Reseña */}
+                      {/* Guía Comercial de Tarifas Sugeridas de Mercado (Cobro Libre / Contra Éxito) */}
                       <div className="p-3.5 rounded-2xl bg-gradient-to-r from-slate-950 via-indigo-950/40 to-slate-950 border border-indigo-500/30 space-y-2.5">
                         <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
                           <div className="flex items-center gap-1.5">
-                            <Package className="w-3.5 h-3.5 text-indigo-400" />
+                            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                             <span className="text-xs font-black text-indigo-300">
-                              {isEn ? 'Multi-Review Shield Packages (Volume Closing)' : '📦 Paquetes de Blindaje Multi-Reseña (Cierre por Volumen)'}
+                              {isEn ? 'Market Pricing Guide • Success Fee Model' : '💡 Tarifas Sugeridas de Mercado (Cobro Contra Éxito)'}
                             </span>
                           </div>
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-900/60 text-indigo-200 border border-indigo-500/30">
-                            {isEn ? 'Commercial Quote' : 'Cotización Asesor'}
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30">
+                            {isEn ? 'Advisor Free Pricing' : 'Cobro Libre del Asesor'}
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-1.5 text-center">
-                          <div className="p-2 rounded-xl bg-slate-900/90 border border-slate-800 space-y-0.5">
-                            <span className="text-[9px] font-bold text-slate-400 block">{isEn ? '1 Review' : '1 Reseña'}</span>
-                            <strong className="text-xs font-black text-white block">$120 USD</strong>
-                            <span className="text-[8.5px] text-slate-500 block">450.000 COP</span>
+                        <p className="text-[10.5px] text-slate-300 leading-relaxed">
+                          {isEn
+                            ? 'Since Google Trust & Safety makes the final decision, the recommended commercial model is a Success Fee (charge only when Google confirms removal), protecting your credibility and generating maximum trust.'
+                            : 'Como Google toma la decisión final, el modelo recomendado es cobrar contra éxito (Success Fee: se cobra al cliente solo si Google retira la reseña), protegiendo la reputación del asesor y cerrando con máxima confianza.'}
+                        </p>
+
+                        {/* Rango de Mercado Sugerido */}
+                        <div className="grid grid-cols-3 gap-1.5 text-center text-xs">
+                          <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                            <span className="text-[9px] text-slate-400 block">{isEn ? '1 Review' : '1 Reseña'}</span>
+                            <strong className="text-xs font-black text-white block">$80 - $150 USD</strong>
+                            <span className="text-[8.5px] text-emerald-400 block font-mono">Solo si se retira</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-indigo-950/60 border border-indigo-500/40 space-y-0.5 relative overflow-hidden">
-                            <span className="text-[9px] font-black text-indigo-300 block">{isEn ? 'Pack 3 (Save 20%)' : 'Pack 3 (-20%)'}</span>
-                            <strong className="text-xs font-black text-amber-300 block">$280 USD</strong>
-                            <span className="text-[8.5px] text-indigo-200/80 block">1.050.000 COP</span>
+                          <div className="p-2 rounded-xl bg-slate-900 border border-indigo-500/30">
+                            <span className="text-[9px] text-indigo-300 block">{isEn ? 'Pack 3' : 'Pack 3'}</span>
+                            <strong className="text-xs font-black text-amber-300 block">$200 - $350 USD</strong>
+                            <span className="text-[8.5px] text-emerald-400 block font-mono">Contra resultado</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-emerald-950/60 border border-emerald-500/40 space-y-0.5 relative overflow-hidden">
-                            <span className="text-[9px] font-black text-emerald-300 block">{isEn ? 'Pack 5 (Save 35%)' : 'Pack 5 (-35%)'}</span>
-                            <strong className="text-xs font-black text-emerald-400 block">$390 USD</strong>
-                            <span className="text-[8.5px] text-emerald-200/80 block">1.500.000 COP</span>
+                          <div className="p-2 rounded-xl bg-slate-900 border border-emerald-500/30">
+                            <span className="text-[9px] text-emerald-300 block">{isEn ? 'Pack 5+' : 'Pack 5+'}</span>
+                            <strong className="text-xs font-black text-emerald-400 block">$350 - $550 USD</strong>
+                            <span className="text-[8.5px] text-emerald-400 block font-mono">Blindaje Total</span>
                           </div>
+                        </div>
+
+                        {/* Campo para que el asesor defina su tarifa libremente */}
+                        <div className="space-y-1 pt-1">
+                          <label className="block text-[10px] font-bold text-slate-400 flex items-center justify-between">
+                            <span>{isEn ? 'Your Agreed Fee with Client (Editable):' : 'Honorario acordado con tu cliente (Editable):'}</span>
+                            <span className="text-[9px] text-slate-500 font-mono">{isEn ? 'Free freedom' : 'Personalizable'}</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={appealCustomFee}
+                            onChange={(e) => setAppealCustomFee(e.target.value)}
+                            placeholder="Ej: $100 USD (400.000 COP) cobrables solo al ser eliminada"
+                            className="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-indigo-400 font-medium font-mono"
+                          />
                         </div>
 
                         {appealContactPhone && (
                           <a
                             href={`https://wa.me/${appealContactPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-                              `Hola ${appealContactName || ''}, te comparto la propuesta de blindaje de reputación para ${scannedAppealBiz?.name || 'tu negocio'}:\n\n` +
-                              `🛡️ Opciones de Retiro Legal de Reseñas en Google Maps:\n` +
-                              `• 1 Reseña Crítica: $120 USD (450.000 COP)\n` +
-                              `• Pack 3 Reseñas (-20% Ahorro): $280 USD (1.050.000 COP)\n` +
-                              `• Pack 5 Reseñas Blindaje Total (-35% Ahorro): $390 USD (1.500.000 COP)\n\n` +
-                              `Incluye memorial legal ante Google Trust & Safety, mitigación pública y seguimiento hasta resolución.`
+                              `Hola ${appealContactName || ''}, te comparto la propuesta de impugnación legal de reseña en Google Maps para ${scannedAppealBiz?.name || 'tu negocio'}:\n\n` +
+                              `⚖️ Procedimiento: Radicación de memorial formal ante Google Trust & Safety por infracción de políticas.\n` +
+                              `💰 Honorario Propuesto: ${appealCustomFee || '$100 USD (cobrables únicamente contra retiro efectivo)'}\n` +
+                              `🛡️ Condición de Transparencia: Como la decisión final la dictamina Google, el cobro principal se hace efectivo solo una vez confirmada la supresión de la reseña.\n\n` +
+                              `¿Deseas que procedamos hoy con la radicación oficial?`
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full py-1.5 px-2.5 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 font-black text-[11px] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-98"
+                            className="w-full py-2 px-3 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 font-black text-[11px] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-98"
                           >
-                            <span>💬 {isEn ? 'Send Multi-Package Proposal via WhatsApp' : 'Enviar Cotización de Paquetes a WhatsApp'}</span>
+                            <span>💬 {isEn ? 'Send Success-Fee Proposal via WhatsApp' : 'Enviar Propuesta Contra Éxito a WhatsApp'}</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         )}
