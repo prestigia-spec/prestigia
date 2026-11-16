@@ -1911,7 +1911,8 @@ export default function LocalStudioPage() {
   const [appealSuccessCopied, setAppealSuccessCopied] = useState<string | null>(null);
   const [appealStarFilter, setAppealStarFilter] = useState<'all' | 1 | 2 | 3>('all');
   const [appealSortBy, setAppealSortBy] = useState<'probability' | 'rating' | 'recent'>('probability');
-  const [appealCustomFee, setAppealCustomFee] = useState<string>('$100 USD (400.000 COP) cobrables solo al ser eliminada');
+  const [appealInitialFee, setAppealInitialFee] = useState<string>('$30 USD (120.000 COP)');
+  const [appealSuccessFee, setAppealSuccessFee] = useState<string>('$90 USD (350.000 COP)');
 
   // Manual Review Form State
   const [showManualReviewForm, setShowManualReviewForm] = useState(false);
@@ -2822,7 +2823,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     setAppealEvidenceChecks({});
     setAppealStarFilter('all');
     setAppealSortBy('probability');
-    setAppealCustomFee('$100 USD (400.000 COP) cobrables solo al ser eliminada');
+    setAppealInitialFee('$30 USD (120.000 COP)');
+    setAppealSuccessFee('$90 USD (350.000 COP)');
     setShowManualReviewForm(false);
     setManualAuthor('');
     setManualRating(1);
@@ -11579,74 +11581,118 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         </div>
                       </div>
 
-                      {/* Guía Comercial de Tarifas Sugeridas de Mercado (Cobro Libre / Contra Éxito) */}
+                      {/* Guía Comercial Mixta: Cobro Inicial Bajo + Pago Restante Contra Éxito */}
                       <div className="p-3.5 rounded-2xl bg-gradient-to-r from-slate-950 via-indigo-950/40 to-slate-950 border border-indigo-500/30 space-y-2.5">
                         <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20">
                           <div className="flex items-center gap-1.5">
                             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                             <span className="text-xs font-black text-indigo-300">
-                              {isEn ? 'Market Pricing Guide • Success Fee Model' : '💡 Tarifas Sugeridas de Mercado (Cobro Contra Éxito)'}
+                              {isEn ? 'Hybrid Fee Model: Low Filing Fee + Success Balance' : '💡 Modelo Híbrido: Trámite Inicial Bajo + Saldo al Éxito'}
                             </span>
                           </div>
                           <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30">
-                            {isEn ? 'Advisor Free Pricing' : 'Cobro Libre del Asesor'}
+                            {isEn ? 'Equitable & Safe' : 'Equitativo & Seguro'}
                           </span>
                         </div>
 
                         <p className="text-[10.5px] text-slate-300 leading-relaxed">
                           {isEn
-                            ? 'Since Google Trust & Safety makes the final decision, the recommended commercial model is a Success Fee (charge only when Google confirms removal), protecting your credibility and generating maximum trust.'
-                            : 'Como Google toma la decisión final, el modelo recomendado es cobrar contra éxito (Success Fee: se cobra al cliente solo si Google retira la reseña), protegiendo la reputación del asesor y cerrando con máxima confianza.'}
+                            ? 'The safest commercial strategy: Charge a low upfront fee for legal drafting and filing, and collect the remaining balance ONLY when Google successfully removes the review.'
+                            : 'La mejor estrategia comercial: Se cobra un honorario bajo inicial por la radicación legal ante Google, y el saldo restante se liquida ÚNICAMENTE cuando Google certifique el retiro de la reseña.'}
                         </p>
 
-                        {/* Rango de Mercado Sugerido */}
-                        <div className="grid grid-cols-3 gap-1.5 text-center text-xs">
-                          <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
-                            <span className="text-[9px] text-slate-400 block">{isEn ? '1 Review' : '1 Reseña'}</span>
-                            <strong className="text-xs font-black text-white block">$80 - $150 USD</strong>
-                            <span className="text-[8.5px] text-emerald-400 block font-mono">Solo si se retira</span>
+                        {/* Rango de Mercado Sugerido en 2 Pasos */}
+                        <div className="grid grid-cols-2 gap-2 text-center text-xs">
+                          <div className="p-2 rounded-xl bg-slate-900 border border-amber-500/30 space-y-0.5">
+                            <span className="text-[9px] text-amber-400 block font-bold">{isEn ? '1. Low Upfront Filing Fee' : '1. Trámite Inicial (Fijo Bajo)'}</span>
+                            <strong className="text-xs font-black text-white block">$25 - $40 USD</strong>
+                            <span className="text-[8.5px] text-slate-400 block">100.000 - 150.000 COP</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-slate-900 border border-indigo-500/30">
-                            <span className="text-[9px] text-indigo-300 block">{isEn ? 'Pack 3' : 'Pack 3'}</span>
-                            <strong className="text-xs font-black text-amber-300 block">$200 - $350 USD</strong>
-                            <span className="text-[8.5px] text-emerald-400 block font-mono">Contra resultado</span>
-                          </div>
-                          <div className="p-2 rounded-xl bg-slate-900 border border-emerald-500/30">
-                            <span className="text-[9px] text-emerald-300 block">{isEn ? 'Pack 5+' : 'Pack 5+'}</span>
-                            <strong className="text-xs font-black text-emerald-400 block">$350 - $550 USD</strong>
-                            <span className="text-[8.5px] text-emerald-400 block font-mono">Blindaje Total</span>
+                          <div className="p-2 rounded-xl bg-slate-900 border border-emerald-500/30 space-y-0.5">
+                            <span className="text-[9px] text-emerald-300 block font-bold">{isEn ? '2. Remaining Balance on Success' : '2. Saldo al Retiro Exitoso'}</span>
+                            <strong className="text-xs font-black text-emerald-400 block">$75 - $110 USD</strong>
+                            <span className="text-[8.5px] text-emerald-300/80 block">300.000 - 450.000 COP</span>
                           </div>
                         </div>
 
-                        {/* Campo para que el asesor defina su tarifa libremente */}
-                        <div className="space-y-1 pt-1">
-                          <label className="block text-[10px] font-bold text-slate-400 flex items-center justify-between">
-                            <span>{isEn ? 'Your Agreed Fee with Client (Editable):' : 'Honorario acordado con tu cliente (Editable):'}</span>
-                            <span className="text-[9px] text-slate-500 font-mono">{isEn ? 'Free freedom' : 'Personalizable'}</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={appealCustomFee}
-                            onChange={(e) => setAppealCustomFee(e.target.value)}
-                            placeholder="Ej: $100 USD (400.000 COP) cobrables solo al ser eliminada"
-                            className="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-indigo-400 font-medium font-mono"
-                          />
+                        {/* Píldoras de configuración rápida (1-Clic) */}
+                        <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                          <span className="text-[9px] text-slate-500 font-mono">{isEn ? 'Presets:' : 'Atajos:'}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAppealInitialFee('$30 USD (120.000 COP)');
+                              setAppealSuccessFee('$90 USD (350.000 COP)');
+                            }}
+                            className="px-2 py-0.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-[9.5px] text-slate-300 border border-slate-700 transition cursor-pointer"
+                          >
+                            Estándar ($30 + $90)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAppealInitialFee('$20 USD (80.000 COP)');
+                              setAppealSuccessFee('$110 USD (420.000 COP)');
+                            }}
+                            className="px-2 py-0.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-[9.5px] text-slate-300 border border-slate-700 transition cursor-pointer"
+                          >
+                            Agresivo ($20 + $110)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAppealInitialFee('$60 USD (240.000 COP)');
+                              setAppealSuccessFee('$200 USD (800.000 COP)');
+                            }}
+                            className="px-2 py-0.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-[9.5px] text-indigo-300 border border-indigo-500/30 transition cursor-pointer"
+                          >
+                            Pack 3 ($60 + $200)
+                          </button>
+                        </div>
+
+                        {/* Campos editables para el Asesor */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-indigo-500/15">
+                          <div>
+                            <label className="block text-[9.5px] font-bold text-amber-300/90 mb-0.5">
+                              {isEn ? '1. Upfront Filing Fee (Editable):' : '1. Cobro Inicial de Trámite (Editable):'}
+                            </label>
+                            <input
+                              type="text"
+                              value={appealInitialFee}
+                              onChange={(e) => setAppealInitialFee(e.target.value)}
+                              placeholder="Ej: $30 USD (120.000 COP)"
+                              className="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-amber-400 font-mono"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[9.5px] font-bold text-emerald-400 mb-0.5">
+                              {isEn ? '2. Balance on Removal (Editable):' : '2. Saldo al ser Retirada (Editable):'}
+                            </label>
+                            <input
+                              type="text"
+                              value={appealSuccessFee}
+                              onChange={(e) => setAppealSuccessFee(e.target.value)}
+                              placeholder="Ej: $90 USD (350.000 COP)"
+                              className="w-full px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-emerald-400 font-mono"
+                            />
+                          </div>
                         </div>
 
                         {appealContactPhone && (
                           <a
                             href={`https://wa.me/${appealContactPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-                              `Hola ${appealContactName || ''}, te comparto la propuesta de impugnación legal de reseña en Google Maps para ${scannedAppealBiz?.name || 'tu negocio'}:\n\n` +
-                              `⚖️ Procedimiento: Radicación de memorial formal ante Google Trust & Safety por infracción de políticas.\n` +
-                              `💰 Honorario Propuesto: ${appealCustomFee || '$100 USD (cobrables únicamente contra retiro efectivo)'}\n` +
-                              `🛡️ Condición de Transparencia: Como la decisión final la dictamina Google, el cobro principal se hace efectivo solo una vez confirmada la supresión de la reseña.\n\n` +
+                              `Hola ${appealContactName || ''}, te comparto la propuesta de impugnación legal de reseña negativa en Google Maps para ${scannedAppealBiz?.name || 'tu negocio'}:\n\n` +
+                              `⚖️ Procedimiento: Radicación de memorial probatorio formal ante Google Trust & Safety por infracción de políticas.\n\n` +
+                              `1️⃣ Trámite Inicial de Radicación: ${appealInitialFee || '$30 USD (120.000 COP)'} (cubre el estudio forense y radicación en consola oficial de Google).\n` +
+                              `2️⃣ Saldo Restante al Retiro Exitoso: ${appealSuccessFee || '$90 USD (350.000 COP)'} (se liquida ÚNICAMENTE cuando Google certifique la eliminación de la reseña).\n\n` +
+                              `🛡️ Garantía de Transparencia: Si la reseña no es eliminada por Google, NO pagas el saldo restante.\n\n` +
                               `¿Deseas que procedamos hoy con la radicación oficial?`
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="w-full py-2 px-3 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 font-black text-[11px] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-98"
                           >
-                            <span>💬 {isEn ? 'Send Success-Fee Proposal via WhatsApp' : 'Enviar Propuesta Contra Éxito a WhatsApp'}</span>
+                            <span>💬 {isEn ? 'Send 2-Step Proposal via WhatsApp' : 'Enviar Propuesta en 2 Pasos a WhatsApp'}</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         )}
