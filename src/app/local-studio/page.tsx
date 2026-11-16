@@ -1390,10 +1390,11 @@ const TXT_DOSSIERS = {
     kpiPrivacyVal: '100% Blindado',
     filterBy: 'Servicio:',
     filterAll: 'Todos',
-    filterCreate: '🏗️ Fichas Nuevas',
-    filterAudit: '🔬 Auditorías Top 3',
-    filterRescue: '🛡️ Rescates 72h',
-    filterAppeal: '⚖️ Apelaciones 1-3★',
+    filterCreate: '🏗️ 1. Crear Ficha',
+    filterAudit: '🔬 2. Auditar & Optimizar',
+    filterRescue: '🛡️ 3. Rescatar Ficha',
+    filterAppeal: '⚖️ 4. Apelar Reseñas',
+    filterProspect: '🎯 5. Prospectar & Cerrar',
     filterCountry: 'País:',
     filterCity: 'Ciudad:',
     filterNeighborhood: 'Barrio / Localidad:',
@@ -1407,9 +1408,11 @@ const TXT_DOSSIERS = {
     emptyTitle: 'No se encontraron clientes con los filtros seleccionados',
     emptyDesc: 'Intenta limpiar los filtros o genera un nuevo expediente en los módulos superiores.',
     btnCreateFirst: '🏗️ Crear Primera Ficha Ganadora',
-    badgeCreate: '🏗️ Ficha Creada',
-    badgeAudit: '🔬 Auditoría Top 3',
-    badgeRescue: '🛡️ Ficha Rescatada',
+    badgeCreate: '🏗️ 1. Ficha Creada',
+    badgeAudit: '🔬 2. Auditoría Top 3',
+    badgeRescue: '🛡️ 3. Ficha Rescatada',
+    badgeAppeal: '⚖️ 4. Apelación 1-3★',
+    badgeProspect: '🎯 5. Prospección & Cierre',
     ownerBadge: '👑 Luisma (Cuenta Principal)',
     btnLoadView: '👁️ Cargar y Ver',
     sendWhatsappKit: 'Enviar Kit por WhatsApp',
@@ -1441,10 +1444,11 @@ const TXT_DOSSIERS = {
     kpiPrivacyVal: '100% Shielded',
     filterBy: 'Service:',
     filterAll: 'All',
-    filterCreate: '🏗️ New Listings',
-    filterAudit: '🔬 Top 3 Audits',
-    filterRescue: '🛡️ 72h Rescues',
-    filterAppeal: '⚖️ 1-3★ Appeals',
+    filterCreate: '🏗️ 1. Build Listing',
+    filterAudit: '🔬 2. Audit & Optimize',
+    filterRescue: '🛡️ 3. Rescue Listing',
+    filterAppeal: '⚖️ 4. Appeal Reviews',
+    filterProspect: '🎯 5. Prospect & Close',
     filterCountry: 'Country:',
     filterCity: 'City:',
     filterNeighborhood: 'Neighborhood:',
@@ -1458,9 +1462,11 @@ const TXT_DOSSIERS = {
     emptyTitle: 'No clients found matching the selected filters',
     emptyDesc: 'Try resetting the filters or generate a new dossier in the modules above.',
     btnCreateFirst: '🏗️ Build First Winning Listing',
-    badgeCreate: '🏗️ Built Listing',
-    badgeAudit: '🔬 Top 3 Audit',
-    badgeRescue: '🛡️ Rescued Listing',
+    badgeCreate: '🏗️ 1. Built Listing',
+    badgeAudit: '🔬 2. Top 3 Audit',
+    badgeRescue: '🛡️ 3. Rescued Listing',
+    badgeAppeal: '⚖️ 4. 1-3★ Appeal',
+    badgeProspect: '🎯 5. Prospect & Close',
     ownerBadge: '👑 Luisma (Main Account)',
     btnLoadView: '👁️ Load & View',
     sendWhatsappKit: 'Send Kit via WhatsApp',
@@ -4382,7 +4388,13 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
   // Active filtered view of dossiers for UI presentation
   const myDossiers = useMemo(() => {
     return luismaBaseDossiers.filter((d) => {
-      if (dossierModeFilter !== 'all' && d.mode !== dossierModeFilter) return false;
+      if (dossierModeFilter !== 'all') {
+        if (dossierModeFilter === 'prospect') {
+          if (d.mode !== 'prospect' && d.mode !== 'tools') return false;
+        } else if (d.mode !== dossierModeFilter) {
+          return false;
+        }
+      }
       if (dossierCountryFilter !== 'all' && (d.country || 'Colombia') !== dossierCountryFilter) return false;
       if (dossierCityFilter !== 'all' && d.city.toLowerCase() !== dossierCityFilter.toLowerCase()) return false;
       if (
@@ -13748,11 +13760,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     onClick={() => setDossierModeFilter('prospect')}
                     className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer ${
                       dossierModeFilter === 'prospect'
-                        ? 'bg-amber-500 text-slate-950 font-black'
+                        ? 'bg-purple-600 text-white font-black shadow-md shadow-purple-600/20'
                         : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
                     }`}
                   >
-                    🎯 {isEn ? 'Prospects' : 'Propuestas'} ({luismaBaseDossiers.filter((d) => d.mode === 'prospect').length})
+                    {tDossiers.filterProspect} ({luismaBaseDossiers.filter((d) => d.mode === 'prospect' || d.mode === 'tools').length})
                   </button>
                 </div>
 
@@ -13958,9 +13970,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             : d.mode === 'rescue'
                             ? tDossiers.badgeRescue
                             : d.mode === 'appeal'
-                            ? (isEn ? '⚖️ 1-3★ Appeal' : '⚖️ Apelación 1-3★')
+                            ? tDossiers.badgeAppeal
                             : d.mode === 'prospect' || d.mode === 'tools'
-                            ? (isEn ? '🎯 Prospect & Pitch' : '🎯 Prospección & Cierre')
+                            ? tDossiers.badgeProspect
                             : tDossiers.badgeAudit}
                         </span>
 
