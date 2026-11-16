@@ -1378,12 +1378,12 @@ const TXT_DOSSIERS = {
     title: 'Mis Clientes & Expedientes Comerciales',
     desc: 'Expedientes creados, auditados, rescatados, apelados y prospectados personalmente por ti. Métricas de cobro, suscripciones activas y 100% aislados de la red.',
     searchPlaceholder: 'Buscar por cliente, categoría, ciudad...',
-    kpiDossiers: 'Mis Expedientes',
-    kpiCreated: 'Fichas Desde Cero',
-    kpiAudited: 'Auditorías Top 3',
-    kpiRescued: 'Fichas Rescatadas',
-    kpiAppeals: 'Apelaciones 1-3★',
-    kpiProspects: 'Propuestas Cierre',
+    kpiDossiers: 'Total Expedientes',
+    kpiCreated: '1. Fichas Creadas',
+    kpiAudited: '2. Auditorías Top 3',
+    kpiRescued: '3. Rescates 72h',
+    kpiAppeals: '4. Apelaciones 1-3★',
+    kpiProspects: '5. Prospección & Cierre',
     kpiRevenue: 'Total Facturado Setup',
     kpiMrr: 'MRR Prestigia',
     kpiPrivacy: 'Privacidad',
@@ -1432,12 +1432,12 @@ const TXT_DOSSIERS = {
     title: 'My Clients & Commercial Dossiers',
     desc: 'Dossiers created, audited, rescued, appealed and prospected personally by you. Revenue tracking, active subscriptions and 100% isolated.',
     searchPlaceholder: 'Search by client, category, city...',
-    kpiDossiers: 'My Dossiers',
-    kpiCreated: 'Built From Scratch',
-    kpiAudited: 'Top 3 Audits',
-    kpiRescued: 'Rescued Listings',
-    kpiAppeals: '1-3★ Appeals',
-    kpiProspects: 'Closing Pitches',
+    kpiDossiers: 'Total Dossiers',
+    kpiCreated: '1. Built Listings',
+    kpiAudited: '2. Top 3 Audits',
+    kpiRescued: '3. 72h Rescues',
+    kpiAppeals: '4. 1-3★ Appeals',
+    kpiProspects: '5. Prospect & Close',
     kpiRevenue: 'Total Setup Revenue',
     kpiMrr: 'Prestigia MRR',
     kpiPrivacy: 'Privacy',
@@ -13658,12 +13658,12 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               </div>
 
               <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 shadow-md">
-                <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/40 flex items-center justify-center text-purple-400 shrink-0">
                   <Target className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
                   <span className="text-[10px] text-slate-400 block font-medium truncate">{tDossiers.kpiProspects}</span>
-                  <strong className="text-base sm:text-lg font-black text-amber-400">
+                  <strong className="text-base sm:text-lg font-black text-purple-400">
                     {luismaBaseDossiers.filter((d) => d.mode === 'prospect' || d.mode === 'tools').length}
                   </strong>
                 </div>
