@@ -1857,6 +1857,8 @@ export default function LocalStudioPage() {
   const [rescueMaskedEmail, setRescueMaskedEmail] = useState('');
   const [activeRescueDossierId, setActiveRescueDossierId] = useState<string | null>(null);
   const [showManualRescueFields, setShowManualRescueFields] = useState(false);
+  const [rescueEvidenceChecks, setRescueEvidenceChecks] = useState<Record<string, boolean>>({});
+  const [isSavingRescueAdjustments, setIsSavingRescueAdjustments] = useState(false);
 
   // -------------------------------------------------------------
   // TAB 4: APELACIÓN Y RESCATE LEGAL DE RESEÑAS 1-3★ DEDICATED STATE
@@ -2401,6 +2403,35 @@ export default function LocalStudioPage() {
           ? `Hello ${bName}! 👋\n\nTo complete your official Google Business Profile setup on Google Maps, please provide the following materials:\n\n📸 *1. PHOTOS (Clear lighting):*\n- 2 Exterior facade photos (daytime and evening with illuminated sign)\n- 3 Interior customer area photos\n- 4 Photos of your main specialties (${createSpecialties || 'products/services'})\n- 1 Photo of your working team\n- Official logo in high resolution\n\n🎥 *2. CONTINUOUS 60s VERIFICATION VIDEO (Official Google Protocol):*\n- Take 1: Recording the street and exterior permanent sign\n- Take 2: Opening the front door with keys\n- Take 3: Recording the register, POS, and interior operation\n\n📋 *3. OPERATING DATA:*\n- Exact operating hours\n- Accepted payment methods\n- Gmail address for profile ownership\n\nWe will configure your Google Business Profile with verified local SEO categories! 🚀`
           : `¡Hola ${bName}! 👋\n\nPara configurar y verificar la ficha oficial de tu negocio en Google Maps con máxima autoridad, requerimos los siguientes materiales:\n\n📸 *1. FOTOS TÉCNICAS (Con buena iluminación):*\n- 2 Fotos de fachada exterior (de día y de noche con aviso comercial visible)\n- 3 Fotos del local o área de atención a clientes limpia y equipada\n- 4 Fotos de tus especialidades principales (${createSpecialties || 'servicios y tratamientos'})\n- 1 Foto del equipo de trabajo o especialistas uniformados\n- Logo oficial en alta resolución\n\n🎥 *2. VIDEO CONTINUO DE 60 SEGUNDOS (Exigido por Google sin cortes):*\n- Toma 1: Grabando la calle, número de dirección y el aviso de la fachada\n- Toma 2: Abriendo la puerta de entrada con llaves\n- Toma 3: Grabando el mostrador de recepción, datáfono/caja e instalaciones operativas\n\n📋 *3. DATOS OPERATIVOS:*\n- Horarios exactos de atención semanal\n- Medios de pago recibidos (efectivo, tarjetas, transferencias)\n- Correo de Gmail donde deseas recibir la propiedad de la ficha\n\n¡Nos encargamos de toda la arquitectura técnica, palabras clave locales y posicionamiento en Google Maps! 🚀`);
   }, [createGeneratedData?.whatsappOnboardingMessage, createBusinessName, createBusinessModel, createSpecialties, isEn]);
+
+  const rescueDeadlineInfo = useMemo(() => {
+    const start = new Date();
+    const deadline = new Date(start);
+    let businessDaysAdded = 0;
+    while (businessDaysAdded < 3) {
+      deadline.setDate(deadline.getDate() + 1);
+      const day = deadline.getDay();
+      if (day !== 0 && day !== 6) {
+        businessDaysAdded++;
+      }
+    }
+    return {
+      formattedStart: start.toLocaleDateString(isEn ? 'en-US' : 'es-CO', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      formattedDeadline: deadline.toLocaleDateString(isEn ? 'en-US' : 'es-CO', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    };
+  }, [isEn]);
   const [newPlanTier, setNewPlanTier] = useState<'level_1' | 'level_2' | 'level_3' | 'courtesy'>('level_1');
   const [newAccountType, setNewAccountType] = useState<'internal_advisor' | 'partner_agency'>('internal_advisor');
   const [newAdvisorName, setNewAdvisorName] = useState('');
@@ -2616,6 +2647,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     setRescueMaskedEmail('');
     setActiveRescueDossierId(null);
     setShowManualRescueFields(false);
+    setRescueEvidenceChecks({});
     showToast(isEn ? '✨ Ready to run a new rescue' : '✨ Formulario listo para un nuevo rescate');
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2688,6 +2720,54 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       } catch (e) {
         console.warn('Error updating rescue escalation to case 3:', e);
       }
+    }
+  };
+
+  const toggleEvidenceCheck = (key: string) => {
+    setRescueEvidenceChecks((prev) => {
+      const updated = { ...prev, [key]: !prev[key] };
+      if (typeof window !== 'undefined' && (rescueBusinessName.trim() || rescueScannedListing?.name)) {
+        try {
+          const targetName = (rescueBusinessName.trim() || rescueScannedListing?.name || '').toLowerCase();
+          localStorage.setItem(`prestigia_rescue_evidence_${targetName}`, JSON.stringify(updated));
+        } catch {}
+      }
+      return updated;
+    });
+  };
+
+  const handleSaveManualRescueAdjustments = async () => {
+    setIsSavingRescueAdjustments(true);
+    try {
+      if (activeRescueDossierId) {
+        await fetch('/api/local-studio/dossiers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: activeRescueDossierId,
+            clientName: rescueBusinessName || rescueScannedListing?.name || 'Ficha en Rescate',
+            city: rescueCity,
+            neighborhood: rescueNeighborhood,
+            data: {
+              placeData: rescueScannedListing,
+              scenario: rescueScenario,
+              caseStatus: rescueCaseStatus,
+              address: rescueAddress,
+              phone: rescuePhone,
+              maskedEmail: rescueMaskedEmail,
+              evidenceChecks: rescueEvidenceChecks,
+              lastAdjustedAt: new Date().toISOString(),
+            },
+          }),
+        });
+        fetchDossiers();
+      }
+      showToast(isEn ? '✓ Dossier adjustments saved to CRM' : '✓ Ajustes guardados y sincronizados en el CRM de Prestigia');
+    } catch (err) {
+      console.error('Error saving manual adjustments:', err);
+      showToast(isEn ? '⚠️ Error syncing adjustments' : '⚠️ Error al guardar ajustes en CRM');
+    } finally {
+      setIsSavingRescueAdjustments(false);
     }
   };
 
@@ -4529,6 +4609,14 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       if (dossier.data?.scenario) {
         setRescueScenario(dossier.data.scenario);
       }
+      if (dossier.data?.evidenceChecks) {
+        setRescueEvidenceChecks(dossier.data.evidenceChecks);
+      } else if (typeof window !== 'undefined' && dossier.clientName) {
+        try {
+          const saved = localStorage.getItem(`prestigia_rescue_evidence_${dossier.clientName.toLowerCase()}`);
+          if (saved) setRescueEvidenceChecks(JSON.parse(saved));
+        } catch {}
+      }
       if (
         dossier.closingStatus === 'setup_paid' ||
         dossier.closingStatus === 'prestigia_subscriber' ||
@@ -5623,7 +5711,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             )}
             <span className="text-slate-400">•</span>
             <span className="text-amber-700 font-extrabold text-xs">
-              {isEn ? 'MASTER TOP 3 LOCAL RANKING DOSSIER' : 'EXPEDIENTE MAESTRO DE POSICIONAMIENTO LOCAL TOP 3'}
+              {activeTab === 'rescue'
+                ? (isEn ? 'OFFICIAL GOOGLE MAPS OWNERSHIP RESTITUTION DOSSIER' : 'EXPEDIENTE OFICIAL DE RESTITUCIÓN DE TITULARIDAD GOOGLE MAPS')
+                : (isEn ? 'MASTER TOP 3 LOCAL RANKING DOSSIER' : 'EXPEDIENTE MAESTRO DE POSICIONAMIENTO LOCAL TOP 3')}
             </span>
           </div>
           <div className="text-right">
@@ -9627,6 +9717,25 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                               className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs font-mono"
                             />
                           </div>
+
+                          <div className="pt-2 flex items-center justify-between border-t border-slate-800">
+                            <span className="text-[10px] text-slate-400">
+                              {isEn ? 'Sync fixes with CRM (0 credits debit)' : 'Sincronizar cambios con CRM (0 créditos)'}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={handleSaveManualRescueAdjustments}
+                              disabled={isSavingRescueAdjustments}
+                              className="py-1.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md active:scale-95"
+                            >
+                              {isSavingRescueAdjustments ? (
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                              ) : (
+                                <Save className="w-3.5 h-3.5" />
+                              )}
+                              <span>{isEn ? 'Save in CRM Dossier' : '💾 Sincronizar con CRM'}</span>
+                            </button>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -9670,19 +9779,46 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         : 'Bonifica el 100% de los honorarios técnicos y legales de rescate ($0 costo) como gancho de cierre al adquirir su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital).'}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const scriptText = isEn
-                        ? `Hello ${rescueBusinessName || 'Business Owner'}, to reclaim and transfer your Google Maps profile to your direct account, our legal ownership recovery fee is 100% WAIVED ($0 cost) when you activate your tailored Prestigia plan (Digital 5★ Review Accelerator + Reputation Shield). You get your listing back and your reputation secured. Shall we start the protocol today?`
-                        : `Hola estimado/a ${rescueBusinessName || 'propietario'}, para recuperar la titularidad legal de su ficha en Google Maps y transferir el control total a su cuenta oficial mediante el protocolo de Google, le BONIFICAMOS el 100% de los costos de gestión técnica y legal de rescate ($0 USD) al adquirir su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital). Recupera su ficha y blindamos su reputación. ¿Iniciamos el protocolo hoy?`;
-                      copyToClipboard(scriptText, isEn ? 'Rescue Proposal' : 'Propuesta de Rescate');
-                    }}
-                    className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
-                  >
-                    <Copy className="w-3.5 h-3.5" />
-                    <span>{isEn ? 'Copy Tailored Plan Closing Script (WhatsApp)' : 'Copiar Propuesta Comercial de Cierre (WhatsApp)'}</span>
-                  </button>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const scriptText = isEn
+                          ? `Hello ${rescueBusinessName || 'Business Owner'}, to reclaim and transfer your Google Maps profile to your direct account, our legal ownership recovery fee is 100% WAIVED ($0 cost) when you activate your tailored Prestigia plan (Digital 5★ Review Accelerator + Reputation Shield). You get your listing back and your reputation secured. Shall we start the protocol today?`
+                          : `Hola estimado/a ${rescueBusinessName || 'propietario'}, para recuperar la titularidad legal de su ficha en Google Maps y transferir el control total a su cuenta oficial mediante el protocolo de Google, le BONIFICAMOS el 100% de los costos de gestión técnica y legal de rescate ($0 USD) al adquirir su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital). Recupera su ficha y blindamos su reputación. ¿Iniciamos el protocolo hoy?`;
+                        copyToClipboard(scriptText, isEn ? 'Rescue Proposal' : 'Propuesta de Rescate');
+                      }}
+                      className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer border border-emerald-500/40"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>{isEn ? 'Copy Script' : 'Copiar Propuesta'}</span>
+                    </button>
+
+                    {rescueContactPhone ? (
+                      <a
+                        href={`https://wa.me/${rescueContactPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                          isEn
+                            ? `Hello ${rescueBusinessName || 'Business Owner'}, to reclaim and transfer your Google Maps profile to your direct account, our legal ownership recovery fee is 100% WAIVED ($0 cost) when you activate your tailored Prestigia plan (Digital 5★ Review Accelerator + Reputation Shield). You get your listing back and your reputation secured. Shall we start the protocol today?`
+                            : `Hola estimado/a ${rescueBusinessName || 'propietario'}, para recuperar la titularidad legal de su ficha en Google Maps y transferir el control total a su cuenta oficial mediante el protocolo de Google, le BONIFICAMOS el 100% de los costos de gestión técnica y legal de rescate ($0 USD) al adquirir su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital). Recupera su ficha y blindamos su reputación. ¿Iniciamos el protocolo hoy?`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        <span>{isEn ? 'Send to WhatsApp' : '💬 Enviar a WhatsApp'}</span>
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => showToast(isEn ? '⚠️ Fill client phone first' : '⚠️ Ingresa el WhatsApp del cliente arriba')}
+                        className="py-2 px-3 rounded-xl bg-slate-950 text-slate-500 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-not-allowed border border-slate-800"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5 opacity-50" />
+                        <span>{isEn ? 'WhatsApp (Add phone)' : 'WhatsApp (Sin número)'}</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Botón rápido Nuevo Rescate cuando ya hay datos */}
@@ -9815,13 +9951,24 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         </span>
                       </div>
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-rose-950/80 border border-rose-500/40 text-rose-300">
-                      {rescueScenario === 'orphan'
-                        ? (isEn ? 'Status: Orphan Listing' : 'Estado: Ficha Huérfana')
-                        : rescueScenario === 'rejected'
-                        ? (isEn ? 'Status: Appeal In Progress' : 'Estado: Negativa en Apelación')
-                        : (isEn ? 'Status: 72h Dispute' : 'Estado: Disputa 72 Horas')}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-rose-950/80 border border-rose-500/40 text-rose-300">
+                        {rescueScenario === 'orphan'
+                          ? (isEn ? 'Status: Orphan Listing' : 'Estado: Ficha Huérfana')
+                          : rescueScenario === 'rejected'
+                          ? (isEn ? 'Status: Appeal In Progress' : 'Estado: Negativa en Apelación')
+                          : (isEn ? 'Status: 72h Dispute' : 'Estado: Disputa 72 Horas')}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => window.print()}
+                        className="py-1 px-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold text-[11px] transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 print:hidden"
+                        title={isEn ? 'Print / Export Official Legal Dossier (PDF)' : 'Imprimir / Exportar Expediente Legal en PDF'}
+                      >
+                        <Printer className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{isEn ? 'Print / PDF' : '📄 Imprimir / PDF'}</span>
+                      </button>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -9962,6 +10109,34 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         </span>
                       </div>
 
+                      {/* Live 72-Hour Legal Deadline Tracker */}
+                      <div className="p-3.5 rounded-2xl bg-gradient-to-r from-indigo-950/60 via-slate-950 to-slate-900 border border-indigo-500/40 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 text-indigo-400 font-bold text-xs">
+                            <Clock className="w-4 h-4 text-indigo-400" />
+                            <span>{isEn ? 'Official 72-Hour Legal Countdown & Arbitration Tracker' : 'Cronómetro & Plazo Legal de 72 Horas Google'}</span>
+                          </div>
+                          <span className="text-[10px] font-mono font-black text-indigo-300 bg-indigo-950 px-2 py-0.5 rounded border border-indigo-500/30">
+                            Google TOS Sec. 4
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                          <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+                            <span className="text-[10px] text-slate-400 block font-bold">{isEn ? 'Filing / Request Date:' : 'Fecha de Radicación:'}</span>
+                            <span className="text-white font-mono font-bold text-xs">{rescueDeadlineInfo.formattedStart}</span>
+                          </div>
+                          <div className="p-2.5 rounded-xl bg-slate-900/90 border border-amber-500/30">
+                            <span className="text-[10px] text-amber-400 block font-bold">{isEn ? 'Google Abandonment Release Deadline:' : 'Plazo Límite de Desbloqueo Google:'}</span>
+                            <span className="text-amber-300 font-mono font-bold text-xs">⏳ {rescueDeadlineInfo.formattedDeadline}</span>
+                          </div>
+                        </div>
+                        <p className="text-[11px] text-slate-300 leading-relaxed pt-0.5">
+                          {isEn
+                            ? 'If the current manager does not transfer primary ownership before this deadline, Google rules the listing abandoned and automatically activates the blue "Claim & Verify" button in Maps and Search.'
+                            : 'Si el ocupante actual no transfiere la titularidad antes de este plazo, Google dictamina abandono legal de ficha y desbloquea automáticamente el botón azul "Reclamar / Verificar Perfil" en Maps y Search.'}
+                        </p>
+                      </div>
+
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                         <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
                           <span className="font-black text-indigo-400 block text-xs">{isEn ? 'Day 1: Form Filing (NMX)' : 'Día 1: Radicación Formal en Google'}</span>
@@ -10096,133 +10271,267 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                 </div>
 
                 {/* Evidentiary Checklist */}
-                <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 text-xs shadow-xl">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                    <span className="text-xs font-black text-white flex items-center gap-2">
-                      <FileCheck className="w-4 h-4 text-emerald-400" />
-                      <span>{tTools.rescueDocsTitle}</span>
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-mono">
-                      {isEn ? 'Google Trust & Safety Certified Checklist' : 'Checklist Oficial Certificado Google Trust & Safety'}
-                    </span>
-                  </div>
+                {(() => {
+                  const rescueEvidenceItems = [
+                    {
+                      id: 'tax_id',
+                      num: 1,
+                      title: isEn ? '1. Tax ID / Legal Registration' : '1. Registro Tributario & Personería Jurídica',
+                      desc: isEn
+                        ? 'RUT (Colombia), RFC / SAT (Mexico), CIF / Mod. 036 (Spain), or Articles of Org / EIN (USA). Business name and physical address must match Maps 100%.'
+                        : 'RUT con personería jurídica (Colombia), Constancia Fiscal SAT (México), CIF/Modelo 036 (España), o EIN/Articles (USA). Razón social y dirección deben ser idénticas a la ficha.',
+                    },
+                    {
+                      id: 'utility_bill',
+                      num: 2,
+                      title: isEn ? '2. Fixed Utility Bill (<60-90 Days)' : '2. Factura de Servicios Públicos Fijos (<60d)',
+                      desc: isEn
+                        ? 'Recent electricity, water, gas or business fiber internet bill showing business name and exact street address (mobile prepaid bills rejected).'
+                        : 'Recibo reciente de energía eléctrica, agua, gas o internet corporativo de fibra óptica a nombre de la empresa y con la dirección del inmueble (no telefonía celular prepago).',
+                    },
+                    {
+                      id: 'lease_contract',
+                      num: 3,
+                      title: isEn ? '3. Commercial Lease or Property Deed' : '3. Contrato de Arrendamiento o Escritura',
+                      desc: isEn
+                        ? 'Current signed commercial lease contract or official property deed certifying legal possession and authorized occupancy of the physical premises.'
+                        : 'Contrato vigente de arrendamiento comercial con firmas reconocidas o escritura pública que certifique la posesión legal y ocupación autorizada del establecimiento físico.',
+                    },
+                    {
+                      id: 'gps_photos',
+                      num: 4,
+                      title: isEn ? '4. Geotagged Photo Trilogy (GPS Metadata)' : '4. Trilogía Fotográfica con Metadatos GPS',
+                      desc: isEn
+                        ? 'High-res photos: 1) Exterior facade from across the street with permanent signage & street number; 2) Entrance with business hours; 3) Operating POS/checkout area.'
+                        : 'Fotos reales en alta resolución: 1) Fachada completa desde la calle con letrero permanente y placa de nomenclatura; 2) Entrada con horario; 3) Caja o datáfono POS imprimiendo ticket.',
+                    },
+                    {
+                      id: 'video_walkthrough',
+                      num: 5,
+                      title: isEn ? '5. 60–90s Continuous Video Walkthrough' : '5. Video Continuo de 60 a 90 Segundos sin Cortes',
+                      desc: isEn
+                        ? 'Single uncut take: 0-20s Street sign & facade → 20-50s Walk in through entrance showing service area → 50-80s Employee-only zone, POS/system on, Tax ID → 80-90s Keys opening lock.'
+                        : 'Toma continua sin cortes: 0-20s Calle, placa y fachada → 20-50s Entrada al local e instalaciones → 50-80s Área privada, datáfono/software encendido y RUT físico → 80-90s Llaves en puerta.',
+                    },
+                    {
+                      id: 'domain_email',
+                      num: 6,
+                      title: isEn ? '6. Official Custom Domain Email' : '6. Correo Corporativo con Dominio Propio',
+                      desc: isEn
+                        ? 'Filing the dispute from a Google Workspace email on the listing’s website domain (e.g. name@company.com) validates DNS ownership and boosts instant approval by 95%.'
+                        : 'Radicar la disputa desde un correo corporativo Google Workspace con el mismo dominio de la web (ej: gerencia@tuempresa.com) valida el DNS y acelera la restitución en un 95%.',
+                    },
+                  ];
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-white block text-xs">{isEn ? '1. Tax ID / Legal Registration' : '1. Registro Tributario & Personería Jurídica'}</strong>
-                        <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                          {isEn ? 'RUT (Colombia), RFC / SAT (Mexico), CIF / Mod. 036 (Spain), or Articles of Org / EIN (USA). Business name and physical address must match Maps 100%.' : 'RUT con personería jurídica (Colombia), Constancia Fiscal SAT (México), CIF/Modelo 036 (España), o EIN/Articles (USA). Razón social y dirección deben ser idénticas a la ficha.'}
-                        </p>
+                  const checkedEvCount = rescueEvidenceItems.filter((e) => rescueEvidenceChecks[e.id]).length;
+                  const evScorePct = Math.round((checkedEvCount / 6) * 100);
+
+                  return (
+                    <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 text-xs shadow-xl print-card-box">
+                      <div className="space-y-2 pb-2 border-b border-slate-800">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="text-xs font-black text-white flex items-center gap-2">
+                            <FileCheck className="w-4 h-4 text-emerald-400" />
+                            <span>{tTools.rescueDocsTitle}</span>
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10.5px] font-mono font-bold text-slate-300">
+                              {isEn ? 'Forensic Strength:' : 'Fuerza Probatoria:'}
+                            </span>
+                            <span
+                              className={`text-[10.5px] font-mono font-black px-2 py-0.5 rounded-full ${
+                                checkedEvCount === 6
+                                  ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                                  : checkedEvCount >= 4
+                                  ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                  : 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                              }`}
+                            >
+                              {checkedEvCount}/6 ({evScorePct}%)
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="w-full h-2 rounded-full bg-slate-950 overflow-hidden border border-slate-800">
+                          <div
+                            className={`h-full transition-all duration-500 ${
+                              checkedEvCount === 6
+                                ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
+                                : checkedEvCount >= 4
+                                ? 'bg-gradient-to-r from-amber-500 to-emerald-500'
+                                : 'bg-gradient-to-r from-rose-500 to-amber-500'
+                            }`}
+                            style={{ width: `${Math.max(5, evScorePct)}%` }}
+                          />
+                        </div>
+
+                        {checkedEvCount === 6 ? (
+                          <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold flex items-center gap-1.5 animate-in fade-in">
+                            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                            <span>
+                              {isEn
+                                ? '🛡️ Expediente 100% Blindado • Tasa estimada de Restitución Forzosa en Google Trust & Safety: 98%'
+                                : '🛡️ Expediente 100% Blindado • Tasa estimada de Restitución Forzosa en Google Trust & Safety: 98%'}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-slate-400 block">
+                            {isEn
+                              ? '💡 Check each document as received from the client to guarantee an airtight appeal without Google objections.'
+                              : '💡 Marca cada prueba a medida que el cliente te la entregue para garantizar la restitución forzosa sin objeciones.'}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {rescueEvidenceItems.map((item) => {
+                          const isChecked = Boolean(rescueEvidenceChecks[item.id]);
+                          return (
+                            <div
+                              key={item.id}
+                              onClick={() => toggleEvidenceCheck(item.id)}
+                              className={`p-3.5 rounded-xl border transition cursor-pointer select-none flex items-start gap-3 active:scale-98 ${
+                                isChecked
+                                  ? 'bg-emerald-950/30 border-emerald-500/50 shadow-sm shadow-emerald-500/10'
+                                  : 'bg-slate-950 hover:bg-slate-900 border-slate-800'
+                              }`}
+                            >
+                              <div className="mt-0.5 shrink-0">
+                                {isChecked ? (
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                                ) : (
+                                  <div className="w-4 h-4 rounded-md border-2 border-slate-600 hover:border-slate-400" />
+                                )}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-1.5">
+                                  <strong className={`block text-xs ${isChecked ? 'text-emerald-300' : 'text-white'}`}>
+                                    {item.title}
+                                  </strong>
+                                  {isChecked && (
+                                    <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-400 border border-emerald-500/30">
+                                      ✓ Recibido
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                                  {item.desc}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
-
-                    <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-white block text-xs">{isEn ? '2. Fixed Utility Bill (<60-90 Days)' : '2. Factura de Servicios Públicos Fijos (<60d)'}</strong>
-                        <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                          {isEn ? 'Recent electricity, water, gas or business fiber internet bill showing business name and exact street address (mobile prepaid bills rejected).' : 'Recibo reciente de energía eléctrica, agua, gas o internet corporativo de fibra óptica a nombre de la empresa y con la dirección del inmueble (no telefonía celular prepago).'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-white block text-xs">{isEn ? '3. Commercial Lease or Property Deed' : '3. Contrato de Arrendamiento o Escritura'}</strong>
-                        <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                          {isEn ? 'Current signed commercial lease contract or official property deed certifying legal possession and authorized occupancy of the physical premises.' : 'Contrato vigente de arrendamiento comercial con firmas reconocidas o escritura pública que certifique la posesión legal y ocupación autorizada del establecimiento físico.'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-white block text-xs">{isEn ? '4. Geotagged Photo Trilogy (GPS Metadata)' : '4. Trilogía Fotográfica con Metadatos GPS'}</strong>
-                        <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                          {isEn ? 'High-res photos: 1) Exterior facade from across the street with permanent signage & street number; 2) Entrance with business hours; 3) Operating POS/checkout area.' : 'Fotos reales en alta resolución: 1) Fachada completa desde la calle con letrero permanente y placa de nomenclatura; 2) Entrada con horario; 3) Caja o datáfono POS imprimiendo ticket.'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-white block text-xs">{isEn ? '5. 60–90s Continuous Video Walkthrough' : '5. Video Continuo de 60 a 90 Segundos sin Cortes'}</strong>
-                        <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                          {isEn ? 'Single uncut take: 0-20s Street sign & facade → 20-50s Walk in through entrance showing service area → 50-80s Employee-only zone, POS/system on, Tax ID → 80-90s Keys opening lock.' : 'Toma continua sin cortes: 0-20s Calle, placa y fachada → 20-50s Entrada al local e instalaciones → 50-80s Área privada, datáfono/software encendido y RUT físico → 80-90s Llaves en puerta.'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-white block text-xs">{isEn ? '6. Official Custom Domain Email' : '6. Correo Corporativo con Dominio Propio'}</strong>
-                        <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                          {isEn ? 'Filing the dispute from a Google Workspace email on the listing’s website domain (e.g. name@company.com) validates DNS ownership and boosts instant approval by 95%.' : 'Radicar la disputa desde un correo corporativo Google Workspace con el mismo dominio de la web (ej: gerencia@tuempresa.com) valida el DNS y acelera la restitución en un 95%.'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })()}
 
                 {/* WhatsApp Diagnostic Script */}
-                <div className="p-6 rounded-3xl bg-slate-900 border border-amber-500/40 space-y-3 text-xs shadow-xl">
+                <div className="p-6 rounded-3xl bg-slate-900 border border-amber-500/40 space-y-3 text-xs shadow-xl print-card-box">
                   <div className="flex items-center justify-between pb-2 border-b border-slate-800">
                     <span className="text-xs font-black text-amber-400 flex items-center gap-2">
                       <MessageSquare className="w-4 h-4" />
                       <span>{tTools.rescueWhatsappScriptTitle}</span>
                     </span>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const emailSnippet = rescueMaskedEmail.trim()
-                          ? `(${rescueMaskedEmail.trim()})`
-                          : isEn
-                          ? '(an external unauthorized email)'
-                          : '(un correo externo no autorizado)';
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const emailSnippet = rescueMaskedEmail.trim()
+                            ? `(${rescueMaskedEmail.trim()})`
+                            : isEn
+                            ? '(an external unauthorized email)'
+                            : '(un correo externo no autorizado)';
 
-                        const senderIdentity = isLuismaMaster
-                          ? 'Luisma de Prestigia'
-                          : currentUser?.agencyName
-                          ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}`
-                          : currentUser?.name
-                          ? `${currentUser.name} de Local Prestigia`
-                          : 'el equipo de Local Prestigia';
+                          const senderIdentity = isLuismaMaster
+                            ? 'Luisma de Prestigia'
+                            : currentUser?.agencyName
+                            ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}`
+                            : currentUser?.name
+                            ? `${currentUser.name} de Local Prestigia`
+                            : 'el equipo de Local Prestigia';
 
-                        const senderIdentityEn = isLuismaMaster
-                          ? 'Luisma from Prestigia'
-                          : currentUser?.agencyName
-                          ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}`
-                          : currentUser?.name
-                          ? `${currentUser.name} from Local Prestigia`
-                          : 'the Local Prestigia team';
+                          const senderIdentityEn = isLuismaMaster
+                            ? 'Luisma from Prestigia'
+                            : currentUser?.agencyName
+                            ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}`
+                            : currentUser?.name
+                            ? `${currentUser.name} from Local Prestigia`
+                            : 'the Local Prestigia team';
 
-                        const clientPerson = rescueContactName.trim() || rescueBusinessName.trim() || (isEn ? 'Business Owner' : 'propietario');
+                          const clientPerson = rescueContactName.trim() || rescueBusinessName.trim() || (isEn ? 'Business Owner' : 'propietario');
 
-                        const scriptText = isEn
-                          ? rescueScenario === 'orphan'
-                            ? `Hello ${clientPerson}, this is ${senderIdentityEn}. We audited your Google Maps presence and discovered a critical vulnerability: your business listing exists but is currently 'Unclaimed / Orphan'. Any third party or competitor can suggest edits or claim ownership. With our team, we can process your official ownership claim today and secure full legal control without altering your existing reviews or SEO ranking. Shall we start your protection protocol?`
+                          const scriptText = isEn
+                            ? rescueScenario === 'orphan'
+                              ? `Hello ${clientPerson}, this is ${senderIdentityEn}. We audited your Google Maps presence and discovered a critical vulnerability: your business listing exists but is currently 'Unclaimed / Orphan'. Any third party or competitor can suggest edits or claim ownership. With our team, we can process your official ownership claim today and secure full legal control without altering your existing reviews or SEO ranking. Shall we start your protection protocol?`
+                              : rescueScenario === 'third_party'
+                              ? `Hello ${clientPerson}, this is ${senderIdentityEn}. Upon auditing your business on Google Maps, we noticed your official listing is linked to an external email ${emailSnippet} and you lack Primary Owner access. Do not worry: creating a new listing is NOT necessary (doing so causes duplicate listing penalties). We execute Google's Official 72-Hour Legal Ownership Protocol to request ownership and transfer complete control directly to your personal account within a week, preserving all reviews and photos. Shall we initiate the protocol today?`
+                              : `Hello ${clientPerson}, this is ${senderIdentityEn}. If a previous agency or ex-employee refused to transfer your Google Maps profile, Google's official policies protect your legitimate ownership. We submit an evidentiary appeal dossier with your corporate tax documentation and storefront evidence so Google Support revokes the third party and restores complete ownership to you. Would you like us to draft the official appeal?`
+                            : rescueScenario === 'orphan'
+                            ? `Hola estimado/a ${clientPerson}, le saluda ${senderIdentity}. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. Con nuestro equipo podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?`
                             : rescueScenario === 'third_party'
-                            ? `Hello ${clientPerson}, this is ${senderIdentityEn}. Upon auditing your business on Google Maps, we noticed your official listing is linked to an external email ${emailSnippet} and you lack Primary Owner access. Do not worry: creating a new listing is NOT necessary (doing so causes duplicate listing penalties). We execute Google's Official 72-Hour Legal Ownership Protocol to request ownership and transfer complete control directly to your personal account within a week, preserving all reviews and photos. Shall we initiate the protocol today?`
-                            : `Hello ${clientPerson}, this is ${senderIdentityEn}. If a previous agency or ex-employee refused to transfer your Google Maps profile, Google's official policies protect your legitimate ownership. We submit an evidentiary appeal dossier with your corporate tax documentation and storefront evidence so Google Support revokes the third party and restores complete ownership to you. Would you like us to draft the official appeal?`
-                          : rescueScenario === 'orphan'
-                          ? `Hola estimado/a ${clientPerson}, le saluda ${senderIdentity}. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. Con nuestro equipo podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?`
-                          : rescueScenario === 'third_party'
-                          ? `Hola estimado/a ${clientPerson}, le saluda ${senderIdentity}. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${emailSnippet} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?`
-                          : `Hola estimado/a ${clientPerson}, le saluda ${senderIdentity}. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?`;
-                        copyToClipboard(scriptText, isEn ? 'WhatsApp Script' : 'Guion de WhatsApp');
-                      }}
-                      className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold transition flex items-center gap-1.5 cursor-pointer border border-amber-500/40"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>{isEn ? 'Copy Script' : 'Copiar Guion'}</span>
-                    </button>
+                            ? `Hola estimado/a ${clientPerson}, le saluda ${senderIdentity}. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${emailSnippet} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?`
+                            : `Hola estimado/a ${clientPerson}, le saluda ${senderIdentity}. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?`;
+                          copyToClipboard(scriptText, isEn ? 'WhatsApp Script' : 'Guion de WhatsApp');
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold transition flex items-center gap-1.5 cursor-pointer border border-amber-500/40"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>{isEn ? 'Copy Script' : 'Copiar Guion'}</span>
+                      </button>
+
+                      {rescueContactPhone && (
+                        <a
+                          href={`https://wa.me/${rescueContactPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                            (() => {
+                              const emailSnippet = rescueMaskedEmail.trim()
+                                ? `(${rescueMaskedEmail.trim()})`
+                                : isEn
+                                ? '(an external unauthorized email)'
+                                : '(un correo externo no autorizado)';
+
+                              const senderIdentity = isLuismaMaster
+                                ? 'Luisma de Prestigia'
+                                : currentUser?.agencyName
+                                ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}`
+                                : currentUser?.name
+                                ? `${currentUser.name} de Local Prestigia`
+                                : 'el equipo de Local Prestigia';
+
+                              const senderIdentityEn = isLuismaMaster
+                                ? 'Luisma from Prestigia'
+                                : currentUser?.agencyName
+                                ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}`
+                                : currentUser?.name
+                                ? `${currentUser.name} from Local Prestigia`
+                                : 'the Local Prestigia team';
+
+                              const clientPerson = rescueContactName.trim() || rescueBusinessName.trim() || (isEn ? 'Business Owner' : 'propietario');
+
+                              return isEn
+                                ? rescueScenario === 'orphan'
+                                  ? `Hello ${clientPerson}, this is ${senderIdentityEn}. We audited your Google Maps presence and discovered a critical vulnerability: your business listing exists but is currently 'Unclaimed / Orphan'. Any third party or competitor can suggest edits or claim ownership. With our team, we can process your official ownership claim today and secure full legal control without altering your existing reviews or SEO ranking. Shall we start your protection protocol?`
+                                  : rescueScenario === 'third_party'
+                                  ? `Hello ${clientPerson}, this is ${senderIdentityEn}. Upon auditing your business on Google Maps, we noticed your official listing is linked to an external email ${emailSnippet} and you lack Primary Owner access. Do not worry: creating a new listing is NOT necessary (doing so causes duplicate listing penalties). We execute Google's Official 72-Hour Legal Ownership Protocol to request ownership and transfer complete control directly to your personal account within a week, preserving all reviews and photos. Shall we initiate the protocol today?`
+                                  : `Hello ${clientPerson}, this is ${senderIdentityEn}. If a previous agency or ex-employee refused to transfer your Google Maps profile, Google's official policies protect your legitimate ownership. We submit an evidentiary appeal dossier with your corporate tax documentation and storefront evidence so Google Support revokes the third party and restores complete ownership to you. Would you like us to draft the official appeal?`
+                                : rescueScenario === 'orphan'
+                                ? `Hola estimado/a ${clientPerson}, le saluda ${senderIdentity}. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. Con nuestro equipo podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?`
+                                : rescueScenario === 'third_party'
+                                ? `Hola estimado/a ${clientPerson}, le saluda ${senderIdentity}. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${emailSnippet} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?`
+                                : `Hola estimado/a ${clientPerson}, le saluda ${senderIdentity}. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?`;
+                            })()
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md print:hidden"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                          <span>{isEn ? 'Send via WhatsApp' : '💬 Enviar a WhatsApp'}</span>
+                        </a>
+                      )}
+                    </div>
                   </div>
 
                   <p className="text-xs text-slate-300 italic leading-relaxed p-4 rounded-xl bg-slate-950 border border-slate-800">
