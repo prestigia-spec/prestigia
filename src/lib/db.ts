@@ -1309,7 +1309,7 @@ export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
     if (supabase) {
       const { data, error } = await supabase.from('studio_advisors').select('*');
       if (!error && Array.isArray(data) && data.length > 0) {
-        return data.map((a: any) => {
+        const mapped: StudioAdvisor[] = data.map((a: any): StudioAdvisor => {
           let cleanLicenseStatus = a.license_status || a.licenseStatus || 'active';
           let metaObj: any = {};
           if (cleanLicenseStatus && typeof cleanLicenseStatus === 'string' && cleanLicenseStatus.includes('::meta::')) {
@@ -1367,6 +1367,13 @@ export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
             createdAt: a.created_at || a.createdAt,
           };
         });
+        return mapped.sort((a, b) => {
+          const aIsMaster = a.id === 'adv-luisma' || a.accountType === 'founder' || a.username?.toLowerCase() === 'luisma';
+          const bIsMaster = b.id === 'adv-luisma' || b.accountType === 'founder' || b.username?.toLowerCase() === 'luisma';
+          if (aIsMaster && !bIsMaster) return -1;
+          if (!aIsMaster && bIsMaster) return 1;
+          return 0;
+        });
       }
     }
   } catch {}
@@ -1413,7 +1420,13 @@ export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
   });
   if (modified) writeDbFile(db);
 
-  return db.studioAdvisors || [];
+  return (db.studioAdvisors || []).sort((a, b) => {
+    const aIsMaster = a.id === 'adv-luisma' || a.accountType === 'founder' || a.username?.toLowerCase() === 'luisma';
+    const bIsMaster = b.id === 'adv-luisma' || b.accountType === 'founder' || b.username?.toLowerCase() === 'luisma';
+    if (aIsMaster && !bIsMaster) return -1;
+    if (!aIsMaster && bIsMaster) return 1;
+    return 0;
+  });
 }
 
 export async function saveStudioAdvisor(advisor: StudioAdvisor): Promise<void> {

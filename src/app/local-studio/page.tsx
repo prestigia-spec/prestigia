@@ -2566,7 +2566,14 @@ export default function LocalStudioPage() {
       const res = await fetch(`/api/local-studio/advisors?isAdmin=true&callerId=${encodeURIComponent(callerId)}&masterKey=admin`);
       const data = await res.json();
       if (data.success && Array.isArray(data.advisors)) {
-        setAdvisorsList(data.advisors);
+        const sorted = [...data.advisors].sort((a, b) => {
+          const aIsMaster = a.id === 'adv-luisma' || a.accountType === 'founder' || a.username?.toLowerCase() === 'luisma';
+          const bIsMaster = b.id === 'adv-luisma' || b.accountType === 'founder' || b.username?.toLowerCase() === 'luisma';
+          if (aIsMaster && !bIsMaster) return -1;
+          if (!aIsMaster && bIsMaster) return 1;
+          return 0;
+        });
+        setAdvisorsList(sorted);
       }
     } catch (err) {
       console.warn('Error fetching advisors:', err);
@@ -4621,7 +4628,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
   // FILTERED ADVISORS FOR NETWORK TAB (Exclusively Advisor & Agency Cards)
   const filteredAdvisors = useMemo(() => {
-    return advisorsList.filter((adv) => {
+    const list = advisorsList.filter((adv) => {
       if (networkCountryFilter !== 'all' && (adv.country || 'Colombia') !== networkCountryFilter) return false;
       if (networkCityFilter !== 'all' && (adv.city || '').toLowerCase() !== networkCityFilter.toLowerCase()) return false;
       if (networkTypeFilter !== 'all') {
@@ -4663,6 +4670,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         if (!match) return false;
       }
       return true;
+    });
+
+    // REGLA FUNDACIONAL: Luisma (Director General & Founder) SIEMPRE debe estar de primero de izquierda a derecha (índice 0)
+    return list.sort((a, b) => {
+      const aIsMaster = a.id === 'adv-luisma' || a.accountType === 'founder' || a.username?.toLowerCase() === 'luisma';
+      const bIsMaster = b.id === 'adv-luisma' || b.accountType === 'founder' || b.username?.toLowerCase() === 'luisma';
+      if (aIsMaster && !bIsMaster) return -1;
+      if (!aIsMaster && bIsMaster) return 1;
+      return 0;
     });
   }, [
     advisorsList,
@@ -4733,7 +4749,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
   // Lista filtrada de usuarios para el Reporte Ejecutivo
   const filteredReportUsers = useMemo(() => {
-    return advisorsList.filter((adv) => {
+    const list = advisorsList.filter((adv) => {
       if (reportCountryFilter !== 'all' && (adv.country || 'Colombia') !== reportCountryFilter) return false;
       if (reportCityFilter !== 'all' && (adv.city || '').toLowerCase() !== reportCityFilter.toLowerCase()) return false;
       if (reportUserTypeFilter !== 'all') {
@@ -4775,6 +4791,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         if (!matchName && !matchUser && !matchPhone && !matchAgency && !matchCity && !matchCountry) return false;
       }
       return true;
+    });
+
+    // Luisma (Director General & Founder) SIEMPRE debe estar de primero en reportes ejecutivos
+    return list.sort((a, b) => {
+      const aIsMaster = a.id === 'adv-luisma' || a.accountType === 'founder' || a.username?.toLowerCase() === 'luisma';
+      const bIsMaster = b.id === 'adv-luisma' || b.accountType === 'founder' || b.username?.toLowerCase() === 'luisma';
+      if (aIsMaster && !bIsMaster) return -1;
+      if (!aIsMaster && bIsMaster) return 1;
+      return 0;
     });
   }, [advisorsList, reportCountryFilter, reportCityFilter, reportUserTypeFilter, reportStatusFilter, reportSearch]);
 
