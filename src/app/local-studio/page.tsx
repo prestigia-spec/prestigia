@@ -4716,6 +4716,267 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     };
   }, [filteredReportUsers, savedDossiers]);
 
+  // Generador de PDF / Impresión Ejecutiva de Alta Definición sin hojas en blanco
+  const printExecutiveUsersReport = (usersToPrint?: StudioAdvisorUser[]) => {
+    const targetAdvisors = usersToPrint && usersToPrint.length > 0 ? usersToPrint : advisorsList;
+    const nowStr = new Date().toLocaleString('es-CO', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    const totalUsers = targetAdvisors.length;
+    const advisorsCount = targetAdvisors.filter(
+      (a) => a.accountType !== 'partner_agency' && a.id !== 'adv-luisma' && a.id !== 'adv-admin'
+    ).length;
+    const agenciesCount = targetAdvisors.filter((a) => a.accountType === 'partner_agency').length;
+    const totalMrr = targetAdvisors.reduce((acc, a) => acc + (a.monthlyFeeUsd || 0), 0);
+    const activeCount = targetAdvisors.filter((a) => a.active).length;
+    const inactiveCount = targetAdvisors.filter((a) => !a.active).length;
+
+    let totalDossiersAll = 0;
+    targetAdvisors.forEach((adv) => {
+      totalDossiersAll += savedDossiers.filter((d) => d.advisorId === adv.id).length;
+    });
+
+    const rowsHtml = targetAdvisors
+      .map((adv, idx) => {
+        const isFounder = adv.id === 'adv-luisma' || adv.accountType === 'founder';
+        const advDossiers = savedDossiers.filter((d) => d.advisorId === adv.id);
+        const creates = advDossiers.filter((d) => d.mode === 'create').length;
+        const audits = advDossiers.filter((d) => d.mode === 'audit').length;
+        const rescues = advDossiers.filter((d) => d.mode === 'rescue').length;
+        const appeals = advDossiers.filter((d) => d.mode === 'appeal').length;
+        const tools = advDossiers.filter((d) => d.mode === 'tools' || d.mode === 'prospect').length;
+
+        const roleBadge = isFounder
+          ? '<span style="background-color: #FEF3C7; color: #92400E; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #FDE68A;">👑 Fundador</span>'
+          : adv.accountType === 'partner_agency'
+          ? '<span style="background-color: #F3E8FF; color: #6B21A8; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #E9D5FF;">🏢 Agencia</span>'
+          : '<span style="background-color: #E0E7FF; color: #3730A3; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #C7D2FE;">💼 Asesor</span>';
+
+        const statusBadge = adv.active
+          ? '<span style="background-color: #DCFCE7; color: #166534; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #86EFAC;">🟢 Encendida</span>'
+          : '<span style="background-color: #FEE2E2; color: #991B1B; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #FCA5A5;">🔴 Apagada</span>';
+
+        const tierName =
+          adv.planTier === 'courtesy'
+            ? 'Cortesía $0'
+            : adv.planTier === 'level_3'
+            ? 'Nivel 3'
+            : adv.planTier === 'level_2'
+            ? 'Nivel 2'
+            : adv.planTier === 'level_1'
+            ? 'Nivel 1'
+            : isFounder
+            ? 'Ilimitado'
+            : 'Estándar';
+
+        const rowBg = idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC';
+
+        return `
+          <tr style="background-color: ${rowBg};">
+            <td style="padding: 6px 8px; font-family: monospace; color: #64748B; text-align: center; border: 1px solid #CBD5E1;">${idx + 1}</td>
+            <td style="padding: 6px 8px; font-weight: bold; color: #0F172A; border: 1px solid #CBD5E1;">
+              ${adv.name}
+              <span style="display: block; font-size: 7.5pt; color: #4338CA; font-family: monospace;">@${adv.username}</span>
+              ${adv.agencyName ? `<span style="display: block; font-size: 7pt; color: #7E22CE; font-weight: normal;">🏢 ${adv.agencyName}</span>` : ''}
+            </td>
+            <td style="padding: 6px 8px; text-align: center; border: 1px solid #CBD5E1;">${roleBadge}</td>
+            <td style="padding: 6px 8px; text-align: center; font-size: 8pt; color: #334155; border: 1px solid #CBD5E1;">${tierName}</td>
+            <td style="padding: 6px 8px; font-family: monospace; color: #0284C7; font-weight: bold; text-align: center; border: 1px solid #CBD5E1;">${adv.phone || '-'}</td>
+            <td style="padding: 6px 8px; text-align: center; color: #334155; border: 1px solid #CBD5E1;">${adv.country || 'Colombia'} • ${adv.city || 'Bogotá'}</td>
+            <td style="padding: 6px 8px; text-align: center; border: 1px solid #CBD5E1;">${statusBadge}</td>
+            <td style="padding: 6px 8px; text-align: right; font-weight: bold; color: #15803D; border: 1px solid #CBD5E1;">$${adv.monthlyFeeUsd ?? 0} USD</td>
+            <td style="padding: 6px 8px; text-align: center; font-size: 7.5pt; font-family: monospace; border: 1px solid #CBD5E1;">C:${adv.maxCreatesMonthly ?? 10} A:${adv.maxAuditsMonthly ?? 10} R:${adv.maxRescuesMonthly ?? 10}</td>
+            <td style="padding: 6px 8px; text-align: center; font-weight: bold; color: #1D4ED8; background-color: #EFF6FF; border: 1px solid #CBD5E1;">
+              ${advDossiers.length}
+              <span style="display: block; font-size: 6.5pt; color: #64748B; font-weight: normal;">🏗️${creates} 🔬${audits} 🛡️${rescues} ⚖️${appeals} 🎯${tools}</span>
+            </td>
+            <td style="padding: 6px 8px; font-family: monospace; text-align: center; font-weight: bold; color: #991B1B; background-color: #FEF2F2; border: 1px solid #CBD5E1;">${adv.password || '••••••••'}</td>
+          </tr>
+        `;
+      })
+      .join('');
+
+    const printHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>Reporte Ejecutivo de Usuarios - Prestigia Local Studio</title>
+        <style>
+          @page {
+            size: landscape;
+            margin: 6mm 8mm;
+          }
+          * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            margin: 0;
+            padding: 8px;
+            color: #0F172A;
+            background: #FFFFFF;
+            font-size: 8pt;
+          }
+          .header-banner {
+            background-color: #0B132B;
+            border-bottom: 3px solid #F59E0B;
+            color: #FFFFFF;
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            margin-bottom: 10px;
+          }
+          .kpi-card {
+            border-radius: 6px;
+            padding: 6px 8px;
+            text-align: center;
+            border: 1px solid #CBD5E1;
+          }
+          .kpi-card strong {
+            display: block;
+            font-size: 12pt;
+            font-weight: 900;
+            margin-top: 1px;
+          }
+          .kpi-card span {
+            font-size: 6.5pt;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #64748B;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 7.5pt;
+          }
+          th {
+            background-color: #0F172A;
+            color: #FFFFFF;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 7pt;
+            padding: 6px 7px;
+            border: 1px solid #334155;
+          }
+          td {
+            vertical-align: middle;
+          }
+          .footer-note {
+            margin-top: 8px;
+            text-align: center;
+            font-size: 7pt;
+            color: #64748B;
+            font-style: italic;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header-banner">
+          <div>
+            <div style="font-size: 11pt; font-weight: 900; color: #F59E0B;">
+              ⭐ PRESTIGIA LOCAL STUDIO • AUDITORÍA EJECUTIVA DE RED DE USUARIOS Y LICENCIAS B2B
+            </div>
+            <div style="font-size: 7.5pt; color: #94A3B8; margin-top: 2px;">
+              Consolidado Oficial de Asesores Comerciales, Agencias Partners B2B y Credenciales
+            </div>
+          </div>
+          <div style="text-align: right; font-size: 7.5pt; color: #E2E8F0;">
+            <div><strong>Emisor Master:</strong> Luisma (Dirección General)</div>
+            <div style="color: #94A3B8; font-size: 7pt;">Fecha: ${nowStr} • ${totalUsers} Registros</div>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card" style="background-color: #F8FAFC; border-color: #CBD5E1;">
+            <span>Total Usuarios Red</span>
+            <strong style="color: #0F172A;">${totalUsers}</strong>
+          </div>
+          <div class="kpi-card" style="background-color: #EEF2FF; border-color: #C7D2FE;">
+            <span style="color: #4338CA;">Asesores Internos</span>
+            <strong style="color: #4338CA;">${advisorsCount}</strong>
+          </div>
+          <div class="kpi-card" style="background-color: #FAF5FF; border-color: #E9D5FF;">
+            <span style="color: #6B21A8;">Agencias Partners B2B</span>
+            <strong style="color: #6B21A8;">${agenciesCount}</strong>
+          </div>
+          <div class="kpi-card" style="background-color: #F0FDF4; border-color: #86EFAC;">
+            <span style="color: #15803D;">Facturación MRR</span>
+            <strong style="color: #15803D;">$${totalMrr} USD/m</strong>
+          </div>
+          <div class="kpi-card" style="background-color: #F0F9FF; border-color: #BAE6FD;">
+            <span style="color: #0369A1;">Total Fichas Red</span>
+            <strong style="color: #0369A1;">${totalDossiersAll}</strong>
+          </div>
+          <div class="kpi-card" style="background-color: #F8FAFC; border-color: #CBD5E1;">
+            <span>Estado Operativo</span>
+            <strong style="color: #166534; font-size: 9.5pt;">🟢 ${activeCount} Activas • 🔴 ${inactiveCount} Off</strong>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 25px;">#</th>
+              <th>Usuario & Titular</th>
+              <th style="width: 80px;">Rol / Tipo</th>
+              <th style="width: 70px;">Plan</th>
+              <th style="width: 95px;">Teléfono / WhatsApp</th>
+              <th style="width: 95px;">Ubicación</th>
+              <th style="width: 75px;">Estado</th>
+              <th style="width: 70px;">Canon (USD)</th>
+              <th style="width: 85px;">Cuotas Mensuales</th>
+              <th style="width: 90px;">Producción Real</th>
+              <th style="width: 80px;">Contraseña</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+
+        <div class="footer-note">
+          🔒 Documento Privado & Confidencial • Generado automáticamente para Dirección General Prestigia Master • Prohibida su divulgación fuera de la organización.
+        </div>
+
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.focus();
+              window.print();
+            }, 350);
+          };
+        </script>
+      </body>
+      </html>
+    `;
+
+    const printWin = window.open('', '_blank');
+    if (printWin) {
+      printWin.document.open();
+      printWin.document.write(printHtml);
+      printWin.document.close();
+      showToast('🖨️ ¡Ventana de impresión y guardado PDF abierta!');
+    } else {
+      window.print();
+    }
+  };
+
   // Descarga del Reporte Ejecutivo de Usuarios (Asesores & Agencias) en Excel Profesional Nativo (.xlsx) con diseño, colores y badges
   const downloadAdvisorsExcelReport = async (customList?: StudioAdvisorUser[]) => {
     const targetAdvisors = customList || advisorsList;
@@ -6599,6 +6860,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                 ? (isEn ? 'OFFICIAL GOOGLE MAPS REVIEW REMOVAL & LEGAL APPEAL DOSSIER' : 'EXPEDIENTE OFICIAL DE IMPUGNACIÓN & RETIRO DE RESEÑAS GOOGLE MAPS')
                 : activeTab === 'tools'
                 ? (isEn ? 'OFFICIAL GOOGLE MAPS PROSPECTING & SALES CLOSING DOSSIER' : 'EXPEDIENTE OFICIAL DE PROSPECCIÓN & CIERRE COMERCIAL GOOGLE MAPS')
+                : (activeTab === 'advisors' || activeTab === 'network')
+                ? (isEn ? 'OFFICIAL NETWORK USERS & B2B LICENSES EXECUTIVE AUDIT' : 'AUDITORÍA EJECUTIVA OFICIAL DE USUARIOS Y LICENCIAS B2B')
                 : (isEn ? 'MASTER TOP 3 LOCAL RANKING DOSSIER' : 'EXPEDIENTE MAESTRO DE POSICIONAMIENTO LOCAL TOP 3')}
             </span>
           </div>
@@ -15325,9 +15588,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         )}
 
         {(activeTab === 'advisors' || activeTab === 'network') && isLuismaMaster && (
-          <div className="space-y-6 print:hidden">
+          <div className="space-y-6">
             {/* Header */}
-            <div className="bg-gradient-to-r from-amber-500/10 via-slate-900 to-indigo-950/40 border border-amber-500/40 rounded-3xl p-5 sm:p-6 shadow-xl">
+            <div className="bg-gradient-to-r from-amber-500/10 via-slate-900 to-indigo-950/40 border border-amber-500/40 rounded-3xl p-5 sm:p-6 shadow-xl print:hidden">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -15378,7 +15641,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             </div>
 
             {/* Monetization & Network KPI Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 text-xs print:hidden">
               <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0">
                   <Briefcase className="w-5 h-5" />
@@ -15451,7 +15714,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             </div>
 
             {/* Sub-view Switcher: Directorio vs Reporte Ejecutivo vs Bóveda Forense */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-1.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-1.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs print:hidden">
               <button
                 type="button"
                 onClick={() => setNetworkTabMode('directory')}
@@ -15493,7 +15756,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             </div>
 
             {networkTabMode === 'directory' && (
-              <div className="space-y-6">
+              <div className="space-y-6 print:hidden">
                 {/* Barra de Filtros Inteligentes de Asesores & Agencias */}
             <div className="p-4 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-slate-300 font-bold">
@@ -16092,7 +16355,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         {networkTabMode === 'report' && (
           <div className="space-y-6">
             {/* Encabezado del Reporte Ejecutivo */}
-            <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 print:hidden">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300 flex items-center gap-1">
@@ -16126,9 +16389,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                 <button
                   type="button"
-                  onClick={() => window.print()}
+                  onClick={() => printExecutiveUsersReport(filteredReportUsers)}
                   className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition cursor-pointer flex items-center gap-1.5 shadow-sm"
-                  title={isEn ? 'Print or Save as PDF' : 'Imprimir o Guardar en PDF'}
+                  title={isEn ? 'Print or Save as PDF' : 'Imprimir o Guardar en PDF de Alta Definición'}
                 >
                   <Printer className="w-4 h-4 text-slate-400" />
                   <span>{isEn ? 'Print / PDF' : 'Imprimir / PDF'}</span>
@@ -16147,7 +16410,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             </div>
 
             {/* A. Barra de Filtros Interactivos en Tiempo Real */}
-            <div className="p-4 rounded-3xl bg-slate-950 border border-slate-800 space-y-3">
+            <div className="p-4 rounded-3xl bg-slate-950 border border-slate-800 space-y-3 print:hidden">
               <div className="flex items-center justify-between gap-2 flex-wrap text-slate-300 font-bold">
                 <span className="text-xs flex items-center gap-1.5 text-amber-400">
                   <Filter className="w-3.5 h-3.5" />
@@ -18276,9 +18539,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
-                onClick={() => window.print()}
+                onClick={() => printExecutiveUsersReport(filteredReportUsers)}
                 className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition cursor-pointer flex items-center gap-1.5 shadow-sm"
-                title={isEn ? 'Print or Save as PDF' : 'Imprimir o Guardar en PDF'}
+                title={isEn ? 'Print or Save as PDF' : 'Imprimir o Guardar en PDF de Alta Definición'}
               >
                 <Printer className="w-4 h-4 text-slate-400" />
                 <span>{isEn ? 'Print / PDF' : 'Imprimir / PDF'}</span>
