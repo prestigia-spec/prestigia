@@ -4840,27 +4840,27 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         const tools = advDossiers.filter((d) => d.mode === 'tools' || d.mode === 'prospect').length;
 
         const roleBadge = isFounder
-          ? '<span style="background-color: #FEF3C7; color: #92400E; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #FDE68A;">👑 Fundador</span>'
+          ? `<span style="background-color: #FEF3C7; color: #92400E; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #FDE68A;">${isEn ? '👑 Founder' : '👑 Fundador'}</span>`
           : adv.accountType === 'partner_agency'
-          ? '<span style="background-color: #F3E8FF; color: #6B21A8; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #E9D5FF;">🏢 Agencia</span>'
-          : '<span style="background-color: #E0E7FF; color: #3730A3; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #C7D2FE;">💼 Asesor</span>';
+          ? `<span style="background-color: #F3E8FF; color: #6B21A8; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #E9D5FF;">${isEn ? '🏢 Partner Agency' : '🏢 Agencia'}</span>`
+          : `<span style="background-color: #E0E7FF; color: #3730A3; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #C7D2FE;">${isEn ? '💼 Sales Advisor' : '💼 Asesor'}</span>`;
 
         const statusBadge = adv.active
-          ? '<span style="background-color: #DCFCE7; color: #166534; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #86EFAC;">🟢 Encendida</span>'
-          : '<span style="background-color: #FEE2E2; color: #991B1B; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #FCA5A5;">🔴 Apagada</span>';
+          ? `<span style="background-color: #DCFCE7; color: #166534; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #86EFAC;">${isEn ? '🟢 Active' : '🟢 Encendida'}</span>`
+          : `<span style="background-color: #FEE2E2; color: #991B1B; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 8pt; border: 1px solid #FCA5A5;">${isEn ? '🔴 Off' : '🔴 Apagada'}</span>`;
 
         const tierName =
           adv.planTier === 'courtesy'
-            ? 'Cortesía $0'
+            ? (isEn ? 'Courtesy $0' : 'Cortesía $0')
             : adv.planTier === 'level_3'
-            ? 'Nivel 3'
+            ? (isEn ? 'Level 3' : 'Nivel 3')
             : adv.planTier === 'level_2'
-            ? 'Nivel 2'
+            ? (isEn ? 'Level 2' : 'Nivel 2')
             : adv.planTier === 'level_1'
-            ? 'Nivel 1'
+            ? (isEn ? 'Level 1' : 'Nivel 1')
             : isFounder
-            ? 'Ilimitado'
-            : 'Estándar';
+            ? (isEn ? 'Unlimited' : 'Ilimitado')
+            : (isEn ? 'Standard' : 'Estándar');
 
         const rowBg = idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC';
 
@@ -4894,7 +4894,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       <html>
       <head>
         <meta charset="utf-8" />
-        <title>Reporte Ejecutivo de Usuarios - Prestigia Local Studio</title>
+        <title>${isEn ? 'Executive Users Report - Prestigia Local Studio' : 'Reporte Ejecutivo de Usuarios - Prestigia Local Studio'}</title>
         <style>
           @page {
             size: landscape;
@@ -4978,42 +4978,42 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         <div class="header-banner">
           <div>
             <div style="font-size: 11pt; font-weight: 900; color: #F59E0B;">
-              ⭐ PRESTIGIA LOCAL STUDIO • AUDITORÍA EJECUTIVA DE RED DE USUARIOS Y LICENCIAS B2B
+              ${isEn ? '⭐ PRESTIGIA LOCAL STUDIO • EXECUTIVE AUDIT OF USERS & B2B LICENSES' : '⭐ PRESTIGIA LOCAL STUDIO • AUDITORÍA EJECUTIVA DE RED DE USUARIOS Y LICENCIAS B2B'}
             </div>
             <div style="font-size: 7.5pt; color: #94A3B8; margin-top: 2px;">
-              Consolidado Oficial de Asesores Comerciales, Agencias Partners B2B y Credenciales
+              ${isEn ? 'Official Consolidated Report of Sales Advisors, B2B Partner Agencies, and Credentials' : 'Consolidado Oficial de Asesores Comerciales, Agencias Partners B2B y Credenciales'}
             </div>
           </div>
           <div style="text-align: right; font-size: 7.5pt; color: #E2E8F0;">
-            <div><strong>Emisor Master:</strong> Luisma (Dirección General)</div>
-            <div style="color: #94A3B8; font-size: 7pt;">Fecha: ${nowStr} • ${totalUsers} Registros</div>
+            <div><strong>${isEn ? 'Master Issuer:' : 'Emisor Master:'}</strong> Luisma (${isEn ? 'General Directorate' : 'Dirección General'})</div>
+            <div style="color: #94A3B8; font-size: 7pt;">${isEn ? 'Date:' : 'Fecha:'} ${nowStr} • ${totalUsers} ${isEn ? 'Records' : 'Registros'}</div>
           </div>
         </div>
 
         <div class="kpi-grid">
           <div class="kpi-card" style="background-color: #F8FAFC; border-color: #CBD5E1;">
-            <span>Total Usuarios Red</span>
+            <span>${isEn ? 'Total Network Users' : 'Total Usuarios Red'}</span>
             <strong style="color: #0F172A;">${totalUsers}</strong>
           </div>
           <div class="kpi-card" style="background-color: #EEF2FF; border-color: #C7D2FE;">
-            <span style="color: #4338CA;">Asesores Internos</span>
+            <span style="color: #4338CA;">${isEn ? 'Internal Advisors' : 'Asesores Internos'}</span>
             <strong style="color: #4338CA;">${advisorsCount}</strong>
           </div>
           <div class="kpi-card" style="background-color: #FAF5FF; border-color: #E9D5FF;">
-            <span style="color: #6B21A8;">Agencias Partners B2B</span>
+            <span style="color: #6B21A8;">${isEn ? 'B2B Partner Agencies' : 'Agencias Partners B2B'}</span>
             <strong style="color: #6B21A8;">${agenciesCount}</strong>
           </div>
           <div class="kpi-card" style="background-color: #F0FDF4; border-color: #86EFAC;">
-            <span style="color: #15803D;">Facturación MRR</span>
+            <span style="color: #15803D;">${isEn ? 'Monthly MRR Revenue' : 'Facturación MRR'}</span>
             <strong style="color: #15803D;">$${totalMrr} USD/m</strong>
           </div>
           <div class="kpi-card" style="background-color: #F0F9FF; border-color: #BAE6FD;">
-            <span style="color: #0369A1;">Total Fichas Red</span>
+            <span style="color: #0369A1;">${isEn ? 'Total Network Dossiers' : 'Total Fichas Red'}</span>
             <strong style="color: #0369A1;">${totalDossiersAll}</strong>
           </div>
           <div class="kpi-card" style="background-color: #F8FAFC; border-color: #CBD5E1;">
-            <span>Estado Operativo</span>
-            <strong style="color: #166534; font-size: 9.5pt;">🟢 ${activeCount} Activas • 🔴 ${inactiveCount} Off</strong>
+            <span>${isEn ? 'Operational Status' : 'Estado Operativo'}</span>
+            <strong style="color: #166534; font-size: 9.5pt;">🟢 ${activeCount} ${isEn ? 'Active' : 'Activas'} • 🔴 ${inactiveCount} ${isEn ? 'Off' : 'Off'}</strong>
           </div>
         </div>
 
@@ -5021,16 +5021,16 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
           <thead>
             <tr>
               <th style="width: 25px;">#</th>
-              <th>Usuario & Titular</th>
-              <th style="width: 80px;">Rol / Tipo</th>
-              <th style="width: 70px;">Plan</th>
-              <th style="width: 95px;">Teléfono / WhatsApp</th>
-              <th style="width: 95px;">Ubicación</th>
-              <th style="width: 75px;">Estado</th>
-              <th style="width: 70px;">Canon (USD)</th>
-              <th style="width: 85px;">Cuotas Mensuales</th>
-              <th style="width: 90px;">Producción Real</th>
-              <th style="width: 80px;">Contraseña</th>
+              <th>${isEn ? 'User & Holder' : 'Usuario & Titular'}</th>
+              <th style="width: 80px;">${isEn ? 'Role / Type' : 'Rol / Tipo'}</th>
+              <th style="width: 70px;">${isEn ? 'Plan' : 'Plan'}</th>
+              <th style="width: 95px;">${isEn ? 'Phone / WhatsApp' : 'Teléfono / WhatsApp'}</th>
+              <th style="width: 95px;">${isEn ? 'Location' : 'Ubicación'}</th>
+              <th style="width: 75px;">${isEn ? 'Status' : 'Estado'}</th>
+              <th style="width: 70px;">${isEn ? 'Fee (USD)' : 'Canon (USD)'}</th>
+              <th style="width: 85px;">${isEn ? 'Monthly Quotas' : 'Cuotas Mensuales'}</th>
+              <th style="width: 90px;">${isEn ? 'Produced Dossiers' : 'Producción Real'}</th>
+              <th style="width: 80px;">${isEn ? 'Password' : 'Contraseña'}</th>
             </tr>
           </thead>
           <tbody>
@@ -5039,7 +5039,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         </table>
 
         <div class="footer-note">
-          🔒 Documento Privado & Confidencial • Generado automáticamente para Dirección General Prestigia Master • Prohibida su divulgación fuera de la organización.
+          ${isEn ? '🔒 Private & Confidential Document • Generated automatically for Prestigia Master General Directorate • Unauthorized distribution prohibited.' : '🔒 Documento Privado & Confidencial • Generado automáticamente para Dirección General Prestigia Master • Prohibida su divulgación fuera de la organización.'}
         </div>
 
         <script>
@@ -5084,7 +5084,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       wb.lastModifiedBy = 'Luisma (Dirección General Prestigia)';
       wb.created = new Date();
 
-      const ws = wb.addWorksheet('Auditoría Usuarios y Red', {
+      const safeSheetName = isEn ? 'Users and Agencies' : 'Auditoría Usuarios y Red';
+      const ws = wb.addWorksheet(safeSheetName, {
         views: [{ showGridLines: true }],
       });
 
@@ -5110,7 +5111,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       // 1. BANNER PRINCIPAL (Fila 1)
       ws.mergeCells('A1:AA1');
       const titleCell = ws.getCell('A1');
-      titleCell.value = '⭐ PRESTIGIA LOCAL STUDIO • AUDITORÍA EJECUTIVA DE RED DE USUARIOS Y LICENCIAS B2B';
+      titleCell.value = isEn
+        ? '⭐ PRESTIGIA LOCAL STUDIO • EXECUTIVE AUDIT OF USERS AND B2B LICENSES'
+        : '⭐ PRESTIGIA LOCAL STUDIO • AUDITORÍA EJECUTIVA DE RED DE USUARIOS Y LICENCIAS B2B';
       titleCell.font = { name: 'Segoe UI', size: 14, bold: true, color: { argb: 'FFF59E0B' } };
       titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0B132B' } };
       titleCell.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
@@ -5119,14 +5122,18 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       // 2. SUBTÍTULO Y METADATOS (Fila 2)
       ws.mergeCells('A2:N2');
       const sub1 = ws.getCell('A2');
-      sub1.value = 'Área: Dirección General / Red Comercial & Licenciamiento SaaS • Emisor Master: Luisma';
+      sub1.value = isEn
+        ? 'Area: General Directorate / Commercial Network & SaaS Licensing • Master Issuer: Luisma'
+        : 'Área: Dirección General / Red Comercial & Licenciamiento SaaS • Emisor Master: Luisma';
       sub1.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: 'FFE2E8F0' } };
       sub1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
       sub1.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
 
       ws.mergeCells('O2:AA2');
       const sub2 = ws.getCell('O2');
-      sub2.value = `Fecha de Emisión: ${nowStr} • ${totalUsers} Cuentas Auditadas • Documento Confidencial`;
+      sub2.value = isEn
+        ? `Emission Date: ${nowStr} • ${totalUsers} Audited Accounts • Confidential Document`
+        : `Fecha de Emisión: ${nowStr} • ${totalUsers} Cuentas Auditadas • Documento Confidencial`;
       sub2.font = { name: 'Segoe UI', size: 10, color: { argb: 'FF94A3B8' } };
       sub2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
       sub2.alignment = { vertical: 'middle', horizontal: 'right' };
@@ -5136,14 +5143,23 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       ws.getRow(3).height = 8;
 
       // 3. TARJETAS DE KPIS RESUMEN (Fila 4)
-      const kpis = [
-        { range: 'A4:D4', label: 'TOTAL USUARIOS EN RED', val: `${totalUsers} Cuentas`, bg: 'FF0F172A', fg: 'FFF59E0B' },
-        { range: 'E4:H4', label: 'ASESORES COMERCIALES', val: `${advisorsCount} Vendedores`, bg: 'FF1E1B4B', fg: 'FF818CF8' },
-        { range: 'I4:L4', label: 'AGENCIAS PARTNERS B2B', val: `${agenciesCount} Licencias`, bg: 'FF3B0764', fg: 'FFC084FC' },
-        { range: 'M4:Q4', label: 'FACTURACIÓN MENSUAL (MRR)', val: `$${totalMrr} USD / mes`, bg: 'FF064E3B', fg: 'FF34D399' },
-        { range: 'R4:V4', label: 'TOTAL FICHAS EN RED', val: 'Cálculo Acumulado', bg: 'FF0C4A6E', fg: 'FF38BDF8' },
-        { range: 'W4:AA4', label: 'ESTADO OPERATIVO', val: `${activeCount} Activas • ${inactiveCount} Pausadas`, bg: 'FF1E293B', fg: 'FF4ADE80' },
-      ];
+      const kpis = isEn
+        ? [
+            { range: 'A4:D4', label: 'TOTAL NETWORK USERS', val: `${totalUsers} Accounts`, bg: 'FF0F172A', fg: 'FFF59E0B' },
+            { range: 'E4:H4', label: 'SALES ADVISORS', val: `${advisorsCount} Advisors`, bg: 'FF1E1B4B', fg: 'FF818CF8' },
+            { range: 'I4:L4', label: 'B2B PARTNER AGENCIES', val: `${agenciesCount} Licenses`, bg: 'FF3B0764', fg: 'FFC084FC' },
+            { range: 'M4:Q4', label: 'MONTHLY REVENUE (MRR)', val: `$${totalMrr} USD / mo`, bg: 'FF064E3B', fg: 'FF34D399' },
+            { range: 'R4:V4', label: 'TOTAL NETWORK DOSSIERS', val: 'Accumulated Count', bg: 'FF0C4A6E', fg: 'FF38BDF8' },
+            { range: 'W4:AA4', label: 'OPERATING STATUS', val: `${activeCount} Active • ${inactiveCount} Off`, bg: 'FF1E293B', fg: 'FF4ADE80' },
+          ]
+        : [
+            { range: 'A4:D4', label: 'TOTAL USUARIOS EN RED', val: `${totalUsers} Cuentas`, bg: 'FF0F172A', fg: 'FFF59E0B' },
+            { range: 'E4:H4', label: 'ASESORES COMERCIALES', val: `${advisorsCount} Vendedores`, bg: 'FF1E1B4B', fg: 'FF818CF8' },
+            { range: 'I4:L4', label: 'AGENCIAS PARTNERS B2B', val: `${agenciesCount} Licencias`, bg: 'FF3B0764', fg: 'FFC084FC' },
+            { range: 'M4:Q4', label: 'FACTURACIÓN MENSUAL (MRR)', val: `$${totalMrr} USD / mes`, bg: 'FF064E3B', fg: 'FF34D399' },
+            { range: 'R4:V4', label: 'TOTAL FICHAS EN RED', val: 'Cálculo Acumulado', bg: 'FF0C4A6E', fg: 'FF38BDF8' },
+            { range: 'W4:AA4', label: 'ESTADO OPERATIVO', val: `${activeCount} Activas • ${inactiveCount} Pausadas`, bg: 'FF1E293B', fg: 'FF4ADE80' },
+          ];
 
       for (const k of kpis) {
         ws.mergeCells(k.range);
@@ -5165,35 +5181,65 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       ws.getRow(5).height = 10;
 
       // 4. ENCABEZADOS DE COLUMNA (Fila 6)
-      const columnDefs = [
-        { title: 'ID Usuario', width: 18 },
-        { title: 'Nombre Completo / Titular', width: 30 },
-        { title: 'Usuario (@username)', width: 22 },
-        { title: 'Contraseña de Acceso', width: 22 },
-        { title: 'Teléfono / WhatsApp', width: 24 },
-        { title: 'Tipo de Cuenta', width: 30 },
-        { title: 'Nombre de Agencia', width: 26 },
-        { title: 'País', width: 16 },
-        { title: 'Ciudad', width: 18 },
-        { title: 'Nivel de Plan', width: 20 },
-        { title: 'Canon Mensual (USD)', width: 20 },
-        { title: 'Estado Licencia', width: 18 },
-        { title: 'Cuenta Encendida', width: 22 },
-        { title: 'Fecha Inicio Plan', width: 18 },
-        { title: 'Cuota Creación', width: 16 },
-        { title: 'Cuota Auditoría', width: 16 },
-        { title: 'Cuota Rescate', width: 16 },
-        { title: 'Cuota Apelación', width: 16 },
-        { title: 'Cuota Prospección', width: 16 },
-        { title: 'Créditos Extra Total', width: 18 },
-        { title: 'Total Fichas Producidas', width: 24 },
-        { title: 'Fichas Creadas', width: 14 },
-        { title: 'Auditorías', width: 14 },
-        { title: 'Rescates', width: 14 },
-        { title: 'Apelaciones', width: 14 },
-        { title: 'Prospecciones', width: 14 },
-        { title: 'Bóveda Forense', width: 16 },
-      ];
+      const columnDefs = isEn
+        ? [
+            { title: 'User ID', width: 18 },
+            { title: 'Full Name / Holder', width: 30 },
+            { title: 'Username (@user)', width: 22 },
+            { title: 'Access Password', width: 22 },
+            { title: 'Phone / WhatsApp', width: 24 },
+            { title: 'Account Type', width: 30 },
+            { title: 'Agency Name', width: 26 },
+            { title: 'Country', width: 16 },
+            { title: 'City', width: 18 },
+            { title: 'Plan Tier', width: 20 },
+            { title: 'Monthly Fee (USD)', width: 20 },
+            { title: 'License Status', width: 18 },
+            { title: 'Turned On (Active)', width: 22 },
+            { title: 'Plan Start Date', width: 18 },
+            { title: 'Creation Quota', width: 16 },
+            { title: 'Audit Quota', width: 16 },
+            { title: 'Rescue Quota', width: 16 },
+            { title: 'Appeal Quota', width: 16 },
+            { title: 'Prospect Quota', width: 16 },
+            { title: 'Total Extra Credits', width: 18 },
+            { title: 'Total Produced Dossiers', width: 24 },
+            { title: 'Created Listings', width: 14 },
+            { title: 'Audits', width: 14 },
+            { title: 'Rescues', width: 14 },
+            { title: 'Appeals', width: 14 },
+            { title: 'Prospects', width: 14 },
+            { title: 'Forensic Vault', width: 16 },
+          ]
+        : [
+            { title: 'ID Usuario', width: 18 },
+            { title: 'Nombre Completo / Titular', width: 30 },
+            { title: 'Usuario (@username)', width: 22 },
+            { title: 'Contraseña de Acceso', width: 22 },
+            { title: 'Teléfono / WhatsApp', width: 24 },
+            { title: 'Tipo de Cuenta', width: 30 },
+            { title: 'Nombre de Agencia', width: 26 },
+            { title: 'País', width: 16 },
+            { title: 'Ciudad', width: 18 },
+            { title: 'Nivel de Plan', width: 20 },
+            { title: 'Canon Mensual (USD)', width: 20 },
+            { title: 'Estado Licencia', width: 18 },
+            { title: 'Cuenta Encendida', width: 22 },
+            { title: 'Fecha Inicio Plan', width: 18 },
+            { title: 'Cuota Creación', width: 16 },
+            { title: 'Cuota Auditoría', width: 16 },
+            { title: 'Cuota Rescate', width: 16 },
+            { title: 'Cuota Apelación', width: 16 },
+            { title: 'Cuota Prospección', width: 16 },
+            { title: 'Créditos Extra Total', width: 18 },
+            { title: 'Total Fichas Producidas', width: 24 },
+            { title: 'Fichas Creadas', width: 14 },
+            { title: 'Auditorías', width: 14 },
+            { title: 'Rescates', width: 14 },
+            { title: 'Apelaciones', width: 14 },
+            { title: 'Prospecciones', width: 14 },
+            { title: 'Bóveda Forense', width: 16 },
+          ];
 
       columnDefs.forEach((col, idx) => {
         ws.getColumn(idx + 1).width = col.width;
@@ -5248,27 +5294,27 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         const rowBg = index % 2 === 0 ? 'FFFFFFFF' : 'FFF8FAFC';
 
         const typeLabel = isFounder
-          ? '👑 Dirección General / Fundador'
+          ? (isEn ? '👑 General Directorate / Founder' : '👑 Dirección General / Fundador')
           : adv.accountType === 'partner_agency'
-          ? '🏢 Agencia Partner B2B (Licencia)'
-          : '💼 Asesor Comercial Interno';
+          ? (isEn ? '🏢 B2B Partner Agency (License)' : '🏢 Agencia Partner B2B (Licencia)')
+          : (isEn ? '💼 Internal Sales Advisor' : '💼 Asesor Comercial Interno');
 
         const tierLabel =
           adv.planTier === 'courtesy'
-            ? 'Cortesía VIP ($0)'
+            ? (isEn ? 'VIP Courtesy ($0)' : 'Cortesía VIP ($0)')
             : adv.planTier === 'level_3'
-            ? 'Nivel 3'
+            ? (isEn ? 'Level 3' : 'Nivel 3')
             : adv.planTier === 'level_2'
-            ? 'Nivel 2'
+            ? (isEn ? 'Level 2' : 'Nivel 2')
             : adv.planTier === 'level_1'
-            ? 'Nivel 1'
+            ? (isEn ? 'Level 1' : 'Nivel 1')
             : isFounder
-            ? 'Ilimitado Master'
-            : 'Estándar';
+            ? (isEn ? 'Master Unlimited' : 'Ilimitado Master')
+            : (isEn ? 'Standard' : 'Estándar');
 
         const values = [
           adv.id,
-          adv.name || 'Sin Nombre',
+          adv.name || (isEn ? 'Unnamed' : 'Sin Nombre'),
           adv.username ? `@${adv.username}` : '',
           adv.password || '••••••••',
           adv.phone ? `+${adv.phone.replace(/^\+/, '')}` : '-',
@@ -5279,7 +5325,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
           tierLabel,
           adv.monthlyFeeUsd ?? 0,
           (adv.licenseStatus || 'active').toUpperCase(),
-          adv.active ? '🟢 ENCENDIDA' : '🔴 APAGADA',
+          adv.active ? (isEn ? '🟢 TURNED ON' : '🟢 ENCENDIDA') : (isEn ? '🔴 TURNED OFF' : '🔴 APAGADA'),
           adv.planStartDate ? new Date(adv.planStartDate).toLocaleDateString() : 'N/A',
           adv.maxCreatesMonthly ?? 10,
           adv.maxAuditsMonthly ?? 10,
@@ -5364,7 +5410,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
       // Actualizar KPI de fichas totales en R4
       const kpiFichas = ws.getCell('R4');
-      kpiFichas.value = `TOTAL FICHAS EN RED\n${totalDossiersAll} Fichas`;
+      kpiFichas.value = isEn ? `TOTAL NETWORK DOSSIERS\n${totalDossiersAll} Dossiers` : `TOTAL FICHAS EN RED\n${totalDossiersAll} Fichas`;
 
       // 6. FILA DE TOTALES CONSOLIDADOS
       const totalsRowNum = 7 + targetAdvisors.length;
@@ -5383,13 +5429,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
       ws.mergeCells(`A${totalsRowNum}:E${totalsRowNum}`);
       const tLabel = ws.getCell(`A${totalsRowNum}`);
-      tLabel.value = `TOTALES CONSOLIDADOS (${totalUsers} USUARIOS):`;
+      tLabel.value = isEn ? `CONSOLIDATED TOTALS (${totalUsers} USERS):` : `TOTALES CONSOLIDADOS (${totalUsers} USUARIOS):`;
       tLabel.alignment = { vertical: 'middle', horizontal: 'right' };
       tLabel.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FFF59E0B' } };
 
       ws.mergeCells(`F${totalsRowNum}:J${totalsRowNum}`);
       const tSub = ws.getCell(`F${totalsRowNum}`);
-      tSub.value = `${advisorsCount} Asesores • ${agenciesCount} Agencias Licenciadas`;
+      tSub.value = isEn
+        ? `${advisorsCount} Advisors • ${agenciesCount} Licensed Partner Agencies`
+        : `${advisorsCount} Asesores • ${agenciesCount} Agencias Licenciadas`;
       tSub.alignment = { vertical: 'middle', horizontal: 'center' };
       tSub.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: 'FFE2E8F0' } };
 
@@ -5429,7 +5477,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       const footRowNum = totalsRowNum + 1;
       ws.mergeCells(`A${footRowNum}:AA${footRowNum}`);
       const footCell = ws.getCell(`A${footRowNum}`);
-      footCell.value = '🔒 Documento Confidencial • Generado automáticamente por Prestigia Local Studio para Dirección General Master • Prohibida su divulgación fuera de la organización.';
+      footCell.value = isEn
+        ? '🔒 Confidential Document • Generated automatically by Prestigia Local Studio for Master General Directorate • Unauthorized distribution prohibited.'
+        : '🔒 Documento Confidencial • Generado automáticamente por Prestigia Local Studio para Dirección General Master • Prohibida su divulgación fuera de la organización.';
       footCell.font = { name: 'Segoe UI', size: 9, italic: true, color: { argb: 'FF64748B' } };
       footCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } };
       footCell.alignment = { vertical: 'middle', horizontal: 'center' };
@@ -5448,7 +5498,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      showToast('📊 ¡Reporte Excel Oficial (.xlsx) descargado con éxito!');
+      showToast(isEn ? '📊 Official Excel Report (.xlsx) downloaded successfully!' : '📊 ¡Reporte Excel Oficial (.xlsx) descargado con éxito!');
     } catch (err) {
       console.error('Error generating Excel with ExcelJS, falling back:', err);
       showToast('⚠️ Error generando Excel nativo.');
@@ -5458,35 +5508,65 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
   // Descarga alternativa del Reporte Completo de Usuarios en CSV plano
   const downloadAdvisorsCsvReport = (customList?: StudioAdvisorUser[]) => {
     const targetAdvisors = customList || advisorsList;
-    const headers = [
-      'ID Usuario',
-      'Nombre Completo / Titular',
-      'Usuario (@username)',
-      'Contraseña de Acceso',
-      'Teléfono / WhatsApp',
-      'Tipo de Cuenta',
-      'Nombre de Agencia',
-      'País',
-      'Ciudad',
-      'Nivel de Plan',
-      'Canon Mensual (USD)',
-      'Estado de Licencia',
-      'Cuenta Encendida (Activa)',
-      'Fecha Inicio de Plan',
-      'Cuota Creación (Mes)',
-      'Cuota Auditoría (Mes)',
-      'Cuota Rescate (Mes)',
-      'Cuota Apelación (Mes)',
-      'Cuota Prospección (Mes)',
-      'Créditos Extra Total',
-      'Total Fichas Producidas',
-      'Fichas Creadas',
-      'Auditorías Realizadas',
-      'Rescates Gestionados',
-      'Apelaciones Radicadas',
-      'Prospecciones Realizadas',
-      'Fichas en Bóveda Forense',
-    ];
+    const headers = isEn
+      ? [
+          'User ID',
+          'Full Name / Holder',
+          'Username (@user)',
+          'Access Password',
+          'Phone / WhatsApp',
+          'Account Type',
+          'Agency Name',
+          'Country',
+          'City',
+          'Plan Tier',
+          'Monthly Fee (USD)',
+          'License Status',
+          'Turned On (Active)',
+          'Plan Start Date',
+          'Creation Quota (Month)',
+          'Audit Quota (Month)',
+          'Rescue Quota (Month)',
+          'Appeal Quota (Month)',
+          'Prospect Quota (Month)',
+          'Total Extra Credits',
+          'Total Produced Dossiers',
+          'Created Listings',
+          'Audits Done',
+          'Rescues Managed',
+          'Appeals Filed',
+          'Prospects Done',
+          'Forensic Vault Dossiers',
+        ]
+      : [
+          'ID Usuario',
+          'Nombre Completo / Titular',
+          'Usuario (@username)',
+          'Contraseña de Acceso',
+          'Teléfono / WhatsApp',
+          'Tipo de Cuenta',
+          'Nombre de Agencia',
+          'País',
+          'Ciudad',
+          'Nivel de Plan',
+          'Canon Mensual (USD)',
+          'Estado de Licencia',
+          'Cuenta Encendida (Activa)',
+          'Fecha Inicio de Plan',
+          'Cuota Creación (Mes)',
+          'Cuota Auditoría (Mes)',
+          'Cuota Rescate (Mes)',
+          'Cuota Apelación (Mes)',
+          'Cuota Prospección (Mes)',
+          'Créditos Extra Total',
+          'Total Fichas Producidas',
+          'Fichas Creadas',
+          'Auditorías Realizadas',
+          'Rescates Gestionados',
+          'Apelaciones Radicadas',
+          'Prospecciones Realizadas',
+          'Fichas en Bóveda Forense',
+        ];
 
     const rows = targetAdvisors.map((adv) => {
       const isFounder = adv.id === 'adv-luisma' || adv.accountType === 'founder';
@@ -5506,23 +5586,23 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
       const typeLabel =
         isFounder
-          ? 'Dirección General / Fundador'
+          ? (isEn ? 'General Directorate / Founder' : 'Dirección General / Fundador')
           : adv.accountType === 'partner_agency'
-          ? 'Agencia Partner B2B (Licencia)'
-          : 'Asesor Comercial Interno';
+          ? (isEn ? 'B2B Partner Agency (License)' : 'Agencia Partner B2B (Licencia)')
+          : (isEn ? 'Internal Sales Advisor' : 'Asesor Comercial Interno');
 
       const tierLabel =
         adv.planTier === 'courtesy'
-          ? 'Cortesía VIP ($0)'
+          ? (isEn ? 'VIP Courtesy ($0)' : 'Cortesía VIP ($0)')
           : adv.planTier === 'level_3'
-          ? 'Nivel 3'
+          ? (isEn ? 'Level 3' : 'Nivel 3')
           : adv.planTier === 'level_2'
-          ? 'Nivel 2'
+          ? (isEn ? 'Level 2' : 'Nivel 2')
           : adv.planTier === 'level_1'
-          ? 'Nivel 1'
+          ? (isEn ? 'Level 1' : 'Nivel 1')
           : isFounder
-          ? 'Ilimitado Master'
-          : 'Estándar';
+          ? (isEn ? 'Master Unlimited' : 'Ilimitado Master')
+          : (isEn ? 'Standard' : 'Estándar');
 
       return [
         `"${adv.id}"`,
@@ -5537,7 +5617,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         `"${tierLabel}"`,
         `"${adv.monthlyFeeUsd ?? 0}"`,
         `"${adv.licenseStatus || 'active'}"`,
-        adv.active ? 'SÍ (Encendida)' : 'NO (Apagada)',
+        adv.active ? (isEn ? 'YES (Active)' : 'SÍ (Encendida)') : (isEn ? 'NO (Off)' : 'NO (Apagada)'),
         `"${adv.planStartDate ? new Date(adv.planStartDate).toLocaleDateString() : 'N/A'}"`,
         `"${adv.maxCreatesMonthly ?? 10}"`,
         `"${adv.maxAuditsMonthly ?? 10}"`,
@@ -5602,24 +5682,24 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       const effTools = (advisor.maxToolsMonthly ?? 10) + (advisor.extraCredits?.tools || 0);
 
       const tierLabel = isFounder
-        ? '👑 Ilimitado Master'
+        ? (isEn ? '👑 Master Unlimited' : '👑 Ilimitado Master')
         : advisor.planTier === 'courtesy'
-        ? '🎁 Cortesía VIP ($0 USD)'
+        ? (isEn ? '🎁 VIP Courtesy ($0 USD)' : '🎁 Cortesía VIP ($0 USD)')
         : advisor.planTier === 'level_3'
-        ? 'Nivel 3 ($140 USD)'
+        ? (isEn ? 'Level 3 ($140 USD)' : 'Nivel 3 ($140 USD)')
         : advisor.planTier === 'level_2'
-        ? 'Nivel 2 ★ ($90 USD)'
+        ? (isEn ? 'Level 2 ★ ($90 USD)' : 'Nivel 2 ★ ($90 USD)')
         : advisor.planTier === 'level_1'
-        ? 'Nivel 1 ($49 USD)'
-        : 'Estándar';
+        ? (isEn ? 'Level 1 ($49 USD)' : 'Nivel 1 ($49 USD)')
+        : (isEn ? 'Standard' : 'Estándar');
 
       const roleLabel = isFounder
-        ? '👑 Dirección General / Fundador'
+        ? (isEn ? '👑 General Directorate / Founder' : '👑 Dirección General / Fundador')
         : advisor.accountType === 'partner_agency'
-        ? '🏢 Agencia Partner B2B (Licencia SaaS)'
-        : '💼 Asesor Comercial Interno';
+        ? (isEn ? '🏢 B2B Partner Agency (SaaS License)' : '🏢 Agencia Partner B2B (Licencia SaaS)')
+        : (isEn ? '💼 Internal Sales Advisor' : '💼 Asesor Comercial Interno');
 
-      const nowStr = new Date().toLocaleString('es-CO', {
+      const nowStr = new Date().toLocaleString(isEn ? 'en-US' : 'es-CO', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
@@ -5630,7 +5710,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       // 1. Banner Principal
       ws.mergeCells('A1:N1');
       const banner = ws.getCell('A1');
-      banner.value = `⭐ PRESTIGIA LOCAL STUDIO • INFORME INDIVIDUAL DE PRODUCCIÓN Y AUDITORÍA FORENSE`;
+      banner.value = isEn
+        ? `⭐ PRESTIGIA LOCAL STUDIO • INDIVIDUAL PRODUCTION & FORENSIC AUDIT REPORT`
+        : `⭐ PRESTIGIA LOCAL STUDIO • INFORME INDIVIDUAL DE PRODUCCIÓN Y AUDITORÍA FORENSE`;
       banner.font = { name: 'Segoe UI', size: 13, bold: true, color: { argb: 'FFF59E0B' } };
       banner.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0B132B' } };
       banner.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
@@ -5639,14 +5721,18 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       // 2. Subtítulo y Datos del Titular
       ws.mergeCells('A2:H2');
       const s1 = ws.getCell('A2');
-      s1.value = `Titular: ${advisor.name} (@${advisor.username}) • Rol: ${roleLabel} • Plan: ${tierLabel}`;
+      s1.value = isEn
+        ? `Holder: ${advisor.name} (@${advisor.username}) • Role: ${roleLabel} • Plan: ${tierLabel}`
+        : `Titular: ${advisor.name} (@${advisor.username}) • Rol: ${roleLabel} • Plan: ${tierLabel}`;
       s1.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: 'FFE2E8F0' } };
       s1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
       s1.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
 
       ws.mergeCells('I2:N2');
       const s2 = ws.getCell('I2');
-      s2.value = `Ubicación: ${advisor.city || 'Bogotá'}, ${advisor.country || 'Colombia'} • Tel: ${advisor.phone} • Emisión: ${nowStr}`;
+      s2.value = isEn
+        ? `Location: ${advisor.city || 'Bogota'}, ${advisor.country || 'Colombia'} • Phone: ${advisor.phone} • Emission: ${nowStr}`
+        : `Ubicación: ${advisor.city || 'Bogotá'}, ${advisor.country || 'Colombia'} • Tel: ${advisor.phone} • Emisión: ${nowStr}`;
       s2.font = { name: 'Segoe UI', size: 9.5, color: { argb: 'FF94A3B8' } };
       s2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
       s2.alignment = { vertical: 'middle', horizontal: 'right' };
@@ -5655,15 +5741,25 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       ws.getRow(3).height = 8;
 
       // 3. Tarjetas KPI del Asesor
-      const kpis = [
-        { range: 'A4:B4', label: 'HISTÓRICO TOTAL', val: `${allDossiers.length} Fichas`, bg: 'FF0F172A', fg: 'FFF59E0B' },
-        { range: 'C4:D4', label: 'ACTIVAS EN PRODUCCIÓN', val: `${activeDossiers.length} Fichas`, bg: 'FF064E3B', fg: 'FF34D399' },
-        { range: 'E4:F4', label: 'BÓVEDA FORENSE (BORRADAS)', val: `${deletedDossiers.length} Fichas`, bg: 'FF4C0519', fg: 'FFF43F5E' },
-        { range: 'G4:H4', label: 'CREACIONES', val: `${createsCount} / ${effCreates}`, bg: 'FF064E3B', fg: 'FF6EE7B7' },
-        { range: 'I4:J4', label: 'AUDITORÍAS TOP 3', val: `${auditsCount} / ${effAudits}`, bg: 'FF0C4A6E', fg: 'FF38BDF8' },
-        { range: 'K4:L4', label: 'RESCATES 72H', val: `${rescuesCount} / ${effRescues}`, bg: 'FF78350F', fg: 'FFFBBF24' },
-        { range: 'M4:N4', label: 'APELACIONES & PROSPECT', val: `${appealsCount + toolsCount} Casos`, bg: 'FF3B0764', fg: 'FFC084FC' },
-      ];
+      const kpis = isEn
+        ? [
+            { range: 'A4:B4', label: 'HISTORIC TOTAL', val: `${allDossiers.length} Dossiers`, bg: 'FF0F172A', fg: 'FFF59E0B' },
+            { range: 'C4:D4', label: 'ACTIVE IN PRODUCTION', val: `${activeDossiers.length} Dossiers`, bg: 'FF064E3B', fg: 'FF34D399' },
+            { range: 'E4:F4', label: 'FORENSIC VAULT (DELETED)', val: `${deletedDossiers.length} Dossiers`, bg: 'FF4C0519', fg: 'FFF43F5E' },
+            { range: 'G4:H4', label: 'CREATIONS', val: `${createsCount} / ${effCreates}`, bg: 'FF064E3B', fg: 'FF6EE7B7' },
+            { range: 'I4:J4', label: 'TOP 3 AUDITS', val: `${auditsCount} / ${effAudits}`, bg: 'FF0C4A6E', fg: 'FF38BDF8' },
+            { range: 'K4:L4', label: '72H RESCUES', val: `${rescuesCount} / ${effRescues}`, bg: 'FF78350F', fg: 'FFFBBF24' },
+            { range: 'M4:N4', label: 'APPEALS & PROSPECT', val: `${appealsCount + toolsCount} Cases`, bg: 'FF3B0764', fg: 'FFC084FC' },
+          ]
+        : [
+            { range: 'A4:B4', label: 'HISTÓRICO TOTAL', val: `${allDossiers.length} Fichas`, bg: 'FF0F172A', fg: 'FFF59E0B' },
+            { range: 'C4:D4', label: 'ACTIVAS EN PRODUCCIÓN', val: `${activeDossiers.length} Fichas`, bg: 'FF064E3B', fg: 'FF34D399' },
+            { range: 'E4:F4', label: 'BÓVEDA FORENSE (BORRADAS)', val: `${deletedDossiers.length} Fichas`, bg: 'FF4C0519', fg: 'FFF43F5E' },
+            { range: 'G4:H4', label: 'CREACIONES', val: `${createsCount} / ${effCreates}`, bg: 'FF064E3B', fg: 'FF6EE7B7' },
+            { range: 'I4:J4', label: 'AUDITORÍAS TOP 3', val: `${auditsCount} / ${effAudits}`, bg: 'FF0C4A6E', fg: 'FF38BDF8' },
+            { range: 'K4:L4', label: 'RESCATES 72H', val: `${rescuesCount} / ${effRescues}`, bg: 'FF78350F', fg: 'FFFBBF24' },
+            { range: 'M4:N4', label: 'APELACIONES & PROSPECT', val: `${appealsCount + toolsCount} Casos`, bg: 'FF3B0764', fg: 'FFC084FC' },
+          ];
 
       for (const k of kpis) {
         ws.mergeCells(k.range);
@@ -5684,22 +5780,39 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       ws.getRow(5).height = 10;
 
       // 4. Columnas de la Tabla
-      const colDefs = [
-        { title: '#', width: 6 },
-        { title: 'Estado en Red', width: 22 },
-        { title: 'Tipo de Servicio', width: 20 },
-        { title: 'Negocio / Cliente', width: 32 },
-        { title: 'Categoría', width: 22 },
-        { title: 'Ciudad', width: 16 },
-        { title: 'Barrio / Dirección', width: 22 },
-        { title: 'Contacto Contratante', width: 24 },
-        { title: 'Cargo', width: 18 },
-        { title: 'Empresa', width: 22 },
-        { title: 'Teléfono / WhatsApp', width: 20 },
-        { title: 'Email', width: 24 },
-        { title: 'Estado Cierre', width: 20 },
-        { title: 'Fecha de Registro', width: 18 },
-      ];
+      const colDefs = isEn
+        ? [
+            { title: '#', width: 6 },
+            { title: 'Network Status', width: 22 },
+            { title: 'Service Mode', width: 20 },
+            { title: 'Business / Client', width: 32 },
+            { title: 'Category', width: 22 },
+            { title: 'City', width: 16 },
+            { title: 'Neighborhood / Address', width: 22 },
+            { title: 'Contracting Contact', width: 24 },
+            { title: 'Role', width: 18 },
+            { title: 'Company', width: 22 },
+            { title: 'Phone / WhatsApp', width: 20 },
+            { title: 'Email', width: 24 },
+            { title: 'Closing Status', width: 20 },
+            { title: 'Registration Date', width: 18 },
+          ]
+        : [
+            { title: '#', width: 6 },
+            { title: 'Estado en Red', width: 22 },
+            { title: 'Tipo de Servicio', width: 20 },
+            { title: 'Negocio / Cliente', width: 32 },
+            { title: 'Categoría', width: 22 },
+            { title: 'Ciudad', width: 16 },
+            { title: 'Barrio / Dirección', width: 22 },
+            { title: 'Contacto Contratante', width: 24 },
+            { title: 'Cargo', width: 18 },
+            { title: 'Empresa', width: 22 },
+            { title: 'Teléfono / WhatsApp', width: 20 },
+            { title: 'Email', width: 24 },
+            { title: 'Estado Cierre', width: 20 },
+            { title: 'Fecha de Registro', width: 18 },
+          ];
 
       colDefs.forEach((col, idx) => {
         ws.getColumn(idx + 1).width = col.width;
@@ -5730,24 +5843,26 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         const isDeleted = Boolean(d.deletedByAdvisor);
         const rowBg = isDeleted ? 'FFFFF1F2' : idx % 2 === 0 ? 'FFFFFFFF' : 'FFF8FAFC';
 
-        const statusLabel = isDeleted ? '🔴 BÓVEDA FORENSE (BORRADA)' : '🟢 ACTIVA EN PRODUCCIÓN';
+        const statusLabel = isDeleted
+          ? (isEn ? '🔴 FORENSIC VAULT (DELETED)' : '🔴 BÓVEDA FORENSE (BORRADA)')
+          : (isEn ? '🟢 ACTIVE IN PRODUCTION' : '🟢 ACTIVA EN PRODUCCIÓN');
         const serviceLabel =
           d.mode === 'create'
-            ? '🏗️ Ficha Nueva'
+            ? (isEn ? '🏗️ New Listing' : '🏗️ Ficha Nueva')
             : d.mode === 'rescue'
-            ? '🛡️ Rescate 72h'
+            ? (isEn ? '🛡️ 72h Rescue' : '🛡️ Rescate 72h')
             : d.mode === 'appeal'
-            ? '⚖️ Apelación 1-3★'
+            ? (isEn ? '⚖️ 1-3★ Appeal' : '⚖️ Apelación 1-3★')
             : d.mode === 'tools' || d.mode === 'prospect'
-            ? '🎯 Prospección & Cierre'
-            : '🔬 Auditoría Top 3';
+            ? (isEn ? '🎯 Prospect & Pitch' : '🎯 Prospección & Cierre')
+            : (isEn ? '🔬 Top 3 Audit' : '🔬 Auditoría Top 3');
 
         const closingLabel =
           d.closingStatus === 'prestigia_subscriber'
-            ? '💎 Suscriptor Prestigia'
+            ? (isEn ? '💎 Subscriber' : '💎 Suscriptor Prestigia')
             : d.closingStatus === 'setup_paid'
-            ? '💵 Setup Pagado'
-            : '📝 En Estudio';
+            ? (isEn ? '💵 Setup Paid' : '💵 Setup Pagado')
+            : (isEn ? '📝 Under Study' : '📝 En Estudio');
 
         const phoneVal = d.contactPhone || (d as any).data?.phone || '-';
 
@@ -5755,12 +5870,12 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
           idx + 1,
           statusLabel,
           serviceLabel,
-          d.clientName || 'Sin Nombre',
-          d.category || 'Servicio Local',
+          d.clientName || (isEn ? 'Unnamed' : 'Sin Nombre'),
+          d.category || (isEn ? 'Local Service' : 'Servicio Local'),
           d.city || 'Bogotá',
           d.neighborhood || '-',
-          d.contactName || 'No registrado',
-          d.contactRole || 'Propietario',
+          d.contactName || (isEn ? 'Not recorded' : 'No registrado'),
+          d.contactRole || (isEn ? 'Owner' : 'Propietario'),
           d.contactCompany || '-',
           phoneVal,
           d.contactEmail || '-',
@@ -5801,7 +5916,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       const footRow = 7 + allDossiers.length;
       ws.mergeCells(`A${footRow}:N${footRow}`);
       const fC = ws.getCell(`A${footRow}`);
-      fC.value = `🔒 Expediente Oficial Prestigia Master • Historial de ${allDossiers.length} fichas producidas por ${advisor.name} (@${advisor.username}). Conservado para Dirección General.`;
+      fC.value = isEn
+        ? `🔒 Official Prestigia Master File • History of ${allDossiers.length} dossiers produced by ${advisor.name} (@${advisor.username}). Retained for General Directorate.`
+        : `🔒 Expediente Oficial Prestigia Master • Historial de ${allDossiers.length} fichas producidas por ${advisor.name} (@${advisor.username}). Conservado para Dirección General.`;
       fC.font = { name: 'Segoe UI', size: 8.5, italic: true, color: { argb: 'FF64748B' } };
       fC.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } };
       fC.alignment = { vertical: 'middle', horizontal: 'center' };
@@ -5846,24 +5963,24 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     const effTools = (advisor.maxToolsMonthly ?? 10) + (advisor.extraCredits?.tools || 0);
 
     const tierName = isFounder
-      ? '👑 Ilimitado Master'
+      ? (isEn ? '👑 Master Unlimited' : '👑 Ilimitado Master')
       : advisor.planTier === 'courtesy'
-      ? '🎁 Cortesía VIP ($0 USD)'
+      ? (isEn ? '🎁 VIP Courtesy ($0 USD)' : '🎁 Cortesía VIP ($0 USD)')
       : advisor.planTier === 'level_3'
-      ? 'Nivel 3 ($140 USD)'
+      ? (isEn ? 'Level 3 ($140 USD)' : 'Nivel 3 ($140 USD)')
       : advisor.planTier === 'level_2'
-      ? 'Nivel 2 ★ ($90 USD)'
+      ? (isEn ? 'Level 2 ★ ($90 USD)' : 'Nivel 2 ★ ($90 USD)')
       : advisor.planTier === 'level_1'
-      ? 'Nivel 1 ($49 USD)'
-      : 'Estándar';
+      ? (isEn ? 'Level 1 ($49 USD)' : 'Nivel 1 ($49 USD)')
+      : (isEn ? 'Standard' : 'Estándar');
 
     const roleName = isFounder
-      ? 'Dirección General / Fundador'
+      ? (isEn ? 'General Directorate / Founder' : 'Dirección General / Fundador')
       : advisor.accountType === 'partner_agency'
-      ? 'Agencia Partner B2B (Licencia SaaS)'
-      : 'Asesor Comercial Interno';
+      ? (isEn ? 'B2B Partner Agency (SaaS License)' : 'Agencia Partner B2B (Licencia SaaS)')
+      : (isEn ? 'Internal Sales Advisor' : 'Asesor Comercial Interno');
 
-    const nowStr = new Date().toLocaleString('es-CO', {
+    const nowStr = new Date().toLocaleString(isEn ? 'en-US' : 'es-CO', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -5877,26 +5994,26 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         const rowBg = isDeleted ? '#FFF1F2' : idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC';
 
         const statusTag = isDeleted
-          ? '<span style="background-color: #FEE2E2; color: #991B1B; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 7.5pt; border: 1px solid #FCA5A5;">🔴 Bóveda Forense</span>'
-          : '<span style="background-color: #DCFCE7; color: #166534; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 7.5pt; border: 1px solid #86EFAC;">🟢 Activo</span>';
+          ? `<span style="background-color: #FEE2E2; color: #991B1B; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 7.5pt; border: 1px solid #FCA5A5;">${isEn ? '🔴 Forensic Vault' : '🔴 Bóveda Forense'}</span>`
+          : `<span style="background-color: #DCFCE7; color: #166534; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 7.5pt; border: 1px solid #86EFAC;">${isEn ? '🟢 Active' : '🟢 Activo'}</span>`;
 
         const serviceTag =
           d.mode === 'create'
-            ? '<span style="background-color: #ECFDF5; color: #047857; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">🏗️ Creación</span>'
+            ? `<span style="background-color: #ECFDF5; color: #047857; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">${isEn ? '🏗️ Creation' : '🏗️ Creación'}</span>`
             : d.mode === 'rescue'
-            ? '<span style="background-color: #FFFBEB; color: #B45309; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">🛡️ Rescate 72h</span>'
+            ? `<span style="background-color: #FFFBEB; color: #B45309; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">${isEn ? '🛡️ 72h Rescue' : '🛡️ Rescate 72h'}</span>`
             : d.mode === 'appeal'
-            ? '<span style="background-color: #FAF5FF; color: #7E22CE; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">⚖️ Apelación</span>'
+            ? `<span style="background-color: #FAF5FF; color: #7E22CE; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">${isEn ? '⚖️ Appeal' : '⚖️ Apelación'}</span>`
             : d.mode === 'tools' || d.mode === 'prospect'
-            ? '<span style="background-color: #EEF2FF; color: #4338CA; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">🎯 Prospección</span>'
-            : '<span style="background-color: #EFF6FF; color: #1D4ED8; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">🔬 Auditoría</span>';
+            ? `<span style="background-color: #EEF2FF; color: #4338CA; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">${isEn ? '🎯 Prospecting' : '🎯 Prospección'}</span>`
+            : `<span style="background-color: #EFF6FF; color: #1D4ED8; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">${isEn ? '🔬 Top 3 Audit' : '🔬 Auditoría'}</span>`;
 
         const closingTag =
           d.closingStatus === 'prestigia_subscriber'
-            ? '<span style="color: #047857; font-weight: bold;">💎 Suscriptor</span>'
+            ? `<span style="color: #047857; font-weight: bold;">${isEn ? '💎 Subscriber' : '💎 Suscriptor'}</span>`
             : d.closingStatus === 'setup_paid'
-            ? '<span style="color: #B45309; font-weight: bold;">💵 Setup Pagado</span>'
-            : '<span style="color: #64748B;">📝 En Estudio</span>';
+            ? `<span style="color: #B45309; font-weight: bold;">${isEn ? '💵 Setup Paid' : '💵 Setup Pagado'}</span>`
+            : `<span style="color: #64748B;">${isEn ? '📝 Under Study' : '📝 En Estudio'}</span>`;
 
         const contactPhone = d.contactPhone || (d as any).data?.phone || '-';
 
@@ -5906,7 +6023,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             <td style="padding: 5px 6px; text-align: center; border: 1px solid #CBD5E1;">${statusTag}</td>
             <td style="padding: 5px 6px; text-align: center; border: 1px solid #CBD5E1;">${serviceTag}</td>
             <td style="padding: 5px 6px; font-weight: bold; color: #0F172A; border: 1px solid #CBD5E1;">
-              ${d.clientName || 'Sin Nombre'}
+              ${d.clientName || (isEn ? 'Unnamed' : 'Sin Nombre')}
               <span style="display: block; font-size: 7pt; color: #64748B; font-weight: normal;">📍 ${d.city || 'Bogotá'}${d.neighborhood ? `, ${d.neighborhood}` : ''}</span>
             </td>
             <td style="padding: 5px 6px; font-size: 7.5pt; color: #4338CA; font-weight: bold; border: 1px solid #CBD5E1;">${d.category || '-'}</td>
@@ -5928,7 +6045,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       <html>
       <head>
         <meta charset="utf-8" />
-        <title>Informe de Producción - ${advisor.name} (@${advisor.username})</title>
+        <title>${isEn ? `Production Report - ${advisor.name} (@${advisor.username})` : `Informe de Producción - ${advisor.name} (@${advisor.username})`}</title>
         <style>
           @page {
             size: landscape;
@@ -6014,15 +6131,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         <div class="header-banner">
           <div>
             <div style="font-size: 11pt; font-weight: 900; color: #F59E0B; letter-spacing: 0.5px;">
-              ⭐ PRESTIGIA LOCAL STUDIO • INFORME INDIVIDUAL DE PRODUCCIÓN Y AUDITORÍA
+              ${isEn ? '⭐ PRESTIGIA LOCAL STUDIO • INDIVIDUAL PRODUCTION & AUDIT REPORT' : '⭐ PRESTIGIA LOCAL STUDIO • INFORME INDIVIDUAL DE PRODUCCIÓN Y AUDITORÍA'}
             </div>
             <div style="font-size: 7.5pt; color: #94A3B8; margin-top: 2px;">
-              Dirección General: Luisma • Red Comercial & Monetización SaaS • Confidencial
+              ${isEn ? 'General Directorate: Luisma • Commercial Network & SaaS Monetization • Confidential' : 'Dirección General: Luisma • Red Comercial & Monetización SaaS • Confidencial'}
             </div>
           </div>
           <div style="text-align: right; font-size: 7.5pt; color: #E2E8F0;">
-            <div>📅 Fecha: <strong>${nowStr}</strong></div>
-            <div>WhatsApp Central: <strong>+57 305 8314049</strong></div>
+            <div>📅 ${isEn ? 'Date:' : 'Fecha:'} <strong>${nowStr}</strong></div>
+            <div>${isEn ? 'Central WhatsApp:' : 'WhatsApp Central:'} <strong>+57 305 8314049</strong></div>
           </div>
         </div>
 
@@ -6034,38 +6151,38 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             <span style="margin-left: 6px; background: #E0E7FF; color: #3730A3; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">${roleName}</span>
           </div>
           <div style="font-size: 8pt; color: #334155;">
-            📍 ${advisor.city || 'Bogotá'}, ${advisor.country || 'Colombia'} • 📞 <strong>${advisor.phone}</strong> • Canon: <strong>$${advisor.monthlyFeeUsd || 0} USD/mes</strong>
+            📍 ${advisor.city || 'Bogotá'}, ${advisor.country || 'Colombia'} • 📞 <strong>${advisor.phone}</strong> • ${isEn ? 'Monthly Fee:' : 'Canon:'} <strong>$${advisor.monthlyFeeUsd || 0} USD/${isEn ? 'mo' : 'mes'}</strong>
           </div>
         </div>
 
         <div class="kpi-grid">
           <div class="kpi-card" style="border-left: 3px solid #F59E0B;">
-            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">TOTAL EXPEDIENTES</span>
+            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">${isEn ? 'TOTAL DOSSIERS' : 'TOTAL EXPEDIENTES'}</span>
             <span class="kpi-val" style="color: #D97706;">${allDossiers.length}</span>
           </div>
           <div class="kpi-card" style="border-left: 3px solid #10B981;">
-            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">🟢 ACTIVOS EN RED</span>
+            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">${isEn ? '🟢 ACTIVE IN NETWORK' : '🟢 ACTIVOS EN RED'}</span>
             <span class="kpi-val" style="color: #059669;">${activeDossiers.length}</span>
           </div>
           <div class="kpi-card" style="border-left: 3px solid #EF4444;">
-            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">🗑️ BÓVEDA FORENSE</span>
+            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">${isEn ? '🗑️ FORENSIC VAULT' : '🗑️ BÓVEDA FORENSE'}</span>
             <span class="kpi-val" style="color: #DC2626;">${deletedDossiers.length}</span>
           </div>
           <div class="kpi-card" style="border-left: 3px solid #10B981;">
-            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">🏗️ FICHAS NUEVAS</span>
+            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">${isEn ? '🏗️ CREATIONS' : '🏗️ FICHAS NUEVAS'}</span>
             <span class="kpi-val" style="color: #047857;">${creates} / ${effCreates}</span>
           </div>
           <div class="kpi-card" style="border-left: 3px solid #0284C7;">
-            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">🔬 AUDITORÍAS</span>
+            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">${isEn ? '🔬 AUDITS' : '🔬 AUDITORÍAS'}</span>
             <span class="kpi-val" style="color: #0284C7;">${audits} / ${effAudits}</span>
           </div>
           <div class="kpi-card" style="border-left: 3px solid #F59E0B;">
-            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">🛡️ RESCATES 72H</span>
+            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">${isEn ? '🛡️ RESCUES 72H' : '🛡️ RESCATES 72H'}</span>
             <span class="kpi-val" style="color: #B45309;">${rescues} / ${effRescues}</span>
           </div>
           <div class="kpi-card" style="border-left: 3px solid #8B5CF6;">
-            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">⚖️ APELACIONES</span>
-            <span class="kpi-val" style="color: #7C3AED;">${appeals} / ${effAppeals}</span>
+            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">${isEn ? '⚖️ APPEALS & PITCH' : '⚖️ APELACIONES'}</span>
+            <span class="kpi-val" style="color: #7C3AED;">${appeals + tools}</span>
           </div>
         </div>
 
@@ -6073,23 +6190,25 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
           <thead>
             <tr>
               <th style="width: 25px;">#</th>
-              <th style="width: 90px;">Estado en Red</th>
-              <th style="width: 80px;">Servicio</th>
-              <th>Negocio / Cliente Auditado</th>
-              <th style="width: 100px;">Categoría</th>
-              <th style="width: 120px;">Contacto Contratante</th>
-              <th style="width: 85px;">Teléfono</th>
-              <th style="width: 80px;">Cierre</th>
-              <th style="width: 70px;">Fecha</th>
+              <th style="width: 90px;">${isEn ? 'Network Status' : 'Estado en Red'}</th>
+              <th style="width: 80px;">${isEn ? 'Service Mode' : 'Servicio'}</th>
+              <th>${isEn ? 'Business / Audited Client' : 'Negocio / Cliente Auditado'}</th>
+              <th style="width: 100px;">${isEn ? 'Category' : 'Categoría'}</th>
+              <th style="width: 120px;">${isEn ? 'Contracting Contact' : 'Contacto Contratante'}</th>
+              <th style="width: 85px;">${isEn ? 'Phone' : 'Teléfono'}</th>
+              <th style="width: 80px;">${isEn ? 'Closing' : 'Cierre'}</th>
+              <th style="width: 70px;">${isEn ? 'Date' : 'Fecha'}</th>
             </tr>
           </thead>
           <tbody>
-            ${rowsHtml || '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #64748B;">No hay expedientes registrados para este usuario.</td></tr>'}
+            ${rowsHtml || `<tr><td colspan="9" style="text-align: center; padding: 20px; color: #64748B;">${isEn ? 'No dossiers recorded for this user yet.' : 'No hay expedientes registrados para este usuario.'}</td></tr>`}
           </tbody>
         </table>
 
         <div class="footer-note">
-          🔒 Documento Oficial Prestigia Master • Expediente auditado con ${allDossiers.length} fichas producidas por ${advisor.name} (@${advisor.username}). Conservado para Dirección General.
+          ${isEn
+            ? `🔒 Prestigia Master Official Document • Audited file with ${allDossiers.length} dossiers produced by ${advisor.name} (@${advisor.username}). Retained for General Directorate.`
+            : `🔒 Documento Oficial Prestigia Master • Expediente auditado con ${allDossiers.length} fichas producidas por ${advisor.name} (@${advisor.username}). Conservado para Dirección General.`}
         </div>
 
         <script>
@@ -16341,7 +16460,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <span className="text-[11px] text-slate-400 block font-bold">{isEn ? 'Forensic Vault' : 'Bóveda Forense'}</span>
                   <div className="flex items-center gap-1.5">
                     <strong className="text-xl font-black text-rose-400">{forensicDeletedDossiers.length}</strong>
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Borradas</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold">{isEn ? 'Deleted' : 'Borradas'}</span>
                   </div>
                 </div>
               </button>
@@ -16351,56 +16470,56 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs print:hidden">
               <div className="p-3 rounded-2xl bg-indigo-950/30 border border-indigo-500/30 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400 block">Nivel 1 ($49 USD)</span>
-                  <span className="text-[9px] text-indigo-400 font-bold">50 Créditos • 10/pestaña</span>
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400 block">{isEn ? 'Level 1 ($49 USD)' : 'Nivel 1 ($49 USD)'}</span>
+                  <span className="text-[9px] text-indigo-400 font-bold">{isEn ? '50 Credits • 10/tab' : '50 Créditos • 10/pestaña'}</span>
                 </div>
                 <strong className="text-base font-black text-indigo-300">
                   {advisorsList.filter((a) => {
                     if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                     const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
                     return t === 'level_1';
-                  }).length} <span className="text-[9px] text-slate-400 font-normal">cuentas</span>
+                  }).length} <span className="text-[9px] text-slate-400 font-normal">{isEn ? 'accounts' : 'cuentas'}</span>
                 </strong>
               </div>
 
               <div className="p-3 rounded-2xl bg-purple-950/30 border border-purple-500/30 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-mono tracking-wider text-purple-300 block">Nivel 2 ★ ($90 USD)</span>
-                  <span className="text-[9px] text-purple-400 font-bold">100 Créditos • 20/pestaña</span>
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-purple-300 block">{isEn ? 'Level 2 ★ ($90 USD)' : 'Nivel 2 ★ ($90 USD)'}</span>
+                  <span className="text-[9px] text-purple-400 font-bold">{isEn ? '100 Credits • 20/tab' : '100 Créditos • 20/pestaña'}</span>
                 </div>
                 <strong className="text-base font-black text-purple-300">
                   {advisorsList.filter((a) => {
                     if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                     const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
                     return t === 'level_2';
-                  }).length} <span className="text-[9px] text-slate-400 font-normal">cuentas</span>
+                  }).length} <span className="text-[9px] text-slate-400 font-normal">{isEn ? 'accounts' : 'cuentas'}</span>
                 </strong>
               </div>
 
               <div className="p-3 rounded-2xl bg-amber-950/30 border border-amber-500/30 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-mono tracking-wider text-amber-400 block">Nivel 3 ($140 USD)</span>
-                  <span className="text-[9px] text-amber-400 font-bold">150 Créditos • 30/pestaña</span>
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-amber-400 block">{isEn ? 'Level 3 ($140 USD)' : 'Nivel 3 ($140 USD)'}</span>
+                  <span className="text-[9px] text-amber-400 font-bold">{isEn ? '150 Credits • 30/tab' : '150 Créditos • 30/pestaña'}</span>
                 </div>
                 <strong className="text-base font-black text-amber-300">
                   {advisorsList.filter((a) => {
                     if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                     const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
                     return t === 'level_3';
-                  }).length} <span className="text-[9px] text-slate-400 font-normal">cuentas</span>
+                  }).length} <span className="text-[9px] text-slate-400 font-normal">{isEn ? 'accounts' : 'cuentas'}</span>
                 </strong>
               </div>
 
               <div className="p-3 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-mono tracking-wider text-emerald-400 block">🎁 Cortesía ($0 USD)</span>
-                  <span className="text-[9px] text-emerald-400 font-bold">15 Créditos • 3/pestaña</span>
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-emerald-400 block">{isEn ? '🎁 Courtesy ($0 USD)' : '🎁 Cortesía ($0 USD)'}</span>
+                  <span className="text-[9px] text-emerald-400 font-bold">{isEn ? '15 Credits • 3/tab' : '15 Créditos • 3/pestaña'}</span>
                 </div>
                 <strong className="text-base font-black text-emerald-300">
                   {advisorsList.filter((a) => {
                     if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                     return a.planTier === 'courtesy' || Number(a.monthlyFeeUsd) === 0;
-                  }).length} <span className="text-[9px] text-slate-400 font-normal">cuentas</span>
+                  }).length} <span className="text-[9px] text-slate-400 font-normal">{isEn ? 'accounts' : 'cuentas'}</span>
                 </strong>
               </div>
             </div>
@@ -16542,7 +16661,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     }`}
                   >
                     {networkCountryFilter === 'all' ? (
-                      <option value="all">🔒 Selecciona un país primero</option>
+                      <option value="all">{isEn ? '🔒 Select a country first' : '🔒 Selecciona un país primero'}</option>
                     ) : (
                       <>
                         <option value="all">{isEn ? `🏙️ All Cities in ${networkCountryFilter} (${networkAvailableCities.length})` : `🏙️ Todas las Ciudades de ${networkCountryFilter} (${networkAvailableCities.length})`}</option>
@@ -16583,28 +16702,28 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                     <optgroup label={isEn ? '📋 4 Official Plan Tiers (3 Levels + 1 Courtesy)' : '📋 Las 4 Fichas Oficiales (3 Niveles + 1 Cortesía)'}>
                       <option value="level_1">
-                        💼 Nivel 1 ($49 USD • 50 Créditos) ({advisorsList.filter((a) => {
+                        💼 {isEn ? 'Level 1 ($49 USD • 50 Credits)' : 'Nivel 1 ($49 USD • 50 Créditos)'} ({advisorsList.filter((a) => {
                           if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                           const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
                           return t === 'level_1';
                         }).length})
                       </option>
                       <option value="level_2">
-                        🏢 Nivel 2 ★ ($90 USD • 100 Créditos) ({advisorsList.filter((a) => {
+                        🏢 {isEn ? 'Level 2 ★ ($90 USD • 100 Credits)' : 'Nivel 2 ★ ($90 USD • 100 Créditos)'} ({advisorsList.filter((a) => {
                           if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                           const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
                           return t === 'level_2';
                         }).length})
                       </option>
                       <option value="level_3">
-                        🏢 Nivel 3 ($140 USD • 150 Créditos) ({advisorsList.filter((a) => {
+                        🏢 {isEn ? 'Level 3 ($140 USD • 150 Credits)' : 'Nivel 3 ($140 USD • 150 Créditos)'} ({advisorsList.filter((a) => {
                           if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                           const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
                           return t === 'level_3';
                         }).length})
                       </option>
                       <option value="courtesy">
-                        🎁 Cortesía VIP ($0 USD • 15 Créditos) ({advisorsList.filter((a) => {
+                        🎁 {isEn ? 'VIP Courtesy ($0 USD • 15 Credits)' : 'Cortesía VIP ($0 USD • 15 Créditos)'} ({advisorsList.filter((a) => {
                           if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                           return a.planTier === 'courtesy' || Number(a.monthlyFeeUsd) === 0;
                         }).length})
@@ -17205,28 +17324,28 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                     <optgroup label={isEn ? '📋 4 Official Plan Tiers (3 Levels + 1 Courtesy)' : '📋 Las 4 Fichas Oficiales (3 Niveles + 1 Cortesía)'}>
                       <option value="level_1">
-                        💼 Nivel 1 ($49 USD • 50 Créditos) ({advisorsList.filter((a) => {
+                        💼 {isEn ? 'Level 1 ($49 USD • 50 Credits)' : 'Nivel 1 ($49 USD • 50 Créditos)'} ({advisorsList.filter((a) => {
                           if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                           const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
                           return t === 'level_1';
                         }).length})
                       </option>
                       <option value="level_2">
-                        🏢 Nivel 2 ★ ($90 USD • 100 Créditos) ({advisorsList.filter((a) => {
+                        🏢 {isEn ? 'Level 2 ★ ($90 USD • 100 Credits)' : 'Nivel 2 ★ ($90 USD • 100 Créditos)'} ({advisorsList.filter((a) => {
                           if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                           const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
                           return t === 'level_2';
                         }).length})
                       </option>
                       <option value="level_3">
-                        🏢 Nivel 3 ($140 USD • 150 Créditos) ({advisorsList.filter((a) => {
+                        🏢 {isEn ? 'Level 3 ($140 USD • 150 Credits)' : 'Nivel 3 ($140 USD • 150 Créditos)'} ({advisorsList.filter((a) => {
                           if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                           const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
                           return t === 'level_3';
                         }).length})
                       </option>
                       <option value="courtesy">
-                        🎁 Cortesía VIP ($0 USD • 15 Créditos) ({advisorsList.filter((a) => {
+                        🎁 {isEn ? 'VIP Courtesy ($0 USD • 15 Credits)' : 'Cortesía VIP ($0 USD • 15 Créditos)'} ({advisorsList.filter((a) => {
                           if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                           return a.planTier === 'courtesy' || Number(a.monthlyFeeUsd) === 0;
                         }).length})
@@ -17451,7 +17570,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <BarChart3 className="w-3.5 h-3.5 text-amber-400" />
                     <span>{isEn ? 'Network Composition' : 'Composición de la Red'}</span>
                   </span>
-                  <span className="text-[10px] text-slate-400 font-mono">{reportStats.total} cuentas</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{reportStats.total} {isEn ? 'accounts' : 'cuentas'}</span>
                 </div>
 
                 <div className="space-y-2 pt-1">
@@ -17459,35 +17578,35 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <div
                       style={{ width: `${(reportStats.advisors / (reportStats.total || 1)) * 100}%` }}
                       className="h-full bg-indigo-500 transition-all duration-500"
-                      title={`Asesores: ${reportStats.advisors}`}
+                      title={`${isEn ? 'Advisors' : 'Asesores'}: ${reportStats.advisors}`}
                     />
                     <div
                       style={{ width: `${(reportStats.agencies / (reportStats.total || 1)) * 100}%` }}
                       className="h-full bg-purple-500 transition-all duration-500"
-                      title={`Agencias: ${reportStats.agencies}`}
+                      title={`${isEn ? 'Agencies' : 'Agencias'}: ${reportStats.agencies}`}
                     />
                     <div
                       style={{ width: `${(reportStats.founders / (reportStats.total || 1)) * 100}%` }}
                       className="h-full bg-amber-400 transition-all duration-500"
-                      title={`Dirección: ${reportStats.founders}`}
+                      title={`${isEn ? 'Directorate' : 'Dirección'}: ${reportStats.founders}`}
                     />
                   </div>
 
                   <div className="grid grid-cols-3 gap-1 pt-1 text-[10px]">
                     <div className="p-2 rounded-xl bg-slate-900 border border-indigo-500/20 text-center">
-                      <span className="text-slate-400 block text-[9px]">💼 Asesores</span>
+                      <span className="text-slate-400 block text-[9px]">💼 {isEn ? 'Advisors' : 'Asesores'}</span>
                       <strong className="text-xs font-black text-indigo-300">
                         {reportStats.advisors} ({Math.round((reportStats.advisors / (reportStats.total || 1)) * 100)}%)
                       </strong>
                     </div>
                     <div className="p-2 rounded-xl bg-slate-900 border border-purple-500/20 text-center">
-                      <span className="text-slate-400 block text-[9px]">🏢 Agencias</span>
+                      <span className="text-slate-400 block text-[9px]">🏢 {isEn ? 'Agencies' : 'Agencias'}</span>
                       <strong className="text-xs font-black text-purple-300">
                         {reportStats.agencies} ({Math.round((reportStats.agencies / (reportStats.total || 1)) * 100)}%)
                       </strong>
                     </div>
                     <div className="p-2 rounded-xl bg-slate-900 border border-amber-500/20 text-center">
-                      <span className="text-slate-400 block text-[9px]">👑 Dirección</span>
+                      <span className="text-slate-400 block text-[9px]">👑 {isEn ? 'Directorate' : 'Dirección'}</span>
                       <strong className="text-xs font-black text-amber-300">
                         {reportStats.founders} ({Math.round((reportStats.founders / (reportStats.total || 1)) * 100)}%)
                       </strong>
@@ -17497,19 +17616,19 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   {/* Desglose por las 4 Fichas Oficiales */}
                   <div className="grid grid-cols-4 gap-1 pt-1.5 border-t border-slate-800 text-[9px]">
                     <div className="p-1.5 rounded-xl bg-indigo-950/40 border border-indigo-500/20 text-center">
-                      <span className="text-slate-400 block text-[8px] font-mono">NIVEL 1 ($49)</span>
+                      <span className="text-slate-400 block text-[8px] font-mono">{isEn ? 'LEVEL 1 ($49)' : 'NIVEL 1 ($49)'}</span>
                       <strong className="text-indigo-300 font-black text-xs">{reportStats.planL1Count}</strong>
                     </div>
                     <div className="p-1.5 rounded-xl bg-purple-950/40 border border-purple-500/20 text-center">
-                      <span className="text-purple-300 block text-[8px] font-mono">NIVEL 2 ($90)</span>
+                      <span className="text-purple-300 block text-[8px] font-mono">{isEn ? 'LEVEL 2 ($90)' : 'NIVEL 2 ($90)'}</span>
                       <strong className="text-purple-200 font-black text-xs">{reportStats.planL2Count}</strong>
                     </div>
                     <div className="p-1.5 rounded-xl bg-amber-950/40 border border-amber-500/20 text-center">
-                      <span className="text-amber-300 block text-[8px] font-mono">NIVEL 3 ($140)</span>
+                      <span className="text-amber-300 block text-[8px] font-mono">{isEn ? 'LEVEL 3 ($140)' : 'NIVEL 3 ($140)'}</span>
                       <strong className="text-amber-200 font-black text-xs">{reportStats.planL3Count}</strong>
                     </div>
                     <div className="p-1.5 rounded-xl bg-emerald-950/40 border border-emerald-500/20 text-center">
-                      <span className="text-emerald-300 block text-[8px] font-mono">🎁 CORTESÍA</span>
+                      <span className="text-emerald-300 block text-[8px] font-mono">🎁 {isEn ? 'COURTESY' : 'CORTESÍA'}</span>
                       <strong className="text-emerald-300 font-black text-xs">{reportStats.planCourtesyCount}</strong>
                     </div>
                   </div>
@@ -17523,12 +17642,12 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <Globe className="w-3.5 h-3.5 text-amber-400" />
                     <span>{isEn ? 'Geographic Distribution' : 'Distribución por País'}</span>
                   </span>
-                  <span className="text-[10px] text-slate-400 font-mono">{reportStats.countries.length} países</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{reportStats.countries.length} {isEn ? 'countries' : 'países'}</span>
                 </div>
 
                 <div className="space-y-2 pt-1 max-h-36 overflow-y-auto pr-1">
                   {reportStats.countries.length === 0 ? (
-                    <span className="text-slate-500 text-[10px] italic">Sin países registrados</span>
+                    <span className="text-slate-500 text-[10px] italic">{isEn ? 'No countries registered' : 'Sin países registrados'}</span>
                   ) : (
                     reportStats.countries.map(([country, count]) => {
                       const pct = Math.round((count / (reportStats.total || 1)) * 100);
@@ -17580,7 +17699,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <span>{isEn ? 'Licensing Health & Status' : 'Salud de Licencias & Estado'}</span>
                   </span>
                   <span className="text-[10px] text-emerald-400 font-mono font-bold">
-                    {Math.round((reportStats.active / (reportStats.total || 1)) * 100)}% Operativas
+                    {Math.round((reportStats.active / (reportStats.total || 1)) * 100)}% {isEn ? 'Operational' : 'Operativas'}
                   </span>
                 </div>
 
@@ -17589,24 +17708,24 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <div
                       style={{ width: `${(reportStats.active / (reportStats.total || 1)) * 100}%` }}
                       className="h-full bg-emerald-500 transition-all duration-500"
-                      title={`Activas: ${reportStats.active}`}
+                      title={`${isEn ? 'Active' : 'Activas'}: ${reportStats.active}`}
                     />
                     <div
                       style={{ width: `${(reportStats.inactive / (reportStats.total || 1)) * 100}%` }}
                       className="h-full bg-rose-500 transition-all duration-500"
-                      title={`Apagadas: ${reportStats.inactive}`}
+                      title={`${isEn ? 'Off' : 'Apagadas'}: ${reportStats.inactive}`}
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 pt-1 text-[10px]">
                     <div className="p-2 rounded-xl bg-slate-900 border border-emerald-500/20 text-center">
-                      <span className="text-slate-400 block text-[9px]">🟢 Encendidas (Activas)</span>
+                      <span className="text-slate-400 block text-[9px]">🟢 {isEn ? 'Turned On (Active)' : 'Encendidas (Activas)'}</span>
                       <strong className="text-sm font-black text-emerald-400">
                         {reportStats.active}
                       </strong>
                     </div>
                     <div className="p-2 rounded-xl bg-slate-900 border border-rose-500/20 text-center">
-                      <span className="text-slate-400 block text-[9px]">🔴 Apagadas (Inactivas)</span>
+                      <span className="text-slate-400 block text-[9px]">🔴 {isEn ? 'Turned Off (Inactive)' : 'Apagadas (Inactivas)'}</span>
                       <strong className="text-sm font-black text-rose-400">
                         {reportStats.inactive}
                       </strong>
@@ -17624,7 +17743,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <span>{isEn ? 'Complete Users Directory Table' : 'Directorio Consolidado de Usuarios, Licencias & Credenciales'}</span>
                 </span>
                 <span className="text-xs text-slate-400 font-mono">
-                  {filteredReportUsers.length} registros listados
+                  {filteredReportUsers.length} {isEn ? 'records listed' : 'registros listados'}
                 </span>
               </div>
 
@@ -17633,16 +17752,16 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <thead className="bg-slate-900/95 text-[10px] uppercase font-black tracking-wider text-slate-400 border-b border-slate-800 sticky top-0 z-10 backdrop-blur-sm">
                     <tr>
                       <th className="py-3 px-3">#</th>
-                      <th className="py-3 px-3">Usuario & Titular</th>
-                      <th className="py-3 px-3">Tipo & Plan</th>
-                      <th className="py-3 px-3">Contacto Directo</th>
-                      <th className="py-3 px-3">Ubicación</th>
-                      <th className="py-3 px-3">Estado</th>
-                      <th className="py-3 px-3">Canon (USD)</th>
-                      <th className="py-3 px-3">Cuotas (Mes)</th>
-                      <th className="py-3 px-3">Producción Real</th>
-                      <th className="py-3 px-3">Credencial Acceso</th>
-                      <th className="py-3 px-3">Inicio Ciclo</th>
+                      <th className="py-3 px-3">{isEn ? 'User & Holder' : 'Usuario & Titular'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Type & Plan' : 'Tipo & Plan'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Direct Contact' : 'Contacto Directo'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Location' : 'Ubicación'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Status' : 'Estado'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Fee (USD)' : 'Canon (USD)'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Monthly Quotas' : 'Cuotas (Mes)'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Produced Dossiers' : 'Producción Real'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Access Credential' : 'Credencial Acceso'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Cycle Start' : 'Inicio Ciclo'}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/80">
@@ -17716,23 +17835,23 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                   }`}
                                 >
                                   {isFounder
-                                    ? '👑 Fundador'
+                                    ? (isEn ? '👑 Founder' : '👑 Fundador')
                                     : adv.accountType === 'partner_agency'
-                                    ? '🏢 Agencia Partner'
-                                    : '💼 Asesor'}
+                                    ? (isEn ? '🏢 Partner Agency' : '🏢 Agencia Partner')
+                                    : (isEn ? '💼 Sales Advisor' : '💼 Asesor')}
                                 </span>
                                 <span className="text-[10px] text-slate-400 block font-medium">
                                   {adv.planTier === 'courtesy'
-                                    ? '🎁 Cortesía ($0)'
+                                    ? (isEn ? '🎁 Courtesy ($0)' : '🎁 Cortesía ($0)')
                                     : adv.planTier === 'level_3'
-                                    ? 'Nivel 3'
+                                    ? (isEn ? 'Level 3' : 'Nivel 3')
                                     : adv.planTier === 'level_2'
-                                    ? 'Nivel 2'
+                                    ? (isEn ? 'Level 2' : 'Nivel 2')
                                     : adv.planTier === 'level_1'
-                                    ? 'Nivel 1'
+                                    ? (isEn ? 'Level 1' : 'Nivel 1')
                                     : isFounder
-                                    ? 'Ilimitado'
-                                    : 'Estándar'}
+                                    ? (isEn ? 'Master Unlimited' : 'Ilimitado')
+                                    : (isEn ? 'Standard' : 'Estándar')}
                                 </span>
                               </div>
                             </td>
@@ -17749,7 +17868,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                   <span>{adv.phone}</span>
                                 </a>
                               ) : (
-                                <span className="text-slate-500 italic text-[10px]">Sin teléfono</span>
+                                <span className="text-slate-500 italic text-[10px]">{isEn ? 'No phone' : 'Sin teléfono'}</span>
                               )}
                             </td>
 
@@ -17770,7 +17889,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                     : 'bg-rose-950 text-rose-300 border border-rose-500/30'
                                 }`}
                               >
-                                <span>{adv.active ? '🟢 Encendida' : '🔴 Apagada'}</span>
+                                <span>{adv.active ? (isEn ? '🟢 Active' : '🟢 Encendida') : (isEn ? '🔴 Off' : '🔴 Apagada')}</span>
                               </span>
                             </td>
 
@@ -17778,11 +17897,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                               {isFounder ? (
                                 <span className="text-amber-300 font-bold">$0 (Founder)</span>
                               ) : adv.planTier === 'courtesy' || Number(adv.monthlyFeeUsd) === 0 ? (
-                                <span className="text-emerald-400 font-bold">Cortesía $0</span>
+                                <span className="text-emerald-400 font-bold">{isEn ? 'Courtesy $0' : 'Cortesía $0'}</span>
                               ) : (
                                 <strong className="text-emerald-400 text-xs font-black">
                                   ${adv.monthlyFeeUsd || 79}{' '}
-                                  <span className="text-[9px] text-slate-500">/m</span>
+                                  <span className="text-[9px] text-slate-500">/{isEn ? 'mo' : 'm'}</span>
                                 </strong>
                               )}
                             </td>
@@ -18013,14 +18132,14 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         }`}
                       >
                         {isFounder
-                          ? '👑 Master Ilimitado'
+                          ? (isEn ? '👑 Master Unlimited' : '👑 Master Ilimitado')
                           : isCourtesy
-                          ? '🎁 Cortesía VIP ($0 USD)'
+                          ? (isEn ? '🎁 Courtesy VIP ($0 USD)' : '🎁 Cortesía VIP ($0 USD)')
                           : viewingAdvisorWorks.planTier === 'level_3'
-                          ? `Nivel 3 • $${viewingAdvisorWorks.monthlyFeeUsd ?? 140} USD`
+                          ? (isEn ? `Level 3 • $${viewingAdvisorWorks.monthlyFeeUsd ?? 140} USD` : `Nivel 3 • $${viewingAdvisorWorks.monthlyFeeUsd ?? 140} USD`)
                           : viewingAdvisorWorks.planTier === 'level_2' || viewingAdvisorWorks.accountType === 'partner_agency'
-                          ? `Nivel 2 ★ • $${viewingAdvisorWorks.monthlyFeeUsd ?? 90} USD`
-                          : `Nivel 1 • $${viewingAdvisorWorks.monthlyFeeUsd ?? 49} USD`}
+                          ? (isEn ? `Level 2 ★ • $${viewingAdvisorWorks.monthlyFeeUsd ?? 90} USD` : `Nivel 2 ★ • $${viewingAdvisorWorks.monthlyFeeUsd ?? 90} USD`)
+                          : (isEn ? `Level 1 • $${viewingAdvisorWorks.monthlyFeeUsd ?? 49} USD` : `Nivel 1 • $${viewingAdvisorWorks.monthlyFeeUsd ?? 49} USD`)}
                       </span>
                     );
                   })()}
@@ -18042,7 +18161,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <span>•</span>
                   <span>📞 Tel: <strong className="text-slate-300 font-mono">{viewingAdvisorWorks.phone}</strong></span>
                   <span>•</span>
-                  <span>💰 Canon: <strong className="text-emerald-400">${viewingAdvisorWorks.monthlyFeeUsd || 0} USD/mes</strong></span>
+                  <span>💰 {isEn ? 'Fee:' : 'Canon:'} <strong className="text-emerald-400">${viewingAdvisorWorks.monthlyFeeUsd || 0} USD{isEn ? '/mo' : '/mes'}</strong></span>
                 </p>
               </div>
 
@@ -18103,31 +18222,31 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <strong className="text-base font-black text-white">{allAdvisorDossiers.length}</strong>
                   </div>
                   <div className="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
-                    <span className="text-[9.5px] text-emerald-400 font-bold block uppercase truncate">🟢 Activos Red</span>
+                    <span className="text-[9.5px] text-emerald-400 font-bold block uppercase truncate">{isEn ? '🟢 Active Network' : '🟢 Activos Red'}</span>
                     <strong className="text-base font-black text-emerald-300">{activeDossiers.length}</strong>
                   </div>
                   <div className="p-2 rounded-xl bg-rose-950/40 border border-rose-500/30">
-                    <span className="text-[9.5px] text-rose-400 font-bold block uppercase truncate">🗑️ Bóveda Forense</span>
+                    <span className="text-[9.5px] text-rose-400 font-bold block uppercase truncate">{isEn ? '🗑️ Forensic Vault' : '🗑️ Bóveda Forense'}</span>
                     <strong className="text-base font-black text-rose-300">{deletedDossiers.length}</strong>
                   </div>
                   <div className="p-2 rounded-xl bg-slate-900 border border-emerald-500/20">
-                    <span className="text-[9.5px] text-emerald-400 font-bold block uppercase truncate">🏗️ Creaciones</span>
+                    <span className="text-[9.5px] text-emerald-400 font-bold block uppercase truncate">{isEn ? '🏗️ Creations' : '🏗️ Creaciones'}</span>
                     <strong className="text-sm font-black text-white">{createsCount} <span className="text-[9px] text-slate-400 font-normal">/ {effCreates}</span></strong>
                   </div>
                   <div className="p-2 rounded-xl bg-slate-900 border border-blue-500/20">
-                    <span className="text-[9.5px] text-blue-400 font-bold block uppercase truncate">🔬 Auditorías</span>
+                    <span className="text-[9.5px] text-blue-400 font-bold block uppercase truncate">{isEn ? '🔬 Audits' : '🔬 Auditorías'}</span>
                     <strong className="text-sm font-black text-white">{auditsCount} <span className="text-[9px] text-slate-400 font-normal">/ {effAudits}</span></strong>
                   </div>
                   <div className="p-2 rounded-xl bg-slate-900 border border-amber-500/20">
-                    <span className="text-[9.5px] text-amber-400 font-bold block uppercase truncate">🛡️ Rescates</span>
+                    <span className="text-[9.5px] text-amber-400 font-bold block uppercase truncate">{isEn ? '🛡️ Rescues' : '🛡️ Rescates'}</span>
                     <strong className="text-sm font-black text-white">{rescuesCount} <span className="text-[9px] text-slate-400 font-normal">/ {effRescues}</span></strong>
                   </div>
                   <div className="p-2 rounded-xl bg-slate-900 border border-purple-500/20">
-                    <span className="text-[9.5px] text-purple-400 font-bold block uppercase truncate">⚖️ Apelaciones</span>
+                    <span className="text-[9.5px] text-purple-400 font-bold block uppercase truncate">{isEn ? '⚖️ Appeals' : '⚖️ Apelaciones'}</span>
                     <strong className="text-sm font-black text-white">{appealsCount} <span className="text-[9px] text-slate-400 font-normal">/ {effAppeals}</span></strong>
                   </div>
                   <div className="p-2 rounded-xl bg-slate-900 border border-indigo-500/20">
-                    <span className="text-[9.5px] text-indigo-400 font-bold block uppercase truncate">🎯 Prospección</span>
+                    <span className="text-[9.5px] text-indigo-400 font-bold block uppercase truncate">{isEn ? '🎯 Prospecting' : '🎯 Prospección'}</span>
                     <strong className="text-sm font-black text-white">{prospectsCount} <span className="text-[9px] text-slate-400 font-normal">/ {effTools}</span></strong>
                   </div>
                 </div>
@@ -18192,11 +18311,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       className="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 cursor-pointer shrink-0"
                     >
                       <option value="all">{isEn ? 'All Services' : 'Todos los Servicios'}</option>
-                      <option value="create">🏗️ Creación de Ficha</option>
-                      <option value="audit">🔬 Auditoría Top 3</option>
-                      <option value="rescue">🛡️ Rescate 72h</option>
-                      <option value="appeal">⚖️ Apelación 1-3★</option>
-                      <option value="prospect">🎯 Prospección & Pitch</option>
+                      <option value="create">{isEn ? '🏗️ New Listing Creation' : '🏗️ Creación de Ficha'}</option>
+                      <option value="audit">{isEn ? '🔬 Top 3 Audit' : '🔬 Auditoría Top 3'}</option>
+                      <option value="rescue">{isEn ? '🛡️ 72h Rescue' : '🛡️ Rescate 72h'}</option>
+                      <option value="appeal">{isEn ? '⚖️ 1-3★ Appeal' : '⚖️ Apelación 1-3★'}</option>
+                      <option value="prospect">{isEn ? '🎯 Prospect & Pitch' : '🎯 Prospección & Pitch'}</option>
                     </select>
 
                     <div className="relative flex-1">
@@ -18366,9 +18485,13 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                           {d.closingStatus && (
                             <div className="flex items-center justify-between text-[10.5px] p-2 rounded-xl bg-slate-900/60 border border-slate-800">
-                              <span className="text-slate-400">Estado de Cierre:</span>
+                              <span className="text-slate-400">{isEn ? 'Closing Status:' : 'Estado de Cierre:'}</span>
                               <span className="font-bold text-amber-300">
-                                {d.closingStatus === 'prestigia_subscriber' ? '💎 Suscriptor Prestigia' : d.closingStatus === 'setup_paid' ? '💵 Setup Pagado' : '📝 En Estudio'}
+                                {d.closingStatus === 'prestigia_subscriber'
+                                  ? (isEn ? '💎 Prestigia Subscriber' : '💎 Suscriptor Prestigia')
+                                  : d.closingStatus === 'setup_paid'
+                                  ? (isEn ? '💵 Setup Paid' : '💵 Setup Pagado')
+                                  : (isEn ? '📝 In Review' : '📝 En Estudio')}
                               </span>
                             </div>
                           )}
@@ -18382,7 +18505,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                   <span>{isEn ? 'Profile Deleted by Advisor' : 'Ficha Borrada por el Asesor'}</span>
                                 </span>
                                 <span className="text-[9.5px] font-mono text-slate-400">
-                                  {d.deletedAt ? new Date(d.deletedAt).toLocaleString() : 'Archivado'}
+                                  {d.deletedAt ? new Date(d.deletedAt).toLocaleString() : (isEn ? 'Archived' : 'Archivado')}
                                 </span>
                               </div>
                               <p className="text-[10px] text-slate-400 leading-tight">
@@ -18437,7 +18560,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                 onClick={() => setViewingAdvisorWorks(null)}
                 className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
               >
-                Cerrar
+                {isEn ? 'Close' : 'Cerrar'}
               </button>
             </div>
           </div>
@@ -19643,28 +19766,28 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                     <optgroup label={isEn ? '📋 4 Official Plan Tiers (3 Levels + 1 Courtesy)' : '📋 Las 4 Fichas Oficiales (3 Niveles + 1 Cortesía)'}>
                       <option value="level_1">
-                        💼 Nivel 1 ($49 USD • 50 Créditos) ({advisorsList.filter((a) => {
+                        💼 {isEn ? 'Level 1 ($49 USD • 50 Credits)' : 'Nivel 1 ($49 USD • 50 Créditos)'} ({advisorsList.filter((a) => {
                           if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                           const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
                           return t === 'level_1';
                         }).length})
                       </option>
                       <option value="level_2">
-                        🏢 Nivel 2 ★ ($90 USD • 100 Créditos) ({advisorsList.filter((a) => {
+                        🏢 {isEn ? 'Level 2 ★ ($90 USD • 100 Credits)' : 'Nivel 2 ★ ($90 USD • 100 Créditos)'} ({advisorsList.filter((a) => {
                           if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                           const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
                           return t === 'level_2';
                         }).length})
                       </option>
                       <option value="level_3">
-                        🏢 Nivel 3 ($140 USD • 150 Créditos) ({advisorsList.filter((a) => {
+                        🏢 {isEn ? 'Level 3 ($140 USD • 150 Credits)' : 'Nivel 3 ($140 USD • 150 Créditos)'} ({advisorsList.filter((a) => {
                           if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                           const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
                           return t === 'level_3';
                         }).length})
                       </option>
                       <option value="courtesy">
-                        🎁 Cortesía VIP ($0 USD • 15 Créditos) ({advisorsList.filter((a) => {
+                        🎁 {isEn ? 'VIP Courtesy ($0 USD • 15 Credits)' : 'Cortesía VIP ($0 USD • 15 Créditos)'} ({advisorsList.filter((a) => {
                           if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
                           return a.planTier === 'courtesy' || Number(a.monthlyFeeUsd) === 0;
                         }).length})
@@ -20019,7 +20142,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <span>{isEn ? 'Licensing Health & Status' : 'Salud de Licencias & Estado'}</span>
                   </span>
                   <span className="text-[10px] text-emerald-400 font-mono font-bold">
-                    {Math.round((reportStats.active / (reportStats.total || 1)) * 100)}% Operativas
+                    {Math.round((reportStats.active / (reportStats.total || 1)) * 100)}% {isEn ? 'Operational' : 'Operativas'}
                   </span>
                 </div>
 
@@ -20028,24 +20151,24 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <div
                       style={{ width: `${(reportStats.active / (reportStats.total || 1)) * 100}%` }}
                       className="h-full bg-emerald-500 transition-all duration-500"
-                      title={`Activas: ${reportStats.active}`}
+                      title={isEn ? `Active: ${reportStats.active}` : `Activas: ${reportStats.active}`}
                     />
                     <div
                       style={{ width: `${(reportStats.inactive / (reportStats.total || 1)) * 100}%` }}
                       className="h-full bg-rose-500 transition-all duration-500"
-                      title={`Apagadas: ${reportStats.inactive}`}
+                      title={isEn ? `Turned Off: ${reportStats.inactive}` : `Apagadas: ${reportStats.inactive}`}
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 pt-1 text-[10px]">
                     <div className="p-2 rounded-xl bg-slate-900 border border-emerald-500/20 text-center">
-                      <span className="text-slate-400 block text-[9px]">🟢 Encendidas (Activas)</span>
+                      <span className="text-slate-400 block text-[9px]">{isEn ? '🟢 Turned On (Active)' : '🟢 Encendidas (Activas)'}</span>
                       <strong className="text-sm font-black text-emerald-400">
                         {reportStats.active}
                       </strong>
                     </div>
                     <div className="p-2 rounded-xl bg-slate-900 border border-rose-500/20 text-center">
-                      <span className="text-slate-400 block text-[9px]">🔴 Apagadas (Inactivas)</span>
+                      <span className="text-slate-400 block text-[9px]">{isEn ? '🔴 Turned Off (Inactive)' : '🔴 Apagadas (Inactivas)'}</span>
                       <strong className="text-sm font-black text-rose-400">
                         {reportStats.inactive}
                       </strong>
@@ -20063,7 +20186,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <span>{isEn ? 'Complete Users Directory Table' : 'Directorio Consolidado de Usuarios & Expedientes'}</span>
                 </span>
                 <span className="text-[11px] text-slate-400">
-                  {filteredReportUsers.length} registros listados
+                  {filteredReportUsers.length} {isEn ? 'records listed' : 'registros listados'}
                 </span>
               </div>
 
@@ -20072,16 +20195,16 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <thead className="bg-slate-900/95 text-[10px] uppercase font-black tracking-wider text-slate-400 border-b border-slate-800 sticky top-0 z-10 backdrop-blur-sm">
                     <tr>
                       <th className="py-3 px-3">#</th>
-                      <th className="py-3 px-3">Usuario & Titular</th>
-                      <th className="py-3 px-3">Tipo & Plan</th>
-                      <th className="py-3 px-3">Contacto Directo</th>
-                      <th className="py-3 px-3">Ubicación</th>
-                      <th className="py-3 px-3">Estado</th>
-                      <th className="py-3 px-3">Canon (USD)</th>
-                      <th className="py-3 px-3">Cuotas (Mes)</th>
-                      <th className="py-3 px-3">Producción Real</th>
-                      <th className="py-3 px-3">Credencial Acceso</th>
-                      <th className="py-3 px-3">Inicio Ciclo</th>
+                      <th className="py-3 px-3">{isEn ? 'User & Holder' : 'Usuario & Titular'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Type & Plan' : 'Tipo & Plan'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Direct Contact' : 'Contacto Directo'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Location' : 'Ubicación'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Status' : 'Estado'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Fee (USD)' : 'Canon (USD)'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Monthly Quotas' : 'Cuotas (Mes)'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Real Production' : 'Producción Real'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Access Credential' : 'Credencial Acceso'}</th>
+                      <th className="py-3 px-3">{isEn ? 'Cycle Start' : 'Inicio Ciclo'}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/80">
@@ -20158,23 +20281,23 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                   }`}
                                 >
                                   {isFounder
-                                    ? '👑 Fundador'
+                                    ? (isEn ? '👑 Founder' : '👑 Fundador')
                                     : adv.accountType === 'partner_agency'
-                                    ? '🏢 Agencia Partner'
-                                    : '💼 Asesor'}
+                                    ? (isEn ? '🏢 Partner Agency' : '🏢 Agencia Partner')
+                                    : (isEn ? '💼 Sales Advisor' : '💼 Asesor')}
                                 </span>
                                 <span className="text-[10px] text-slate-400 block font-medium">
                                   {adv.planTier === 'courtesy'
-                                    ? '🎁 Cortesía ($0)'
+                                    ? (isEn ? '🎁 Courtesy ($0)' : '🎁 Cortesía ($0)')
                                     : adv.planTier === 'level_3'
-                                    ? 'Nivel 3'
+                                    ? (isEn ? 'Level 3' : 'Nivel 3')
                                     : adv.planTier === 'level_2'
-                                    ? 'Nivel 2'
+                                    ? (isEn ? 'Level 2' : 'Nivel 2')
                                     : adv.planTier === 'level_1'
-                                    ? 'Nivel 1'
+                                    ? (isEn ? 'Level 1' : 'Nivel 1')
                                     : isFounder
-                                    ? 'Ilimitado'
-                                    : 'Estándar'}
+                                    ? (isEn ? 'Master Unlimited' : 'Ilimitado')
+                                    : (isEn ? 'Standard' : 'Estándar')}
                                 </span>
                               </div>
                             </td>
@@ -20192,7 +20315,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                   <span>{adv.phone}</span>
                                 </a>
                               ) : (
-                                <span className="text-slate-500 italic text-[10px]">Sin teléfono</span>
+                                <span className="text-slate-500 italic text-[10px]">{isEn ? 'No phone' : 'Sin teléfono'}</span>
                               )}
                             </td>
 
@@ -20215,7 +20338,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                     : 'bg-rose-950 text-rose-300 border border-rose-500/30'
                                 }`}
                               >
-                                <span>{adv.active ? '🟢 Encendida' : '🔴 Apagada'}</span>
+                                <span>{adv.active ? (isEn ? '🟢 Active' : '🟢 Encendida') : (isEn ? '🔴 Off' : '🔴 Apagada')}</span>
                               </span>
                             </td>
 
@@ -20224,11 +20347,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                               {isFounder ? (
                                 <span className="text-amber-300 font-bold">$0 (Founder)</span>
                               ) : adv.planTier === 'courtesy' || Number(adv.monthlyFeeUsd) === 0 ? (
-                                <span className="text-emerald-400 font-bold">Cortesía $0</span>
+                                <span className="text-emerald-400 font-bold">{isEn ? 'Courtesy $0' : 'Cortesía $0'}</span>
                               ) : (
                                 <strong className="text-emerald-400 text-xs font-black">
                                   ${adv.monthlyFeeUsd || 79}{' '}
-                                  <span className="text-[9px] text-slate-500">/m</span>
+                                  <span className="text-[9px] text-slate-500">{isEn ? '/mo' : '/m'}</span>
                                 </strong>
                               )}
                             </td>
@@ -20236,19 +20359,19 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             {/* Cuotas (Mes) */}
                             <td className="py-2.5 px-3">
                               <div className="flex items-center gap-1 text-[9px] font-mono flex-wrap">
-                                <span className="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30" title="Creación">
+                                <span className="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30" title={isEn ? 'Creation' : 'Creación'}>
                                   C:{adv.maxCreatesMonthly ?? 10}
                                 </span>
-                                <span className="px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/30" title="Auditoría">
+                                <span className="px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/30" title={isEn ? 'Audit' : 'Auditoría'}>
                                   A:{adv.maxAuditsMonthly ?? 10}
                                 </span>
-                                <span className="px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/30" title="Rescate">
+                                <span className="px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/30" title={isEn ? 'Rescue' : 'Rescate'}>
                                   R:{adv.maxRescuesMonthly ?? 10}
                                 </span>
-                                <span className="px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/30" title="Apelación">
+                                <span className="px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/30" title={isEn ? 'Appeal' : 'Apelación'}>
                                   AP:{adv.maxAppealsMonthly ?? 10}
                                 </span>
-                                <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-500/30" title="Prospección">
+                                <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-500/30" title={isEn ? 'Prospecting' : 'Prospección'}>
                                   P:{adv.maxToolsMonthly ?? 10}
                                 </span>
                               </div>
@@ -20258,7 +20381,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             <td className="py-2.5 px-3">
                               <div className="space-y-0.5">
                                 <strong className="text-amber-300 font-black text-xs block">
-                                  {advisorDossiers.length} fichas
+                                  {advisorDossiers.length} {isEn ? 'dossiers' : 'fichas'}
                                 </strong>
                                 <div className="text-[9px] text-slate-400 flex items-center gap-1 font-mono">
                                   <span>🏗️{creates}</span>
@@ -20269,7 +20392,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                 </div>
                                 {deleted > 0 && (
                                   <span className="text-[9px] text-rose-400 font-bold block">
-                                    🗑️ {deleted} en Bóveda
+                                    🗑️ {deleted} {isEn ? 'in Vault' : 'en Bóveda'}
                                   </span>
                                 )}
                               </div>
@@ -20290,7 +20413,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                     }))
                                   }
                                   className="p-1 rounded text-slate-500 hover:text-white transition cursor-pointer"
-                                  title="Revelar contraseña"
+                                  title={isEn ? 'Reveal password' : 'Revelar contraseña'}
                                 >
                                   {isRevealed ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                                 </button>
@@ -20301,7 +20424,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             <td className="py-2.5 px-3 text-[10px] text-slate-400 font-mono">
                               {adv.planStartDate
                                 ? new Date(adv.planStartDate).toLocaleDateString()
-                                : 'Activo'}
+                                : (isEn ? 'Active' : 'Activo')}
                             </td>
                           </tr>
                         );
