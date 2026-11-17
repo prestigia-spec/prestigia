@@ -2573,36 +2573,88 @@ export default function LocalStudioPage() {
     }
   };
 
-  // Generador de Mensaje Oficial de Bienvenida con Credenciales y Cupos Dinámicos por WhatsApp
-  const getAdvisorWelcomeWhatsAppUrl = (adv: StudioAdvisorUser): string => {
-    const cleanPhone = (adv.phone || '').replace(/[^0-9]/g, '');
-    if (!cleanPhone) return '#';
-
+  // Generador de Mensaje Oficial de Bienvenida con Credenciales y Cupos Dinámicos
+  const getAdvisorWelcomeText = (adv: StudioAdvisorUser): string => {
+    const isFounder = adv.id === 'adv-luisma' || adv.accountType === 'founder';
     const fee = adv.monthlyFeeUsd !== undefined && adv.monthlyFeeUsd !== null
       ? adv.monthlyFeeUsd
       : (adv.planTier === 'level_3' ? 140 : adv.planTier === 'level_2' ? 90 : adv.planTier === 'courtesy' ? 0 : 49);
 
     const isCourtesy = adv.planTier === 'courtesy' || fee === 0;
 
-    const planName =
-      adv.planTier === 'level_3' ? 'Nivel 3' :
-      adv.planTier === 'level_2' ? 'Nivel 2' :
-      adv.planTier === 'founder' ? 'Dirección General / Master' :
-      isCourtesy ? 'Licencia de Cortesía / Período de Prueba' :
-      'Nivel 1';
+    const planName = isEn
+      ? (isFounder
+          ? 'Master Director / Founder (Unlimited)'
+          : adv.planTier === 'level_3'
+          ? 'Level 3 ($140 USD • 150 Monthly Credits)'
+          : adv.planTier === 'level_2'
+          ? 'Level 2 ($90 USD • 100 Monthly Credits)'
+          : isCourtesy
+          ? 'VIP Courtesy ($0 USD • 15 Monthly Credits)'
+          : 'Level 1 ($49 USD • 50 Monthly Credits)')
+      : (isFounder
+          ? 'Dirección General / Fundador (Ilimitado)'
+          : adv.planTier === 'level_3'
+          ? 'Nivel 3 ($140 USD • 150 Créditos Mensuales)'
+          : adv.planTier === 'level_2'
+          ? 'Nivel 2 ($90 USD • 100 Créditos Mensuales)'
+          : isCourtesy
+          ? 'Cortesía VIP ($0 USD • 15 Créditos Mensuales)'
+          : 'Nivel 1 ($49 USD • 50 Créditos Mensuales)');
 
-    const feeText = isCourtesy ? '$0 USD/mes (100% Bonificada)' : `$${fee} USD/mes`;
+    const feeText = isCourtesy
+      ? (isEn ? '$0 USD/mo (100% Granted)' : '$0 USD/mes (100% Bonificada)')
+      : `$${fee} USD${isEn ? '/mo' : '/mes'}`;
 
-    // Lectura dinámica de los cupos exactos y activos configurados para esta cuenta (+ recargas)
-    const quotaCreates = (adv.maxCreatesMonthly ?? 10) + (adv.extraCredits?.creates || 0);
-    const quotaAudits = (adv.maxAuditsMonthly ?? 10) + (adv.extraCredits?.audits || 0);
-    const quotaRescues = (adv.maxRescuesMonthly ?? 10) + (adv.extraCredits?.rescues || 0);
-    const quotaAppeals = (adv.maxAppealsMonthly ?? 10) + (adv.extraCredits?.appeals || 0);
-    const quotaTools = (adv.maxToolsMonthly ?? 10) + (adv.extraCredits?.tools || 0);
+    const defaultPerTool = isFounder ? 9999 : adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : isCourtesy ? 3 : 10;
+
+    // Calibración para asegurar que cuentas de cortesía reflejen los 3 créditos oficiales por pestaña si venían con el legacy 5
+    const baseCreates = (isCourtesy && adv.maxCreatesMonthly === 5) ? 3 : (adv.maxCreatesMonthly ?? defaultPerTool);
+    const baseAudits = (isCourtesy && adv.maxAuditsMonthly === 5) ? 3 : (adv.maxAuditsMonthly ?? defaultPerTool);
+    const baseRescues = (isCourtesy && adv.maxRescuesMonthly === 5) ? 3 : (adv.maxRescuesMonthly ?? defaultPerTool);
+    const baseAppeals = (isCourtesy && adv.maxAppealsMonthly === 5) ? 3 : (adv.maxAppealsMonthly ?? defaultPerTool);
+    const baseTools = (isCourtesy && adv.maxToolsMonthly === 5) ? 3 : (adv.maxToolsMonthly ?? defaultPerTool);
+
+    const quotaCreates = baseCreates + (adv.extraCredits?.creates || 0);
+    const quotaAudits = baseAudits + (adv.extraCredits?.audits || 0);
+    const quotaRescues = baseRescues + (adv.extraCredits?.rescues || 0);
+    const quotaAppeals = baseAppeals + (adv.extraCredits?.appeals || 0);
+    const quotaTools = baseTools + (adv.extraCredits?.tools || 0);
 
     const totalCredits = quotaCreates + quotaAudits + quotaRescues + quotaAppeals + quotaTools;
 
-    const msg = `¡Hola, ${adv.name}! 👋 Bienvenido a la red oficial de *Prestigia Local Studio*.
+    if (isEn) {
+      return `Hello, ${adv.name}! 👋 Welcome to the official *Prestigia Local Studio* network.
+
+Your commercial account has been successfully activated on the platform. Below is the summary of your active subscription and official access credentials:
+
+━━━━━━━━━━━━━━━━━━━
+🛡️ *PLAN DETAILS:*
+━━━━━━━━━━━━━━━━━━━
+• *Plan:* ${planName}
+• *Monthly Fee:* ${feeText}
+• *Total Assigned Quota:* ${totalCredits} Active monthly credits
+• *Distribution per Tool:*
+  ✓ Top 3 Listing Creation: ${quotaCreates} credits
+  ✓ Forensic Audits: ${quotaAudits} credits
+  ✓ Business Rescues: ${quotaRescues} credits
+  ✓ Review Appeals & Challenges: ${quotaAppeals} credits
+  ✓ Top 3 Weapons & Strategies: ${quotaTools} credits
+
+⚡ *EMERGENCY TOP-UPS (+10 CREDITS):*
+If you require more quota before the end of your billing cycle to prospect or close clients, you can request an immediate top-up of *+10 credits at a time* by contacting General Management.
+
+━━━━━━━━━━━━━━━━━━━
+🔑 *YOUR ACCESS CREDENTIALS:*
+━━━━━━━━━━━━━━━━━━━
+🌐 *Platform:* https://prestigia-oficial.vercel.app/local-studio
+👤 *Username:* ${adv.username}
+🔒 *Password:* ${adv.password || '1234'}
+
+Wishing you great success prospecting and closing deals with Prestigia! 🚀`;
+    }
+
+    return `¡Hola, ${adv.name}! 👋 Bienvenido a la red oficial de *Prestigia Local Studio*.
 
 Tu cuenta comercial ha sido activada con éxito en la plataforma. A continuación encuentras el resumen de tu suscripción activa y tus credenciales oficiales de acceso:
 
@@ -2630,8 +2682,14 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 🔒 *Contraseña:* ${adv.password || '1234'}
 
 ¡Muchos éxitos prospectando y cerrando negocios con Prestigia! 🚀`;
+  };
 
-    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+  const getAdvisorWelcomeWhatsAppUrl = (adv: StudioAdvisorUser): string => {
+    const cleanPhone = (adv.phone || '').replace(/[^0-9]/g, '');
+    if (!cleanPhone) return '#';
+    const msg = getAdvisorWelcomeText(adv);
+    // Usamos api.whatsapp.com/send directo para evitar el 302 redirect de wa.me que corrompe emojis en Windows
+    return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(msg)}`;
   };
 
   // Sanitización y Validación Estricta de Entradas (Letras para nombres, + y números para teléfonos, formato de email obligatorio)
@@ -16945,19 +17003,39 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           <p className="text-xs text-slate-400 truncate">
                             📍 {adv.city || 'Bogotá'}, {adv.country || 'Colombia'}
                           </p>
-                          <div className="flex items-center gap-2 text-[11px] text-slate-400 truncate">
-                            <span>Teléfono: <strong className="text-slate-300 font-mono">{adv.phone || 'No registrado'}</strong></span>
+                          <div className="flex items-center justify-between gap-2 text-[11px] text-slate-400 flex-wrap">
+                            <span className="truncate">Tel: <strong className="text-slate-300 font-mono">{adv.phone || 'No registrado'}</strong></span>
                             {adv.phone && (
-                              <a
-                                href={getAdvisorWelcomeWhatsAppUrl(adv)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 text-[10px] shrink-0 bg-emerald-950/40 border border-emerald-500/30 px-2 py-0.5 rounded-lg hover:bg-emerald-900/50 transition cursor-pointer shadow-sm active:scale-95"
-                                title="Enviar bienvenida oficial con credenciales y cupo por WhatsApp"
-                              >
-                                <MessageSquare className="w-3 h-3 text-emerald-400" />
-                                <span>WhatsApp</span>
-                              </a>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <a
+                                  href={getAdvisorWelcomeWhatsAppUrl(adv)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 text-[10px] bg-emerald-950/40 border border-emerald-500/30 px-2 py-0.5 rounded-lg hover:bg-emerald-900/50 transition cursor-pointer shadow-sm active:scale-95"
+                                  title={isEn ? "Send official welcome via WhatsApp" : "Enviar bienvenida oficial con credenciales y cupo por WhatsApp"}
+                                >
+                                  <MessageSquare className="w-3 h-3 text-emerald-400" />
+                                  <span>WhatsApp</span>
+                                </a>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const text = getAdvisorWelcomeText(adv);
+                                    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+                                      navigator.clipboard.writeText(text);
+                                      showToast(isEn ? '📋 Official welcome message copied to clipboard!' : '📋 ¡Mensaje oficial de bienvenida copiado al portapapeles!');
+                                    } else {
+                                      copyToClipboard(text, isEn ? 'Welcome Message' : 'Mensaje de Bienvenida');
+                                    }
+                                  }}
+                                  className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 text-[10px] bg-amber-950/40 border border-amber-500/30 px-2 py-0.5 rounded-lg hover:bg-amber-900/50 transition cursor-pointer shadow-sm active:scale-95"
+                                  title={isEn ? "Copy official welcome message to clipboard" : "Copiar mensaje oficial de bienvenida al portapapeles"}
+                                >
+                                  <Copy className="w-3 h-3 text-amber-400" />
+                                  <span>{isEn ? "Copy Msg" : "Copiar"}</span>
+                                </button>
+                              </div>
                             )}
                           </div>
                         </div>
