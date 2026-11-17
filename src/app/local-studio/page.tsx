@@ -4716,7 +4716,299 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     };
   }, [filteredReportUsers, savedDossiers]);
 
-  // Descarga del Reporte Completo de Usuarios (Asesores & Agencias) en CSV
+  // Descarga del Reporte Ejecutivo de Usuarios (Asesores & Agencias) en Excel Profesional (.xls) con diseño, colores y badges
+  const downloadAdvisorsExcelReport = (customList?: StudioAdvisorUser[]) => {
+    const targetAdvisors = customList || advisorsList;
+    const nowStr = new Date().toLocaleString('es-CO', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    // Cálculos de KPIs para el resumen superior
+    const totalUsers = targetAdvisors.length;
+    const advisorsCount = targetAdvisors.filter(
+      (a) => a.accountType !== 'partner_agency' && a.id !== 'adv-luisma' && a.id !== 'adv-admin'
+    ).length;
+    const agenciesCount = targetAdvisors.filter((a) => a.accountType === 'partner_agency').length;
+    const totalMrr = targetAdvisors.reduce((acc, a) => acc + (a.monthlyFeeUsd || 0), 0);
+    const activeCount = targetAdvisors.filter((a) => a.active).length;
+    const inactiveCount = targetAdvisors.filter((a) => !a.active).length;
+
+    let totalCreatesAll = 0;
+    let totalAuditsAll = 0;
+    let totalRescuesAll = 0;
+    let totalAppealsAll = 0;
+    let totalToolsAll = 0;
+    let totalDossiersAll = 0;
+    let totalDeletedAll = 0;
+    let totalExtraAll = 0;
+
+    const dataRowsHtml = targetAdvisors.map((adv, index) => {
+      const isFounder = adv.id === 'adv-luisma' || adv.accountType === 'founder';
+      const advisorDossiers = savedDossiers.filter((d) => d.advisorId === adv.id);
+      const createsCount = advisorDossiers.filter((d) => d.mode === 'create').length;
+      const auditsCount = advisorDossiers.filter((d) => d.mode === 'audit').length;
+      const rescuesCount = advisorDossiers.filter((d) => d.mode === 'rescue').length;
+      const appealsCount = advisorDossiers.filter((d) => d.mode === 'appeal').length;
+      const toolsCount = advisorDossiers.filter((d) => d.mode === 'tools' || d.mode === 'prospect').length;
+      const deletedCount = advisorDossiers.filter((d) => d.deletedByAdvisor).length;
+      const extraTotal =
+        (adv.extraCredits?.creates || 0) +
+        (adv.extraCredits?.audits || 0) +
+        (adv.extraCredits?.rescues || 0) +
+        (adv.extraCredits?.appeals || 0) +
+        (adv.extraCredits?.tools || 0);
+
+      totalCreatesAll += createsCount;
+      totalAuditsAll += auditsCount;
+      totalRescuesAll += rescuesCount;
+      totalAppealsAll += appealsCount;
+      totalToolsAll += toolsCount;
+      totalDossiersAll += advisorDossiers.length;
+      totalDeletedAll += deletedCount;
+      totalExtraAll += extraTotal;
+
+      const typeLabel = isFounder
+        ? '👑 Dirección General / Fundador'
+        : adv.accountType === 'partner_agency'
+        ? '🏢 Agencia Partner B2B (Licencia)'
+        : '💼 Asesor Comercial Interno';
+
+      const typeBg = isFounder ? '#FEF3C7' : adv.accountType === 'partner_agency' ? '#F3E8FF' : '#E0E7FF';
+      const typeColor = isFounder ? '#92400E' : adv.accountType === 'partner_agency' ? '#6B21A8' : '#3730A3';
+      const typeBorder = isFounder ? '#FDE68A' : adv.accountType === 'partner_agency' ? '#E9D5FF' : '#C7D2FE';
+
+      const tierLabel =
+        adv.planTier === 'courtesy'
+          ? 'Cortesía VIP ($0)'
+          : adv.planTier === 'level_3'
+          ? 'Nivel 3'
+          : adv.planTier === 'level_2'
+          ? 'Nivel 2'
+          : adv.planTier === 'level_1'
+          ? 'Nivel 1'
+          : isFounder
+          ? 'Ilimitado Master'
+          : 'Estándar';
+
+      const statusBadge = adv.active
+        ? '<span style="background-color: #DCFCE7; color: #166534; font-weight: bold; padding: 4px 10px; border-radius: 4px; border: 1px solid #86EFAC;">🟢 ENCENDIDA</span>'
+        : '<span style="background-color: #FEE2E2; color: #991B1B; font-weight: bold; padding: 4px 10px; border-radius: 4px; border: 1px solid #FCA5A5;">🔴 APAGADA</span>';
+
+      const rowBg = index % 2 === 0 ? '#FFFFFF' : '#F8FAFC';
+
+      return `
+        <tr style="background-color: ${rowBg};">
+          <td style="mso-number-format: '\\@'; text-align: center; color: #64748B; font-weight: bold; font-family: Consolas, monospace;">${adv.id}</td>
+          <td style="mso-number-format: '\\@'; font-weight: bold; color: #0F172A;">${adv.name || 'Sin Nombre'}</td>
+          <td style="mso-number-format: '\\@'; color: #4338CA; font-weight: bold;">@${adv.username || ''}</td>
+          <td style="mso-number-format: '\\@'; text-align: center; background-color: #FEF2F2; color: #991B1B; font-weight: bold; font-family: Consolas, monospace; border: 1px dashed #FCA5A5;">${adv.password || '••••••••'}</td>
+          <td style="mso-number-format: '\\@'; text-align: center; font-weight: bold; color: #0284C7; background-color: #F0F9FF;">${adv.phone || '-'}</td>
+          <td style="text-align: center;"><span style="background-color: ${typeBg}; color: ${typeColor}; border: 1px solid ${typeBorder}; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 10px;">${typeLabel}</span></td>
+          <td style="mso-number-format: '\\@'; font-weight: bold; color: #334155;">${adv.agencyName || 'N/A'}</td>
+          <td style="text-align: center; color: #475569;">${adv.country || 'Colombia'}</td>
+          <td style="text-align: center; color: #475569;">${adv.city || '-'}</td>
+          <td style="text-align: center; font-weight: bold; color: #0F172A;">${tierLabel}</td>
+          <td style="mso-number-format: '\\$#,##0'; text-align: right; font-weight: bold; color: #15803D; background-color: #F0FDF4;">$${adv.monthlyFeeUsd ?? 0} USD</td>
+          <td style="text-align: center; text-transform: uppercase; font-weight: bold; color: #475569; font-size: 10px;">${adv.licenseStatus || 'active'}</td>
+          <td style="text-align: center;">${statusBadge}</td>
+          <td style="mso-number-format: 'yyyy-mm-dd'; text-align: center; color: #64748B;">${adv.planStartDate ? new Date(adv.planStartDate).toLocaleDateString() : 'N/A'}</td>
+          <td style="mso-number-format: '#,##0'; text-align: center; font-weight: bold; color: #0F172A;">${adv.maxCreatesMonthly ?? 10}</td>
+          <td style="mso-number-format: '#,##0'; text-align: center; font-weight: bold; color: #0F172A;">${adv.maxAuditsMonthly ?? 10}</td>
+          <td style="mso-number-format: '#,##0'; text-align: center; font-weight: bold; color: #0F172A;">${adv.maxRescuesMonthly ?? 10}</td>
+          <td style="mso-number-format: '#,##0'; text-align: center; font-weight: bold; color: #0F172A;">${adv.maxAppealsMonthly ?? 10}</td>
+          <td style="mso-number-format: '#,##0'; text-align: center; font-weight: bold; color: #0F172A;">${adv.maxToolsMonthly ?? 10}</td>
+          <td style="mso-number-format: '#,##0'; text-align: center; font-weight: bold; color: #D97706; background-color: #FFFBEB;">${extraTotal}</td>
+          <td style="mso-number-format: '#,##0'; text-align: center; font-weight: 900; color: #1D4ED8; background-color: #EFF6FF; font-size: 12px;">${advisorDossiers.length}</td>
+          <td style="mso-number-format: '#,##0'; text-align: center; color: #334155;">${createsCount}</td>
+          <td style="mso-number-format: '#,##0'; text-align: center; color: #334155;">${auditsCount}</td>
+          <td style="mso-number-format: '#,##0'; text-align: center; color: #334155;">${rescuesCount}</td>
+          <td style="mso-number-format: '#,##0'; text-align: center; color: #334155;">${appealsCount}</td>
+          <td style="mso-number-format: '#,##0'; text-align: center; color: #334155;">${toolsCount}</td>
+          <td style="mso-number-format: '#,##0'; text-align: center; color: #94A3B8;">${deletedCount}</td>
+        </tr>
+      `;
+    }).join('');
+
+    const excelHtml = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <!--[if gte mso 9]>
+        <xml>
+          <x:ExcelWorkbook>
+            <x:ExcelWorksheets>
+              <x:ExcelWorksheet>
+                <x:Name>Red Usuarios y Licencias</x:Name>
+                <x:WorksheetOptions>
+                  <x:DisplayGridlines/>
+                  <x:Print><x:ValidPrinterInfo/></x:Print>
+                </x:WorksheetOptions>
+              </x:ExcelWorksheet>
+            </x:ExcelWorksheets>
+          </x:ExcelWorkbook>
+        </xml>
+        <![endif]-->
+        <style>
+          body { font-family: 'Segoe UI', Calibri, Arial, sans-serif; margin: 0; padding: 10px; background-color: #F8FAFC; }
+          table { border-collapse: collapse; width: 100%; font-family: 'Segoe UI', Calibri, Arial, sans-serif; font-size: 11px; }
+          th { border: 1px solid #334155; padding: 9px 12px; font-weight: bold; background-color: #0F172A; color: #FFFFFF; }
+          td { border: 1px solid #CBD5E1; padding: 7px 10px; font-size: 11px; vertical-align: middle; }
+        </style>
+      </head>
+      <body>
+        <table border="1" cellpadding="0" cellspacing="0">
+          <!-- 1. BANNER EJECUTIVO CORPORATIVO PRESTIGIA -->
+          <tr>
+            <th colspan="27" style="background-color: #0B132B; color: #F59E0B; font-size: 16px; font-weight: 900; padding: 14px; text-align: left; border-bottom: 3px solid #F59E0B;">
+              ⭐ PRESTIGIA LOCAL STUDIO • AUDITORÍA EJECUTIVA DE RED DE USUARIOS, ASESORES Y LICENCIAS B2B
+            </th>
+          </tr>
+          <tr style="background-color: #1E293B;">
+            <td colspan="15" style="background-color: #1E293B; color: #E2E8F0; font-size: 11px; padding: 6px 14px; border: none;">
+              <strong>Área:</strong> Dirección General / Red Comercial & Licenciamiento SaaS • <strong>Emisor Master:</strong> Luisma
+            </td>
+            <td colspan="12" style="background-color: #1E293B; color: #94A3B8; font-size: 11px; text-align: right; padding: 6px 14px; border: none;">
+              <strong>Fecha de Emisión:</strong> ${nowStr} • <strong>Registros:</strong> ${totalUsers} cuentas
+            </td>
+          </tr>
+          <tr><td colspan="27" style="height: 10px; background-color: #F8FAFC; border: none;"></td></tr>
+
+          <!-- 2. RESUMEN EJECUTIVO (KPI BOXES) -->
+          <tr style="background-color: #F1F5F9;">
+            <td colspan="4" style="background-color: #0F172A; color: #F8FAFC; padding: 10px; text-align: center; border: 2px solid #334155;">
+              <span style="font-size: 9px; text-transform: uppercase; color: #94A3B8; display: block; font-weight: bold;">TOTAL USUARIOS EN RED</span>
+              <strong style="font-size: 18px; color: #F59E0B; display: block;">${totalUsers}</strong>
+            </td>
+            <td colspan="4" style="background-color: #1E1B4B; color: #F8FAFC; padding: 10px; text-align: center; border: 2px solid #4338CA;">
+              <span style="font-size: 9px; text-transform: uppercase; color: #A5B4FC; display: block; font-weight: bold;">ASESORES COMERCIALES</span>
+              <strong style="font-size: 18px; color: #818CF8; display: block;">${advisorsCount}</strong>
+            </td>
+            <td colspan="4" style="background-color: #3B0764; color: #F8FAFC; padding: 10px; text-align: center; border: 2px solid #7E22CE;">
+              <span style="font-size: 9px; text-transform: uppercase; color: #D8B4FE; display: block; font-weight: bold;">AGENCIAS PARTNERS B2B</span>
+              <strong style="font-size: 18px; color: #C084FC; display: block;">${agenciesCount}</strong>
+            </td>
+            <td colspan="5" style="background-color: #064E3B; color: #F8FAFC; padding: 10px; text-align: center; border: 2px solid #059669;">
+              <span style="font-size: 9px; text-transform: uppercase; color: #6EE7B7; display: block; font-weight: bold;">FACTURACIÓN RECURRENTE (MRR)</span>
+              <strong style="font-size: 18px; color: #34D399; display: block;">$${totalMrr} USD / mes</strong>
+            </td>
+            <td colspan="5" style="background-color: #0C4A6E; color: #F8FAFC; padding: 10px; text-align: center; border: 2px solid #0284C7;">
+              <span style="font-size: 9px; text-transform: uppercase; color: #7DD3FC; display: block; font-weight: bold;">TOTAL FICHAS PRODUCIDAS</span>
+              <strong style="font-size: 18px; color: #38BDF8; display: block;">${totalDossiersAll} Fichas</strong>
+            </td>
+            <td colspan="5" style="background-color: #1E293B; color: #F8FAFC; padding: 10px; text-align: center; border: 2px solid #475569;">
+              <span style="font-size: 9px; text-transform: uppercase; color: #CBD5E1; display: block; font-weight: bold;">ESTADO OPERATIVO</span>
+              <strong style="font-size: 15px; color: #4ADE80; display: block;">🟢 ${activeCount} Activas • 🔴 ${inactiveCount} Pausadas</strong>
+            </td>
+          </tr>
+          <tr><td colspan="27" style="height: 12px; background-color: #F8FAFC; border: none;"></td></tr>
+
+          <!-- 3. ENCABEZADOS DE COLUMNAS -->
+          <tr style="background-color: #0F172A; color: #FFFFFF;">
+            <th style="width: 110px;">ID Usuario</th>
+            <th style="width: 180px;">Nombre Completo / Titular</th>
+            <th style="width: 140px;">Usuario (@username)</th>
+            <th style="width: 130px;">Contraseña de Acceso</th>
+            <th style="width: 140px;">Teléfono / WhatsApp</th>
+            <th style="width: 170px;">Tipo de Cuenta</th>
+            <th style="width: 160px;">Nombre de Agencia</th>
+            <th style="width: 100px;">País</th>
+            <th style="width: 110px;">Ciudad</th>
+            <th style="width: 130px;">Nivel de Plan</th>
+            <th style="width: 120px;">Canon Mensual (USD)</th>
+            <th style="width: 110px;">Estado Licencia</th>
+            <th style="width: 130px;">Cuenta Encendida</th>
+            <th style="width: 110px;">Fecha Inicio</th>
+            <th style="width: 90px;">Cuota Creación</th>
+            <th style="width: 90px;">Cuota Auditoría</th>
+            <th style="width: 90px;">Cuota Rescate</th>
+            <th style="width: 90px;">Cuota Apelación</th>
+            <th style="width: 90px;">Cuota Prospección</th>
+            <th style="width: 90px;">Créditos Extra</th>
+            <th style="width: 100px;">Total Fichas</th>
+            <th style="width: 80px;">Creadas</th>
+            <th style="width: 80px;">Auditorías</th>
+            <th style="width: 80px;">Rescates</th>
+            <th style="width: 80px;">Apelaciones</th>
+            <th style="width: 80px;">Prospecciones</th>
+            <th style="width: 90px;">Bóveda Forense</th>
+          </tr>
+
+          <!-- 4. FILAS DE DATOS ESTILIZADAS -->
+          ${dataRowsHtml}
+
+          <!-- 5. FILA DE TOTALES CONSOLIDADOS -->
+          <tr style="background-color: #0F172A; color: #FFFFFF; font-weight: bold; border-top: 2px solid #F59E0B;">
+            <td colspan="5" style="text-align: right; padding: 10px 14px; font-size: 12px; color: #F59E0B; background-color: #0F172A;">
+              TOTALES CONSOLIDADOS DE LA RED (${totalUsers} USUARIOS):
+            </td>
+            <td colspan="5" style="text-align: center; color: #E2E8F0; background-color: #0F172A;">
+              ${advisorsCount} Asesores • ${agenciesCount} Agencias
+            </td>
+            <td style="mso-number-format: '\\$#,##0'; text-align: right; font-size: 13px; color: #4ADE80; background-color: #0F172A;">
+              $${totalMrr} USD/mes
+            </td>
+            <td colspan="3" style="text-align: center; color: #E2E8F0; background-color: #0F172A;">
+              ${activeCount} Cuentas Encendidas
+            </td>
+            <td colspan="5" style="text-align: center; color: #94A3B8; background-color: #0F172A;">
+              Cuotas Mensuales Asignadas
+            </td>
+            <td style="mso-number-format: '#,##0'; text-align: center; color: #FBBF24; background-color: #0F172A;">
+              ${totalExtraAll}
+            </td>
+            <td style="mso-number-format: '#,##0'; text-align: center; font-size: 13px; color: #60A5FA; background-color: #0F172A;">
+              ${totalDossiersAll}
+            </td>
+            <td style="mso-number-format: '#,##0'; text-align: center; color: #FFFFFF; background-color: #0F172A;">
+              ${totalCreatesAll}
+            </td>
+            <td style="mso-number-format: '#,##0'; text-align: center; color: #FFFFFF; background-color: #0F172A;">
+              ${totalAuditsAll}
+            </td>
+            <td style="mso-number-format: '#,##0'; text-align: center; color: #FFFFFF; background-color: #0F172A;">
+              ${totalRescuesAll}
+            </td>
+            <td style="mso-number-format: '#,##0'; text-align: center; color: #FFFFFF; background-color: #0F172A;">
+              ${totalAppealsAll}
+            </td>
+            <td style="mso-number-format: '#,##0'; text-align: center; color: #FFFFFF; background-color: #0F172A;">
+              ${totalToolsAll}
+            </td>
+            <td style="mso-number-format: '#,##0'; text-align: center; color: #94A3B8; background-color: #0F172A;">
+              ${totalDeletedAll}
+            </td>
+          </tr>
+
+          <!-- 6. PIE LEGAL Y CONFIDENCIALIDAD -->
+          <tr>
+            <td colspan="27" style="background-color: #F1F5F9; color: #64748B; font-size: 10px; font-style: italic; padding: 10px; text-align: center; border: 1px solid #CBD5E1;">
+              🔒 Documento Privado & Confidencial • Generado automáticamente por Prestigia Local Studio para Dirección General Master • Prohibida su divulgación fuera de la organización.
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob(['\uFEFF' + excelHtml], {
+      type: 'application/vnd.ms-excel;charset=utf-8;',
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Reporte_Ejecutivo_Usuarios_Prestigia_${new Date().toISOString().slice(0, 10)}.xls`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast('📊 ¡Reporte Excel Ejecutivo descargado con éxito!');
+  };
+
+  // Descarga alternativa del Reporte Completo de Usuarios en CSV plano
   const downloadAdvisorsCsvReport = (customList?: StudioAdvisorUser[]) => {
     const targetAdvisors = customList || advisorsList;
     const headers = [
@@ -4790,7 +5082,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         `"${(adv.name || '').replace(/"/g, '""')}"`,
         `"${adv.username || ''}"`,
         `"${(adv.password || '••••••••').replace(/"/g, '""')}"`,
-        `"${adv.phone || ''}"`,
+        `"'+${adv.phone || ''}"`,
         `"${typeLabel}"`,
         `"${(adv.agencyName || '').replace(/"/g, '""')}"`,
         `"${adv.country || 'Colombia'}"`,
@@ -4827,7 +5119,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast('📥 ¡Reporte oficial de usuarios de la red descargado en CSV con éxito!');
+    showToast('📥 ¡Reporte CSV descargado con éxito!');
   };
 
   // Jump from Advisor management tab directly to that advisor's dossiers in the network tab
@@ -14961,17 +15253,27 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs transition cursor-pointer flex items-center gap-2 shadow-lg shadow-amber-500/25 shrink-0 active:scale-98 ring-1 ring-amber-300"
                   >
                     <BarChart3 className="w-4 h-4 text-slate-950" />
-                    <span>{isEn ? '📊 Executive Users Report' : '📊 Reporte Ejecutivo de Usuarios'}</span>
+                    <span>{isEn ? '📊 Interactive Report' : '👁️ Ver Reporte en Pantalla'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => downloadAdvisorsExcelReport()}
+                    title={isEn ? 'Download professional styled Excel report' : 'Descargar reporte ejecutivo profesional en Excel con colores, métricas y badges'}
+                    className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition cursor-pointer flex items-center gap-2 shadow-lg shadow-emerald-600/30 shrink-0 active:scale-98"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>{isEn ? '📊 Download Excel Report' : '📊 Descargar Reporte Excel Profesional'}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => downloadAdvisorsCsvReport()}
-                    title={isEn ? 'Download all advisors and licensed agencies in CSV' : 'Descargar todos los asesores y agencias en CSV'}
-                    className="px-3.5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-emerald-400 hover:text-emerald-300 border border-emerald-500/40 font-bold text-xs transition cursor-pointer flex items-center gap-1.5 shadow-md shrink-0 active:scale-98"
+                    title={isEn ? 'Download all advisors and licensed agencies in CSV' : 'Descargar todos los asesores y agencias en CSV plano'}
+                    className="px-3 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 font-bold text-xs transition cursor-pointer flex items-center gap-1.5 shadow-sm shrink-0 active:scale-98"
                   >
-                    <Download className="w-4 h-4" />
-                    <span>{isEn ? 'Export Users CSV' : 'Descargar Reporte CSV'}</span>
+                    <Download className="w-3.5 h-3.5" />
+                    <span>CSV</span>
                   </button>
                 </div>
               </div>
@@ -17182,11 +17484,20 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
               <button
                 type="button"
+                onClick={() => downloadAdvisorsExcelReport(filteredReportUsers)}
+                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition cursor-pointer flex items-center gap-1.5 shadow-md shadow-emerald-600/30 active:scale-98"
+                title={isEn ? 'Export Filtered List to Professional Excel' : 'Exportar Lista Filtrada a Excel Profesional con Colores y Métricas'}
+              >
+                <Download className="w-4 h-4" />
+                <span>{isEn ? 'Excel (.xls)' : 'Excel Profesional'}</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => downloadAdvisorsCsvReport(filteredReportUsers)}
-                className="px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 font-bold text-xs transition cursor-pointer flex items-center gap-1.5 shadow-sm"
+                className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer flex items-center gap-1.5 shadow-sm"
                 title={isEn ? 'Export Filtered List to CSV' : 'Exportar Lista Filtrada a CSV'}
               >
-                <Download className="w-4 h-4 text-emerald-400" />
                 <span>CSV</span>
               </button>
 
