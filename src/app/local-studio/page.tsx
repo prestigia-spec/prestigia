@@ -2586,21 +2586,21 @@ export default function LocalStudioPage() {
       ? (isFounder
           ? 'Master Director / Founder (Unlimited)'
           : adv.planTier === 'level_3'
-          ? 'Level 3 ($140 USD • 150 Monthly Credits)'
+          ? 'Level 3 ($140 USD)'
           : adv.planTier === 'level_2'
-          ? 'Level 2 ($90 USD • 100 Monthly Credits)'
+          ? 'Level 2 ($90 USD)'
           : isCourtesy
-          ? 'VIP Courtesy ($0 USD • 15 Monthly Credits)'
-          : 'Level 1 ($49 USD • 50 Monthly Credits)')
+          ? 'VIP Courtesy ($0 USD)'
+          : 'Level 1 ($49 USD)')
       : (isFounder
           ? 'Dirección General / Fundador (Ilimitado)'
           : adv.planTier === 'level_3'
-          ? 'Nivel 3 ($140 USD • 150 Créditos Mensuales)'
+          ? 'Nivel 3 ($140 USD)'
           : adv.planTier === 'level_2'
-          ? 'Nivel 2 ($90 USD • 100 Créditos Mensuales)'
+          ? 'Nivel 2 ($90 USD)'
           : isCourtesy
-          ? 'Cortesía VIP ($0 USD • 15 Créditos Mensuales)'
-          : 'Nivel 1 ($49 USD • 50 Créditos Mensuales)');
+          ? 'Cortesía VIP ($0 USD)'
+          : 'Nivel 1 ($49 USD)');
 
     const feeText = isCourtesy
       ? (isEn ? '$0 USD/mo (100% Granted)' : '$0 USD/mes (100% Bonificada)')
@@ -2608,18 +2608,12 @@ export default function LocalStudioPage() {
 
     const defaultPerTool = isFounder ? 9999 : adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : isCourtesy ? 3 : 10;
 
-    // Calibración para asegurar que cuentas de cortesía reflejen los 3 créditos oficiales por pestaña si venían con el legacy 5
-    const baseCreates = (isCourtesy && adv.maxCreatesMonthly === 5) ? 3 : (adv.maxCreatesMonthly ?? defaultPerTool);
-    const baseAudits = (isCourtesy && adv.maxAuditsMonthly === 5) ? 3 : (adv.maxAuditsMonthly ?? defaultPerTool);
-    const baseRescues = (isCourtesy && adv.maxRescuesMonthly === 5) ? 3 : (adv.maxRescuesMonthly ?? defaultPerTool);
-    const baseAppeals = (isCourtesy && adv.maxAppealsMonthly === 5) ? 3 : (adv.maxAppealsMonthly ?? defaultPerTool);
-    const baseTools = (isCourtesy && adv.maxToolsMonthly === 5) ? 3 : (adv.maxToolsMonthly ?? defaultPerTool);
-
-    const quotaCreates = baseCreates + (adv.extraCredits?.creates || 0);
-    const quotaAudits = baseAudits + (adv.extraCredits?.audits || 0);
-    const quotaRescues = baseRescues + (adv.extraCredits?.rescues || 0);
-    const quotaAppeals = baseAppeals + (adv.extraCredits?.appeals || 0);
-    const quotaTools = baseTools + (adv.extraCredits?.tools || 0);
+    // Respetar estrictamente los cupos configurados por Dirección General para este usuario (+ recargas activas)
+    const quotaCreates = (adv.maxCreatesMonthly !== undefined && adv.maxCreatesMonthly !== null ? Number(adv.maxCreatesMonthly) : defaultPerTool) + (adv.extraCredits?.creates || 0);
+    const quotaAudits = (adv.maxAuditsMonthly !== undefined && adv.maxAuditsMonthly !== null ? Number(adv.maxAuditsMonthly) : defaultPerTool) + (adv.extraCredits?.audits || 0);
+    const quotaRescues = (adv.maxRescuesMonthly !== undefined && adv.maxRescuesMonthly !== null ? Number(adv.maxRescuesMonthly) : defaultPerTool) + (adv.extraCredits?.rescues || 0);
+    const quotaAppeals = (adv.maxAppealsMonthly !== undefined && adv.maxAppealsMonthly !== null ? Number(adv.maxAppealsMonthly) : defaultPerTool) + (adv.extraCredits?.appeals || 0);
+    const quotaTools = (adv.maxToolsMonthly !== undefined && adv.maxToolsMonthly !== null ? Number(adv.maxToolsMonthly) : defaultPerTool) + (adv.extraCredits?.tools || 0);
 
     const totalCredits = quotaCreates + quotaAudits + quotaRescues + quotaAppeals + quotaTools;
 
@@ -2639,7 +2633,7 @@ Your commercial account has been successfully activated on the platform. Below i
   ✓ Forensic Audits: ${quotaAudits} credits
   ✓ Business Rescues: ${quotaRescues} credits
   ✓ Review Appeals & Challenges: ${quotaAppeals} credits
-  ✓ Top 3 Weapons & Strategies: ${quotaTools} credits
+  ✓ Client Prospecting & Closing: ${quotaTools} credits
 
 ⚡ *EMERGENCY TOP-UPS (+10 CREDITS):*
 If you require more quota before the end of your billing cycle to prospect or close clients, you can request an immediate top-up of *+10 credits at a time* by contacting General Management.
@@ -2669,7 +2663,7 @@ Tu cuenta comercial ha sido activada con éxito en la plataforma. A continuació
   ✓ Auditorías Forenses: ${quotaAudits} créditos
   ✓ Rescate de Negocios: ${quotaRescues} créditos
   ✓ Apelación e Impugnación de Reseñas: ${quotaAppeals} créditos
-  ✓ Armas y Estrategias Top 3: ${quotaTools} créditos
+  ✓ Prospección & Cierre de Clientes: ${quotaTools} créditos
 
 ⚡ *RECARGAS DE EMERGENCIA (+10 CRÉDITOS):*
 Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerrar clientes, puedes solicitar una recarga inmediata de *+10 créditos a la vez* contactando a Dirección General.
@@ -4078,8 +4072,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         isUserSuspended
           ? (isEn ? '⚠️ Account suspended due to pending payment.' : '⚠️ Cuenta pausada por facturación pendiente.')
           : (isEn
-              ? `⚠️ Monthly limit of ${userMaxTools} Top 3 Sales Arsenal credits reached.`
-              : `⚠️ Has alcanzado tu cupo de ${userMaxTools} créditos de Armas Top 3 de Cierre. Adquiere una recarga de +10 créditos.`)
+              ? `⚠️ Monthly limit of ${userMaxTools} Prospecting & Closing credits reached.`
+              : `⚠️ Has alcanzado tu cupo de ${userMaxTools} créditos de Prospección & Cierre. Adquiere una recarga de +10 créditos.`)
       );
       return;
     }
