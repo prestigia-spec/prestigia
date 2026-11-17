@@ -2316,7 +2316,7 @@ export default function LocalStudioPage() {
   const [networkSubView, setNetworkSubView] = useState<'monitor' | 'register' | 'directory'>('directory');
   const [networkSearch, setNetworkSearch] = useState('');
   const [networkAdvisorFilter, setNetworkAdvisorFilter] = useState('all');
-  const [networkTypeFilter, setNetworkTypeFilter] = useState<'all' | 'director' | 'internal_advisor' | 'partner_agency'>('all');
+  const [networkTypeFilter, setNetworkTypeFilter] = useState<'all' | 'director' | 'level_1' | 'level_2' | 'level_3' | 'courtesy' | 'internal_advisor' | 'partner_agency'>('all');
   const [networkCountryFilter, setNetworkCountryFilter] = useState('all');
   const [networkCityFilter, setNetworkCityFilter] = useState('all');
   const [networkModeFilter, setNetworkModeFilter] = useState<'all' | 'create' | 'audit' | 'rescue' | 'appeal' | 'tools'>('all');
@@ -2362,7 +2362,7 @@ export default function LocalStudioPage() {
 
   // Executive Users Report Modal State (Reporte Profesional de Usuarios: Asesores & Agencias)
   const [showUsersReportModal, setShowUsersReportModal] = useState<boolean>(false);
-  const [reportUserTypeFilter, setReportUserTypeFilter] = useState<'all' | 'director' | 'internal_advisor' | 'partner_agency'>('all');
+  const [reportUserTypeFilter, setReportUserTypeFilter] = useState<'all' | 'director' | 'level_1' | 'level_2' | 'level_3' | 'courtesy' | 'internal_advisor' | 'partner_agency'>('all');
   const [reportCountryFilter, setReportCountryFilter] = useState<string>('all');
   const [reportCityFilter, setReportCityFilter] = useState<string>('all');
   const [reportStatusFilter, setReportStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
@@ -4458,8 +4458,22 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         if (networkCountryFilter !== 'all' && (d.country || 'Colombia') !== networkCountryFilter) return false;
         if (networkCityFilter !== 'all' && d.city.toLowerCase() !== networkCityFilter.toLowerCase()) return false;
         if (networkTypeFilter !== 'all') {
-          if (networkTypeFilter === 'partner_agency' && d.advisorType !== 'partner_agency') return false;
-          if (networkTypeFilter === 'internal_advisor' && d.advisorType === 'partner_agency') return false;
+          if (networkTypeFilter === 'director') {
+            if (d.advisorId !== 'adv-luisma') return false;
+          } else if (networkTypeFilter === 'partner_agency') {
+            if (d.advisorType !== 'partner_agency') return false;
+          } else if (networkTypeFilter === 'internal_advisor') {
+            if (d.advisorType === 'partner_agency') return false;
+          } else {
+            const adv = advisorsList.find((a) => a.id === d.advisorId);
+            if (!adv) return false;
+            const advTier = adv.planTier || (adv.accountType === 'partner_agency' ? 'level_2' : Number(adv.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+            if (networkTypeFilter === 'courtesy') {
+              if (advTier !== 'courtesy' && Number(adv.monthlyFeeUsd) !== 0) return false;
+            } else if (advTier !== networkTypeFilter) {
+              return false;
+            }
+          }
         }
         if (networkSearch.trim()) {
           const q = networkSearch.toLowerCase();
@@ -4556,9 +4570,28 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       if (networkCountryFilter !== 'all' && (adv.country || 'Colombia') !== networkCountryFilter) return false;
       if (networkCityFilter !== 'all' && (adv.city || '').toLowerCase() !== networkCityFilter.toLowerCase()) return false;
       if (networkTypeFilter !== 'all') {
-        if (networkTypeFilter === 'director' && adv.accountType !== 'director' && adv.accountType !== 'founder') return false;
-        if (networkTypeFilter === 'partner_agency' && adv.accountType !== 'partner_agency') return false;
-        if (networkTypeFilter === 'internal_advisor' && adv.accountType !== 'internal_advisor') return false;
+        const isFounder = adv.id === 'adv-luisma' || adv.accountType === 'founder';
+        const advTier = adv.planTier || (adv.accountType === 'partner_agency' ? 'level_2' : Number(adv.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+        if (networkTypeFilter === 'director') {
+          if (!isFounder && adv.accountType !== 'director') return false;
+        } else if (networkTypeFilter === 'partner_agency') {
+          if (adv.accountType !== 'partner_agency') return false;
+        } else if (networkTypeFilter === 'internal_advisor') {
+          if (adv.accountType !== 'internal_advisor') return false;
+        } else if (networkTypeFilter === 'courtesy') {
+          if (isFounder) return false;
+          const isCourtesy = adv.planTier === 'courtesy' || Number(adv.monthlyFeeUsd) === 0;
+          if (!isCourtesy) return false;
+        } else if (networkTypeFilter === 'level_1') {
+          if (isFounder) return false;
+          if (advTier !== 'level_1') return false;
+        } else if (networkTypeFilter === 'level_2') {
+          if (isFounder) return false;
+          if (advTier !== 'level_2') return false;
+        } else if (networkTypeFilter === 'level_3') {
+          if (isFounder) return false;
+          if (advTier !== 'level_3') return false;
+        }
       }
       if (networkActiveFilter !== 'all') {
         if (networkActiveFilter === 'active' && !adv.active) return false;
@@ -4649,9 +4682,28 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       if (reportCountryFilter !== 'all' && (adv.country || 'Colombia') !== reportCountryFilter) return false;
       if (reportCityFilter !== 'all' && (adv.city || '').toLowerCase() !== reportCityFilter.toLowerCase()) return false;
       if (reportUserTypeFilter !== 'all') {
-        if (reportUserTypeFilter === 'director' && adv.accountType !== 'director' && adv.accountType !== 'founder' && adv.id !== 'adv-luisma') return false;
-        if (reportUserTypeFilter === 'partner_agency' && adv.accountType !== 'partner_agency') return false;
-        if (reportUserTypeFilter === 'internal_advisor' && adv.accountType !== 'internal_advisor') return false;
+        const isFounder = adv.id === 'adv-luisma' || adv.accountType === 'founder';
+        const advTier = adv.planTier || (adv.accountType === 'partner_agency' ? 'level_2' : Number(adv.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+        if (reportUserTypeFilter === 'director') {
+          if (!isFounder && adv.accountType !== 'director') return false;
+        } else if (reportUserTypeFilter === 'partner_agency') {
+          if (adv.accountType !== 'partner_agency') return false;
+        } else if (reportUserTypeFilter === 'internal_advisor') {
+          if (adv.accountType !== 'internal_advisor') return false;
+        } else if (reportUserTypeFilter === 'courtesy') {
+          if (isFounder) return false;
+          const isCourtesy = adv.planTier === 'courtesy' || Number(adv.monthlyFeeUsd) === 0;
+          if (!isCourtesy) return false;
+        } else if (reportUserTypeFilter === 'level_1') {
+          if (isFounder) return false;
+          if (advTier !== 'level_1') return false;
+        } else if (reportUserTypeFilter === 'level_2') {
+          if (isFounder) return false;
+          if (advTier !== 'level_2') return false;
+        } else if (reportUserTypeFilter === 'level_3') {
+          if (isFounder) return false;
+          if (advTier !== 'level_3') return false;
+        }
       }
       if (reportStatusFilter !== 'all') {
         if (reportStatusFilter === 'active' && !adv.active) return false;
@@ -4680,6 +4732,35 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     const advisors = users.filter((u) => u.accountType === 'internal_advisor').length;
     const agencies = users.filter((u) => u.accountType === 'partner_agency').length;
     const founders = users.filter((u) => u.accountType === 'founder' || u.accountType === 'director' || u.id === 'adv-luisma').length;
+
+    // Desglose por las 4 Fichas Oficiales
+    const planL1Count = users.filter((u) => {
+      const isFounder = u.accountType === 'founder' || u.id === 'adv-luisma';
+      if (isFounder) return false;
+      const tier = u.planTier || (u.accountType === 'partner_agency' ? 'level_2' : Number(u.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+      return tier === 'level_1';
+    }).length;
+
+    const planL2Count = users.filter((u) => {
+      const isFounder = u.accountType === 'founder' || u.id === 'adv-luisma';
+      if (isFounder) return false;
+      const tier = u.planTier || (u.accountType === 'partner_agency' ? 'level_2' : Number(u.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+      return tier === 'level_2';
+    }).length;
+
+    const planL3Count = users.filter((u) => {
+      const isFounder = u.accountType === 'founder' || u.id === 'adv-luisma';
+      if (isFounder) return false;
+      const tier = u.planTier || (u.accountType === 'partner_agency' ? 'level_2' : Number(u.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+      return tier === 'level_3';
+    }).length;
+
+    const planCourtesyCount = users.filter((u) => {
+      const isFounder = u.accountType === 'founder' || u.id === 'adv-luisma';
+      if (isFounder) return false;
+      return u.planTier === 'courtesy' || Number(u.monthlyFeeUsd) === 0;
+    }).length;
+
     const totalMrr = users
       .filter((u) => u.accountType !== 'founder' && (u.licenseStatus === 'active' || u.active))
       .reduce((sum, u) => sum + (u.monthlyFeeUsd || 0), 0);
@@ -4709,6 +4790,10 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       advisors,
       agencies,
       founders,
+      planL1Count,
+      planL2Count,
+      planL3Count,
+      planCourtesyCount,
       totalMrr,
       totalProduced,
       countries,
@@ -15869,20 +15954,64 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   </select>
                 </div>
 
-                {/* Filter Account Type */}
+                {/* Filter Account Type & Plan (Las 4 Fichas Oficiales) */}
                 <div>
-                  <label className="block text-[10px] text-slate-400 uppercase font-black mb-1">
-                    {isEn ? 'Account Type' : 'Tipo de Cuenta'}
+                  <label className="block text-[10px] text-amber-400 uppercase font-black mb-1">
+                    {isEn ? 'Plan (4 Tiers) / Account Role' : 'Plan Oficial (4 Fichas) / Rol'}
                   </label>
                   <select
                     value={networkTypeFilter}
                     onChange={(e) => setNetworkTypeFilter(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-amber-400 text-xs cursor-pointer"
                   >
-                    <option value="all">{isEn ? 'All Types' : 'Todos los Tipos'}</option>
-                    <option value="director">{isEn ? '👑 General Directorate (Luisma)' : '👑 Dirección General (Luisma)'}</option>
-                    <option value="internal_advisor">{isEn ? '💼 Sales Advisors' : '💼 Asesores Comerciales'}</option>
-                    <option value="partner_agency">{isEn ? '🏢 Partner Agencies (B2B)' : '🏢 Agencias Partners (B2B)'}</option>
+                    <option value="all">
+                      {isEn ? `🌐 All Plans & Roles (${advisorsList.length})` : `🌐 Todos los Planes & Roles (${advisorsList.length})`}
+                    </option>
+
+                    <optgroup label={isEn ? '👑 Directorate & Master' : '👑 Dirección General (Tu Cuenta)'}>
+                      <option value="director">
+                        👑 {isEn ? 'General Directorate (Luisma)' : 'Dirección General (Luisma)'} ({advisorsList.filter((a) => a.id === 'adv-luisma' || a.accountType === 'founder').length})
+                      </option>
+                    </optgroup>
+
+                    <optgroup label={isEn ? '📋 4 Official Plan Tiers (3 Levels + 1 Courtesy)' : '📋 Las 4 Fichas Oficiales (3 Niveles + 1 Cortesía)'}>
+                      <option value="level_1">
+                        💼 Nivel 1 ($49 USD • 50 Créditos) ({advisorsList.filter((a) => {
+                          if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                          const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+                          return t === 'level_1';
+                        }).length})
+                      </option>
+                      <option value="level_2">
+                        🏢 Nivel 2 ★ ($90 USD • 100 Créditos) ({advisorsList.filter((a) => {
+                          if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                          const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+                          return t === 'level_2';
+                        }).length})
+                      </option>
+                      <option value="level_3">
+                        🏢 Nivel 3 ($140 USD • 150 Créditos) ({advisorsList.filter((a) => {
+                          if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                          const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+                          return t === 'level_3';
+                        }).length})
+                      </option>
+                      <option value="courtesy">
+                        🎁 Cortesía VIP ($0 USD • 15 Créditos) ({advisorsList.filter((a) => {
+                          if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                          return a.planTier === 'courtesy' || Number(a.monthlyFeeUsd) === 0;
+                        }).length})
+                      </option>
+                    </optgroup>
+
+                    <optgroup label={isEn ? '👥 By Account Role' : '👥 Por Rol de Cuenta'}>
+                      <option value="internal_advisor">
+                        💼 {isEn ? 'All Sales Advisors' : 'Todos los Asesores Comerciales'} ({advisorsList.filter((a) => a.accountType === 'internal_advisor').length})
+                      </option>
+                      <option value="partner_agency">
+                        🏢 {isEn ? 'All Partner Agencies (B2B)' : 'Todas las Agencias Partners (B2B)'} ({advisorsList.filter((a) => a.accountType === 'partner_agency').length})
+                      </option>
+                    </optgroup>
                   </select>
                 </div>
 
@@ -16426,20 +16555,64 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
-                {/* Tipo de Cuenta */}
+                {/* Plan Oficial (4 Fichas) / Tipo de Cuenta */}
                 <div>
-                  <label className="block text-[10px] text-slate-400 uppercase font-bold mb-1">
-                    {isEn ? 'Account Type:' : 'Tipo de Cuenta:'}
+                  <label className="block text-[10px] text-amber-400 uppercase font-black mb-1">
+                    {isEn ? 'Plan (4 Tiers) / Account Role:' : 'Plan Oficial (4 Fichas) / Rol:'}
                   </label>
                   <select
                     value={reportUserTypeFilter}
                     onChange={(e) => setReportUserTypeFilter(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 cursor-pointer"
                   >
-                    <option value="all">{isEn ? 'All Account Types' : 'Todos los Tipos de Cuenta'}</option>
-                    <option value="director">{isEn ? '👑 Directorate / Founder' : '👑 Dirección General / Fundador'}</option>
-                    <option value="internal_advisor">{isEn ? '💼 Sales Advisors' : '💼 Asesores Comerciales'}</option>
-                    <option value="partner_agency">{isEn ? '🏢 Partner Agencies B2B' : '🏢 Agencias Partners B2B'}</option>
+                    <option value="all">
+                      {isEn ? `🌐 All Plans & Roles (${advisorsList.length})` : `🌐 Todos los Planes & Roles (${advisorsList.length})`}
+                    </option>
+
+                    <optgroup label={isEn ? '👑 Directorate & Master' : '👑 Dirección General (Tu Cuenta)'}>
+                      <option value="director">
+                        👑 {isEn ? 'General Directorate (Luisma)' : 'Dirección General (Luisma)'} ({advisorsList.filter((a) => a.id === 'adv-luisma' || a.accountType === 'founder').length})
+                      </option>
+                    </optgroup>
+
+                    <optgroup label={isEn ? '📋 4 Official Plan Tiers (3 Levels + 1 Courtesy)' : '📋 Las 4 Fichas Oficiales (3 Niveles + 1 Cortesía)'}>
+                      <option value="level_1">
+                        💼 Nivel 1 ($49 USD • 50 Créditos) ({advisorsList.filter((a) => {
+                          if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                          const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+                          return t === 'level_1';
+                        }).length})
+                      </option>
+                      <option value="level_2">
+                        🏢 Nivel 2 ★ ($90 USD • 100 Créditos) ({advisorsList.filter((a) => {
+                          if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                          const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+                          return t === 'level_2';
+                        }).length})
+                      </option>
+                      <option value="level_3">
+                        🏢 Nivel 3 ($140 USD • 150 Créditos) ({advisorsList.filter((a) => {
+                          if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                          const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+                          return t === 'level_3';
+                        }).length})
+                      </option>
+                      <option value="courtesy">
+                        🎁 Cortesía VIP ($0 USD • 15 Créditos) ({advisorsList.filter((a) => {
+                          if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                          return a.planTier === 'courtesy' || Number(a.monthlyFeeUsd) === 0;
+                        }).length})
+                      </option>
+                    </optgroup>
+
+                    <optgroup label={isEn ? '👥 By Account Role' : '👥 Por Rol de Cuenta'}>
+                      <option value="internal_advisor">
+                        💼 {isEn ? 'All Sales Advisors' : 'Todos los Asesores Comerciales'} ({advisorsList.filter((a) => a.accountType === 'internal_advisor').length})
+                      </option>
+                      <option value="partner_agency">
+                        🏢 {isEn ? 'All Partner Agencies (B2B)' : 'Todas las Agencias Partners (B2B)'} ({advisorsList.filter((a) => a.accountType === 'partner_agency').length})
+                      </option>
+                    </optgroup>
                   </select>
                 </div>
 
@@ -16690,6 +16863,26 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       <strong className="text-xs font-black text-amber-300">
                         {reportStats.founders} ({Math.round((reportStats.founders / (reportStats.total || 1)) * 100)}%)
                       </strong>
+                    </div>
+                  </div>
+
+                  {/* Desglose por las 4 Fichas Oficiales */}
+                  <div className="grid grid-cols-4 gap-1 pt-1.5 border-t border-slate-800 text-[9px]">
+                    <div className="p-1.5 rounded-xl bg-indigo-950/40 border border-indigo-500/20 text-center">
+                      <span className="text-slate-400 block text-[8px] font-mono">NIVEL 1 ($49)</span>
+                      <strong className="text-indigo-300 font-black text-xs">{reportStats.planL1Count}</strong>
+                    </div>
+                    <div className="p-1.5 rounded-xl bg-purple-950/40 border border-purple-500/20 text-center">
+                      <span className="text-purple-300 block text-[8px] font-mono">NIVEL 2 ($90)</span>
+                      <strong className="text-purple-200 font-black text-xs">{reportStats.planL2Count}</strong>
+                    </div>
+                    <div className="p-1.5 rounded-xl bg-amber-950/40 border border-amber-500/20 text-center">
+                      <span className="text-amber-300 block text-[8px] font-mono">NIVEL 3 ($140)</span>
+                      <strong className="text-amber-200 font-black text-xs">{reportStats.planL3Count}</strong>
+                    </div>
+                    <div className="p-1.5 rounded-xl bg-emerald-950/40 border border-emerald-500/20 text-center">
+                      <span className="text-emerald-300 block text-[8px] font-mono">🎁 CORTESÍA</span>
+                      <strong className="text-emerald-300 font-black text-xs">{reportStats.planCourtesyCount}</strong>
                     </div>
                   </div>
                 </div>
@@ -18595,20 +18788,64 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
-                {/* Tipo de Cuenta */}
+                {/* Plan Oficial (4 Fichas) / Tipo de Cuenta */}
                 <div>
-                  <label className="block text-[10px] text-slate-400 uppercase font-bold mb-1">
-                    {isEn ? 'Account Type:' : 'Tipo de Cuenta:'}
+                  <label className="block text-[10px] text-amber-400 uppercase font-black mb-1">
+                    {isEn ? 'Plan (4 Tiers) / Account Role:' : 'Plan Oficial (4 Fichas) / Rol:'}
                   </label>
                   <select
                     value={reportUserTypeFilter}
                     onChange={(e) => setReportUserTypeFilter(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 cursor-pointer"
                   >
-                    <option value="all">{isEn ? 'All Account Types' : 'Todos los Tipos de Cuenta'}</option>
-                    <option value="director">{isEn ? '👑 Directorate / Founder' : '👑 Dirección General / Fundador'}</option>
-                    <option value="internal_advisor">{isEn ? '💼 Sales Advisors' : '💼 Asesores Comerciales'}</option>
-                    <option value="partner_agency">{isEn ? '🏢 Partner Agencies B2B' : '🏢 Agencias Partners B2B'}</option>
+                    <option value="all">
+                      {isEn ? `🌐 All Plans & Roles (${advisorsList.length})` : `🌐 Todos los Planes & Roles (${advisorsList.length})`}
+                    </option>
+
+                    <optgroup label={isEn ? '👑 Directorate & Master' : '👑 Dirección General (Tu Cuenta)'}>
+                      <option value="director">
+                        👑 {isEn ? 'General Directorate (Luisma)' : 'Dirección General (Luisma)'} ({advisorsList.filter((a) => a.id === 'adv-luisma' || a.accountType === 'founder').length})
+                      </option>
+                    </optgroup>
+
+                    <optgroup label={isEn ? '📋 4 Official Plan Tiers (3 Levels + 1 Courtesy)' : '📋 Las 4 Fichas Oficiales (3 Niveles + 1 Cortesía)'}>
+                      <option value="level_1">
+                        💼 Nivel 1 ($49 USD • 50 Créditos) ({advisorsList.filter((a) => {
+                          if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                          const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+                          return t === 'level_1';
+                        }).length})
+                      </option>
+                      <option value="level_2">
+                        🏢 Nivel 2 ★ ($90 USD • 100 Créditos) ({advisorsList.filter((a) => {
+                          if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                          const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+                          return t === 'level_2';
+                        }).length})
+                      </option>
+                      <option value="level_3">
+                        🏢 Nivel 3 ($140 USD • 150 Créditos) ({advisorsList.filter((a) => {
+                          if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                          const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+                          return t === 'level_3';
+                        }).length})
+                      </option>
+                      <option value="courtesy">
+                        🎁 Cortesía VIP ($0 USD • 15 Créditos) ({advisorsList.filter((a) => {
+                          if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                          return a.planTier === 'courtesy' || Number(a.monthlyFeeUsd) === 0;
+                        }).length})
+                      </option>
+                    </optgroup>
+
+                    <optgroup label={isEn ? '👥 By Account Role' : '👥 Por Rol de Cuenta'}>
+                      <option value="internal_advisor">
+                        💼 {isEn ? 'All Sales Advisors' : 'Todos los Asesores Comerciales'} ({advisorsList.filter((a) => a.accountType === 'internal_advisor').length})
+                      </option>
+                      <option value="partner_agency">
+                        🏢 {isEn ? 'All Partner Agencies (B2B)' : 'Todas las Agencias Partners (B2B)'} ({advisorsList.filter((a) => a.accountType === 'partner_agency').length})
+                      </option>
+                    </optgroup>
                   </select>
                 </div>
 
@@ -18860,6 +19097,26 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       <strong className="text-xs font-black text-amber-300">
                         {reportStats.founders} ({Math.round((reportStats.founders / (reportStats.total || 1)) * 100)}%)
                       </strong>
+                    </div>
+                  </div>
+
+                  {/* Desglose por las 4 Fichas Oficiales */}
+                  <div className="grid grid-cols-4 gap-1 pt-1.5 border-t border-slate-800 text-[9px]">
+                    <div className="p-1.5 rounded-xl bg-indigo-950/40 border border-indigo-500/20 text-center">
+                      <span className="text-slate-400 block text-[8px] font-mono">NIVEL 1 ($49)</span>
+                      <strong className="text-indigo-300 font-black text-xs">{reportStats.planL1Count}</strong>
+                    </div>
+                    <div className="p-1.5 rounded-xl bg-purple-950/40 border border-purple-500/20 text-center">
+                      <span className="text-purple-300 block text-[8px] font-mono">NIVEL 2 ($90)</span>
+                      <strong className="text-purple-200 font-black text-xs">{reportStats.planL2Count}</strong>
+                    </div>
+                    <div className="p-1.5 rounded-xl bg-amber-950/40 border border-amber-500/20 text-center">
+                      <span className="text-amber-300 block text-[8px] font-mono">NIVEL 3 ($140)</span>
+                      <strong className="text-amber-200 font-black text-xs">{reportStats.planL3Count}</strong>
+                    </div>
+                    <div className="p-1.5 rounded-xl bg-emerald-950/40 border border-emerald-500/20 text-center">
+                      <span className="text-emerald-300 block text-[8px] font-mono">🎁 CORTESÍA</span>
+                      <strong className="text-emerald-300 font-black text-xs">{reportStats.planCourtesyCount}</strong>
                     </div>
                   </div>
                 </div>
