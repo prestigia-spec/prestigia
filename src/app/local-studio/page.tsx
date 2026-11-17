@@ -2323,6 +2323,9 @@ export default function LocalStudioPage() {
   const [networkActiveFilter, setNetworkActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({});
   const [viewingAdvisorWorks, setViewingAdvisorWorks] = useState<StudioAdvisorUser | null>(null);
+  const [advisorReportFilter, setAdvisorReportFilter] = useState<'all' | 'active' | 'deleted'>('all');
+  const [advisorReportModeFilter, setAdvisorReportModeFilter] = useState<string>('all');
+  const [advisorReportSearch, setAdvisorReportSearch] = useState<string>('');
   const [showRegisterAdvisorModal, setShowRegisterAdvisorModal] = useState<boolean>(false);
   const [networkTabMode, setNetworkTabMode] = useState<'directory' | 'report' | 'forensic'>('directory');
 
@@ -5564,6 +5567,552 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     link.click();
     document.body.removeChild(link);
     showToast('📥 ¡Reporte CSV descargado con éxito!');
+  };
+
+  // Descarga del Reporte Individual de Producción en Excel (.xlsx) con exceljs
+  const downloadSingleAdvisorExcelReport = async (advisor: StudioAdvisorUser) => {
+    try {
+      showToast(isEn ? `⏳ Generating Excel report for ${advisor.name}...` : `⏳ Generando reporte Excel de producción para ${advisor.name}...`);
+      const ExcelJSModule = (await import('exceljs')).default || (await import('exceljs'));
+      const wb = new ExcelJSModule.Workbook();
+      wb.creator = 'Prestigia Local Studio Master';
+      wb.lastModifiedBy = 'Luisma (Dirección General Prestigia)';
+      wb.created = new Date();
+
+      const safeSheetName = `Producción ${advisor.username.replace(/[^a-zA-Z0-9]/g, '').slice(0, 15)}`;
+      const ws = wb.addWorksheet(safeSheetName, {
+        views: [{ showGridLines: true }],
+      });
+
+      const isFounder = advisor.id === 'adv-luisma' || advisor.accountType === 'founder';
+      const allDossiers = savedDossiers.filter((d) => d.advisorId === advisor.id);
+      const activeDossiers = allDossiers.filter((d) => !d.deletedByAdvisor);
+      const deletedDossiers = allDossiers.filter((d) => d.deletedByAdvisor);
+
+      const createsCount = allDossiers.filter((d) => d.mode === 'create').length;
+      const auditsCount = allDossiers.filter((d) => d.mode === 'audit').length;
+      const rescuesCount = allDossiers.filter((d) => d.mode === 'rescue').length;
+      const appealsCount = allDossiers.filter((d) => d.mode === 'appeal').length;
+      const toolsCount = allDossiers.filter((d) => d.mode === 'tools' || d.mode === 'prospect').length;
+
+      const effCreates = (advisor.maxCreatesMonthly ?? 10) + (advisor.extraCredits?.creates || 0);
+      const effAudits = (advisor.maxAuditsMonthly ?? 10) + (advisor.extraCredits?.audits || 0);
+      const effRescues = (advisor.maxRescuesMonthly ?? 10) + (advisor.extraCredits?.rescues || 0);
+      const effAppeals = (advisor.maxAppealsMonthly ?? 10) + (advisor.extraCredits?.appeals || 0);
+      const effTools = (advisor.maxToolsMonthly ?? 10) + (advisor.extraCredits?.tools || 0);
+
+      const tierLabel = isFounder
+        ? '👑 Ilimitado Master'
+        : advisor.planTier === 'courtesy'
+        ? '🎁 Cortesía VIP ($0 USD)'
+        : advisor.planTier === 'level_3'
+        ? 'Nivel 3 ($140 USD)'
+        : advisor.planTier === 'level_2'
+        ? 'Nivel 2 ★ ($90 USD)'
+        : advisor.planTier === 'level_1'
+        ? 'Nivel 1 ($49 USD)'
+        : 'Estándar';
+
+      const roleLabel = isFounder
+        ? '👑 Dirección General / Fundador'
+        : advisor.accountType === 'partner_agency'
+        ? '🏢 Agencia Partner B2B (Licencia SaaS)'
+        : '💼 Asesor Comercial Interno';
+
+      const nowStr = new Date().toLocaleString('es-CO', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+      // 1. Banner Principal
+      ws.mergeCells('A1:N1');
+      const banner = ws.getCell('A1');
+      banner.value = `⭐ PRESTIGIA LOCAL STUDIO • INFORME INDIVIDUAL DE PRODUCCIÓN Y AUDITORÍA FORENSE`;
+      banner.font = { name: 'Segoe UI', size: 13, bold: true, color: { argb: 'FFF59E0B' } };
+      banner.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0B132B' } };
+      banner.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+      ws.getRow(1).height = 34;
+
+      // 2. Subtítulo y Datos del Titular
+      ws.mergeCells('A2:H2');
+      const s1 = ws.getCell('A2');
+      s1.value = `Titular: ${advisor.name} (@${advisor.username}) • Rol: ${roleLabel} • Plan: ${tierLabel}`;
+      s1.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: 'FFE2E8F0' } };
+      s1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
+      s1.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+
+      ws.mergeCells('I2:N2');
+      const s2 = ws.getCell('I2');
+      s2.value = `Ubicación: ${advisor.city || 'Bogotá'}, ${advisor.country || 'Colombia'} • Tel: ${advisor.phone} • Emisión: ${nowStr}`;
+      s2.font = { name: 'Segoe UI', size: 9.5, color: { argb: 'FF94A3B8' } };
+      s2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
+      s2.alignment = { vertical: 'middle', horizontal: 'right' };
+      ws.getRow(2).height = 24;
+
+      ws.getRow(3).height = 8;
+
+      // 3. Tarjetas KPI del Asesor
+      const kpis = [
+        { range: 'A4:B4', label: 'HISTÓRICO TOTAL', val: `${allDossiers.length} Fichas`, bg: 'FF0F172A', fg: 'FFF59E0B' },
+        { range: 'C4:D4', label: 'ACTIVAS EN PRODUCCIÓN', val: `${activeDossiers.length} Fichas`, bg: 'FF064E3B', fg: 'FF34D399' },
+        { range: 'E4:F4', label: 'BÓVEDA FORENSE (BORRADAS)', val: `${deletedDossiers.length} Fichas`, bg: 'FF4C0519', fg: 'FFF43F5E' },
+        { range: 'G4:H4', label: 'CREACIONES', val: `${createsCount} / ${effCreates}`, bg: 'FF064E3B', fg: 'FF6EE7B7' },
+        { range: 'I4:J4', label: 'AUDITORÍAS TOP 3', val: `${auditsCount} / ${effAudits}`, bg: 'FF0C4A6E', fg: 'FF38BDF8' },
+        { range: 'K4:L4', label: 'RESCATES 72H', val: `${rescuesCount} / ${effRescues}`, bg: 'FF78350F', fg: 'FFFBBF24' },
+        { range: 'M4:N4', label: 'APELACIONES & PROSPECT', val: `${appealsCount + toolsCount} Casos`, bg: 'FF3B0764', fg: 'FFC084FC' },
+      ];
+
+      for (const k of kpis) {
+        ws.mergeCells(k.range);
+        const c = ws.getCell(k.range.split(':')[0]);
+        c.value = `${k.label}\n${k.val}`;
+        c.font = { name: 'Segoe UI', size: 9.5, bold: true, color: { argb: k.fg } };
+        c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: k.bg } };
+        c.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+        c.border = {
+          top: { style: 'thin', color: { argb: 'FF475569' } },
+          bottom: { style: 'thin', color: { argb: 'FF475569' } },
+          left: { style: 'thin', color: { argb: 'FF475569' } },
+          right: { style: 'thin', color: { argb: 'FF475569' } },
+        };
+      }
+      ws.getRow(4).height = 38;
+
+      ws.getRow(5).height = 10;
+
+      // 4. Columnas de la Tabla
+      const colDefs = [
+        { title: '#', width: 6 },
+        { title: 'Estado en Red', width: 22 },
+        { title: 'Tipo de Servicio', width: 20 },
+        { title: 'Negocio / Cliente', width: 32 },
+        { title: 'Categoría', width: 22 },
+        { title: 'Ciudad', width: 16 },
+        { title: 'Barrio / Dirección', width: 22 },
+        { title: 'Contacto Contratante', width: 24 },
+        { title: 'Cargo', width: 18 },
+        { title: 'Empresa', width: 22 },
+        { title: 'Teléfono / WhatsApp', width: 20 },
+        { title: 'Email', width: 24 },
+        { title: 'Estado Cierre', width: 20 },
+        { title: 'Fecha de Registro', width: 18 },
+      ];
+
+      colDefs.forEach((col, idx) => {
+        ws.getColumn(idx + 1).width = col.width;
+      });
+
+      const headerRow = ws.getRow(6);
+      headerRow.height = 28;
+      colDefs.forEach((col, idx) => {
+        const c = headerRow.getCell(idx + 1);
+        c.value = col.title;
+        c.font = { name: 'Segoe UI', size: 9.5, bold: true, color: { argb: 'FFFFFFFF' } };
+        c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F172A' } };
+        c.alignment = { vertical: 'middle', horizontal: 'center' };
+        c.border = {
+          top: { style: 'thin', color: { argb: 'FF334155' } },
+          bottom: { style: 'medium', color: { argb: 'FFF59E0B' } },
+          left: { style: 'thin', color: { argb: 'FF334155' } },
+          right: { style: 'thin', color: { argb: 'FF334155' } },
+        };
+      });
+
+      // 5. Filas de Expedientes
+      allDossiers.forEach((d, idx) => {
+        const rowNum = 7 + idx;
+        const row = ws.getRow(rowNum);
+        row.height = 22;
+
+        const isDeleted = Boolean(d.deletedByAdvisor);
+        const rowBg = isDeleted ? 'FFFFF1F2' : idx % 2 === 0 ? 'FFFFFFFF' : 'FFF8FAFC';
+
+        const statusLabel = isDeleted ? '🔴 BÓVEDA FORENSE (BORRADA)' : '🟢 ACTIVA EN PRODUCCIÓN';
+        const serviceLabel =
+          d.mode === 'create'
+            ? '🏗️ Ficha Nueva'
+            : d.mode === 'rescue'
+            ? '🛡️ Rescate 72h'
+            : d.mode === 'appeal'
+            ? '⚖️ Apelación 1-3★'
+            : d.mode === 'tools' || d.mode === 'prospect'
+            ? '🎯 Prospección & Cierre'
+            : '🔬 Auditoría Top 3';
+
+        const closingLabel =
+          d.closingStatus === 'prestigia_subscriber'
+            ? '💎 Suscriptor Prestigia'
+            : d.closingStatus === 'setup_paid'
+            ? '💵 Setup Pagado'
+            : '📝 En Estudio';
+
+        const phoneVal = d.contactPhone || (d as any).data?.phone || '-';
+
+        const vals = [
+          idx + 1,
+          statusLabel,
+          serviceLabel,
+          d.clientName || 'Sin Nombre',
+          d.category || 'Servicio Local',
+          d.city || 'Bogotá',
+          d.neighborhood || '-',
+          d.contactName || 'No registrado',
+          d.contactRole || 'Propietario',
+          d.contactCompany || '-',
+          phoneVal,
+          d.contactEmail || '-',
+          closingLabel,
+          new Date(d.createdAt).toLocaleDateString(),
+        ];
+
+        vals.forEach((v, cIdx) => {
+          const c = row.getCell(cIdx + 1);
+          c.value = v;
+          c.font = { name: 'Segoe UI', size: 9, color: { argb: 'FF0F172A' } };
+          c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rowBg } };
+          c.alignment = { vertical: 'middle', horizontal: cIdx === 3 ? 'left' : 'center' };
+          c.border = {
+            top: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+            bottom: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+            left: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+            right: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+          };
+        });
+
+        // Celda de Estado (columna 2)
+        const statusCell = row.getCell(2);
+        if (isDeleted) {
+          statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } };
+          statusCell.font = { name: 'Segoe UI', size: 9, bold: true, color: { argb: 'FF991B1B' } };
+        } else {
+          statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } };
+          statusCell.font = { name: 'Segoe UI', size: 9, bold: true, color: { argb: 'FF166534' } };
+        }
+
+        // Celda de Teléfono (columna 11: texto exacto para no activar fórmulas)
+        row.getCell(11).numFmt = '@';
+        row.getCell(11).font = { name: 'Consolas', size: 9, bold: true, color: { argb: 'FF0284C7' } };
+      });
+
+      // Pie de confidencialidad
+      const footRow = 7 + allDossiers.length;
+      ws.mergeCells(`A${footRow}:N${footRow}`);
+      const fC = ws.getCell(`A${footRow}`);
+      fC.value = `🔒 Expediente Oficial Prestigia Master • Historial de ${allDossiers.length} fichas producidas por ${advisor.name} (@${advisor.username}). Conservado para Dirección General.`;
+      fC.font = { name: 'Segoe UI', size: 8.5, italic: true, color: { argb: 'FF64748B' } };
+      fC.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } };
+      fC.alignment = { vertical: 'middle', horizontal: 'center' };
+      ws.getRow(footRow).height = 24;
+
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Reporte_Produccion_${advisor.username}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast(isEn ? `📊 Excel report downloaded for ${advisor.name}!` : `📊 ¡Reporte Excel de ${advisor.name} descargado con éxito!`);
+    } catch (err) {
+      console.error('Error generating single advisor excel:', err);
+      showToast('⚠️ Error generando Excel.');
+    }
+  };
+
+  // Generador de PDF / Impresión Ejecutiva de Alta Definición para UN solo Asesor / Agencia (Activos + Bóveda Forense)
+  const printSingleAdvisorReport = (advisor: StudioAdvisorUser) => {
+    const isFounder = advisor.id === 'adv-luisma' || advisor.accountType === 'founder';
+    const allDossiers = savedDossiers.filter((d) => d.advisorId === advisor.id);
+    const activeDossiers = allDossiers.filter((d) => !d.deletedByAdvisor);
+    const deletedDossiers = allDossiers.filter((d) => d.deletedByAdvisor);
+
+    const creates = allDossiers.filter((d) => d.mode === 'create').length;
+    const audits = allDossiers.filter((d) => d.mode === 'audit').length;
+    const rescues = allDossiers.filter((d) => d.mode === 'rescue').length;
+    const appeals = allDossiers.filter((d) => d.mode === 'appeal').length;
+    const tools = allDossiers.filter((d) => d.mode === 'tools' || d.mode === 'prospect').length;
+
+    const effCreates = (advisor.maxCreatesMonthly ?? 10) + (advisor.extraCredits?.creates || 0);
+    const effAudits = (advisor.maxAuditsMonthly ?? 10) + (advisor.extraCredits?.audits || 0);
+    const effRescues = (advisor.maxRescuesMonthly ?? 10) + (advisor.extraCredits?.rescues || 0);
+    const effAppeals = (advisor.maxAppealsMonthly ?? 10) + (advisor.extraCredits?.appeals || 0);
+    const effTools = (advisor.maxToolsMonthly ?? 10) + (advisor.extraCredits?.tools || 0);
+
+    const tierName = isFounder
+      ? '👑 Ilimitado Master'
+      : advisor.planTier === 'courtesy'
+      ? '🎁 Cortesía VIP ($0 USD)'
+      : advisor.planTier === 'level_3'
+      ? 'Nivel 3 ($140 USD)'
+      : advisor.planTier === 'level_2'
+      ? 'Nivel 2 ★ ($90 USD)'
+      : advisor.planTier === 'level_1'
+      ? 'Nivel 1 ($49 USD)'
+      : 'Estándar';
+
+    const roleName = isFounder
+      ? 'Dirección General / Fundador'
+      : advisor.accountType === 'partner_agency'
+      ? 'Agencia Partner B2B (Licencia SaaS)'
+      : 'Asesor Comercial Interno';
+
+    const nowStr = new Date().toLocaleString('es-CO', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    const rowsHtml = allDossiers
+      .map((d, idx) => {
+        const isDeleted = Boolean(d.deletedByAdvisor);
+        const rowBg = isDeleted ? '#FFF1F2' : idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC';
+
+        const statusTag = isDeleted
+          ? '<span style="background-color: #FEE2E2; color: #991B1B; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 7.5pt; border: 1px solid #FCA5A5;">🔴 Bóveda Forense</span>'
+          : '<span style="background-color: #DCFCE7; color: #166534; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 7.5pt; border: 1px solid #86EFAC;">🟢 Activo</span>';
+
+        const serviceTag =
+          d.mode === 'create'
+            ? '<span style="background-color: #ECFDF5; color: #047857; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">🏗️ Creación</span>'
+            : d.mode === 'rescue'
+            ? '<span style="background-color: #FFFBEB; color: #B45309; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">🛡️ Rescate 72h</span>'
+            : d.mode === 'appeal'
+            ? '<span style="background-color: #FAF5FF; color: #7E22CE; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">⚖️ Apelación</span>'
+            : d.mode === 'tools' || d.mode === 'prospect'
+            ? '<span style="background-color: #EEF2FF; color: #4338CA; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">🎯 Prospección</span>'
+            : '<span style="background-color: #EFF6FF; color: #1D4ED8; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">🔬 Auditoría</span>';
+
+        const closingTag =
+          d.closingStatus === 'prestigia_subscriber'
+            ? '<span style="color: #047857; font-weight: bold;">💎 Suscriptor</span>'
+            : d.closingStatus === 'setup_paid'
+            ? '<span style="color: #B45309; font-weight: bold;">💵 Setup Pagado</span>'
+            : '<span style="color: #64748B;">📝 En Estudio</span>';
+
+        const contactPhone = d.contactPhone || (d as any).data?.phone || '-';
+
+        return `
+          <tr style="background-color: ${rowBg};">
+            <td style="padding: 5px 6px; text-align: center; color: #64748B; font-family: monospace; border: 1px solid #CBD5E1;">${idx + 1}</td>
+            <td style="padding: 5px 6px; text-align: center; border: 1px solid #CBD5E1;">${statusTag}</td>
+            <td style="padding: 5px 6px; text-align: center; border: 1px solid #CBD5E1;">${serviceTag}</td>
+            <td style="padding: 5px 6px; font-weight: bold; color: #0F172A; border: 1px solid #CBD5E1;">
+              ${d.clientName || 'Sin Nombre'}
+              <span style="display: block; font-size: 7pt; color: #64748B; font-weight: normal;">📍 ${d.city || 'Bogotá'}${d.neighborhood ? `, ${d.neighborhood}` : ''}</span>
+            </td>
+            <td style="padding: 5px 6px; font-size: 7.5pt; color: #4338CA; font-weight: bold; border: 1px solid #CBD5E1;">${d.category || '-'}</td>
+            <td style="padding: 5px 6px; border: 1px solid #CBD5E1;">
+              <strong>${d.contactName || '-'}</strong>
+              ${d.contactRole ? `<span style="display: block; font-size: 7pt; color: #64748B;">(${d.contactRole})</span>` : ''}
+              ${d.contactCompany ? `<span style="display: block; font-size: 7pt; color: #7E22CE;">🏢 ${d.contactCompany}</span>` : ''}
+            </td>
+            <td style="padding: 5px 6px; font-family: monospace; font-size: 7.5pt; color: #0284C7; font-weight: bold; text-align: center; border: 1px solid #CBD5E1;">${contactPhone}</td>
+            <td style="padding: 5px 6px; font-size: 7.5pt; text-align: center; border: 1px solid #CBD5E1;">${closingTag}</td>
+            <td style="padding: 5px 6px; font-size: 7.5pt; font-family: monospace; color: #64748B; text-align: center; border: 1px solid #CBD5E1;">${new Date(d.createdAt).toLocaleDateString()}</td>
+          </tr>
+        `;
+      })
+      .join('');
+
+    const printHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>Informe de Producción - ${advisor.name} (@${advisor.username})</title>
+        <style>
+          @page {
+            size: landscape;
+            margin: 6mm 8mm;
+          }
+          * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            margin: 0;
+            padding: 8px;
+            color: #0F172A;
+            background: #FFFFFF;
+            font-size: 8pt;
+          }
+          .header-banner {
+            background-color: #0B132B;
+            border-bottom: 3px solid #F59E0B;
+            color: #FFFFFF;
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .advisor-card {
+            background-color: #F8FAFC;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-bottom: 8px;
+          }
+          .kpi-card {
+            background: #F1F5F9;
+            border: 1px solid #CBD5E1;
+            padding: 6px 8px;
+            border-radius: 5px;
+            text-align: center;
+          }
+          .kpi-val {
+            font-size: 11pt;
+            font-weight: 900;
+            display: block;
+            margin-top: 2px;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 7.5pt;
+          }
+          th {
+            background-color: #0F172A;
+            color: #FFFFFF;
+            padding: 6px 6px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #334155;
+          }
+          .footer-note {
+            margin-top: 10px;
+            padding-top: 6px;
+            border-top: 1px solid #CBD5E1;
+            font-size: 7pt;
+            color: #64748B;
+            text-align: center;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header-banner">
+          <div>
+            <div style="font-size: 11pt; font-weight: 900; color: #F59E0B; letter-spacing: 0.5px;">
+              ⭐ PRESTIGIA LOCAL STUDIO • INFORME INDIVIDUAL DE PRODUCCIÓN Y AUDITORÍA
+            </div>
+            <div style="font-size: 7.5pt; color: #94A3B8; margin-top: 2px;">
+              Dirección General: Luisma • Red Comercial & Monetización SaaS • Confidencial
+            </div>
+          </div>
+          <div style="text-align: right; font-size: 7.5pt; color: #E2E8F0;">
+            <div>📅 Fecha: <strong>${nowStr}</strong></div>
+            <div>WhatsApp Central: <strong>+57 305 8314049</strong></div>
+          </div>
+        </div>
+
+        <div class="advisor-card">
+          <div>
+            <span style="font-size: 11pt; font-weight: 900; color: #0F172A;">${advisor.name}</span>
+            <span style="font-family: monospace; color: #4338CA; font-weight: bold; font-size: 8.5pt; margin-left: 6px;">@${advisor.username}</span>
+            <span style="margin-left: 8px; background: #0F172A; color: #F59E0B; padding: 2px 7px; border-radius: 4px; font-weight: 900; font-size: 7.5pt;">${tierName}</span>
+            <span style="margin-left: 6px; background: #E0E7FF; color: #3730A3; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 7.5pt;">${roleName}</span>
+          </div>
+          <div style="font-size: 8pt; color: #334155;">
+            📍 ${advisor.city || 'Bogotá'}, ${advisor.country || 'Colombia'} • 📞 <strong>${advisor.phone}</strong> • Canon: <strong>$${advisor.monthlyFeeUsd || 0} USD/mes</strong>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card" style="border-left: 3px solid #F59E0B;">
+            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">TOTAL EXPEDIENTES</span>
+            <span class="kpi-val" style="color: #D97706;">${allDossiers.length}</span>
+          </div>
+          <div class="kpi-card" style="border-left: 3px solid #10B981;">
+            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">🟢 ACTIVOS EN RED</span>
+            <span class="kpi-val" style="color: #059669;">${activeDossiers.length}</span>
+          </div>
+          <div class="kpi-card" style="border-left: 3px solid #EF4444;">
+            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">🗑️ BÓVEDA FORENSE</span>
+            <span class="kpi-val" style="color: #DC2626;">${deletedDossiers.length}</span>
+          </div>
+          <div class="kpi-card" style="border-left: 3px solid #10B981;">
+            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">🏗️ FICHAS NUEVAS</span>
+            <span class="kpi-val" style="color: #047857;">${creates} / ${effCreates}</span>
+          </div>
+          <div class="kpi-card" style="border-left: 3px solid #0284C7;">
+            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">🔬 AUDITORÍAS</span>
+            <span class="kpi-val" style="color: #0284C7;">${audits} / ${effAudits}</span>
+          </div>
+          <div class="kpi-card" style="border-left: 3px solid #F59E0B;">
+            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">🛡️ RESCATES 72H</span>
+            <span class="kpi-val" style="color: #B45309;">${rescues} / ${effRescues}</span>
+          </div>
+          <div class="kpi-card" style="border-left: 3px solid #8B5CF6;">
+            <span style="font-size: 7pt; color: #64748B; font-weight: bold;">⚖️ APELACIONES</span>
+            <span class="kpi-val" style="color: #7C3AED;">${appeals} / ${effAppeals}</span>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 25px;">#</th>
+              <th style="width: 90px;">Estado en Red</th>
+              <th style="width: 80px;">Servicio</th>
+              <th>Negocio / Cliente Auditado</th>
+              <th style="width: 100px;">Categoría</th>
+              <th style="width: 120px;">Contacto Contratante</th>
+              <th style="width: 85px;">Teléfono</th>
+              <th style="width: 80px;">Cierre</th>
+              <th style="width: 70px;">Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml || '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #64748B;">No hay expedientes registrados para este usuario.</td></tr>'}
+          </tbody>
+        </table>
+
+        <div class="footer-note">
+          🔒 Documento Oficial Prestigia Master • Expediente auditado con ${allDossiers.length} fichas producidas por ${advisor.name} (@${advisor.username}). Conservado para Dirección General.
+        </div>
+
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.focus();
+              window.print();
+            }, 350);
+          };
+        </script>
+      </body>
+      </html>
+    `;
+
+    const printWin = window.open('', '_blank');
+    if (printWin) {
+      printWin.document.open();
+      printWin.document.write(printHtml);
+      printWin.document.close();
+      showToast(isEn ? `🖨️ Opening print/PDF view for ${advisor.name}...` : `🖨️ ¡Abriendo ventana de impresión y PDF para ${advisor.name}!`);
+    } else {
+      window.print();
+    }
   };
 
   // Jump from Advisor management tab directly to that advisor's dossiers in the network tab
@@ -15798,6 +16347,64 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               </button>
             </div>
 
+            {/* Resumen Ejecutivo de las 4 Fichas Oficiales Prestigia */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs print:hidden">
+              <div className="p-3 rounded-2xl bg-indigo-950/30 border border-indigo-500/30 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400 block">Nivel 1 ($49 USD)</span>
+                  <span className="text-[9px] text-indigo-400 font-bold">50 Créditos • 10/pestaña</span>
+                </div>
+                <strong className="text-base font-black text-indigo-300">
+                  {advisorsList.filter((a) => {
+                    if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                    const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+                    return t === 'level_1';
+                  }).length} <span className="text-[9px] text-slate-400 font-normal">cuentas</span>
+                </strong>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-purple-950/30 border border-purple-500/30 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-purple-300 block">Nivel 2 ★ ($90 USD)</span>
+                  <span className="text-[9px] text-purple-400 font-bold">100 Créditos • 20/pestaña</span>
+                </div>
+                <strong className="text-base font-black text-purple-300">
+                  {advisorsList.filter((a) => {
+                    if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                    const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+                    return t === 'level_2';
+                  }).length} <span className="text-[9px] text-slate-400 font-normal">cuentas</span>
+                </strong>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-amber-950/30 border border-amber-500/30 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-amber-400 block">Nivel 3 ($140 USD)</span>
+                  <span className="text-[9px] text-amber-400 font-bold">150 Créditos • 30/pestaña</span>
+                </div>
+                <strong className="text-base font-black text-amber-300">
+                  {advisorsList.filter((a) => {
+                    if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                    const t = a.planTier || (a.accountType === 'partner_agency' ? 'level_2' : Number(a.monthlyFeeUsd) === 0 ? 'courtesy' : 'level_1');
+                    return t === 'level_3';
+                  }).length} <span className="text-[9px] text-slate-400 font-normal">cuentas</span>
+                </strong>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-emerald-400 block">🎁 Cortesía ($0 USD)</span>
+                  <span className="text-[9px] text-emerald-400 font-bold">15 Créditos • 3/pestaña</span>
+                </div>
+                <strong className="text-base font-black text-emerald-300">
+                  {advisorsList.filter((a) => {
+                    if (a.id === 'adv-luisma' || a.accountType === 'founder') return false;
+                    return a.planTier === 'courtesy' || Number(a.monthlyFeeUsd) === 0;
+                  }).length} <span className="text-[9px] text-slate-400 font-normal">cuentas</span>
+                </strong>
+              </div>
+            </div>
+
             {/* Sub-view Switcher: Directorio vs Reporte Ejecutivo vs Bóveda Forense */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-1.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs print:hidden">
               <button
@@ -16167,7 +16774,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                   );
                                 })()}
 
-                                <div className="shrink-0 flex items-center">
+                                <div className="shrink-0 flex flex-col items-end gap-1.5">
                                   {/* Badge y Toggle de Estado: Encendida vs Apagada */}
                                   {isFounder ? (
                                     <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 inline-flex items-center gap-1">
@@ -16189,6 +16796,22 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                       <span>{adv.active ? (isEn ? 'Active • Turn Off' : '🟢 Activa • Apagar') : (isEn ? 'Off • Turn On' : '🔴 Apagada • Encender')}</span>
                                     </button>
                                   )}
+
+                                  {/* Botón de Reporte de Trabajos (justo debajo de activo) */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setViewingAdvisorWorks(adv);
+                                      setAdvisorReportFilter('all');
+                                      setAdvisorReportModeFilter('all');
+                                      setAdvisorReportSearch('');
+                                    }}
+                                    className="px-2.5 py-1 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-[10px] transition cursor-pointer flex items-center gap-1 shadow-md shadow-amber-500/20 active:scale-95 border border-amber-300/40 shrink-0"
+                                    title={isEn ? `Open individual production & forensic report (${advisorDossiers.length} dossiers)` : `Abrir reporte individual de producción y bóveda forense (${advisorDossiers.length} fichas)`}
+                                  >
+                                    <FileText className="w-3 h-3 text-slate-950" />
+                                    <span>{isEn ? `📊 Report (${advisorDossiers.length})` : `📊 Reporte (${advisorDossiers.length})`}</span>
+                                  </button>
                                 </div>
                               </div>
                             </>
@@ -16438,7 +17061,12 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         {/* Botón Principal para Ver sus Trabajos */}
                         <button
                           type="button"
-                          onClick={() => setViewingAdvisorWorks(adv)}
+                          onClick={() => {
+                            setViewingAdvisorWorks(adv);
+                            setAdvisorReportFilter('all');
+                            setAdvisorReportModeFilter('all');
+                            setAdvisorReportSearch('');
+                          }}
                           className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-98"
                         >
                           <Search className="w-3.5 h-3.5 text-slate-950" />
@@ -17358,71 +17986,229 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       </div>
     )}
 
-      {/* MODAL: VER TRABAJOS & FICHAS REALIZADAS POR EL ASESOR */}
+      {/* MODAL: VER TRABAJOS & REPORTE INTEGRAL DE PRODUCCIÓN Y BÓVEDA FORENSE DEL USUARIO */}
       {viewingAdvisorWorks && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 print:hidden animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden">
-            {/* Cabecera Fija del Modal */}
-            <div className="p-5 sm:p-6 border-b border-slate-800 bg-slate-900/95 flex items-start justify-between gap-4 shrink-0">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300">
-                    {viewingAdvisorWorks.accountType === 'partner_agency' ? (isEn ? '🏢 Partner Agency' : '🏢 Agencia Partner') : (isEn ? '💼 Sales Advisor' : '💼 Asesor Comercial')}
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 print:hidden animate-in fade-in duration-200">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl relative overflow-hidden">
+            {/* Cabecera Ejecutiva del Modal */}
+            <div className="p-4 sm:p-5 border-b border-slate-800 bg-slate-900/95 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0">
+              <div className="space-y-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* Badge de Plan */}
+                  {(() => {
+                    const isFounder = viewingAdvisorWorks.id === 'adv-luisma' || viewingAdvisorWorks.accountType === 'founder';
+                    const isCourtesy = viewingAdvisorWorks.planTier === 'courtesy' || Number(viewingAdvisorWorks.monthlyFeeUsd) === 0;
+                    return (
+                      <span
+                        className={`text-[9.5px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
+                          isFounder
+                            ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                            : isCourtesy
+                            ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40 ring-1 ring-emerald-500/30'
+                            : viewingAdvisorWorks.planTier === 'level_3'
+                            ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
+                            : viewingAdvisorWorks.planTier === 'level_2' || viewingAdvisorWorks.accountType === 'partner_agency'
+                            ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
+                            : 'bg-indigo-950 text-indigo-300 border border-indigo-500/40'
+                        }`}
+                      >
+                        {isFounder
+                          ? '👑 Master Ilimitado'
+                          : isCourtesy
+                          ? '🎁 Cortesía VIP ($0 USD)'
+                          : viewingAdvisorWorks.planTier === 'level_3'
+                          ? `Nivel 3 • $${viewingAdvisorWorks.monthlyFeeUsd ?? 140} USD`
+                          : viewingAdvisorWorks.planTier === 'level_2' || viewingAdvisorWorks.accountType === 'partner_agency'
+                          ? `Nivel 2 ★ • $${viewingAdvisorWorks.monthlyFeeUsd ?? 90} USD`
+                          : `Nivel 1 • $${viewingAdvisorWorks.monthlyFeeUsd ?? 49} USD`}
+                      </span>
+                    );
+                  })()}
+
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                    {viewingAdvisorWorks.accountType === 'partner_agency' ? (isEn ? '🏢 Partner Agency' : '🏢 Agencia Partner B2B') : (isEn ? '💼 Sales Advisor' : '💼 Asesor Comercial')}
                   </span>
+
                   <span className="text-xs text-slate-400 font-mono">@{viewingAdvisorWorks.username}</span>
                 </div>
-                <h3 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
-                  <span>{isEn ? '📂 Work Delivered by:' : '📂 Trabajos Realizados por:'}</span>
+
+                <h3 className="text-lg sm:text-xl font-black text-white flex items-center gap-2 truncate">
+                  <span>{isEn ? '📊 Production & Forensic Report:' : '📊 Reporte Ejecutivo de Producción:'}</span>
                   <span className="text-amber-400">{viewingAdvisorWorks.name}</span>
                 </h3>
-                <p className="text-xs text-slate-400">
-                  📍 {viewingAdvisorWorks.city || 'Bogotá'}, {viewingAdvisorWorks.country || 'Colombia'} • Tel: {viewingAdvisorWorks.phone}
+
+                <p className="text-xs text-slate-400 flex items-center gap-2 flex-wrap">
+                  <span>📍 {viewingAdvisorWorks.city || 'Bogotá'}, {viewingAdvisorWorks.country || 'Colombia'}</span>
+                  <span>•</span>
+                  <span>📞 Tel: <strong className="text-slate-300 font-mono">{viewingAdvisorWorks.phone}</strong></span>
+                  <span>•</span>
+                  <span>💰 Canon: <strong className="text-emerald-400">${viewingAdvisorWorks.monthlyFeeUsd || 0} USD/mes</strong></span>
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setViewingAdvisorWorks(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer shrink-0"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              {/* Botones de Acción Ejecutiva: Imprimir PDF, Exportar Excel y Cerrar */}
+              <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => printSingleAdvisorReport(viewingAdvisorWorks)}
+                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold text-xs transition cursor-pointer flex items-center gap-1.5 border border-slate-700 active:scale-95"
+                  title={isEn ? 'Print or save report as PDF' : 'Imprimir o guardar reporte en PDF'}
+                >
+                  <Printer className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{isEn ? 'Print / PDF' : 'Imprimir / PDF'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => downloadSingleAdvisorExcelReport(viewingAdvisorWorks)}
+                  className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition cursor-pointer flex items-center gap-1.5 shadow-md shadow-emerald-600/30 active:scale-95"
+                  title={isEn ? 'Download professional Excel report (.xlsx)' : 'Descargar reporte profesional en Excel (.xlsx)'}
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Excel (.xlsx)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setViewingAdvisorWorks(null)}
+                  className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer shrink-0"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
-            {/* Métricas de Producción del Asesor */}
+            {/* Métricas Consolidadas del Asesor (8 KPIs de Producción) */}
             {(() => {
-              const advisorDossiers = savedDossiers.filter((d) => d.advisorId === viewingAdvisorWorks.id);
-              const createsCount = advisorDossiers.filter((d) => d.mode === 'create').length;
-              const auditsCount = advisorDossiers.filter((d) => d.mode === 'audit').length;
-              const rescuesCount = advisorDossiers.filter((d) => d.mode === 'rescue').length;
-              const appealsCount = advisorDossiers.filter((d) => d.mode === 'appeal').length;
-              const prospectsCount = advisorDossiers.filter((d) => d.mode === 'tools' || d.mode === 'prospect').length;
+              const allAdvisorDossiers = savedDossiers.filter((d) => d.advisorId === viewingAdvisorWorks.id);
+              const activeDossiers = allAdvisorDossiers.filter((d) => !d.deletedByAdvisor);
+              const deletedDossiers = allAdvisorDossiers.filter((d) => d.deletedByAdvisor);
+
+              const createsCount = allAdvisorDossiers.filter((d) => d.mode === 'create').length;
+              const auditsCount = allAdvisorDossiers.filter((d) => d.mode === 'audit').length;
+              const rescuesCount = allAdvisorDossiers.filter((d) => d.mode === 'rescue').length;
+              const appealsCount = allAdvisorDossiers.filter((d) => d.mode === 'appeal').length;
+              const prospectsCount = allAdvisorDossiers.filter((d) => d.mode === 'tools' || d.mode === 'prospect').length;
+
+              const effCreates = (viewingAdvisorWorks.maxCreatesMonthly ?? 10) + (viewingAdvisorWorks.extraCredits?.creates || 0);
+              const effAudits = (viewingAdvisorWorks.maxAuditsMonthly ?? 10) + (viewingAdvisorWorks.extraCredits?.audits || 0);
+              const effRescues = (viewingAdvisorWorks.maxRescuesMonthly ?? 10) + (viewingAdvisorWorks.extraCredits?.rescues || 0);
+              const effAppeals = (viewingAdvisorWorks.maxAppealsMonthly ?? 10) + (viewingAdvisorWorks.extraCredits?.appeals || 0);
+              const effTools = (viewingAdvisorWorks.maxToolsMonthly ?? 10) + (viewingAdvisorWorks.extraCredits?.tools || 0);
 
               return (
-                <div className="p-4 border-b border-slate-800 bg-slate-950/60 grid grid-cols-2 sm:grid-cols-6 gap-2 text-center text-xs shrink-0">
-                  <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 col-span-2 sm:col-span-1">
-                    <span className="text-[10px] text-slate-400 font-bold block uppercase">{isEn ? 'Total Profiles' : 'Total Fichas'}</span>
-                    <strong className="text-lg font-black text-white">{advisorDossiers.length}</strong>
+                <div className="p-3 sm:p-4 border-b border-slate-800 bg-slate-950/80 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-center text-xs shrink-0">
+                  <div className="p-2 rounded-xl bg-slate-900 border border-amber-500/30">
+                    <span className="text-[9.5px] text-amber-400 font-bold block uppercase truncate">{isEn ? 'Total Profiles' : 'Histórico Total'}</span>
+                    <strong className="text-base font-black text-white">{allAdvisorDossiers.length}</strong>
                   </div>
                   <div className="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
-                    <span className="text-[10px] text-emerald-400 font-bold block uppercase truncate">{isEn ? '🏗️ Builds' : '🏗️ Creaciones'}</span>
-                    <strong className="text-lg font-black text-emerald-300">{createsCount}</strong>
+                    <span className="text-[9.5px] text-emerald-400 font-bold block uppercase truncate">🟢 Activos Red</span>
+                    <strong className="text-base font-black text-emerald-300">{activeDossiers.length}</strong>
                   </div>
-                  <div className="p-2 rounded-xl bg-blue-950/40 border border-blue-500/30">
-                    <span className="text-[10px] text-blue-400 font-bold block uppercase truncate">{isEn ? '🔬 Audits' : '🔬 Auditorías'}</span>
-                    <strong className="text-lg font-black text-blue-300">{auditsCount}</strong>
+                  <div className="p-2 rounded-xl bg-rose-950/40 border border-rose-500/30">
+                    <span className="text-[9.5px] text-rose-400 font-bold block uppercase truncate">🗑️ Bóveda Forense</span>
+                    <strong className="text-base font-black text-rose-300">{deletedDossiers.length}</strong>
                   </div>
-                  <div className="p-2 rounded-xl bg-amber-950/40 border border-amber-500/30">
-                    <span className="text-[10px] text-amber-400 font-bold block uppercase truncate">{isEn ? '🛡️ Rescues' : '🛡️ Rescates'}</span>
-                    <strong className="text-lg font-black text-amber-300">{rescuesCount}</strong>
+                  <div className="p-2 rounded-xl bg-slate-900 border border-emerald-500/20">
+                    <span className="text-[9.5px] text-emerald-400 font-bold block uppercase truncate">🏗️ Creaciones</span>
+                    <strong className="text-sm font-black text-white">{createsCount} <span className="text-[9px] text-slate-400 font-normal">/ {effCreates}</span></strong>
                   </div>
-                  <div className="p-2 rounded-xl bg-purple-950/40 border border-purple-500/30">
-                    <span className="text-[10px] text-purple-400 font-bold block uppercase truncate">{isEn ? '⚖️ Appeals' : '⚖️ Apelaciones'}</span>
-                    <strong className="text-lg font-black text-purple-300">{appealsCount}</strong>
+                  <div className="p-2 rounded-xl bg-slate-900 border border-blue-500/20">
+                    <span className="text-[9.5px] text-blue-400 font-bold block uppercase truncate">🔬 Auditorías</span>
+                    <strong className="text-sm font-black text-white">{auditsCount} <span className="text-[9px] text-slate-400 font-normal">/ {effAudits}</span></strong>
                   </div>
-                  <div className="p-2 rounded-xl bg-indigo-950/40 border border-indigo-500/30">
-                    <span className="text-[10px] text-indigo-400 font-bold block uppercase truncate">{isEn ? '🎯 Pitch' : '🎯 Propuestas'}</span>
-                    <strong className="text-lg font-black text-indigo-300">{prospectsCount}</strong>
+                  <div className="p-2 rounded-xl bg-slate-900 border border-amber-500/20">
+                    <span className="text-[9.5px] text-amber-400 font-bold block uppercase truncate">🛡️ Rescates</span>
+                    <strong className="text-sm font-black text-white">{rescuesCount} <span className="text-[9px] text-slate-400 font-normal">/ {effRescues}</span></strong>
+                  </div>
+                  <div className="p-2 rounded-xl bg-slate-900 border border-purple-500/20">
+                    <span className="text-[9.5px] text-purple-400 font-bold block uppercase truncate">⚖️ Apelaciones</span>
+                    <strong className="text-sm font-black text-white">{appealsCount} <span className="text-[9px] text-slate-400 font-normal">/ {effAppeals}</span></strong>
+                  </div>
+                  <div className="p-2 rounded-xl bg-slate-900 border border-indigo-500/20">
+                    <span className="text-[9.5px] text-indigo-400 font-bold block uppercase truncate">🎯 Prospección</span>
+                    <strong className="text-sm font-black text-white">{prospectsCount} <span className="text-[9px] text-slate-400 font-normal">/ {effTools}</span></strong>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Barra de Filtros Internos del Reporte: Todos vs Activos vs Bóveda Forense */}
+            {(() => {
+              const allAdvisorDossiers = savedDossiers.filter((d) => d.advisorId === viewingAdvisorWorks.id);
+              const activeCount = allAdvisorDossiers.filter((d) => !d.deletedByAdvisor).length;
+              const deletedCount = allAdvisorDossiers.filter((d) => d.deletedByAdvisor).length;
+
+              return (
+                <div className="p-3 border-b border-slate-800 bg-slate-900/60 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs shrink-0">
+                  {/* Selector de Estado de Expedientes */}
+                  <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-950 border border-slate-800 w-full sm:w-auto">
+                    <button
+                      type="button"
+                      onClick={() => setAdvisorReportFilter('all')}
+                      className={`px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer flex items-center gap-1.5 ${
+                        advisorReportFilter === 'all'
+                          ? 'bg-amber-500 text-slate-950 shadow'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <Layers className="w-3.5 h-3.5" />
+                      <span>{isEn ? `All (${allAdvisorDossiers.length})` : `Todos (${allAdvisorDossiers.length})`}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setAdvisorReportFilter('active')}
+                      className={`px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer flex items-center gap-1.5 ${
+                        advisorReportFilter === 'active'
+                          ? 'bg-emerald-600 text-white shadow'
+                          : 'text-slate-400 hover:text-emerald-300'
+                      }`}
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>{isEn ? `Active (${activeCount})` : `🟢 Activos (${activeCount})`}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setAdvisorReportFilter('deleted')}
+                      className={`px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer flex items-center gap-1.5 ${
+                        advisorReportFilter === 'deleted'
+                          ? 'bg-rose-600 text-white shadow'
+                          : 'text-slate-400 hover:text-rose-300'
+                      }`}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>{isEn ? `Forensic (${deletedCount})` : `🗑️ Bóveda (${deletedCount})`}</span>
+                    </button>
+                  </div>
+
+                  {/* Filtro por Modo y Buscador */}
+                  <div className="flex items-center gap-2 w-full sm:w-auto flex-1 sm:max-w-md">
+                    <select
+                      value={advisorReportModeFilter}
+                      onChange={(e) => setAdvisorReportModeFilter(e.target.value)}
+                      className="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-amber-400 cursor-pointer shrink-0"
+                    >
+                      <option value="all">{isEn ? 'All Services' : 'Todos los Servicios'}</option>
+                      <option value="create">🏗️ Creación de Ficha</option>
+                      <option value="audit">🔬 Auditoría Top 3</option>
+                      <option value="rescue">🛡️ Rescate 72h</option>
+                      <option value="appeal">⚖️ Apelación 1-3★</option>
+                      <option value="prospect">🎯 Prospección & Pitch</option>
+                    </select>
+
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        value={advisorReportSearch}
+                        onChange={(e) => setAdvisorReportSearch(e.target.value)}
+                        placeholder={isEn ? 'Search client or phone...' : 'Buscar cliente o teléfono...'}
+                        className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                      />
+                      <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2" />
+                    </div>
                   </div>
                 </div>
               );
@@ -17431,8 +18217,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             {/* Cuerpo con Scroll: Lista de Expedientes y Clientes */}
             <div className="p-5 overflow-y-auto space-y-3.5 flex-1 text-xs">
               {(() => {
-                const advisorDossiers = savedDossiers.filter((d) => d.advisorId === viewingAdvisorWorks.id);
-                if (advisorDossiers.length === 0) {
+                const rawAdvisorDossiers = savedDossiers.filter((d) => d.advisorId === viewingAdvisorWorks.id);
+                if (rawAdvisorDossiers.length === 0) {
                   return (
                     <div className="text-center py-12 space-y-2 text-slate-400">
                       <Layers className="w-10 h-10 text-slate-600 mx-auto" />
@@ -17442,9 +18228,56 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   );
                 }
 
+                let dossiers = rawAdvisorDossiers;
+                if (advisorReportFilter === 'active') {
+                  dossiers = dossiers.filter((d) => !d.deletedByAdvisor);
+                } else if (advisorReportFilter === 'deleted') {
+                  dossiers = dossiers.filter((d) => d.deletedByAdvisor);
+                }
+
+                if (advisorReportModeFilter !== 'all') {
+                  if (advisorReportModeFilter === 'prospect') {
+                    dossiers = dossiers.filter((d) => d.mode === 'prospect' || d.mode === 'tools');
+                  } else {
+                    dossiers = dossiers.filter((d) => d.mode === advisorReportModeFilter);
+                  }
+                }
+
+                if (advisorReportSearch.trim()) {
+                  const q = advisorReportSearch.toLowerCase().trim();
+                  dossiers = dossiers.filter((d) =>
+                    (d.clientName || '').toLowerCase().includes(q) ||
+                    (d.city || '').toLowerCase().includes(q) ||
+                    (d.category || '').toLowerCase().includes(q) ||
+                    (d.contactName || '').toLowerCase().includes(q) ||
+                    (d.contactPhone || '').toLowerCase().includes(q) ||
+                    (d.contactEmail || '').toLowerCase().includes(q)
+                  );
+                }
+
+                if (dossiers.length === 0) {
+                  return (
+                    <div className="text-center py-12 space-y-2 text-slate-400">
+                      <Search className="w-8 h-8 text-slate-600 mx-auto" />
+                      <p className="font-bold text-white text-sm">{isEn ? 'No dossiers match your active filters.' : 'No hay expedientes con los filtros seleccionados.'}</p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAdvisorReportFilter('all');
+                          setAdvisorReportModeFilter('all');
+                          setAdvisorReportSearch('');
+                        }}
+                        className="text-xs text-amber-400 hover:underline font-bold"
+                      >
+                        {isEn ? 'Reset sub-filters' : 'Restablecer filtros del reporte'}
+                      </button>
+                    </div>
+                  );
+                }
+
                 return (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                    {advisorDossiers.map((d) => (
+                    {dossiers.map((d) => (
                       <div
                         key={d.id}
                         className={`p-4 rounded-2xl border transition space-y-3 flex flex-col justify-between ${
