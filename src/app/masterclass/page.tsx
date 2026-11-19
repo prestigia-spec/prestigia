@@ -287,20 +287,16 @@ function MasterclassContent() {
   const isEn = lang === 'en';
   const copy = isEn ? COPIES_EN[selectedAngle] : COPIES_ES[selectedAngle];
 
-  // Countdown Timer: Targets the upcoming Thursday at 7:00 PM Colombia time
+  // Countdown Timer: Targets official date: Jueves 10 de Diciembre 2026 at 7:00 PM Colombia/Miami time (2026-12-10T19:00:00-05:00)
   const targetDate = useMemo(() => {
-    const d = new Date();
-    // Default to 4 days from now at 19:00 (7:00 PM)
-    d.setDate(d.getDate() + 3);
-    d.setHours(19, 0, 0, 0);
-    return d;
+    return new Date('2026-12-10T19:00:00-05:00');
   }, []);
 
   const [timeLeft, setTimeLeft] = useState<{ days: number; hours: number; minutes: number; seconds: number }>({
-    days: 3,
-    hours: 8,
-    minutes: 42,
-    seconds: 15,
+    days: 21,
+    hours: 6,
+    minutes: 15,
+    seconds: 0,
   });
 
   useEffect(() => {
@@ -511,14 +507,24 @@ function MasterclassContent() {
               </p>
 
               {/* CONTADOR REGRESIVO HACIA EL EVENTO EN VIVO */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-2">
-                <div className="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs font-bold text-slate-400 uppercase tracking-wider pb-1 border-b border-slate-800/80">
                   <span className="flex items-center gap-1.5 text-amber-400">
-                    <Clock className="w-4 h-4" />
+                    <Calendar className="w-4 h-4 text-amber-400" />
+                    <span>{isEn ? '🗓 Thursday, Dec 10 • 7:00 PM EST' : '🗓 Jueves, 10 de Diciembre • 7:00 PM (Col/Miami)'}</span>
+                  </span>
+                  <span className="text-emerald-400 font-mono text-[11px]">
+                    {isEn ? '⚡ Limited Seats Available' : '⚡ Cupos de Transmisión Limitados'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold uppercase tracking-wider">
+                  <span className="flex items-center gap-1.5 text-slate-300">
+                    <Clock className="w-3.5 h-3.5 text-amber-400" />
                     <span>{isEn ? 'Opening Live Room in:' : 'La sala en vivo abre en:'}</span>
                   </span>
-                  <span className="text-emerald-400 font-mono">
-                    {isEn ? '⚡ Limited Seats Available' : '⚡ Cupos de Zoom / Transmisión Limitados'}
+                  <span className="text-amber-300 font-mono text-[10px]">
+                    {isEn ? '🔴 Live Private Session' : '🔴 Transmisión Privada'}
                   </span>
                 </div>
 
