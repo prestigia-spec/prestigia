@@ -15,9 +15,15 @@ export async function POST(request: NextRequest) {
       city,
       country,
       angle = 'general',
+      referralCode,
+      referredBy,
+      ref,
       utmSource,
       utmCampaign,
     } = body;
+
+    const rawRef = referralCode || referredBy || ref || '';
+    const cleanRef = rawRef ? sanitizeInput(String(rawRef)).toLowerCase().trim() : 'directo';
 
     if (!fullName || !phone) {
       return NextResponse.json(
@@ -43,6 +49,7 @@ export async function POST(request: NextRequest) {
       source: 'masterclass_registration',
       angle,
       role,
+      referredBy: cleanRef,
       utmSource: utmSource || 'organic',
       utmCampaign: utmCampaign || 'general',
       device: isMobile ? 'Móvil' : 'Computador',
@@ -58,7 +65,7 @@ export async function POST(request: NextRequest) {
       city: city ? sanitizeInput(city) : (headerCity ? decodeURIComponent(headerCity) : 'Bogotá'),
       branchCount: '1',
       notes: leadNotes,
-      primaryGoal: `Masterclass: ${angle}`,
+      primaryGoal: `Masterclass: ${angle} | Ref: ${cleanRef}`,
       ip,
       country: country || (headerCountry === 'CO' ? 'Colombia' : headerCountry),
       countryCode: headerCountry,

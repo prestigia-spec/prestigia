@@ -260,6 +260,7 @@ const COUNTRY_CODES = [
 function MasterclassContent() {
   const searchParams = useSearchParams();
   const rawAngle = searchParams.get('angle') as MasterclassAngle | null;
+  const rawRef = searchParams.get('ref') || searchParams.get('amigo') || searchParams.get('invitado') || '';
 
   const [lang, setLang] = useState<'es' | 'en'>('es');
   const [selectedAngle, setSelectedAngle] = useState<MasterclassAngle>('general');
@@ -271,18 +272,25 @@ function MasterclassContent() {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('independent');
   const [city, setCity] = useState('');
+  const [referralCode, setReferralCode] = useState(rawRef || '');
 
   // Submission State
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [registeredLeadData, setRegisteredLeadData] = useState<{ id?: string; groupUrl?: string } | null>(null);
 
-  // Initialize Angle from URL query parameter
+  // Initialize Angle & Referral from URL query parameters
   useEffect(() => {
     if (rawAngle && COPIES_ES[rawAngle]) {
       setSelectedAngle(rawAngle);
     }
   }, [rawAngle]);
+
+  useEffect(() => {
+    if (rawRef) {
+      setReferralCode(rawRef.toLowerCase().trim());
+    }
+  }, [rawRef]);
 
   const isEn = lang === 'en';
   const copy = isEn ? COPIES_EN[selectedAngle] : COPIES_ES[selectedAngle];
@@ -334,6 +342,7 @@ function MasterclassContent() {
         role,
         city: city.trim() || 'Bogotá',
         angle: selectedAngle,
+        referralCode: referralCode.trim() || rawRef || 'directo',
         utmSource: searchParams.get('utm_source') || 'direct',
         utmCampaign: searchParams.get('utm_campaign') || 'masterclass_2026',
       };
@@ -669,6 +678,27 @@ function MasterclassContent() {
                         className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 text-xs"
                       />
                     </div>
+                  </div>
+
+                  {/* Código de Invitado / Referido (Amigo) */}
+                  <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
+                    <div className="flex items-center justify-between text-[11px] font-bold">
+                      <label className="text-slate-300 flex items-center gap-1">
+                        <span>🎟️ {isEn ? 'Invited by a friend? (Optional code):' : '¿Te invitó un amigo? (Código opcional):'}</span>
+                      </label>
+                      {referralCode && (
+                        <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                          ✓ @{referralCode}
+                        </span>
+                      )}
+                    </div>
+                    <input
+                      type="text"
+                      value={referralCode}
+                      onChange={(e) => setReferralCode(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                      placeholder={isEn ? 'e.g. carlos, pedro, juan...' : 'Ej: carlos, pedro, juan...'}
+                      className="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 text-xs font-mono"
+                    />
                   </div>
 
                   {/* Botón de Envío */}
