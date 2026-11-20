@@ -1120,26 +1120,24 @@ export async function saveCommercialLead(
   try {
     const supabase = getSupabase();
     if (supabase) {
-      Promise.resolve(
-        supabase.from('commercial_leads').insert({
-          id: newLead.id,
-          created_at: newLead.createdAt,
-          full_name: newLead.fullName,
-          business_name: newLead.businessName,
-          category: newLead.category || null,
-          city: newLead.city,
-          country: newLead.country || 'Colombia',
-          phone: newLead.phone,
-          email: newLead.email || null,
-          branch_count: newLead.branchCount || 1,
-          preferred_time: newLead.preferredTime || null,
-          primary_goal: newLead.primaryGoal || null,
-          status: newLead.status,
-          ip: newLead.ip || null,
-          device: newLead.device || null,
-          notes: newLead.notes || null,
-        })
-      ).catch(() => {});
+      await supabase.from('commercial_leads').insert({
+        id: newLead.id,
+        created_at: newLead.createdAt,
+        full_name: newLead.fullName,
+        business_name: newLead.businessName,
+        category: newLead.category || null,
+        city: newLead.city || 'Bogotá',
+        country: newLead.country || 'Colombia',
+        phone: newLead.phone,
+        email: newLead.email || null,
+        branch_count: newLead.branchCount || 1,
+        preferred_time: newLead.preferredTime || null,
+        primary_goal: newLead.primaryGoal || null,
+        status: newLead.status,
+        ip: newLead.ip || null,
+        device: newLead.device || null,
+        notes: newLead.notes || null,
+      });
     }
   } catch {}
 
