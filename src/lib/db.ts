@@ -1147,6 +1147,37 @@ export async function saveCommercialLead(
 }
 
 export async function getAllCommercialLeads(): Promise<CommercialLead[]> {
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('commercial_leads')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error && Array.isArray(data) && data.length > 0) {
+        return data.map((d: any): CommercialLead => ({
+          id: d.id,
+          createdAt: d.created_at || d.createdAt,
+          fullName: d.full_name || d.fullName,
+          businessName: d.business_name || d.businessName,
+          category: d.category,
+          city: d.city,
+          country: d.country,
+          countryCode: d.country_code || d.countryCode,
+          phone: d.phone,
+          email: d.email,
+          branchCount: d.branch_count || d.branchCount,
+          preferredTime: d.preferred_time || d.preferredTime,
+          primaryGoal: d.primary_goal || d.primaryGoal,
+          status: d.status || 'new',
+          notes: d.notes,
+          ip: d.ip,
+          device: d.device,
+        }));
+      }
+    }
+  } catch {}
+
   const db = ensureDbFile();
   return db.leads || [];
 }

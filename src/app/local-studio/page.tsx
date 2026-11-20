@@ -16601,46 +16601,56 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               </div>
             </div>
 
-            {/* Sub-view Switcher: Directorio vs Reporte Ejecutivo vs Bóveda Forense */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-1.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs print:hidden">
+            {/* Sub-view Switcher: Directorio vs Reporte Ejecutivo vs Bóveda Forense vs Referidos Masterclass */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 p-1.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs print:hidden">
               <button
                 type="button"
                 onClick={() => setNetworkTabMode('directory')}
-                className={`py-2.5 px-4 rounded-xl font-black transition flex items-center justify-center gap-2 cursor-pointer ${
+                className={`py-2.5 px-3 rounded-xl font-black transition flex items-center justify-center gap-1.5 cursor-pointer ${
                   networkTabMode === 'directory'
                     ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
                     : 'text-slate-400 hover:text-white hover:bg-slate-900'
                 }`}
               >
                 <Users className="w-4 h-4" />
-                <span>👥 {isEn ? 'Directory of Accounts' : 'Directorio de Cuentas'} ({filteredAdvisors.length})</span>
+                <span>👥 {isEn ? 'Directory' : 'Directorio'} ({filteredAdvisors.length})</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setNetworkTabMode('report')}
-                className={`py-2.5 px-4 rounded-xl font-black transition flex items-center justify-center gap-2 cursor-pointer ${
+                className={`py-2.5 px-3 rounded-xl font-black transition flex items-center justify-center gap-1.5 cursor-pointer ${
                   networkTabMode === 'report'
                     ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 text-white shadow-lg shadow-indigo-600/30 ring-1 ring-indigo-400'
                     : 'text-slate-400 hover:text-white hover:bg-slate-900'
                 }`}
               >
                 <BarChart3 className="w-4 h-4 text-amber-400" />
-                <span>📊 {isEn ? 'Executive Report (Charts & Filters)' : 'Reporte Ejecutivo (Gráficas & Filtros)'} ({filteredReportUsers.length})</span>
+                <span>📊 {isEn ? 'Reports' : 'Reporte'} ({filteredReportUsers.length})</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setNetworkTabMode('forensic')}
-                className={`py-2.5 px-4 rounded-xl font-black transition flex items-center justify-center gap-2 cursor-pointer ${
+                className={`py-2.5 px-3 rounded-xl font-black transition flex items-center justify-center gap-1.5 cursor-pointer ${
                   networkTabMode === 'forensic'
                     ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md shadow-rose-600/30'
                     : 'text-slate-400 hover:text-white hover:bg-slate-900'
                 }`}
               >
                 <ShieldAlert className="w-4 h-4 text-rose-400" />
-                <span>🛡️ {isEn ? 'Forensic Vault' : 'Bóveda Forense'} ({forensicDeletedDossiers.length})</span>
+                <span>🛡️ {isEn ? 'Vault' : 'Bóveda'} ({forensicDeletedDossiers.length})</span>
               </button>
+
+              <Link
+                href="/masterclass/referidos"
+                target="_blank"
+                className="py-2.5 px-3 rounded-xl font-black transition flex items-center justify-center gap-1.5 cursor-pointer bg-gradient-to-r from-amber-500/15 via-amber-400/10 to-amber-500/15 hover:from-amber-500 hover:to-amber-400 text-amber-300 hover:text-slate-950 border border-amber-500/30 shadow-sm"
+                title={isEn ? "View live guest list & friends referral ranking" : "Ver lista en vivo de invitados y ranking de amigos referidos"}
+              >
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>🎟️ {isEn ? 'Referrals Hub' : 'Referidos Masterclass'} ↗</span>
+              </Link>
             </div>
 
             {networkTabMode === 'directory' && (
