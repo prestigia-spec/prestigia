@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { PrestigiaIcon } from '@/components/PrestigiaIcon';
 import {
   Sparkles,
   CheckCircle2,
@@ -60,17 +59,17 @@ const COPIES_ES: Record<MasterclassAngle, AngleCopy> = {
     heroHeadline: 'Cómo Crear y Posicionar Fichas de Google Maps para',
     heroHighlight: 'Facturar de $150 a $250 USD por Servicio desde Casa',
     heroSubtitle:
-      'Aprende el método paso a paso para crear fichas que atraen clientes todos los días, cómo automatizarlo con la IA de Local Studio en 10 minutos (sin saber de programación), y cómo generar comisiones mensuales recurrentes conectando clientes a Prestigia.',
+      'Aprende el método paso a paso para posicionar negocios locales en Google Maps, cómo automatizar la entrega técnica con Inteligencia Artificial en minutos (sin saber de programación), y cómo generar ingresos y mensualidades recurrentes con comercios de cualquier ciudad.',
     formTitle: 'Reserva tu Cupo Gratuito a la Masterclass',
     formSubtitle: 'Acceso exclusivo a la sala en vivo y materiales de trabajo.',
     pillar1Title: '1. Creación & Posicionamiento Paso a Paso',
     pillar1Desc: 'Aprenderás en vivo el proceso exacto para dar de alta y optimizar una ficha de negocio para que Google la priorice en las búsquedas locales de tu ciudad.',
-    pillar2Title: '2. La Automatización con Local Studio en 10 Min',
-    pillar2Desc: 'Descubrirás cómo el software hace el trabajo técnico en minutos: auditorías forenses, rescate 72h de fichas suspendidas y apelación de reseñas de 1 estrella.',
+    pillar2Title: '2. Automatización con Inteligencia Artificial en Minutos',
+    pillar2Desc: 'Descubrirás cómo entregar el trabajo técnico pesado en minutos: auditorías forenses, rescate de fichas suspendidas y apelación legal de reseñas injustas.',
     pillar3Title: '3. El Negocio: Cobrar de $150 a $250 USD por Servicio',
-    pillar3Desc: 'Te revelamos la matemática exacta: cómo cobrar tarifas de alto valor a comercios locales con una inversión operativa desde solo $49 USD al mes.',
-    pillar4Title: '4. Comisiones Mensuales Recurrentes con Prestigia',
-    pillar4Desc: 'Al canalizar a tus clientes a Prestigia para gestionar sus reseñas y equipo, recibes comisiones automáticas todos los meses mientras sigan activos.',
+    pillar3Desc: 'Te revelamos la matemática exacta: cómo cobrar tarifas de alto valor a comercios locales con márgenes superiores al 90% gracias a la tecnología.',
+    pillar4Title: '4. Contratos Recurrentes & Retención Mensual',
+    pillar4Desc: 'Cómo estructurar planes mensuales de gestión de reputación para que cada cliente te pague una mensualidad continua mes tras mes.',
     ctaButtonText: 'RESERVAR MI CUPO GRATIS AHORA',
   },
   'ingresos-casa': {
@@ -78,17 +77,17 @@ const COPIES_ES: Record<MasterclassAngle, AngleCopy> = {
     heroHeadline: 'Cómo Ganar de $150 a $250 USD por Servicio desde Casa',
     heroHighlight: 'Ayudando a Negocios Locales en Google Maps con IA',
     heroSubtitle:
-      'Sin saber de programación, sin ser experto en marketing y sin jefes. Te enseñaremos cómo crear perfiles de Google Maps en minutos usando un sistema paso a paso que hace el trabajo pesado por ti, y cómo ganar comisiones recurrentes mes a mes.',
+      'Sin saber de programación, sin ser experto en marketing y sin jefes. Te enseñaremos cómo crear y optimizar perfiles de Google Maps en minutos usando un sistema paso a paso que hace el trabajo pesado por ti, y cómo ganar ingresos recurrentes mes a mes.',
     formTitle: 'Comienza a Facturar desde Casa',
     formSubtitle: 'Aprende una habilidad digital rentable en una sola sesión en vivo.',
     pillar1Title: '1. 100% Desde Casa con tu Laptop',
     pillar1Desc: 'Solo necesitas una computadora y conexión a internet. Sin horarios forzados ni desplazamientos en tráfico.',
-    pillar2Title: '2. Cero Conocimientos de IA o Tecnología',
-    pillar2Desc: 'El software de Local Studio te guía clic a clic para generar auditorías, rescates y configuraciones listas para entregar.',
+    pillar2Title: '2. Cero Conocimientos de Programación o Tecnología',
+    pillar2Desc: 'Un método guiado paso a paso para generar auditorías, rescates y optimizaciones listas para entregar a clientes.',
     pillar3Title: '3. Gana entre $150 y $250 USD por Cliente',
     pillar3Desc: 'Con solo 2 a 4 clientes al mes puedes generar entre $500 y $1,000 USD extra en tu tiempo libre.',
-    pillar4Title: '4. Comisiones Pasivas Mes a Mes',
-    pillar4Desc: 'Recomiendas el ecosistema de Prestigia a tus comercios y cobras comisiones recurrentes mes tras mes.',
+    pillar4Title: '4. Ingresos Recurrentes Mes a Mes',
+    pillar4Desc: 'Construyes una cartera de comercios que te pagan mensualidades fijas por cuidar su presencia y reputación en Google.',
     ctaButtonText: 'QUIERO APRENDER DESDE CASA GRATIS',
   },
   freelancers: {
@@ -96,7 +95,7 @@ const COPIES_ES: Record<MasterclassAngle, AngleCopy> = {
     heroHeadline: 'El Negocio de Google Maps en 2026: Servicios de',
     heroHighlight: '$150 a $250 USD con Entregas en Minutos y Cierres en Frío',
     heroSubtitle:
-      'El 90% de los comercios de tu ciudad están perdiendo llamadas porque su ficha está mal configurada o suspendida. Aprende a prospectar con auditorías forenses en mano, cerrar contratos de inmediato y construir comisiones mensuales recurrentes.',
+      'El 90% de los comercios de tu ciudad están perdiendo llamadas porque su ficha está mal configurada o suspendida. Aprende a prospectar con auditorías forenses en mano, cerrar contratos de inmediato y construir mensualidades recurrentes.',
     formTitle: 'Multiplica tus Ingresos como Consultor Local',
     formSubtitle: 'El servicio con mayor tasa de cierre y menor competencia local.',
     pillar1Title: '1. Prospección Demoledora con Auditorías en Mano',
@@ -104,9 +103,9 @@ const COPIES_ES: Record<MasterclassAngle, AngleCopy> = {
     pillar2Title: '2. Portafolio Completo de Servicios Cotizados',
     pillar2Desc: 'Crea fichas Top 3, audita con reportes ejecutivos en PDF, rescata fichas caídas en 72h y remueve reseñas de 1 estrella.',
     pillar3Title: '3. Cierre Rápido y Márgenes de más del 90%',
-    pillar3Desc: 'Cobras entre $150 y $250 USD por ficha. Tu costo es de solo $4.90 por crédito en tu plan de Local Studio ($49 USD/mes).',
-    pillar4Title: '4. Fidelización y Comisiones Recurrentes',
-    pillar4Desc: 'No te quedes en el servicio puntual: conéctalos a Prestigia para su gestión de reseñas y gana mensualidades residuales.',
+    pillar3Desc: 'Cobras entre $150 y $300 USD por servicio con entregas en minutos gracias a reportes automatizados de nivel corporativo.',
+    pillar4Title: '4. Fidelización y Mensualidades Recurrentes',
+    pillar4Desc: 'No te quedes en el servicio puntual: ofrece mantenimiento y gestión de reseñas continuo para generar ingresos residuales.',
     ctaButtonText: 'ACCEDER A LA MASTERCLASS PARA FREELANCERS',
   },
   agencias: {
@@ -114,7 +113,7 @@ const COPIES_ES: Record<MasterclassAngle, AngleCopy> = {
     heroHeadline: 'Añade un Servicio de $500 a $1,500 USD/Mes a tu Agencia con',
     heroHighlight: '90% de Margen: Posicionamiento, Rescate y Apelación con IA',
     heroSubtitle:
-      'Deja de perder horas en optimizaciones manuales de Google Business Profile. Descubre cómo sistematizar auditorías forenses, apelación legal de reseñas falsas y rescate 72h con tecnología Local Studio, delegando la operativa y escalando tu MRR.',
+      'Deja de perder horas en optimizaciones manuales de Google Business Profile. Descubre cómo sistematizar auditorías forenses, apelación legal de reseñas falsas y rescate 72h, delegando la operativa y escalando tu MRR.',
     formTitle: 'Escala la Facturación y Margen de tu Agencia',
     formSubtitle: 'Entrega servicios de Google Maps de nivel corporativo en minutos.',
     pillar1Title: '1. Reportes y Auditorías en Marca Blanca (White-Label)',
@@ -122,9 +121,9 @@ const COPIES_ES: Record<MasterclassAngle, AngleCopy> = {
     pillar2Title: '2. Resuelve los Dolores Más Graves de tus Clientes',
     pillar2Desc: 'Recupera fichas inhabilitadas en 72 horas y apela reseñas destructivas de 1 a 3 estrellas con argumentos respaldados.',
     pillar3Title: '3. Alta Rentabilidad sin Aumentar Nómina',
-    pillar3Desc: 'El software de Local Studio automatiza la ejecución técnica, permitiendo a tu equipo atender 10 veces más cuentas.',
-    pillar4Title: '4. Aumento del LTV & Ingresos Recurrentes en Prestigia',
-    pillar4Desc: 'Integra a tus clientes con la suite Prestigia para gestión de reputación y genera comisiones fijas mes a mes.',
+    pillar3Desc: 'Automatiza la ejecución técnica pesada, permitiendo a tu equipo atender 10 veces más cuentas sin saturarse.',
+    pillar4Title: '4. Aumento del LTV & Retención de Clientes',
+    pillar4Desc: 'Integra servicios de reputación continua para fidelizar a tus clientes y asegurar facturación fija mes a mes.',
     ctaButtonText: 'RESERVAR ACCESO VIP PARA AGENCIAS',
   },
   negocios: {
@@ -142,7 +141,7 @@ const COPIES_ES: Record<MasterclassAngle, AngleCopy> = {
     pillar3Title: '3. Blindaje y Rescate Rápido contra Suspensiones',
     pillar3Desc: 'Conoce las directrices para que Google nunca inhabilite tu perfil o cómo reactivarlo en 72 horas si fue suspendido.',
     pillar4Title: '4. Automatización de Reseñas de Clientes Felices',
-    pillar4Desc: 'Descubre cómo Prestigia te ayuda a recolectar decenas de reseñas de 5 estrellas de tus clientes satisfechos en automático.',
+    pillar4Desc: 'Aprende a implementar sistemas automáticos que recolectan decenas de reseñas de 5 estrellas de tus clientes satisfechos.',
     ctaButtonText: 'QUIERO MÁS CLIENTES EN MI NEGOCIO',
   },
 };
@@ -153,17 +152,17 @@ const COPIES_EN: Record<MasterclassAngle, AngleCopy> = {
     heroHeadline: 'How to Build & Rank Google Maps Profiles to',
     heroHighlight: 'Earn $150 to $250 USD per Service from Home',
     heroSubtitle:
-      'Learn the step-by-step method to build listings that attract customers every day, how to automate it with Local Studio AI in 10 minutes (no coding needed), and how to earn recurring monthly commissions connecting clients to Prestigia.',
+      'Learn the step-by-step method to rank local businesses on Google Maps, how to automate technical delivery with Artificial Intelligence in minutes (no coding needed), and how to build recurring monthly contracts with shops anywhere.',
     formTitle: 'Reserve Your Free Seat for the Masterclass',
     formSubtitle: 'Exclusive access to live training room and work files.',
     pillar1Title: '1. Step-by-Step Listing Creation & Ranking',
     pillar1Desc: 'Learn live the exact process to launch and optimize a local business profile so Google prioritizes it in local search results.',
-    pillar2Title: '2. Automation with Local Studio in 10 Min',
-    pillar2Desc: 'Discover how software does the heavy lifting in minutes: forensic audits, 72h suspended listing rescues, and 1-star review appeals.',
+    pillar2Title: '2. AI Automation in Minutes',
+    pillar2Desc: 'Discover how modern tools do the heavy lifting in minutes: forensic audits, 72h suspended listing rescues, and 1-star review appeals.',
     pillar3Title: '3. The Business: Charge $150 to $250 USD per Client',
-    pillar3Desc: 'We reveal the exact numbers: how to charge high-value fees to local businesses with an operational cost from just $49 USD/month.',
-    pillar4Title: '4. Monthly Recurring Commissions with Prestigia',
-    pillar4Desc: 'By funneling clients into Prestigia to manage reviews and staff, you earn passive commissions every single month.',
+    pillar3Desc: 'We reveal the exact numbers: how to charge high-value fees to local businesses with 90%+ profit margins thanks to technology.',
+    pillar4Title: '4. Recurring Contracts & Client Retention',
+    pillar4Desc: 'How to structure monthly reputation management packages so clients pay you continuous monthly retainers.',
     ctaButtonText: 'RESERVE MY FREE SEAT NOW',
   },
   'ingresos-casa': {
@@ -171,17 +170,17 @@ const COPIES_EN: Record<MasterclassAngle, AngleCopy> = {
     heroHeadline: 'How to Earn $150 to $250 USD per Service from Home',
     heroHighlight: 'Helping Local Businesses on Google Maps with AI',
     heroSubtitle:
-      'No programming, no marketing degree, and no boss. We teach you how to build Google Maps profiles in minutes using a guided step-by-step system, and how to build recurring monthly commissions from your laptop.',
+      'No programming, no marketing degree, and no boss. We teach you how to build and optimize Google Maps profiles in minutes using a guided step-by-step system, and how to build recurring monthly income from your laptop.',
     formTitle: 'Start Earning from Home',
     formSubtitle: 'Learn a profitable digital skill in a single live session.',
     pillar1Title: '1. 100% Remote from Your Laptop',
     pillar1Desc: 'All you need is a laptop and an internet connection. Work on your own schedule with zero commute.',
-    pillar2Title: '2. Zero AI or Tech Knowledge Needed',
-    pillar2Desc: 'Local Studio guides you click-by-click to generate ready-to-deliver audits, rescues, and listings.',
+    pillar2Title: '2. Zero Coding or Tech Knowledge Needed',
+    pillar2Desc: 'A guided step-by-step method to generate client-ready audits, rescues, and profile rankings.',
     pillar3Title: '3. Earn Between $150 and $250 USD per Client',
     pillar3Desc: 'With just 2 to 4 clients a month, you can easily generate $500 to $1,000 USD in extra income.',
-    pillar4Title: '4. Passive Monthly Commissions',
-    pillar4Desc: 'Recommend the Prestigia ecosystem to your business clients and earn monthly residual commissions.',
+    pillar4Title: '4. Recurring Monthly Retainers',
+    pillar4Desc: 'Build a client roster of businesses that pay you predictable monthly retainers to safeguard their Google reputation.',
     ctaButtonText: 'START LEARNING FROM HOME FOR FREE',
   },
   freelancers: {
@@ -189,7 +188,7 @@ const COPIES_EN: Record<MasterclassAngle, AngleCopy> = {
     heroHeadline: 'The Google Maps Business in 2026: Deliver',
     heroHighlight: '$150 to $250 USD Services in Minutes with Cold Closes',
     heroSubtitle:
-      '90% of local shops in your city lose phone calls due to poorly configured or suspended profiles. Learn how to prospect with visual audits in hand, close on the spot, and generate recurring monthly commissions.',
+      '90% of local shops in your city lose phone calls due to poorly configured or suspended profiles. Learn how to prospect with visual audits in hand, close on the spot, and generate recurring monthly retainers.',
     formTitle: 'Multiply Your Freelance Income',
     formSubtitle: 'The digital service with the highest closing rate and least local competition.',
     pillar1Title: '1. Powerful Prospecting with Visual Audits',
@@ -197,9 +196,9 @@ const COPIES_EN: Record<MasterclassAngle, AngleCopy> = {
     pillar2Title: '2. Complete In-Demand Service Catalog',
     pillar2Desc: 'Create Top 3 profiles, audit with executive PDF reports, rescue suspended accounts in 72h, and challenge 1-star reviews.',
     pillar3Title: '3. Fast Turnaround & 90%+ Profit Margins',
-    pillar3Desc: 'Charge $150 to $250 USD per profile. Your operational cost is just $4.90 per credit with Local Studio ($49 USD/mo).',
+    pillar3Desc: 'Charge $150 to $300 USD per service with fast delivery powered by corporate-level automated reporting.',
     pillar4Title: '4. Client Retention & Monthly Residuals',
-    pillar4Desc: 'Don’t stop at one-off setup: plug them into Prestigia for reputation management and get paid every single month.',
+    pillar4Desc: 'Do not stop at one-off setups: offer ongoing review management and reputation upkeep to earn recurring cash flow.',
     ctaButtonText: 'JOIN THE MASTERCLASS FOR FREELANCERS',
   },
   agencias: {
@@ -207,7 +206,7 @@ const COPIES_EN: Record<MasterclassAngle, AngleCopy> = {
     heroHeadline: 'Add a $500 to $1,500 USD/Month Service to Your Agency with',
     heroHighlight: '90% Net Margin: Google Maps Optimization, Rescue & Appeal',
     heroSubtitle:
-      'Stop wasting hours on manual Google Business Profile tasks. Discover how to systematize forensic audits, legal review appeals, and 72h account recovery with Local Studio, freeing your team while scaling agency MRR.',
+      'Stop wasting hours on manual Google Business Profile tasks. Discover how to systematize forensic audits, legal review appeals, and fast rescues, freeing your team while scaling agency MRR.',
     formTitle: 'Scale Your Agency Margins & Revenue',
     formSubtitle: 'Deliver enterprise-grade Google Maps solutions in minutes.',
     pillar1Title: '1. 100% White-Label Client Reports',
@@ -215,9 +214,9 @@ const COPIES_EN: Record<MasterclassAngle, AngleCopy> = {
     pillar2Title: '2. Solve Your Clients’ Pain Points Fast',
     pillar2Desc: 'Recover suspended listings in 72 hours and dispute defamatory 1-star reviews using proven policies.',
     pillar3Title: '3. High Margins Without Hiring Staff',
-    pillar3Desc: 'Local Studio automates technical execution, empowering your team to handle 10x more client accounts.',
-    pillar4Title: '4. Maximize LTV & Recurring Subscriptions',
-    pillar4Desc: 'Onboard clients to the Prestigia suite for review management and earn recurring revenue every month.',
+    pillar3Desc: 'Automate heavy technical execution, empowering your team to handle 10x more client accounts with zero burnout.',
+    pillar4Title: '4. Maximize LTV & Client Retention',
+    pillar4Desc: 'Integrate continuous reputation workflows to lock in clients and secure predictable monthly billing.',
     ctaButtonText: 'CLAIM AGENCY VIP SEAT',
   },
   negocios: {
@@ -235,7 +234,7 @@ const COPIES_EN: Record<MasterclassAngle, AngleCopy> = {
     pillar3Title: '3. Protection & Fast 72-Hour Account Recovery',
     pillar3Desc: 'Keep your listing compliant so Google never suspends it, or recover it fast if already flagged.',
     pillar4Title: '4. Automated 5-Star Reviews from Happy Clients',
-    pillar4Desc: 'Discover how Prestigia collects dozens of authentic 5-star reviews on autopilot.',
+    pillar4Desc: 'Learn how to implement automated workflows that collect dozens of authentic 5-star reviews from pleased customers.',
     ctaButtonText: 'I WANT MORE CUSTOMERS IN MY STORE',
   },
 };
@@ -377,13 +376,17 @@ function MasterclassContent() {
       <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 group">
-              <PrestigiaIcon className="w-8 h-8 text-amber-400 group-hover:scale-105 transition" />
-              <div className="leading-none">
-                <span className="font-black text-sm tracking-widest text-white block">PRESTIGIA</span>
-                <span className="text-[10px] text-amber-400 font-black tracking-widest uppercase block">LOCAL STUDIO</span>
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center shadow-md shadow-amber-500/20 text-slate-950 font-black text-sm">
+                📍
               </div>
-            </Link>
+              <div className="leading-none">
+                <span className="font-black text-sm tracking-widest text-white block">MASTERCLASS 2026</span>
+                <span className="text-[10px] text-amber-400 font-bold tracking-widest uppercase block">
+                  {isEn ? 'Google Maps Business' : 'El Negocio de Google Maps'}
+                </span>
+              </div>
+            </div>
           </div>
 
           {/* Selector de Idiomas */}
@@ -571,8 +574,8 @@ function MasterclassContent() {
                   </div>
                   <p className="text-xs text-slate-400 mt-0.5">
                     {isEn
-                      ? 'Founder of Prestigia & Creator of Local Studio AI Ecosystem.'
-                      : 'Fundador de Prestigia & Creador del Ecosistema Local Studio.'}
+                      ? 'Digital Strategist & Local Business Growth Expert.'
+                      : 'Estratega Digital & Experto en Crecimiento de Negocios Locales.'}
                   </p>
                 </div>
               </div>
@@ -737,8 +740,8 @@ function MasterclassContent() {
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-white">
               {isEn
-                ? 'The 4 Stages of the Google Maps & AI Revenue Machine'
-                : 'Las 4 Etapas del Negocio de Google Maps & Local Studio'}
+                ? 'The 4 Stages of the Google Maps & AI Business Model'
+                : 'Las 4 Etapas del Negocio de Google Maps & Posicionamiento Local'}
             </h2>
             <p className="text-xs sm:text-sm text-slate-400">
               {isEn
@@ -787,19 +790,19 @@ function MasterclassContent() {
         </div>
       </section>
 
-      {/* 4. PREVIEW DE LAS 5 HERRAMIENTAS DE LOCAL STUDIO */}
+      {/* 4. PREVIEW DE LOS 5 SERVICIOS DE MAYOR DEMANDA */}
       <section className="py-14 px-4 sm:px-6 max-w-6xl mx-auto space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <span className="text-xs font-black text-emerald-400 uppercase tracking-widest block">
-            {isEn ? 'THE SUITE YOU WILL SEE LIVE' : 'LA TECNOLOGÍA QUE VERÁS EN ACCIÓN EN VIVO'}
+            {isEn ? 'THE HIGH-VALUE SERVICES YOU WILL LEARN' : 'LOS SERVICIOS QUE APRENDERÁS A ENTREGAR'}
           </span>
           <h2 className="text-2xl sm:text-3xl font-black text-white">
-            {isEn ? 'The 5 High-Demand Services of Prestigia Local Studio' : 'Los 5 Servicios Más Cotizados de Prestigia Local Studio'}
+            {isEn ? 'The 5 Most In-Demand Google Maps Services' : 'Los 5 Servicios Más Cotizados en Google Maps & Reputación'}
           </h2>
           <p className="text-xs sm:text-sm text-slate-400">
             {isEn
-              ? 'Deliveries that normally take days, generated in 10 minutes with client-ready PDF and Excel dossiers.'
-              : 'Trabajos que normalmente toman días, generados en minutos con dossieres en PDF y Excel listos para facturar.'}
+              ? 'Deliveries that normally take days, solved in minutes with client-ready PDF and Excel dossiers.'
+              : 'Trabajos que normalmente toman días, resueltos en minutos con dossieres en PDF y Excel listos para facturar.'}
           </p>
         </div>
 
@@ -839,12 +842,12 @@ function MasterclassContent() {
       {/* 5. FOOTER */}
       <footer className="py-8 border-t border-slate-800 text-center text-xs text-slate-500 space-y-2">
         <p className="font-medium text-slate-400">
-          👑 Prestigia Local Studio • {isEn ? 'Official Live Masterclass 2026' : 'Masterclass Oficial en Vivo 2026'}
+          📍 Masterclass Oficial • {isEn ? 'The Google Maps Business 2026' : 'El Negocio de Google Maps 2026'}
         </p>
         <p className="text-[11px]">
           {isEn
-            ? 'All rights reserved. Prestigia is a trademark registered for B2B local business intelligence.'
-            : 'Todos los derechos reservados. Prestigia es una marca registrada de inteligencia de negocios locales.'}
+            ? 'All rights reserved. Professional training for local business growth and digital services.'
+            : 'Todos los derechos reservados. Formación profesional en crecimiento de negocios locales y servicios digitales.'}
         </p>
       </footer>
 
