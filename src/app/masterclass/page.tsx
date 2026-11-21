@@ -428,7 +428,7 @@ function MasterclassContent() {
               }`}
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>{isEn ? 'All Audiences' : '🌟 General'}</span>
+              <span>{isEn ? 'All Audiences' : 'General'}</span>
             </button>
 
             <button
@@ -441,7 +441,7 @@ function MasterclassContent() {
               }`}
             >
               <span>🏠</span>
-              <span>{isEn ? 'From Home (Beginners)' : '🏠 Ingresos desde Casa'}</span>
+              <span>{isEn ? 'From Home (Beginners)' : 'Ingresos desde Casa'}</span>
             </button>
 
             <button
@@ -454,7 +454,7 @@ function MasterclassContent() {
               }`}
             >
               <span>💼</span>
-              <span>{isEn ? 'Freelancers & Closers' : '💼 Freelancers & Asesores'}</span>
+              <span>{isEn ? 'Freelancers & Closers' : 'Freelancers & Asesores'}</span>
             </button>
 
             <button
@@ -467,7 +467,7 @@ function MasterclassContent() {
               }`}
             >
               <span>🏢</span>
-              <span>{isEn ? 'Marketing Agencies' : '🏢 Agencias de Marketing'}</span>
+              <span>{isEn ? 'Marketing Agencies' : 'Agencias de Marketing'}</span>
             </button>
 
             <button
@@ -480,7 +480,7 @@ function MasterclassContent() {
               }`}
             >
               <span>📍</span>
-              <span>{isEn ? 'Local Business Owners' : '📍 Dueños de Negocio'}</span>
+              <span>{isEn ? 'Local Business Owners' : 'Dueños de Negocio'}</span>
             </button>
           </div>
         </div>
