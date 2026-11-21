@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Enlace oficial por defecto al grupo VIP de WhatsApp de la Masterclass
-    const defaultWhatsAppGroup = process.env.NEXT_PUBLIC_MASTERCLASS_WA_GROUP || 'https://chat.whatsapp.com/Gj9X7pP1o8sK4y2zQ';
+    const defaultWhatsAppGroup = process.env.NEXT_PUBLIC_MASTERCLASS_WA_GROUP || 'https://chat.whatsapp.com/HywvVNPmonBEyZWnw9OxNw';
 
     return NextResponse.json({
       success: true,

@@ -357,7 +357,7 @@ function MasterclassContent() {
       if (res.ok && data.success) {
         setRegisteredLeadData({
           id: data.leadId,
-          groupUrl: data.whatsappGroupUrl || 'https://chat.whatsapp.com/Gj9X7pP1o8sK4y2zQ',
+          groupUrl: data.whatsappGroupUrl || 'https://chat.whatsapp.com/HywvVNPmonBEyZWnw9OxNw',
         });
         setShowSuccessModal(true);
       } else {
@@ -876,7 +876,7 @@ function MasterclassContent() {
             {/* BOTÓN AL GRUPO VIP DE WHATSAPP */}
             <div className="pt-2">
               <a
-                href={registeredLeadData?.groupUrl || 'https://chat.whatsapp.com/Gj9X7pP1o8sK4y2zQ'}
+                href={registeredLeadData?.groupUrl || 'https://chat.whatsapp.com/HywvVNPmonBEyZWnw9OxNw'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm uppercase tracking-wider transition cursor-pointer flex items-center justify-center gap-2.5 shadow-xl shadow-emerald-600/30 active:scale-98 animate-pulse"
