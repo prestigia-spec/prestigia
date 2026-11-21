@@ -57,7 +57,7 @@ const COPIES_ES: Record<MasterclassAngle, AngleCopy> = {
   general: {
     badge: '🔴 MASTERCLASS EN VIVO • ACCESO 100% GRATUITO',
     heroHeadline: 'Cómo Crear y Posicionar Fichas de Google Maps para',
-    heroHighlight: 'Facturar de $150 a $250 USD por Servicio desde Casa',
+    heroHighlight: 'Facturar de $150 a $250 USD por Cliente desde Casa',
     heroSubtitle:
       'Aprende el método paso a paso para posicionar negocios locales en Google Maps, cómo automatizar la entrega técnica con Inteligencia Artificial en minutos (sin saber de programación), y cómo generar ingresos y mensualidades recurrentes con comercios de cualquier ciudad.',
     formTitle: 'Reserva tu Cupo Gratuito a la Masterclass',
@@ -66,7 +66,7 @@ const COPIES_ES: Record<MasterclassAngle, AngleCopy> = {
     pillar1Desc: 'Aprenderás en vivo el proceso exacto para dar de alta y optimizar una ficha de negocio para que Google la priorice en las búsquedas locales de tu ciudad.',
     pillar2Title: '2. Automatización con Inteligencia Artificial en Minutos',
     pillar2Desc: 'Descubrirás cómo entregar el trabajo técnico pesado en minutos: auditorías forenses, rescate de fichas suspendidas y apelación legal de reseñas injustas.',
-    pillar3Title: '3. El Negocio: Cobrar de $150 a $250 USD por Servicio',
+    pillar3Title: '3. El Negocio: Cobrar de $150 a $250 USD por Cliente',
     pillar3Desc: 'Te revelamos la matemática exacta: cómo cobrar tarifas de alto valor a comercios locales con márgenes superiores al 90% gracias a la tecnología.',
     pillar4Title: '4. Contratos Recurrentes & Retención Mensual',
     pillar4Desc: 'Cómo estructurar planes mensuales de gestión de reputación para que cada cliente te pague una mensualidad continua mes tras mes.',
@@ -74,7 +74,7 @@ const COPIES_ES: Record<MasterclassAngle, AngleCopy> = {
   },
   'ingresos-casa': {
     badge: '🏠 TRABAJO DESDE CASA • CERO EXPERIENCIA REQUERIDA',
-    heroHeadline: 'Cómo Ganar de $150 a $250 USD por Servicio desde Casa',
+    heroHeadline: 'Cómo Ganar de $150 a $250 USD por Cliente desde Casa',
     heroHighlight: 'Ayudando a Negocios Locales en Google Maps con IA',
     heroSubtitle:
       'Sin saber de programación, sin ser experto en marketing y sin jefes. Te enseñaremos cómo crear y optimizar perfiles de Google Maps en minutos usando un sistema paso a paso que hace el trabajo pesado por ti, y cómo ganar ingresos recurrentes mes a mes.',
@@ -93,7 +93,7 @@ const COPIES_ES: Record<MasterclassAngle, AngleCopy> = {
   freelancers: {
     badge: '💼 PARA FREELANCERS, ASESORES & VENDEDORES',
     heroHeadline: 'El Negocio de Google Maps en 2026: Servicios de',
-    heroHighlight: '$150 a $250 USD con Entregas en Minutos y Cierres en Frío',
+    heroHighlight: '$150 a $250 USD por Cliente con Entregas en Minutos',
     heroSubtitle:
       'El 90% de los comercios de tu ciudad están perdiendo llamadas porque su ficha está mal configurada o suspendida. Aprende a prospectar con auditorías forenses en mano, cerrar contratos de inmediato y construir mensualidades recurrentes.',
     formTitle: 'Multiplica tus Ingresos como Consultor Local',
