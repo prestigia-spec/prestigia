@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('Error registering to masterclass:', error);
     return NextResponse.json(
-      { error: 'Error del servidor al procesar el registro.' },
+      { error: error?.message || 'Error del servidor al procesar el registro.' },
       { status: 500 }
     );
   }
