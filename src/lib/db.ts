@@ -1103,9 +1103,6 @@ export async function getAllTrafficVisits(): Promise<TrafficVisit[]> {
 export async function saveCommercialLead(
   lead: Omit<CommercialLead, 'id' | 'createdAt' | 'status'>
 ): Promise<CommercialLead> {
-  const db = ensureDbFile();
-  if (!db.leads) db.leads = [];
-
   const newLead: CommercialLead = {
     ...lead,
     id: `lead-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
@@ -1113,8 +1110,14 @@ export async function saveCommercialLead(
     status: 'new',
   };
 
-  db.leads.unshift(newLead);
-  writeDbFile(db);
+  try {
+    const db = ensureDbFile();
+    if (!db.leads) db.leads = [];
+    db.leads.unshift(newLead);
+    writeDbFile(db);
+  } catch (err) {
+    console.warn('[saveCommercialLead] local file write skipped:', err);
+  }
 
   // Sync real-time to Supabase
   try {
@@ -1130,7 +1133,7 @@ export async function saveCommercialLead(
         country: newLead.country || 'Colombia',
         phone: newLead.phone,
         email: newLead.email || null,
-        branch_count: newLead.branchCount || 1,
+        branch_count: Number(newLead.branchCount) || 1,
         preferred_time: newLead.preferredTime || null,
         primary_goal: newLead.primaryGoal || null,
         status: newLead.status,
@@ -1139,7 +1142,9 @@ export async function saveCommercialLead(
         notes: newLead.notes || null,
       });
     }
-  } catch {}
+  } catch (sbErr) {
+    console.error('[saveCommercialLead] Supabase insert error:', sbErr);
+  }
 
   return newLead;
 }
