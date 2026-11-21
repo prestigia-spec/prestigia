@@ -2229,6 +2229,15 @@ export default function LocalStudioPage() {
     const isSab = createBusinessModel === 'service_area';
     return [
       {
+        id: 'step_google_portal',
+        title: isEn
+          ? '0. Open business.google.com/create & Setup Client Ownership'
+          : '0. Abrir business.google.com/create y Gestionar Propiedad del Cliente',
+        desc: isEn
+          ? `Create directly with client's email (${createContactEmail || 'Gmail'}) or transfer Primary Ownership under Business Profile Settings > People and Access`
+          : `Crear directamente con el correo Gmail del cliente (${createContactEmail || 'Gmail'}) o transferir Propiedad Principal en Configuración > Personas y Acceso`,
+      },
+      {
         id: 'step_title',
         title: isEn ? '1. Update Official Listing Title with Local SEO formula' : '1. Actualizar Título Oficial con la fórmula Local SEO',
         desc: isEn ? 'Combines brand + category + city/zone in Google Business Profile' : 'Combina marca + categoría + ciudad/zona en Google Business Profile',
@@ -8611,6 +8620,82 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             <span className="text-xs text-slate-500 font-bold">Sin registrar</span>
                           )}
                           <span className="text-[10px] text-slate-400 block">Notificaciones</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 0. GUÍA OPERATIVA FUNDAMENTAL: DÓNDE CREAR LA FICHA & GESTIÓN DE ACCESO DEL CLIENTE */}
+                    <div className="p-5 rounded-3xl bg-gradient-to-br from-blue-950/70 via-slate-900 to-indigo-950/60 border-2 border-blue-500/50 space-y-4 shadow-xl print-card-box">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-blue-500/20">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2.5 rounded-2xl bg-blue-500/20 border border-blue-500/40 text-blue-400 shrink-0">
+                            <ExternalLink className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-black uppercase tracking-wider text-blue-300 bg-blue-950/90 px-2.5 py-0.5 rounded-full border border-blue-500/40">
+                              {isEn ? 'Foundation Step 0: Google Portal & Ownership Protocol' : 'Paso Cero Fundamental: Portal Oficial & Protocolo de Propiedad'}
+                            </span>
+                            <h3 className="text-sm sm:text-base font-black text-white mt-1">
+                              {isEn ? 'Where to Create the Listing & How to Grant Client Ownership' : '¿Dónde Crear la Ficha y Cómo Garantizar el Acceso del Cliente?'}
+                            </h3>
+                          </div>
+                        </div>
+
+                        <a
+                          href="https://business.google.com/create"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25 cursor-pointer shrink-0 active:scale-95"
+                        >
+                          <span>{isEn ? 'Open business.google.com/create' : 'Abrir business.google.com/create'}</span>
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </div>
+
+                      {/* 2 Rutas Operativas Claras */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                        <div className="p-3.5 rounded-2xl bg-slate-950/90 border border-blue-500/30 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                            <strong className="text-white text-xs font-black">
+                              {isEn ? 'Route A (Recommended): Direct Client Account' : 'Ruta A (Recomendada): Directo con Cuenta del Cliente'}
+                            </strong>
+                          </div>
+                          <p className="text-slate-300 text-[11px] leading-relaxed">
+                            {isEn
+                              ? `Open Google logged in with the client's official email (${createContactEmail || 'client@gmail.com'}) and go to business.google.com/create. The client is the direct owner from day one without transfers.`
+                              : `Abre Google con la sesión iniciada en el correo oficial del cliente (${createContactEmail || 'cliente@gmail.com'}) y entra a business.google.com/create. Así el cliente es el dueño absoluto desde el segundo 1 sin trámites posteriores.`}
+                          </p>
+                          {createContactEmail && (
+                            <div className="pt-1 flex items-center justify-between">
+                              <span className="text-[10px] text-slate-400 font-mono truncate">{createContactEmail}</span>
+                              <button
+                                type="button"
+                                onClick={() => copyToClipboard(createContactEmail, 'Correo del Cliente')}
+                                className="text-[10px] text-blue-400 hover:text-blue-300 font-bold flex items-center gap-1 cursor-pointer"
+                              >
+                                <Copy className="w-3 h-3" />
+                                <span>Copiar Correo</span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="p-3.5 rounded-2xl bg-slate-950/90 border border-indigo-500/30 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <ShieldCheck className="w-4 h-4 text-indigo-400 shrink-0" />
+                            <strong className="text-white text-xs font-black">
+                              {isEn ? 'Route B (Agency Method): Transfer Primary Ownership' : 'Ruta B (Método Agencia): Traspaso de Propiedad'}
+                            </strong>
+                          </div>
+                          <p className="text-slate-300 text-[11px] leading-relaxed">
+                            {isEn
+                              ? `Create the profile from your agency account to speed up delivery. Once created, click ⋮ (Menu) > "Business Profile Settings" > "People & Access" > Invite ${createContactEmail || 'client@gmail.com'} as "Primary Owner". You retain "Manager" role to manage it monthly.`
+                              : `Crea la ficha desde tu cuenta de asesor para agilizar el trabajo. Una vez creada, haz clic en ⋮ (Menú) > "Configuración del Perfil de Empresa" > "Personas y Acceso" > Invita a ${createContactEmail || 'cliente@gmail.com'} como "Propietario Principal". Tú conservas el rol de "Administrador" para cobrarle mantenimiento mensual.`}
+                          </p>
+                          <div className="pt-1 text-[10px] text-indigo-300 font-semibold flex items-center gap-1">
+                            <span>💡 El cliente recibe una invitación por correo y se vuelve el dueño oficial.</span>
+                          </div>
                         </div>
                       </div>
                     </div>
