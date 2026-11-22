@@ -2619,7 +2619,7 @@ export default function LocalStudioPage() {
           : 'Nivel 1 ($49 USD)');
 
     const feeText = isCourtesy
-      ? (isEn ? '$0 USD/mo (100% Granted)' : '$0 USD/mes (100% Bonificada)')
+      ? (isEn ? '$0 USD/mo (VIP License)' : '$0 USD/mes (Licencia VIP Cortesía)')
       : `$${fee} USD${isEn ? '/mo' : '/mes'}`;
 
     const defaultPerTool = isFounder ? 9999 : adv.planTier === 'level_3' ? 30 : adv.planTier === 'level_2' ? 20 : isCourtesy ? 3 : 10;
@@ -8354,7 +8354,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   </button>
                 )}
 
-                {/* Commercial Strategy: Setup Fee & 100% Annual Plan Waiver */}
+                {/* Commercial Strategy: Setup Fee & Client 25% Discount + Advisor Monthly Recurring Commission */}
                 <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-slate-900 to-teal-500/10 border border-emerald-500/30 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
@@ -8364,31 +8364,31 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </span>
                     </div>
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-emerald-950 text-emerald-300 border border-emerald-500/40">
-                      $150 - $250 USD
+                      $150 - $250 USD Setup + 20% Mes 2+
                     </span>
                   </div>
                   <div>
                     <strong className="text-white text-xs block mb-1">
-                      {isEn ? 'Technical Setup Waiver Closing Hook' : 'Setup Fee de Creación 100% Bonificado'}
+                      {isEn ? 'Dual Incentive: 25% Off Month 1 for Client + Recurring Commission Month 2+' : 'Incentivo Dual: 25% Dto. Mes 1 al Cliente + Comisión Recurrente Mes 2+'}
                     </strong>
                     <p className="text-[11px] text-slate-300 leading-relaxed">
                       {isEn
-                        ? 'Waive 100% of the technical setup fee ($0 implementation cost) as an irresistible closing hook when the client subscribes to their tailored Prestigia plan (Digital QR & WhatsApp Flow + 5★ Review Accelerator).'
-                        : 'Bonifica el 100% del setup técnico ($0 costo de implementación) como gancho de cierre de alto impacto si el cliente adquiere su Plan Prestigia a la medida (Software de Reseñas 5★ + Blindaje Digital).'}
+                        ? 'Charge your full technical setup fee ($150-$250 USD) directly to the client for your creation work. As an irresistible closing hook, your client receives 25% OFF their first month of Prestigia software. Starting on month 2, you receive your recurring monthly commission (20%) while the client remains active.'
+                        : 'Cobra tu setup técnico ($150–$250 USD) directamente al cliente por tu trabajo de creación. Como incentivo de cierre, tu cliente recibe un 25% DE DESCUENTO exclusivo en su primer mes de software Prestigia. A partir del mes 2, tú recibes tu comisión mensual recurrente (20%) mientras el cliente continúe activo.'}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => {
                       const scriptText = isEn
-                        ? `Hello ${createBusinessName || 'Business Owner'}, to build, verify, and architect your Google Maps profile for Top 3 rankings, our technical setup fee is 100% WAIVED ($0 implementation cost) when you activate your tailored Prestigia plan for your business (5★ Review Accelerator + Digital Reputation Shield). Shall we reserve your slot and launch this week?`
-                        : `Hola estimado/a ${createBusinessName || 'propietario'}, para crear, verificar y estructurar su ficha en Google Maps con arquitectura de posicionamiento Top 3, le BONIFICAMOS el 100% del Setup Fee técnico ($0 costo de implementación) al activar su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital). ¿Le reservo el cupo y coordinamos la activación esta semana?`;
-                      copyToClipboard(scriptText, isEn ? 'Setup Fee Proposal' : 'Propuesta de Setup Fee');
+                        ? `Hello ${createBusinessName || 'Business Owner'}, to build, verify, and architect your Google Maps profile with Top 3 ranking SEO, our technical setup is $150 USD. Plus, as our preferred referral client, you receive an exclusive 25% DISCOUNT on your first month of the official Prestigia suite (5★ Review Accelerator + Reputation Shield). Shall we reserve your slot and launch this week?`
+                        : `Hola estimado/a ${createBusinessName || 'propietario'}, para crear, verificar y estructurar su ficha en Google Maps con arquitectura de posicionamiento Top 3, nuestro setup técnico es de $150 USD. Además, como cliente recomendado por nuestra consultoría, le otorgamos un 25% DE DESCUENTO exclusivo en su primer mes de la suite oficial Prestigia (Software de Reseñas 5★ + Blindaje Digital). ¿Le reservo el cupo e iniciamos esta semana?`;
+                      copyToClipboard(scriptText, isEn ? '25% Discount Proposal' : 'Propuesta con 25% Descuento');
                     }}
                     className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
                   >
                     <Copy className="w-3.5 h-3.5" />
-                    <span>{isEn ? 'Copy Annual Plan Closing Script (WhatsApp)' : 'Copiar Propuesta Comercial de Cierre (WhatsApp)'}</span>
+                    <span>{isEn ? 'Copy 25% Off Referral Script (WhatsApp)' : 'Copiar Propuesta con 25% Dto. (WhatsApp)'}</span>
                   </button>
                 </div>
               </div>
@@ -9411,8 +9411,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   </h3>
                   <p className="text-xs text-slate-400">
                     {isEn
-                      ? 'Tactical pitch and objection handling to close listing setup fees or convert directly into monthly Prestigia plans.'
-                      : 'Speech táctico y manejo de objeciones para cobrar el setup técnico o cerrar la membresía mensual de Prestigia con setup bonificado.'}
+                      ? 'Tactical pitch and objection handling to charge the technical setup fee and grant 25% off Month 1 on Prestigia plans.'
+                      : 'Speech táctico y manejo de objeciones para cobrar el setup técnico y conectar el software con 25% de descuento en el mes 1 para el cliente.'}
                   </p>
                 </div>
 
@@ -9429,8 +9429,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       : (isEn ? 'the Local Prestigia team' : 'el equipo de Local Prestigia');
 
                     const script = isEn
-                      ? `Hello *${clientPersonName}*, this is *${senderIdentity}*.\n\nWe were analyzing customer searches for *${createCategory || 'your sector'}* in *${createCity || 'your city'}* and identified a critical situation: *${createBusinessName || 'your business'} simply DOES NOT exist on Google Maps*.\n\nToday, 70% of local buyers choose directly from the Top 3 map listings. Every day without a verified profile represents dozens of paying clients lost to your competitors.\n\nWe handle 100% of the technical setup, Top 3 ranking SEO, and official Google verification without suspension risk. Plus, we activate the official *Prestigia (5★ Reviews + Digital Shield)* software suite.\n\nBy activating your *Tailored Prestigia Plan* today, we *WAIVE 100% of the setup fee ($0 creation cost)*.\n\nDo you have 2 minutes to coordinate and send you the 60-second video verification link?`
-                      : `Hola *${clientPersonName}*, le saluda *${senderIdentity}*.\n\nEstuvimos analizando las búsquedas comerciales de *${createCategory || 'su sector'}* en *${createCity || 'su ciudad'}* y notamos una situación crítica: *${createBusinessName || 'su negocio'} sencillamente NO existe en Google Maps*.\n\nHoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha verificada son decenas de ventas que le regala a su competencia más cercana.\n\nNosotros nos encargamos del 100% de la creación técnica, posicionamiento Top 3 y verificación oficial ante Google sin riesgo de suspensión. Además, le activamos la suite de software oficial de *Prestigia (Reseñas 5★ + Blindaje Digital)* para capturar clientes en automático.\n\nAl activar hoy su *Plan Prestigia a la medida*, le *BONIFICAMOS el 100% del setup técnico ($0 costo de creación)* y le entregamos la ficha lista para facturar.\n\n¿Tiene 2 minutos para coordinar la activación y enviarle el enlace del video de 60 segundos?`;
+                      ? `Hello *${clientPersonName}*, this is *${senderIdentity}*.\n\nWe were analyzing customer searches for *${createCategory || 'your sector'}* in *${createCity || 'your city'}* and identified a critical situation: *${createBusinessName || 'your business'} simply DOES NOT exist on Google Maps*.\n\nToday, 70% of local buyers choose directly from the Top 3 map listings. Every day without a verified profile represents dozens of paying clients lost to your competitors.\n\nWe handle 100% of the technical setup, Top 3 ranking SEO, and official Google verification without suspension risk for a one-time fee of $150 USD. Plus, as our referral client, you receive an exclusive *25% DISCOUNT on your first month* of the official *Prestigia (5★ Reviews + Digital Shield)* software suite.\n\nDo you have 2 minutes to coordinate and send you the 60-second video verification link?`
+                      : `Hola *${clientPersonName}*, le saluda *${senderIdentity}*.\n\nEstuvimos analizando las búsquedas comerciales de *${createCategory || 'su sector'}* en *${createCity || 'su ciudad'}* y notamos una situación crítica: *${createBusinessName || 'su negocio'} sencillamente NO existe en Google Maps*.\n\nHoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha verificada son decenas de ventas que le regala a su competencia más cercana.\n\nNosotros nos encargamos del 100% de la creación técnica, posicionamiento Top 3 y verificación oficial ante Google sin riesgo de suspensión por una tarifa única de solo $150 USD. Además, como cliente recomendado de nuestra consultoría, le otorgamos un *25% de DESCUENTO en su primer mes* al activar la suite oficial de *Prestigia (Reseñas 5★ + Blindaje Digital)*.\n\n¿Tiene 2 minutos para coordinar la activación y enviarle el enlace del video de 60 segundos?`;
 
                     copyToClipboard(script, isEn ? 'Creation Pitch (WhatsApp)' : 'Guión de Venta de Creación (WhatsApp)');
                   }}
@@ -9453,9 +9453,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                 </div>
                 <p>
                   {isEn ? (
-                    <>"Hello <strong>{createContactName || createBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}</strong>. We were analyzing customer searches for <strong>{createCategory || 'your industry'}</strong> in <strong>{createCity || 'your area'}</strong> and noticed a critical gap: <strong>{createBusinessName || 'your business'} simply DOES NOT exist on Google Maps</strong>. Today, 70% of local buyers choose directly from the top 3 map profiles. Every single day without a verified listing represents dozens of paying clients handed to your closest rivals. We build and verify your official Google profile with Top 3 architecture, and activate the official <strong>Prestigia 5★ Review Acceleration & Digital Shield</strong> software suite with 100% waived setup."</>
+                    <>"Hello <strong>{createContactName || createBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}</strong>. We were analyzing customer searches for <strong>{createCategory || 'your industry'}</strong> in <strong>{createCity || 'your area'}</strong> and noticed a critical gap: <strong>{createBusinessName || 'your business'} simply DOES NOT exist on Google Maps</strong>. Today, 70% of local buyers choose directly from the top 3 map profiles. Every single day without a verified listing represents dozens of paying clients handed to your closest rivals. We build and verify your official Google profile with Top 3 architecture, and activate the official <strong>Prestigia 5★ Review Acceleration & Digital Shield</strong> software suite with 25% off your first month."</>
                   ) : (
-                    <>"Hola <strong>{createContactName || createBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}</strong>. Estuvimos analizando las búsquedas comerciales de <strong>{createCategory || 'su sector'}</strong> en <strong>{createCity || 'su ciudad'}</strong> y notamos una situación crítica: <strong>{createBusinessName || 'su negocio'} sencillamente NO existe en Google Maps</strong>. Hoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha son decenas de ventas que le regala a su competencia. Nosotros creamos y verificamos su perfil oficial ante Google con arquitectura Top 3, y le activamos la suite oficial de <strong>Prestigia (Reseñas 5★ + Blindaje Digital)</strong> con setup 100% bonificado."</>
+                    <>"Hola <strong>{createContactName || createBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}</strong>. Estuvimos analizando las búsquedas comerciales de <strong>{createCategory || 'su sector'}</strong> en <strong>{createCity || 'su ciudad'}</strong> y notamos una situación crítica: <strong>{createBusinessName || 'su negocio'} sencillamente NO existe en Google Maps</strong>. Hoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha son decenas de ventas que le regala a su competencia. Nosotros creamos y verificamos su perfil oficial ante Google con arquitectura Top 3 por un setup técnico único, y le activamos la suite oficial de <strong>Prestigia (Reseñas 5★ + Blindaje Digital)</strong> con 25% de descuento exclusivo en su primer mes."</>
                   )}
                 </p>
               </div>
@@ -9485,7 +9485,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     {isEn ? '⚠️ Objection: "How much does this service cost?"' : '⚠️ Objeción: "¿Y cuánto me cuesta este servicio?"'}
                   </strong>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"The technical setup and anti-suspension architecture is normally $150 to $250 USD. However, by activating your tailored Prestigia 5★ Review Plan today, we WAIVE 100% of the setup ($0 implementation fee). You only cover the monthly software and your verified listing is built for free."' : '"El setup técnico y blindaje anti-suspensión vale normalmente de $150 a $250 USD. Sin embargo, al activar hoy su Plan Prestigia de Reseñas 5★ a la medida, le BONIFICAMOS el 100% del setup ($0 costo de creación). Solo cubre su software mensual y su ficha le queda creada y verificada gratis."'}
+                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"The technical setup and anti-suspension architecture is a transparent one-time fee of $150 USD. Plus, by activating your Prestigia 5★ Review Plan through our agency today, you get 25% OFF your first month of software."' : '"El setup técnico y blindaje anti-suspensión es una tarifa única y transparente de solo $150 USD por todo el trabajo de creación y radicación. Además, al activar hoy su Plan Prestigia de Reseñas 5★ a través de nuestra agencia, recibe un 25% DE DESCUENTO exclusivo en su primer mes de software."'}
                   </p>
                 </div>
               </div>
@@ -9494,14 +9494,14 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-900 border border-emerald-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                 <div>
                   <span className="font-black text-emerald-300 uppercase tracking-wide block text-xs">
-                    {isEn ? '🎁 The Prestigia Closing Hook ($0 Setup Waiver):' : '🎁 El Gancho de Cierre Prestigia ($0 Setup):'}
+                    {isEn ? '🎁 The Prestigia Closing Hook (25% Off Month 1):' : '🎁 El Gancho de Cierre Prestigia (25% Dto. Mes 1):'}
                   </span>
                   <p className="text-slate-300 text-[11px] mt-0.5">
-                    {isEn ? <>"When you subscribe today to your tailored <strong>Prestigia Plan</strong> for your business, we waive 100% of the technical setup fee (<strong>$0 implementation cost</strong>) and include full activation of your 5★ review software and digital shield."</> : <>"Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, te bonificamos el 100% del setup técnico de creación (<strong>$0 costo de implementación</strong>) e incluimos la activación total de tu software de reseñas 5★ y blindaje reputacional."</>}
+                    {isEn ? <>"When you activate your listing with us, you receive an exclusive <strong>25% DISCOUNT on your first month</strong> of your tailored Prestigia plan, guaranteeing automated 5★ reviews and digital reputation shielding."</> : <>"Al activar tu ficha con nosotros, recibes un <strong>25% DE DESCUENTO exclusivo en tu primer mes</strong> de tu Plan Prestigia a la medida, asegurando captura automática de reseñas 5★ y blindaje reputacional desde el día uno."</>}
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-black text-xs">
-                  {isEn ? 'Tailored Plan' : (isEn ? 'Tailored Plan' : 'Plan a la Medida')}
+                  {isEn ? '25% Off Month 1' : '25% Dto. Mes 1'}
                 </span>
               </div>
 
@@ -10006,7 +10006,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   )}
                 </div>
 
-                {/* Commercial Strategy: Setup Fee & 100% Annual Plan Waiver */}
+                {/* Commercial Strategy: Setup Fee & Client 25% Discount + Advisor Monthly Recurring Commission */}
                 <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-900 to-orange-500/10 border border-amber-500/30 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
@@ -10016,31 +10016,31 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </span>
                     </div>
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-amber-950 text-amber-300 border border-amber-500/40">
-                      $150 - $250 USD
+                      $200 - $350 USD Setup + 20% Mes 2+
                     </span>
                   </div>
                   <div>
                     <strong className="text-white text-xs block mb-1">
-                      {isEn ? 'Audit & Upgrade Setup Waiver' : 'Setup Fee de Auditoría 100% Bonificado'}
+                      {isEn ? 'Dual Incentive: 25% Off Month 1 for Client + Recurring Commission Month 2+' : 'Incentivo Dual: 25% Dto. Mes 1 al Cliente + Comisión Recurrente Mes 2+'}
                     </strong>
                     <p className="text-[11px] text-slate-300 leading-relaxed">
                       {isEn
-                        ? 'Waive 100% of the forensic overhaul fee ($0 implementation cost) as an irresistible hook when the client acquires their tailored Prestigia plan.'
-                        : 'Bonifica el 100% del setup técnico de auditoría y reingeniería ($0 costo de implementación) como gancho de cierre al adquirir su Plan Prestigia a la medida (Software de Reseñas 5★ + Blindaje Digital).'}
+                        ? 'Charge your forensic audit and reengineering fee ($200-$350 USD) directly to the client. As an exclusive closing hook, grant your client 25% OFF their first month of Prestigia software. Starting on month 2, you earn your 20% recurring monthly commission while they remain active.'
+                        : 'Cobra tus honorarios de auditoría y reingeniería técnica ($200–$350 USD) directamente al cliente. Como gancho de cierre, tu cliente recibe un 25% DE DESCUENTO exclusivo en su primer mes de software Prestigia. A partir del mes 2, tú recibes tu comisión mensual recurrente (20%) mientras el cliente continúe activo.'}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => {
                       const scriptText = isEn
-                        ? `Hello ${auditBusinessName || 'Business Owner'}, after performing our forensic audit on your Google Maps listing, we identified critical gaps keeping you outside the Top 3. When you activate our tailored Prestigia plan for your business (Digital 5★ Review Accelerator + Reputation Shield), we WAIVE 100% of the deep optimization setup fee ($0 USD). Shall we lock in this waiver and elevate your listing this week?`
-                        : `Hola estimado/a ${auditBusinessName || 'propietario'}, tras auditar su negocio en Google Maps detectamos fallas críticas que le hacen perder clientes frente a la competencia. Al adquirir su Plan Prestigia a la medida (Software de Reseñas 5★ + Blindaje Digital), le BONIFICAMOS el 100% de la optimización técnica ($0 USD). ¿Le gustaría aprovechar esta bonificación y activar su plan a la medida?`;
+                        ? `Hello ${auditBusinessName || 'Business Owner'}, after performing our forensic audit on your Google Maps listing, we identified critical gaps keeping you outside the Top 3. Our technical optimization fee is $200 USD. Plus, as our referral client, we grant you an exclusive 25% DISCOUNT on your first month of the official Prestigia software (5★ Review Accelerator + Reputation Shield). Shall we launch your upgrade this week?`
+                        : `Hola estimado/a ${auditBusinessName || 'propietario'}, tras auditar su negocio en Google Maps detectamos fallas críticas que le hacen perder clientes frente a la competencia. Nuestros honorarios de optimización técnica son de $200 USD. Además, como cliente recomendado de nuestra agencia, le otorgamos un 25% DE DESCUENTO exclusivo en su primer mes de software Prestigia (Reseñas 5★ + Blindaje Digital). ¿Coordinamos la optimización esta semana?`;
                       copyToClipboard(scriptText, isEn ? 'Audit Proposal' : 'Propuesta de Auditoría');
                     }}
                     className="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
                   >
                     <Copy className="w-3.5 h-3.5" />
-                    <span>{isEn ? 'Copy Tailored Plan Closing Script (WhatsApp)' : 'Copiar Propuesta Comercial de Cierre (WhatsApp)'}</span>
+                    <span>{isEn ? 'Copy 25% Off Referral Script (WhatsApp)' : 'Copiar Propuesta con 25% Dto. (WhatsApp)'}</span>
                   </button>
                 </div>
               </div>
@@ -10110,7 +10110,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           <span className="text-xs font-black text-slate-200">{isEn ? 'Closing Playbook' : 'Guión & Cierre'}</span>
                         </div>
                         <p className="text-[11px] text-slate-400 leading-snug">
-                          {isEn ? 'Step-by-step click guide and closing pitch with waived setup' : 'Paso a paso dónde dar clic y speech de venta con setup bonificado'}
+                          {isEn ? 'Step-by-step click guide and closing pitch with 25% off month 1' : 'Paso a paso dónde dar clic y speech de venta con 25% dto. mes 1'}
                         </p>
                       </div>
                     </div>
@@ -11064,8 +11064,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       : (isEn ? 'the Local Prestigia team' : 'el equipo de Local Prestigia');
 
                     const script = isEn
-                      ? `Hello *${clientPersonName}*, this is *${senderIdentity}*.\n\nWe audited your Google Maps profile for *${auditBusinessName || 'your business'}* in *${auditCity || 'your city'}* and identified the exact reasons keeping you outside the Top 3: your profile has critical algorithmic leaks costing you dozens of local buyers daily.\n\nWe restructured the 100% technical blueprint to outrank podium competitors, and activate the official *Prestigia (5★ Reviews + Digital Shield)* software suite.\n\nBy activating your *Tailored Prestigia Plan* today, we *WAIVE 100% of the optimization setup fee ($0 USD)*.\n\nWould you like to review the direct head-to-head comparison against your top rival?`
-                      : `Hola *${clientPersonName}*, le saluda *${senderIdentity}*.\n\nAuditamos minuciosamente el perfil de Google Maps de *${auditBusinessName || 'su negocio'}* en *${auditCity || 'su ciudad'}* y descubrimos la razón exacta por la cual no está en los primeros 3 lugares: su ficha tiene fugas algorítmicas críticas que le regalan clientes a su competencia a diario.\n\nEn Prestigia reestructuramos el 100% de su perfil para desbancar a los líderes del podio y le activamos la suite oficial de *Prestigia (Reseñas 5★ + Blindaje Digital)* para inyectar opiniones 5 estrellas continuas.\n\nAl activar hoy su *Plan Prestigia a la medida*, nosotros le *BONIFICAMOS el 100% del setup técnico de optimización ($0 costo de implementación)*.\n\n¿Tiene 2 minutos para ver la comparativa directa frente a su competidor más fuerte?`;
+                      ? `Hello *${clientPersonName}*, this is *${senderIdentity}*.\n\nWe audited your Google Maps profile for *${auditBusinessName || 'your business'}* in *${auditCity || 'your city'}* and identified the exact reasons keeping you outside the Top 3: your profile has critical algorithmic leaks costing you dozens of local buyers daily.\n\nWe restructured the 100% technical blueprint to outrank podium competitors for a one-time optimization fee of $200 USD. Plus, as our referral client, you receive an exclusive *25% DISCOUNT on your first month* of the official *Prestigia (5★ Reviews + Digital Shield)* software suite.\n\nWould you like to review the direct head-to-head comparison against your top rival?`
+                      : `Hola *${clientPersonName}*, le saluda *${senderIdentity}*.\n\nAuditamos minuciosamente el perfil de Google Maps de *${auditBusinessName || 'su negocio'}* en *${auditCity || 'su ciudad'}* y descubrimos la razón exacta por la cual no está en los primeros 3 lugares: su ficha tiene fugas algorítmicas críticas que le regalan clientes a su competencia a diario.\n\nEn nuestra consultoría reestructuramos el 100% de su perfil para desbancar a los líderes del podio por unos honorarios únicos de $200 USD. Además, como cliente recomendado por nosotros, le otorgamos un *25% de DESCUENTO en su primer mes* al activar la suite oficial de *Prestigia (Reseñas 5★ + Blindaje Digital)*.\n\n¿Tiene 2 minutos para ver la comparativa directa frente a su competidor más fuerte?`;
 
                     copyToClipboard(script, isEn ? 'Audit Pitch (WhatsApp)' : 'Guión de Venta de Auditoría (WhatsApp)');
                   }}
@@ -11088,9 +11088,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                 </div>
                 <p>
                   {isEn ? (
-                    <>"Hello <strong>{auditContactName || auditBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}</strong>. We audited your Google profile in <strong>{auditCity || 'your area'}</strong> and pinpointed exactly why you aren\'t ranking in the Top 3: your listing suffers from <strong>3 critical algorithmic flaws</strong> leaking clients daily. We structured the exact blueprint to dethrone podium rivals and activate the official <strong>Prestigia 5★ Review Acceleration & Digital Shield</strong> platform with 100% waived setup."</>
+                    <>"Hello <strong>{auditContactName || auditBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}</strong>. We audited your Google profile in <strong>{auditCity || 'your area'}</strong> and pinpointed exactly why you aren\'t ranking in the Top 3: your listing suffers from <strong>3 critical algorithmic flaws</strong> leaking clients daily. We structured the exact blueprint to dethrone podium rivals, and activate the official <strong>Prestigia 5★ Review Acceleration & Digital Shield</strong> platform with an exclusive 25% discount on your first month."</>
                   ) : (
-                    <>"Hola <strong>{auditContactName || auditBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}</strong>. Auditamos su ficha en <strong>{auditCity || 'su zona'}</strong> y detectamos por qué no está en el Top 3: su perfil tiene <strong>3 fallas algorítmicas graves</strong> que le están costando clientes todos los días frente a sus competidores líderes. Hemos estructurado el plan técnico para desbancar a los rivales y activar la suite oficial de <strong>Prestigia (Reseñas 5★ + Blindaje Digital)</strong> con setup 100% bonificado."</>
+                    <>"Hola <strong>{auditContactName || auditBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}</strong>. Auditamos su ficha en <strong>{auditCity || 'su zona'}</strong> y detectamos por qué no está en el Top 3: su perfil tiene <strong>3 fallas algorítmicas graves</strong> que le están costando clientes todos los días. Hemos estructurado el plan técnico para desbancar a los rivales y activar la suite oficial de <strong>Prestigia (Reseñas 5★ + Blindaje Digital)</strong> con un 25% de descuento exclusivo en su primer mes."</>
                   )}
                 </p>
               </div>
@@ -11120,7 +11120,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     {isEn ? '⚠️ Objection: "How much does optimization cost?"' : '⚠️ Objeción: "¿Y cuánto me cuesta esta optimización?"'}
                   </strong>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"The forensic audit and Top 3 upgrade is normally $200 to $350 USD. However, by activating your tailored Prestigia 5★ Plan, we WAIVE 100% of the setup ($0 fee). You only cover the monthly software and your listing is fully upgraded for free."' : '"El setup de auditoría y optimización forense vale normalmente de $200 a $350 USD. Sin embargo, al activar hoy su Plan Prestigia de Reseñas 5★ a la medida, le BONIFICAMOS el 100% del setup ($0 costo). Solo cubre su software mensual y su ficha queda optimizada gratis."'}
+                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"The forensic audit and Top 3 upgrade is a transparent technical fee of $200 USD. Plus, by activating your tailored Prestigia 5★ Plan through us today, you get 25% OFF your first month of software."' : '"El setup de auditoría y optimización forense es una tarifa única y transparente de $200 USD por todo el trabajo técnico. Además, al activar su Plan Prestigia de Reseñas 5★ a través de nosotros, recibe un 25% DE DESCUENTO exclusivo en su primer mes de software."'}
                   </p>
                 </div>
               </div>
@@ -11129,14 +11129,14 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-950/80 via-slate-900 to-slate-900 border border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                 <div>
                   <span className="font-black text-amber-300 uppercase tracking-wide block text-xs">
-                    {isEn ? '🎁 The Prestigia Closing Hook ($0 Setup Waiver):' : '🎁 El Gancho de Cierre Prestigia ($0 Setup):'}
+                    {isEn ? '🎁 The Prestigia Closing Hook (25% Off Month 1):' : '🎁 El Gancho de Cierre Prestigia (25% Dto. Mes 1):'}
                   </span>
                   <p className="text-slate-300 text-[11px] mt-0.5">
-                    {isEn ? <>"When you subscribe today to your tailored <strong>Prestigia Plan</strong>, the entire technical reengineering setup is <strong>100% WAIVED ($0 implementation cost)</strong>, including instant access to our 5★ review software and reputation shield."</> : <>"Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, el setup técnico de reingeniería y optimización te queda en <strong>$0 (100% bonificado)</strong> e incluye la activación completa del software de aceleración 5★ y blindaje reputacional."</>}
+                    {isEn ? <>"When you optimize your listing with us, you unlock an exclusive <strong>25% DISCOUNT on your first month</strong> of your tailored Prestigia software, activating continuous 5★ review capture and reputation shielding."</> : <>"Al optimizar tu ficha con nosotros, desbloqueas un <strong>25% DE DESCUENTO exclusivo en tu primer mes</strong> del software oficial Prestigia a la medida, activando captura continua de reseñas 5★ y blindaje reputacional."</>}
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black text-xs">
-                  {isEn ? 'Tailored Plan' : (isEn ? 'Tailored Plan' : 'Plan a la Medida')}
+                  {isEn ? '25% Off Month 1' : '25% Dto. Mes 1'}
                 </span>
               </div>
               {/* Bottom Quick Action: Nueva Auditoría */}
@@ -11820,7 +11820,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   </div>
                 )}
 
-                {/* Commercial Strategy: Setup Fee & 100% Annual Plan Waiver */}
+                {/* Commercial Strategy: Setup Fee & Client 25% Discount + Advisor Monthly Recurring Commission */}
                 <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-slate-900 to-teal-500/10 border border-emerald-500/30 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
@@ -11830,17 +11830,17 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </span>
                     </div>
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-emerald-950 text-emerald-300 border border-emerald-500/40">
-                      $150 - $250 USD
+                      $250 - $450 USD Setup + 20% Mes 2+
                     </span>
                   </div>
                   <div>
                     <strong className="text-white text-xs block mb-1">
-                      {isEn ? 'Rescue Management Waiver Closing Hook' : 'Gestión Legal de Rescate 100% Bonificada'}
+                      {isEn ? 'Dual Incentive: 25% Off Month 1 for Client + Recurring Commission Month 2+' : 'Incentivo Dual: 25% Dto. Mes 1 al Cliente + Comisión Recurrente Mes 2+'}
                     </strong>
                     <p className="text-[11px] text-slate-300 leading-relaxed">
                       {isEn
-                        ? 'Waive 100% of the legal ownership recovery fee ($0 cost) as an irresistible hook when the client acquires their tailored Prestigia plan (Digital QR & WhatsApp Flow + 5★ Review Accelerator).'
-                        : 'Bonifica el 100% de los honorarios técnicos y legales de rescate ($0 costo) como gancho de cierre al adquirir su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital).'}
+                        ? 'Charge your full legal and technical recovery fee ($250-$450 USD) directly to the client. Grant your client 25% OFF their first month of Prestigia software. Starting on month 2, you receive your 20% recurring monthly commission while the client remains active.'
+                        : 'Cobra tus honorarios técnicos y de gestión probatoria de rescate ($250–$450 USD) directamente al cliente. Como gancho de cierre, tu cliente recibe un 25% DE DESCUENTO exclusivo en su primer mes de software Prestigia. A partir del mes 2, tú recibes tu comisión mensual recurrente (20%) mientras el cliente continúe activo.'}
                     </p>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -11848,8 +11848,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       type="button"
                       onClick={() => {
                         const scriptText = isEn
-                          ? `Hello ${rescueBusinessName || 'Business Owner'}, to reclaim and transfer your Google Maps profile to your direct account, our legal ownership recovery fee is 100% WAIVED ($0 cost) when you activate your tailored Prestigia plan (Digital 5★ Review Accelerator + Reputation Shield). You get your listing back and your reputation secured. Shall we start the protocol today?`
-                          : `Hola estimado/a ${rescueBusinessName || 'propietario'}, para recuperar la titularidad legal de su ficha en Google Maps y transferir el control total a su cuenta oficial mediante el protocolo de Google, le BONIFICAMOS el 100% de los costos de gestión técnica y legal de rescate ($0 USD) al adquirir su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital). Recupera su ficha y blindamos su reputación. ¿Iniciamos el protocolo hoy?`;
+                          ? `Hello ${rescueBusinessName || 'Business Owner'}, to reclaim and transfer your Google Maps profile to your direct account, our legal ownership recovery fee is $250 USD. Plus, as our referral client, you receive an exclusive 25% DISCOUNT on your first month of the official Prestigia suite (5★ Review Accelerator + Reputation Shield). Shall we start the protocol today?`
+                          : `Hola estimado/a ${rescueBusinessName || 'propietario'}, para recuperar la titularidad legal de su ficha en Google Maps y transferir el control total a su cuenta oficial mediante el protocolo de Google, nuestros honorarios de gestión de rescate son de $250 USD. Además, como cliente recomendado por nosotros, le otorgamos un 25% DE DESCUENTO exclusivo en su primer mes de software Prestigia (Reseñas 5★ + Blindaje Digital). ¿Iniciamos el protocolo hoy?`;
                         copyToClipboard(scriptText, isEn ? 'Rescue Proposal' : 'Propuesta de Rescate');
                       }}
                       className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer border border-emerald-500/40"
@@ -11862,8 +11862,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       <a
                         href={`https://wa.me/${rescueContactPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
                           isEn
-                            ? `Hello ${rescueBusinessName || 'Business Owner'}, to reclaim and transfer your Google Maps profile to your direct account, our legal ownership recovery fee is 100% WAIVED ($0 cost) when you activate your tailored Prestigia plan (Digital 5★ Review Accelerator + Reputation Shield). You get your listing back and your reputation secured. Shall we start the protocol today?`
-                            : `Hola estimado/a ${rescueBusinessName || 'propietario'}, para recuperar la titularidad legal de su ficha en Google Maps y transferir el control total a su cuenta oficial mediante el protocolo de Google, le BONIFICAMOS el 100% de los costos de gestión técnica y legal de rescate ($0 USD) al adquirir su Plan Prestigia a la medida de su negocio (Software de Reseñas 5★ + Blindaje Digital). Recupera su ficha y blindamos su reputación. ¿Iniciamos el protocolo hoy?`
+                            ? `Hello ${rescueBusinessName || 'Business Owner'}, to reclaim and transfer your Google Maps profile to your direct account, our legal ownership recovery fee is $250 USD. Plus, as our referral client, you receive an exclusive 25% DISCOUNT on your first month of the official Prestigia suite (5★ Review Accelerator + Reputation Shield). Shall we start the protocol today?`
+                            : `Hola estimado/a ${rescueBusinessName || 'propietario'}, para recuperar la titularidad legal de su ficha en Google Maps y transferir el control total a su cuenta oficial mediante el protocolo de Google, nuestros honorarios de gestión de rescate son de $250 USD. Además, como cliente recomendado por nosotros, le otorgamos un 25% DE DESCUENTO exclusivo en su primer mes de software Prestigia (Reseñas 5★ + Blindaje Digital). ¿Iniciamos el protocolo hoy?`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -12683,8 +12683,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     </div>
                     <p className="text-[11px] text-slate-400">
                       {isEn
-                        ? 'Commercial hook waiving rescue fees when the client contracts the Prestigia plan.'
-                        : 'Guion persuasivo para bonificar los honorarios y cerrar el Plan Prestigia de reseñas.'}
+                        ? 'Commercial hook charging recovery fee with 25% off month 1 on Prestigia software.'
+                        : 'Guion persuasivo para cobrar honorarios de rescate y activar Prestigia con 25% dto. en mes 1.'}
                     </p>
                   </div>
                 </div>
@@ -12841,8 +12841,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           : 'the Local Prestigia team';
 
                         const script = isEn
-                          ? `Hello *${clientPersonName}*, this is *${senderIdentityEn}* with an urgent advisory regarding your Google Maps listing. We detected that your official profile is currently compromised by a third party or suspended by Google. Customers searching for your business in *${rescueCity || 'your city'}* may be calling outdated numbers or unable to find your address. Please DO NOT make the serious mistake of creating a new profile: Google will penalize both listings for duplicity and you will lose all reviews, photos, and years of commercial seniority. At Prestigia, we are certified listing recovery specialists and execute Google's Official 72-Hour Legal Ownership Protocol to submit the evidentiary dossier and return absolute legal control to you. When you activate your tailored *Prestigia Plan* today to protect your reputation, we absorb 100% of the technical and legal recovery fee (*$0 waived*) and shield your listing from future takeovers. Would you authorize us to submit the ownership claim today?`
-                          : `Hola *${clientPersonName}*, le saluda *${senderIdentity}* con una alerta prioritaria de su negocio en Google Maps. Detectamos que su ficha oficial se encuentra actualmente secuestrada por un tercero / suspendida por Google. Los clientes que buscan su negocio en *${rescueCity || 'su ciudad'}* están llamando a números que no le pertenecen o no pueden encontrar su dirección. Por favor NO cometa el grave error de crear una ficha nueva: Google la suspenderá por duplicidad y usted perderá todas sus reseñas, fotos y años de antigüedad comercial. Nosotros somos especialistas certificados en rescates de titularidad y ejecutamos el Protocolo Oficial de 72 Horas de Google para radicar el expediente probatorio y devolverle el control legal absoluto de su perfil. Al activar hoy su *Plan Prestigia a la medida* para blindar su reputación, nosotros absorbemos el 100% del costo legal y técnico de rescate (*$0 bonificado*) y blindamos su ficha para que nunca nadie vuelva a quitársela. ¿Nos autoriza a radicar la solicitud de titularidad hoy mismo?`;
+                          ? `Hello *${clientPersonName}*, this is *${senderIdentityEn}* with an urgent advisory regarding your Google Maps listing. We detected that your official profile is currently compromised by a third party or suspended by Google. Customers searching for your business in *${rescueCity || 'your city'}* may be calling outdated numbers or unable to find your address. Please DO NOT make the serious mistake of creating a new profile: Google will penalize both listings for duplicity and you will lose all reviews, photos, and years of commercial seniority. At Prestigia, we are certified listing recovery specialists and execute Google's Official 72-Hour Legal Ownership Protocol to submit the evidentiary dossier and return absolute legal control to you for a setup fee of $250 USD. Plus, as our referral client, you receive an exclusive *25% DISCOUNT on your first month* of your tailored *Prestigia Plan* to shield your listing from future takeovers. Would you authorize us to submit the ownership claim today?`
+                          : `Hola *${clientPersonName}*, le saluda *${senderIdentity}* con una alerta prioritaria de su negocio en Google Maps. Detectamos que su ficha oficial se encuentra actualmente secuestrada por un tercero / suspendida por Google. Los clientes que buscan su negocio en *${rescueCity || 'su ciudad'}* están llamando a números que no le pertenecen o no pueden encontrar su dirección. Por favor NO cometa el grave error de crear una ficha nueva: Google la suspenderá por duplicidad y usted perderá todas sus reseñas, fotos y años de antigüedad comercial. Nosotros somos especialistas certificados en rescates de titularidad y ejecutamos el Protocolo Oficial de 72 Horas de Google para radicar el expediente probatorio y devolverle el control legal absoluto por honorarios de $250 USD. Además, como cliente recomendado por nosotros, le otorgamos un *25% de DESCUENTO en su primer mes* al activar su *Plan Prestigia a la medida* para blindar su ficha contra futuros secuestros. ¿Nos autoriza a radicar la solicitud de titularidad hoy mismo?`;
                         copyToClipboard(script, isEn ? 'Listing Rescue Pitch' : 'Guión de Rescate de Ficha');
                       }}
                       className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition flex items-center gap-2 shadow-lg shadow-rose-600/20 cursor-pointer shrink-0 active:scale-98"
@@ -12864,9 +12864,9 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     </div>
                     <p>
                       {isEn ? (
-                        <>"Hello <strong>{rescueContactName || rescueBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}</strong> with an urgent advisory. Your official Google Maps profile is currently <strong>compromised / suspended by Google</strong>. Potential clients searching your business are calling outdated numbers. <strong>DO NOT create a duplicate profile</strong>: Google will penalize both listings and you will lose all reviews and domain history. We execute the official 72-Hour Legal Protocol with Google Trust & Safety to restore full ownership."</>
+                        <>"Hello <strong>{rescueContactName || rescueBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}</strong> with an urgent advisory. Your official Google Maps profile is currently <strong>compromised / suspended by Google</strong>. Potential clients searching your business are calling outdated numbers. <strong>DO NOT create a duplicate profile</strong>: Google will penalize both listings and you will lose all reviews and domain history. We execute the official 72-Hour Legal Protocol with Google Trust & Safety to restore full ownership, and activate your Prestigia reputation shield with 25% off your first month."</>
                       ) : (
-                        <>"Hola <strong>{rescueContactName || rescueBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}</strong> con una alerta urgente. Su ficha en Google Maps está actualmente <strong>secuestrada por un tercero / suspendida</strong>. Clientes que buscan su negocio están llamando a números ajenos. <strong>NO cree una ficha nueva</strong>: Google la sancionará por duplicidad y perderá todas sus reseñas. Nosotros ejecutamos el protocolo legal de 72h con Google Trust & Safety para restituirle la titularidad legítima."</>
+                        <>"Hola <strong>{rescueContactName || rescueBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}</strong> con una alerta urgente. Su ficha en Google Maps está actualmente <strong>secuestrada por un tercero / suspendida</strong>. Clientes que buscan su negocio están llamando a números ajenos. <strong>NO cree una ficha nueva</strong>: Google la sancionará por duplicidad y perderá todas sus reseñas. Nosotros ejecutamos el protocolo legal de 72h con Google Trust & Safety para restituirle la titularidad legítima por honorarios únicos, y le activamos su blindaje Prestigia con 25% de descuento exclusivo en su primer mes."</>
                       )}
                     </p>
                   </div>
@@ -12896,14 +12896,14 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-950/80 via-slate-900 to-slate-900 border border-rose-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                     <div>
                       <span className="font-black text-rose-300 uppercase tracking-wide block text-xs">
-                        {isEn ? '🎁 The Prestigia Closing Hook ($0 Setup Waiver):' : '🎁 El Gancho de Cierre Prestigia ($0 Setup):'}
+                        {isEn ? '🎁 The Prestigia Closing Hook (25% Off Month 1):' : '🎁 El Gancho de Cierre Prestigia (25% Dto. Mes 1):'}
                       </span>
                       <p className="text-slate-300 text-[11px] mt-0.5">
-                        {isEn ? <>"When you activate your tailored <strong>Prestigia Plan</strong> today, we absorb 100% of the technical and legal rescue fee (<strong>$0 cost waived</strong>) and shield your listing from future hijackings."</> : <>"Al contratar hoy tu <strong>Plan Prestigia a la medida</strong> para tu negocio, nosotros asumimos el 100% del costo técnico y legal del rescate (<strong>$0 bonificado</strong>) y blindamos tu ficha."</>}
+                        {isEn ? <>"When you recover your profile with us, you receive an exclusive <strong>25% DISCOUNT on your first month</strong> of your tailored Prestigia plan to permanently shield your reputation."</> : <>"Al recuperar tu ficha con nosotros, recibes un <strong>25% DE DESCUENTO exclusivo en tu primer mes</strong> del Plan Prestigia a la medida para blindar permanentemente tu reputación."</>}
                       </p>
                     </div>
                     <span className="shrink-0 px-3 py-1.5 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-black text-xs">
-                      {isEn ? 'Tailored Plan' : 'Plan a la Medida'}
+                      {isEn ? '25% Off Month 1' : '25% Dto. Mes 1'}
                     </span>
                   </div>
 
@@ -15446,11 +15446,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
                     {isEn ? (
                       <>
-                        <strong className="text-white">Creation:</strong> $150–$250 USD (3–5h) • <strong className="text-white">Top 3 Audit:</strong> $200–$350 USD (4–6h) • <strong className="text-white">72h Rescue:</strong> $250–$450 USD (5–8h) • <strong className="text-white">1-3★ Appeals:</strong> $25–$40 filing + $75–$110 on removal • <strong className="text-white">Forensic Pitch:</strong> $120–$200 USD • <strong className="text-amber-300">Prestigia Plans:</strong> 100% custom-tailored per client (Technical Setup $0 waived).
+                        <strong className="text-white">Creation:</strong> $150–$250 USD (3–5h) • <strong className="text-white">Top 3 Audit:</strong> $200–$350 USD (4–6h) • <strong className="text-white">72h Rescue:</strong> $250–$450 USD (5–8h) • <strong className="text-white">1-3★ Appeals:</strong> $25–$40 filing + $75–$110 on removal • <strong className="text-white">Forensic Pitch:</strong> $120–$200 USD • <strong className="text-amber-300">Prestigia Plans:</strong> 25% Off Month 1 for Client + 20% Monthly Recurring Commission Month 2+ for Advisor.
                       </>
                     ) : (
                       <>
-                        <strong className="text-white">Creación:</strong> $150–$250 USD (3–5h) • <strong className="text-white">Auditoría Top 3:</strong> $200–$350 USD (4–6h) • <strong className="text-white">Rescate 72h:</strong> $250–$450 USD (5–8h) • <strong className="text-white">Apelaciones 1-3★:</strong> $25–$40 USD radicación + $75–$110 USD contra éxito • <strong className="text-white">Prospección Forense:</strong> $120–$200 USD • <strong className="text-amber-300">Planes Prestigia:</strong> 100% a la medida de cada cliente (Setup Técnico $0 bonificado).
+                        <strong className="text-white">Creación:</strong> $150–$250 USD (3–5h) • <strong className="text-white">Auditoría Top 3:</strong> $200–$350 USD (4–6h) • <strong className="text-white">Rescate 72h:</strong> $250–$450 USD (5–8h) • <strong className="text-white">Apelaciones 1-3★:</strong> $25–$40 USD radicación + $75–$110 USD contra éxito • <strong className="text-white">Prospección Forense:</strong> $120–$200 USD • <strong className="text-amber-300">Planes Prestigia:</strong> 25% Dto. Mes 1 al Cliente + 20% Comisión Recurrente Mes 2+ al Asesor.
                       </>
                     )}
                   </p>
@@ -15459,7 +15459,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               <div className="shrink-0">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-[11px] font-black text-emerald-300">
                   <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>{isEn ? 'Strategy: Setup $0 Waived with Prestigia Plan' : 'Estrategia: Setup $0 Bonificado con Plan Prestigia'}</span>
+                  <span>{isEn ? 'Strategy: 25% Off Month 1 + 20% Recurring Month 2+' : 'Estrategia: 25% Dto. Mes 1 + 20% Recurrente Mes 2+'}</span>
                 </span>
               </div>
             </div>
@@ -15943,7 +15943,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1 border-t border-emerald-500/20">
                               <span className="text-slate-400">{isEn ? 'Technical Setup:' : 'Setup Técnico:'}</span>
                               <span className="font-bold text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                                {isEn ? '$0 USD (100% Waived)' : '$0 USD (100% Bonificado)'}
+                                {d.setupFeeChargedUsd ? `$${d.setupFeeChargedUsd} USD` : (isEn ? 'Advisor Setup Fee' : 'Cobrado por Asesor')}
                               </span>
                             </div>
                           </div>
@@ -16380,13 +16380,12 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           const val = e.target.value as any;
                           setClosingFormStatus(val);
                           if (val === 'prestigia_subscriber') {
-                            setClosingFormSetupFee(0);
                             if (closingFormMonthlyPlan === 0) setClosingFormMonthlyPlan(199);
                           }
                         }}
                         className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400 transition"
                       >
-                        <option value="prestigia_subscriber">{isEn ? '💎 Active Prestigia Subscriber (Setup $0 USD 100% Waived)' : '💎 Suscriptor Prestigia Activo (Setup $0 USD 100% Bonificado)'}</option>
+                        <option value="prestigia_subscriber">{isEn ? '💎 Active Prestigia Subscriber (25% Off M1 + Recurr. Comm. M2+)' : '💎 Suscriptor Prestigia Activo (25% Dto. Mes 1 + Comisión Recurrente Mes 2+)'}</option>
                         <option value="setup_paid">{isEn ? '💵 Technical Setup Paid (One-time technical delivery fee)' : '💵 Setup Técnico Cobrado (Pago único por trabajo técnico)'}</option>
                         <option value="proposal_sent">{isEn ? '⏳ Proposal Sent (In commercial follow-up)' : '⏳ Propuesta Enviada (En seguimiento comercial)'}</option>
                         <option value="negotiating">{isEn ? '🤝 In Active Negotiation' : '🤝 En Negociación Activa'}</option>
@@ -16412,7 +16411,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           <DollarSign className="w-4 h-4 text-slate-500 absolute left-2.5 top-2.5" />
                         </div>
                         <span className="text-[10px] text-slate-500 mt-0.5 block">
-                          {isEn ? 'If client subscribed to Prestigia, enter $0 (Setup waived).' : 'Si adquirió Prestigia, coloca $0 (Setup bonificado).'}
+                          {isEn ? 'Enter the one-time technical setup fee you charged.' : 'Introduce el valor del setup técnico cobrado por tu trabajo.'}
                         </span>
                       </div>
 
