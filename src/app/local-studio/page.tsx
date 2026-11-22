@@ -1843,6 +1843,7 @@ export default function LocalStudioPage() {
   const [isGeneratingCreate, setIsGeneratingCreate] = useState(false);
   const [createGeneratedData, setCreateGeneratedData] = useState<BlueprintData | null>(null);
   const [activeCreateDossierId, setActiveCreateDossierId] = useState<string | null>(null);
+  const [showDataRequestPreview, setShowDataRequestPreview] = useState(false);
 
   // -------------------------------------------------------------
   // TAB 2: AUDITAR & OPTIMIZAR (AUDIT) DEDICATED STATE
@@ -2483,6 +2484,23 @@ export default function LocalStudioPage() {
           ? `Hello ${bName}! 👋\n\nTo complete your official Google Business Profile setup on Google Maps, please provide the following materials:\n\n📸 *1. PHOTOS (Clear lighting):*\n- 2 Exterior facade photos (daytime and evening with illuminated sign)\n- 3 Interior customer area photos\n- 4 Photos of your main specialties (${createSpecialties || 'products/services'})\n- 1 Photo of your working team\n- Official logo in high resolution\n\n🎥 *2. CONTINUOUS 60s VERIFICATION VIDEO (Official Google Protocol):*\n- Take 1: Recording the street and exterior permanent sign\n- Take 2: Opening the front door with keys\n- Take 3: Recording the register, POS, and interior operation\n\n📋 *3. BUSINESS OPERATING DATA:*\n- ⏰ Exact weekly operating hours (Monday to Sunday opening and closing times)\n- 💳 Accepted payment methods (Cash, Credit/Debit Cards, Mobile payments Zelle/Apple Pay)\n- 🚗 Parking available or wheelchair-accessible entrance?\n- ✉️ Official Gmail address for profile ownership\n\nWe will configure your Google Business Profile with verified local SEO categories! 🚀`
           : `¡Hola ${bName}! 👋\n\nPara configurar y verificar la ficha oficial de tu negocio en Google Maps con máxima autoridad, requerimos los siguientes materiales:\n\n📸 *1. FOTOS TÉCNICAS (Con buena iluminación):*\n- 2 Fotos de fachada exterior (de día y de noche con aviso comercial visible)\n- 3 Fotos del local o área de atención a clientes limpia y equipada\n- 4 Fotos de tus especialidades principales (${createSpecialties || 'servicios y tratamientos'})\n- 1 Foto del equipo de trabajo o especialistas uniformados\n- Logo oficial en alta resolución\n\n🎥 *2. VIDEO CONTINUO DE 60 SEGUNDOS (Exigido por Google sin cortes):*\n- Toma 1: Grabando la calle, número de dirección y el aviso de la fachada\n- Toma 2: Abriendo la puerta de entrada con llaves\n- Toma 3: Grabando el mostrador de recepción, datáfono/caja e instalaciones operativas\n\n📋 *3. DATOS OPERATIVOS DEL NEGOCIO:*\n- ⏰ Horarios exactos de atención semanal (Lunes a Domingo con horas de apertura y cierre)\n- 💳 Medios de pago recibidos (Efectivo, Tarjetas débito/crédito, Transferencias Nequi/Daviplata/Zelle)\n- 🚗 ¿Cuentas con parqueadero de clientes o acceso para personas en silla de ruedas?\n- ✉️ Correo de Gmail donde deseas recibir la propiedad oficial de la ficha\n\n¡Nos encargamos de toda la arquitectura técnica, palabras clave locales y posicionamiento en Google Maps! 🚀`);
   }, [createGeneratedData?.whatsappOnboardingMessage, createBusinessName, createBusinessModel, createSpecialties, isEn]);
+
+  // Plantilla de WhatsApp para solicitar al cliente los datos iniciales de creación (antes de generar)
+  const effectiveDataRequestTemplate = useMemo(() => {
+    const senderName = currentUser?.name || 'Luisma';
+    const roleTitle = isLuismaMaster
+      ? (isEn ? 'General Director at Prestigia' : 'Director General de Prestigia')
+      : currentUser?.agencyName
+      ? (isEn ? `Local SEO Specialist at ${currentUser.agencyName}` : `Especialista en Posicionamiento Local & SEO de ${currentUser.agencyName}`)
+      : (isEn ? 'Local SEO & Google Maps Specialist' : 'Especialista en Posicionamiento Local & SEO en Google Maps');
+
+    const bizNameMention = createBusinessName.trim() ? (isEn ? ` for *${createBusinessName.trim()}*` : ` para *${createBusinessName.trim()}*`) : '';
+    const clientNameMention = createContactName.trim() ? ` *${createContactName.trim()}*` : '';
+
+    return isEn
+      ? `Hello${clientNameMention}! 👋\n\nThis is *${senderName}*, ${roleTitle}.\n\nTo build and verify your official Google Maps business profile${bizNameMention} with our Top 3 Ranking SEO Architecture, please provide the following initial details so our team can configure your blueprint:\n\n📋 *INITIAL SETUP DETAILS REQUIRED:*\n1. 👤 *Contact Person / Owner:* (Full name)\n2. 🏢 *Company / Billing Name:* (Legal business or personal name)\n3. 📍 *Official Business Name:* (Exact commercial name to show on Google Maps)\n4. 🏙️ *City & Neighborhood:* (Storefront location address or service coverage areas)\n5. 🛠️ *Top 3 Best-Selling Products or Services:* (Specialties you want to rank #1)\n6. 📱 *Commercial WhatsApp / Phone:* (Official customer inquiry number)\n7. ✉️ *Official Gmail Address:* (To assign you as the primary legal owner of the listing)\n\nOnce you send these details, our AI engine will generate your custom ranking architecture, and we will guide you through the fast 60-second verification video. 🚀`
+      : `¡Hola${clientNameMention}! 👋 Le saluda *${senderName}*, ${roleTitle}.\n\nPara iniciar la estructuración y verificación de su ficha oficial en Google Maps${bizNameMention} con nuestra Arquitectura de Posicionamiento Top 3, por favor envíeme los siguientes datos iniciales para que nuestro equipo configure su sistema:\n\n📋 *DATOS REQUERIDOS PARA LA CREACIÓN:*\n1. 👤 *Nombre de contacto / Propietario:* (Nombre y apellido)\n2. 🏢 *Empresa o Razón Social:* (Nombre legal o particular)\n3. 📍 *Nombre comercial del negocio:* (Exactamente cómo desea que aparezca en Google Maps)\n4. 🏙️ *Ciudad y Barrio / Sector:* (Ubicación física del local o zonas de atención a domicilio)\n5. 🛠️ *Sus 3 productos o servicios estrella:* (Los más vendidos que más le interesa posicionar)\n6. 📱 *WhatsApp comercial de atención:* (Número oficial donde recibirán clientes)\n7. ✉️ *Correo Gmail oficial:* (Para configurarlo a usted como Propietario Principal de la ficha)\n\nEn cuanto me envíe estos datos, nuestro sistema generará la arquitectura técnica de su negocio y coordinamos el paso a paso de la verificación en 60 segundos. 🚀`;
+  }, [currentUser?.name, currentUser?.agencyName, isLuismaMaster, isEn, createBusinessName, createContactName]);
 
   const rescueDeadlineInfo = useMemo(() => {
     const start = new Date();
@@ -7824,6 +7842,66 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                 <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
                   <Building2 className="w-4 h-4 text-emerald-400" />
                   <h2 className="text-sm font-black text-white">{t.formHeader1}</h2>
+                </div>
+
+                {/* Tarjeta de Petición de Datos al Cliente por WhatsApp */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-950/70 via-slate-900 to-indigo-950/60 border border-emerald-500/40 space-y-2.5 shadow-md">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 shrink-0">
+                        <MessageSquare className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">
+                          {isEn ? 'Client WhatsApp Intake Template' : 'Petición de Datos por WhatsApp'}
+                        </span>
+                        <p className="text-[11px] text-slate-300">
+                          {isEn
+                            ? 'Request the 7 required business details with 1 click before creating.'
+                            : 'Pídele los 7 datos clave a tu cliente por WhatsApp antes de crear su ficha.'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setShowDataRequestPreview((prev) => !prev)}
+                        className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                        title={isEn ? 'Preview template' : 'Ver mensaje'}
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>{showDataRequestPreview ? (isEn ? 'Hide' : 'Ocultar') : (isEn ? 'Preview' : 'Ver')}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(effectiveDataRequestTemplate, isEn ? 'Data Request Template' : 'Plantilla de Petición de Datos')}
+                        className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-emerald-500/20 cursor-pointer active:scale-95"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>{isEn ? 'Copy Request' : 'Copiar Mensaje'}</span>
+                      </button>
+
+                      {createContactPhone && (
+                        <a
+                          href={`https://wa.me/${createContactPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(effectiveDataRequestTemplate)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 transition flex items-center justify-center cursor-pointer shadow-md"
+                          title={isEn ? 'Send via WhatsApp Web' : 'Abrir chat de WhatsApp'}
+                        >
+                          <Send className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  {showDataRequestPreview && (
+                    <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-emerald-300 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto animate-in fade-in duration-200">
+                      {effectiveDataRequestTemplate}
+                    </div>
+                  )}
                 </div>
 
                 {/* Tarjeta de Datos del Cliente / Contratante (Quién Solicita y Paga el Servicio) */}
