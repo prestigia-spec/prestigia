@@ -7871,8 +7871,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         </span>
                         <p className="text-[11px] text-slate-300">
                           {isEn
-                            ? 'Request the 7 required business details with 1 click before creating.'
-                            : 'Pídele los 7 datos clave a tu cliente por WhatsApp antes de crear su ficha.'}
+                            ? 'Request the required business details with 1 click before creating.'
+                            : 'Pídele los datos clave a tu cliente por WhatsApp antes de crear su ficha.'}
                         </p>
                       </div>
                     </div>
