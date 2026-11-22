@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllCommercialLeads } from '@/lib/db';
+import { getAllCommercialLeads, deleteCommercialLead, deleteCommercialLeadsByFriend } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -58,5 +58,27 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     console.error('Error fetching masterclass leads:', error);
     return NextResponse.json({ error: 'Error del servidor al obtener referidos' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { leadId, friendCode } = body;
+
+    if (leadId) {
+      await deleteCommercialLead(leadId);
+      return NextResponse.json({ success: true, message: 'Invitado eliminado con éxito' });
+    }
+
+    if (friendCode) {
+      const count = await deleteCommercialLeadsByFriend(friendCode);
+      return NextResponse.json({ success: true, message: `Amigo y sus ${count} referidos eliminados con éxito` });
+    }
+
+    return NextResponse.json({ error: 'Se requiere leadId o friendCode' }, { status: 400 });
+  } catch (error: any) {
+    console.error('Error deleting lead:', error);
+    return NextResponse.json({ error: 'Error del servidor al eliminar' }, { status: 500 });
   }
 }

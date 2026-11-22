@@ -1207,6 +1207,58 @@ export async function updateCommercialLeadStatus(
   return true;
 }
 
+export async function deleteCommercialLead(id: string): Promise<boolean> {
+  try {
+    const db = ensureDbFile();
+    if (db.leads) {
+      db.leads = db.leads.filter((l) => l.id !== id);
+      writeDbFile(db);
+    }
+  } catch (err) {
+    console.warn('[deleteCommercialLead] local file write error:', err);
+  }
+
+  // Delete from Supabase
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      await supabase.from('commercial_leads').delete().eq('id', id);
+    }
+  } catch (sbErr) {
+    console.error('[deleteCommercialLead] Supabase delete error:', sbErr);
+  }
+
+  return true;
+}
+
+export async function deleteCommercialLeadsByFriend(friendCode: string): Promise<number> {
+  const all = await getAllCommercialLeads();
+  const targetCode = friendCode.toLowerCase().trim();
+
+  const toDelete = all.filter((lead) => {
+    let ref = 'directo';
+    if (lead.notes) {
+      try {
+        const parsed = JSON.parse(lead.notes);
+        if (parsed.referredBy) ref = String(parsed.referredBy).toLowerCase().trim();
+      } catch {
+        const m = lead.notes.match(/referredBy["']?:\s*["']?([a-zA-Z0-9_-]+)/);
+        if (m && m[1]) ref = m[1].toLowerCase().trim();
+      }
+    } else if (lead.primaryGoal && lead.primaryGoal.includes('Ref:')) {
+      const parts = lead.primaryGoal.split('Ref:');
+      if (parts[1]) ref = parts[1].trim().toLowerCase();
+    }
+    return ref === targetCode;
+  });
+
+  for (const item of toDelete) {
+    await deleteCommercialLead(item.id);
+  }
+
+  return toDelete.length;
+}
+
 export async function getAllEmailDispatches(): Promise<EmailDispatchRecord[]> {
   const db = ensureDbFile();
   return db.emailDispatches || [];
