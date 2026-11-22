@@ -259,7 +259,7 @@ const COUNTRY_CODES = [
 function MasterclassContent() {
   const searchParams = useSearchParams();
   const rawAngle = searchParams.get('angle') as MasterclassAngle | null;
-  const rawRef = searchParams.get('ref') || searchParams.get('amigo') || searchParams.get('invitado') || '';
+  const rawRef = searchParams.get('ref') || searchParams.get('aliado') || searchParams.get('amigo') || searchParams.get('invitado') || '';
 
   const [lang, setLang] = useState<'es' | 'en'>('es');
   const [selectedAngle, setSelectedAngle] = useState<MasterclassAngle>('general');
@@ -683,11 +683,11 @@ function MasterclassContent() {
                     </div>
                   </div>
 
-                  {/* Código de Invitado / Referido (Amigo) */}
+                  {/* Código de Invitado / Referido (Aliado) */}
                   <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
                     <div className="flex items-center justify-between text-[11px] font-bold">
                       <label className="text-slate-300 flex items-center gap-1">
-                        <span>🎟️ {isEn ? 'Invited by a friend? (Optional code):' : '¿Te invitó un amigo? (Código opcional):'}</span>
+                        <span>🎟️ {isEn ? 'Invited by a partner? (Optional code):' : '¿Te invitó un aliado o promotor? (Código opcional):'}</span>
                       </label>
                       {referralCode && (
                         <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/30">

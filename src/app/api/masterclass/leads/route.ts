@@ -73,7 +73,7 @@ export async function DELETE(request: NextRequest) {
 
     if (friendCode) {
       const count = await deleteCommercialLeadsByFriend(friendCode);
-      return NextResponse.json({ success: true, message: `Amigo y sus ${count} referidos eliminados con éxito` });
+      return NextResponse.json({ success: true, message: `Aliado y sus ${count} referidos eliminados con éxito` });
     }
 
     return NextResponse.json({ error: 'Se requiere leadId o friendCode' }, { status: 400 });

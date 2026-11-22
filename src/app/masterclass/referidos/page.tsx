@@ -58,7 +58,7 @@ export default function MasterclassReferidosPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-  // New Friend link generator
+  // New Ally link generator
   const [newFriendInput, setNewFriendInput] = useState('');
   const [createdFriendLink, setCreatedFriendLink] = useState<string | null>(null);
 
@@ -127,7 +127,7 @@ export default function MasterclassReferidosPage() {
     }
   };
 
-  // Generate friend link on the fly
+  // Generate ally link on the fly
   const handleGenerateFriendLink = () => {
     if (!newFriendInput.trim()) return;
     const clean = newFriendInput.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '');
@@ -186,7 +186,7 @@ export default function MasterclassReferidosPage() {
 
     const filterLabel =
       selectedFriend === 'all'
-        ? 'Todos los Amigos (Consolidado General)'
+        ? 'Todos los Aliados (Consolidado General)'
         : `@${selectedFriend.toUpperCase()}`;
 
     const excelHtml = `
@@ -232,7 +232,7 @@ export default function MasterclassReferidosPage() {
           <tr>
             <td class="kpi-title">Fecha de Emisi&oacute;n:</td>
             <td class="kpi-val" colspan="2">${dateFormatted}</td>
-            <td class="kpi-title">Filtro Amigo:</td>
+            <td class="kpi-title">Filtro Aliado:</td>
             <td class="kpi-val" colspan="2">${filterLabel}</td>
             <td class="kpi-title">Total Registros:</td>
             <td class="kpi-val" style="color: #059669; font-size: 11pt;">${filteredLeads.length} Invitados</td>
@@ -246,7 +246,7 @@ export default function MasterclassReferidosPage() {
               <th class="th-col" style="width: 140px;">WhatsApp Directo</th>
               <th class="th-col" style="width: 130px;">Ciudad y Pa&iacute;s</th>
               <th class="th-col" style="width: 160px;">Perfil / Profesion</th>
-              <th class="th-col" style="width: 130px;">Promotor / Amigo</th>
+              <th class="th-col" style="width: 130px;">Promotor / Aliado</th>
               <th class="th-col" style="width: 150px;">Enlace Chat WhatsApp</th>
             </tr>
           </thead>
@@ -302,7 +302,7 @@ export default function MasterclassReferidosPage() {
               <div className="leading-none">
                 <span className="font-black text-sm tracking-widest text-white block">PRESTIGIA</span>
                 <span className="text-[10px] text-amber-400 font-black tracking-widest uppercase block">
-                  SISTEMA DE REFERIDOS & AMIGOS
+                  RED DE ALIADOS & REFERIDOS
                 </span>
               </div>
             </Link>
@@ -336,13 +336,13 @@ export default function MasterclassReferidosPage() {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-black uppercase tracking-wider mb-2">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Panel Ejecutivo de Promotores & Tráfico Orgánico</span>
+              <span>Panel Ejecutivo de Aliados Estratégicos & Tráfico</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white">
-              Gestión Oficial de Amigos y Referidos
+              Gestión Oficial de Aliados y Referidos
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              Monitorea los prospectos de la Masterclass del 10 de Diciembre, filtra por promotor, elimina registros y descarga reportes profesionales en Excel.
+              Monitorea los prospectos de la Masterclass del 10 de Diciembre, filtra por aliado, elimina registros y descarga reportes profesionales en Excel.
             </p>
           </div>
 
@@ -368,7 +368,7 @@ export default function MasterclassReferidosPage() {
           </div>
 
           <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Amigos Promotores</span>
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Aliados Activos</span>
             <div className="text-3xl font-black text-amber-400 font-mono">
               {referralSummary.filter((r) => r.code !== 'directo').length}
             </div>
@@ -376,7 +376,7 @@ export default function MasterclassReferidosPage() {
           </div>
 
           <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Top Promotor #1</span>
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Top Aliado #1</span>
             <div className="text-2xl font-black text-emerald-400 truncate font-mono">
               {referralSummary.find((r) => r.code !== 'directo')?.code
                 ? `@${referralSummary.find((r) => r.code !== 'directo')!.code}`
@@ -385,7 +385,7 @@ export default function MasterclassReferidosPage() {
             <span className="text-[10px] text-emerald-300 font-semibold block">
               {referralSummary.find((r) => r.code !== 'directo')?.count
                 ? `${referralSummary.find((r) => r.code !== 'directo')!.count} invitados traídos`
-                : 'Pasa los enlaces a tus amigos'}
+                : 'Pasa los enlaces a tus aliados'}
             </span>
           </div>
 
@@ -410,7 +410,7 @@ export default function MasterclassReferidosPage() {
               }`}
             >
               <Award className="w-4 h-4" />
-              <span>👥 Lista de Amigos / Promotores</span>
+              <span>👥 Lista de Aliados / Promotores</span>
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
                 activeTab === 'friends' ? 'bg-slate-950 text-amber-400' : 'bg-slate-800 text-slate-300'
               }`}>
@@ -436,12 +436,12 @@ export default function MasterclassReferidosPage() {
             </button>
           </div>
 
-          {/* Quick Friend Filter in Leads Tab */}
+          {/* Quick Ally Filter in Leads Tab */}
           {activeTab === 'leads' && (
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <span className="text-[11px] text-slate-400 font-bold whitespace-nowrap flex items-center gap-1">
                 <Filter className="w-3.5 h-3.5 text-amber-400" />
-                <span>Filtrar Amigo:</span>
+                <span>Filtrar Aliado:</span>
               </span>
               <select
                 value={selectedFriend}
@@ -460,18 +460,18 @@ export default function MasterclassReferidosPage() {
         </div>
 
         {/* ============================================================== */}
-        {/* TAB 1: LISTA DE AMIGOS / PROMOTORES */}
+        {/* TAB 1: LISTA DE ALIADOS / PROMOTORES */}
         {/* ============================================================== */}
         {activeTab === 'friends' && (
           <div className="space-y-6">
-            {/* GENERAR ENLACE RÁPIDO PARA UN AMIGO */}
+            {/* GENERAR ENLACE RÁPIDO PARA UN ALIADO */}
             <div className="p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-900 to-slate-900 border border-amber-500/30 space-y-3">
               <div className="flex items-center gap-2 text-amber-400 font-black text-sm">
                 <UserPlus className="w-4 h-4" />
-                <span>Generar Enlace Personalizado para un Nuevo Amigo</span>
+                <span>Generar Enlace Personalizado para un Nuevo Aliado</span>
               </div>
               <p className="text-xs text-slate-300">
-                Escribe el nombre o alias de tu amigo para crear de inmediato su enlace de recomendación con comisión del 20% recurrente sobre ventas de Prestigia:
+                Escribe el nombre o alias de tu aliado estratégico para crear de inmediato su enlace de recomendación con comisión del 20% recurrente sobre ventas de Prestigia:
               </p>
 
               <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -518,11 +518,11 @@ export default function MasterclassReferidosPage() {
               )}
             </div>
 
-            {/* TABLA DE AMIGOS */}
+            {/* TABLA DE ALIADOS */}
             <div className="rounded-3xl bg-slate-900/60 border border-slate-800 overflow-hidden shadow-xl">
               <div className="p-4 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-black text-white">Ranking de Amigos Promotores</h3>
+                  <h3 className="text-sm font-black text-white">Ranking de Aliados Estratégicos</h3>
                   <span className="text-xs font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/30">
                     {referralSummary.length} promotores registrados
                   </span>
@@ -535,9 +535,9 @@ export default function MasterclassReferidosPage() {
               {referralSummary.length === 0 ? (
                 <div className="py-16 text-center space-y-2">
                   <Users className="w-10 h-10 text-slate-600 mx-auto" />
-                  <p className="text-sm font-bold text-white">Aún no hay amigos con referidos</p>
+                  <p className="text-sm font-bold text-white">Aún no hay aliados con referidos</p>
                   <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                    Crea un enlace con la caja superior y compártelo a tus amigos para que empiecen a sumar invitados.
+                    Crea un enlace con la caja superior y compártelo a tus aliados para que empiecen a sumar invitados.
                   </p>
                 </div>
               ) : (
@@ -546,7 +546,7 @@ export default function MasterclassReferidosPage() {
                     <thead className="bg-slate-950/80 text-[10px] uppercase font-bold text-slate-400 tracking-wider border-b border-slate-800">
                       <tr>
                         <th className="py-3 px-4 w-12 text-center">Rank</th>
-                        <th className="py-3 px-4">Amigo / Promotor</th>
+                        <th className="py-3 px-4">Aliado / Promotor</th>
                         <th className="py-3 px-4 text-center">Invitados Registrados</th>
                         <th className="py-3 px-4">Enlace Único de Referido</th>
                         <th className="py-3 px-4 text-center">Comisión Estimada (20%)</th>
@@ -586,7 +586,7 @@ export default function MasterclassReferidosPage() {
                                   <span className="text-amber-400 text-sm">🎟️</span>
                                   <div>
                                     <div className="font-mono text-amber-300 text-sm">@{item.code}</div>
-                                    <div className="text-[10px] text-slate-400 font-normal">Promotor Oficial</div>
+                                    <div className="text-[10px] text-slate-400 font-normal">Aliado Estratégico</div>
                                   </div>
                                 </div>
                               )}
@@ -606,7 +606,7 @@ export default function MasterclassReferidosPage() {
                                   type="button"
                                   onClick={() => copyFriendLink(item.code)}
                                   className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-950 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 text-[11px] font-mono transition cursor-pointer"
-                                  title="Copiar enlace oficial de este amigo"
+                                  title="Copiar enlace oficial de este aliado"
                                 >
                                   <Copy className="w-3 h-3 text-amber-400" />
                                   <span>{copiedCode === item.code ? '¡Copiado!' : `...&ref=${item.code}`}</span>
@@ -630,7 +630,7 @@ export default function MasterclassReferidosPage() {
                                     setActiveTab('leads');
                                   }}
                                   className="px-3 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
-                                  title="Filtrar y ver los invitados de este amigo"
+                                  title="Filtrar y ver los invitados de este aliado"
                                 >
                                   <span>Ver Invitados</span>
                                   <ChevronRight className="w-3.5 h-3.5" />
@@ -647,7 +647,7 @@ export default function MasterclassReferidosPage() {
                                     })
                                   }
                                   className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition cursor-pointer"
-                                  title={`Eliminar amigo ${item.code} y todos sus ${item.count} referidos`}
+                                  title={`Eliminar aliado ${item.code} y todos sus ${item.count} referidos`}
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
@@ -687,7 +687,7 @@ export default function MasterclassReferidosPage() {
                   onClick={() => setSelectedFriend('all')}
                   className="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold transition whitespace-nowrap cursor-pointer"
                 >
-                  Ver Todos los Amigos
+                  Ver Todos los Aliados
                 </button>
               )}
 
@@ -724,7 +724,7 @@ export default function MasterclassReferidosPage() {
                   <p className="text-sm font-bold text-white">No hay invitados en esta vista</p>
                   <p className="text-xs text-slate-500 max-w-sm mx-auto">
                     {selectedFriend !== 'all'
-                      ? `Tu amigo @${selectedFriend} aún no tiene registros. Pásale su enlace para que empiece a invitar.`
+                      ? `Tu aliado @${selectedFriend} aún no tiene registros. Pásale su enlace para que empiece a invitar.`
                       : 'Aún no se ha registrado nadie. Los registros aparecerán aquí automáticamente en tiempo real.'}
                   </p>
                 </div>
@@ -737,7 +737,7 @@ export default function MasterclassReferidosPage() {
                         <th className="py-3 px-4">WhatsApp Directo</th>
                         <th className="py-3 px-4">Ubicación</th>
                         <th className="py-3 px-4">Perfil</th>
-                        <th className="py-3 px-4">Invitado Por (Amigo)</th>
+                        <th className="py-3 px-4">Invitado Por (Aliado)</th>
                         <th className="py-3 px-4">Fecha y Hora</th>
                         <th className="py-3 px-4 text-right">Acción</th>
                       </tr>
@@ -835,7 +835,7 @@ export default function MasterclassReferidosPage() {
               </div>
               <div>
                 <h3 className="font-black text-white text-base">
-                  {deleteTarget.type === 'lead' ? '¿Eliminar este Invitado?' : '¿Eliminar Amigo y sus Referidos?'}
+                  {deleteTarget.type === 'lead' ? '¿Eliminar este Invitado?' : '¿Eliminar Aliado y sus Referidos?'}
                 </h3>
                 <p className="text-xs text-slate-400">Esta acción no se puede deshacer.</p>
               </div>
@@ -850,7 +850,7 @@ export default function MasterclassReferidosPage() {
                   </>
                 ) : (
                   <>
-                    Estás a punto de borrar al amigo <strong className="text-amber-400 font-mono">{deleteTarget.name}</strong> y a sus{' '}
+                    Estás a punto de borrar al aliado <strong className="text-amber-400 font-mono">{deleteTarget.name}</strong> y a sus{' '}
                     <strong className="text-rose-400 font-bold">{deleteTarget.count || 0} invitados registrados</strong>.
                   </>
                 )}
