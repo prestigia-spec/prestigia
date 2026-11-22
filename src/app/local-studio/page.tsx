@@ -1999,6 +1999,7 @@ export default function LocalStudioPage() {
   const [targetCountryForNewCity, setTargetCountryForNewCity] = useState<string>('Colombia');
   const [newCountryInput, setNewCountryInput] = useState<string>('');
   const [newCityInput, setNewCityInput] = useState<string>('');
+  const [showAgencyProtocolModal, setShowAgencyProtocolModal] = useState<boolean>(false);
 
   // Closing modal location states
   const [closingFormCountry, setClosingFormCountry] = useState<string>('Colombia');
@@ -7824,6 +7825,16 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                   <button
                     type="button"
+                    onClick={() => setShowAgencyProtocolModal(true)}
+                    className="px-3.5 py-2 rounded-2xl bg-indigo-950/90 hover:bg-indigo-900 border border-indigo-500/40 text-indigo-300 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer shrink-0 active:scale-95"
+                    title={isEn ? 'Agency Protocol: Central Email & Ownership Transfer' : 'Protocolo de Agencia: Correo Central y Traspaso de Propiedad'}
+                  >
+                    <KeyRound className="w-4 h-4 text-indigo-400" />
+                    <span>{isEn ? 'Agency Ownership Guide' : 'Manual Traspaso Fichas'}</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={handleResetCreateForm}
                     className="px-3.5 py-2 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-emerald-500/20 cursor-pointer shrink-0 active:scale-95"
                     title={isEn ? 'Clear form to create another profile' : 'Crear una nueva ficha desde cero'}
@@ -8771,8 +8782,18 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                               ? `Create the profile from your agency account to speed up delivery. Once created, click ⋮ (Menu) > "Business Profile Settings" > "People & Access" > Invite ${createContactEmail || 'client@gmail.com'} as "Primary Owner". You retain "Manager" role to manage it monthly.`
                               : `Crea la ficha desde tu cuenta de asesor para agilizar el trabajo. Una vez creada, haz clic en ⋮ (Menú) > "Configuración del Perfil de Empresa" > "Personas y Acceso" > Invita a ${createContactEmail || 'cliente@gmail.com'} como "Propietario Principal". Tú conservas el rol de "Administrador" para cobrarle mantenimiento mensual.`}
                           </p>
-                          <div className="pt-1 text-[10px] text-indigo-300 font-semibold flex items-center gap-1">
-                            <span>💡 El cliente recibe una invitación por correo y se vuelve el dueño oficial.</span>
+                          <div className="pt-1 flex items-center justify-between">
+                            <span className="text-[10px] text-indigo-300 font-semibold flex items-center gap-1">
+                              💡 El cliente recibe la invitación y se vuelve dueño oficial.
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setShowAgencyProtocolModal(true)}
+                              className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-1 cursor-pointer underline underline-offset-2 shrink-0"
+                            >
+                              <KeyRound className="w-3 h-3" />
+                              <span>{isEn ? 'View 4-Step Playbook' : 'Ver Manual 4 Pasos'}</span>
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -20970,6 +20991,175 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                 {isLoggingIn ? tAuth.verifying : tAuth.btnLogin}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Manual Maestro de Agencia - Creación con Correo Central y Traspaso de Propiedad */}
+      {showAgencyProtocolModal && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md overflow-y-auto flex items-center justify-center p-4">
+          <div className="bg-slate-900 border-2 border-indigo-500/50 rounded-3xl p-6 sm:p-7 max-w-2xl w-full space-y-5 shadow-2xl animate-in zoom-in-95 max-h-[92vh] overflow-y-auto my-auto text-left">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-950 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0">
+                  <KeyRound className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-indigo-400 bg-indigo-950/80 px-2.5 py-0.5 rounded-full border border-indigo-500/30">
+                    {isEn ? 'Official Agency Playbook' : 'Manual Maestro de Agencia'}
+                  </span>
+                  <h3 className="text-base sm:text-lg font-black text-white mt-1">
+                    {isEn
+                      ? 'Central Email Creation & Ownership Transfer Protocol'
+                      : 'Creación con Correo Central y Traspaso de Propiedad al Cliente'}
+                  </h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAgencyProtocolModal(false)}
+                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Ventaja Estratégica */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/50 via-slate-950 to-indigo-950/40 border border-blue-500/30 space-y-1.5 text-xs">
+              <div className="flex items-center gap-1.5 text-blue-400 font-bold">
+                <Sparkles className="w-4 h-4" />
+                <span className="text-xs uppercase font-black tracking-wider">
+                  {isEn ? 'The Zero-Friction Agency Secret' : 'El Secreto de Agencia: Cero Fricción con el Cliente'}
+                </span>
+              </div>
+              <p className="text-slate-300 text-[11.5px] leading-relaxed">
+                {isEn
+                  ? 'Create a dedicated agency Gmail account (e.g. youragency.listings@gmail.com). You build and verify all client listings from this single master email without ever asking for the client\'s personal passwords. Once verified, you transfer primary ownership in 3 clicks while retaining manager access to charge recurring monthly maintenance.'
+                  : 'Crea una cuenta de Gmail dedicada exclusivamente para tu consultoría o agencia (ej: tuagencia.fichas@gmail.com). Con esta cuenta creas todas las fichas en Google sin tener que pedirle contraseñas personales al cliente ni depender de sus horarios. Una vez verificada, le transfieres la propiedad oficial en 3 clics.'}
+              </p>
+            </div>
+
+            {/* Los 4 Pasos Exactos */}
+            <div className="space-y-3">
+              <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 block">
+                {isEn ? 'Step-by-Step Execution Protocol:' : 'Protocolo de Ejecución en 4 Pasos:'}
+              </span>
+
+              <div className="space-y-2 text-xs">
+                <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-xl bg-blue-500/20 text-blue-400 font-black text-xs flex items-center justify-center shrink-0 border border-blue-500/30">
+                    1
+                  </span>
+                  <div className="space-y-1">
+                    <strong className="text-white text-xs font-bold block">
+                      {isEn ? 'Create Listing from Central Email' : 'Paso 1: Crear la Ficha con tu Correo Central'}
+                    </strong>
+                    <p className="text-slate-300 text-[11px] leading-relaxed">
+                      {isEn
+                        ? 'Open business.google.com/create logged in with your central agency email. Paste the optimized Title, Primary Category, and SEO parameters generated by Local Studio.'
+                        : 'Entra a business.google.com/create con la sesión iniciada en tu correo central de agencia (ej: tuagencia.fichas@gmail.com). Llena el título optimizado, categoría oficial y catálogo que te dio Local Studio.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-xl bg-emerald-500/20 text-emerald-400 font-black text-xs flex items-center justify-center shrink-0 border border-emerald-500/30">
+                    2
+                  </span>
+                  <div className="space-y-1">
+                    <strong className="text-white text-xs font-bold block">
+                      {isEn ? 'Video Verification (60 Seconds)' : 'Paso 2: Verificación por Video de 60 Segundos'}
+                    </strong>
+                    <p className="text-slate-300 text-[11px] leading-relaxed">
+                      {isEn
+                        ? 'Google will trigger video verification. Send the Local Studio video script to your client via WhatsApp. They record the continuous 60-second clip (exterior sign -> door keys -> interior/POS) or you accompany them in person.'
+                        : 'Google solicitará la verificación. Envíale a tu cliente el guion de video de Local Studio por WhatsApp. El cliente graba el video continuo de 60 segundos dentro de su negocio (o tú lo acompañas si es presencial) y la ficha queda verificada.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-xl bg-amber-500/20 text-amber-400 font-black text-xs flex items-center justify-center shrink-0 border border-amber-500/30">
+                    3
+                  </span>
+                  <div className="space-y-1">
+                    <strong className="text-white text-xs font-bold block">
+                      {isEn ? 'Transfer Primary Ownership in 3 Clicks' : 'Paso 3: Transferir la Propiedad en Google Maps (3 clics)'}
+                    </strong>
+                    <p className="text-slate-300 text-[11px] leading-relaxed">
+                      {isEn
+                        ? 'In the verified profile on Google Maps, click the three dots ⋮ (Menu) > "Business Profile Settings" > "People and Access" > Click "Add (+)" > Type the client\'s Gmail address > Choose role "Owner" (Propietario) and send the invitation.'
+                        : 'En la ficha ya verificada en Google Maps, haz clic en los 3 puntos ⋮ (Menú superior) > "Configuración del Perfil de Empresa" > "Personas y Acceso" > Haz clic en "Agregar (+)" > Escribe el correo Gmail del cliente > Selecciona la función "Propietario" (Owner) y envía la invitación.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-950 border border-indigo-500/30 flex items-start gap-3 bg-gradient-to-r from-slate-950 to-indigo-950/30">
+                  <span className="w-6 h-6 rounded-xl bg-indigo-500/20 text-indigo-400 font-black text-xs flex items-center justify-center shrink-0 border border-indigo-500/30">
+                    4
+                  </span>
+                  <div className="space-y-1">
+                    <strong className="text-white text-xs font-bold block">
+                      {isEn ? 'Client Accepts & You Retain Manager Access (Recurring Revenue)' : 'Paso 4: El Cliente Acepta y Tú Conservas el Rol de Administrador'}
+                    </strong>
+                    <p className="text-slate-300 text-[11px] leading-relaxed">
+                      {isEn
+                        ? 'The client receives Google\'s official email and clicks "Accept". The client becomes the legitimate legal owner. Crucially, your central email stays connected as "Manager", allowing you to publish weekly Google Posts and manage reviews to collect your $100-$200 USD monthly maintenance fee.'
+                        : 'Tu cliente recibe un correo oficial de Google: "Te han invitado a ser propietario de tu negocio", y hace clic en "Aceptar". En ese momento el cliente es el dueño legítimo, y tu correo se mantiene automáticamente como "Administrador" (Manager), permitiéndote subir posts semanales, gestionar reseñas y cobrarle de $100 a $200 USD mensuales de mantenimiento recurrente.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mensaje Rápido para Enviar al Cliente al Traspasar */}
+            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase text-amber-300 tracking-wider flex items-center gap-1.5">
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  {isEn ? 'WhatsApp Message to Notify Client of Transfer:' : 'Mensaje de WhatsApp para Notificar el Traspaso al Cliente:'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const notifyMsg = isEn
+                      ? `Hello! 👋 We have completed the setup of your official Google Maps business profile. We just sent an official ownership invitation from Google to your email (${createContactEmail || 'your Gmail'}). Please open your inbox, look for the email from "Google Business Profile" and click "Accept Invitation" to become the official Primary Owner of your listing. 🚀`
+                      : `¡Hola! 👋 Ya completamos la creación y arquitectura de su ficha oficial en Google Maps. Le acabamos de enviar la invitación oficial de propiedad de Google a su correo (${createContactEmail || 'su correo Gmail'}). Por favor revise su bandeja de entrada, busque el correo de "Google Perfil de Empresa" y presione el botón azul "Aceptar Invitación" para quedar como el Propietario Oficial de su ficha. 🚀`;
+                    copyToClipboard(notifyMsg, isEn ? 'Transfer Notification' : 'Notificación de Traspaso');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
+                >
+                  <Copy className="w-3 h-3" />
+                  <span>{isEn ? 'Copy Text' : 'Copiar Texto'}</span>
+                </button>
+              </div>
+              <p className="text-[11px] font-mono text-slate-300 leading-relaxed bg-slate-900 p-2.5 rounded-xl border border-slate-800">
+                {isEn
+                  ? `¡Hola! 👋 We just sent the official Google ownership invitation to your email (${createContactEmail || 'your Gmail'}). Please click "Accept Invitation" to become the official Primary Owner...`
+                  : `¡Hola! 👋 Le acabamos de enviar la invitación oficial de propiedad de Google a su correo (${createContactEmail || 'su correo Gmail'}). Por favor revise su bandeja de entrada y presione "Aceptar Invitación" para quedar como el Propietario Oficial...`}
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+              <a
+                href="https://business.google.com/create"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-md shadow-blue-500/20"
+              >
+                <span>{isEn ? 'Open business.google.com/create' : 'Abrir business.google.com/create'}</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setShowAgencyProtocolModal(false)}
+                className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg shadow-emerald-500/20"
+              >
+                {isEn ? 'Understood' : 'Entendido'}
+              </button>
+            </div>
           </div>
         </div>
       )}
