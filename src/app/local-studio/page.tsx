@@ -2754,6 +2754,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
     setCreateCategory(categoryOptions[0] || CATEGORY_OPTIONS[0]);
     setCreateGeneratedData(null);
     setActiveCreateDossierId(null);
+    setShowAgencyProtocolModal(false);
     showToast(isEn ? '✨ Ready to create a new profile' : '✨ Formulario listo para crear una nueva ficha');
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -7823,15 +7824,17 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     <span className="text-lg font-black text-emerald-400">{t.mod1TimeVal}</span>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setShowAgencyProtocolModal(true)}
-                    className="px-3.5 py-2 rounded-2xl bg-indigo-950/90 hover:bg-indigo-900 border border-indigo-500/40 text-indigo-300 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer shrink-0 active:scale-95"
-                    title={isEn ? 'Agency Protocol: Central Email & Ownership Transfer' : 'Protocolo de Agencia: Correo Central y Traspaso de Propiedad'}
-                  >
-                    <KeyRound className="w-4 h-4 text-indigo-400" />
-                    <span>{isEn ? 'Agency Ownership Guide' : 'Manual Traspaso Fichas'}</span>
-                  </button>
+                  {createGeneratedData && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAgencyProtocolModal(true)}
+                      className="px-3.5 py-2 rounded-2xl bg-indigo-950/90 hover:bg-indigo-900 border border-indigo-500/40 text-indigo-300 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-indigo-500/20 cursor-pointer shrink-0 active:scale-95 animate-in fade-in"
+                      title={isEn ? 'Agency Protocol: Central Email & Ownership Transfer' : 'Protocolo de Agencia: Correo Central y Traspaso de Propiedad'}
+                    >
+                      <KeyRound className="w-4 h-4 text-indigo-400" />
+                      <span>{isEn ? 'Agency Ownership Guide' : 'Manual Traspaso Fichas'}</span>
+                    </button>
+                  )}
 
                   <button
                     type="button"
@@ -20996,7 +20999,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       )}
 
       {/* Modal: Manual Maestro de Agencia - Creación con Correo Central y Traspaso de Propiedad */}
-      {showAgencyProtocolModal && (
+      {showAgencyProtocolModal && createGeneratedData && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md overflow-y-auto flex items-center justify-center p-4">
           <div className="bg-slate-900 border-2 border-indigo-500/50 rounded-3xl p-6 sm:p-7 max-w-2xl w-full space-y-5 shadow-2xl animate-in zoom-in-95 max-h-[92vh] overflow-y-auto my-auto text-left">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
