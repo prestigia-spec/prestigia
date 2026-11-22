@@ -255,7 +255,9 @@ export default function MasterclassReferidosPage() {
               .map((lead, idx) => {
                 const bg = idx % 2 === 1 ? 'td-alt' : '';
                 const cleanPhone = (lead.phone || '').replace(/[^0-9]/g, '');
-                const waUrl = `https://wa.me/${cleanPhone}`;
+                const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
+                  `Hola ${lead.fullName}, te saluda Luisma. Veo que te registraste para la Masterclass del 10 de Diciembre. ¿Pudiste entrar al grupo VIP de WhatsApp?`
+                )}`;
                 const dt = new Date(lead.createdAt).toLocaleString('es-CO');
                 const refCode = (lead.referredBy || 'DIRECTO').toUpperCase();
                 return `
@@ -746,7 +748,7 @@ export default function MasterclassReferidosPage() {
                       {filteredLeads.map((lead) => {
                         const cleanPhone = lead.phone.replace(/[^0-9]/g, '');
                         const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-                          `Hola ${lead.fullName}, te saluda Luisma de Prestigia. Veo que te registraste para la Masterclass del 10 de Diciembre. ¿Pudiste entrar al grupo VIP de WhatsApp?`
+                          `Hola ${lead.fullName}, te saluda Luisma. Veo que te registraste para la Masterclass del 10 de Diciembre. ¿Pudiste entrar al grupo VIP de WhatsApp?`
                         )}`;
 
                         return (
