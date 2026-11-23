@@ -7446,7 +7446,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
         {/* Top Header */}
         <header className="px-4 sm:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/70">
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group cursor-pointer select-none">
+          <Link href="/local-studio" className="flex items-center gap-2.5 sm:gap-3 group cursor-pointer select-none">
             <PrestigiaIcon className="w-8 h-8 sm:w-9 sm:h-9 drop-shadow-md shrink-0 group-hover:scale-105 transition-transform duration-300" />
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
