@@ -203,7 +203,7 @@ for (let i = 0; i < 60; i++) {
   generatedFeedbacks.push({
     id: `fb-demo-${String(i + 1).padStart(2, '0')}`,
     businessId: "demo",
-    businessName: "La Parrilla de Andrés & Co. (Demo Oficial Prestigia)",
+    businessName: "La Parrilla de Andrés & Co.",
     branchId: "demo-sede-principal",
     branchName: "Sede Principal Zona G",
     rating,

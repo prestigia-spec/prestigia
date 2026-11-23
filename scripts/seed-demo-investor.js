@@ -7,7 +7,7 @@ const db = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
 // 1. Create demo business
 const demoBusiness = {
   id: "demo",
-  name: "La Parrilla de Andrés & Co. (Demo Oficial Prestigia)",
+  name: "La Parrilla de Andrés & Co.",
   legalName: "Inversiones Gastronómicas Gómez & Cía S.A.S.",
   taxId: "901.482.910-4",
   address: "Calle 69A # 5-28, Zona G",
