@@ -7180,7 +7180,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             <PrestigiaIcon className="w-8 h-8 drop-shadow-md shrink-0" />
             <div className="flex flex-col">
               <span className="text-xs font-black tracking-widest text-white">PRESTIGIA</span>
-              <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">Local Prestigia • División Google Maps</span>
+              <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">Local Studio • División Google Maps</span>
             </div>
           </div>
 
@@ -7455,7 +7455,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   5★ SUITE
                 </span>
               </div>
-              <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">Local Prestigia • División Google Maps</span>
+              <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">Local Studio • División Google Maps</span>
             </div>
           </Link>
           <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold">
@@ -9527,8 +9527,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       : currentUser?.agencyName
                       ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}`
                       : currentUser?.name
-                      ? `${currentUser.name} de Local Prestigia`
-                      : (isEn ? 'the Local Prestigia team' : 'el equipo de Local Prestigia');
+                      ? `${currentUser.name} de Local Studio`
+                      : (isEn ? 'the Local Studio team' : 'el equipo de Local Studio');
 
                     const script = isEn
                       ? `Hello *${clientPersonName}*, this is *${senderIdentity}*.\n\nWe were analyzing customer searches for *${createCategory || 'your sector'}* in *${createCity || 'your city'}* and identified a critical situation: *${createBusinessName || 'your business'} simply DOES NOT exist on Google Maps*.\n\nToday, 70% of local buyers choose directly from the Top 3 map listings. Every day without a verified profile represents dozens of paying clients lost to your competitors.\n\nWe handle 100% of the technical setup, Top 3 ranking SEO, and official Google verification without suspension risk for a one-time fee of $150 USD. Plus, as our referral client, you receive an exclusive *25% DISCOUNT on your first month* of the official *Prestigia (5★ Reviews + Digital Shield)* software suite.\n\nDo you have 2 minutes to coordinate and send you the 60-second video verification link?`
@@ -9550,14 +9550,14 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     {isEn ? '🎙️ Outreach & Opening Pitch (Call, On-Site or WhatsApp):' : '🎙️ Speech de Prospección & Apertura (Llamada, Visita o WhatsApp):'}
                   </span>
                   <span className="text-[10px] text-emerald-400/80 font-mono">
-                    {isLuismaMaster ? '👑 Prestigia Direct' : currentUser?.agencyName ? `🏢 Marca Blanca: ${currentUser.agencyName}` : '🛡️ Local Prestigia'}
+                    {isLuismaMaster ? '👑 Prestigia Direct' : currentUser?.agencyName ? `🏢 Marca Blanca: ${currentUser.agencyName}` : '🛡️ Local Studio'}
                   </span>
                 </div>
                 <p>
                   {isEn ? (
-                    <>"Hello <strong>{createContactName || createBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}</strong>. We were analyzing customer searches for <strong>{createCategory || 'your industry'}</strong> in <strong>{createCity || 'your area'}</strong> and noticed a critical gap: <strong>{createBusinessName || 'your business'} simply DOES NOT exist on Google Maps</strong>. Today, 70% of local buyers choose directly from the top 3 map profiles. Every single day without a verified listing represents dozens of paying clients handed to your closest rivals. We build and verify your official Google profile with Top 3 architecture, and activate the official <strong>Prestigia 5★ Review Acceleration & Digital Shield</strong> software suite with 25% off your first month."</>
+                    <>"Hello <strong>{createContactName || createBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Studio` : 'the Local Studio team'}</strong>. We were analyzing customer searches for <strong>{createCategory || 'your industry'}</strong> in <strong>{createCity || 'your area'}</strong> and noticed a critical gap: <strong>{createBusinessName || 'your business'} simply DOES NOT exist on Google Maps</strong>. Today, 70% of local buyers choose directly from the top 3 map profiles. Every single day without a verified listing represents dozens of paying clients handed to your closest rivals. We build and verify your official Google profile with Top 3 architecture, and activate the official <strong>Prestigia 5★ Review Acceleration & Digital Shield</strong> software suite with 25% off your first month."</>
                   ) : (
-                    <>"Hola <strong>{createContactName || createBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}</strong>. Estuvimos analizando las búsquedas comerciales de <strong>{createCategory || 'su sector'}</strong> en <strong>{createCity || 'su ciudad'}</strong> y notamos una situación crítica: <strong>{createBusinessName || 'su negocio'} sencillamente NO existe en Google Maps</strong>. Hoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha son decenas de ventas que le regala a su competencia. Nosotros creamos y verificamos su perfil oficial ante Google con arquitectura Top 3 por un setup técnico único, y le activamos la suite oficial de <strong>Prestigia (Reseñas 5★ + Blindaje Digital)</strong> con 25% de descuento exclusivo en su primer mes."</>
+                    <>"Hola <strong>{createContactName || createBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Studio` : 'el equipo de Local Studio'}</strong>. Estuvimos analizando las búsquedas comerciales de <strong>{createCategory || 'su sector'}</strong> en <strong>{createCity || 'su ciudad'}</strong> y notamos una situación crítica: <strong>{createBusinessName || 'su negocio'} sencillamente NO existe en Google Maps</strong>. Hoy en día, el 70% de las personas que van a comprar eligen entre los 3 primeros perfiles del mapa. Cada día sin ficha son decenas de ventas que le regala a su competencia. Nosotros creamos y verificamos su perfil oficial ante Google con arquitectura Top 3 por un setup técnico único, y le activamos la suite oficial de <strong>Prestigia (Reseñas 5★ + Blindaje Digital)</strong> con 25% de descuento exclusivo en su primer mes."</>
                   )}
                 </p>
               </div>
@@ -11162,8 +11162,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       : currentUser?.agencyName
                       ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}`
                       : currentUser?.name
-                      ? `${currentUser.name} de Local Prestigia`
-                      : (isEn ? 'the Local Prestigia team' : 'el equipo de Local Prestigia');
+                      ? `${currentUser.name} de Local Studio`
+                      : (isEn ? 'the Local Studio team' : 'el equipo de Local Studio');
 
                     const script = isEn
                       ? `Hello *${clientPersonName}*, this is *${senderIdentity}*.\n\nWe audited your Google Maps profile for *${auditBusinessName || 'your business'}* in *${auditCity || 'your city'}* and identified the exact reasons keeping you outside the Top 3: your profile has critical algorithmic leaks costing you dozens of local buyers daily.\n\nWe restructured the 100% technical blueprint to outrank podium competitors for a one-time optimization fee of $200 USD. Plus, as our referral client, you receive an exclusive *25% DISCOUNT on your first month* of the official *Prestigia (5★ Reviews + Digital Shield)* software suite.\n\nWould you like to review the direct head-to-head comparison against your top rival?`
@@ -11185,14 +11185,14 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     {isEn ? '🎙️ Forensic Audit Closing Pitch:' : '🎙️ Speech de Cierre de Auditoría Forense:'}
                   </span>
                   <span className="text-[10px] text-amber-400/80 font-mono">
-                    {isLuismaMaster ? '👑 Prestigia Direct' : currentUser?.agencyName ? `🏢 Marca Blanca: ${currentUser.agencyName}` : '🛡️ Local Prestigia'}
+                    {isLuismaMaster ? '👑 Prestigia Direct' : currentUser?.agencyName ? `🏢 Marca Blanca: ${currentUser.agencyName}` : '🛡️ Local Studio'}
                   </span>
                 </div>
                 <p>
                   {isEn ? (
-                    <>"Hello <strong>{auditContactName || auditBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}</strong>. We audited your Google profile in <strong>{auditCity || 'your area'}</strong> and pinpointed exactly why you aren\'t ranking in the Top 3: your listing suffers from <strong>3 critical algorithmic flaws</strong> leaking clients daily. We structured the exact blueprint to dethrone podium rivals, and activate the official <strong>Prestigia 5★ Review Acceleration & Digital Shield</strong> platform with an exclusive 25% discount on your first month."</>
+                    <>"Hello <strong>{auditContactName || auditBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Studio` : 'the Local Studio team'}</strong>. We audited your Google profile in <strong>{auditCity || 'your area'}</strong> and pinpointed exactly why you aren\'t ranking in the Top 3: your listing suffers from <strong>3 critical algorithmic flaws</strong> leaking clients daily. We structured the exact blueprint to dethrone podium rivals, and activate the official <strong>Prestigia 5★ Review Acceleration & Digital Shield</strong> platform with an exclusive 25% discount on your first month."</>
                   ) : (
-                    <>"Hola <strong>{auditContactName || auditBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}</strong>. Auditamos su ficha en <strong>{auditCity || 'su zona'}</strong> y detectamos por qué no está en el Top 3: su perfil tiene <strong>3 fallas algorítmicas graves</strong> que le están costando clientes todos los días. Hemos estructurado el plan técnico para desbancar a los rivales y activar la suite oficial de <strong>Prestigia (Reseñas 5★ + Blindaje Digital)</strong> con un 25% de descuento exclusivo en su primer mes."</>
+                    <>"Hola <strong>{auditContactName || auditBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Studio` : 'el equipo de Local Studio'}</strong>. Auditamos su ficha en <strong>{auditCity || 'su zona'}</strong> y detectamos por qué no está en el Top 3: su perfil tiene <strong>3 fallas algorítmicas graves</strong> que le están costando clientes todos los días. Hemos estructurado el plan técnico para desbancar a los rivales y activar la suite oficial de <strong>Prestigia (Reseñas 5★ + Blindaje Digital)</strong> con un 25% de descuento exclusivo en su primer mes."</>
                   )}
                 </p>
               </div>
@@ -12616,16 +12616,16 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                             : currentUser?.agencyName
                             ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}`
                             : currentUser?.name
-                            ? `${currentUser.name} de Local Prestigia`
-                            : 'el equipo de Local Prestigia';
+                            ? `${currentUser.name} de Local Studio`
+                            : 'el equipo de Local Studio';
 
                           const senderIdentityEn = isLuismaMaster
                             ? 'Luisma from Prestigia'
                             : currentUser?.agencyName
                             ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}`
                             : currentUser?.name
-                            ? `${currentUser.name} from Local Prestigia`
-                            : 'the Local Prestigia team';
+                            ? `${currentUser.name} from Local Studio`
+                            : 'the Local Studio team';
 
                           const clientPerson = rescueContactName.trim() || rescueBusinessName.trim() || (isEn ? 'Business Owner' : 'propietario');
 
@@ -12663,16 +12663,16 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                 : currentUser?.agencyName
                                 ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}`
                                 : currentUser?.name
-                                ? `${currentUser.name} de Local Prestigia`
-                                : 'el equipo de Local Prestigia';
+                                ? `${currentUser.name} de Local Studio`
+                                : 'el equipo de Local Studio';
 
                               const senderIdentityEn = isLuismaMaster
                                 ? 'Luisma from Prestigia'
                                 : currentUser?.agencyName
                                 ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}`
                                 : currentUser?.name
-                                ? `${currentUser.name} from Local Prestigia`
-                                : 'the Local Prestigia team';
+                                ? `${currentUser.name} from Local Studio`
+                                : 'the Local Studio team';
 
                               const clientPerson = rescueContactName.trim() || rescueBusinessName.trim() || (isEn ? 'Business Owner' : 'propietario');
 
@@ -12703,15 +12703,15 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   <p className="text-xs text-slate-300 italic leading-relaxed p-4 rounded-xl bg-slate-950 border border-slate-800">
                     {isEn
                       ? rescueScenario === 'orphan'
-                        ? `"Hello ${rescueContactName || rescueBusinessName || 'Business Owner'}, this is ${isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}. We audited your Google Maps presence and discovered a critical vulnerability: your business listing exists but is currently 'Unclaimed / Orphan'. Any third party or competitor can suggest edits or claim ownership. With our team, we can process your official ownership claim today and secure full legal control without altering your existing reviews or SEO ranking. Shall we start your protection protocol?"`
+                        ? `"Hello ${rescueContactName || rescueBusinessName || 'Business Owner'}, this is ${isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Studio` : 'the Local Studio team'}. We audited your Google Maps presence and discovered a critical vulnerability: your business listing exists but is currently 'Unclaimed / Orphan'. Any third party or competitor can suggest edits or claim ownership. With our team, we can process your official ownership claim today and secure full legal control without altering your existing reviews or SEO ranking. Shall we start your protection protocol?"`
                         : rescueScenario === 'third_party'
-                        ? `"Hello ${rescueContactName || rescueBusinessName || 'Business Owner'}, this is ${isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}. Upon auditing your business on Google Maps, we noticed your official listing is linked to an external email ${rescueMaskedEmail.trim() ? `(${rescueMaskedEmail.trim()})` : '(an external unauthorized email)'} and you lack Primary Owner access. Do not worry: creating a new listing is NOT necessary (doing so causes duplicate listing penalties). We execute Google's Official 72-Hour Legal Ownership Protocol to request ownership and transfer complete control directly to your personal account within a week, preserving all reviews and photos. Shall we initiate the protocol today?"`
-                        : `"Hello ${rescueContactName || rescueBusinessName || 'Business Owner'}, this is ${isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}. If a previous agency or ex-employee refused to transfer your Google Maps profile, Google's official policies protect your legitimate ownership. We submit an evidentiary appeal dossier with your corporate tax documentation and storefront evidence so Google Support revokes the third party and restores complete ownership to you. Would you like us to draft the official appeal?"`
+                        ? `"Hello ${rescueContactName || rescueBusinessName || 'Business Owner'}, this is ${isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Studio` : 'the Local Studio team'}. Upon auditing your business on Google Maps, we noticed your official listing is linked to an external email ${rescueMaskedEmail.trim() ? `(${rescueMaskedEmail.trim()})` : '(an external unauthorized email)'} and you lack Primary Owner access. Do not worry: creating a new listing is NOT necessary (doing so causes duplicate listing penalties). We execute Google's Official 72-Hour Legal Ownership Protocol to request ownership and transfer complete control directly to your personal account within a week, preserving all reviews and photos. Shall we initiate the protocol today?"`
+                        : `"Hello ${rescueContactName || rescueBusinessName || 'Business Owner'}, this is ${isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Studio` : 'the Local Studio team'}. If a previous agency or ex-employee refused to transfer your Google Maps profile, Google's official policies protect your legitimate ownership. We submit an evidentiary appeal dossier with your corporate tax documentation and storefront evidence so Google Support revokes the third party and restores complete ownership to you. Would you like us to draft the official appeal?"`
                       : rescueScenario === 'orphan'
-                      ? `"Hola estimado/a ${rescueContactName || rescueBusinessName || 'propietario'}, le saluda ${isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. Con nuestro equipo podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?"`
+                      ? `"Hola estimado/a ${rescueContactName || rescueBusinessName || 'propietario'}, le saluda ${isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Studio` : 'el equipo de Local Studio'}. Auditamos su presencia en Google Maps y detectamos una vulnerabilidad crítica: su ficha de negocio existe pero actualmente se encuentra 'Huérfana / Sin Reclamar'. Esto significa que cualquier tercero o competidor puede sugerir cambios o adueñarse de ella. Con nuestro equipo podemos gestionar hoy mismo la reclamación oficial y blindar la titularidad legal de su empresa sin alterar sus reseñas ni su posicionamiento. ¿Desea que iniciemos el trámite de protección?"`
                       : rescueScenario === 'third_party'
-                      ? `"Hola estimado/a ${rescueContactName || rescueBusinessName || 'propietario'}, le saluda ${isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${rescueMaskedEmail.trim() ? `(${rescueMaskedEmail.trim()})` : '(un correo externo no autorizado)'} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?"`
-                      : `"Hola estimado/a ${rescueContactName || rescueBusinessName || 'propietario'}, le saluda ${isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?"`}
+                      ? `"Hola estimado/a ${rescueContactName || rescueBusinessName || 'propietario'}, le saluda ${isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Studio` : 'el equipo de Local Studio'}. Al auditar su negocio en Google Maps notamos que su ficha oficial está vinculada a un correo externo ${rescueMaskedEmail.trim() ? `(${rescueMaskedEmail.trim()})` : '(un correo externo no autorizado)'} y usted no cuenta con el acceso de Propietario Principal. No se preocupe: NO es necesario crear una ficha nueva (hacerlo causaría sanción por duplicidad). Nosotros ejecutamos el Protocolo Oficial de 72 Horas de Google para solicitar la propiedad y transferirle el control legal completo a su cuenta personal en menos de una semana, conservando todas sus reseñas y fotos. ¿Coordinamos los datos para radicar la solicitud hoy?"`
+                      : `"Hola estimado/a ${rescueContactName || rescueBusinessName || 'propietario'}, le saluda ${isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Studio` : 'el equipo de Local Studio'}. Si una agencia anterior o ex-empleado le negó el traspaso de su ficha en Google Maps, las políticas oficiales de Google amparan su titularidad legítima. Nosotros radicamos el expediente probatorio de apelación con su personería jurídica y evidencias del local para que el equipo de soporte de Google revoque al tercero y le restituya el control total de su negocio. ¿Le gustaría que redactemos la apelación oficial?"`}
                   </p>
                 </div>
               </div>
@@ -12931,16 +12931,16 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           : currentUser?.agencyName
                           ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}`
                           : currentUser?.name
-                          ? `${currentUser.name} de Local Prestigia`
-                          : 'el equipo de Local Prestigia';
+                          ? `${currentUser.name} de Local Studio`
+                          : 'el equipo de Local Studio';
 
                         const senderIdentityEn = isLuismaMaster
                           ? 'Luisma from Prestigia'
                           : currentUser?.agencyName
                           ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}`
                           : currentUser?.name
-                          ? `${currentUser.name} from Local Prestigia`
-                          : 'the Local Prestigia team';
+                          ? `${currentUser.name} from Local Studio`
+                          : 'the Local Studio team';
 
                         const script = isEn
                           ? `Hello *${clientPersonName}*, this is *${senderIdentityEn}* with an urgent advisory regarding your Google Maps listing. We detected that your official profile is currently compromised by a third party or suspended by Google. Customers searching for your business in *${rescueCity || 'your city'}* may be calling outdated numbers or unable to find your address. Please DO NOT make the serious mistake of creating a new profile: Google will penalize both listings for duplicity and you will lose all reviews, photos, and years of commercial seniority. At Prestigia, we are certified listing recovery specialists and execute Google's Official 72-Hour Legal Ownership Protocol to submit the evidentiary dossier and return absolute legal control to you for a setup fee of $250 USD. Plus, as our referral client, you receive an exclusive *25% DISCOUNT on your first month* of your tailored *Prestigia Plan* to shield your listing from future takeovers. Would you authorize us to submit the ownership claim today?`
@@ -12961,14 +12961,14 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         {isEn ? '🎙️ High-Urgency Ownership Rescue Pitch:' : '🎙️ Speech de Urgencia & Rescate de Titularidad:'}
                       </span>
                       <span className="text-[10px] text-rose-400/80 font-mono">
-                        {isLuismaMaster ? '👑 Prestigia Direct' : currentUser?.agencyName ? `🏢 Marca Blanca: ${currentUser.agencyName}` : '🛡️ Local Prestigia'}
+                        {isLuismaMaster ? '👑 Prestigia Direct' : currentUser?.agencyName ? `🏢 Marca Blanca: ${currentUser.agencyName}` : '🛡️ Local Studio'}
                       </span>
                     </div>
                     <p>
                       {isEn ? (
-                        <>"Hello <strong>{rescueContactName || rescueBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Prestigia` : 'the Local Prestigia team'}</strong> with an urgent advisory. Your official Google Maps profile is currently <strong>compromised / suspended by Google</strong>. Potential clients searching your business are calling outdated numbers. <strong>DO NOT create a duplicate profile</strong>: Google will penalize both listings and you will lose all reviews and domain history. We execute the official 72-Hour Legal Protocol with Google Trust & Safety to restore full ownership, and activate your Prestigia reputation shield with 25% off your first month."</>
+                        <>"Hello <strong>{rescueContactName || rescueBusinessName || 'Business Owner'}</strong>, this is <strong>{isLuismaMaster ? 'Luisma from Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'your consultant'} from ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} from Local Studio` : 'the Local Studio team'}</strong> with an urgent advisory. Your official Google Maps profile is currently <strong>compromised / suspended by Google</strong>. Potential clients searching your business are calling outdated numbers. <strong>DO NOT create a duplicate profile</strong>: Google will penalize both listings and you will lose all reviews and domain history. We execute the official 72-Hour Legal Protocol with Google Trust & Safety to restore full ownership, and activate your Prestigia reputation shield with 25% off your first month."</>
                       ) : (
-                        <>"Hola <strong>{rescueContactName || rescueBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Prestigia` : 'el equipo de Local Prestigia'}</strong> con una alerta urgente. Su ficha en Google Maps está actualmente <strong>secuestrada por un tercero / suspendida</strong>. Clientes que buscan su negocio están llamando a números ajenos. <strong>NO cree una ficha nueva</strong>: Google la sancionará por duplicidad y perderá todas sus reseñas. Nosotros ejecutamos el protocolo legal de 72h con Google Trust & Safety para restituirle la titularidad legítima por honorarios únicos, y le activamos su blindaje Prestigia con 25% de descuento exclusivo en su primer mes."</>
+                        <>"Hola <strong>{rescueContactName || rescueBusinessName || 'propietario'}</strong>, le saluda <strong>{isLuismaMaster ? 'Luisma de Prestigia' : currentUser?.agencyName ? `${currentUser.name || 'su consultor'} de ${currentUser.agencyName}` : currentUser?.name ? `${currentUser.name} de Local Studio` : 'el equipo de Local Studio'}</strong> con una alerta urgente. Su ficha en Google Maps está actualmente <strong>secuestrada por un tercero / suspendida</strong>. Clientes que buscan su negocio están llamando a números ajenos. <strong>NO cree una ficha nueva</strong>: Google la sancionará por duplicidad y perderá todas sus reseñas. Nosotros ejecutamos el protocolo legal de 72h con Google Trust & Safety para restituirle la titularidad legítima por honorarios únicos, y le activamos su blindaje Prestigia con 25% de descuento exclusivo en su primer mes."</>
                       )}
                     </p>
                   </div>
