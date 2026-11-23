@@ -9165,15 +9165,15 @@ export default function PortalPage() {
                 </div>
               )}
 
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className={`font-extrabold text-sm sm:text-base transition ${
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-nowrap">
+                  <span className={`font-extrabold text-sm sm:text-base whitespace-nowrap transition ${
                     theme === 'light' ? 'text-slate-900 group-hover:text-amber-600' : 'text-white group-hover:text-amber-300'
                   }`}>
                     {session.business.name}
                   </span>
                   <span
-                    className={`text-[10px] uppercase tracking-wider font-black px-2 py-0.5 rounded border ${
+                    className={`text-[10px] uppercase tracking-wider font-black px-2 py-0.5 rounded border whitespace-nowrap shrink-0 ${
                       effectivePlan === 'empresarial'
                         ? 'bg-purple-500/20 text-purple-400 border-purple-500/40 shadow-sm shadow-purple-500/10'
                         : effectivePlan === 'elite'
@@ -9205,7 +9205,7 @@ export default function PortalPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className={`hidden lg:inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-lg border transition group/sup ${
+                    className={`hidden xl:inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-lg border transition whitespace-nowrap shrink-0 group/sup ${
                       theme === 'light'
                         ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700 shadow-sm'
                         : 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 hover:border-amber-500/40 text-slate-400 hover:text-slate-200'
@@ -9222,7 +9222,7 @@ export default function PortalPage() {
                     </span>
                   </a>
                 </div>
-                <div className={`text-[11px] flex items-center gap-1.5 ${theme === 'light' ? 'text-slate-600' : 'text-slate-400'}`}>
+                <div className={`text-[11px] flex items-center gap-1.5 whitespace-nowrap leading-tight mt-0.5 ${theme === 'light' ? 'text-slate-600' : 'text-slate-400'}`}>
                   {effectiveRole === 'owner' ? (
                     <span className="text-amber-500 dark:text-amber-400 flex items-center gap-1 font-semibold">
                       {session.business.category ? `🏢 ${session.business.category}` : t.navbar.ownerView}
