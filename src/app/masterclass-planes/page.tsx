@@ -44,8 +44,8 @@ export default function MasterclassPlanesPage() {
   useEffect(() => {
     if (typeof document !== 'undefined') {
       document.title = lang === 'en'
-        ? 'Prestigia | B2B Partner Plans & Credit Economics 2026'
-        : 'Prestigia | Planes Oficiales de Partners & Economía de Créditos 2026';
+        ? 'Local Studio | B2B Partner Plans & Credit Economics 2026'
+        : 'Local Studio | Planes Oficiales de Partners & Economía de Créditos 2026';
     }
   }, [lang]);
 
@@ -111,11 +111,11 @@ export default function MasterclassPlanesPage() {
       <header className="no-print sticky top-0 z-50 backdrop-blur-2xl bg-[#06080E]/90 border-b border-slate-800/80 px-4 sm:px-8 py-3.5 shadow-xl">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 group cursor-pointer">
+            <Link href="/local-studio" className="flex items-center gap-2 group cursor-pointer">
               <PrestigiaIcon className="w-8 h-8 drop-shadow-md shrink-0 group-hover:scale-105 transition-transform duration-300" />
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-black text-sm tracking-wider text-white">PRESTIGIA</span>
+                  <span className="font-black text-sm tracking-wider text-white">LOCAL STUDIO</span>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
                     {isEn ? 'Masterclass Partner Dossier' : 'Dossier Masterclass Partners'}
                   </span>
@@ -155,7 +155,7 @@ export default function MasterclassPlanesPage() {
 
             {/* Direct WhatsApp CTA */}
             <a
-              href={isEn ? "https://wa.me/573058314049?text=Hello%20Prestigia,%20I%20want%20to%20activate%20my%20Local%20Studio%20Partner%20Plan" : "https://wa.me/573058314049?text=Hola%20Prestigia,%20deseo%20activar%20mi%20Plan%20de%20Partner%20en%20Local%20Studio"}
+              href={isEn ? "https://wa.me/573058314049?text=Hello%20Luisma,%20I%20want%20to%20activate%20my%20Local%20Studio%20Partner%20Plan" : "https://wa.me/573058314049?text=Hola%20Luisma,%20deseo%20activar%20mi%20Plan%20de%20Partner%20en%20Local%20Studio"}
               target="_blank"
               rel="noopener noreferrer"
               className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/20 active:scale-95 cursor-pointer"
@@ -179,15 +179,15 @@ export default function MasterclassPlanesPage() {
               <PrestigiaIcon className="w-12 h-12 drop-shadow-lg shrink-0" />
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">PRESTIGIA</h1>
+                  <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">LOCAL STUDIO</h1>
                   <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300">
-                    5★ SUITE
+                    {isEn ? 'AI Agency Suite' : 'Suite de Agencia IA'}
                   </span>
                 </div>
                 <p className="text-xs text-amber-300/90 font-medium">
                   {isEn
-                    ? 'Local Studio • B2B Commercial Partner & Agency Credit Economics'
-                    : 'Local Studio • Programa Oficial de Partners & Economía de Créditos B2B'}
+                    ? 'Official Partner Program & B2B Credit Economics 2026'
+                    : 'Programa Oficial de Partners, Asesores & Economía de Créditos 2026'}
                 </p>
               </div>
             </div>
@@ -215,8 +215,8 @@ export default function MasterclassPlanesPage() {
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl">
               {isEn
-                ? 'Prestigia Local Studio equips independent advisors and digital agencies with proprietary AI algorithmic engineering. Sell premium profile creation, forensic gap audits, 72h listing rescues (held by third parties or former agencies), and review appeals at $100–$250 USD each (agency market standard), generating immediate cash flow while building recurring revenue through Prestigia annual software agreements.'
-                : 'Prestigia Local Studio equipa a consultores independientes y agencias digitales con ingeniería algorítmica de IA propia. Vende creación técnica de fichas, auditorías forenses Top 3, rescates de ficha en 72h (en manos de terceros o ex-agencias) y apelación de reseñas falsas de $100 a $250 USD por cada servicio (estándar de cobro en agencias), recuperando el 100% de tu inversión desde tu primera venta y generando comisiones de contado con paquetes anuales de Prestigia.'}
+                ? 'Local Studio equips independent advisors and digital agencies with proprietary AI algorithmic engineering. Sell premium profile creation, forensic gap audits, 72h listing rescues (held by third parties or former agencies), and review appeals at $100–$250 USD each (agency market standard), generating immediate cash flow while building recurring revenue through our 5★ Review & Digital Shield software agreements.'
+                : 'Local Studio equipa a consultores independientes y agencias digitales con ingeniería algorítmica de IA propia. Vende creación técnica de fichas, auditorías forenses Top 3, rescates de ficha en 72h (en manos de terceros o ex-agencias) y apelación de reseñas falsas de $100 a $250 USD por cada servicio (estándar de cobro en agencias), recuperando el 100% de tu inversión desde tu primera venta y generando comisiones de contado y recurrentes con la suite de software de reseñas 5★.'}
             </p>
           </div>
 
@@ -331,7 +331,7 @@ export default function MasterclassPlanesPage() {
                   <strong>{isEn ? 'Breakeven:' : 'Retorno:'}</strong> {isEn ? '1 client at $100–$250 USD = 204% to 510% recovered.' : 'Vendes 1 cliente a $100-$250 USD y recuperas del 204% al 510% de tu inversión.'}
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400">{isEn ? 'Prestigia Recurring Commission:' : 'Comisión Prestigia Recurrente:'}</span>
+                  <span className="text-slate-400">{isEn ? 'Monthly Recurring Commission:' : 'Comisión Mensual Recurrente:'}</span>
                   <span className="text-cyan-400 font-black">{isEn ? '10% (Monthly & Prepaid)' : '10% (Mensual & Contado)'}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
@@ -412,7 +412,7 @@ export default function MasterclassPlanesPage() {
                   <strong>{isEn ? 'Breakeven:' : 'Retorno:'}</strong> {isEn ? '1 single $100–$250 USD client pays the plan (111% to 277% return).' : 'Con 1 solo cliente ($100-$250 USD) pagas el plan y ganas del 111% al 277%.'}
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400">{isEn ? 'Prestigia Recurring Commission:' : 'Comisión Prestigia Recurrente:'}</span>
+                  <span className="text-slate-400">{isEn ? 'Monthly Recurring Commission:' : 'Comisión Mensual Recurrente:'}</span>
                   <span className="text-cyan-400 font-black text-sm">{isEn ? '20% (Monthly & Prepaid)' : '20% (Mensual & Contado)'}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
@@ -489,7 +489,7 @@ export default function MasterclassPlanesPage() {
                   <strong>{isEn ? 'Breakeven:' : 'Retorno:'}</strong> {isEn ? '1 single $140–$250 USD client recovers 100% to 178% of your investment.' : 'Con 1 solo cliente de $140-$250 USD recuperas del 100% al 178% de la inversión.'}
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400">{isEn ? 'Prestigia Recurring Commission:' : 'Comisión Prestigia Recurrente:'}</span>
+                  <span className="text-slate-400">{isEn ? 'Monthly Recurring Commission:' : 'Comisión Mensual Recurrente:'}</span>
                   <span className="text-cyan-400 font-black text-sm">{isEn ? '30% (Monthly & Prepaid)' : '30% (Mensual & Contado)'}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
@@ -523,8 +523,8 @@ export default function MasterclassPlanesPage() {
           </h3>
           <p className="text-xs text-slate-300 leading-relaxed">
             {isEn
-              ? 'Each tab in Prestigia Local Studio automates a critical technical procedure that traditional marketing agencies charge $200–$450 USD to execute manually:'
-              : 'Cada pestaña de Prestigia Local Studio automatiza en segundos un procedimiento técnico que a una agencia tradicional le toma días y cobra entre $200 y $450 USD:'}
+              ? 'Each tab in Local Studio automates a critical technical procedure that traditional marketing agencies charge $200–$450 USD to execute manually:'
+              : 'Cada pestaña de Local Studio automatiza en segundos un procedimiento técnico que a una agencia tradicional le toma días y cobra entre $200 y $450 USD:'}
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-xs">
@@ -614,7 +614,7 @@ export default function MasterclassPlanesPage() {
         <section className="space-y-4 print-card p-6 rounded-2xl bg-[#090D17] border border-amber-500/30">
           <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-wider">
             <Coins className="w-4 h-4 text-amber-400" />
-            <span>{isEn ? 'Market Cost Reality: Traditional Agency Software vs. Prestigia Local Studio' : 'Realidad de Costos en el Mercado: Software de Agencia Tradicional vs. Prestigia Local Studio'}</span>
+            <span>{isEn ? 'Market Cost Reality: Traditional Agency Software vs. Local Studio' : 'Realidad de Costos en el Mercado: Software de Agencia Tradicional vs. Local Studio'}</span>
           </div>
           <h3 className="text-lg sm:text-xl font-black text-white">
             {isEn
@@ -623,8 +623,8 @@ export default function MasterclassPlanesPage() {
           </h3>
           <p className="text-xs text-slate-300 leading-relaxed">
             {isEn
-              ? 'Traditional marketing agencies are forced to pay multiple expensive monthly subscriptions in USD, even if they have zero clients in a given month. Prestigia unites everything into one single operational engine with no mandatory monthly fees:'
-              : 'Cualquier agencia tradicional que ofrezca posicionamiento en Google Maps tiene que pagar suscripciones mensuales obligatorias en dólares, vendan o no vendan clientes en el mes. Prestigia une todo el flujo en una sola plataforma sin mensualidades forzadas:'}
+              ? 'Traditional marketing agencies are forced to pay multiple expensive monthly subscriptions in USD, even if they have zero clients in a given month. Local Studio unites everything into one single operational engine with no mandatory monthly fees:'
+              : 'Cualquier agencia tradicional que ofrezca posicionamiento en Google Maps tiene que pagar suscripciones mensuales obligatorias en dólares, vendan o no vendan clientes en el mes. Local Studio une todo el flujo en una sola plataforma sin mensualidades forzadas:'}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs">
@@ -658,10 +658,10 @@ export default function MasterclassPlanesPage() {
               </div>
             </div>
 
-            {/* Box 3: The Prestigia Advantage */}
+            {/* Box 3: The Local Studio Advantage */}
             <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-950/40 via-slate-950 to-indigo-950/40 border border-emerald-500/40 space-y-3">
               <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
-                {isEn ? '3. The Prestigia Local Studio Advantage' : '3. La Ventaja Prestigia Local Studio'}
+                {isEn ? '3. The Local Studio Advantage' : '3. La Ventaja Local Studio'}
               </span>
               <ul className="space-y-1.5 text-slate-200 text-[11px]">
                 <li>• <strong>{isEn ? 'All in 1 single place:' : 'Todo en 1 solo lugar:'}</strong> {isEn ? 'All 5 production engines unified in one integrated suite.' : 'Las 5 herramientas en una sola suite integrada.'}</li>
@@ -681,7 +681,7 @@ export default function MasterclassPlanesPage() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs uppercase tracking-wider">
               <Percent className="w-4 h-4 text-cyan-400" />
-              <span>{isEn ? '3. The Double Monetization Model: Upfront Setup + Lifetime Recurring Prestigia MRR' : '3. El Modelo de Doble Monetización: Setup Inmediato + Renta Recurrente Mensual Prestigia'}</span>
+              <span>{isEn ? '3. The Double Monetization Model: Upfront Setup + Lifetime Monthly Recurring MRR' : '3. El Modelo de Doble Monetización: Setup Inmediato + Renta Recurrente Mensual de Software'}</span>
             </div>
             <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
               {isEn ? 'Active Retention Policy' : 'Regla de Clientes Activos'}
@@ -696,8 +696,8 @@ export default function MasterclassPlanesPage() {
             </h3>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mt-1.5">
               {isEn
-                ? 'When you optimize a client with Local Studio, the natural next step is connecting them to Prestigia for automated weekly posts, review defense, and local Top 3 maintenance. You earn 10%, 20%, or 30% commission across ALL Prestigia plans (Monthly, 3-Month, 6-Month, and Annual) as long as the client and your advisor account remain active:'
-                : 'Al optimizar la ficha de un cliente con Local Studio, el paso natural es conectarlo a Prestigia para su mantenimiento, blindaje reputacional y posicionamiento continuo. Ganas el 10%, 20% o 30% de comisión en TODOS los planes (Mensuales, Trimestrales, Semestrales y Anuales) mientras el cliente y tu cuenta de asesor permanezcan activos en las plataformas:'}
+                ? 'When you optimize a client with Local Studio, the natural next step is connecting them to our automated 5★ Review & Digital Shield software for review defense and local Top 3 maintenance. You earn 10%, 20%, or 30% monthly recurring commission across ALL plans (Monthly, 3-Month, 6-Month, and Annual) as long as the client and your advisor account remain active:'
+                : 'Al optimizar la ficha de un cliente con Local Studio, el paso natural es conectarlo a nuestra suite de Reseñas 5★ y Blindaje Digital para su mantenimiento, defensa de reputación y posicionamiento continuo. Ganas el 10%, 20% o 30% de comisión mensual recurrente en TODOS los planes (Mensuales, Trimestrales, Semestrales y Anuales) mientras el cliente y tu cuenta de asesor permanezcan activos en las plataformas:'}
             </p>
           </div>
 
@@ -811,8 +811,8 @@ export default function MasterclassPlanesPage() {
               </strong>
               <p className="text-slate-300 text-[11px] leading-relaxed max-w-3xl">
                 {isEn
-                  ? 'Local Studio is NOT an expense: you recover 100% of your investment with your very first client ($150–$300 USD). From there, every single profile you create becomes a candidate to connect into Prestigia, turning cold local businesses into recurring monthly income in USD that deposits into your account automatically.'
-                  : 'Local Studio NO es un gasto: recuperas el 100% de tu inversión con tu primer cliente ($150–$300 USD). A partir de ahí, cada negocio que optimizas se convierte en un candidato para conectarlo a Prestigia, transformando clientes de tu ciudad en una renta mensual en dólares que entra a tu cuenta de forma automática mientras la plataforma trabaja por ti.'}
+                  ? 'Local Studio is NOT an expense: you recover 100% of your investment with your very first client ($150–$300 USD). From there, every single profile you create becomes a candidate to connect into recurring reputation software, turning cold local businesses into recurring monthly income in USD that deposits into your account automatically.'
+                  : 'Local Studio NO es un gasto: recuperas el 100% de tu inversión con tu primer cliente ($150–$300 USD). A partir de ahí, cada negocio que optimizas se convierte en un candidato para conectarlo a la suite de software recurrente, transformando clientes de tu ciudad en una renta mensual en dólares que entra a tu cuenta de forma automática mientras la plataforma trabaja por ti.'}
               </p>
             </div>
             <div className="text-right shrink-0">
@@ -873,19 +873,19 @@ export default function MasterclassPlanesPage() {
               <TechnologicalSolutionsLogo className="h-8" showText={true} />
             </div>
             <div className="text-left sm:text-right text-[11px] text-slate-400">
-              <span>{isEn ? 'Prestigia Technologies Enterprise • Authorized Partner Network' : 'Prestigia Technologies Enterprise • Red Autorizada de Partners B2B'}</span>
+              <span>{isEn ? 'Local Studio Enterprise • Authorized Partner Network' : 'Local Studio Enterprise • Red Autorizada de Partners B2B'}</span>
             </div>
           </div>
 
           <p className="text-slate-300 leading-relaxed text-xs">
             {isEn
-              ? 'Prestigia Local Studio is developed, hosted, and maintained under enterprise SLA standards by Technological Solutions Software. Commercial partners operate as independent entities, retaining 100% of the fees charged to their end clients.'
-              : 'Prestigia Local Studio es desarrollado, alojado y respaldado bajo estándares corporativos por Technological Solutions Software. Los partners comerciales operan de manera independiente, conservando el 100% de los honorarios cobrados a sus clientes finales.'}
+              ? 'Local Studio is developed, hosted, and maintained under enterprise SLA standards by Technological Solutions Software. Commercial partners operate as independent entities, retaining 100% of the fees charged to their end clients.'
+              : 'Local Studio es desarrollado, alojado y respaldado bajo estándares corporativos por Technological Solutions Software. Los partners comerciales operan de manera independiente, conservando el 100% de los honorarios cobrados a sus clientes finales.'}
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-400 text-[11px]">
             <span>
-              Prestigia &copy; 2026 &bull; {isEn ? 'All rights reserved.' : 'Todos los derechos reservados.'}
+              Local Studio &copy; 2026 &bull; {isEn ? 'All rights reserved.' : 'Todos los derechos reservados.'}
             </span>
             <div className="flex flex-wrap items-center gap-3 font-bold no-print">
               <button
@@ -897,7 +897,7 @@ export default function MasterclassPlanesPage() {
                 <span>{isEn ? 'Pay Online with Bold (PSE / Cards)' : 'Pagar en Línea con Bold (PSE / Tarjetas)'}</span>
               </button>
               <a
-                href={isEn ? "https://wa.me/573058314049?text=Hello%20Prestigia,%20I%20want%20to%20activate%20my%20Local%20Studio%20Partner%20Plan" : "https://wa.me/573058314049?text=Hola%20Prestigia,%20deseo%20activar%20mi%20Plan%20de%20Partner%20en%20Local%20Studio"}
+                href={isEn ? "https://wa.me/573058314049?text=Hello%20Luisma,%20I%20want%20to%20activate%20my%20Local%20Studio%20Partner%20Plan" : "https://wa.me/573058314049?text=Hola%20Luisma,%20deseo%20activar%20mi%20Plan%20de%20Partner%20en%20Local%20Studio"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/30 transition hover:bg-emerald-500/20"
