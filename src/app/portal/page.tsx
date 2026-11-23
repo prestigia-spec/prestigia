@@ -3646,6 +3646,14 @@ export default function PortalPage() {
     const finalActor = resolverNameOverride || currentActorName;
     const finalRole = resolverNameOverride?.includes('Dueño') ? 'owner' : (currentActorRole || 'branch_manager');
 
+    const target = (effectivePlan === 'independiente' ? independentFeedbacks : feedbacks).find(f => f.id === id);
+    const firstName = target?.customerName?.split(' ')[0] || '';
+    const generatedRescueMsg = rescueMessage || (target ? (
+      target.rating >= 4
+        ? `¡Hola ${firstName}! Te saluda ${finalActor}. Muchísimas gracias por tus amables comentarios sobre nuestro servicio ("${target.complaintReason || ''}"). En tu próxima visita tienes una cortesía de la casa reservada. ¡Será un placer tenerte de nuevo en tu casa!`
+        : `Hola ${firstName}, te saluda ${finalActor}. Lamentamos sinceramente el inconveniente con tu visita ("${target.complaintReason || ''}"). Ya conversamos con el equipo y aplicamos los correctivos de inmediato. Te dejamos reservado un corte especial de cortesía y dos copas de vino en tu próxima visita. ¿Cuándo nos acompañas para atenderte como mereces?`
+    ) : undefined);
+
     if (effectivePlan === 'independiente') {
       setIndependentFeedbacks((prev) =>
         prev.map((f) =>
@@ -3656,7 +3664,7 @@ export default function PortalPage() {
                 resolvedAt: new Date().toISOString(),
                 resolvedBy: finalActor,
                 resolvedByRole: finalRole,
-                rescueMessage: rescueMessage || f.rescueMessage,
+                rescueMessage: generatedRescueMsg || f.rescueMessage,
               }
             : f
         )
@@ -3673,7 +3681,7 @@ export default function PortalPage() {
           status: 'resolved',
           resolvedBy: finalActor,
           resolvedByRole: finalRole,
-          rescueMessage,
+          rescueMessage: generatedRescueMsg,
         }),
       });
       if (res.ok) {
@@ -3686,7 +3694,7 @@ export default function PortalPage() {
                   resolvedAt: new Date().toISOString(),
                   resolvedBy: finalActor,
                   resolvedByRole: finalRole,
-                  rescueMessage: rescueMessage || f.rescueMessage,
+                  rescueMessage: generatedRescueMsg || f.rescueMessage,
                 }
               : f
           )
@@ -11065,15 +11073,26 @@ export default function PortalPage() {
                       </div>
 
                       <div className={`p-3 rounded-xl border text-xs space-y-1.5 ${
-                        theme === 'light'
-                          ? 'bg-red-50 border-red-200 text-red-900'
-                          : 'bg-red-950/20 border border-red-500/20 text-red-200'
+                        item.rating >= 4
+                          ? theme === 'light'
+                            ? 'bg-emerald-50/80 border-emerald-200 text-emerald-950'
+                            : 'bg-emerald-950/20 border border-emerald-500/20 text-emerald-200'
+                          : theme === 'light'
+                            ? 'bg-red-50 border-red-200 text-red-900'
+                            : 'bg-red-950/20 border border-red-500/20 text-red-200'
                       }`}>
                         <div className="flex flex-wrap items-center justify-between gap-1.5">
                           <div className="max-w-[75%]">
-                            <strong>{t.complaints.complaintReasonLabel}</strong> "{localizedReason}"
+                            <strong>{item.rating >= 4 ? (lang === 'en' ? 'Customer Experience / Compliment:' : 'Comentario / Experiencia:') : t.complaints.complaintReasonLabel}</strong> "{localizedReason}"
                           </div>
                           {(() => {
+                            if (item.rating >= 4) {
+                              return (
+                                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold border shrink-0 text-emerald-400 bg-emerald-500/10 border-emerald-500/30">
+                                  ⭐ {lang === 'en' ? 'Positive Experience' : 'Experiencia Positiva'}
+                                </span>
+                              );
+                            }
                             const cat = categorizeComplaintReason(item.complaintReason);
                             return (
                               <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border shrink-0 ${cat.color}`}>
@@ -11099,7 +11118,9 @@ export default function PortalPage() {
                         }`}>
                           <div className="flex flex-wrap items-center justify-between gap-2">
                             <span className="text-[10px] uppercase font-black text-indigo-400 tracking-wider">
-                              {t.complaints.officialRescueTitle}
+                              {item.rating >= 4
+                                ? (lang === 'en' ? '⚡ VIP LOYALTY MESSAGE SENT VIA WHATSAPP:' : '⚡ MENSAJE DE FIDELIZACIÓN / AGRADECIMIENTO ENVIADO POR WHATSAPP:')
+                                : t.complaints.officialRescueTitle}
                             </span>
                             {rescueTimeStr && (
                               <span className={`text-[10px] px-2 py-0.5 rounded border ${
@@ -11113,7 +11134,7 @@ export default function PortalPage() {
                           </div>
 
                           <p className="italic leading-relaxed font-normal">
-                            "{item.rescueMessage || (lang === 'en' ? 'Customer successfully contacted and rescued directly via WhatsApp.' : 'Cliente contactado y rescatado directamente vía WhatsApp.')}"
+                            "{item.rescueMessage || (item.rating >= 4 ? (lang === 'en' ? 'VIP thank-you message sent directly via WhatsApp.' : 'Mensaje de agradecimiento y fidelización VIP enviado vía WhatsApp.') : (lang === 'en' ? 'Customer successfully contacted and rescued directly via WhatsApp.' : 'Cliente contactado y rescatado directamente vía WhatsApp.'))}"
                           </p>
 
                           {/* Audit: Who resolved it & When */}

@@ -70,14 +70,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 1,
       "customerName": "Rodrigo Vargas",
-      "customerPhone": "+573321449500",
+      "customerPhone": "+573454133659",
       "complaintReason": "El bife de chorizo llegó bien cocido cuando lo pedí término medio. Tuvimos que pedir cambio.",
       "attendedBy": "Carlos Gómez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-08-15T18:33:26.145Z",
-      "resolvedAt": "2026-08-15T18:57:58.244Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-08-16T02:13:02.878Z",
+      "resolvedAt": "2026-08-16T02:28:17.652Z",
+      "resolvedBy": "Mariana Pérez (Jefe de Sala)",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Hola Rodrigo, te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Lamento profundamente el inconveniente que tuviste (\"El bife de chorizo llegó bien cocido cuando lo pedí término medio. Tuvimos que pedir cambio.\"). Ya conversé directamente con Carlos Gómez y ajustamos el servicio en mesa y cocina de inmediato. Queremos compensarte: te dejamos reservado un corte especial de cortesía y dos copas de vino en tu próxima visita. ¿Cuándo nos acompañas para atenderte como mereces?",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-02",
@@ -87,14 +92,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 2,
       "customerName": "Natalia Gómez",
-      "customerPhone": "+573854151874",
+      "customerPhone": "+573846602771",
       "complaintReason": "Tardaron 35 minutos en traer los platos principales un domingo concurrido.",
       "attendedBy": "Mariana Pérez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-08-17T05:16:33.288Z",
-      "resolvedAt": "2026-08-17T06:30:17.493Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-08-18T01:17:12.466Z",
+      "resolvedAt": "2026-08-18T02:05:30.276Z",
+      "resolvedBy": "Carlos Gómez (Dueño General)",
+      "resolvedByRole": "owner",
+      "rescueMessage": "Hola Natalia, te escribe personalmente Carlos Gómez, dueño de La Parrilla de Andrés. Me enteré de lo ocurrido con \"Tardaron 35 minutos en traer los platos principales un domingo concurrido.\" y quiero pedirte una sincera disculpa. En mi casa la calidad y el servicio son sagrados. Ya tomé medidas directas con el equipo y me gustaría invitarte personalmente una cena completa por mi cuenta para que vivas la experiencia que verdaderamente nos representa. Por favor avísame cuando desees volver.",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-03",
@@ -104,14 +114,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 3,
       "customerName": "Sebastián Beltrán",
-      "customerPhone": "+573185360994",
+      "customerPhone": "+573949614822",
       "complaintReason": "Los cócteles muy ricos, aunque la música en la terraza estaba un poco alta para conversar.",
       "attendedBy": "Andrés Martínez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-08-19T14:02:29.787Z",
-      "resolvedAt": "2026-08-19T14:56:25.276Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-08-19T05:18:18.041Z",
+      "resolvedAt": "2026-08-19T06:13:26.417Z",
+      "resolvedBy": "Filtro Privado Prestigia AI",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Estimado/a Sebastián, el Agente de Rescate Prestigia AI detectó tu reporte (\"Los cócteles muy ricos, aunque la música en la terraza estaba un poco alta para conversar.\") y lo escaló de forma inmediata a la Gerencia General de La Parrilla de Andrés. Lamentamos el malestar ocasionado. Se ha generado un Bono Digital de Rescate del 100% en plato fuerte para tu próxima visita y la Jefe de Sala Mariana Pérez supervisará personalmente tu mesa.",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-04",
@@ -121,14 +136,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 4,
       "customerName": "Paula Andrea Ortiz",
-      "customerPhone": "+573551992152",
+      "customerPhone": "+573760542391",
       "complaintReason": "Muy buena música en vivo el sábado. Los cócteles de la casa son de primer nivel.",
       "attendedBy": "Camila López",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-08-20T13:31:51.336Z",
-      "resolvedAt": "2026-08-20T14:04:15.767Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-08-20T18:27:49.569Z",
+      "resolvedAt": "2026-08-20T19:16:45.389Z",
+      "resolvedBy": "Mariana Pérez (Jefe de Sala)",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "¡Hola Paula! Te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Muchísimas gracias por compartir tu experiencia con nosotros (\"Muy buena música en vivo el sábado. Los cócteles de la casa son de primer nivel.\"). Le extendí personalmente tus felicitaciones a Camila López, quien se alegró enormemente. Te dejamos registrado un cóctel de autor o postre de cortesía para tu próxima visita. ¡Será un placer tenerte de nuevo en tu casa!",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-05",
@@ -138,14 +158,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 5,
       "customerName": "Mateo Jaramillo",
-      "customerPhone": "+573576051611",
+      "customerPhone": "+573678427175",
       "complaintReason": "Diego en la parrilla es un artista. Las costillas BBQ son las mejores de la Zona G.",
       "attendedBy": "Diego Morales",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-08-22T11:50:21.033Z",
-      "resolvedAt": "2026-08-22T12:32:33.809Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-08-22T09:46:01.431Z",
+      "resolvedAt": "2026-08-22T10:14:29.490Z",
+      "resolvedBy": "Carlos Gómez (Dueño General)",
+      "resolvedByRole": "owner",
+      "rescueMessage": "Hola Mateo, te saluda Carlos Gómez, propietario de La Parrilla de Andrés. Qué gran orgullo y satisfacción leer tu opinión (\"Diego en la parrilla es un artista. Las costillas BBQ son las mejores de la Zona G.\"). Nuestro compromiso diario es brindarte una experiencia gastronómica impecable. Tienes una invitación especial de mi parte con dos copas de vino y postre reservadas para tu próxima visita. ¡Un fuerte abrazo!",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-06",
@@ -155,14 +180,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 1,
       "customerName": "Laura Marcela Reyes",
-      "customerPhone": "+573876202127",
+      "customerPhone": "+573502729609",
       "complaintReason": "El café llegó frío después del postre. El encargado fue amable pero deben cuidar ese detalle.",
       "attendedBy": "Carlos Gómez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-08-24T10:43:03.673Z",
-      "resolvedAt": "2026-08-24T11:02:13.432Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-08-24T03:09:35.602Z",
+      "resolvedAt": "2026-08-24T03:45:33.862Z",
+      "resolvedBy": "Filtro Privado Prestigia AI",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Estimado/a Laura, el Agente de Rescate Prestigia AI detectó tu reporte (\"El café llegó frío después del postre. El encargado fue amable pero deben cuidar ese detalle.\") y lo escaló de forma inmediata a la Gerencia General de La Parrilla de Andrés. Lamentamos el malestar ocasionado. Se ha generado un Bono Digital de Rescate del 100% en plato fuerte para tu próxima visita y la Jefe de Sala Mariana Pérez supervisará personalmente tu mesa.",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-07",
@@ -172,14 +202,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 2,
       "customerName": "Cristian Camilo Torres",
-      "customerPhone": "+573181697046",
+      "customerPhone": "+573222810061",
       "complaintReason": "El bife de chorizo llegó bien cocido cuando lo pedí término medio. Tuvimos que pedir cambio.",
       "attendedBy": "Mariana Pérez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-08-26T04:26:29.293Z",
-      "resolvedAt": "2026-08-26T05:11:16.324Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-08-26T06:36:26.014Z",
+      "resolvedAt": "2026-08-26T07:10:24.790Z",
+      "resolvedBy": "Mariana Pérez (Jefe de Sala)",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Hola Cristian, te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Lamento profundamente el inconveniente que tuviste (\"El bife de chorizo llegó bien cocido cuando lo pedí término medio. Tuvimos que pedir cambio.\"). Ya conversé directamente con Mariana Pérez y ajustamos el servicio en mesa y cocina de inmediato. Queremos compensarte: te dejamos reservado un corte especial de cortesía y dos copas de vino en tu próxima visita. ¿Cuándo nos acompañas para atenderte como mereces?",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-08",
@@ -189,14 +224,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 3,
       "customerName": "Gabriela Salamanca",
-      "customerPhone": "+573456796777",
+      "customerPhone": "+573687191139",
       "complaintReason": "Buen sabor pero el parqueadero del valet estaba bastante lleno un viernes a las 8pm.",
       "attendedBy": "Andrés Martínez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-08-27T06:31:43.255Z",
-      "resolvedAt": "2026-08-27T07:28:18.968Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-08-28T02:10:54.279Z",
+      "resolvedAt": "2026-08-28T03:19:05.846Z",
+      "resolvedBy": "Carlos Gómez (Dueño General)",
+      "resolvedByRole": "owner",
+      "rescueMessage": "Hola Gabriela, te escribe personalmente Carlos Gómez, dueño de La Parrilla de Andrés. Me enteré de lo ocurrido con \"Buen sabor pero el parqueadero del valet estaba bastante lleno un viernes a las 8pm.\" y quiero pedirte una sincera disculpa. En mi casa la calidad y el servicio son sagrados. Ya tomé medidas directas con el equipo y me gustaría invitarte personalmente una cena completa por mi cuenta para que vivas la experiencia que verdaderamente nos representa. Por favor avísame cuando desees volver.",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-09",
@@ -206,14 +246,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 4,
       "customerName": "Nicolás Arango",
-      "customerPhone": "+573599938963",
+      "customerPhone": "+573162364829",
       "complaintReason": "Los acompañamientos y el chimichurri artesanal tienen un sabor increíble.",
       "attendedBy": "Camila López",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-08-29T16:47:47.188Z",
-      "resolvedAt": "2026-08-29T17:13:19.106Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-08-29T12:04:17.333Z",
+      "resolvedAt": "2026-08-29T12:52:47.644Z",
+      "resolvedBy": "Filtro Privado Prestigia AI",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Estimado/a Nicolás, el Sistema Inteligente Prestigia AI y la Dirección de La Parrilla de Andrés agradecen tu excelente calificación de 4 estrellas (\"Los acompañamientos y el chimichurri artesanal tienen un sabor increíble.\"). Hemos registrado tu felicitación para el colaborador Camila López en nuestro cuadro de honor y te activamos el estatus de Cliente VIP con beneficios de cortesía en tu próxima reserva. ¡Gracias por preferirnos!",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-10",
@@ -223,14 +268,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 5,
       "customerName": "Vanessa Quintero",
-      "customerPhone": "+573157695903",
+      "customerPhone": "+573273074042",
       "complaintReason": "Celebramos una cena de negocios y todo salió perfecto. 100% recomendado.",
       "attendedBy": "Diego Morales",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-08-31T10:32:30.697Z",
-      "resolvedAt": "2026-08-31T11:40:57.761Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-08-30T18:04:19.406Z",
+      "resolvedAt": "2026-08-30T18:41:19.777Z",
+      "resolvedBy": "Mariana Pérez (Jefe de Sala)",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "¡Hola Vanessa! Te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Muchísimas gracias por compartir tu experiencia con nosotros (\"Celebramos una cena de negocios y todo salió perfecto. 100% recomendado.\"). Le extendí personalmente tus felicitaciones a Diego Morales, quien se alegró enormemente. Te dejamos registrado un cóctel de autor o postre de cortesía para tu próxima visita. ¡Será un placer tenerte de nuevo en tu casa!",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-11",
@@ -240,14 +290,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 1,
       "customerName": "David Fernando Meza",
-      "customerPhone": "+573751640428",
+      "customerPhone": "+573845640817",
       "complaintReason": "Nos trajeron la cuenta con un plato que no habíamos pedido, aunque lo corrigieron rápido.",
       "attendedBy": "Carlos Gómez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-01T12:23:43.941Z",
-      "resolvedAt": "2026-09-01T12:41:13.194Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-09-01T20:09:43.872Z",
+      "resolvedAt": "2026-09-01T20:40:19.874Z",
+      "resolvedBy": "Carlos Gómez (Dueño General)",
+      "resolvedByRole": "owner",
+      "rescueMessage": "Hola David, te escribe personalmente Carlos Gómez, dueño de La Parrilla de Andrés. Me enteré de lo ocurrido con \"Nos trajeron la cuenta con un plato que no habíamos pedido, aunque lo corrigieron rápido.\" y quiero pedirte una sincera disculpa. En mi casa la calidad y el servicio son sagrados. Ya tomé medidas directas con el equipo y me gustaría invitarte personalmente una cena completa por mi cuenta para que vivas la experiencia que verdaderamente nos representa. Por favor avísame cuando desees volver.",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-12",
@@ -257,14 +312,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 2,
       "customerName": "Mariana Cardona",
-      "customerPhone": "+573554793553",
+      "customerPhone": "+573461407991",
       "complaintReason": "El café llegó frío después del postre. El encargado fue amable pero deben cuidar ese detalle.",
       "attendedBy": "Mariana Pérez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-03T11:19:28.128Z",
-      "resolvedAt": "2026-09-03T12:00:09.503Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-09-03T08:43:50.714Z",
+      "resolvedAt": "2026-09-03T09:20:42.392Z",
+      "resolvedBy": "Filtro Privado Prestigia AI",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Estimado/a Mariana, el Agente de Rescate Prestigia AI detectó tu reporte (\"El café llegó frío después del postre. El encargado fue amable pero deben cuidar ese detalle.\") y lo escaló de forma inmediata a la Gerencia General de La Parrilla de Andrés. Lamentamos el malestar ocasionado. Se ha generado un Bono Digital de Rescate del 100% en plato fuerte para tu próxima visita y la Jefe de Sala Mariana Pérez supervisará personalmente tu mesa.",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-13",
@@ -274,14 +334,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 3,
       "customerName": "Ricardo Albarracín",
-      "customerPhone": "+573204468874",
+      "customerPhone": "+573912332143",
       "complaintReason": "La comida deliciosa, pero tardaron unos 15 minutos en traer las bebidas.",
       "attendedBy": "Andrés Martínez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-04T13:03:40.934Z",
-      "resolvedAt": "2026-09-04T13:28:17.682Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-09-05T09:10:19.287Z",
+      "resolvedAt": "2026-09-05T09:41:47.221Z",
+      "resolvedBy": "Mariana Pérez (Jefe de Sala)",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Hola Ricardo, te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Lamento profundamente el inconveniente que tuviste (\"La comida deliciosa, pero tardaron unos 15 minutos en traer las bebidas.\"). Ya conversé directamente con Andrés Martínez y ajustamos el servicio en mesa y cocina de inmediato. Queremos compensarte: te dejamos reservado un corte especial de cortesía y dos copas de vino en tu próxima visita. ¿Cuándo nos acompañas para atenderte como mereces?",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-14",
@@ -291,14 +356,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 4,
       "customerName": "Tatiana Monsalve",
-      "customerPhone": "+573592426561",
+      "customerPhone": "+573640624973",
       "complaintReason": "Excelente ambiente para celebrar cumpleaños familiar. Nos encantó la sugerencia de vino.",
       "attendedBy": "Camila López",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-06T18:46:44.167Z",
-      "resolvedAt": "2026-09-06T19:26:53.764Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-09-06T07:32:05.851Z",
+      "resolvedAt": "2026-09-06T08:40:35.831Z",
+      "resolvedBy": "Carlos Gómez (Dueño General)",
+      "resolvedByRole": "owner",
+      "rescueMessage": "Hola Tatiana, te saluda Carlos Gómez, propietario de La Parrilla de Andrés. Qué gran orgullo y satisfacción leer tu opinión (\"Excelente ambiente para celebrar cumpleaños familiar. Nos encantó la sugerencia de vino.\"). Nuestro compromiso diario es brindarte una experiencia gastronómica impecable. Tienes una invitación especial de mi parte con dos copas de vino y postre reservadas para tu próxima visita. ¡Un fuerte abrazo!",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-15",
@@ -308,14 +378,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 5,
       "customerName": "Héctor Fabio Morales",
-      "customerPhone": "+573864858729",
+      "customerPhone": "+573808002573",
       "complaintReason": "El corte Tomahawk superó todas las expectativas. Gran atención en la mesa.",
       "attendedBy": "Diego Morales",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-08T11:00:24.104Z",
-      "resolvedAt": "2026-09-08T11:21:05.213Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-09-08T05:39:42.379Z",
+      "resolvedAt": "2026-09-08T05:55:26.457Z",
+      "resolvedBy": "Filtro Privado Prestigia AI",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Estimado/a Héctor, el Sistema Inteligente Prestigia AI y la Dirección de La Parrilla de Andrés agradecen tu excelente calificación de 5 estrellas (\"El corte Tomahawk superó todas las expectativas. Gran atención en la mesa.\"). Hemos registrado tu felicitación para el colaborador Diego Morales en nuestro cuadro de honor y te activamos el estatus de Cliente VIP con beneficios de cortesía en tu próxima reserva. ¡Gracias por preferirnos!",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-16",
@@ -325,14 +400,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 1,
       "customerName": "Juliana Peñuela",
-      "customerPhone": "+573151500648",
+      "customerPhone": "+573976299735",
       "complaintReason": "Mesa asignada cerca de la puerta con mucho frío por la corriente de aire.",
       "attendedBy": "Carlos Gómez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-10T06:20:48.795Z",
-      "resolvedAt": "2026-09-10T07:05:44.746Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-09-09T22:49:33.357Z",
+      "resolvedAt": "2026-09-09T23:09:21.205Z",
+      "resolvedBy": "Mariana Pérez (Jefe de Sala)",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Hola Juliana, te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Lamento profundamente el inconveniente que tuviste (\"Mesa asignada cerca de la puerta con mucho frío por la corriente de aire.\"). Ya conversé directamente con Carlos Gómez y ajustamos el servicio en mesa y cocina de inmediato. Queremos compensarte: te dejamos reservado un corte especial de cortesía y dos copas de vino en tu próxima visita. ¿Cuándo nos acompañas para atenderte como mereces?",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-17",
@@ -342,14 +422,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 2,
       "customerName": "Camilo Sampedro",
-      "customerPhone": "+573782944823",
+      "customerPhone": "+573224348173",
       "complaintReason": "Nos trajeron la cuenta con un plato que no habíamos pedido, aunque lo corrigieron rápido.",
       "attendedBy": "Mariana Pérez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-11T18:45:58.813Z",
-      "resolvedAt": "2026-09-11T19:08:51.526Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-09-11T23:12:59.560Z",
+      "resolvedAt": "2026-09-11T23:37:40.717Z",
+      "resolvedBy": "Carlos Gómez (Dueño General)",
+      "resolvedByRole": "owner",
+      "rescueMessage": "Hola Camilo, te escribe personalmente Carlos Gómez, dueño de La Parrilla de Andrés. Me enteré de lo ocurrido con \"Nos trajeron la cuenta con un plato que no habíamos pedido, aunque lo corrigieron rápido.\" y quiero pedirte una sincera disculpa. En mi casa la calidad y el servicio son sagrados. Ya tomé medidas directas con el equipo y me gustaría invitarte personalmente una cena completa por mi cuenta para que vivas la experiencia que verdaderamente nos representa. Por favor avísame cuando desees volver.",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-18",
@@ -359,14 +444,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 3,
       "customerName": "Diana Milena Buitrago",
-      "customerPhone": "+573174156474",
+      "customerPhone": "+573150467769",
       "complaintReason": "El restaurante es muy bonito, solo sugiero más opciones de postres sin azúcar.",
       "attendedBy": "Andrés Martínez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-13T02:29:47.506Z",
-      "resolvedAt": "2026-09-13T02:59:43.120Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-09-13T09:48:08.095Z",
+      "resolvedAt": "2026-09-13T10:37:47.704Z",
+      "resolvedBy": "Filtro Privado Prestigia AI",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Estimado/a Diana, el Agente de Rescate Prestigia AI detectó tu reporte (\"El restaurante es muy bonito, solo sugiero más opciones de postres sin azúcar.\") y lo escaló de forma inmediata a la Gerencia General de La Parrilla de Andrés. Lamentamos el malestar ocasionado. Se ha generado un Bono Digital de Rescate del 100% en plato fuerte para tu próxima visita y la Jefe de Sala Mariana Pérez supervisará personalmente tu mesa.",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-19",
@@ -376,14 +466,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 4,
       "customerName": "Álvaro José Hoyos",
-      "customerPhone": "+573178365904",
+      "customerPhone": "+573857400355",
       "complaintReason": "Rápida atención y comida deliciosa. Muy cómodo el pago sin contacto.",
       "attendedBy": "Camila López",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-14T12:32:34.500Z",
-      "resolvedAt": "2026-09-14T12:51:38.935Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-09-15T05:25:41.290Z",
+      "resolvedAt": "2026-09-15T06:04:03.599Z",
+      "resolvedBy": "Mariana Pérez (Jefe de Sala)",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "¡Hola Álvaro! Te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Muchísimas gracias por compartir tu experiencia con nosotros (\"Rápida atención y comida deliciosa. Muy cómodo el pago sin contacto.\"). Le extendí personalmente tus felicitaciones a Camila López, quien se alegró enormemente. Te dejamos registrado un cóctel de autor o postre de cortesía para tu próxima visita. ¡Será un placer tenerte de nuevo en tu casa!",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-20",
@@ -393,14 +488,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 5,
       "customerName": "Catalina Villamil",
-      "customerPhone": "+573249170671",
+      "customerPhone": "+573999893892",
       "complaintReason": "Excelente servicio de Carlos, estuvo pendiente de cada detalle sin ser invasivo.",
       "attendedBy": "Diego Morales",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-16T11:52:37.717Z",
-      "resolvedAt": "2026-09-16T12:39:33.551Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-09-16T18:16:46.490Z",
+      "resolvedAt": "2026-09-16T19:09:54.351Z",
+      "resolvedBy": "Carlos Gómez (Dueño General)",
+      "resolvedByRole": "owner",
+      "rescueMessage": "Hola Catalina, te saluda Carlos Gómez, propietario de La Parrilla de Andrés. Qué gran orgullo y satisfacción leer tu opinión (\"Excelente servicio de Carlos, estuvo pendiente de cada detalle sin ser invasivo.\"). Nuestro compromiso diario es brindarte una experiencia gastronómica impecable. Tienes una invitación especial de mi parte con dos copas de vino y postre reservadas para tu próxima visita. ¡Un fuerte abrazo!",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-21",
@@ -410,14 +510,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 1,
       "customerName": "Oscar Eduardo Prada",
-      "customerPhone": "+573979927201",
+      "customerPhone": "+573973336324",
       "complaintReason": "La ensalada llegó sin el aderezo prometido en la carta y el mesero tardó en traerlo.",
       "attendedBy": "Carlos Gómez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-18T08:22:45.162Z",
-      "resolvedAt": "2026-09-18T09:14:15.618Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-09-18T15:49:08.008Z",
+      "resolvedAt": "2026-09-18T16:13:48.013Z",
+      "resolvedBy": "Filtro Privado Prestigia AI",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Estimado/a Oscar, el Agente de Rescate Prestigia AI detectó tu reporte (\"La ensalada llegó sin el aderezo prometido en la carta y el mesero tardó en traerlo.\") y lo escaló de forma inmediata a la Gerencia General de La Parrilla de Andrés. Lamentamos el malestar ocasionado. Se ha generado un Bono Digital de Rescate del 100% en plato fuerte para tu próxima visita y la Jefe de Sala Mariana Pérez supervisará personalmente tu mesa.",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-22",
@@ -427,14 +532,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 2,
       "customerName": "Mónica Forero",
-      "customerPhone": "+573694251753",
+      "customerPhone": "+573936314336",
       "complaintReason": "Mesa asignada cerca de la puerta con mucho frío por la corriente de aire.",
       "attendedBy": "Mariana Pérez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-20T11:22:07.298Z",
-      "resolvedAt": "2026-09-20T12:26:57.064Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-09-19T20:53:04.166Z",
+      "resolvedAt": "2026-09-19T21:37:37.003Z",
+      "resolvedBy": "Mariana Pérez (Jefe de Sala)",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Hola Mónica, te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Lamento profundamente el inconveniente que tuviste (\"Mesa asignada cerca de la puerta con mucho frío por la corriente de aire.\"). Ya conversé directamente con Mariana Pérez y ajustamos el servicio en mesa y cocina de inmediato. Queremos compensarte: te dejamos reservado un corte especial de cortesía y dos copas de vino en tu próxima visita. ¿Cuándo nos acompañas para atenderte como mereces?",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-23",
@@ -444,14 +554,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 3,
       "customerName": "Sergio Iván Pardo",
-      "customerPhone": "+573900169394",
+      "customerPhone": "+573339746632",
       "complaintReason": "Pedimos término medio y uno de los cortes llegó un poco más cocido, pero lo comimos bien.",
       "attendedBy": "Andrés Martínez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-21T13:30:33.849Z",
-      "resolvedAt": "2026-09-21T14:43:09.273Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-09-21T20:26:54.319Z",
+      "resolvedAt": "2026-09-21T20:57:58.023Z",
+      "resolvedBy": "Carlos Gómez (Dueño General)",
+      "resolvedByRole": "owner",
+      "rescueMessage": "Hola Sergio, te escribe personalmente Carlos Gómez, dueño de La Parrilla de Andrés. Me enteré de lo ocurrido con \"Pedimos término medio y uno de los cortes llegó un poco más cocido, pero lo comimos bien.\" y quiero pedirte una sincera disculpa. En mi casa la calidad y el servicio son sagrados. Ya tomé medidas directas con el equipo y me gustaría invitarte personalmente una cena completa por mi cuenta para que vivas la experiencia que verdaderamente nos representa. Por favor avísame cuando desees volver.",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-24",
@@ -461,14 +576,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 4,
       "customerName": "Paola Andrea Cruz",
-      "customerPhone": "+573107547194",
+      "customerPhone": "+573706531981",
       "complaintReason": "Ambiente acogedor, decoración sobria y cortes de carne muy suaves.",
       "attendedBy": "Camila López",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-22T20:24:15.201Z",
-      "resolvedAt": "2026-09-22T21:36:07.718Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-09-23T01:30:45.193Z",
+      "resolvedAt": "2026-09-23T01:50:00.853Z",
+      "resolvedBy": "Filtro Privado Prestigia AI",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Estimado/a Paola, el Sistema Inteligente Prestigia AI y la Dirección de La Parrilla de Andrés agradecen tu excelente calificación de 4 estrellas (\"Ambiente acogedor, decoración sobria y cortes de carne muy suaves.\"). Hemos registrado tu felicitación para el colaborador Camila López en nuestro cuadro de honor y te activamos el estatus de Cliente VIP con beneficios de cortesía en tu próxima reserva. ¡Gracias por preferirnos!",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-25",
@@ -478,14 +598,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 5,
       "customerName": "Guillermo León Vélez",
-      "customerPhone": "+573473581643",
+      "customerPhone": "+573781998473",
       "complaintReason": "La carne madurada en su punto exacto. La atención fue impecable desde la entrada.",
       "attendedBy": "Diego Morales",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-25T07:53:09.902Z",
-      "resolvedAt": "2026-09-25T08:56:06.381Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-09-24T19:37:35.399Z",
+      "resolvedAt": "2026-09-24T20:02:25.009Z",
+      "resolvedBy": "Mariana Pérez (Jefe de Sala)",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "¡Hola Guillermo! Te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Muchísimas gracias por compartir tu experiencia con nosotros (\"La carne madurada en su punto exacto. La atención fue impecable desde la entrada.\"). Le extendí personalmente tus felicitaciones a Diego Morales, quien se alegró enormemente. Te dejamos registrado un cóctel de autor o postre de cortesía para tu próxima visita. ¡Será un placer tenerte de nuevo en tu casa!",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-26",
@@ -495,14 +620,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 1,
       "customerName": "Marcela Benítez",
-      "customerPhone": "+573958654817",
+      "customerPhone": "+573522357524",
       "complaintReason": "Tardaron 35 minutos en traer los platos principales un domingo concurrido.",
       "attendedBy": "Carlos Gómez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-26T22:16:03.868Z",
-      "resolvedAt": "2026-09-26T23:07:20.824Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-09-26T07:42:22.155Z",
+      "resolvedAt": "2026-09-26T08:14:02.394Z",
+      "resolvedBy": "Carlos Gómez (Dueño General)",
+      "resolvedByRole": "owner",
+      "rescueMessage": "Hola Marcela, te escribe personalmente Carlos Gómez, dueño de La Parrilla de Andrés. Me enteré de lo ocurrido con \"Tardaron 35 minutos en traer los platos principales un domingo concurrido.\" y quiero pedirte una sincera disculpa. En mi casa la calidad y el servicio son sagrados. Ya tomé medidas directas con el equipo y me gustaría invitarte personalmente una cena completa por mi cuenta para que vivas la experiencia que verdaderamente nos representa. Por favor avísame cuando desees volver.",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-27",
@@ -512,14 +642,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 2,
       "customerName": "Germán Alonso Patiño",
-      "customerPhone": "+573717240595",
+      "customerPhone": "+573819879323",
       "complaintReason": "La ensalada llegó sin el aderezo prometido en la carta y el mesero tardó en traerlo.",
       "attendedBy": "Mariana Pérez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-28T05:13:33.417Z",
-      "resolvedAt": "2026-09-28T06:02:09.881Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-09-27T22:05:00.591Z",
+      "resolvedAt": "2026-09-27T22:23:48.689Z",
+      "resolvedBy": "Filtro Privado Prestigia AI",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Estimado/a Germán, el Agente de Rescate Prestigia AI detectó tu reporte (\"La ensalada llegó sin el aderezo prometido en la carta y el mesero tardó en traerlo.\") y lo escaló de forma inmediata a la Gerencia General de La Parrilla de Andrés. Lamentamos el malestar ocasionado. Se ha generado un Bono Digital de Rescate del 100% en plato fuerte para tu próxima visita y la Jefe de Sala Mariana Pérez supervisará personalmente tu mesa.",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-28",
@@ -529,14 +664,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 3,
       "customerName": "Silvia Juliana León",
-      "customerPhone": "+573408685867",
+      "customerPhone": "+573849275381",
       "complaintReason": "La atención fue buena, solo que el datáfono se demoró en procesar la tarjeta por señal.",
       "attendedBy": "Andrés Martínez",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-09-29T12:53:01.965Z",
-      "resolvedAt": "2026-09-29T13:43:50.103Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-09-29T23:19:55.144Z",
+      "resolvedAt": "2026-09-30T00:22:52.682Z",
+      "resolvedBy": "Mariana Pérez (Jefe de Sala)",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Hola Silvia, te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Lamento profundamente el inconveniente que tuviste (\"La atención fue buena, solo que el datáfono se demoró en procesar la tarjeta por señal.\"). Ya conversé directamente con Andrés Martínez y ajustamos el servicio en mesa y cocina de inmediato. Queremos compensarte: te dejamos reservado un corte especial de cortesía y dos copas de vino en tu próxima visita. ¿Cuándo nos acompañas para atenderte como mereces?",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-29",
@@ -546,14 +686,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 4,
       "customerName": "César Augusto Franco",
-      "customerPhone": "+573792104610",
+      "customerPhone": "+573340349070",
       "complaintReason": "Diego en la parrilla es un artista. Las costillas BBQ son las mejores de la Zona G.",
       "attendedBy": "Camila López",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-10-02T00:35:58.786Z",
-      "resolvedAt": "2026-10-02T01:38:09.774Z",
-      "resolvedBy": "Mariana Pérez (Jefe de Sala)"
+      "createdAt": "2026-10-01T09:39:21.660Z",
+      "resolvedAt": "2026-10-01T10:35:48.350Z",
+      "resolvedBy": "Carlos Gómez (Dueño General)",
+      "resolvedByRole": "owner",
+      "rescueMessage": "Hola César, te saluda Carlos Gómez, propietario de La Parrilla de Andrés. Qué gran orgullo y satisfacción leer tu opinión (\"Diego en la parrilla es un artista. Las costillas BBQ son las mejores de la Zona G.\"). Nuestro compromiso diario es brindarte una experiencia gastronómica impecable. Tienes una invitación especial de mi parte con dos copas de vino y postre reservadas para tu próxima visita. ¡Un fuerte abrazo!",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-30",
@@ -563,14 +708,19 @@
       "branchName": "Sede Principal Zona G",
       "rating": 5,
       "customerName": "Adriana Lucía Parra",
-      "customerPhone": "+573939315335",
+      "customerPhone": "+573529184648",
       "complaintReason": "La hostess Camila nos atendió de inmediato y nos ubicó en una mesa excelente sin reserva.",
       "attendedBy": "Diego Morales",
       "clubConsent": true,
       "status": "resolved",
-      "createdAt": "2026-10-03T16:14:31.344Z",
-      "resolvedAt": "2026-10-03T16:45:51.599Z",
-      "resolvedBy": "Filtro Privado Prestigia AI"
+      "createdAt": "2026-10-02T22:13:12.325Z",
+      "resolvedAt": "2026-10-02T22:30:14.466Z",
+      "resolvedBy": "Filtro Privado Prestigia AI",
+      "resolvedByRole": "branch_manager",
+      "rescueMessage": "Estimado/a Adriana, el Sistema Inteligente Prestigia AI y la Dirección de La Parrilla de Andrés agradecen tu excelente calificación de 5 estrellas (\"La hostess Camila nos atendió de inmediato y nos ubicó en una mesa excelente sin reserva.\"). Hemos registrado tu felicitación para el colaborador Diego Morales en nuestro cuadro de honor y te activamos el estatus de Cliente VIP con beneficios de cortesía en tu próxima reserva. ¡Gracias por preferirnos!",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-31",
@@ -580,12 +730,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 1,
       "customerName": "Fabio Nelson Quiceno",
-      "customerPhone": "+573155533467",
+      "customerPhone": "+573779596562",
       "complaintReason": "El bife de chorizo llegó bien cocido cuando lo pedí término medio. Tuvimos que pedir cambio.",
       "attendedBy": "Carlos Gómez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-04T15:27:43.476Z"
+      "createdAt": "2026-10-05T08:48:34.707Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-32",
@@ -595,12 +748,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 2,
       "customerName": "Andrea Carolina Roa",
-      "customerPhone": "+573625011722",
+      "customerPhone": "+573164363869",
       "complaintReason": "Tardaron 35 minutos en traer los platos principales un domingo concurrido.",
       "attendedBy": "Mariana Pérez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-06T13:59:38.740Z"
+      "createdAt": "2026-10-06T14:10:13.769Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-33",
@@ -610,12 +766,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 3,
       "customerName": "Juan Pablo Cuéllar",
-      "customerPhone": "+573991971489",
+      "customerPhone": "+573166493502",
       "complaintReason": "Los cócteles muy ricos, aunque la música en la terraza estaba un poco alta para conversar.",
       "attendedBy": "Andrés Martínez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-08T13:06:56.783Z"
+      "createdAt": "2026-10-08T04:53:54.589Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-34",
@@ -625,12 +784,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 4,
       "customerName": "Claudia Jimena Ospina",
-      "customerPhone": "+573618014665",
+      "customerPhone": "+573142711404",
       "complaintReason": "Celebramos una cena de negocios y todo salió perfecto. 100% recomendado.",
       "attendedBy": "Camila López",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-10T07:17:17.272Z"
+      "createdAt": "2026-10-09T17:31:43.029Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-35",
@@ -640,12 +802,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 5,
       "customerName": "Manuel Guillermo Solano",
-      "customerPhone": "+573381987536",
+      "customerPhone": "+573219976456",
       "complaintReason": "El postre de tres leches y el café especial al final cerraron una cena de 10.",
       "attendedBy": "Diego Morales",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-11T17:55:56.063Z"
+      "createdAt": "2026-10-11T17:24:51.974Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-36",
@@ -655,12 +820,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 1,
       "customerName": "Esperanza Barreto",
-      "customerPhone": "+573845887600",
+      "customerPhone": "+573119505085",
       "complaintReason": "El café llegó frío después del postre. El encargado fue amable pero deben cuidar ese detalle.",
       "attendedBy": "Carlos Gómez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-13T15:31:37.384Z"
+      "createdAt": "2026-10-13T13:00:48.186Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-37",
@@ -670,12 +838,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 2,
       "customerName": "Leonardo Favio Chaves",
-      "customerPhone": "+573996875006",
+      "customerPhone": "+573426308367",
       "complaintReason": "El bife de chorizo llegó bien cocido cuando lo pedí término medio. Tuvimos que pedir cambio.",
       "attendedBy": "Mariana Pérez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-15T01:44:32.572Z"
+      "createdAt": "2026-10-14T13:52:12.045Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-38",
@@ -685,12 +856,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 3,
       "customerName": "Yolanda Castañeda",
-      "customerPhone": "+573787166894",
+      "customerPhone": "+573907746697",
       "complaintReason": "Buen sabor pero el parqueadero del valet estaba bastante lleno un viernes a las 8pm.",
       "attendedBy": "Andrés Martínez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-16T17:47:54.390Z"
+      "createdAt": "2026-10-16T12:50:26.164Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-39",
@@ -700,12 +874,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 4,
       "customerName": "Rubén Darío Henao",
-      "customerPhone": "+573527491300",
+      "customerPhone": "+573788969646",
       "complaintReason": "El corte Tomahawk superó todas las expectativas. Gran atención en la mesa.",
       "attendedBy": "Camila López",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-17T20:13:40.785Z"
+      "createdAt": "2026-10-18T12:03:16.422Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-40",
@@ -715,12 +892,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 5,
       "customerName": "Luz Marina Agudelo",
-      "customerPhone": "+573866414160",
+      "customerPhone": "+573783445939",
       "complaintReason": "Muy buena música en vivo el sábado. Los cócteles de la casa son de primer nivel.",
       "attendedBy": "Diego Morales",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-19T14:50:29.494Z"
+      "createdAt": "2026-10-20T08:41:56.511Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-41",
@@ -730,12 +910,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 1,
       "customerName": "Gonzalo Efrén Mayorga",
-      "customerPhone": "+573749427132",
+      "customerPhone": "+573109348850",
       "complaintReason": "Nos trajeron la cuenta con un plato que no habíamos pedido, aunque lo corrigieron rápido.",
       "attendedBy": "Carlos Gómez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-22T03:20:01.906Z"
+      "createdAt": "2026-10-21T12:35:02.624Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-42",
@@ -745,12 +928,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 2,
       "customerName": "Sandra Patricia Barón",
-      "customerPhone": "+573759420703",
+      "customerPhone": "+573861321831",
       "complaintReason": "El café llegó frío después del postre. El encargado fue amable pero deben cuidar ese detalle.",
       "attendedBy": "Mariana Pérez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-23T06:52:26.335Z"
+      "createdAt": "2026-10-22T21:34:42.698Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-43",
@@ -760,12 +946,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 3,
       "customerName": "Víctor Manuel Cañizares",
-      "customerPhone": "+573765999263",
+      "customerPhone": "+573670472050",
       "complaintReason": "La comida deliciosa, pero tardaron unos 15 minutos en traer las bebidas.",
       "attendedBy": "Andrés Martínez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-24T14:09:15.989Z"
+      "createdAt": "2026-10-25T02:39:55.877Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-44",
@@ -775,12 +964,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 4,
       "customerName": "Gloria Inés Suescún",
-      "customerPhone": "+573528630165",
+      "customerPhone": "+573880780950",
       "complaintReason": "Excelente servicio de Carlos, estuvo pendiente de cada detalle sin ser invasivo.",
       "attendedBy": "Camila López",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-26T14:40:47.807Z"
+      "createdAt": "2026-10-26T17:43:10.476Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-45",
@@ -790,12 +982,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 5,
       "customerName": "Édgar Mauricio Carvajal",
-      "customerPhone": "+573386921007",
+      "customerPhone": "+573109027688",
       "complaintReason": "Los acompañamientos y el chimichurri artesanal tienen un sabor increíble.",
       "attendedBy": "Diego Morales",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-28T08:46:32.177Z"
+      "createdAt": "2026-10-28T18:53:07.755Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-46",
@@ -805,12 +1000,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 1,
       "customerName": "Valentina Rincón",
-      "customerPhone": "+573155811716",
+      "customerPhone": "+573956545515",
       "complaintReason": "Mesa asignada cerca de la puerta con mucho frío por la corriente de aire.",
       "attendedBy": "Carlos Gómez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-30T05:16:39.643Z"
+      "createdAt": "2026-10-29T16:17:18.038Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-47",
@@ -820,12 +1018,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 2,
       "customerName": "Mauricio Restrepo",
-      "customerPhone": "+573789278698",
+      "customerPhone": "+573581408052",
       "complaintReason": "Nos trajeron la cuenta con un plato que no habíamos pedido, aunque lo corrigieron rápido.",
       "attendedBy": "Mariana Pérez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-10-31T23:56:53.057Z"
+      "createdAt": "2026-10-31T09:47:28.626Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-48",
@@ -835,12 +1036,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 3,
       "customerName": "Felipe Caicedo",
-      "customerPhone": "+573792958173",
+      "customerPhone": "+573267634948",
       "complaintReason": "El restaurante es muy bonito, solo sugiero más opciones de postres sin azúcar.",
       "attendedBy": "Andrés Martínez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-11-02T03:39:13.373Z"
+      "createdAt": "2026-11-02T04:54:44.705Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-49",
@@ -850,12 +1054,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 4,
       "customerName": "Dra. Sofía Mendoza",
-      "customerPhone": "+573990775870",
+      "customerPhone": "+573983617275",
       "complaintReason": "La carne madurada en su punto exacto. La atención fue impecable desde la entrada.",
       "attendedBy": "Camila López",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-11-04T08:37:14.965Z"
+      "createdAt": "2026-11-03T15:33:49.010Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-50",
@@ -865,12 +1072,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 5,
       "customerName": "Esteban Osorio",
-      "customerPhone": "+573794019941",
+      "customerPhone": "+573409509109",
       "complaintReason": "Excelente ambiente para celebrar cumpleaños familiar. Nos encantó la sugerencia de vino.",
       "attendedBy": "Diego Morales",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-11-05T17:19:15.576Z"
+      "createdAt": "2026-11-05T12:46:15.824Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-51",
@@ -880,12 +1090,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 1,
       "customerName": "Jorge Pinzón",
-      "customerPhone": "+573535309865",
+      "customerPhone": "+573727310500",
       "complaintReason": "La ensalada llegó sin el aderezo prometido en la carta y el mesero tardó en traerlo.",
       "attendedBy": "Carlos Gómez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-11-07T13:22:51.096Z"
+      "createdAt": "2026-11-07T02:12:13.824Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-52",
@@ -895,12 +1108,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 2,
       "customerName": "Lorena Silva",
-      "customerPhone": "+573764573203",
+      "customerPhone": "+573550326698",
       "complaintReason": "Mesa asignada cerca de la puerta con mucho frío por la corriente de aire.",
       "attendedBy": "Mariana Pérez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-11-09T10:36:39.444Z"
+      "createdAt": "2026-11-08T17:57:26.326Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-53",
@@ -910,12 +1126,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 3,
       "customerName": "Alejandro Bernal",
-      "customerPhone": "+573429873407",
+      "customerPhone": "+573928302106",
       "complaintReason": "Pedimos término medio y uno de los cortes llegó un poco más cocido, pero lo comimos bien.",
       "attendedBy": "Andrés Martínez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-11-11T01:20:37.204Z"
+      "createdAt": "2026-11-10T12:20:17.332Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-54",
@@ -925,12 +1144,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 4,
       "customerName": "Carolina Duarte",
-      "customerPhone": "+573579659176",
+      "customerPhone": "+573792496876",
       "complaintReason": "La hostess Camila nos atendió de inmediato y nos ubicó en una mesa excelente sin reserva.",
       "attendedBy": "Camila López",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-11-12T02:24:35.017Z"
+      "createdAt": "2026-11-12T10:16:29.135Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-55",
@@ -940,12 +1162,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 5,
       "customerName": "Santiago Echeverri",
-      "customerPhone": "+573793824375",
+      "customerPhone": "+573760958429",
       "complaintReason": "Rápida atención y comida deliciosa. Muy cómodo el pago sin contacto.",
       "attendedBy": "Diego Morales",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-11-14T04:00:59.244Z"
+      "createdAt": "2026-11-13T22:14:58.192Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-56",
@@ -955,12 +1180,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 1,
       "customerName": "Patricia Vega",
-      "customerPhone": "+573432685697",
+      "customerPhone": "+573288642751",
       "complaintReason": "Tardaron 35 minutos en traer los platos principales un domingo concurrido.",
       "attendedBy": "Carlos Gómez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-11-16T01:49:08.691Z"
+      "createdAt": "2026-11-15T13:56:29.478Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-57",
@@ -970,12 +1198,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 2,
       "customerName": "Andrés Felipe Ruiz",
-      "customerPhone": "+573316289576",
+      "customerPhone": "+573462404169",
       "complaintReason": "La ensalada llegó sin el aderezo prometido en la carta y el mesero tardó en traerlo.",
       "attendedBy": "Mariana Pérez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-11-17T10:35:55.172Z"
+      "createdAt": "2026-11-17T19:46:51.184Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-58",
@@ -985,12 +1216,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 3,
       "customerName": "Camila Navas",
-      "customerPhone": "+573304416483",
+      "customerPhone": "+573289260235",
       "complaintReason": "La atención fue buena, solo que el datáfono se demoró en procesar la tarjeta por señal.",
       "attendedBy": "Andrés Martínez",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-11-19T05:54:58.436Z"
+      "createdAt": "2026-11-18T13:42:42.913Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-59",
@@ -1000,12 +1234,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 4,
       "customerName": "Julián Castro",
-      "customerPhone": "+573334049623",
+      "customerPhone": "+573329623539",
       "complaintReason": "El postre de tres leches y el café especial al final cerraron una cena de 10.",
       "attendedBy": "Camila López",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-11-21T01:16:44.017Z"
+      "createdAt": "2026-11-21T02:31:02.321Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     },
     {
       "id": "fb-demo-60",
@@ -1015,12 +1252,15 @@
       "branchName": "Sede Principal Zona G",
       "rating": 5,
       "customerName": "Daniela Cárdenas",
-      "customerPhone": "+573547472367",
+      "customerPhone": "+573356534177",
       "complaintReason": "Ambiente acogedor, decoración sobria y cortes de carne muy suaves.",
       "attendedBy": "Diego Morales",
       "clubConsent": true,
       "status": "pending",
-      "createdAt": "2026-11-22T19:23:52.641Z"
+      "createdAt": "2026-11-22T16:58:06.728Z",
+      "category": "Restaurantes & Gastronomía",
+      "city": "Bogotá",
+      "locality": "Zona G"
     }
   ],
   "googleReviews": [
@@ -1035,10 +1275,10 @@
       "text": "La carne madurada en su punto exacto. La atención fue impecable desde la entrada. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Valentina, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-08-15T22:20:23.923Z",
+      "repliedAt": "2026-08-16T03:33:53.861Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-08-15T21:23:44.213Z"
+      "createdAt": "2026-08-16T02:59:47.481Z"
     },
     {
       "id": "gr-demo-02",
@@ -1051,10 +1291,10 @@
       "text": "Excelente ambiente para celebrar cumpleaños familiar. Nos encantó la sugerencia de vino. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Mauricio, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-08-17T12:22:18.681Z",
+      "repliedAt": "2026-08-17T07:44:29.806Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-08-17T10:34:24.469Z"
+      "createdAt": "2026-08-17T06:10:39.999Z"
     },
     {
       "id": "gr-demo-03",
@@ -1067,10 +1307,10 @@
       "text": "El corte Tomahawk superó todas las expectativas. Gran atención en la mesa. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Felipe, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-08-19T21:31:51.805Z",
+      "repliedAt": "2026-08-19T20:25:21.041Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-08-19T19:27:37.079Z"
+      "createdAt": "2026-08-19T18:48:08.114Z"
     },
     {
       "id": "gr-demo-04",
@@ -1083,10 +1323,10 @@
       "text": "Muy buena música en vivo el sábado. Los cócteles de la casa son de primer nivel. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Dra., ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-08-20T22:11:07.819Z",
+      "repliedAt": "2026-08-21T06:44:12.428Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-08-20T20:10:02.435Z"
+      "createdAt": "2026-08-21T04:55:23.712Z"
     },
     {
       "id": "gr-demo-05",
@@ -1099,10 +1339,10 @@
       "text": "Diego en la parrilla es un artista. Las costillas BBQ son las mejores de la Zona G. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Esteban, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-08-22T16:10:46.272Z",
+      "repliedAt": "2026-08-22T18:58:34.114Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-08-22T14:05:49.856Z"
+      "createdAt": "2026-08-22T18:19:42.113Z"
     },
     {
       "id": "gr-demo-06",
@@ -1115,10 +1355,10 @@
       "text": "La hostess Camila nos atendió de inmediato y nos ubicó en una mesa excelente sin reserva. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Jorge, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-08-24T04:32:54.017Z",
+      "repliedAt": "2026-08-24T20:21:36.359Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-08-24T03:01:37.883Z"
+      "createdAt": "2026-08-24T18:07:52.684Z"
     },
     {
       "id": "gr-demo-07",
@@ -1131,10 +1371,10 @@
       "text": "Rápida atención y comida deliciosa. Muy cómodo el pago sin contacto. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Lorena, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-08-25T17:11:50.689Z",
+      "repliedAt": "2026-08-26T11:05:22.565Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-08-25T16:29:39.234Z"
+      "createdAt": "2026-08-26T08:59:34.002Z"
     },
     {
       "id": "gr-demo-08",
@@ -1147,10 +1387,10 @@
       "text": "Excelente servicio de Carlos, estuvo pendiente de cada detalle sin ser invasivo. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Alejandro, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-08-27T07:17:48.482Z",
+      "repliedAt": "2026-08-27T14:37:05.552Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-08-27T06:04:35.850Z"
+      "createdAt": "2026-08-27T12:14:37.055Z"
     },
     {
       "id": "gr-demo-09",
@@ -1163,10 +1403,10 @@
       "text": "Los acompañamientos y el chimichurri artesanal tienen un sabor increíble. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Carolina, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-08-29T10:59:23.283Z",
+      "repliedAt": "2026-08-29T10:19:43.745Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-08-29T09:24:39.306Z"
+      "createdAt": "2026-08-29T08:23:30.770Z"
     },
     {
       "id": "gr-demo-10",
@@ -1179,10 +1419,10 @@
       "text": "Celebramos una cena de negocios y todo salió perfecto. 100% recomendado. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Santiago, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-08-31T09:03:09.037Z",
+      "repliedAt": "2026-08-31T09:12:47.585Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-08-31T08:03:35.264Z"
+      "createdAt": "2026-08-31T07:18:41.384Z"
     },
     {
       "id": "gr-demo-11",
@@ -1195,10 +1435,10 @@
       "text": "El postre de tres leches y el café especial al final cerraron una cena de 10. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Patricia, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-02T04:39:44.516Z",
+      "repliedAt": "2026-09-01T06:36:05.790Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-02T03:45:44.488Z"
+      "createdAt": "2026-09-01T04:58:54.464Z"
     },
     {
       "id": "gr-demo-12",
@@ -1211,10 +1451,10 @@
       "text": "Ambiente acogedor, decoración sobria y cortes de carne muy suaves. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Andrés, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-03T11:51:40.188Z",
+      "repliedAt": "2026-09-03T00:41:03.250Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-03T09:34:47.632Z"
+      "createdAt": "2026-09-02T22:52:54.958Z"
     },
     {
       "id": "gr-demo-13",
@@ -1227,10 +1467,10 @@
       "text": "La carne madurada en su punto exacto. La atención fue impecable desde la entrada. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Camila, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-05T03:59:02.578Z",
+      "repliedAt": "2026-09-05T01:30:24.654Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-05T01:55:49.060Z"
+      "createdAt": "2026-09-05T00:03:28.766Z"
     },
     {
       "id": "gr-demo-14",
@@ -1243,10 +1483,10 @@
       "text": "Excelente ambiente para celebrar cumpleaños familiar. Nos encantó la sugerencia de vino. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Julián, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-06T17:45:27.652Z",
+      "repliedAt": "2026-09-07T04:25:18.673Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-06T16:10:30.822Z"
+      "createdAt": "2026-09-07T02:41:03.773Z"
     },
     {
       "id": "gr-demo-15",
@@ -1259,10 +1499,10 @@
       "text": "El corte Tomahawk superó todas las expectativas. Gran atención en la mesa. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Daniela, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-08T05:23:42.052Z",
+      "repliedAt": "2026-09-08T08:34:31.201Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-08T04:05:12.798Z"
+      "createdAt": "2026-09-08T06:26:37.230Z"
     },
     {
       "id": "gr-demo-16",
@@ -1275,10 +1515,10 @@
       "text": "Muy buena música en vivo el sábado. Los cócteles de la casa son de primer nivel. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Rodrigo, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-09T23:22:57.594Z",
+      "repliedAt": "2026-09-10T09:30:53.123Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-09T21:38:36.772Z"
+      "createdAt": "2026-09-10T07:54:49.678Z"
     },
     {
       "id": "gr-demo-17",
@@ -1291,10 +1531,10 @@
       "text": "Diego en la parrilla es un artista. Las costillas BBQ son las mejores de la Zona G. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Natalia, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-11T08:06:02.211Z",
+      "repliedAt": "2026-09-11T19:00:14.456Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-11T07:16:17.428Z"
+      "createdAt": "2026-09-11T17:05:50.286Z"
     },
     {
       "id": "gr-demo-18",
@@ -1307,10 +1547,10 @@
       "text": "La hostess Camila nos atendió de inmediato y nos ubicó en una mesa excelente sin reserva. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Sebastián, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-12T22:18:00.092Z",
+      "repliedAt": "2026-09-13T13:23:04.557Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-12T20:00:08.456Z"
+      "createdAt": "2026-09-13T12:31:06.191Z"
     },
     {
       "id": "gr-demo-19",
@@ -1323,10 +1563,10 @@
       "text": "Rápida atención y comida deliciosa. Muy cómodo el pago sin contacto. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Paula, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-15T01:55:39.308Z",
+      "repliedAt": "2026-09-15T02:41:14.503Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-15T00:08:17.406Z"
+      "createdAt": "2026-09-15T01:51:41.808Z"
     },
     {
       "id": "gr-demo-20",
@@ -1339,10 +1579,10 @@
       "text": "Excelente servicio de Carlos, estuvo pendiente de cada detalle sin ser invasivo. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Mateo, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-16T13:04:10.776Z",
+      "repliedAt": "2026-09-16T23:50:07.877Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-16T11:08:02.715Z"
+      "createdAt": "2026-09-16T22:31:59.268Z"
     },
     {
       "id": "gr-demo-21",
@@ -1355,10 +1595,10 @@
       "text": "Los acompañamientos y el chimichurri artesanal tienen un sabor increíble. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Laura, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-18T04:17:50.727Z",
+      "repliedAt": "2026-09-17T23:22:36.463Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-18T03:16:22.871Z"
+      "createdAt": "2026-09-17T21:40:34.148Z"
     },
     {
       "id": "gr-demo-22",
@@ -1371,10 +1611,10 @@
       "text": "Celebramos una cena de negocios y todo salió perfecto. 100% recomendado. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Cristian, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-20T00:45:25.603Z",
+      "repliedAt": "2026-09-20T06:36:18.870Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-19T22:30:48.794Z"
+      "createdAt": "2026-09-20T05:07:53.647Z"
     },
     {
       "id": "gr-demo-23",
@@ -1387,10 +1627,10 @@
       "text": "El postre de tres leches y el café especial al final cerraron una cena de 10. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Gabriela, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-21T18:30:43.660Z",
+      "repliedAt": "2026-09-21T14:09:20.165Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-21T16:29:53.639Z"
+      "createdAt": "2026-09-21T12:25:27.493Z"
     },
     {
       "id": "gr-demo-24",
@@ -1403,10 +1643,10 @@
       "text": "Ambiente acogedor, decoración sobria y cortes de carne muy suaves. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Nicolás, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-23T08:44:03.858Z",
+      "repliedAt": "2026-09-23T00:55:04.674Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-23T08:03:35.178Z"
+      "createdAt": "2026-09-23T00:20:32.167Z"
     },
     {
       "id": "gr-demo-25",
@@ -1419,10 +1659,10 @@
       "text": "La carne madurada en su punto exacto. La atención fue impecable desde la entrada. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Vanessa, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-24T16:47:39.203Z",
+      "repliedAt": "2026-09-25T03:40:02.035Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-24T14:36:27.908Z"
+      "createdAt": "2026-09-25T03:03:36.288Z"
     },
     {
       "id": "gr-demo-26",
@@ -1435,10 +1675,10 @@
       "text": "Excelente ambiente para celebrar cumpleaños familiar. Nos encantó la sugerencia de vino. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola David, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-26T23:34:52.242Z",
+      "repliedAt": "2026-09-26T08:40:58.483Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-26T21:12:34.429Z"
+      "createdAt": "2026-09-26T06:31:20.207Z"
     },
     {
       "id": "gr-demo-27",
@@ -1451,10 +1691,10 @@
       "text": "El corte Tomahawk superó todas las expectativas. Gran atención en la mesa. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Mariana, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-28T21:47:22.699Z",
+      "repliedAt": "2026-09-28T05:27:05.856Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-28T19:18:00.117Z"
+      "createdAt": "2026-09-28T04:44:34.826Z"
     },
     {
       "id": "gr-demo-28",
@@ -1467,10 +1707,10 @@
       "text": "Muy buena música en vivo el sábado. Los cócteles de la casa son de primer nivel. Volveremos pronto con amigos.",
       "status": "answered",
       "replyText": "Hola Ricardo, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-09-30T07:01:05.585Z",
+      "repliedAt": "2026-09-29T23:57:46.116Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-09-30T05:09:50.089Z"
+      "createdAt": "2026-09-29T23:14:17.495Z"
     },
     {
       "id": "gr-demo-29",
@@ -1483,10 +1723,10 @@
       "text": "Pedimos término medio y uno de los cortes llegó un poco más cocido, pero lo comimos bien.",
       "status": "answered",
       "replyText": "Hola Tatiana, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-10-01T10:00:59.046Z",
+      "repliedAt": "2026-10-02T02:30:01.707Z",
       "repliedBy": "Carlos Gómez (Dueño)",
       "repliedByRole": "owner",
-      "createdAt": "2026-10-01T08:44:53.571Z"
+      "createdAt": "2026-10-02T00:00:19.117Z"
     },
     {
       "id": "gr-demo-30",
@@ -1499,10 +1739,10 @@
       "text": "El restaurante es muy bonito, solo sugiero más opciones de postres sin azúcar.",
       "status": "answered",
       "replyText": "Hola Héctor, ¡muchísimas gracias por visitarnos en La Parrilla de Andrés! Nos alegra de corazón que hayas tenido una experiencia tan grata. Será un placer recibirte de nuevo en tu casa.",
-      "repliedAt": "2026-10-03T17:31:18.741Z",
+      "repliedAt": "2026-10-03T21:40:01.312Z",
       "repliedBy": "Prestigia AI Assistant",
       "repliedByRole": "owner",
-      "createdAt": "2026-10-03T16:31:11.306Z"
+      "createdAt": "2026-10-03T19:36:42.753Z"
     },
     {
       "id": "gr-demo-31",
@@ -1514,7 +1754,7 @@
       "relativeTime": "hace 1 mes",
       "text": "La comida deliciosa, pero tardaron unos 15 minutos en traer las bebidas.",
       "status": "unanswered",
-      "createdAt": "2026-10-05T06:46:36.810Z"
+      "createdAt": "2026-10-04T14:44:04.849Z"
     },
     {
       "id": "gr-demo-32",
@@ -1526,7 +1766,7 @@
       "relativeTime": "hace 1 mes",
       "text": "Buen sabor pero el parqueadero del valet estaba bastante lleno un viernes a las 8pm.",
       "status": "unanswered",
-      "createdAt": "2026-10-06T16:42:02.979Z"
+      "createdAt": "2026-10-06T17:16:36.339Z"
     },
     {
       "id": "gr-demo-33",
@@ -1538,7 +1778,7 @@
       "relativeTime": "hace 1 mes",
       "text": "Los cócteles muy ricos, aunque la música en la terraza estaba un poco alta para conversar.",
       "status": "unanswered",
-      "createdAt": "2026-10-07T20:18:06.938Z"
+      "createdAt": "2026-10-08T16:06:27.459Z"
     },
     {
       "id": "gr-demo-34",
@@ -1550,7 +1790,7 @@
       "relativeTime": "hace 1 mes",
       "text": "La atención fue buena, solo que el datáfono se demoró en procesar la tarjeta por señal.",
       "status": "unanswered",
-      "createdAt": "2026-10-09T13:46:45.996Z"
+      "createdAt": "2026-10-10T01:06:07.827Z"
     },
     {
       "id": "gr-demo-35",
@@ -1562,7 +1802,7 @@
       "relativeTime": "hace 1 mes",
       "text": "Pedimos término medio y uno de los cortes llegó un poco más cocido, pero lo comimos bien.",
       "status": "unanswered",
-      "createdAt": "2026-10-11T15:17:46.355Z"
+      "createdAt": "2026-10-11T13:20:45.425Z"
     },
     {
       "id": "gr-demo-36",
@@ -1574,7 +1814,7 @@
       "relativeTime": "hace 1 mes",
       "text": "El restaurante es muy bonito, solo sugiero más opciones de postres sin azúcar.",
       "status": "unanswered",
-      "createdAt": "2026-10-13T19:01:19.469Z"
+      "createdAt": "2026-10-13T02:25:30.523Z"
     },
     {
       "id": "gr-demo-37",
@@ -1586,7 +1826,7 @@
       "relativeTime": "hace 1 mes",
       "text": "La comida deliciosa, pero tardaron unos 15 minutos en traer las bebidas.",
       "status": "unanswered",
-      "createdAt": "2026-10-14T23:08:04.644Z"
+      "createdAt": "2026-10-15T04:15:45.626Z"
     },
     {
       "id": "gr-demo-38",
@@ -1598,7 +1838,7 @@
       "relativeTime": "hace 1 mes",
       "text": "Buen sabor pero el parqueadero del valet estaba bastante lleno un viernes a las 8pm.",
       "status": "unanswered",
-      "createdAt": "2026-10-16T13:57:36.819Z"
+      "createdAt": "2026-10-16T22:25:24.293Z"
     },
     {
       "id": "gr-demo-39",
@@ -1610,7 +1850,7 @@
       "relativeTime": "hace 1 mes",
       "text": "Los cócteles muy ricos, aunque la música en la terraza estaba un poco alta para conversar.",
       "status": "unanswered",
-      "createdAt": "2026-10-18T08:29:21.365Z"
+      "createdAt": "2026-10-18T06:06:23.958Z"
     },
     {
       "id": "gr-demo-40",
@@ -1622,7 +1862,7 @@
       "relativeTime": "hace 1 mes",
       "text": "La atención fue buena, solo que el datáfono se demoró en procesar la tarjeta por señal.",
       "status": "unanswered",
-      "createdAt": "2026-10-19T22:38:29.850Z"
+      "createdAt": "2026-10-20T09:35:12.385Z"
     },
     {
       "id": "gr-demo-41",
@@ -1634,7 +1874,7 @@
       "relativeTime": "hace 1 mes",
       "text": "Pedimos término medio y uno de los cortes llegó un poco más cocido, pero lo comimos bien.",
       "status": "unanswered",
-      "createdAt": "2026-10-21T06:05:05.017Z"
+      "createdAt": "2026-10-21T10:54:02.090Z"
     },
     {
       "id": "gr-demo-42",
@@ -1646,7 +1886,7 @@
       "relativeTime": "hace 1 mes",
       "text": "El restaurante es muy bonito, solo sugiero más opciones de postres sin azúcar.",
       "status": "unanswered",
-      "createdAt": "2026-10-23T02:12:11.134Z"
+      "createdAt": "2026-10-23T18:54:51.593Z"
     },
     {
       "id": "gr-demo-43",
@@ -1658,7 +1898,7 @@
       "relativeTime": "hace 1 mes",
       "text": "Los cócteles muy ricos, aunque la música en la terraza estaba un poco alta para conversar. Aceptable pero con detalles por mejorar.",
       "status": "unanswered",
-      "createdAt": "2026-10-24T14:54:09.164Z"
+      "createdAt": "2026-10-25T05:25:45.800Z"
     },
     {
       "id": "gr-demo-44",
@@ -1670,7 +1910,7 @@
       "relativeTime": "hace 1 mes",
       "text": "La atención fue buena, solo que el datáfono se demoró en procesar la tarjeta por señal. Aceptable pero con detalles por mejorar.",
       "status": "unanswered",
-      "createdAt": "2026-10-26T22:33:03.848Z"
+      "createdAt": "2026-10-26T06:25:24.153Z"
     },
     {
       "id": "gr-demo-45",
@@ -1682,7 +1922,7 @@
       "relativeTime": "hace 1 mes",
       "text": "Pedimos término medio y uno de los cortes llegó un poco más cocido, pero lo comimos bien. Aceptable pero con detalles por mejorar.",
       "status": "unanswered",
-      "createdAt": "2026-10-28T08:45:16.009Z"
+      "createdAt": "2026-10-28T02:03:43.295Z"
     },
     {
       "id": "gr-demo-46",
@@ -1694,7 +1934,7 @@
       "relativeTime": "hace 2 meses",
       "text": "El restaurante es muy bonito, solo sugiero más opciones de postres sin azúcar. Aceptable pero con detalles por mejorar.",
       "status": "unanswered",
-      "createdAt": "2026-10-29T17:46:32.406Z"
+      "createdAt": "2026-10-30T04:41:20.653Z"
     },
     {
       "id": "gr-demo-47",
@@ -1706,7 +1946,7 @@
       "relativeTime": "hace 2 meses",
       "text": "La comida deliciosa, pero tardaron unos 15 minutos en traer las bebidas. Aceptable pero con detalles por mejorar.",
       "status": "unanswered",
-      "createdAt": "2026-11-01T02:38:37.263Z"
+      "createdAt": "2026-10-31T23:35:05.623Z"
     },
     {
       "id": "gr-demo-48",
@@ -1718,7 +1958,7 @@
       "relativeTime": "hace 2 meses",
       "text": "Buen sabor pero el parqueadero del valet estaba bastante lleno un viernes a las 8pm. Aceptable pero con detalles por mejorar.",
       "status": "unanswered",
-      "createdAt": "2026-11-02T01:37:37.765Z"
+      "createdAt": "2026-11-02T02:01:50.146Z"
     },
     {
       "id": "gr-demo-49",
@@ -1730,7 +1970,7 @@
       "relativeTime": "hace 2 meses",
       "text": "El bife de chorizo llegó bien cocido cuando lo pedí término medio. Tuvimos que pedir cambio.",
       "status": "unanswered",
-      "createdAt": "2026-11-04T06:40:56.680Z"
+      "createdAt": "2026-11-04T07:38:44.616Z"
     },
     {
       "id": "gr-demo-50",
@@ -1742,7 +1982,7 @@
       "relativeTime": "hace 2 meses",
       "text": "Tardaron 35 minutos en traer los platos principales un domingo concurrido.",
       "status": "unanswered",
-      "createdAt": "2026-11-05T14:29:19.487Z"
+      "createdAt": "2026-11-06T00:08:07.098Z"
     },
     {
       "id": "gr-demo-51",
@@ -1754,7 +1994,7 @@
       "relativeTime": "hace 2 meses",
       "text": "La ensalada llegó sin el aderezo prometido en la carta y el mesero tardó en traerlo.",
       "status": "unanswered",
-      "createdAt": "2026-11-07T13:57:05.730Z"
+      "createdAt": "2026-11-07T08:01:12.515Z"
     },
     {
       "id": "gr-demo-52",
@@ -1766,7 +2006,7 @@
       "relativeTime": "hace 2 meses",
       "text": "Mesa asignada cerca de la puerta con mucho frío por la corriente de aire.",
       "status": "unanswered",
-      "createdAt": "2026-11-09T09:01:20.442Z"
+      "createdAt": "2026-11-08T16:11:09.449Z"
     },
     {
       "id": "gr-demo-53",
@@ -1778,7 +2018,7 @@
       "relativeTime": "hace 2 meses",
       "text": "Nos trajeron la cuenta con un plato que no habíamos pedido, aunque lo corrigieron rápido.",
       "status": "unanswered",
-      "createdAt": "2026-11-10T14:07:50.302Z"
+      "createdAt": "2026-11-10T12:47:33.076Z"
     },
     {
       "id": "gr-demo-54",
@@ -1790,7 +2030,7 @@
       "relativeTime": "hace 2 meses",
       "text": "El café llegó frío después del postre. El encargado fue amable pero deben cuidar ese detalle.",
       "status": "unanswered",
-      "createdAt": "2026-11-11T20:56:52.805Z"
+      "createdAt": "2026-11-12T03:39:48.957Z"
     },
     {
       "id": "gr-demo-55",
@@ -1802,7 +2042,7 @@
       "relativeTime": "hace 2 meses",
       "text": "El bife de chorizo llegó bien cocido cuando lo pedí término medio. Tuvimos que pedir cambio.",
       "status": "unanswered",
-      "createdAt": "2026-11-14T10:18:13.859Z"
+      "createdAt": "2026-11-13T19:02:33.598Z"
     },
     {
       "id": "gr-demo-56",
@@ -1814,7 +2054,7 @@
       "relativeTime": "hace 2 meses",
       "text": "Tardaron 35 minutos en traer los platos principales un domingo concurrido.",
       "status": "unanswered",
-      "createdAt": "2026-11-15T15:03:02.262Z"
+      "createdAt": "2026-11-15T22:05:44.739Z"
     },
     {
       "id": "gr-demo-57",
@@ -1826,7 +2066,7 @@
       "relativeTime": "hace 2 meses",
       "text": "La ensalada llegó sin el aderezo prometido en la carta y el mesero tardó en traerlo.",
       "status": "unanswered",
-      "createdAt": "2026-11-17T13:03:15.276Z"
+      "createdAt": "2026-11-17T03:59:53.616Z"
     },
     {
       "id": "gr-demo-58",
@@ -1838,7 +2078,7 @@
       "relativeTime": "hace 2 meses",
       "text": "Mesa asignada cerca de la puerta con mucho frío por la corriente de aire.",
       "status": "unanswered",
-      "createdAt": "2026-11-18T19:49:25.569Z"
+      "createdAt": "2026-11-18T19:36:01.238Z"
     },
     {
       "id": "gr-demo-59",
@@ -1850,7 +2090,7 @@
       "relativeTime": "hace 2 meses",
       "text": "Nos trajeron la cuenta con un plato que no habíamos pedido, aunque lo corrigieron rápido.",
       "status": "unanswered",
-      "createdAt": "2026-11-20T20:00:36.038Z"
+      "createdAt": "2026-11-20T08:47:14.069Z"
     },
     {
       "id": "gr-demo-60",
@@ -1862,7 +2102,7 @@
       "relativeTime": "hace 2 meses",
       "text": "El café llegó frío después del postre. El encargado fue amable pero deben cuidar ese detalle.",
       "status": "unanswered",
-      "createdAt": "2026-11-22T08:47:49.012Z"
+      "createdAt": "2026-11-21T20:14:48.516Z"
     }
   ],
   "incidents": [],

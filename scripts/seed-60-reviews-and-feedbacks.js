@@ -162,10 +162,38 @@ for (let i = 0; i < 60; i++) {
 
   let resolvedAt = undefined;
   let resolvedBy = undefined;
+  let resolvedByRole = undefined;
+  let rescueMessage = undefined;
 
   if (isResolved) {
     resolvedAt = new Date(new Date(dateIso).getTime() + (Math.random() * 3600000 + 900000)).toISOString();
-    resolvedBy = (i % 2 === 0) ? "Mariana Pérez (Jefe de Sala)" : "Filtro Privado Prestigia AI";
+    const firstName = customer.split(' ')[0];
+
+    if (i % 3 === 0) {
+      resolvedBy = "Mariana Pérez (Jefe de Sala)";
+      resolvedByRole = "branch_manager";
+      if (rating >= 4) {
+        rescueMessage = `¡Hola ${firstName}! Te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Muchísimas gracias por compartir tu experiencia con nosotros ("${reason}"). Le extendí personalmente tus felicitaciones a ${staff}, quien se alegró enormemente. Te dejamos registrado un cóctel de autor o postre de cortesía para tu próxima visita. ¡Será un placer tenerte de nuevo en tu casa!`;
+      } else {
+        rescueMessage = `Hola ${firstName}, te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Lamento profundamente el inconveniente que tuviste ("${reason}"). Ya conversé directamente con ${staff} y ajustamos el servicio en mesa y cocina de inmediato. Queremos compensarte: te dejamos reservado un corte especial de cortesía y dos copas de vino en tu próxima visita. ¿Cuándo nos acompañas para atenderte como mereces?`;
+      }
+    } else if (i % 3 === 1) {
+      resolvedBy = "Carlos Gómez (Dueño General)";
+      resolvedByRole = "owner";
+      if (rating >= 4) {
+        rescueMessage = `Hola ${firstName}, te saluda Carlos Gómez, propietario de La Parrilla de Andrés. Qué gran orgullo y satisfacción leer tu opinión ("${reason}"). Nuestro compromiso diario es brindarte una experiencia gastronómica impecable. Tienes una invitación especial de mi parte con dos copas de vino y postre reservadas para tu próxima visita. ¡Un fuerte abrazo!`;
+      } else {
+        rescueMessage = `Hola ${firstName}, te escribe personalmente Carlos Gómez, dueño de La Parrilla de Andrés. Me enteré de lo ocurrido con "${reason}" y quiero pedirte una sincera disculpa. En mi casa la calidad y el servicio son sagrados. Ya tomé medidas directas con el equipo y me gustaría invitarte personalmente una cena completa por mi cuenta para que vivas la experiencia que verdaderamente nos representa. Por favor avísame cuando desees volver.`;
+      }
+    } else {
+      resolvedBy = "Filtro Privado Prestigia AI";
+      resolvedByRole = "branch_manager";
+      if (rating >= 4) {
+        rescueMessage = `Estimado/a ${firstName}, el Sistema Inteligente Prestigia AI y la Dirección de La Parrilla de Andrés agradecen tu excelente calificación de ${rating} estrellas ("${reason}"). Hemos registrado tu felicitación para el colaborador ${staff} en nuestro cuadro de honor y te activamos el estatus de Cliente VIP con beneficios de cortesía en tu próxima reserva. ¡Gracias por preferirnos!`;
+      } else {
+        rescueMessage = `Estimado/a ${firstName}, el Agente de Rescate Prestigia AI detectó tu reporte ("${reason}") y lo escaló de forma inmediata a la Gerencia General de La Parrilla de Andrés. Lamentamos el malestar ocasionado. Se ha generado un Bono Digital de Rescate del 100% en plato fuerte para tu próxima visita y la Jefe de Sala Mariana Pérez supervisará personalmente tu mesa.`;
+      }
+    }
   }
 
   generatedFeedbacks.push({
@@ -183,7 +211,12 @@ for (let i = 0; i < 60; i++) {
     status: isResolved ? "resolved" : "pending",
     createdAt: dateIso,
     resolvedAt,
-    resolvedBy
+    resolvedBy,
+    resolvedByRole,
+    rescueMessage,
+    category: "Restaurantes & Gastronomía",
+    city: "Bogotá",
+    locality: "Zona G"
   });
 }
 
