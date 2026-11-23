@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { PrestigiaIcon } from '@/components/PrestigiaIcon';
 import {
   Sparkles,
   CheckCircle2,
@@ -377,9 +378,7 @@ function MasterclassContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center shadow-md shadow-amber-500/20 text-slate-950 font-black text-sm">
-                📍
-              </div>
+              <PrestigiaIcon className="w-8 h-8 drop-shadow-md shrink-0" />
               <div className="leading-none">
                 <span className="font-black text-sm tracking-widest text-white block">MASTERCLASS 2026</span>
                 <span className="text-[10px] text-amber-400 font-bold tracking-widest uppercase block">
