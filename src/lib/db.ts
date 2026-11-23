@@ -1453,6 +1453,17 @@ export async function getAllStudioAdvisors(): Promise<StudioAdvisor[]> {
             createdAt: a.created_at || a.createdAt,
           };
         });
+
+        // Merge local/seed studioAdvisors (e.g. demo_inversionista) if not present in Supabase
+        const db = ensureDbFile();
+        if (db.studioAdvisors && Array.isArray(db.studioAdvisors)) {
+          for (const localAdv of db.studioAdvisors) {
+            if (!mapped.some((m) => m.username.toLowerCase() === localAdv.username.toLowerCase())) {
+              mapped.push(localAdv);
+            }
+          }
+        }
+
         return mapped.sort((a, b) => {
           const aIsMaster = a.id === 'adv-luisma' || a.accountType === 'founder' || a.username?.toLowerCase() === 'luisma';
           const bIsMaster = b.id === 'adv-luisma' || b.accountType === 'founder' || b.username?.toLowerCase() === 'luisma';
