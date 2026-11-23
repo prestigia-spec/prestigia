@@ -133,7 +133,30 @@ for (let i = 0; i < 60; i++) {
   });
 }
 
-// 2. GENERATE EXACTLY 60 PRIVATE FEEDBACKS
+const complaintsList = [
+  "El bife de chorizo llegó bien cocido cuando lo pedí término medio. Tuvimos que pedir cambio y tardaron 25 minutos.",
+  "Tardaron 40 minutos en traer los platos principales un domingo concurrido y las bebidas llegaron tibias.",
+  "La ensalada llegó sin el aderezo prometido en la carta y el mesero tardó en traerlo con evidente mala cara.",
+  "Mesa asignada cerca de la puerta con mucho frío por la corriente de aire; pedimos cambio y no nos dieron solución.",
+  "Nos trajeron la cuenta con un plato y dos cócteles que nunca pedimos, y demoraron en hacer la corrección.",
+  "El corte de carne tenía demasiado nervio y grasa para ser corte premium. No concordaba con el precio.",
+  "Pedimos la hamburguesa sin cebolla por tema de alergia y vino con cebolla. Mala comunicación con la cocina.",
+  "El mesero derramó salsa en la mesa al servir y no limpió ni ofreció cambio de mantel.",
+  "La crema de champiñones llegó tibia casi fría. La regresamos y tardaron 15 minutos en devolverla.",
+  "Demasiado ruido de los parlantes de música en vivo en la terraza. Imposible conversar en la mesa.",
+  "El datáfono no tenía señal y nos hicieron esperar 15 minutos en caja para poder pagar.",
+  "El baño de clientes estaba descuidado y sin toallas de papel en pleno servicio de la noche.",
+  "La carne deliciosa, pero tardaron unos 20 minutos en traer las primeras bebidas a la mesa.",
+  "Buen sabor pero el valet parking colapsó un viernes a las 8pm y demoraron en recibir el carro.",
+  "Los cócteles muy ricos, aunque la música estaba un poco alta para una cena de negocios.",
+  "La atención fue amable, solo que el datáfono se demoró en procesar la tarjeta por señal.",
+  "Pedimos término medio y uno de los cortes llegó un poco más cocido, aunque aún pasable.",
+  "El restaurante es muy bonito, solo sugiero incluir más opciones sin azúcar y postres sin gluten.",
+  "El plato principal estuvo excelente, pero las papas rústicas de acompañamiento llegaron frías.",
+  "El mesero atendía demasiadas mesas al mismo tiempo y costaba trabajo llamarlo para pedir la cuenta."
+];
+
+// 2. GENERATE EXACTLY 60 PRIVATE FEEDBACKS (STRICTLY 1★, 2★, 3★ - PRIVATELY FILTERED)
 // 30 resolved, 30 pending
 const generatedFeedbacks = [];
 
@@ -144,21 +167,14 @@ for (let i = 0; i < 60; i++) {
   const staff = staffList[i % staffList.length];
   const phone = `+573${Math.floor(100000000 + Math.random() * 899999999)}`;
 
-  let rating = 5;
-  if (i % 5 === 0) rating = 1;
-  else if (i % 5 === 1) rating = 2;
-  else if (i % 5 === 2) rating = 3;
-  else if (i % 5 === 3) rating = 4;
-  else rating = 5;
+  // STRICT RULE OF PRESTIGIA: Private complaints filter ONLY captures 1★, 2★ and 3★!
+  // (4★ and 5★ are redirected automatically by Prestigia to Google Maps!)
+  let rating = 1;
+  if (i % 3 === 0) rating = 1;
+  else if (i % 3 === 1) rating = 2;
+  else rating = 3;
 
-  let reason = "";
-  if (rating >= 4) {
-    reason = positiveFeedbacks[i % positiveFeedbacks.length];
-  } else if (rating === 3) {
-    reason = neutralFeedbacks[i % neutralFeedbacks.length];
-  } else {
-    reason = negativeFeedbacks[i % negativeFeedbacks.length];
-  }
+  const reason = complaintsList[i % complaintsList.length];
 
   let resolvedAt = undefined;
   let resolvedBy = undefined;
@@ -172,27 +188,15 @@ for (let i = 0; i < 60; i++) {
     if (i % 3 === 0) {
       resolvedBy = "Mariana Pérez (Jefe de Sala)";
       resolvedByRole = "branch_manager";
-      if (rating >= 4) {
-        rescueMessage = `¡Hola ${firstName}! Te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Muchísimas gracias por compartir tu experiencia con nosotros ("${reason}"). Le extendí personalmente tus felicitaciones a ${staff}, quien se alegró enormemente. Te dejamos registrado un cóctel de autor o postre de cortesía para tu próxima visita. ¡Será un placer tenerte de nuevo en tu casa!`;
-      } else {
-        rescueMessage = `Hola ${firstName}, te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Lamento profundamente el inconveniente que tuviste ("${reason}"). Ya conversé directamente con ${staff} y ajustamos el servicio en mesa y cocina de inmediato. Queremos compensarte: te dejamos reservado un corte especial de cortesía y dos copas de vino en tu próxima visita. ¿Cuándo nos acompañas para atenderte como mereces?`;
-      }
+      rescueMessage = `Hola ${firstName}, te saluda Mariana Pérez, Jefe de Sala de La Parrilla de Andrés. Lamento profundamente el inconveniente que tuviste ("${reason}"). Ya conversé directamente con ${staff} y ajustamos el servicio en mesa y cocina de inmediato. Queremos compensarte: te dejamos reservado un corte especial de cortesía y dos copas de vino en tu próxima visita. ¿Cuándo nos acompañas para atenderte como mereces?`;
     } else if (i % 3 === 1) {
       resolvedBy = "Carlos Gómez (Dueño General)";
       resolvedByRole = "owner";
-      if (rating >= 4) {
-        rescueMessage = `Hola ${firstName}, te saluda Carlos Gómez, propietario de La Parrilla de Andrés. Qué gran orgullo y satisfacción leer tu opinión ("${reason}"). Nuestro compromiso diario es brindarte una experiencia gastronómica impecable. Tienes una invitación especial de mi parte con dos copas de vino y postre reservadas para tu próxima visita. ¡Un fuerte abrazo!`;
-      } else {
-        rescueMessage = `Hola ${firstName}, te escribe personalmente Carlos Gómez, dueño de La Parrilla de Andrés. Me enteré de lo ocurrido con "${reason}" y quiero pedirte una sincera disculpa. En mi casa la calidad y el servicio son sagrados. Ya tomé medidas directas con el equipo y me gustaría invitarte personalmente una cena completa por mi cuenta para que vivas la experiencia que verdaderamente nos representa. Por favor avísame cuando desees volver.`;
-      }
+      rescueMessage = `Hola ${firstName}, te escribe personalmente Carlos Gómez, dueño de La Parrilla de Andrés. Me enteré de lo ocurrido con "${reason}" y quiero pedirte una sincera disculpa. En mi casa la calidad y el servicio son sagrados. Ya tomé medidas directas con el equipo y me gustaría invitarte personalmente una cena completa por mi cuenta para que vivas la experiencia que verdaderamente nos representa. Por favor avísame cuando desees volver.`;
     } else {
       resolvedBy = "Filtro Privado Prestigia AI";
       resolvedByRole = "branch_manager";
-      if (rating >= 4) {
-        rescueMessage = `Estimado/a ${firstName}, el Sistema Inteligente Prestigia AI y la Dirección de La Parrilla de Andrés agradecen tu excelente calificación de ${rating} estrellas ("${reason}"). Hemos registrado tu felicitación para el colaborador ${staff} en nuestro cuadro de honor y te activamos el estatus de Cliente VIP con beneficios de cortesía en tu próxima reserva. ¡Gracias por preferirnos!`;
-      } else {
-        rescueMessage = `Estimado/a ${firstName}, el Agente de Rescate Prestigia AI detectó tu reporte ("${reason}") y lo escaló de forma inmediata a la Gerencia General de La Parrilla de Andrés. Lamentamos el malestar ocasionado. Se ha generado un Bono Digital de Rescate del 100% en plato fuerte para tu próxima visita y la Jefe de Sala Mariana Pérez supervisará personalmente tu mesa.`;
-      }
+      rescueMessage = `Estimado/a ${firstName}, el Agente de Rescate Prestigia AI detectó tu reporte ("${reason}") y lo escaló de forma inmediata a la Gerencia General de La Parrilla de Andrés. Lamentamos el malestar ocasionado. Se ha generado un Bono Digital de Rescate del 100% en plato fuerte para tu próxima visita y la Jefe de Sala Mariana Pérez supervisará personalmente tu mesa.`;
     }
   }
 
