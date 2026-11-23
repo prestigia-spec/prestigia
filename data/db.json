@@ -21,7 +21,7 @@
           "address": "Calle 69A # 5-28, Zona G",
           "city": "Bogotá",
           "locality": "Chapinero / Zona G",
-          "googleReviewUrl": "https://maps.google.com/?cid=1029384756",
+          "googleReviewUrl": "https://search.google.com/local/writereview?placeid=ChIJsXAk_TybP44REHFuyaadU8I",
           "managerPhone": "+573001234567",
           "managerPassword": "admin",
           "managerUsername": "encargado_demo",
@@ -56,9 +56,35 @@
               "role": "Jefe de Parrilla",
               "joinedAt": "2026-07-20"
             }
-          ]
+          ],
+          "googlePlaceId": "ChIJsXAk_TybP44REHFuyaadU8I",
+          "instagramUrl": "https://instagram.com/laparrilladeandres",
+          "tiktokUrl": "https://tiktok.com/@laparrilladeandres",
+          "facebookUrl": "https://facebook.com/laparrilladeandres",
+          "whatsappVipUrl": "https://wa.me/573001234567?text=Hola%20La%20Parrilla%20de%20Andr%C3%A9s%2C%20deseo%20unirme%20al%20Club%20VIP",
+          "menuUrl": "https://prestigia-oficial.vercel.app/menu",
+          "containmentMessage": "En La Parrilla de Andrés & Co. tu satisfacción es nuestra obsesión. Si algo no cumplió tus expectativas hoy en mesa, nuestro equipo de gerencia te responderá en menos de 15 minutos para compensarte y darte una solución inmediata.",
+          "responseTimeSla": "< 15 min"
         }
-      ]
+      ],
+      "googleReviewUrl": "https://search.google.com/local/writereview?placeid=ChIJsXAk_TybP44REHFuyaadU8I",
+      "googlePlaceId": "ChIJsXAk_TybP44REHFuyaadU8I",
+      "websiteUrl": "https://prestigia-oficial.vercel.app",
+      "instagramUrl": "https://instagram.com/laparrilladeandres",
+      "tiktokUrl": "https://tiktok.com/@laparrilladeandres",
+      "facebookUrl": "https://facebook.com/laparrilladeandres",
+      "whatsappVipUrl": "https://wa.me/573001234567?text=Hola%20La%20Parrilla%20de%20Andr%C3%A9s%2C%20deseo%20unirme%20al%20Club%20VIP",
+      "menuUrl": "https://prestigia-oficial.vercel.app/menu",
+      "containmentMessage": "En La Parrilla de Andrés & Co. tu satisfacción es nuestra obsesión. Si algo no cumplió tus expectativas hoy en mesa, nuestro equipo de gerencia te responderá en menos de 15 minutos para compensarte y darte una solución inmediata.",
+      "responseTimeSla": "< 15 min",
+      "campaign": {
+        "id": "camp-demo-01",
+        "title": "Sorteo Mensual VIP: Cena Gourmet para 2",
+        "reward": "Cena Gourmet para 2 (Cortes Madurados + Cócteles de Autor + Postre)",
+        "active": true,
+        "drawDate": "30 de Noviembre de 2026",
+        "terms": "Sorteo exclusivo para comensales verificados de La Parrilla de Andrés & Co."
+      }
     }
   ],
   "feedbacks": [

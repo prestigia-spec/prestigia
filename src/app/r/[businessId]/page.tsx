@@ -112,7 +112,7 @@ export default function RatingCapturePage() {
     }
 
     const targetHref = e.currentTarget.getAttribute('href') || '';
-    if (business?.businessId === 'demo' || targetHref.startsWith('#')) {
+    if (targetHref.startsWith('#') || !targetHref) {
       e.preventDefault();
       setDemoNotice(
         isEn
@@ -477,11 +477,19 @@ export default function RatingCapturePage() {
     );
   }
 
+  const instagramUrl = business.instagramUrl || (business.businessId === 'demo' ? 'https://instagram.com/laparrilladeandres' : null);
+  const tiktokUrl = business.tiktokUrl || (business.businessId === 'demo' ? 'https://tiktok.com/@laparrilladeandres' : null);
+  const facebookUrl = business.facebookUrl || (business.businessId === 'demo' ? 'https://facebook.com/laparrilladeandres' : null);
+  const whatsappVipUrl = business.whatsappVipUrl || (business.businessId === 'demo' ? 'https://wa.me/573001234567?text=Hola%20La%20Parrilla%20de%20Andr%C3%A9s%2C%20deseo%20unirme%20al%20Club%20VIP' : null);
+  const menuUrl = (business as any).menuUrl || (business.businessId === 'demo' ? 'https://prestigia-oficial.vercel.app/menu' : null);
+
   const hasSocials = Boolean(
-    business.instagramUrl ||
-    business.tiktokUrl ||
-    business.facebookUrl ||
-    business.whatsappVipUrl
+    instagramUrl ||
+    tiktokUrl ||
+    facebookUrl ||
+    whatsappVipUrl ||
+    menuUrl ||
+    business.businessId === 'demo'
   );
 
   const brandColor = business.branding?.primaryColor || '#6366F1';
@@ -631,6 +639,49 @@ export default function RatingCapturePage() {
                 )
               )}
             </p>
+
+            {/* Direct Google Maps Review Box (Always prominent on 4★ / 5★) */}
+            {hasRatedPositive && (
+              <div className="mb-5 p-4 sm:p-5 rounded-2xl bg-white text-slate-900 shadow-2xl border-2 border-amber-400 text-center space-y-3 animate-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-center gap-2">
+                  <svg className="w-6 h-6 shrink-0" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                  </svg>
+                  <span className="font-black text-sm text-slate-900 tracking-tight">Google Maps</span>
+                  <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    {isEn ? 'Official Redirect' : 'Redirección Oficial'}
+                  </span>
+                </div>
+
+                <div className="text-amber-400 font-black text-2xl tracking-wider">
+                  ★★★★★
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="font-extrabold text-sm text-slate-900">
+                    {isEn ? 'Publish your 5-Star Review on Google' : 'Publica tu Reseña de 5 Estrellas en Google'}
+                  </h3>
+                  <p className="text-[11px] text-slate-600 leading-relaxed max-w-xs mx-auto">
+                    {isEn
+                      ? `Help us grow! Tap below to open Google Maps directly and share your experience at ${business.businessName}.`
+                      : `¡Tu opinión nos ayuda a crecer! Toca el botón para abrir la ficha oficial de Google Maps y calificar con 5★ a ${business.businessName}.`}
+                  </p>
+                </div>
+
+                <a
+                  href={business.googleReviewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-blue-600/30 transition active:scale-[0.98] cursor-pointer"
+                >
+                  <span>{isEn ? '⭐ Open Google Maps & Review (5★)' : '⭐ Abrir Google Maps y Calificar (5★)'}</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+            )}
 
             {/* Campaign Participation Card on Positive Review (Only if rated positive) */}
             {hasRatedPositive && business.campaign && business.campaign.active && (
@@ -787,9 +838,9 @@ export default function RatingCapturePage() {
                 )}
 
                 {/* Digital Menu / Services (Shown if available or demo) */}
-                {((business as any).menuUrl || business.websiteUrl || business.businessId === 'demo') && (
+                {menuUrl && (
                   <a
-                    href={(business as any).menuUrl || business.websiteUrl || '#demo-menu'}
+                    href={menuUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => handleDemoChannelClick(e, isEn ? 'Digital Menu' : 'Menú Digital', 'menu')}
@@ -804,9 +855,9 @@ export default function RatingCapturePage() {
                 )}
 
                 {/* Instagram (Always shown if present) */}
-                {business.instagramUrl && (
+                {instagramUrl && (
                   <a
-                    href={business.instagramUrl}
+                    href={instagramUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => handleDemoChannelClick(e, 'Instagram')}
@@ -820,10 +871,10 @@ export default function RatingCapturePage() {
                   </a>
                 )}
 
-                {/* TikTok (If Pro/Élite, or if Basic without Instagram) */}
-                {business.tiktokUrl && (business.plan !== 'basic' || !business.instagramUrl) && (
+                {/* TikTok (If present) */}
+                {tiktokUrl && (
                   <a
-                    href={business.tiktokUrl}
+                    href={tiktokUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => handleDemoChannelClick(e, 'TikTok')}
@@ -843,28 +894,27 @@ export default function RatingCapturePage() {
                   </a>
                 )}
 
-                {/* Facebook (If Pro/Élite, or if Basic without Instagram/TikTok) */}
-                {business.facebookUrl &&
-                  (business.plan !== 'basic' || (!business.instagramUrl && !business.tiktokUrl)) && (
-                    <a
-                      href={business.facebookUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => handleDemoChannelClick(e, 'Facebook')}
-                      className="flex items-center justify-between w-full py-2.5 px-4 rounded-xl bg-[#1877F2]/80 hover:bg-[#1877F2] text-white font-semibold text-xs transition active:scale-[0.99] border border-blue-400/30"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <Facebook className="w-4 h-4 fill-white text-white" />
-                        <span>{isEn ? 'Follow us on Facebook' : 'Síguenos en Facebook'}</span>
-                      </div>
-                      <ExternalLink className="w-3.5 h-3.5 opacity-80" />
-                    </a>
-                  )}
-
-                {/* WhatsApp VIP Club (Exclusivo Plan ÉLITE) */}
-                {business.whatsappVipUrl && business.plan === 'elite' && (
+                {/* Facebook (If present) */}
+                {facebookUrl && (
                   <a
-                    href={business.whatsappVipUrl}
+                    href={facebookUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => handleDemoChannelClick(e, 'Facebook')}
+                    className="flex items-center justify-between w-full py-2.5 px-4 rounded-xl bg-[#1877F2]/80 hover:bg-[#1877F2] text-white font-semibold text-xs transition active:scale-[0.99] border border-blue-400/30"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Facebook className="w-4 h-4 fill-white text-white" />
+                      <span>{isEn ? 'Follow us on Facebook' : 'Síguenos en Facebook'}</span>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+                  </a>
+                )}
+
+                {/* WhatsApp VIP Club */}
+                {whatsappVipUrl && (
+                  <a
+                    href={whatsappVipUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => handleDemoChannelClick(e, isEn ? 'VIP WhatsApp Club' : 'Club VIP de WhatsApp')}
