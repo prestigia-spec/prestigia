@@ -10249,42 +10249,6 @@ export default function PortalPage() {
                     {radarAnsweredCount}
                   </span>
                 </button>
-
-                <button
-                  onClick={() => setRadarFilter('5stars')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap flex items-center gap-1 ${
-                    radarFilter === '5stars'
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-md'
-                      : theme === 'light'
-                        ? 'bg-slate-100 text-slate-800 hover:bg-slate-200 border border-slate-200'
-                        : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800'
-                  }`}
-                >
-                  <span>{t.radar.filterFiveStars}</span>
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
-                    theme === 'light' ? 'bg-slate-200 text-slate-800' : 'bg-black/20'
-                  }`}>
-                    {radarFiveStarCount}
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => setRadarFilter('critical')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap flex items-center gap-1 ${
-                    radarFilter === 'critical'
-                      ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
-                      : theme === 'light'
-                        ? 'bg-red-100/70 text-red-900 hover:bg-red-200/80 border border-red-300'
-                        : 'bg-red-500/15 text-red-300 hover:bg-red-500/25 border border-red-500/30'
-                  }`}
-                >
-                  <span>{t.radar.filterCritical}</span>
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
-                    theme === 'light' ? 'bg-red-200 text-red-950' : 'bg-black/20'
-                  }`}>
-                    {radarCriticalCount}
-                  </span>
-                </button>
               </div>
 
               {/* Real-time Search Input */}
@@ -10432,7 +10396,6 @@ export default function PortalPage() {
                             <div className="text-[11px] text-slate-400 flex flex-wrap items-center gap-2 mt-0.5">
                               <span className="text-amber-400 font-bold tracking-tight">
                                 {'★'.repeat(rev.rating)}
-                                {'☆'.repeat(5 - rev.rating)}
                               </span>
                               <span>•</span>
                               <span className={`flex items-center gap-1 ${theme === 'light' ? 'text-slate-600' : 'text-slate-400'}`}>
@@ -11010,11 +10973,13 @@ export default function PortalPage() {
                       }`}
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex items-center gap-2.5">
-                          <div className={`w-8 h-8 rounded-full font-black text-xs flex items-center justify-center ${
-                            theme === 'light' ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-red-500/20 text-red-400'
+                        <div className="flex items-center gap-3">
+                          <div className={`w-9 h-9 rounded-full border flex items-center justify-center font-black text-sm shadow-inner shrink-0 ${
+                            theme === 'light'
+                              ? 'bg-rose-50 border-rose-200 text-rose-700'
+                              : 'bg-slate-800 border-slate-700 text-rose-300'
                           }`}>
-                            {item.rating}★
+                            {item.customerName ? item.customerName.charAt(0).toUpperCase() : 'C'}
                           </div>
                           <div>
                             <div className="text-sm font-bold flex items-center gap-2">
@@ -11027,7 +10992,11 @@ export default function PortalPage() {
                                 {formatBranchName(item.branchName, lang)}
                               </span>
                             </div>
-                            <div className="text-[11px] text-slate-400 flex flex-wrap items-center gap-2">
+                            <div className="text-[11px] text-slate-400 flex flex-wrap items-center gap-2 mt-0.5">
+                              <span className="text-amber-400 font-bold tracking-tight">
+                                {'★'.repeat(item.rating)}
+                              </span>
+                              <span>•</span>
                               {effectivePlan === 'basic' ? (
                                 <span className="text-slate-400 flex items-center gap-1 font-mono">
                                   <span>Tel: {item.customerPhone.slice(0, 6)}****</span>
