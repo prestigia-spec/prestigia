@@ -1388,14 +1388,39 @@ export async function POST(req: NextRequest) {
       detectedName = 'Ficha de Google Maps';
     }
 
-    detectedName = detectedName.replace(/\s*-\s*Google Maps$/i, '').trim();
+    detectedName = detectedName
+      .replace(/\+/g, ' ')
+      .replace(/\s*-\s*Google Maps$/i, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
 
-    const finalRating = detectedRating !== null ? detectedRating : 4.0;
+    // Clean session/IP-bound parameters (g_ep, skid, authuser, etc.) so opening Maps in user's browser never triggers google.com/sorry IP mismatch
+    const rawOriginalInput = (url || '').trim();
+    let cleanMapsUrl = targetUrl;
+    if (/^https?:\/\/(maps\.app\.goo\.gl|goo\.gl\/maps)\//i.test(rawOriginalInput)) {
+      cleanMapsUrl = rawOriginalInput;
+    } else if (cleanMapsUrl.includes('google.com/sorry')) {
+      cleanMapsUrl = rawOriginalInput.startsWith('http')
+        ? rawOriginalInput
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(detectedName)}`;
+    } else {
+      try {
+        const parsedMapsUrl = new URL(cleanMapsUrl);
+        ['g_ep', 'skid', 'authuser', 'entry', 'ucbcb', 'ved', 'usg'].forEach((p) =>
+          parsedMapsUrl.searchParams.delete(p)
+        );
+        cleanMapsUrl = parsedMapsUrl.toString();
+      } catch {
+        // Keep cleanMapsUrl as-is if URL parsing fails
+      }
+    }
+
+    const finalRating = detectedRating !== null ? detectedRating : 0;
     const finalReviews = detectedReviews !== null ? detectedReviews : 0;
 
     const directReviewUrl = detectedPlaceId
       ? `https://search.google.com/local/writereview?placeid=${detectedPlaceId}`
-      : targetUrl;
+      : cleanMapsUrl;
 
     // Generate comprehensive Google SEO Technical Audit
     const seoAudit = buildGoogleSeoAudit({
@@ -1433,7 +1458,7 @@ export async function POST(req: NextRequest) {
       address: detectedAddress || 'Ubicación verificada en Google Maps',
       placeId: detectedPlaceId || undefined,
       category: seoAudit.primaryCategory,
-      googleMapsUrl: targetUrl,
+      googleMapsUrl: cleanMapsUrl,
       googleReviewUrl: directReviewUrl,
       extractedFrom: fetchedSuccessfully ? 'google_live' : 'url_parse',
       website: detectedWebsite || undefined,

@@ -3634,10 +3634,6 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
       showToast(isEn ? '⚠️ City is required (*)' : '⚠️ La Ciudad es obligatoria (*)');
       return;
     }
-    if (!auditNeighborhood.trim()) {
-      showToast(isEn ? '⚠️ Neighborhood / District is required (*)' : '⚠️ El Barrio o Localidad es obligatorio (*)');
-      return;
-    }
 
     const userMaxAudits = getEffectiveQuota('audits');
     if (!isLuismaMaster && (monthlyUsage.audits >= userMaxAudits || isUserSuspended)) {
@@ -9994,18 +9990,25 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                 {/* Scanned Listing Profile Card (If recognized) */}
                 {auditScannedListing && (
-                  <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-emerald-500/40 space-y-2.5 animate-in fade-in duration-300">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                        <span>{t.verifiedListingBadge}</span>
-                      </span>
+                  <div className={`p-3.5 rounded-2xl bg-slate-950/80 border space-y-2.5 animate-in fade-in duration-300 ${auditScannedListing.extractedFrom === 'google_live' ? 'border-emerald-500/40' : 'border-amber-500/40'}`}>
+                    <div className="flex items-center justify-between gap-2">
+                      {auditScannedListing.extractedFrom === 'google_live' ? (
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                          <span>{t.verifiedListingBadge}</span>
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3 text-amber-400" />
+                          <span>{isEn ? 'Link Detected • Confirm Rating/Reviews' : 'Enlace Detectado • Confirma Rating/Reseñas'}</span>
+                        </span>
+                      )}
                       {auditScannedListing.googleMapsUrl && (
                         <a
                           href={auditScannedListing.googleMapsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[10px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                          className="text-[10px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 shrink-0"
                         >
                           <span>Maps</span>
                           <ExternalLink className="w-3 h-3" />
@@ -10015,7 +10018,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                     <div>
                       <h4 className="text-sm font-black text-white leading-tight">
-                        {auditScannedListing.name}
+                        {(auditScannedListing.name || '').replace(/\+/g, ' ')}
                       </h4>
                       {auditScannedListing.address && (
                         <p className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
@@ -10027,16 +10030,39 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
 
                     <div className="grid grid-cols-3 gap-2 pt-1">
                       <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-center">
-                        <span className="text-[9px] uppercase font-bold text-slate-400 block">Rating</span>
-                        <span className="text-xs font-black text-amber-400">★ {auditScannedListing.rating}</span>
+                        <span className="text-[9px] uppercase font-bold text-slate-400 block">Rating (★)</span>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="1"
+                          max="5"
+                          value={auditExistingRating || ''}
+                          placeholder="5.0"
+                          onChange={(e) => {
+                            const val = parseFloat(e.target.value) || 0;
+                            setAuditExistingRating(val);
+                            setAuditScannedListing((prev) => prev ? { ...prev, rating: val } : prev);
+                          }}
+                          className="w-full text-center bg-transparent text-xs font-black text-amber-400 focus:outline-none border-b border-transparent focus:border-amber-500/50"
+                        />
                       </div>
                       <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-center">
                         <span className="text-[9px] uppercase font-bold text-slate-400 block">{isEn ? 'Reviews' : 'Reseñas'}</span>
-                        <span className="text-xs font-black text-white">{auditScannedListing.reviewsCount}</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={auditExistingReviews ?? 0}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value, 10) || 0;
+                            setAuditExistingReviews(val);
+                            setAuditScannedListing((prev) => prev ? { ...prev, reviewsCount: val } : prev);
+                          }}
+                          className="w-full text-center bg-transparent text-xs font-black text-white focus:outline-none border-b border-transparent focus:border-amber-500/50"
+                        />
                       </div>
                       <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-center">
                         <span className="text-[9px] uppercase font-bold text-slate-400 block">{isEn ? 'Niche' : 'Nicho'}</span>
-                        <span className="text-[10px] font-black text-teal-300 truncate block">
+                        <span className="text-[10px] font-black text-teal-300 truncate block mt-0.5">
                           {auditScannedListing.category || 'General'}
                         </span>
                       </div>
