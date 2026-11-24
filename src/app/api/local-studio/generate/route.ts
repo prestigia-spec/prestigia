@@ -134,9 +134,9 @@ ANALYTICAL DIRECTIVES:
    - If the business is an international courier/shipping/logistics company, real estate, healthcare clinic, legal, automotive workshop, etc., tailormake 100% of the audit, services, and SEO categories strictly to its genuine trade. NEVER default to food/restaurant terminology for non-food businesses.
    - Ground the audit in its actual physical location (${cleanAddress || (cleanNeighborhood ? cleanNeighborhood + ', ' + cleanCity : cleanCity)}).
 2. COMMERCIAL DESCRIPTION (STRICT: 620-740 CHARACTERS):
-   Craft an engaging, high-converting commercial text. Highlight the atmosphere, signature craft/services in "${cleanSpecialties || category}", physical location at ${cleanAddress || (cleanNeighborhood ? cleanNeighborhood + ', ' + cleanCity : cleanCity)}, social proof from ${existingReviews} reviews, and a warm call-to-action with WhatsApp (${cleanPhone}). Grounded, professional, and authentic (no generic spam).
+   Craft an engaging, high-converting commercial text. Highlight the atmosphere, signature craft/services in "${cleanSpecialties || category}", physical location at ${cleanAddress || (cleanNeighborhood ? cleanNeighborhood + ', ' + cleanCity : cleanCity)}, social proof from ${existingReviews} reviews, and a warm call-to-action inviting clients to tap the Call or WhatsApp button on the profile. STRICT GOOGLE POLICY: NEVER include written phone numbers, URLs, emails, or promotional prices/discounts inside the description text.
 3. CATEGORIES: Primary category must be the precise official Google Maps category. Provide exactly 4-5 strictly relevant secondary categories.
-4. OPTIMIZED TITLE: Formula: "${cleanName} | [Primary Specialty/Category] ${isEn ? 'in' : 'en'} ${cleanNeighborhood || cleanCity}".
+4. OPTIMIZED TITLE (STRICT GOOGLE POLICY ANTI-SUSPENSION): Return strictly the exact real-world commercial/legal name "${cleanName}" as it appears on the storefront sign and legal documents. NEVER append extra keywords, categories, or neighborhood/city names (keyword stuffing causes immediate suspension).
 5. SERVICE CATALOG (MANDATORY: UNIQUE BENEFIT-DRIVEN DESCRIPTIONS PER PRODUCT):
    - For every product or service derived from "${cleanSpecialties || category}" (generate 4-6 distinct commercial items):
    - NEVER repeat the same generic sentence or boilerplate formula!
@@ -1009,6 +1009,16 @@ function generateNicheCommercialDescription(params: {
     }
   }
 
+  // Google Business Profile Policy: NEVER include written phone numbers, URLs, or prices inside the description.
+  // Direct users to the profile's Call or WhatsApp button instead.
+  const cleanCtaEn = 'Contact us directly through the Call or WhatsApp button on our profile.';
+  const cleanCtaEs = 'Contáctanos directamente desde el botón de llamada o WhatsApp de nuestro perfil.';
+  desc = desc
+    .replace(/\s*(?:Contact|Message|Book|Schedule|Inquire|Reserve)[^.]*(?:WhatsApp|phone)[^.]*\./gi, ` ${cleanCtaEn}`)
+    .replace(/\s*(?:Escríbenos|Agenda|Reserva|Consulta|Contáctanos|Comunícate)[^.]*WhatsApp[^.]*\./gi, ` ${cleanCtaEs}`)
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
   if (desc.length > 745) {
     desc = desc.substring(0, 740).replace(/\s+\S*$/, '') + '.';
   }
@@ -1067,7 +1077,8 @@ function buildFallbackBlueprint(params: {
   const cleanSpecialties = specialties.trim();
   const rawSpecialties = cleanSpecialties || (isEn ? 'our main specialty items' : 'nuestros productos y servicios principales');
 
-  const optimizedTitle = `${businessName} | ${primaryCategory} ${isEn ? 'in' : 'en'} ${locationTag}`;
+  // Google Policy Anti-Suspension: exact real-world commercial name without keyword/location stuffing
+  const optimizedTitle = businessName.trim();
 
   // Multi-niche rich commercial description (600-745 chars) honoring place, food/offering, customer care, and reviews
   const commercialDescription = generateNicheCommercialDescription({

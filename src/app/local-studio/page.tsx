@@ -2241,8 +2241,8 @@ export default function LocalStudioPage() {
       },
       {
         id: 'step_title',
-        title: isEn ? '1. Update Official Listing Title with Local SEO formula' : '1. Actualizar Título Oficial con la fórmula Local SEO',
-        desc: isEn ? 'Combines brand + category + city/zone in Google Business Profile' : 'Combina marca + categoría + ciudad/zona en Google Business Profile',
+        title: isEn ? '1. Set Exact Real Commercial Title (Anti-Suspension)' : '1. Configurar Nombre Real Exacto (Anti-Suspensión)',
+        desc: isEn ? 'Use exact storefront/legal name without extra keywords or city tags (Google Policy)' : 'Usa el nombre exacto del aviso físico y RUT, sin añadir palabras clave ni ciudad (Norma Google)',
       },
       {
         id: 'step_categories',
@@ -2252,7 +2252,14 @@ export default function LocalStudioPage() {
       {
         id: 'step_description',
         title: isEn ? '3. Publish 745-Character Commercial SEO Description' : '3. Publicar Descripción Comercial SEO de 745 Caracteres',
-        desc: isEn ? 'Includes value proposition, local keywords, and closing call-to-action' : 'Incluye propuesta de valor, palabras clave locales y llamado a la acción',
+        desc: isEn ? 'Includes value proposition & local keywords (never write phone numbers or URLs inside)' : 'Incluye propuesta de valor y palabras clave locales (sin teléfonos ni URLs dentro del texto)',
+      },
+      {
+        id: 'step_whatsapp_btn',
+        title: isEn ? '3b. Activate Official WhatsApp / Chat Button' : '3b. Activar Botón Oficial de WhatsApp en Chat',
+        desc: isEn
+          ? `In Contact > Chat, link WhatsApp using ${createPhone || createContactPhone || 'your commercial number'} (replaces retired native Chat)`
+          : `En Contacto > Chat, vincula WhatsApp con ${createPhone || createContactPhone || 'tu número comercial'} (reemplaza al chat nativo)`,
       },
       {
         id: 'step_catalog',
@@ -11086,10 +11093,10 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">2</span>
-                    <strong className="text-white text-xs">{isEn ? 'Set Penalization-Free Title' : 'Ajustar Título Despenalizado'}</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Set Policy-Safe Title (Stagger Edits)' : 'Ajustar Título Real (Cambios Escalonados)'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    {isEn ? <>In "Business information", replace spammy all-caps titles with the suggested <strong>Optimized Title</strong>, preventing visibility penalties.</> : <>En "Información de la empresa", reemplaza títulos con mayúsculas spam por el <strong>Título Optimizado</strong> sugerido, evitando penalizaciones de visibilidad.</>}
+                    {isEn ? <>Use the exact storefront name without keyword stuffing. <strong>Anti-Block Rule:</strong> Never change Name + Category + Address on the same day (space edits 48-72h apart to avoid triggering video re-verification).</> : <>Usa el nombre comercial exacto sin relleno de palabras clave. <strong>Regla Anti-Bloqueo:</strong> No cambies Nombre + Categoría + Dirección el mismo día (espacia cada ajuste 48-72h para no disparar re-verificación por video).</>}
                   </p>
                 </div>
 
@@ -12372,11 +12379,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           </p>
                         </div>
                         <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
-                          <span className="font-black text-amber-400 block text-xs">{isEn ? 'Step 3: Forensic Dossier Upload' : 'Paso 3: Carga de Expediente Probatorio'}</span>
+                          <span className="font-black text-amber-400 block text-xs">{isEn ? 'Step 3: Forensic Dossier (60-Min Window)' : 'Paso 3: Carga de Pruebas (Ventana 60 Min)'}</span>
                           <p className="text-[11px] text-slate-300 leading-relaxed">
                             {isEn
-                              ? 'Attach the 6 certified documents: Tax ID/EIN, official utility bill (<60d), commercial lease, facade photos with street numbers, and the 60s uncut video walkthrough.'
-                              : 'Adjunta las 6 pruebas oficiales: RUT/Certificado Fiscal, factura de servicios fijos (<60d), contrato de arrendamiento, fotos de fachada con placa y video de 60s sin cortes.'}
+                              ? 'Google gives a strict 60-minute window once you open the Appeal Tool. Have all PDFs/photos ready before starting: Tax ID/EIN, utility bill (<60d), lease, and facade photos.'
+                              : 'Google da una ventana única de 60 minutos al abrir la herramienta de apelación. Ten todo listo antes de entrar: RUT/Certificado Fiscal, factura (<60d), contrato y fotos de fachada.'}
                           </p>
                         </div>
                         <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
@@ -13964,6 +13971,16 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                           <span>📅 {isEn ? 'Estimated Decision by:' : 'Dictamen Estimado:'}</span>
                           <strong className="text-white">{getEstimatedGoogleDecisionDate()}</strong>
                         </div>
+                      </div>
+
+                      {/* Google Merchant Extortion Report Protocol (WhatsApp 1-Star Blackmail) */}
+                      <div className="p-3 rounded-2xl bg-rose-950/30 border border-rose-500/30 text-[11px] text-slate-300 leading-relaxed">
+                        <strong className="text-rose-300">
+                          {isEn ? '🚨 Extortion / WhatsApp Blackmail Protocol:' : '🚨 Protocolo Especial por Extorsión (WhatsApp / Telegram):'}
+                        </strong>{' '}
+                        {isEn
+                          ? 'If 1★ reviews came after threats or money demands via WhatsApp, take full screenshots (sender number, date, time, and threat) and file Google’s official Merchant Extortion Report alongside the Review Management Tool flag.'
+                          : 'Si las reseñas de 1★ llegaron tras amenazas o exigencias de dinero por WhatsApp, toma capturas completas (número visible, fecha, hora y mensaje) y radica el Formulario Oficial de Extorsión a Comerciantes de Google junto con la denuncia en la herramienta de reseñas.'}
                       </div>
                     </div>
 
