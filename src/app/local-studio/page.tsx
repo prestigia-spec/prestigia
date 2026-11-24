@@ -7594,7 +7594,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
             </button>
           )}
 
-          {hasActiveGeneratedData && (
+          {hasActiveGeneratedData && activeTab !== 'create' && (
             <button
               type="button"
               onClick={handlePrint}
