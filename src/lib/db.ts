@@ -1702,8 +1702,6 @@ export async function saveStudioDossier(dossier: StudioDossier): Promise<void> {
         contact_phone: dossier.contactPhone,
         contact_email: dossier.contactEmail,
         contact_role: dossier.contactRole,
-        client_country: dossier.clientCountry || null,
-        client_city: dossier.clientCity || null,
         category: dossier.category,
         city: dossier.city,
         neighborhood: dossier.neighborhood,

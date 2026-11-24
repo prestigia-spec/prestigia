@@ -3542,20 +3542,21 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               serviceAreas: createServiceAreas.trim(),
             },
           };
-          fetch('/api/local-studio/dossiers', {
+          const saveRes = await fetch('/api/local-studio/dossiers', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(autoPayload),
-          })
-            .then((r) => r.json())
-            .then((saveData) => {
-              if (saveData?.dossier?.id) {
-                setActiveCreateDossierId(saveData.dossier.id);
-              }
-              fetchDossiers();
-            });
+          });
+          const saveData = await saveRes.json();
+          if (saveData?.success && saveData?.dossier?.id) {
+            setActiveCreateDossierId(saveData.dossier.id);
+          } else if (!saveRes.ok || saveData?.error) {
+            showToast('⚠️ Error al guardar en Cartera: ' + (saveData?.error || saveRes.status));
+          }
+          await fetchDossiers();
         } catch (autoErr) {
           console.warn('Auto-save error:', autoErr);
+          showToast('⚠️ Error de red al guardar en Cartera.');
         }
       } else {
         fetchDossiers();
@@ -3719,20 +3720,21 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
               phone: auditPhone.trim() || auditContactPhone.trim(),
             },
           };
-          fetch('/api/local-studio/dossiers', {
+          const saveRes = await fetch('/api/local-studio/dossiers', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(autoPayload),
-          })
-            .then((r) => r.json())
-            .then((saveData) => {
-              if (saveData?.dossier?.id) {
-                setActiveAuditDossierId(saveData.dossier.id);
-              }
-              fetchDossiers();
-            });
+          });
+          const saveData = await saveRes.json();
+          if (saveData?.success && saveData?.dossier?.id) {
+            setActiveAuditDossierId(saveData.dossier.id);
+          } else if (!saveRes.ok || saveData?.error) {
+            showToast('⚠️ Error al guardar en Cartera: ' + (saveData?.error || saveRes.status));
+          }
+          await fetchDossiers();
         } catch (autoErr) {
           console.warn('Auto-save error:', autoErr);
+          showToast('⚠️ Error de red al guardar en Cartera.');
         }
       } else {
         fetchDossiers();

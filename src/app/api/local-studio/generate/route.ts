@@ -137,7 +137,11 @@ ANALYTICAL DIRECTIVES:
    Craft an engaging, high-converting commercial text. Highlight the atmosphere, signature craft/services in "${cleanSpecialties || category}", physical location at ${cleanAddress || (cleanNeighborhood ? cleanNeighborhood + ', ' + cleanCity : cleanCity)}, social proof from ${existingReviews} reviews, and a warm call-to-action with WhatsApp (${cleanPhone}). Grounded, professional, and authentic (no generic spam).
 3. CATEGORIES: Primary category must be the precise official Google Maps category. Provide exactly 4-5 strictly relevant secondary categories.
 4. OPTIMIZED TITLE: Formula: "${cleanName} | [Primary Specialty/Category] ${isEn ? 'in' : 'en'} ${cleanNeighborhood || cleanCity}".
-5. SERVICE CATALOG: 4-6 services directly derived from its real business operations and "${cleanSpecialties || category}", with commercial name, benefit description, and local search tag.
+5. SERVICE CATALOG (MANDATORY: UNIQUE BENEFIT-DRIVEN DESCRIPTIONS PER PRODUCT):
+   - For every product or service derived from "${cleanSpecialties || category}" (generate 4-6 distinct commercial items):
+   - NEVER repeat the same generic sentence or boilerplate formula!
+   - Analyze each product individually and write a UNIQUE, persuasive description (120-180 characters) detailing its specific commercial benefit, techniques or ingredients, and high-intent local search keywords.
+   - Example for hair: Extensiones (punto a punto, cabello 100% natural, volumen indetectable), Colorimetría (corrección de color, nutrición capilar, tonos vibrantes), Cortes (visagismo y diseño de imagen personalizado).
 6. PROTOCOLS & MEDIA: 5 specific photo guidelines tailored to this business (e.g. packages, scales, fleet, reception for shipping; dental suites for clinics), 5 preventive FAQs, and a 60-90s video verification guide tailored to ${isSAB ? 'SAB' : 'storefront'}.
 7. WHATSAPP MEDIA REQUEST KIT ("whatsappOnboardingMessage"):
    The exact, ready-to-copy WhatsApp message for the agency to send directly to the owner/manager of "${cleanName}".
@@ -212,10 +216,10 @@ RETURN STRICTLY A COMPACT VALID JSON OBJECT (NO MARKDOWN WRAPPERS):
 }`;
 
         const candidateModels = [
-          'gemini-3.1-flash-lite',
-          'gemini-3.5-flash-lite',
+          'gemini-1.5-flash',
+          'gemini-2.0-flash',
+          'gemini-1.5-pro',
           'gemini-flash-lite-latest',
-          'gemini-3.5-flash',
         ];
         for (const modelName of candidateModels) {
           try {
@@ -689,6 +693,89 @@ function detectTaxonomy(params: {
   };
 }
 
+function generateItemSpecificDescription(item: string, primaryCategory: string, isEn: boolean): string {
+  const iLower = item.toLowerCase();
+  const catLower = primaryCategory.toLowerCase();
+
+  if (isEn) {
+    if (iLower.includes('extension')) {
+      return 'Professional hair extension application using 100% human hair for seamless volume, natural blend, and damage-free length.';
+    }
+    if (iLower.includes('color') || iLower.includes('dye') || iLower.includes('tint') || iLower.includes('bleach')) {
+      return 'Expert customized color transformation and tone correction with deep nourishing formulas for vibrant, long-lasting shine.';
+    }
+    if (iLower.includes('mecha') || iLower.includes('highlight') || iLower.includes('balayage') || iLower.includes('babylight')) {
+      return 'Precision Balayage and dimension lighting tailored to complement your facial structure while preserving hair health.';
+    }
+    if (iLower.includes('cut') || iLower.includes('corte') || iLower.includes('trim')) {
+      return 'Tailored precision haircut and styling designed to elevate your personal look, with expert shape definition and modern finishes.';
+    }
+    if (iLower.includes('blowout') || iLower.includes('peinado') || iLower.includes('secado') || iLower.includes('style') || iLower.includes('styling') || iLower.includes('keratin')) {
+      return 'Professional anti-frizz styling and thermal sealing treatment, providing deep hydration, natural bounce, and lasting hold.';
+    }
+    if (iLower.includes('nail') || iLower.includes('manicur') || iLower.includes('pedicur')) {
+      return 'Complete spa manicure and pedicure with premium cuticle care, long-wear gel polish, and on-trend customized finishes.';
+    }
+    if (iLower.includes('facial') || iLower.includes('skin') || iLower.includes('massage') || iLower.includes('spa')) {
+      return 'Rejuvenating therapy with active botanical serums designed to deeply restore skin barrier radiance, tone, and relaxation.';
+    }
+    if (catLower.includes('restauran') || catLower.includes('cafe') || catLower.includes('pizza') || catLower.includes('burger')) {
+      return `Artisanal preparation of ${iLower} using select fresh ingredients, house recipes, and crafted to order for exceptional flavor.`;
+    }
+    if (catLower.includes('dent') || catLower.includes('odont') || catLower.includes('clinic')) {
+      return `Comprehensive clinical care for ${iLower} using state-of-the-art diagnostic technology with guaranteed patient comfort.`;
+    }
+    if (catLower.includes('auto') || catLower.includes('taller') || catLower.includes('mechanic')) {
+      return `Certified diagnostic evaluation and precision servicing for ${iLower} with guaranteed parts and manufacturer specs.`;
+    }
+    return `Specialized professional attention in ${iLower}, applying advanced techniques, customized advice, and verified quality standards.`;
+  }
+
+  // DESCRIPCIONES EN ESPAÑOL PERSUASIVAS Y ORIENTADAS A BENEFICIOS ESPECÍFICOS
+  if (iLower.includes('extension')) {
+    return 'Aplicación profesional de extensiones con cabello 100% natural, técnicas punto a punto y microchip para máximo volumen y largo indetectable.';
+  }
+  if (iLower.includes('color') || iLower.includes('tinte') || iLower.includes('matiz') || iLower.includes('decolora')) {
+    return 'Transformación y corrección de color personalizada con fórmulas de alta nutrición para lograr tonos vibrantes, cobertura y brillo duradero.';
+  }
+  if (iLower.includes('mecha') || iLower.includes('ilumina') || iLower.includes('balayage') || iLower.includes('babylight') || iLower.includes('rayito')) {
+    return 'Especialistas en Balayage y técnicas de iluminación que aportan luz y dimensión personalizada protegiendo la fibra capilar.';
+  }
+  if (iLower.includes('corte') || iLower.includes('barba') || iLower.includes('visagismo')) {
+    return 'Diseño y asesoría de imagen personalizada según tu visagismo y estilo, con definición de puntas y acabados modernos de alta precisión.';
+  }
+  if (iLower.includes('secado') || iLower.includes('peinado') || iLower.includes('cepillado') || iLower.includes('keratina') || iLower.includes('alisado') || iLower.includes('botox')) {
+    return 'Styling profesional con sellado térmico antifrizz, aportando hidratación profunda, movimiento natural y fijación impecable para todo el día.';
+  }
+  if (iLower.includes('uña') || iLower.includes('manicur') || iLower.includes('pedicur') || iLower.includes('acrílic') || iLower.includes('semipermanent')) {
+    return 'Cuidado estético integral con técnicas de spa, esmaltado semipermanente de alta duración y diseños personalizados de tendencia.';
+  }
+  if (iLower.includes('facial') || iLower.includes('limpieza') || iLower.includes('masaje') || iLower.includes('spa') || iLower.includes('cejas') || iLower.includes('pestaña')) {
+    return 'Protocolo revitalizante con activos especializados para restaurar la luminosidad, armonía facial y descanso profundo.';
+  }
+  if (catLower.includes('restauran') || catLower.includes('cafe') || catLower.includes('panader') || catLower.includes('pizza') || catLower.includes('asador') || catLower.includes('hamburgue') || catLower.includes('sushi') || catLower.includes('taco')) {
+    return `Elaboración artesanal de ${iLower} con ingredientes frescos de primera calidad, receta de la casa y el punto perfecto de cocción al momento.`;
+  }
+  if (catLower.includes('dental') || catLower.includes('odont') || catLower.includes('clinic') || catLower.includes('médic') || catLower.includes('salud')) {
+    return `Evaluación clínica y procedimiento integral para ${iLower} con tecnología de vanguardia y enfoque prioritario en confort y salud.`;
+  }
+  if (catLower.includes('veterin') || catLower.includes('mascota')) {
+    return `Atención médica compasiva y valoración especializada en ${iLower} con equipos de diagnóstico clínico para el bienestar de tu mascota.`;
+  }
+  if (catLower.includes('taller') || catLower.includes('auto') || catLower.includes('mecánic') || catLower.includes('frenos') || catLower.includes('llanta')) {
+    return `Diagnóstico computarizado y servicio técnico de alta precisión para ${iLower} con repuestos certificados y garantía de seguridad.`;
+  }
+  if (catLower.includes('inmobili') || catLower.includes('propiedad') || catLower.includes('bienes')) {
+    return `Asesoría profesional y gestión estratégica en ${iLower} con estudio de mercado, respaldo legal y acompañamiento de inicio a fin.`;
+  }
+  if (catLower.includes('abogad') || catLower.includes('legal') || catLower.includes('jurídic')) {
+    return `Representación legal y consultoría estratégica en ${iLower} con blindaje normativo, análisis de riesgos y defensa prioritaria de tus intereses.`;
+  }
+
+  // FORMULACIÓN PERSONALIZADA PARA CUALQUIER OTRO SERVICIO
+  return `Atención especializada en ${iLower}, aplicando técnicas avanzadas, asesoría personalizada y garantía de satisfacción para resultados de alto nivel.`;
+}
+
 function buildTruthfulServiceCatalog(specialties: string, primaryCategory: string, isEn: boolean) {
   if (!specialties || !specialties.trim()) {
     return [
@@ -700,10 +787,19 @@ function buildTruthfulServiceCatalog(specialties: string, primaryCategory: strin
     ];
   }
 
-  const rawItems = specialties
-    .split(/[,;/]|s+ys+|s+ands+/i)
-    .map(s => s.trim())
-    .filter(Boolean);
+  // Prioritize commas, semicolons, and newlines as true item delimiters so internal "y" (e.g. "damas y caballeros") is not broken
+  let rawItems: string[] = [];
+  if (/[,;\n\r]/.test(specialties)) {
+    rawItems = specialties
+      .split(/[,;\n\r]+/)
+      .map(s => s.trim())
+      .filter(Boolean);
+  } else {
+    rawItems = specialties
+      .split(/\s+y\s+|\s+and\s+/i)
+      .map(s => s.trim())
+      .filter(Boolean);
+  }
 
   if (rawItems.length === 0) {
     return [
@@ -715,27 +811,11 @@ function buildTruthfulServiceCatalog(specialties: string, primaryCategory: strin
     ];
   }
 
-  const catLower = primaryCategory.toLowerCase();
-  let verb = isEn ? 'Specialized service in' : 'Servicio especializado en';
-  if (catLower.includes('restauran') || catLower.includes('cafe') || catLower.includes('panader') || catLower.includes('pizza') || catLower.includes('asador')) {
-    verb = isEn ? 'Preparation and table service of' : 'Elaboración artesanal y servicio de';
-  } else if (catLower.includes('dental') || catLower.includes('odont') || catLower.includes('clinic') || catLower.includes('médic')) {
-    verb = isEn ? 'Clinical evaluation and procedure for' : 'Evaluación clínica y procedimiento especializado en';
-  } else if (catLower.includes('veterin')) {
-    verb = isEn ? 'Compassionate animal care and clinical attention for' : 'Atención médica y cuidado compasivo para';
-  } else if (catLower.includes('barber') || catLower.includes('peluquer') || catLower.includes('belleza')) {
-    verb = isEn ? 'Professional styling and precision grooming for' : 'Estilizado profesional y cuidado personalizado de';
-  } else if (catLower.includes('evento') || catLower.includes('recepc')) {
-    verb = isEn ? 'Comprehensive coordination and venue setup for' : 'Coordinación logística y montaje exclusivo de';
-  } else if (catLower.includes('taller') || catLower.includes('auto') || catLower.includes('mecánic')) {
-    verb = isEn ? 'Technical diagnostics, certified maintenance and repair of' : 'Diagnóstico técnico, mantenimiento preventivo y reparación de';
-  }
-
   return rawItems.map(item => {
     const capitalized = item.charAt(0).toUpperCase() + item.slice(1);
     return {
       name: capitalized,
-      description: `${verb} ${item.toLowerCase()} ${isEn ? 'with guaranteed quality standards.' : 'con estándares de calidad y atención directa.'}`,
+      description: generateItemSpecificDescription(item, primaryCategory, isEn),
       tag: primaryCategory,
     };
   });
