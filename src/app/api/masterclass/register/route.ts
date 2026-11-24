@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { saveCommercialLead } from '@/lib/db';
+import { getAllCommercialLeads, saveCommercialLead } from '@/lib/db';
 import { getClientIp, sanitizeInput } from '@/lib/security';
+
+function normalizePhoneKey(phone?: string): string {
+  const digits = (phone || '').replace(/[^0-9]/g, '');
+  if (digits.length >= 10) return digits.slice(-10);
+  return digits;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,6 +48,38 @@ export async function POST(request: NextRequest) {
     }
     const cleanPhone = rawDigits.length >= 7 ? `+${rawDigits}` : phone.trim();
 
+    const cleanEmail = email ? sanitizeInput(email).trim().toLowerCase() : '';
+    const phoneKey = normalizePhoneKey(cleanPhone);
+
+    // Enlace oficial por defecto al grupo VIP de WhatsApp de la Masterclass
+    const defaultWhatsAppGroup = process.env.NEXT_PUBLIC_MASTERCLASS_WA_GROUP || 'https://chat.whatsapp.com/HywvVNPmonBEyZWnw9OxNw';
+
+    // Verificar si ya está registrado en la Masterclass por WhatsApp o correo
+    const existingLeads = await getAllCommercialLeads();
+    const existingDuplicate = existingLeads.find((l) => {
+      const isMasterclass =
+        (l.category && l.category.toLowerCase().includes('masterclass')) ||
+        (l.primaryGoal && l.primaryGoal.toLowerCase().includes('masterclass'));
+      if (!isMasterclass) return false;
+
+      const existingPhoneKey = normalizePhoneKey(l.phone);
+      const existingEmail = (l.email || '').trim().toLowerCase();
+
+      const samePhone = phoneKey.length >= 7 && existingPhoneKey === phoneKey;
+      const sameEmail = cleanEmail.length > 0 && existingEmail === cleanEmail;
+      return samePhone || sameEmail;
+    });
+
+    if (existingDuplicate) {
+      return NextResponse.json({
+        success: true,
+        duplicate: true,
+        leadId: existingDuplicate.id,
+        whatsappGroupUrl: defaultWhatsAppGroup,
+        message: '¡Ya tenías tu cupo reservado! Te redirigimos al Grupo VIP.',
+      });
+    }
+
     const userAgent = request.headers.get('user-agent') || '';
     const isMobile = /mobile|iphone|android/i.test(userAgent);
 
@@ -61,7 +99,7 @@ export async function POST(request: NextRequest) {
       businessName: role === 'business_owner' ? 'Negocio Propio' : role === 'agency' ? 'Agencia / Marca' : 'Independiente / Emprendedor',
       category: 'Masterclass Local Studio 2026',
       phone: cleanPhone,
-      email: email ? sanitizeInput(email) : undefined,
+      email: cleanEmail || undefined,
       city: city ? sanitizeInput(city) : (headerCity ? decodeURIComponent(headerCity) : 'Bogotá'),
       branchCount: '1',
       notes: leadNotes,
@@ -71,9 +109,6 @@ export async function POST(request: NextRequest) {
       countryCode: headerCountry,
       device: isMobile ? 'Móvil / Celular' : 'Computador',
     });
-
-    // Enlace oficial por defecto al grupo VIP de WhatsApp de la Masterclass
-    const defaultWhatsAppGroup = process.env.NEXT_PUBLIC_MASTERCLASS_WA_GROUP || 'https://chat.whatsapp.com/HywvVNPmonBEyZWnw9OxNw';
 
     return NextResponse.json({
       success: true,

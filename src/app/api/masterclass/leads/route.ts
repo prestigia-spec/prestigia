@@ -1,12 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllCommercialLeads, deleteCommercialLead, deleteCommercialLeadsByFriend } from '@/lib/db';
 
+function normalizePhoneKey(phone?: string): string {
+  const digits = (phone || '').replace(/[^0-9]/g, '');
+  if (digits.length >= 10) return digits.slice(-10);
+  return digits;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const allLeads = await getAllCommercialLeads();
-    const masterclassLeads = allLeads.filter((l) =>
+    const rawMasterclassLeads = allLeads.filter((l) =>
       (l.category && l.category.toLowerCase().includes('masterclass')) ||
       (l.primaryGoal && l.primaryGoal.toLowerCase().includes('masterclass'))
+    );
+
+    // Deduplicate by normalized phone (last 10 digits) or normalized email, keeping the earliest registration
+    const sortedChrono = [...rawMasterclassLeads].sort(
+      (a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
+    );
+    const seenPhones = new Set<string>();
+    const seenEmails = new Set<string>();
+    const masterclassLeads: typeof rawMasterclassLeads = [];
+
+    for (const lead of sortedChrono) {
+      const phoneKey = normalizePhoneKey(lead.phone);
+      const emailKey = (lead.email || '').trim().toLowerCase();
+
+      const isDupPhone = phoneKey.length >= 7 && seenPhones.has(phoneKey);
+      const isDupEmail = emailKey.length > 0 && seenEmails.has(emailKey);
+      if (isDupPhone || isDupEmail) continue;
+
+      if (phoneKey.length >= 7) seenPhones.add(phoneKey);
+      if (emailKey) seenEmails.add(emailKey);
+      masterclassLeads.push(lead);
+    }
+
+    // Present newest first in UI
+    masterclassLeads.sort(
+      (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
     );
 
     const referralMap: Record<string, { code: string; count: number; leads: any[] }> = {};
