@@ -58,7 +58,12 @@ export async function GET(
       responseTimeSla: branch.responseTimeSla || (business as any).responseTimeSla || '< 15 min',
       containmentMessage: branch.containmentMessage || (business as any).containmentMessage || null,
       staffMembers: branch.staffMembers && branch.staffMembers.length > 0 ? branch.staffMembers : ((business as any).staffMembers || []),
-      websiteUrl: branch.websiteUrl || (business as any).websiteUrl || 'https://prestigia.com',
+      websiteUrl:
+        branch.websiteUrl && !branch.websiteUrl.includes('search.google.com/local/writereview')
+          ? branch.websiteUrl
+          : ((business as any).websiteUrl && !(business as any).websiteUrl.includes('search.google.com/local/writereview')
+              ? (business as any).websiteUrl
+              : null),
       instagramUrl: branch.instagramUrl || (business as any).instagramUrl || null,
       tiktokUrl: branch.tiktokUrl || (business as any).tiktokUrl || null,
       facebookUrl: branch.facebookUrl || (business as any).facebookUrl || null,
@@ -180,7 +185,8 @@ export async function PUT(
 
       return {
         ...b,
-        // Permitir actualizar y normalizar redes sociales
+        // Permitir actualizar y normalizar redes sociales y sitio web oficial
+        websiteUrl: incoming.websiteUrl !== undefined ? String(incoming.websiteUrl).trim() : b.websiteUrl,
         instagramUrl: incoming.instagramUrl !== undefined ? normalizeSocialUrl('instagram', incoming.instagramUrl) : b.instagramUrl,
         tiktokUrl: incoming.tiktokUrl !== undefined ? normalizeSocialUrl('tiktok', incoming.tiktokUrl) : b.tiktokUrl,
         facebookUrl: incoming.facebookUrl !== undefined ? normalizeSocialUrl('facebook', incoming.facebookUrl) : b.facebookUrl,
@@ -192,7 +198,11 @@ export async function PUT(
         // Permitir actualizar encargados de servicio (managers multi-cuentas respetando quota)
         managers: cleanedManagers,
         // Permitir actualizar horarios de atención y protocolo de contención de sede
-        schedule: incoming.schedule !== undefined ? String(incoming.schedule) : b.schedule,
+        schedule: incoming.schedule !== undefined
+          ? (typeof incoming.schedule === 'object' && incoming.schedule !== null
+              ? { ...(typeof b.schedule === 'object' && b.schedule ? b.schedule : {}), ...incoming.schedule }
+              : String(incoming.schedule))
+          : b.schedule,
         scheduleWeekdays: incoming.scheduleWeekdays !== undefined ? String(incoming.scheduleWeekdays) : b.scheduleWeekdays,
         scheduleWeekends: incoming.scheduleWeekends !== undefined ? String(incoming.scheduleWeekends) : b.scheduleWeekends,
         scheduleHolidays: incoming.scheduleHolidays !== undefined ? String(incoming.scheduleHolidays) : b.scheduleHolidays,

@@ -577,47 +577,44 @@ export async function saveBusiness(business: Business): Promise<void> {
   try {
     const supabase = getSupabase();
     if (supabase) {
-      Promise.resolve(
-        supabase.from('businesses').upsert({
-          id: business.id,
-          name: business.name,
-          legal_name: business.legalName || null,
-          tax_id: business.taxId || null,
-          address: business.address || null,
-          owner_name: business.ownerName,
-          owner_phone: business.ownerPhone,
-          owner_email: business.ownerEmail || null,
-          plan: business.plan,
-          status: business.status,
-          category: business.category,
-          country: business.country || 'Colombia',
-          password: business.password,
-          branding: business.branding || {},
-          baseline: business.baseline || {},
-          master_add_ons: business.masterAddOns || {},
-          custom_staff_roles: business.customStaffRoles || [],
-        })
-      ).catch(() => {});
+      await supabase.from('businesses').upsert({
+        id: business.id,
+        name: business.name,
+        legal_name: business.legalName || null,
+        tax_id: business.taxId || null,
+        address: business.address || null,
+        owner_name: business.ownerName,
+        owner_phone: business.ownerPhone,
+        owner_email: business.ownerEmail || null,
+        plan: business.plan,
+        status: business.status,
+        category: business.category,
+        country: business.country || 'Colombia',
+        password: business.password,
+        branding: business.branding || {},
+        baseline: business.baseline || {},
+        master_add_ons: business.masterAddOns || {},
+        custom_staff_roles: business.customStaffRoles || [],
+      });
 
       if (business.branches && business.branches.length > 0) {
         for (const br of business.branches) {
-          Promise.resolve(
-            supabase.from('branches').upsert({
-              id: br.id,
-              business_id: business.id,
-              name: br.name,
-              address: br.address || null,
-              city: br.city,
-              locality: br.locality,
-              google_review_url: br.googleReviewUrl,
-              google_place_id: br.googlePlaceId || null,
-              manager_phone: br.managerPhone,
-              manager_password: br.managerPassword || null,
-              manager_username: br.managerUsername || null,
-              status: br.status,
-              containment_message: br.containmentMessage || null,
-            })
-          ).catch(() => {});
+          await supabase.from('branches').upsert({
+            id: br.id,
+            business_id: business.id,
+            name: br.name,
+            address: br.address || null,
+            city: br.city,
+            locality: br.locality,
+            google_review_url: br.googleReviewUrl,
+            google_place_id: br.googlePlaceId || null,
+            manager_phone: br.managerPhone,
+            manager_password: br.managerPassword || null,
+            manager_username: br.managerUsername || null,
+            status: br.status,
+            containment_message: br.containmentMessage || null,
+            website_url: br.websiteUrl || null,
+          });
         }
       }
     }
@@ -1395,6 +1392,7 @@ export async function updateBranchGoogleTokens(
     locationId?: string;
   }
 ): Promise<boolean> {
+  await getAllBusinesses();
   const db = ensureDbFile();
   const target = branchOrBusinessId.toLowerCase().trim();
   let updated = false;

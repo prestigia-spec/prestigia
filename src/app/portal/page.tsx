@@ -1729,6 +1729,74 @@ export default function PortalPage() {
     }
   }, [staffBranchFilter]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined' || !session?.business?.id) return;
+    const params = new URLSearchParams(window.location.search);
+    const googleSuccess = params.get('google_success');
+    const googleError = params.get('google_error');
+    if (!googleSuccess && !googleError) return;
+
+    window.history.replaceState({}, '', window.location.pathname);
+
+    if (googleError) {
+      setGoogleSyncFeedback(`⚠️ Error conectando con Google: ${googleError}`);
+      return;
+    }
+
+    if (googleSuccess === 'connected') {
+      const bizId = session.business.id;
+      const targetBranch =
+        selectedBranchId !== 'all' ? selectedBranchId : (session.branches?.[0]?.id || '');
+
+      (async () => {
+        setIsSyncingGoogleReviews(true);
+        setGoogleSyncFeedback('🔄 Google vinculado. Sincronizando sede y reseñas...');
+        try {
+          const bizRes = await fetch(`/api/businesses/${bizId}?t=${Date.now()}`, { cache: 'no-store' });
+          const bizData = await bizRes.json();
+          if (bizRes.ok && bizData?.rawBusiness) {
+            const refreshedBranches = bizData.rawBusiness.branches || bizData.branches || [];
+            setProfileBranches(refreshedBranches);
+            setSession((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    business: bizData.rawBusiness,
+                    branches:
+                      effectivePlan === 'pro' || effectivePlan === 'independiente'
+                        ? refreshedBranches.slice(0, 1)
+                        : refreshedBranches,
+                  }
+                : null
+            );
+          }
+
+          const syncRes = await fetch('/api/portal/google-business/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ businessId: bizId, branchId: targetBranch }),
+          });
+          const syncData = await syncRes.json();
+          if (syncData.success) {
+            setGoogleSyncFeedback(syncData.message || '✅ Google conectado y reseñas sincronizadas');
+            const branchParam = selectedBranchId !== 'all' ? `&branchId=${selectedBranchId}` : '';
+            const revRes = await fetch(`/api/portal/google-reviews?businessId=${bizId}${branchParam}`);
+            const revData = await revRes.json();
+            if (revData.success && Array.isArray(revData.reviews)) {
+              setGoogleReviews(revData.reviews);
+            }
+          } else {
+            setGoogleSyncFeedback(syncData.error || '✅ Google conectado, pero no se pudieron leer reseñas aún.');
+          }
+        } catch {
+          setGoogleSyncFeedback('⚠️ Google conectado, pero hubo un error de red al sincronizar.');
+        } finally {
+          setIsSyncingGoogleReviews(false);
+        }
+      })();
+    }
+  }, [session?.business?.id]);
+
   // Executive Auto-Scheduler State (Envío Automático Programado por Correo / WhatsApp)
   const [isScheduleReportModalOpen, setIsScheduleReportModalOpen] = useState(false);
   const [scheduleFrequency, setScheduleFrequency] = useState<'weekly' | 'monthly' | 'daily'>(() => {
@@ -9229,11 +9297,11 @@ export default function PortalPage() {
                     href={`https://wa.me/573058314049?text=${encodeURIComponent(
                       lang === 'en'
                         ? `Hello Prestigia, I am the owner of ${session.business.name} (${
-                            effectivePlan === 'elite' ? '👑 Elite Plan' : effectivePlan === 'pro' ? '⭐ Pro Plan' : 'Independent Plan'
+                            effectivePlan === 'elite' ? '👑 Elite Plan' : effectivePlan === 'empresarial' ? '🏢 Enterprise Plan' : effectivePlan === 'pro' ? '⭐ Pro Plan' : 'Independent Plan'
                           }) and I would like to request priority VIP technical assistance.`
                         : `Hola Prestigia, soy ${session.business.name} (${
-                            effectivePlan === 'elite' ? '👑 Plan Élite' : effectivePlan === 'pro' ? '⭐ Plan Pro' : 'Plan Independiente'
-                          }) y deseo solicitar asistencia técnica de mi paquete mensual.`
+                            effectivePlan === 'elite' ? '👑 Plan Élite' : effectivePlan === 'empresarial' ? '🏢 Plan Empresarial' : effectivePlan === 'pro' ? '⭐ Plan Pro' : 'Plan Independiente'
+                          }) y deseo solicitar asistencia técnica para mi cuenta.`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -9248,10 +9316,8 @@ export default function PortalPage() {
                     <Headphones className="w-3 h-3 text-amber-500 dark:text-amber-400 group-hover/sup:scale-110 transition shrink-0" />
                     <span className={`font-medium ${theme === 'light' ? 'text-slate-700' : 'text-slate-300'}`}>
                       {effectivePlan === 'elite'
-                        ? (lang === 'en' ? 'VIP Support 4/mo' : 'Soporte VIP 4/mes')
-                        : effectivePlan === 'pro'
-                        ? (lang === 'en' ? 'Support 2/mo' : 'Soporte 2/mes')
-                        : (lang === 'en' ? 'Support 1/mo' : 'Soporte 1/mes')}
+                        ? (lang === 'en' ? 'VIP Support' : 'Soporte VIP')
+                        : (lang === 'en' ? 'Support' : 'Soporte')}
                     </span>
                   </a>
                 </div>

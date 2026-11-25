@@ -801,28 +801,34 @@ export default function RatingCapturePage() {
               </div>
             )}
 
-            {/* 1. MANDATORY OFFICIAL COMMERCIAL WEBSITE BUTTON */}
-            <a
-              href={business.websiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => handleDemoChannelClick(e, isEn ? 'Official Website' : 'Sitio Web Oficial')}
-              className="flex items-center justify-between w-full p-4 rounded-2xl text-white font-bold text-sm shadow-xl transition active:scale-[0.98] mb-4 group border border-slate-700/60"
-              style={{
-                background: `linear-gradient(135deg, ${brandColor}, #1E1B4B)`,
-                boxShadow: `0 10px 25px -5px ${brandColor}35`,
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-white/10 group-hover:scale-110 transition">
-                  <Globe className="w-5 h-5 text-white" />
+            {/* 1. OFFICIAL COMMERCIAL WEBSITE BUTTON (Only shown if configured) */}
+            {business.websiteUrl && (
+              <a
+                href={
+                  business.websiteUrl.startsWith('#') || /^https?:\/\//i.test(business.websiteUrl)
+                    ? business.websiteUrl
+                    : `https://${business.websiteUrl}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => handleDemoChannelClick(e, isEn ? 'Official Website' : 'Sitio Web Oficial')}
+                className="flex items-center justify-between w-full p-4 rounded-2xl text-white font-bold text-sm shadow-xl transition active:scale-[0.98] mb-4 group border border-slate-700/60"
+                style={{
+                  background: `linear-gradient(135deg, ${brandColor}, #1E1B4B)`,
+                  boxShadow: `0 10px 25px -5px ${brandColor}35`,
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-white/10 group-hover:scale-110 transition">
+                    <Globe className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="font-extrabold text-sm text-white">
+                    {isEn ? 'Official Website' : 'Sitio Web Oficial'}
+                  </div>
                 </div>
-                <div className="font-extrabold text-sm text-white">
-                  {isEn ? 'Official Website' : 'Sitio Web Oficial'}
-                </div>
-              </div>
-              <ArrowRight className="w-5 h-5 text-white/70 group-hover:translate-x-1 transition" />
-            </a>
+                <ArrowRight className="w-5 h-5 text-white/70 group-hover:translate-x-1 transition" />
+              </a>
+            )}
 
             {/* 2. CONFIGURABLE SOCIAL CHANNELS (Basic: 1 single network | Pro & Élite: Full multichannel) */}
             {hasSocials && (
