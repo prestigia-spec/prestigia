@@ -2531,12 +2531,19 @@ export default function PortalPage() {
 
   // LocalStorage Persistence for Reactivation Contacts (Strictly isolated per Business; zero demo data for real clients)
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !session?.business?.id) return;
     setReactivationLoaded(false);
-    const businessKey = session?.business?.id || 'demo';
+    const businessKey = session.business.id;
     const isDemoBiz = businessKey === 'demo' || businessKey === 'la-burguesia';
-    const demoIds = new Set(DEFAULT_REACTIVATION_CONTACTS.map((d) => d.id));
-    const demoPhones = new Set(DEFAULT_REACTIVATION_CONTACTS.map((d) => d.phone.replace(/[^0-9]/g, '').replace(/^57/, '')));
+    const demoIds = new Set([
+      ...DEFAULT_REACTIVATION_CONTACTS.map((d) => d.id),
+      ...DEFAULT_CURRENT_PARTICIPANTS.map((d) => d.id),
+      ...DEFAULT_CURRENT_PARTICIPANTS.map((d) => `qr_${d.id}`),
+    ]);
+    const demoPhones = new Set([
+      ...DEFAULT_REACTIVATION_CONTACTS.map((d) => d.phone.replace(/[^0-9]/g, '').replace(/^57/, '')),
+      ...DEFAULT_CURRENT_PARTICIPANTS.map((d) => d.customerPhone.replace(/[^0-9]/g, '').replace(/^57/, '')),
+    ]);
 
     try {
       localStorage.removeItem(`prestigia_reactivation_${businessKey}`);
@@ -2686,9 +2693,9 @@ export default function PortalPage() {
 
   // LocalStorage Persistence for Current Giveaway (Strictly isolated per Business; zero demo bleed)
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !session?.business?.id) return;
     setGiveawayLoaded(false);
-    const businessKey = session?.business?.id || 'demo';
+    const businessKey = session.business.id;
     const isDemoBiz = businessKey === 'demo' || businessKey === 'la-burguesia';
     const demoParticipantIds = new Set(DEFAULT_CURRENT_PARTICIPANTS.map((d) => d.id));
     const demoParticipantPhones = new Set(DEFAULT_CURRENT_PARTICIPANTS.map((d) => d.customerPhone.replace(/[^0-9]/g, '').replace(/^57/, '')));
@@ -22419,7 +22426,7 @@ export default function PortalPage() {
                   )}
 
                   <div className="space-y-3.5 text-xs">
-                    {/* Website: Locked & Prestigia Managed */}
+                    {/* Website: 100% Editable by Client */}
                     <div className={`p-3.5 rounded-2xl border space-y-1.5 ${
                       theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-slate-900/90 border-slate-800'
                     }`}>
@@ -22430,33 +22437,44 @@ export default function PortalPage() {
                           <Globe className="w-3.5 h-3.5 text-indigo-500" />
                           <span>{t.profile.websiteLabel}</span>
                         </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-600 border border-indigo-500/30 font-bold flex items-center gap-1">
-                          <Lock className="w-3 h-3 text-indigo-500" />
-                          <span>{t.profile.managedByPrestigia}</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold">
+                          {lang === 'en' ? 'Editable by Client' : 'Editable por el Cliente'}
                         </span>
                       </div>
                       {(() => {
-                        const webUrl = profileBranches[activeBranchEditIdx]?.websiteUrl || profileBranches[0]?.websiteUrl || `https://${session.business.id}.prestigia.com`;
+                        const rawWeb = profileBranches[activeBranchEditIdx]?.websiteUrl ?? '';
+                        const webUrl = rawWeb.includes('search.google.com/local/writereview') ? '' : rawWeb;
                         return (
                           <div className="flex items-center gap-2">
                             <input
-                              type="text"
-                              readOnly
+                              type="url"
                               value={webUrl}
-                              className={`flex-1 px-3 py-2 rounded-xl border text-xs font-mono cursor-default ${
+                              placeholder="https://tu-sitio-web.com"
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setProfileBranches((prev) =>
+                                  prev.map((br, idx) =>
+                                    idx === activeBranchEditIdx ? { ...br, websiteUrl: val } : br
+                                  )
+                                );
+                                setIsSocialDirty(true);
+                              }}
+                              className={`flex-1 px-3 py-2 rounded-xl border text-xs font-mono focus:outline-none focus:border-indigo-400 ${
                                 theme === 'light'
-                                  ? 'bg-slate-100 border-slate-200 text-slate-700 font-semibold'
-                                  : 'bg-slate-950 border-slate-800 text-slate-300'
+                                  ? 'bg-white border-slate-300 text-slate-900 font-semibold'
+                                  : 'bg-slate-950 border-slate-700 text-white'
                               }`}
                             />
                             <button
                               type="button"
+                              disabled={!webUrl}
                               onClick={() => {
+                                if (!webUrl) return;
                                 navigator.clipboard.writeText(webUrl);
                                 setCopiedWebsiteUrl(true);
                                 setTimeout(() => setCopiedWebsiteUrl(false), 2000);
                               }}
-                              className={`px-3 py-2 rounded-xl border font-bold text-xs transition shrink-0 flex items-center gap-1 active:scale-95 cursor-pointer ${
+                              className={`px-3 py-2 rounded-xl border font-bold text-xs transition shrink-0 flex items-center gap-1 active:scale-95 cursor-pointer disabled:opacity-40 ${
                                 copiedWebsiteUrl
                                   ? 'bg-emerald-600 text-white border-emerald-500'
                                   : theme === 'light'
@@ -22479,8 +22497,13 @@ export default function PortalPage() {
                             </button>
                             <button
                               type="button"
-                              onClick={() => window.open(webUrl, '_blank', 'noopener,noreferrer')}
-                              className={`px-3 py-2 rounded-xl border font-bold text-xs transition shrink-0 flex items-center gap-1 active:scale-95 cursor-pointer ${
+                              disabled={!webUrl}
+                              onClick={() => {
+                                if (!webUrl) return;
+                                const href = /^https?:\/\//i.test(webUrl) ? webUrl : `https://${webUrl}`;
+                                window.open(href, '_blank', 'noopener,noreferrer');
+                              }}
+                              className={`px-3 py-2 rounded-xl border font-bold text-xs transition shrink-0 flex items-center gap-1 active:scale-95 cursor-pointer disabled:opacity-40 ${
                                 theme === 'light'
                                   ? 'bg-slate-100 hover:bg-indigo-600 hover:text-white border-slate-300 text-slate-900'
                                   : 'bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white border-slate-700 hover:border-indigo-500'
@@ -22493,9 +22516,6 @@ export default function PortalPage() {
                           </div>
                         );
                       })()}
-                      <p className={`text-[10px] leading-tight ${theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>
-                        {t.profile.websiteNote}
-                      </p>
                     </div>
 
                     {/* Editable Social Networks */}

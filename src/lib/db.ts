@@ -441,7 +441,7 @@ export async function getBusinessById(id: string): Promise<Business | null> {
             managerUsername: br.manager_username || undefined,
             status: br.status || 'active',
             containmentMessage: br.containment_message || undefined,
-            websiteUrl: br.website_url || br.google_review_url || '',
+            websiteUrl: br.website_url || '',
             schedule: br.schedule || undefined,
             ...(oauth ? {
               googleAccessToken: oauth.accessToken,
@@ -520,7 +520,7 @@ export async function getAllBusinesses(): Promise<Business[]> {
                   managerUsername: br.manager_username || undefined,
                   status: br.status || 'active',
                   containmentMessage: br.containment_message || undefined,
-                  websiteUrl: br.website_url || br.google_review_url || '',
+                  websiteUrl: br.website_url || '',
                   schedule: br.schedule || undefined,
                   ...(oauth ? {
                     googleAccessToken: oauth.accessToken,
