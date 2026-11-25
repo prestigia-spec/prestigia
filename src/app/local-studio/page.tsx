@@ -9862,9 +9862,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                         onChange={(e) => {
                           const newC = e.target.value;
                           setAuditContactCountry(newC);
+                          setAuditCountry(newC);
                           const avCities = getCitiesForCountry(newC);
                           if (!avCities.includes(auditContactCity) && avCities.length > 0) {
                             setAuditContactCity(avCities[0]);
+                            setAuditCity(avCities[0]);
                           }
                           if (COUNTRY_DIALING_CODES[newC] && (!auditContactPhone || auditContactPhone === '+57')) {
                             setAuditContactPhone(COUNTRY_DIALING_CODES[newC]);
@@ -9898,7 +9900,10 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       </div>
                       <select
                         value={auditContactCity}
-                        onChange={(e) => setAuditContactCity(e.target.value)}
+                        onChange={(e) => {
+                          setAuditContactCity(e.target.value);
+                          setAuditCity(e.target.value);
+                        }}
                         className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-indigo-400 text-xs cursor-pointer"
                       >
                         {getCitiesForCountry(auditContactCountry).map((cty) => (
@@ -10726,17 +10731,23 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                                     <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
                                   </div>
                                   <strong className="text-sm font-black text-white block">
-                                    {needed5Stars === 0
+                                    {needed5Stars === 0 && total >= 20
                                       ? (isEn ? '✓ Target Already Achieved!' : '✓ ¡Meta Alcanzada!')
+                                      : needed5Stars === 0 && total < 20
+                                      ? (isEn ? `+${20 - total} New 5★ Reviews (Volume)` : `+${20 - total} Reseñas 5★ (Volumen Top 3)`)
                                       : isEn
                                       ? `+${needed5Stars} New 5★ Reviews`
                                       : `+${needed5Stars} Nuevas Reseñas de 5★`}
                                   </strong>
                                   <p className="text-[11px] text-slate-300 leading-relaxed">
-                                    {needed5Stars === 0
+                                    {needed5Stars === 0 && total >= 20
                                       ? (isEn
                                           ? `Your listing currently exceeds ${target}★. Maintain review velocity to protect rank.`
                                           : `Tu ficha ya supera ${target}★. Mantén la velocidad de reseñas para defender tu podio.`)
+                                      : needed5Stars === 0 && total < 20
+                                      ? (isEn
+                                          ? `Your rating is strong (${curRating.toFixed(1)}★), but with ${total} review(s) you need +${20 - total} more 5★ reviews (~${Math.ceil((20 - total) / 3)} weeks) to reach Top 3 authority volume.`
+                                          : `Tu calificación es excelente (${curRating.toFixed(1)}★), pero con ${total} reseña(s) necesitas +${20 - total} reseñas de 5★ (~${Math.ceil((20 - total) / 3)} semanas) para alcanzar volumen competitivo de Top 3.`)
                                       : (isEn
                                           ? `To reach ${target}★ organically, generate ${needed5Stars} 5-star reviews using Prestigia NFC cards (~${weeksToGoal} weeks).`
                                           : `Para alcanzar ${target}★ necesitas captar ${needed5Stars} reseñas de 5★ con el sistema Prestigia NFC (~${weeksToGoal} semanas).`)}
@@ -11139,10 +11150,10 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                 <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">4</span>
-                    <strong className="text-white text-xs">{isEn ? 'Upload Menu / Service Catalog' : 'Cargar Menú / Catálogo de Servicios'}</strong>
+                    <strong className="text-white text-xs">{isEn ? 'Catalog, Services & WhatsApp Chat' : 'Catálogo, Servicios & Botón WhatsApp'}</strong>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    {isEn ? <>In the Google main menu, click <strong>"Edit services"</strong> or "Edit menu". Upload key offerings with persuasive copy and transparent pricing.</> : <>En el menú principal de Google, haz clic en <strong>"Editar servicios"</strong> o "Editar menú". Sube los platos o servicios clave con descripciones persuasivas y precios reales.</>}
+                    {isEn ? <>In Google main menu, open <strong>"Edit services"</strong> and/or <strong>"Products"</strong> to upload key offerings, and link your <strong>WhatsApp button</strong> under <em>Contact &gt; Chat</em>.</> : <>En el menú de Google, entra a <strong>"Editar servicios"</strong> y/o <strong>"Productos"</strong> para cargar tu catálogo, y vincula el <strong>botón oficial de WhatsApp</strong> en <em>Contacto &gt; Chat</em>.</>}
                   </p>
                 </div>
 
@@ -11183,8 +11194,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                   </h3>
                   <p className="text-xs text-slate-400">
                     {isEn
-                      ? 'Expose algorithmic gaps and present the dual-balance ROI to close the $200-$350 USD setup or activate monthly recurring plans.'
-                      : 'Evidencia las fallas algorítmicas frente al competidor líder y usa la balanza ROI para cerrar el setup de $250 USD o la suscripción Prestigia.'}
+                      ? 'Contrast daily Client Leaks vs. Prestigia Shield & 5★ Acceleration to close the technical setup and monthly plan.'
+                      : 'Contrasta la Fuga Diaria de Clientes frente al Escudo y Aceleración 5★ de Prestigia para cerrar el setup técnico y el plan mensual.'}
                   </p>
                 </div>
 
@@ -11201,8 +11212,8 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                       : (isEn ? 'the Local Studio team' : 'el equipo de Local Studio');
 
                     const script = isEn
-                      ? `Hello *${clientPersonName}*, this is *${senderIdentity}*.\n\nWe audited your Google Maps profile for *${auditBusinessName || 'your business'}* in *${auditCity || 'your city'}* and identified the exact reasons keeping you outside the Top 3: your profile has critical algorithmic leaks costing you dozens of local buyers daily.\n\nWe restructured the 100% technical blueprint to outrank podium competitors for a one-time optimization fee of $200 USD. Plus, as our referral client, you receive an exclusive *25% DISCOUNT on your first month* of the official *Prestigia (5★ Reviews + Digital Shield)* software suite.\n\nWould you like to review the direct head-to-head comparison against your top rival?`
-                      : `Hola *${clientPersonName}*, le saluda *${senderIdentity}*.\n\nAuditamos minuciosamente el perfil de Google Maps de *${auditBusinessName || 'su negocio'}* en *${auditCity || 'su ciudad'}* y descubrimos la razón exacta por la cual no está en los primeros 3 lugares: su ficha tiene fugas algorítmicas críticas que le regalan clientes a su competencia a diario.\n\nEn nuestra consultoría reestructuramos el 100% de su perfil para desbancar a los líderes del podio por unos honorarios únicos de $200 USD. Además, como cliente recomendado por nosotros, le otorgamos un *25% de DESCUENTO en su primer mes* al activar la suite oficial de *Prestigia (Reseñas 5★ + Blindaje Digital)*.\n\n¿Tiene 2 minutos para ver la comparativa directa frente a su competidor más fuerte?`;
+                      ? `Hello *${clientPersonName}*, this is *${senderIdentity}*.\n\nWe audited your Google Maps profile for *${auditBusinessName || 'your business'}* in *${auditCity || 'your city'}* and spotted a costly Client Leak: while Top 3 rivals keep getting fresh weekly 5★ reviews, your listing has gaps that hand local buyers to competitors daily.\n\nWith *Prestigia*, we fix that contrast immediately:\n• *Technical Top 3 Optimization:* One-time setup fee of *[YOUR FEE]*.\n• *Prestigia Benefit (Digital Shield + 5★ NFC/QR Acceleration):* Private complaint containment before 1★ reviews hit Google + steady weekly 5★ growth, with an exclusive *25% DISCOUNT on Month 1*.\n\nDo you have 2 minutes to review the head-to-head comparison?`
+                      : `Hola *${clientPersonName}*, le saluda *${senderIdentity}*.\n\nAuditamos el perfil de Google Maps de *${auditBusinessName || 'su negocio'}* en *${auditCity || 'su ciudad'}* y detectamos una Fuga de Clientes clara: mientras los líderes del Top 3 suman reseñas frescas cada semana, su ficha tiene brechas que le regalan ventas diarias a la competencia.\n\nCon *Prestigia* cerramos esa fuga de raíz:\n• *Optimización Técnica Top 3:* Honorarios únicos de *[TU TARIFA]*.\n• *Beneficio Prestigia (Escudo Privado + Aceleración 5★ con NFC/QR):* Contención de quejas en privado antes de que dañen su Google Maps + flujo semanal constante de 5★, con *25% DE DESCUENTO en su primer mes*.\n\n¿Tiene 2 minutos para revisar la comparativa directa frente a su competencia?`;
 
                     copyToClipboard(script, isEn ? 'Audit Pitch (WhatsApp)' : 'Guión de Venta de Auditoría (WhatsApp)');
                   }}
@@ -11257,7 +11268,7 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
                     {isEn ? '⚠️ Objection: "How much does optimization cost?"' : '⚠️ Objeción: "¿Y cuánto me cuesta esta optimización?"'}
                   </strong>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"The forensic audit and Top 3 upgrade is a transparent technical fee of $200 USD. Plus, by activating your tailored Prestigia 5★ Plan through us today, you get 25% OFF your first month of software."' : '"El setup de auditoría y optimización forense es una tarifa única y transparente de $200 USD por todo el trabajo técnico. Además, al activar su Plan Prestigia de Reseñas 5★ a través de nosotros, recibe un 25% DE DESCUENTO exclusivo en su primer mes de software."'}
+                    <strong>{isEn ? 'Advisor Answer:' : 'Respuesta Asesor:'}</strong> {isEn ? '"The forensic audit and Top 3 upgrade is a transparent one-time technical fee (quoted according to your market and scope). Plus, by activating your Prestigia 5★ & Digital Shield Plan through us today, you get 25% OFF your first month."' : '"El setup de auditoría y optimización forense es una tarifa única y transparente (definida según el alcance y mercado de tu negocio) por todo el trabajo técnico. Además, al activar hoy su Plan Prestigia de Reseñas 5★ + Escudo Digital, recibe un 25% DE DESCUENTO exclusivo en su primer mes."'}
                   </p>
                 </div>
               </div>

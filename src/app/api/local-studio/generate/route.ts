@@ -456,8 +456,38 @@ function detectTaxonomy(params: {
     };
   }
 
-  // PRIORIDAD 7: SERVICIOS PROFESIONALES / LEGAL / B2B
-  if (cat.includes('legal') || cat.includes('abog') || cat.includes('contab') || cat.includes('b2b') || combined.includes('juríd')) {
+  // PRIORIDAD 7A: ADMINISTRACIÓN DE EMPRESAS / CONSULTORÍA B2B / SERVICIOS EMPRESARIALES (sin ser abogados)
+  const isExplicitLaw =
+    combined.includes('abog') ||
+    combined.includes('juríd') ||
+    combined.includes('jurid') ||
+    combined.includes('notar') ||
+    combined.includes('law firm') ||
+    combined.includes('attorney') ||
+    combined.includes('lawyer') ||
+    combined.includes('servicios legales');
+
+  if (
+    !isExplicitLaw &&
+    (combined.includes('administraci') ||
+      combined.includes('administration') ||
+      combined.includes('management') ||
+      combined.includes('consultor') ||
+      combined.includes('servicios profesional') ||
+      combined.includes('servicios empresarial') ||
+      combined.includes('contab') ||
+      cat.includes('b2b'))
+  ) {
+    return {
+      primaryCategory: isEn ? 'Business Management Consultant' : 'Servicio de administración de empresas',
+      secondaryCategories: isEn
+        ? ['Business Administration Service', 'Corporate Office', 'Business to Business Service', 'Business Development Service', 'Consultant']
+        : ['Consultor de administración empresarial', 'Oficina corporativa', 'Servicio de empresa a empresa', 'Asesoría empresarial', 'Consultoría de negocios'],
+    };
+  }
+
+  // PRIORIDAD 7B: SERVICIOS LEGALES / BUFETE DE ABOGADOS
+  if (isExplicitLaw || cat.includes('legal')) {
     return {
       primaryCategory: isEn ? 'Law Firm' : 'Bufete de abogados',
       secondaryCategories: isEn
@@ -624,7 +654,22 @@ function detectTaxonomy(params: {
     };
   }
 
-  // 5. SERVICIOS PROFESIONALES / LEGAL / B2B
+  // 5A. ADMINISTRACIÓN / CONSULTORÍA EMPRESARIAL B2B
+  if (
+    !combined.includes('abog') &&
+    !combined.includes('juríd') &&
+    !combined.includes('jurid') &&
+    (combined.includes('administraci') || combined.includes('consultor') || combined.includes('management') || combined.includes('servicios profesional'))
+  ) {
+    return {
+      primaryCategory: isEn ? 'Business Management Consultant' : 'Servicio de administración de empresas',
+      secondaryCategories: isEn
+        ? ['Business Administration Service', 'Corporate Office', 'Business to Business Service', 'Business Development Service', 'Consultant']
+        : ['Consultor de administración empresarial', 'Oficina corporativa', 'Servicio de empresa a empresa', 'Asesoría empresarial', 'Consultoría de negocios'],
+    };
+  }
+
+  // 5B. SERVICIOS LEGALES / ABOGADOS
   if (combined.includes('abog') || combined.includes('legal') || combined.includes('juríd')) {
     return {
       primaryCategory: isEn ? 'Law Firm' : 'Bufete de abogados',
