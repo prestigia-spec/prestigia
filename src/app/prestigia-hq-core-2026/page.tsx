@@ -5475,6 +5475,36 @@ export default function MasterAdminPage() {
                             <span>Probar Ficha 5★</span>
                           </a>
 
+                          {/* Connect Google Business OAuth (Direct or Copy Link for Owner) */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              window.open(
+                                `/api/auth/google/login?businessId=${encodeURIComponent(currentBusiness.id)}&branchId=${encodeURIComponent(branch.id)}&returnUrl=/prestigia-hq-core-2026`,
+                                '_blank'
+                              );
+                            }}
+                            className="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                            title="Conectar Gmail dueño de esta sede vía Google OAuth"
+                          >
+                            <Globe className="w-3 h-3 text-emerald-400" />
+                            <span>{branch.googleBusinessStatus === 'connected' ? 'Google Conectado ✓' : 'Conectar Google'}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const authUrl = `${window.location.origin}/api/auth/google/login?businessId=${encodeURIComponent(currentBusiness.id)}&branchId=${encodeURIComponent(branch.id)}&returnUrl=/portal`;
+                              navigator.clipboard.writeText(authUrl);
+                              alert(`🔗 Enlace de autorización Google copiado para enviar por WhatsApp al dueño de ${branch.name}:\n\n${authUrl}`);
+                            }}
+                            className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                            title="Copiar enlace OAuth para que el dueño autorice desde su celular"
+                          >
+                            <ExternalLink className="w-3 h-3 text-slate-300" />
+                            <span>Link OAuth</span>
+                          </button>
+
                           {/* Direct Impersonation for this Branch */}
                           <button
                             type="button"

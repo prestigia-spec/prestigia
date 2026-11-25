@@ -422,21 +422,36 @@ export async function getBusinessById(id: string): Promise<Business | null> {
       const { data: bData } = await supabase.from('businesses').select('*').eq('id', targetId).single();
       if (bData) {
         const { data: branchesData } = await supabase.from('branches').select('*').eq('business_id', targetId);
-        const mappedBranches: Branch[] = (branchesData || []).map((br: any) => ({
-          id: br.id,
-          name: br.name,
-          address: br.address || '',
-          city: br.city || '',
-          locality: br.locality || '',
-          googleReviewUrl: br.google_review_url || '',
-          googlePlaceId: br.google_place_id || undefined,
-          managerPhone: br.manager_phone || '',
-          managerPassword: br.manager_password || undefined,
-          managerUsername: br.manager_username || undefined,
-          status: br.status || 'active',
-          containmentMessage: br.containment_message || undefined,
-          websiteUrl: br.website_url || br.google_review_url || '',
-        }));
+        const mappedBranches: Branch[] = (branchesData || []).map((br: any) => {
+          const oauth = br.schedule?.__googleOAuth;
+          return {
+            id: br.id,
+            name: br.name,
+            address: br.address || '',
+            city: br.city || '',
+            locality: br.locality || '',
+            googleReviewUrl: br.google_review_url || '',
+            googlePlaceId: br.google_place_id || undefined,
+            googleBusinessStatus: br.google_business_status || (oauth?.refreshToken ? 'connected' : 'pending'),
+            googleManagedBy: br.google_managed_by || undefined,
+            googleAuditedAt: br.google_audited_at || undefined,
+            googleAuditNotes: br.google_audit_notes || undefined,
+            managerPhone: br.manager_phone || '',
+            managerPassword: br.manager_password || undefined,
+            managerUsername: br.manager_username || undefined,
+            status: br.status || 'active',
+            containmentMessage: br.containment_message || undefined,
+            websiteUrl: br.website_url || br.google_review_url || '',
+            schedule: br.schedule || undefined,
+            ...(oauth ? {
+              googleAccessToken: oauth.accessToken,
+              googleRefreshToken: oauth.refreshToken,
+              googleConnectedEmail: oauth.connectedEmail,
+              googleAccountId: oauth.accountId,
+              googleLocationId: oauth.locationId,
+            } : {}),
+          } as any;
+        });
 
         const restoredBusiness: Business = {
           id: bData.id,
@@ -486,21 +501,36 @@ export async function getAllBusinesses(): Promise<Business[]> {
           if (!exists) {
             const mappedBranches: Branch[] = (allBranches || [])
               .filter((br: any) => br.business_id.toLowerCase() === bData.id.toLowerCase())
-              .map((br: any) => ({
-                id: br.id,
-                name: br.name,
-                address: br.address || '',
-                city: br.city || '',
-                locality: br.locality || '',
-                googleReviewUrl: br.google_review_url || '',
-                googlePlaceId: br.google_place_id || undefined,
-                managerPhone: br.manager_phone || '',
-                managerPassword: br.manager_password || undefined,
-                managerUsername: br.manager_username || undefined,
-                status: br.status || 'active',
-                containmentMessage: br.containment_message || undefined,
-                websiteUrl: br.website_url || br.google_review_url || '',
-              }));
+              .map((br: any) => {
+                const oauth = br.schedule?.__googleOAuth;
+                return {
+                  id: br.id,
+                  name: br.name,
+                  address: br.address || '',
+                  city: br.city || '',
+                  locality: br.locality || '',
+                  googleReviewUrl: br.google_review_url || '',
+                  googlePlaceId: br.google_place_id || undefined,
+                  googleBusinessStatus: br.google_business_status || (oauth?.refreshToken ? 'connected' : 'pending'),
+                  googleManagedBy: br.google_managed_by || undefined,
+                  googleAuditedAt: br.google_audited_at || undefined,
+                  googleAuditNotes: br.google_audit_notes || undefined,
+                  managerPhone: br.manager_phone || '',
+                  managerPassword: br.manager_password || undefined,
+                  managerUsername: br.manager_username || undefined,
+                  status: br.status || 'active',
+                  containmentMessage: br.containment_message || undefined,
+                  websiteUrl: br.website_url || br.google_review_url || '',
+                  schedule: br.schedule || undefined,
+                  ...(oauth ? {
+                    googleAccessToken: oauth.accessToken,
+                    googleRefreshToken: oauth.refreshToken,
+                    googleConnectedEmail: oauth.connectedEmail,
+                    googleAccountId: oauth.accountId,
+                    googleLocationId: oauth.locationId,
+                  } : {}),
+                } as any;
+              });
 
             db.businesses.push({
               id: bData.id,
@@ -738,12 +768,33 @@ export async function getGoogleReviews(
   businessId: string,
   branchId?: string
 ): Promise<GoogleReview[]> {
+  await syncWithRemoteKv();
   const db = ensureDbFile();
   return db.googleReviews.filter((r) => {
     if (r.businessId !== businessId) return false;
     if (branchId && branchId !== 'all' && r.branchId !== branchId) return false;
     return true;
   });
+}
+
+export async function upsertGoogleReviews(reviews: GoogleReview[]): Promise<number> {
+  if (!reviews || reviews.length === 0) return 0;
+  await syncWithRemoteKv();
+  const db = ensureDbFile();
+  if (!db.googleReviews) db.googleReviews = [];
+
+  let addedOrUpdated = 0;
+  for (const rev of reviews) {
+    const idx = db.googleReviews.findIndex((r) => r.id === rev.id);
+    if (idx >= 0) {
+      db.googleReviews[idx] = { ...db.googleReviews[idx], ...rev };
+    } else {
+      db.googleReviews.unshift(rev);
+    }
+    addedOrUpdated++;
+  }
+  writeDbFile(db);
+  return addedOrUpdated;
 }
 
 export async function updateGoogleReviewReply(
@@ -1363,16 +1414,31 @@ export async function updateBranchGoogleTokens(
           br.googleAuditNotes = `Vinculado exitosamente vía Google OAuth (${tokens.connectedEmail || 'Gmail'})`;
           updated = true;
 
+          const existingSchedule = ((br as any).schedule && typeof (br as any).schedule === 'object') ? (br as any).schedule : {};
+          const mergedSchedule = {
+            ...existingSchedule,
+            __googleOAuth: {
+              accessToken: tokens.accessToken || existingSchedule.__googleOAuth?.accessToken,
+              refreshToken: tokens.refreshToken || existingSchedule.__googleOAuth?.refreshToken,
+              connectedEmail: tokens.connectedEmail || existingSchedule.__googleOAuth?.connectedEmail,
+              accountId: tokens.accountId || existingSchedule.__googleOAuth?.accountId,
+              locationId: tokens.locationId || existingSchedule.__googleOAuth?.locationId,
+              updatedAt: new Date().toISOString(),
+            },
+          };
+          (br as any).schedule = mergedSchedule;
+
           const supabase = getSupabase();
           if (supabase) {
-            Promise.resolve(
-              supabase.from('branches').update({
+            try {
+              await supabase.from('branches').update({
                 google_business_status: 'connected',
                 google_managed_by: 'client_self_service',
                 google_audited_at: new Date().toISOString(),
                 google_audit_notes: `OAuth Vinculado: ${tokens.connectedEmail || 'OK'}`,
-              }).eq('id', br.id)
-            ).catch(() => {});
+                schedule: mergedSchedule,
+              }).eq('id', br.id);
+            } catch {}
           }
         }
       }

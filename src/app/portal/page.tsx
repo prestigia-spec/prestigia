@@ -1662,8 +1662,10 @@ export default function PortalPage() {
   // Customer Database / VIP Club Delivery State
   const [customerDbModalOpen, setCustomerDbModalOpen] = useState(false);
 
-  // Historical Customer Database Reactivation State (For past clients from Excel, WhatsApp, etc.)
-  const [reactivationContacts, setReactivationContacts] = useState<ReactivationContact[]>(DEFAULT_REACTIVATION_CONTACTS);
+  // Historical Customer Database Reactivation State (Empty by default; isolated strictly per business)
+  const [reactivationContacts, setReactivationContacts] = useState<ReactivationContact[]>([]);
+  const [isSyncingGoogleReviews, setIsSyncingGoogleReviews] = useState(false);
+  const [googleSyncFeedback, setGoogleSyncFeedback] = useState<string | null>(null);
   const [reactivationLoaded, setReactivationLoaded] = useState(false);
   const [selectedReactivationBranchId, setSelectedReactivationBranchId] = useState<string | null>(null);
   const [copiedReactivationLink, setCopiedReactivationLink] = useState(false);
@@ -2527,11 +2529,15 @@ export default function PortalPage() {
   // Active Industry Labels for the current business
   const ind = getIndustryLabels(session?.business?.category, lang);
 
-  // LocalStorage Persistence for Reactivation Contacts (Per Business with Multi-Branch Support)
+  // LocalStorage Persistence for Reactivation Contacts (Strictly isolated per Business; zero demo data for real clients)
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    setReactivationLoaded(false);
     const businessKey = session?.business?.id || 'demo';
-    // Purge old bloated key from earlier builds to fix the 6729 phantom items
+    const isDemoBiz = businessKey === 'demo' || businessKey === 'la-burguesia';
+    const demoIds = new Set(DEFAULT_REACTIVATION_CONTACTS.map((d) => d.id));
+    const demoPhones = new Set(DEFAULT_REACTIVATION_CONTACTS.map((d) => d.phone.replace(/[^0-9]/g, '').replace(/^57/, '')));
+
     try {
       localStorage.removeItem(`prestigia_reactivation_${businessKey}`);
     } catch {}
@@ -2541,28 +2547,28 @@ export default function PortalPage() {
       const saved = localStorage.getItem(storageKey);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0 && parsed.length < 150) {
-          // Enrich any contact missing branchId
-          const defaultMap = new Map(DEFAULT_REACTIVATION_CONTACTS.map((d) => [d.phone.replace(/[^0-9]/g, '').replace(/^57/, ''), d]));
-          const upgradedParsed = parsed.map((c: ReactivationContact) => {
-            const clean = c.phone.replace(/[^0-9]/g, '').replace(/^57/, '');
-            const def = defaultMap.get(clean);
-            return {
-              ...c,
-              branchId: c.branchId || def?.branchId || session?.branches[0]?.id,
-              branchName: c.branchName || def?.branchName || session?.branches[0]?.name,
-            };
-          });
+        if (Array.isArray(parsed) && parsed.length < 500) {
+          const filtered = isDemoBiz
+            ? parsed
+            : parsed.filter((c: ReactivationContact) => {
+                const cleanP = (c.phone || '').replace(/[^0-9]/g, '').replace(/^57/, '');
+                return !demoIds.has(c.id) && !demoPhones.has(cleanP);
+              });
+          const upgradedParsed = filtered.map((c: ReactivationContact) => ({
+            ...c,
+            branchId: c.branchId || session?.branches[0]?.id,
+            branchName: c.branchName || session?.branches[0]?.name,
+          }));
           setReactivationContacts(upgradedParsed);
         } else {
-          setReactivationContacts(DEFAULT_REACTIVATION_CONTACTS);
+          setReactivationContacts(isDemoBiz ? DEFAULT_REACTIVATION_CONTACTS : []);
         }
       } else {
-        setReactivationContacts(DEFAULT_REACTIVATION_CONTACTS);
+        setReactivationContacts(isDemoBiz ? DEFAULT_REACTIVATION_CONTACTS : []);
       }
     } catch (e) {
       console.error('Error loading saved reactivation contacts', e);
-      setReactivationContacts(DEFAULT_REACTIVATION_CONTACTS);
+      setReactivationContacts(isDemoBiz ? DEFAULT_REACTIVATION_CONTACTS : []);
     } finally {
       setReactivationLoaded(true);
     }
@@ -2620,15 +2626,15 @@ export default function PortalPage() {
   const [isSavingBranding, setIsSavingBranding] = useState(false);
   const [brandingSaveSuccess, setBrandingSaveSuccess] = useState(false);
 
-  // Campaign Participants (Customers who voted in QR)
-  const [participants, setParticipants] = useState<CampaignParticipant[]>(DEFAULT_CURRENT_PARTICIPANTS);
+  // Campaign Participants (Empty by default; isolated strictly per business)
+  const [participants, setParticipants] = useState<CampaignParticipant[]>([]);
   const [giveawayLoaded, setGiveawayLoaded] = useState(false);
   const [participantSearch, setParticipantSearch] = useState('');
   const [participantBranchFilter, setParticipantBranchFilter] = useState('all');
   const [participantStatusFilter, setParticipantStatusFilter] = useState<'all' | 'winners' | 'participants'>('all');
   const [selectedGiveawayEditionId, setSelectedGiveawayEditionId] = useState<string>('current');
-  const [pastGiveaways, setPastGiveaways] = useState<PastGiveawayEdition[]>(DEFAULT_PAST_GIVEAWAYS);
-  const [vipLoyaltyCustomers, setVipLoyaltyCustomers] = useState<VipLoyaltyCustomer[]>(DEFAULT_VIP_LOYALTY_CUSTOMERS);
+  const [pastGiveaways, setPastGiveaways] = useState<PastGiveawayEdition[]>([]);
+  const [vipLoyaltyCustomers, setVipLoyaltyCustomers] = useState<VipLoyaltyCustomer[]>([]);
 
   // Sync global top navbar branch selection with giveaway & reactivation branch filter & Profile activeBranchEditIdx
   useEffect(() => {
@@ -2678,12 +2684,17 @@ export default function PortalPage() {
     });
   }, [participants, reactivationLoaded, session?.branches]);
 
-  // LocalStorage Persistence for Current Giveaway (Per Business)
+  // LocalStorage Persistence for Current Giveaway (Strictly isolated per Business; zero demo bleed)
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    setGiveawayLoaded(false);
     const businessKey = session?.business?.id || 'demo';
+    const isDemoBiz = businessKey === 'demo' || businessKey === 'la-burguesia';
+    const demoParticipantIds = new Set(DEFAULT_CURRENT_PARTICIPANTS.map((d) => d.id));
+    const demoParticipantPhones = new Set(DEFAULT_CURRENT_PARTICIPANTS.map((d) => d.customerPhone.replace(/[^0-9]/g, '').replace(/^57/, '')));
     const legacyKey = `prestigia_giveaway_${businessKey}`;
     const storageKey = `prestigia_giveaway_v2_${businessKey}`;
+
     try {
       if (localStorage.getItem(legacyKey)) {
         localStorage.removeItem(legacyKey);
@@ -2691,12 +2702,27 @@ export default function PortalPage() {
       const saved = localStorage.getItem(storageKey);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setParticipants(parsed);
+        if (Array.isArray(parsed)) {
+          const cleanList = isDemoBiz
+            ? parsed
+            : parsed.filter((p: CampaignParticipant) => {
+                const cleanP = (p.customerPhone || '').replace(/[^0-9]/g, '').replace(/^57/, '');
+                return !demoParticipantIds.has(p.id) && !demoParticipantPhones.has(cleanP);
+              });
+          setParticipants(cleanList);
+        } else {
+          setParticipants(isDemoBiz ? DEFAULT_CURRENT_PARTICIPANTS : []);
         }
+      } else {
+        setParticipants(isDemoBiz ? DEFAULT_CURRENT_PARTICIPANTS : []);
       }
+      setPastGiveaways(isDemoBiz ? DEFAULT_PAST_GIVEAWAYS : []);
+      setVipLoyaltyCustomers(isDemoBiz ? DEFAULT_VIP_LOYALTY_CUSTOMERS : []);
     } catch (e) {
       console.error('Error loading saved giveaway state', e);
+      setParticipants(isDemoBiz ? DEFAULT_CURRENT_PARTICIPANTS : []);
+      setPastGiveaways(isDemoBiz ? DEFAULT_PAST_GIVEAWAYS : []);
+      setVipLoyaltyCustomers(isDemoBiz ? DEFAULT_VIP_LOYALTY_CUSTOMERS : []);
     } finally {
       setGiveawayLoaded(true);
     }
@@ -10076,6 +10102,73 @@ export default function PortalPage() {
                     ? (lang === 'en' ? 'All Locations' : 'Todas las Sedes')
                     : formatBranchName(session.branches.find(b => b.id === selectedBranchId)?.name || (lang === 'en' ? 'Location' : 'Sede'), lang)}
                 </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!session?.business?.id) return;
+                    const targetBranch =
+                      selectedBranchId !== 'all' ? selectedBranchId : (session.branches[0]?.id || '');
+                    window.location.href = `/api/auth/google/login?businessId=${encodeURIComponent(
+                      session.business.id
+                    )}&branchId=${encodeURIComponent(targetBranch)}&returnUrl=/portal`;
+                  }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm ${
+                    theme === 'light'
+                      ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                      : 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/30'
+                  }`}
+                  title={lang === 'en' ? 'Connect Google Business Profile via OAuth' : 'Conectar cuenta oficial de Google Business (OAuth)'}
+                >
+                  <Globe className="w-3.5 h-3.5" />
+                  <span>{lang === 'en' ? 'Connect Google' : 'Conectar Google'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={isSyncingGoogleReviews}
+                  onClick={async () => {
+                    if (!session?.business?.id) return;
+                    setIsSyncingGoogleReviews(true);
+                    setGoogleSyncFeedback(null);
+                    try {
+                      const targetBranch =
+                        selectedBranchId !== 'all' ? selectedBranchId : (session.branches[0]?.id || '');
+                      const res = await fetch('/api/portal/google-business/sync', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          businessId: session.business.id,
+                          branchId: targetBranch,
+                        }),
+                      });
+                      const data = await res.json();
+                      if (data.success) {
+                        setGoogleSyncFeedback(data.message || '✅ Reseñas sincronizadas');
+                        const branchParam = selectedBranchId !== 'all' ? `&branchId=${selectedBranchId}` : '';
+                        const resG = await fetch(`/api/portal/google-reviews?businessId=${session.business.id}${branchParam}`);
+                        const dataG = await resG.json();
+                        if (dataG.success && Array.isArray(dataG.reviews)) {
+                          setGoogleReviews(dataG.reviews);
+                        }
+                      } else {
+                        setGoogleSyncFeedback(data.error || '⚠️ No se pudo sincronizar con Google.');
+                      }
+                    } catch {
+                      setGoogleSyncFeedback('⚠️ Error de conexión al sincronizar reseñas.');
+                    } finally {
+                      setIsSyncingGoogleReviews(false);
+                    }
+                  }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm disabled:opacity-50 ${
+                    theme === 'light'
+                      ? 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200'
+                      : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/30'
+                  }`}
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isSyncingGoogleReviews ? 'animate-spin' : ''}`} />
+                  <span>{isSyncingGoogleReviews ? (lang === 'en' ? 'Syncing...' : 'Sincronizando...') : (lang === 'en' ? 'Sync Reviews' : 'Sincronizar Reseñas')}</span>
+                </button>
+
                 {session?.branches[0]?.googleReviewUrl && (
                   <a
                     href={
@@ -10098,6 +10191,11 @@ export default function PortalPage() {
                 )}
               </div>
             </div>
+            {googleSyncFeedback && (
+              <div className="px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-indigo-500/30 text-xs text-slate-200">
+                {googleSyncFeedback}
+              </div>
+            )}
 
             {/* KPI Executive Reputation Health Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -23242,8 +23340,22 @@ export default function PortalPage() {
                                 </div>
                               </div>
 
-                              {/* Self Service Button if allowed by Master, or Request Assistance */}
-                              <div className="shrink-0 flex items-center gap-2">
+                              {/* Google OAuth Connect + Self Service / Assistance */}
+                              <div className="shrink-0 flex flex-wrap items-center gap-2">
+                                {session?.business?.id && curBranch?.id && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      window.location.href = `/api/auth/google/login?businessId=${encodeURIComponent(
+                                        session.business.id
+                                      )}&branchId=${encodeURIComponent(curBranch.id)}&returnUrl=/portal`;
+                                    }}
+                                    className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+                                  >
+                                    <Globe className="w-3.5 h-3.5" />
+                                    <span>{isConnected ? (lang === 'en' ? 'Reconnect Google OAuth' : 'Reconectar Google OAuth') : (lang === 'en' ? 'Connect Google OAuth' : 'Conectar con Google (OAuth)')}</span>
+                                  </button>
+                                )}
                                 {selfServiceAllowed ? (
                                   <button
                                     type="button"
