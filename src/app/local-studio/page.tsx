@@ -3819,11 +3819,11 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
           if (!auditContactPhone) setAuditContactPhone(place.phone);
         }
 
-        let parsedCity = auditCity;
+        let parsedCity = (auditCity && auditCity !== 'Bogotá') ? auditCity : (auditContactCity || auditCity);
         let parsedNeighborhood = auditNeighborhood;
-        let parsedCountry = auditCountry;
+        let parsedCountry = (auditCountry && auditCountry !== 'Colombia') ? auditCountry : (auditContactCountry || auditCountry);
         if (place.address && !place.address.toLowerCase().includes('ubicación verificada')) {
-          const parsedGeo = parseAddressGeo(place.address, auditCountry, auditCity, auditNeighborhood);
+          const parsedGeo = parseAddressGeo(place.address, parsedCountry, parsedCity, auditNeighborhood);
           parsedCountry = parsedGeo.country;
           parsedCity = parsedGeo.city;
           parsedNeighborhood = parsedGeo.neighborhood;
@@ -3846,6 +3846,20 @@ Si antes de terminar tu ciclo mensual requieres más cupo para prospectar o cerr
           if (parsedGeo.neighborhood) {
             parsedNeighborhood = parsedGeo.neighborhood;
             setAuditNeighborhood(parsedGeo.neighborhood);
+          }
+        } else if (place.phone && place.phone.trim().startsWith('+1')) {
+          // SAB / hidden street address in US/Canada: never default to Colombia / Bogotá
+          if (parsedCountry === 'Colombia') {
+            parsedCountry = 'Estados Unidos';
+            setAuditCountry('Estados Unidos');
+          }
+          if (parsedCity === 'Bogotá') {
+            parsedCity = (auditContactCountry === 'Estados Unidos' && auditContactCity && auditContactCity !== 'Bogotá')
+              ? auditContactCity
+              : (isEn ? 'your service area' : 'tu zona de cobertura');
+            if (parsedCity !== 'tu zona de cobertura' && parsedCity !== 'your service area') {
+              setAuditCity(parsedCity);
+            }
           }
         }
 
