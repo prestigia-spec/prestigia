@@ -2574,6 +2574,14 @@ export default function HomePage() {
 
         <div className="max-w-[1700px] mx-auto mt-8 pt-6 border-t border-slate-900 text-[10px] text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p>© {new Date().getFullYear()} Prestigia Technologies. {isEn ? 'All rights reserved.' : 'Todos los derechos reservados.'}</p>
+          <div className="flex items-center gap-4">
+            <Link href="/privacidad" className="text-slate-400 hover:text-white underline transition">
+              {isEn ? 'Privacy Policy' : 'Política de Privacidad'}
+            </Link>
+            <Link href="/terminos" className="text-slate-400 hover:text-white underline transition">
+              {isEn ? 'Terms of Service' : 'Términos de Servicio'}
+            </Link>
+          </div>
           <p>{t.footer.compliance}</p>
         </div>
       </footer>
