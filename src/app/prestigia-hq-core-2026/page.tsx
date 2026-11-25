@@ -11669,6 +11669,50 @@ Quedamos atentos a la confirmación o recepción de tu soporte de pago para mant
                     />
                   </div>
                 </div>
+
+                {editingBranch && (
+                  <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div className="text-[11px]">
+                      <span className="font-bold text-emerald-300 block">
+                        {editingBranch.googleBusinessStatus === 'connected'
+                          ? '✅ Google Business OAuth Conectado'
+                          : '🔗 Conexión Oficial Google Business (OAuth)'}
+                      </span>
+                      <span className="text-slate-400">
+                        {editingBranch.googleBusinessStatus === 'connected'
+                          ? 'Permite leer reseñas reales y publicar respuestas directo desde Prestigia.'
+                          : 'Autoriza el Gmail dueño de esta ficha para sincronizar reseñas y responder directo.'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          window.open(
+                            `/api/auth/google/login?businessId=${encodeURIComponent(currentBusiness.id)}&branchId=${encodeURIComponent(editingBranch.id)}&returnUrl=/prestigia-hq-core-2026`,
+                            '_blank'
+                          );
+                        }}
+                        className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                      >
+                        <Globe className="w-3.5 h-3.5" />
+                        <span>{editingBranch.googleBusinessStatus === 'connected' ? 'Reconectar Google' : 'Conectar con Google'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const authUrl = `${window.location.origin}/api/auth/google/login?businessId=${encodeURIComponent(currentBusiness.id)}&branchId=${encodeURIComponent(editingBranch.id)}&returnUrl=/portal`;
+                          navigator.clipboard.writeText(authUrl);
+                          alert(`🔗 Link OAuth copiado para enviar por WhatsApp al dueño de ${editingBranch.name}:\n\n${authUrl}`);
+                        }}
+                        className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>Copiar Link OAuth</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Step 5: Acuerdo Económico y Tarifa Mensual de esta Sede */}
