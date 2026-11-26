@@ -367,10 +367,10 @@ function writeDbFile(data: DatabaseSchema): void {
   }
 }
 
-function mapSupabaseBranch(br: any): Branch {
+function mapSupabaseBranch(br: any, fallbackCfg?: any): Branch {
   const schedObj = br.schedule && typeof br.schedule === 'object' ? br.schedule : {};
   const oauth = schedObj.__googleOAuth || null;
-  const portalCfg = schedObj.__portalConfig || {};
+  const portalCfg = schedObj.__portalConfig || fallbackCfg || {};
 
   return {
     id: br.id,
@@ -418,6 +418,8 @@ function mapSupabaseBranch(br: any): Branch {
 }
 
 function mapSupabaseBusiness(bData: any, branchesData: any[]): Business {
+  const brandingObj = bData.branding && typeof bData.branding === 'object' ? bData.branding : {};
+  const branchConfigs = brandingObj.__branchConfigs && typeof brandingObj.__branchConfigs === 'object' ? brandingObj.__branchConfigs : {};
   return {
     id: bData.id,
     name: bData.name,
@@ -434,11 +436,11 @@ function mapSupabaseBusiness(bData: any, branchesData: any[]): Business {
     country: bData.country || 'Colombia',
     createdAt: bData.created_at || new Date().toISOString(),
     password: bData.password,
-    branding: bData.branding || {},
+    branding: brandingObj,
     baseline: bData.baseline || {},
     masterAddOns: bData.master_add_ons || {},
     customStaffRoles: bData.custom_staff_roles || [],
-    branches: (branchesData || []).map(mapSupabaseBranch),
+    branches: (branchesData || []).map((br: any) => mapSupabaseBranch(br, branchConfigs[br.id])),
   };
 }
 
@@ -580,6 +582,35 @@ export async function saveBusiness(business: Business): Promise<void> {
   try {
     const supabase = getSupabase();
     if (supabase) {
+      const branchConfigs: Record<string, any> = {};
+      const preparedBranches = (business.branches || []).map((br) => {
+        const prevSched = (br as any).schedule && typeof (br as any).schedule === 'object' ? (br as any).schedule : {};
+        const portalCfg = {
+          websiteUrl: br.websiteUrl || '',
+          instagramUrl: br.instagramUrl || '',
+          tiktokUrl: br.tiktokUrl || '',
+          facebookUrl: br.facebookUrl || '',
+          whatsappVipUrl: br.whatsappVipUrl || '',
+          menuUrl: br.menuUrl || '',
+          staffMembers: br.staffMembers || [],
+          managers: br.managers || [],
+          customStaffRoles: br.customStaffRoles || [],
+          scheduleWeekdays: br.scheduleWeekdays || '',
+          scheduleWeekends: br.scheduleWeekends || '',
+          scheduleHolidays: br.scheduleHolidays || '',
+          responseTimeSla: br.responseTimeSla || '',
+          timezone: br.timezone || '',
+          lastAuditUpdate: br.lastAuditUpdate || '',
+        };
+        branchConfigs[br.id] = portalCfg;
+        return { br, mergedSchedule: { ...prevSched, __portalConfig: portalCfg } };
+      });
+
+      const mergedBranding = {
+        ...(business.branding || {}),
+        __branchConfigs: branchConfigs,
+      };
+
       await supabase.from('businesses').upsert({
         id: business.id,
         name: business.name,
@@ -594,52 +625,32 @@ export async function saveBusiness(business: Business): Promise<void> {
         category: business.category,
         country: business.country || 'Colombia',
         password: business.password,
-        branding: business.branding || {},
+        branding: mergedBranding,
         baseline: business.baseline || {},
         master_add_ons: business.masterAddOns || {},
         custom_staff_roles: business.customStaffRoles || [],
       });
 
-      if (business.branches && business.branches.length > 0) {
-        for (const br of business.branches) {
-          const prevSched = (br as any).schedule && typeof (br as any).schedule === 'object' ? (br as any).schedule : {};
-          const mergedSchedule = {
-            ...prevSched,
-            __portalConfig: {
-              websiteUrl: br.websiteUrl || '',
-              instagramUrl: br.instagramUrl || '',
-              tiktokUrl: br.tiktokUrl || '',
-              facebookUrl: br.facebookUrl || '',
-              whatsappVipUrl: br.whatsappVipUrl || '',
-              menuUrl: br.menuUrl || '',
-              staffMembers: br.staffMembers || [],
-              managers: br.managers || [],
-              customStaffRoles: br.customStaffRoles || [],
-              scheduleWeekdays: br.scheduleWeekdays || '',
-              scheduleWeekends: br.scheduleWeekends || '',
-              scheduleHolidays: br.scheduleHolidays || '',
-              responseTimeSla: br.responseTimeSla || '',
-              timezone: br.timezone || '',
-              lastAuditUpdate: br.lastAuditUpdate || '',
-            },
-          };
-          await supabase.from('branches').upsert({
-            id: br.id,
-            business_id: business.id,
-            name: br.name,
-            address: br.address || null,
-            city: br.city,
-            locality: br.locality,
-            google_review_url: br.googleReviewUrl,
-            google_place_id: br.googlePlaceId || null,
-            manager_phone: br.managerPhone,
-            manager_password: br.managerPassword || null,
-            manager_username: br.managerUsername || null,
-            status: br.status,
-            containment_message: br.containmentMessage || null,
-            website_url: br.websiteUrl || null,
-            schedule: mergedSchedule,
-          });
+      for (const { br, mergedSchedule } of preparedBranches) {
+        const { error: upsertErr } = await supabase.from('branches').upsert({
+          id: br.id,
+          business_id: business.id,
+          name: br.name,
+          address: br.address || null,
+          city: br.city,
+          locality: br.locality,
+          google_review_url: br.googleReviewUrl,
+          google_place_id: br.googlePlaceId || null,
+          manager_phone: br.managerPhone,
+          manager_password: br.managerPassword || null,
+          manager_username: br.managerUsername || null,
+          status: br.status,
+          containment_message: br.containmentMessage || null,
+          schedule: mergedSchedule,
+        });
+        if (upsertErr) {
+          console.error('Supabase branch upsert warning:', upsertErr.message);
+          await supabase.from('branches').update({ schedule: mergedSchedule }).eq('id', br.id);
         }
       }
     }

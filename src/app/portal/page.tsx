@@ -8420,16 +8420,20 @@ export default function PortalPage() {
 
       setProfileBranches(normalizedBranches);
 
-      // Update local session
+      // Update local session + localStorage immediately so reload never flashes stale data
       setSession((prev) => {
         if (!prev) return null;
-        return {
+        const updatedSession = {
           ...prev,
           business: data.business,
           branches: (effectivePlan === 'pro' || effectivePlan === 'independiente')
             ? (data.business.branches || []).slice(0, 1)
             : data.business.branches,
         };
+        try {
+          localStorage.setItem('prestigia_portal_session', JSON.stringify(updatedSession));
+        } catch {}
+        return updatedSession;
       });
 
       if (section === 'identity' || section === 'all') setIsIdentityDirty(false);
