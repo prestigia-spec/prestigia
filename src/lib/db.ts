@@ -611,7 +611,7 @@ export async function saveBusiness(business: Business): Promise<void> {
         __branchConfigs: branchConfigs,
       };
 
-      await supabase.from('businesses').upsert({
+      const { error: bizErr } = await supabase.from('businesses').upsert({
         id: business.id,
         name: business.name,
         legal_name: business.legalName || null,
@@ -630,6 +630,9 @@ export async function saveBusiness(business: Business): Promise<void> {
         master_add_ons: business.masterAddOns || {},
         custom_staff_roles: business.customStaffRoles || [],
       });
+      if (bizErr) {
+        throw new Error(`Supabase businesses upsert failed: ${bizErr.message}`);
+      }
 
       for (const { br, mergedSchedule } of preparedBranches) {
         const { error: upsertErr } = await supabase.from('branches').upsert({

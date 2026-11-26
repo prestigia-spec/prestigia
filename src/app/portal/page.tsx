@@ -1238,60 +1238,6 @@ export default function PortalPage() {
             setIncomingApprovalRequest(null);
           }
         }
-
-        // Sincronización en segundo plano con Master cada 10 segundos
-        const now = Date.now();
-        if (!lastMasterSyncRef.current || now - lastMasterSyncRef.current >= 10000) {
-          lastMasterSyncRef.current = now;
-          fetch(`/api/businesses/${session.business.id}?t=${now}`, {
-            cache: 'no-store',
-            headers: { Pragma: 'no-cache' },
-          })
-            .then((r) => r.json())
-            .then((fresh) => {
-              if (fresh && (fresh.rawBusiness || fresh.businessId)) {
-                const hasUnsavedLocalEdits =
-                  isSavingProfile || isSocialDirty || isStaffDirty || isScheduleDirty || isIdentityDirty;
-                const updatedBiz = fresh.rawBusiness || {
-                  ...session.business,
-                  plan: fresh.plan || session.business.plan,
-                  status: fresh.status || session.business.status,
-                  masterAddOns: fresh.masterAddOns !== undefined ? fresh.masterAddOns : session.business.masterAddOns,
-                  branches: fresh.branches || session.business.branches,
-                  branding: fresh.branding || session.business.branding,
-                };
-
-                const planChanged = updatedBiz.plan !== session.business.plan;
-                const statusChanged = updatedBiz.status !== session.business.status;
-                const addOnsChanged = JSON.stringify(updatedBiz.masterAddOns) !== JSON.stringify(session.business.masterAddOns);
-                const branchesChanged =
-                  !hasUnsavedLocalEdits &&
-                  JSON.stringify(updatedBiz.branches) !== JSON.stringify(session.business.branches);
-
-                if (planChanged || statusChanged || addOnsChanged || branchesChanged) {
-                  setSession((prev) => {
-                    if (!prev || prev.business.id !== updatedBiz.id) return prev;
-                    const nextBranches = hasUnsavedLocalEdits
-                      ? prev.branches
-                      : (updatedBiz.branches || prev.branches);
-                    const updated = {
-                      ...prev,
-                      business: {
-                        ...updatedBiz,
-                        branches: hasUnsavedLocalEdits ? prev.business.branches : updatedBiz.branches,
-                      },
-                      branches: nextBranches,
-                    };
-                    try {
-                      localStorage.setItem('prestigia_portal_session', JSON.stringify(updated));
-                    } catch {}
-                    return updated;
-                  });
-                }
-              }
-            })
-            .catch(() => {});
-        }
       } catch (e) {
         console.warn('Heartbeat check error', e);
       }
