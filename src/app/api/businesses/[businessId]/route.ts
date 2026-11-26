@@ -251,10 +251,10 @@ export async function PUT(
 
     await saveBusiness(updatedBusiness);
     return NextResponse.json({ success: true, business: updatedBusiness });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating business:', error);
     return NextResponse.json(
-      { error: 'Error interno al actualizar los datos del negocio' },
+      { error: `Error al actualizar los datos del negocio: ${error?.message || 'Error interno'}` },
       { status: 500 }
     );
   }

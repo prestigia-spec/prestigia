@@ -653,11 +653,17 @@ export async function saveBusiness(business: Business): Promise<void> {
         });
         if (upsertErr) {
           console.error('Supabase branch upsert warning:', upsertErr.message);
-          await supabase.from('branches').update({ schedule: mergedSchedule }).eq('id', br.id);
+          const { error: updErr } = await supabase.from('branches').update({ schedule: mergedSchedule }).eq('id', br.id);
+          if (updErr) {
+            console.error('Supabase branch schedule update warning:', updErr.message);
+          }
         }
       }
     }
-  } catch {}
+  } catch (err: any) {
+    console.error('[DB] saveBusiness Supabase error:', err?.message);
+    throw err;
+  }
 }
 
 export async function updateBusinessStatus(

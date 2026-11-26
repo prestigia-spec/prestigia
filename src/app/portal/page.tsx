@@ -22917,7 +22917,12 @@ export default function PortalPage() {
                     </div>
 
                     {/* Dedicated Save Button for Box 3: Canales Digitales & Redes */}
-                    <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
+                    <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/80 space-y-2">
+                      {profileSaveError && (
+                        <div className="p-2.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-400 text-xs font-bold">
+                          ⚠️ {profileSaveError}
+                        </div>
+                      )}
                       <button
                         type="button"
                         onClick={(e) => handleSaveProfile(e, 'social')}
