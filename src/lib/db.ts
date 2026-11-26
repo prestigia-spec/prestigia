@@ -370,7 +370,10 @@ function writeDbFile(data: DatabaseSchema): void {
 function mapSupabaseBranch(br: any, fallbackCfg?: any): Branch {
   const schedObj = br.schedule && typeof br.schedule === 'object' ? br.schedule : {};
   const oauth = schedObj.__googleOAuth || null;
-  const portalCfg = schedObj.__portalConfig || fallbackCfg || {};
+  const portalCfg = {
+    ...(fallbackCfg && typeof fallbackCfg === 'object' ? fallbackCfg : {}),
+    ...(schedObj.__portalConfig && typeof schedObj.__portalConfig === 'object' ? schedObj.__portalConfig : {}),
+  };
 
   return {
     id: br.id,
