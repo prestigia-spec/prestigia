@@ -611,27 +611,40 @@ export async function saveBusiness(business: Business): Promise<void> {
         __branchConfigs: branchConfigs,
       };
 
-      const { error: bizErr } = await supabase.from('businesses').upsert({
-        id: business.id,
-        name: business.name,
-        legal_name: business.legalName || null,
-        tax_id: business.taxId || null,
-        address: business.address || null,
-        owner_name: business.ownerName,
-        owner_phone: business.ownerPhone,
-        owner_email: business.ownerEmail || null,
-        plan: business.plan,
-        status: business.status,
-        category: business.category,
-        country: business.country || 'Colombia',
-        password: business.password,
-        branding: mergedBranding,
-        baseline: business.baseline || {},
-        master_add_ons: business.masterAddOns || {},
-        custom_staff_roles: business.customStaffRoles || [],
-      });
-      if (bizErr) {
-        throw new Error(`Supabase businesses upsert failed: ${bizErr.message}`);
+      const { data: bizRows, error: bizErr } = await supabase
+        .from('businesses')
+        .upsert({
+          id: business.id,
+          name: business.name,
+          legal_name: business.legalName || null,
+          tax_id: business.taxId || null,
+          address: business.address || null,
+          owner_name: business.ownerName,
+          owner_phone: business.ownerPhone,
+          owner_email: business.ownerEmail || null,
+          plan: business.plan,
+          status: business.status,
+          category: business.category,
+          country: business.country || 'Colombia',
+          password: business.password,
+          branding: mergedBranding,
+          baseline: business.baseline || {},
+          master_add_ons: business.masterAddOns || {},
+          custom_staff_roles: business.customStaffRoles || [],
+        })
+        .select('id');
+
+      if (bizErr || !bizRows || bizRows.length === 0) {
+        const { data: updBizRows, error: updBizErr } = await supabase
+          .from('businesses')
+          .update({ branding: mergedBranding })
+          .ilike('id', business.id)
+          .select('id');
+        if (updBizErr || !updBizRows || updBizRows.length === 0) {
+          throw new Error(
+            `Supabase businesses save failed: ${bizErr?.message || updBizErr?.message || '0 rows updated (RLS/Key)'}`
+          );
+        }
       }
 
       for (const { br, mergedSchedule } of preparedBranches) {
