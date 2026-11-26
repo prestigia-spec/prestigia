@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const error = searchParams.get('error');
   const rawState = searchParams.get('state');
 
-  let stateObj: { businessId?: string; branchId?: string; returnUrl?: string } = {};
+  let stateObj: { businessId?: string; branchId?: string; returnUrl?: string; popup?: boolean } = {};
   try {
     if (rawState) stateObj = JSON.parse(rawState);
   } catch {}
@@ -83,6 +83,37 @@ export async function GET(request: Request) {
         refreshToken: tokenData.refresh_token,
         connectedEmail,
       });
+    }
+
+    if (stateObj.popup) {
+      const payload = JSON.stringify({
+        type: 'PRESTIGIA_GOOGLE_OAUTH',
+        status: 'connected',
+        email: connectedEmail,
+        branchId: targetBranchId,
+      });
+      const fallbackUrl = `${returnUrl}?google_success=connected&email=${encodeURIComponent(connectedEmail)}`;
+      return new NextResponse(
+        `<!DOCTYPE html><html><body style="background:#070A12;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;">
+          <div>
+            <p style="font-size:16px;font-weight:700;">✅ Google conectado correctamente</p>
+            <p style="font-size:13px;color:#94a3b8;">Esta ventana se cerrará automáticamente...</p>
+          </div>
+          <script>
+            try {
+              if (window.opener && !window.opener.closed) {
+                window.opener.postMessage(${payload}, window.location.origin);
+                window.close();
+              } else {
+                window.location.href = ${JSON.stringify(fallbackUrl)};
+              }
+            } catch (e) {
+              window.location.href = ${JSON.stringify(fallbackUrl)};
+            }
+          </script>
+        </body></html>`,
+        { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+      );
     }
 
     return NextResponse.redirect(

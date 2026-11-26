@@ -1731,70 +1731,81 @@ export default function PortalPage() {
 
   useEffect(() => {
     if (typeof window === 'undefined' || !session?.business?.id) return;
+
+    const runPostOAuthSync = async (branchOverride?: string) => {
+      const bizId = session.business.id;
+      const targetBranch =
+        branchOverride || (selectedBranchId !== 'all' ? selectedBranchId : (session.branches?.[0]?.id || ''));
+
+      setIsSyncingGoogleReviews(true);
+      setGoogleSyncFeedback('🔄 Google vinculado. Sincronizando sede y reseñas...');
+      try {
+        const bizRes = await fetch(`/api/businesses/${bizId}?t=${Date.now()}`, { cache: 'no-store' });
+        const bizData = await bizRes.json();
+        if (bizRes.ok && bizData?.rawBusiness) {
+          const refreshedBranches = bizData.rawBusiness.branches || bizData.branches || [];
+          setProfileBranches(refreshedBranches);
+          setSession((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  business: bizData.rawBusiness,
+                  branches:
+                    effectivePlan === 'pro' || effectivePlan === 'independiente'
+                      ? refreshedBranches.slice(0, 1)
+                      : refreshedBranches,
+                }
+              : null
+          );
+        }
+
+        const syncRes = await fetch('/api/portal/google-business/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ businessId: bizId, branchId: targetBranch }),
+        });
+        const syncData = await syncRes.json();
+        if (syncData.success) {
+          setGoogleSyncFeedback(syncData.message || '✅ Google conectado y reseñas sincronizadas');
+          const branchParam = selectedBranchId !== 'all' ? `&branchId=${selectedBranchId}` : '';
+          const revRes = await fetch(`/api/portal/google-reviews?businessId=${bizId}${branchParam}`);
+          const revData = await revRes.json();
+          if (revData.success && Array.isArray(revData.reviews)) {
+            setGoogleReviews(revData.reviews);
+          }
+        } else {
+          setGoogleSyncFeedback(syncData.error || '✅ Google conectado, pero no se pudieron leer reseñas aún.');
+        }
+      } catch {
+        setGoogleSyncFeedback('⚠️ Google conectado, pero hubo un error de red al sincronizar.');
+      } finally {
+        setIsSyncingGoogleReviews(false);
+      }
+    };
+
+    const handleOAuthMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type === 'PRESTIGIA_GOOGLE_OAUTH' && event.data?.status === 'connected') {
+        runPostOAuthSync(event.data?.branchId);
+      }
+    };
+    window.addEventListener('message', handleOAuthMessage);
+
     const params = new URLSearchParams(window.location.search);
     const googleSuccess = params.get('google_success');
     const googleError = params.get('google_error');
-    if (!googleSuccess && !googleError) return;
-
-    window.history.replaceState({}, '', window.location.pathname);
-
-    if (googleError) {
-      setGoogleSyncFeedback(`⚠️ Error conectando con Google: ${googleError}`);
-      return;
+    if (googleSuccess || googleError) {
+      window.history.replaceState({}, '', window.location.pathname);
+      if (googleError) {
+        setGoogleSyncFeedback(`⚠️ Error conectando con Google: ${googleError}`);
+      } else if (googleSuccess === 'connected') {
+        runPostOAuthSync();
+      }
     }
 
-    if (googleSuccess === 'connected') {
-      const bizId = session.business.id;
-      const targetBranch =
-        selectedBranchId !== 'all' ? selectedBranchId : (session.branches?.[0]?.id || '');
-
-      (async () => {
-        setIsSyncingGoogleReviews(true);
-        setGoogleSyncFeedback('🔄 Google vinculado. Sincronizando sede y reseñas...');
-        try {
-          const bizRes = await fetch(`/api/businesses/${bizId}?t=${Date.now()}`, { cache: 'no-store' });
-          const bizData = await bizRes.json();
-          if (bizRes.ok && bizData?.rawBusiness) {
-            const refreshedBranches = bizData.rawBusiness.branches || bizData.branches || [];
-            setProfileBranches(refreshedBranches);
-            setSession((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    business: bizData.rawBusiness,
-                    branches:
-                      effectivePlan === 'pro' || effectivePlan === 'independiente'
-                        ? refreshedBranches.slice(0, 1)
-                        : refreshedBranches,
-                  }
-                : null
-            );
-          }
-
-          const syncRes = await fetch('/api/portal/google-business/sync', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ businessId: bizId, branchId: targetBranch }),
-          });
-          const syncData = await syncRes.json();
-          if (syncData.success) {
-            setGoogleSyncFeedback(syncData.message || '✅ Google conectado y reseñas sincronizadas');
-            const branchParam = selectedBranchId !== 'all' ? `&branchId=${selectedBranchId}` : '';
-            const revRes = await fetch(`/api/portal/google-reviews?businessId=${bizId}${branchParam}`);
-            const revData = await revRes.json();
-            if (revData.success && Array.isArray(revData.reviews)) {
-              setGoogleReviews(revData.reviews);
-            }
-          } else {
-            setGoogleSyncFeedback(syncData.error || '✅ Google conectado, pero no se pudieron leer reseñas aún.');
-          }
-        } catch {
-          setGoogleSyncFeedback('⚠️ Google conectado, pero hubo un error de red al sincronizar.');
-        } finally {
-          setIsSyncingGoogleReviews(false);
-        }
-      })();
-    }
+    return () => {
+      window.removeEventListener('message', handleOAuthMessage);
+    };
   }, [session?.business?.id]);
 
   // Executive Auto-Scheduler State (Envío Automático Programado por Correo / WhatsApp)
@@ -10181,9 +10192,13 @@ export default function PortalPage() {
                     if (!session?.business?.id) return;
                     const targetBranch =
                       selectedBranchId !== 'all' ? selectedBranchId : (session.branches[0]?.id || '');
-                    window.location.href = `/api/auth/google/login?businessId=${encodeURIComponent(
+                    const authUrl = `/api/auth/google/login?businessId=${encodeURIComponent(
                       session.business.id
-                    )}&branchId=${encodeURIComponent(targetBranch)}&returnUrl=/portal`;
+                    )}&branchId=${encodeURIComponent(targetBranch)}&returnUrl=/portal&popup=1`;
+                    const popupWin = window.open(authUrl, 'prestigia_google_oauth', 'width=540,height=700');
+                    if (!popupWin) {
+                      window.location.href = authUrl.replace('&popup=1', '');
+                    }
                   }}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm ${
                     theme === 'light'
@@ -23432,9 +23447,13 @@ export default function PortalPage() {
                                   <button
                                     type="button"
                                     onClick={() => {
-                                      window.location.href = `/api/auth/google/login?businessId=${encodeURIComponent(
+                                      const authUrl = `/api/auth/google/login?businessId=${encodeURIComponent(
                                         session.business.id
-                                      )}&branchId=${encodeURIComponent(curBranch.id)}&returnUrl=/portal`;
+                                      )}&branchId=${encodeURIComponent(curBranch.id)}&returnUrl=/portal&popup=1`;
+                                      const popupWin = window.open(authUrl, 'prestigia_google_oauth', 'width=540,height=700');
+                                      if (!popupWin) {
+                                        window.location.href = authUrl.replace('&popup=1', '');
+                                      }
                                     }}
                                     className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer active:scale-95"
                                   >

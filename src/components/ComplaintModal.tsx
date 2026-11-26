@@ -331,7 +331,7 @@ export function ComplaintModal({
                     required
                     maxLength={selectedCountry.maxDigits}
                     inputMode="numeric"
-                    placeholder={`Ej: ${selectedCountry.example}`}
+                    placeholder={isEn ? `E.g., ${selectedCountry.example}` : `Ej: ${selectedCountry.example}`}
                     value={customerPhone}
                     onChange={handlePhoneChange}
                     className={`flex-1 min-w-0 px-3.5 py-2.5 rounded-xl bg-slate-900/90 border text-white placeholder-slate-500 text-xs sm:text-sm focus:outline-none transition ${

@@ -6,6 +6,7 @@ import { Star } from 'lucide-react';
 interface RatingStarsProps {
   onSelectRating: (rating: number) => void;
   disabled?: boolean;
+  isEn?: boolean;
 }
 
 const RATING_LABELS: Record<number, string> = {
@@ -16,7 +17,15 @@ const RATING_LABELS: Record<number, string> = {
   5: '¡Excelente, servicio impecable!',
 };
 
-export function RatingStars({ onSelectRating, disabled = false }: RatingStarsProps) {
+const RATING_LABELS_EN: Record<number, string> = {
+  1: 'Unsatisfactory experience',
+  2: 'There were details to improve',
+  3: 'Acceptable, with room to improve',
+  4: 'Very good experience!',
+  5: 'Excellent, impeccable service!',
+};
+
+export function RatingStars({ onSelectRating, disabled = false, isEn = false }: RatingStarsProps) {
   const [hoveredRating, setHoveredRating] = useState<number | null>(null);
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
 
@@ -44,7 +53,7 @@ export function RatingStars({ onSelectRating, disabled = false }: RatingStarsPro
               className={`p-2 transition-all duration-200 transform active:scale-90 focus:outline-none ${
                 disabled ? 'cursor-not-allowed opacity-70' : 'cursor-pointer hover:scale-110'
               }`}
-              aria-label={`Calificar con ${star} estrella${star > 1 ? 's' : ''}`}
+              aria-label={isEn ? `Rate ${star} star${star > 1 ? 's' : ''}` : `Calificar con ${star} estrella${star > 1 ? 's' : ''}`}
             >
               <Star
                 className={`w-11 h-11 sm:w-12 sm:h-12 transition-colors duration-200 ${
@@ -65,11 +74,11 @@ export function RatingStars({ onSelectRating, disabled = false }: RatingStarsPro
               activeRating >= 4 ? 'text-emerald-400' : 'text-amber-400'
             }`}
           >
-            {RATING_LABELS[activeRating]}
+            {isEn ? RATING_LABELS_EN[activeRating] : RATING_LABELS[activeRating]}
           </span>
         ) : (
           <span className="text-xs sm:text-sm text-prestigia-muted">
-            Toca una estrella para evaluar tu experiencia
+            {isEn ? 'Tap a star to rate your experience' : 'Toca una estrella para evaluar tu experiencia'}
           </span>
         )}
       </div>

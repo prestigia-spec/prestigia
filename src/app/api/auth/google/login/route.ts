@@ -5,6 +5,7 @@ export async function GET(request: Request) {
   const businessId = searchParams.get('businessId') || '';
   const branchId = searchParams.get('branchId') || '';
   const returnUrl = searchParams.get('returnUrl') || '/portal';
+  const popup = searchParams.get('popup') === '1';
 
   const clientId = process.env.GOOGLE_CLIENT_ID;
   if (!clientId) {
@@ -19,7 +20,7 @@ export async function GET(request: Request) {
   const protocol = host.includes('localhost') ? 'http' : 'https';
   const redirectUri = `${protocol}://${host}/api/auth/google/callback`;
 
-  const state = JSON.stringify({ businessId, branchId, returnUrl });
+  const state = JSON.stringify({ businessId, branchId, returnUrl, popup });
 
   const scopes = [
     'https://www.googleapis.com/auth/business.manage',

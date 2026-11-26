@@ -373,9 +373,95 @@ function writeDbFile(data: DatabaseSchema): void {
 export async function getBranchOrBusiness(
   idOrSlug: string
 ): Promise<{ business: Business; branch: Branch } | null> {
+  const target = idOrSlug.toLowerCase().trim();
+
+  // Always prefer fresh Supabase Cloud state first so QR scans never read stale /tmp cache
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data: brRow } = await supabase
+        .from('branches')
+        .select('business_id')
+        .eq('id', target)
+        .maybeSingle();
+      const bizIdToLoad = brRow?.business_id || target;
+      const { data: bData } = await supabase
+        .from('businesses')
+        .select('*')
+        .eq('id', bizIdToLoad)
+        .maybeSingle();
+
+      if (bData) {
+        const { data: branchesData } = await supabase
+          .from('branches')
+          .select('*')
+          .eq('business_id', bData.id);
+        const mappedBranches: Branch[] = (branchesData || []).map((br: any) => {
+          const oauth = br.schedule && typeof br.schedule === 'object' ? br.schedule.__googleOAuth : null;
+          return {
+            id: br.id,
+            name: br.name,
+            address: br.address || '',
+            city: br.city || '',
+            locality: br.locality || '',
+            googleReviewUrl: br.google_review_url || '',
+            googlePlaceId: br.google_place_id || undefined,
+            googleBusinessStatus: br.google_business_status || (oauth?.refreshToken ? 'connected' : 'pending'),
+            googleManagedBy: br.google_managed_by || undefined,
+            googleAuditedAt: br.google_audited_at || undefined,
+            googleAuditNotes: br.google_audit_notes || undefined,
+            managerPhone: br.manager_phone || '',
+            managerPassword: br.manager_password || undefined,
+            managerUsername: br.manager_username || undefined,
+            status: br.status || 'active',
+            containmentMessage: br.containment_message || undefined,
+            websiteUrl: br.website_url || '',
+            schedule: br.schedule || undefined,
+            ...(oauth
+              ? {
+                  googleAccessToken: oauth.accessToken,
+                  googleRefreshToken: oauth.refreshToken,
+                  googleConnectedEmail: oauth.connectedEmail,
+                  googleAccountId: oauth.accountId,
+                  googleLocationId: oauth.locationId,
+                }
+              : {}),
+          } as any;
+        });
+
+        const freshBusiness: Business = {
+          id: bData.id,
+          name: bData.name,
+          legalName: bData.legal_name || undefined,
+          taxId: bData.tax_id || undefined,
+          address: bData.address || undefined,
+          ownerName: bData.owner_name,
+          ownerPhone: bData.owner_phone,
+          ownerEmail: bData.owner_email || undefined,
+          plan: bData.plan || 'pro',
+          status: bData.status || 'active',
+          trialEndsAt: bData.trial_ends_at || new Date(Date.now() + 30 * 86400000).toISOString(),
+          category: bData.category || 'General',
+          country: bData.country || 'Colombia',
+          createdAt: bData.created_at || new Date().toISOString(),
+          password: bData.password,
+          branding: bData.branding || {},
+          baseline: bData.baseline || {},
+          masterAddOns: bData.master_add_ons || {},
+          customStaffRoles: bData.custom_staff_roles || [],
+          branches: mappedBranches,
+        };
+
+        if (mappedBranches.length > 0) {
+          const matched = mappedBranches.find((br) => br.id.toLowerCase() === target) || mappedBranches[0];
+          return { business: freshBusiness, branch: matched };
+        }
+      }
+    }
+  } catch {}
+
   await syncWithRemoteKv();
   const db = ensureDbFile();
-  const target = idOrSlug.toLowerCase().trim();
 
   // 1. Look for direct branch ID match
   for (const business of db.businesses) {
@@ -395,12 +481,6 @@ export async function getBranchOrBusiness(
   );
   if (foundBusiness && foundBusiness.branches && foundBusiness.branches.length > 0) {
     return { business: foundBusiness, branch: foundBusiness.branches[0] };
-  }
-
-  // 3. Fallback: Check Supabase Cloud via getBusinessById
-  const cloudBiz = await getBusinessById(target);
-  if (cloudBiz && cloudBiz.branches && cloudBiz.branches.length > 0) {
-    return { business: cloudBiz, branch: cloudBiz.branches[0] };
   }
 
   return null;
