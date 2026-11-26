@@ -8418,17 +8418,34 @@ export default function PortalPage() {
         return;
       }
 
-      setProfileBranches(normalizedBranches);
+      const resolvedBranches =
+        Array.isArray(data.business?.branches) && data.business.branches.length > 0
+          ? data.business.branches.map((br: any, idx: number) => ({
+              ...(normalizedBranches[idx] || {}),
+              ...br,
+              websiteUrl: br.websiteUrl || normalizedBranches[idx]?.websiteUrl || '',
+              instagramUrl: br.instagramUrl || normalizedBranches[idx]?.instagramUrl || '',
+              tiktokUrl: br.tiktokUrl || normalizedBranches[idx]?.tiktokUrl || '',
+              facebookUrl: br.facebookUrl || normalizedBranches[idx]?.facebookUrl || '',
+              whatsappVipUrl: br.whatsappVipUrl || normalizedBranches[idx]?.whatsappVipUrl || '',
+              menuUrl: br.menuUrl || normalizedBranches[idx]?.menuUrl || '',
+            }))
+          : normalizedBranches;
+
+      setProfileBranches(resolvedBranches);
 
       // Update local session + localStorage immediately so reload never flashes stale data
       setSession((prev) => {
         if (!prev) return null;
         const updatedSession = {
           ...prev,
-          business: data.business,
+          business: {
+            ...(data.business || prev.business),
+            branches: resolvedBranches,
+          },
           branches: (effectivePlan === 'pro' || effectivePlan === 'independiente')
-            ? (data.business.branches || []).slice(0, 1)
-            : data.business.branches,
+            ? resolvedBranches.slice(0, 1)
+            : resolvedBranches,
         };
         try {
           localStorage.setItem('prestigia_portal_session', JSON.stringify(updatedSession));

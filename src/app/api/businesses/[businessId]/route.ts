@@ -136,8 +136,14 @@ export async function PUT(
     // 3. Colaboradores / Empleados registrados por Sede (staffMembers)
     // NOTA DE SEGURIDAD: La creación/borrado de sedes, datos de empresa (name, category, owner)
     // y credenciales de acceso solo son modificables desde el panel administrativo central de Prestigia.
-    const mergedBranches = existing.branches.map((b) => {
-      const incoming = (body.branches || []).find((ib: any) => ib.id === b.id);
+    const sourceBranches = existing.branches && existing.branches.length > 0
+      ? existing.branches
+      : (Array.isArray(body.branches) ? body.branches : []);
+
+    const mergedBranches = sourceBranches.map((b: any, idx: number) => {
+      const incoming =
+        (body.branches || []).find((ib: any) => ib.id && b.id && ib.id.toLowerCase() === b.id.toLowerCase()) ||
+        (sourceBranches.length === 1 && Array.isArray(body.branches) && body.branches.length === 1 ? body.branches[0] : null);
       if (!incoming) return b;
 
       // Sanitizar y validar colaboradores (máximo 30, sin duplicados ni código malicioso)
@@ -229,10 +235,10 @@ export async function PUT(
     };
 
     // Synchronize overall masterAddOns counters so Master HQ reflects immediately
-    const totalManagersCount = (mergedBranches || []).reduce((acc, b) => {
+    const totalManagersCount = (mergedBranches || []).reduce((acc: number, b: any) => {
       return acc + (b.managers && b.managers.length > 0 ? b.managers.length : (b.managerName ? 1 : 0));
     }, 0);
-    const totalStaffCount = (mergedBranches || []).reduce((acc, b) => {
+    const totalStaffCount = (mergedBranches || []).reduce((acc: number, b: any) => {
       return acc + (b.staffMembers?.length || 0);
     }, 0);
 

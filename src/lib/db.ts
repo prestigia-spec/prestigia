@@ -459,13 +459,13 @@ export async function getBranchOrBusiness(
       const { data: brRow } = await supabase
         .from('branches')
         .select('business_id')
-        .eq('id', target)
+        .ilike('id', target)
         .maybeSingle();
       const bizIdToLoad = brRow?.business_id || target;
       const { data: bData } = await supabase
         .from('businesses')
         .select('*')
-        .eq('id', bizIdToLoad)
+        .ilike('id', bizIdToLoad)
         .maybeSingle();
 
       if (bData) {
@@ -518,7 +518,7 @@ export async function getBusinessById(id: string): Promise<Business | null> {
   try {
     const supabase = getSupabase();
     if (supabase) {
-      const { data: bData } = await supabase.from('businesses').select('*').eq('id', targetId).maybeSingle();
+      const { data: bData } = await supabase.from('businesses').select('*').ilike('id', targetId).maybeSingle();
       if (bData) {
         const { data: branchesData } = await supabase.from('branches').select('*').eq('business_id', bData.id);
         const restoredBusiness = mapSupabaseBusiness(bData, branchesData || []);
