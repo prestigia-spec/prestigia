@@ -1243,10 +1243,15 @@ export default function PortalPage() {
         const now = Date.now();
         if (!lastMasterSyncRef.current || now - lastMasterSyncRef.current >= 10000) {
           lastMasterSyncRef.current = now;
-          fetch(`/api/businesses/${session.business.id}`)
+          fetch(`/api/businesses/${session.business.id}?t=${now}`, {
+            cache: 'no-store',
+            headers: { Pragma: 'no-cache' },
+          })
             .then((r) => r.json())
             .then((fresh) => {
               if (fresh && (fresh.rawBusiness || fresh.businessId)) {
+                const hasUnsavedLocalEdits =
+                  isSavingProfile || isSocialDirty || isStaffDirty || isScheduleDirty || isIdentityDirty;
                 const updatedBiz = fresh.rawBusiness || {
                   ...session.business,
                   plan: fresh.plan || session.business.plan,
@@ -1259,15 +1264,23 @@ export default function PortalPage() {
                 const planChanged = updatedBiz.plan !== session.business.plan;
                 const statusChanged = updatedBiz.status !== session.business.status;
                 const addOnsChanged = JSON.stringify(updatedBiz.masterAddOns) !== JSON.stringify(session.business.masterAddOns);
-                const branchesChanged = JSON.stringify(updatedBiz.branches) !== JSON.stringify(session.business.branches);
+                const branchesChanged =
+                  !hasUnsavedLocalEdits &&
+                  JSON.stringify(updatedBiz.branches) !== JSON.stringify(session.business.branches);
 
                 if (planChanged || statusChanged || addOnsChanged || branchesChanged) {
                   setSession((prev) => {
                     if (!prev || prev.business.id !== updatedBiz.id) return prev;
+                    const nextBranches = hasUnsavedLocalEdits
+                      ? prev.branches
+                      : (updatedBiz.branches || prev.branches);
                     const updated = {
                       ...prev,
-                      business: updatedBiz,
-                      branches: updatedBiz.branches || prev.branches,
+                      business: {
+                        ...updatedBiz,
+                        branches: hasUnsavedLocalEdits ? prev.business.branches : updatedBiz.branches,
+                      },
+                      branches: nextBranches,
                     };
                     try {
                       localStorage.setItem('prestigia_portal_session', JSON.stringify(updated));
@@ -8366,6 +8379,7 @@ export default function PortalPage() {
     setProfileSaveSuccess(false);
     setSaveSuccessSection(null);
     setProfileSaveError(null);
+    lastMasterSyncRef.current = Date.now();
 
     try {
       const auditTimestamp = new Date().toLocaleDateString(lang === 'en' ? 'en-US' : 'es-ES', {
@@ -8433,6 +8447,7 @@ export default function PortalPage() {
           : normalizedBranches;
 
       setProfileBranches(resolvedBranches);
+      lastMasterSyncRef.current = Date.now();
 
       // Update local session + localStorage immediately so reload never flashes stale data
       setSession((prev) => {
