@@ -48,6 +48,7 @@ export interface Branch {
   scheduleHolidays?: string; // e.g. "12:00 PM - 08:00 PM"
   responseTimeSla?: string; // e.g. "< 15 min" | "< 1 hora" | "Mismo día"
   containmentMessage?: string; // Custom private containment message for 1-3★ reviews
+  containmentEnabled?: boolean; // Toggle ON/OFF for private containment protocol (default true)
   status: BusinessStatus; // 'active' | 'suspended'
   websiteUrl: string; // Mandatory official commercial website link
   instagramUrl?: string; // Optional Instagram profile link

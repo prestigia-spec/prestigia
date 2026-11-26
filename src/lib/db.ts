@@ -392,6 +392,7 @@ function mapSupabaseBranch(br: any, fallbackCfg?: any): Branch {
     managerUsername: br.manager_username || undefined,
     status: br.status || 'active',
     containmentMessage: br.containment_message || undefined,
+    containmentEnabled: portalCfg.containmentEnabled !== undefined ? Boolean(portalCfg.containmentEnabled) : true,
     websiteUrl: portalCfg.websiteUrl ?? br.website_url ?? '',
     instagramUrl: portalCfg.instagramUrl ?? '',
     tiktokUrl: portalCfg.tiktokUrl ?? '',
@@ -602,6 +603,7 @@ export async function saveBusiness(business: Business): Promise<void> {
           scheduleWeekends: br.scheduleWeekends || '',
           scheduleHolidays: br.scheduleHolidays || '',
           responseTimeSla: br.responseTimeSla || '',
+          containmentEnabled: br.containmentEnabled !== undefined ? Boolean(br.containmentEnabled) : true,
           timezone: br.timezone || '',
           lastAuditUpdate: br.lastAuditUpdate || '',
         };

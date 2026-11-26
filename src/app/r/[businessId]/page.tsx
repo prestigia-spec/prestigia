@@ -52,6 +52,7 @@ interface PublicBranchInfo {
   staffMembers?: any[];
   websiteUrl: string;
   containmentMessage?: string | null;
+  containmentEnabled?: boolean;
   responseTimeSla?: string | null;
   instagramUrl?: string | null;
   tiktokUrl?: string | null;
@@ -1122,6 +1123,7 @@ export default function RatingCapturePage() {
           staffMembers={business.staffMembers}
           preselectedStaff={selectedStaff}
           containmentMessage={business.containmentMessage || undefined}
+          containmentEnabled={business.containmentEnabled !== false}
           responseTimeSla={business.responseTimeSla || undefined}
           lang={lang}
         />

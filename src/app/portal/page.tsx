@@ -1645,6 +1645,14 @@ export default function PortalPage() {
 
   // Live TV Wallboard / Kiosk Mode State
   const [liveWallboardOpen, setLiveWallboardOpen] = useState(false);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.get('wallboard') === '1') {
+        setLiveWallboardOpen(true);
+      }
+    }
+  }, []);
   const [wallboardTheme, setWallboardTheme] = useState<'dark' | 'light'>('dark');
   const [wallboardAudioEnabled, setWallboardAudioEnabled] = useState(true);
   const [wallboardIsFullscreen, setWallboardIsFullscreen] = useState(false);
@@ -2695,7 +2703,7 @@ export default function PortalPage() {
     }
   }, [selectedBranchId, profileBranches]);
 
-  // Auto-sync LIVE QR participants into Reactivar 5★ Master Database (Clean normalization, no duplication)
+  // Auto-sync LIVE QR participants & Habeas Data Feedbacks into Reactivar 5★ Master Database
   useEffect(() => {
     if (!reactivationLoaded) return;
     setReactivationContacts((prevContacts) => {
@@ -2722,12 +2730,33 @@ export default function PortalPage() {
         }
       });
 
+      feedbacks.forEach((f) => {
+        if (!f.clubConsent) return;
+        const clean = normalizePhoneDigits(f.customerPhone || '');
+        if (clean.length >= 7 && !existingPhones.has(clean)) {
+          existingPhones.add(clean);
+          const br = session?.branches?.find((b) => b.id === f.branchId);
+          newItems.push({
+            id: `fb_${f.id}`,
+            name: f.customerName || 'Cliente QR',
+            phone: clean,
+            status: 'pending',
+            isVip: false,
+            source: br?.name ? `🛡️ Habeas Data QR - ${br.name}` : '🛡️ Habeas Data QR',
+            branchId: f.branchId || session?.branches[0]?.id,
+            branchName: br?.name || session?.branches[0]?.name,
+            daysInactive: 1,
+            visitCount: 1,
+          });
+        }
+      });
+
       if (newItems.length > 0) {
         return [...prevContacts, ...newItems];
       }
       return prevContacts;
     });
-  }, [participants, reactivationLoaded, session?.branches]);
+  }, [participants, feedbacks, reactivationLoaded, session?.branches]);
 
   // LocalStorage Persistence for Current Giveaway (Strictly isolated per Business; zero demo bleed)
   useEffect(() => {
@@ -4294,7 +4323,8 @@ export default function PortalPage() {
   };
 
   // SORTING: Unanswered/Pending first, then by date of arrival (newest first)
-  const sourceReviews = effectivePlan === 'independiente' ? independentReviews : googleReviews;
+  const isDemoMendoza = session?.business?.id === 'carlos-mendoza' || session?.business?.id === 'demo';
+  const sourceReviews = (effectivePlan === 'independiente' && isDemoMendoza) ? independentReviews : googleReviews;
   const sortedGoogleReviews = [...sourceReviews].sort((a, b) => {
     if (a.status === 'unanswered' && b.status === 'answered') return -1;
     if (a.status === 'answered' && b.status === 'unanswered') return 1;
@@ -4304,7 +4334,7 @@ export default function PortalPage() {
   });
 
   // Branch-specific Google Reviews Scoping (Synchronized with selectedBranchId)
-  const branchGoogleReviews = effectivePlan === 'independiente'
+  const branchGoogleReviews = (effectivePlan === 'independiente' && isDemoMendoza)
     ? sortedGoogleReviews
     : sortedGoogleReviews.filter(r => selectedBranchId === 'all' || r.branchId === selectedBranchId);
 
@@ -4322,7 +4352,7 @@ export default function PortalPage() {
 
   // Computation of Multi-Industry AI Sentiment & Trends Matrix
   const sentimentPillars = getIndustrySentimentPillars(session?.business?.category, lang);
-  const branchFeedbacks = effectivePlan === 'independiente'
+  const branchFeedbacks = (effectivePlan === 'independiente' && isDemoMendoza)
     ? independentFeedbacks
     : feedbacks.filter(f => selectedBranchId === 'all' || f.branchId === selectedBranchId);
 
@@ -7672,8 +7702,8 @@ export default function PortalPage() {
     const globalFiveStars = globalReviews.filter((r) => r.rating >= 4).length;
     const globalBlocked = globalFeedbacks.length;
     const globalRate = globalTotal > 0 ? Math.round((globalAnswered / globalTotal) * 100) : 100;
-    const globalProtectedCOP = Math.max(12000000, globalBlocked * 400000);
-    const globalVipDatabase = reactivationContacts.length || 39;
+    const globalProtectedCOP = globalBlocked * 400000;
+    const globalVipDatabase = reactivationContacts.length;
 
     // Branches breakdown
     const branchesData = session.branches.map((b) => {
@@ -7728,14 +7758,16 @@ export default function PortalPage() {
     relevantBranches.forEach((b) => {
       const branchMgrs = b.managers && b.managers.length > 0
         ? b.managers
-        : [
-            {
-              id: `mgr-${b.id}`,
-              name: b.managerName || (lang === 'en' ? 'Shift Manager' : 'Encargado de Turno'),
-              role: b.managerRole || (lang === 'en' ? 'Duty Lead' : 'Líder Operativo'),
-              phone: b.managerPhone || '',
-            },
-          ];
+        : (b.managerName
+            ? [
+                {
+                  id: `mgr-${b.id}`,
+                  name: b.managerName,
+                  role: b.managerRole || (lang === 'en' ? 'Duty Lead' : 'Líder Operativo'),
+                  phone: b.managerPhone || '',
+                },
+              ]
+            : []);
 
       branchMgrs.forEach((m) => {
         const mgrResolved = feedbacks.filter((f) => {
@@ -7781,8 +7813,7 @@ export default function PortalPage() {
 
     relevantBranches.forEach((b, bIdx) => {
       const allTeam = getAllBranchTeamMembers(b, lang === 'en');
-      const defaultStaff = getIndustryStaffMembers(session.business.category || '', lang === 'en');
-      const members = allTeam.length > 0 ? allTeam : defaultStaff;
+      const members = allTeam;
       members.forEach((m: any, mIdx: number) => {
         const cleanName = typeof m === 'object' && m !== null
           ? (m.name || `Colaborador ${mIdx + 1}`)
@@ -8692,9 +8723,30 @@ export default function PortalPage() {
             <button
               type="button"
               onClick={() => setLang(lang === 'es' ? 'en' : 'es')}
-              className="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-[11px] font-bold text-slate-300 border border-slate-700 transition flex items-center gap-1 cursor-pointer"
+              className="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-[11px] font-bold text-slate-300 border border-slate-700 transition flex items-center gap-1.5 cursor-pointer"
             >
-              <span>{lang === 'es' ? '🇺🇸 English' : '🇨🇴 Español'}</span>
+              {lang === 'es' ? (
+                <>
+                  <svg className="w-4 h-3 rounded-[2px] shrink-0" viewBox="0 0 20 14" aria-hidden="true">
+                    <rect width="20" height="14" fill="#B22234" />
+                    <rect y="2" width="20" height="1.5" fill="#fff" />
+                    <rect y="5" width="20" height="1.5" fill="#fff" />
+                    <rect y="8" width="20" height="1.5" fill="#fff" />
+                    <rect y="11" width="20" height="1.5" fill="#fff" />
+                    <rect width="9" height="7.5" fill="#3C3B6E" />
+                  </svg>
+                  <span>English</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-3 rounded-[2px] shrink-0" viewBox="0 0 20 14" aria-hidden="true">
+                    <rect width="20" height="7" fill="#FCD116" />
+                    <rect y="7" width="20" height="3.5" fill="#003893" />
+                    <rect y="10.5" width="20" height="3.5" fill="#CE1126" />
+                  </svg>
+                  <span>Español</span>
+                </>
+              )}
             </button>
           </div>
 
@@ -9321,7 +9373,7 @@ export default function PortalPage() {
                     </span>
                   ) : (
                     <span className="text-cyan-600 dark:text-cyan-400 flex items-center gap-1 font-semibold">
-                      {t.navbar.managerView} {session.activeBranch?.name && formatBranchName(session.activeBranch.name, lang)}
+                      {t.navbar.managerView} {session.activeBranch?.name ? formatBranchName(session.activeBranch.name, lang) : (lang === 'en' ? 'Main Branch' : 'Sede Principal')}
                     </span>
                   )}
                 </div>
@@ -9492,7 +9544,7 @@ export default function PortalPage() {
                         const businessId = session.business.id || 'la-burguesia';
                         const branchParam = selectedBranchId || 'all';
                         window.open(
-                          `/wallboard?businessId=${encodeURIComponent(businessId)}&branchId=${encodeURIComponent(branchParam)}&lang=${lang}`,
+                          `/portal?wallboard=1&businessId=${encodeURIComponent(businessId)}&branchId=${encodeURIComponent(branchParam)}&lang=${lang}`,
                           'PrestigiaWallboardWindow',
                           `popup=yes,width=${width},height=${height},top=${top},left=${left},toolbar=no,menubar=no,location=no,status=no,resizable=yes`
                         );
@@ -12989,6 +13041,7 @@ export default function PortalPage() {
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
+                              {(session?.business?.id === 'demo' || session?.business?.id === 'la-burguesia' || session?.business?.id === 'carlos-mendoza') && (
                               <button
                                 type="button"
                                 onClick={() => {
@@ -13010,6 +13063,7 @@ export default function PortalPage() {
                                 <RefreshCw className="w-3 h-3 text-indigo-400" />
                                 <span>{lang === 'en' ? 'Reset Demo' : 'Restablecer Demo'}</span>
                               </button>
+                              )}
                               <button
                                 type="button"
                                 onClick={handleDownloadAllCustomersCsv}
@@ -14071,7 +14125,7 @@ export default function PortalPage() {
                           </div>
 
                           <div className="flex flex-wrap items-center gap-2 pt-1">
-                            {effectivePlan === 'elite' ? (
+                            {(effectivePlan === 'elite' || effectivePlan === 'empresarial') ? (
                               <>
                                 {/* 1 Ganador */}
                                 <button
@@ -14563,8 +14617,8 @@ export default function PortalPage() {
                       );
                     })()}
 
-                    {/* 1. TOP 5 CLIENTES MÁS FIELES DE LA MARCA (PLAN ÉLITE) O TEASER (PLAN PRO/BÁSICO) */}
-                    {effectivePlan === 'elite' ? (
+                    {/* 1. TOP 5 CLIENTES MÁS FIELES DE LA MARCA (PLAN ÉLITE & EMPRESARIAL) O TEASER */}
+                    {(effectivePlan === 'elite' || effectivePlan === 'empresarial') ? (
                       <div className={`p-5 sm:p-6 rounded-3xl border space-y-4 shadow-xl ${
                         theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#0D1424] border-slate-800'
                       }`}>
@@ -14784,7 +14838,7 @@ export default function PortalPage() {
                             </div>
                           )}
 
-                          {participants.length === 0 && (
+                          {participants.length === 0 && (session?.business?.id === 'demo' || session?.business?.id === 'la-burguesia' || session?.business?.id === 'carlos-mendoza') && (
                             <button
                               type="button"
                               onClick={handleSimulateQrRegistrations}
@@ -14799,8 +14853,8 @@ export default function PortalPage() {
                       </div>
                     </div>
 
-                    {/* 3. SUITE CORPORATIVA PLAN EMPRESARIAL: EDICIONES DE SORTEO & HISTÓRICO */}
-                    {effectivePlan === 'elite' && (
+                    {/* 3. SUITE CORPORATIVA PLAN ÉLITE / EMPRESARIAL: EDICIONES DE SORTEO & HISTÓRICO */}
+                    {(effectivePlan === 'elite' || effectivePlan === 'empresarial') && (
                       <div className="space-y-4">
                         {/* Selector de Sorteos & Exportación Consolidada */}
                         <div className={`p-4 sm:p-5 rounded-3xl border space-y-3 shadow-xl ${
@@ -15526,7 +15580,7 @@ export default function PortalPage() {
                     </span>
                   </button>
 
-                  {effectivePlan === 'elite' ? (
+                  {(effectivePlan === 'elite' || effectivePlan === 'empresarial') ? (
                     <button
                       onClick={() => {
                         setAiQueueType('complaints');
@@ -16523,7 +16577,7 @@ export default function PortalPage() {
                     <div className="text-2xl font-black text-purple-500">
                       {(() => {
                         const active = computedPillars.filter(p => p.hasData && p.score !== null);
-                        return active.length > 0 ? Math.round(active.reduce((a, b) => a + (b.score || 0), 0) / active.length) : 85;
+                        return active.length > 0 ? Math.round(active.reduce((a, b) => a + (b.score || 0), 0) / active.length) : 0;
                       })()}%
                     </div>
                     <p className="text-[10px] text-slate-400 mt-1">
@@ -16564,10 +16618,12 @@ export default function PortalPage() {
                       </div>
                     </div>
                     <div className="text-base font-black text-emerald-500 truncate">
-                      {sortedPillarsByScore[0]?.title || 'Servicio'}
+                      {sortedPillarsByScore[0]?.hasData ? sortedPillarsByScore[0].title : (lang === 'en' ? 'No data yet' : 'Sin datos aún')}
                     </div>
                     <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-1">
-                      {sortedPillarsByScore[0]?.score}% {lang === 'en' ? 'satisfaction' : 'de satisfacción'}
+                      {sortedPillarsByScore[0]?.hasData && sortedPillarsByScore[0]?.score !== null
+                        ? `${sortedPillarsByScore[0].score}% ${lang === 'en' ? 'satisfaction' : 'de satisfacción'}`
+                        : (lang === 'en' ? 'Waiting for reviews' : 'Esperando opiniones')}
                     </p>
                   </div>
 
@@ -19498,20 +19554,14 @@ export default function PortalPage() {
                               selectedBranchId === 'all'
                                 ? reactivationContacts
                                 : reactivationContacts.filter((c) => c.branchId === selectedBranchId || !c.branchId)
-                            ).length || branchFeedbacks.length || 39;
+                            ).length;
 
                             const newInPeriod =
-                              reportPeriod === 'daily'
-                                ? Math.max(1, Math.min(todayFeedbacks.length + 1, 4))
-                                : reportPeriod === 'yesterday'
-                                ? Math.max(1, Math.min(todayFeedbacks.length + 2, 5))
-                                : reportPeriod === 'weekly'
-                                ? Math.max(2, Math.min(periodReceived + 4, 18))
-                                : reportPeriod === 'monthly'
-                                ? Math.max(5, Math.min(periodReceived + 12, Math.round(totalEligible * 0.72)))
-                                : reportPeriod === 'custom'
-                                ? Math.max(1, Math.min(periodReceived + 2, totalEligible))
-                                : totalEligible;
+                              reportPeriod === 'daily' || reportPeriod === 'yesterday'
+                                ? todayFeedbacks.length
+                                : reportPeriod === 'annual'
+                                ? totalEligible
+                                : Math.min(totalEligible, periodFeedbacks.filter(f => f.clubConsent).length || periodReceived);
 
                             const isFullHistory = reportPeriod === 'annual';
 
@@ -19525,8 +19575,8 @@ export default function PortalPage() {
                                 <p className={`text-[11px] font-medium ${theme === 'light' ? 'text-slate-600' : 'text-slate-400'}`}>
                                   {isFullHistory
                                     ? (lang === 'en'
-                                        ? `Opted-in Habeas Data ${effectivePlan === 'elite' ? '(Multi-Location)' : '(1 Location)'}`
-                                        : `Habeas Data fidelizado ${effectivePlan === 'elite' ? '(Multi-Sede)' : '(1 Sede)'}`)
+                                        ? `Opted-in Habeas Data ${(effectivePlan === 'elite' || effectivePlan === 'empresarial') ? '(Multi-Location)' : '(1 Location)'}`
+                                        : `Habeas Data fidelizado ${(effectivePlan === 'elite' || effectivePlan === 'empresarial') ? '(Multi-Sede)' : '(1 Sede)'}`)
                                     : (lang === 'en'
                                         ? `Of ${totalEligible.toLocaleString()} total in database (Habeas Data)`
                                         : `De ${totalEligible.toLocaleString()} en base total (Habeas Data)`)}
@@ -19627,7 +19677,9 @@ export default function PortalPage() {
                         <span>{t.reports.statRatingEvolution}</span>
                       </span>
                       <div className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400">
-                        4.1★ ➔ 4.8★
+                        {periodReviews.length > 0
+                          ? `${(periodReviews.reduce((acc, r) => acc + (r.rating || 0), 0) / periodReviews.length).toFixed(1)}★`
+                          : (branchGoogleReviews.length > 0 ? `${radarAvgRating}★` : '—')}
                       </div>
                       <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
                         {t.reports.statRatingEvolutionDesc}
@@ -20019,12 +20071,11 @@ export default function PortalPage() {
                             const countPublic = r5 + r4;
                             const countShielded = periodFeedbacks.length + periodReviews.filter((r) => r.rating <= 3).length;
                             const sum = countPublic + countShielded;
-                            const total = sum > 0 ? sum : 30;
-                            const cPublic = sum > 0 ? countPublic : 27;
-                            const cShielded = sum > 0 ? countShielded : 3;
+                            const cPublic = countPublic;
+                            const cShielded = countShielded;
 
-                            const pctPublic = Math.max(1, Math.min(99, Math.round((cPublic / total) * 100)));
-                            const pctShielded = 100 - pctPublic;
+                            const pctPublic = sum > 0 ? Math.round((cPublic / sum) * 100) : 0;
+                            const pctShielded = sum > 0 ? 100 - pctPublic : 0;
 
                             const perimeter = 245.04; // 2 * PI * 39
                             const strokePublic = (pctPublic / 100) * perimeter;
@@ -20068,7 +20119,11 @@ export default function PortalPage() {
                                   />
                                 </svg>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                                  <span className={`text-2xl font-black leading-none ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>4.8★</span>
+                                  <span className={`text-2xl font-black leading-none ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
+                                    {periodReviews.length > 0
+                                      ? `${(periodReviews.reduce((acc, r) => acc + (r.rating || 0), 0) / periodReviews.length).toFixed(1)}★`
+                                      : (branchGoogleReviews.length > 0 ? `${radarAvgRating}★` : '—')}
+                                  </span>
                                   <span className="text-[10px] text-amber-500 dark:text-amber-400 font-extrabold uppercase tracking-wider mt-1 whitespace-nowrap">
                                     {t.reports.ratingsAverageBadge}
                                   </span>
@@ -20086,12 +20141,11 @@ export default function PortalPage() {
                             const countPublic = r5 + r4;
                             const countShielded = periodFeedbacks.length + periodReviews.filter((r) => r.rating <= 3).length;
                             const sum = countPublic + countShielded;
-                            const total = sum > 0 ? sum : 30;
-                            const cPublic = sum > 0 ? countPublic : 27;
-                            const cShielded = sum > 0 ? countShielded : 3;
+                            const cPublic = countPublic;
+                            const cShielded = countShielded;
 
-                            const pctPublic = Math.max(1, Math.min(99, Math.round((cPublic / total) * 100)));
-                            const pctShielded = 100 - pctPublic;
+                            const pctPublic = sum > 0 ? Math.round((cPublic / sum) * 100) : 0;
+                            const pctShielded = sum > 0 ? 100 - pctPublic : 0;
 
                             return (
                               <>
@@ -20114,7 +20168,7 @@ export default function PortalPage() {
                                   <div className={`flex justify-between text-[10px] pl-4 ${
                                     theme === 'light' ? 'text-slate-600' : 'text-slate-400'
                                   }`}>
-                                    <span>5★ ({r5 || 24}) • 4★ ({r4 || 3})</span>
+                                    <span>5★ ({r5}) • 4★ ({r4})</span>
                                     <span className="text-emerald-600 dark:text-emerald-400 font-medium">Google Maps</span>
                                   </div>
                                 </div>
@@ -20741,8 +20795,7 @@ export default function PortalPage() {
                     let rawTeam: Array<{ name: string; role: string; branchId: string; branchName: string }> = [];
                     targetBranches.forEach((b) => {
                       const allTeam = getAllBranchTeamMembers(b, lang === 'en');
-                      const defaultStaff = getIndustryStaffMembers(session.business.category || '', lang === 'en');
-                      const members = allTeam.length > 0 ? allTeam : defaultStaff;
+                      const members = allTeam;
                       members.forEach((m: any) => {
                         const cleanName = typeof m === 'object' && m !== null
                           ? (m.name || 'Colaborador')
@@ -21232,14 +21285,16 @@ export default function PortalPage() {
                     relevantBranches.forEach((b) => {
                       const branchMgrs = b.managers && b.managers.length > 0
                         ? b.managers
-                        : [
-                            {
-                              id: `mgr-${b.id}`,
-                              name: b.managerName || (lang === 'en' ? 'Shift Manager' : 'Encargado de Turno'),
-                              role: b.managerRole || (lang === 'en' ? 'Duty Lead' : 'Líder Operativo'),
-                              phone: b.managerPhone || '',
-                            },
-                          ];
+                        : (b.managerName
+                            ? [
+                                {
+                                  id: `mgr-${b.id}`,
+                                  name: b.managerName,
+                                  role: b.managerRole || (lang === 'en' ? 'Duty Lead' : 'Líder Operativo'),
+                                  phone: b.managerPhone || '',
+                                },
+                              ]
+                            : []);
 
                       branchMgrs.forEach((m) => {
                         const mgrResolvedFeedbacks = feedbacks.filter((f) => {
@@ -22004,7 +22059,13 @@ export default function PortalPage() {
                         </span>
                       </div>
                       <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-500 border border-amber-500/40">
-                        {effectivePlan === 'elite' ? t.profile.planElite : effectivePlan === 'pro' ? t.profile.planPro : t.profile.planBasic}
+                        {effectivePlan === 'empresarial'
+                          ? (lang === 'en' ? 'ENTERPRISE PLAN' : 'PLAN EMPRESARIAL')
+                          : effectivePlan === 'elite'
+                          ? t.profile.planElite
+                          : effectivePlan === 'pro'
+                          ? t.profile.planPro
+                          : (lang === 'en' ? 'INDEPENDENT PLAN' : 'PLAN INDEPENDIENTE')}
                       </span>
                     </div>
 
@@ -22019,7 +22080,7 @@ export default function PortalPage() {
                         </span>
                       </div>
                       {(() => {
-                        const maxQuota = session.business.supportTicketsQuota ?? (effectivePlan === 'elite' ? 4 : effectivePlan === 'pro' ? 2 : 1);
+                        const maxQuota = session.business.supportTicketsQuota ?? (effectivePlan === 'empresarial' ? 10 : effectivePlan === 'elite' ? 4 : effectivePlan === 'pro' ? 2 : 1);
                         const usedTickets = session.business.supportTicketsUsed ?? 1;
                         const remaining = Math.max(0, maxQuota - usedTickets);
                         const percentUsed = Math.min(100, Math.round((usedTickets / maxQuota) * 100));
@@ -22054,7 +22115,7 @@ export default function PortalPage() {
                               />
                             </div>
                             <div className="flex items-center justify-between text-[9px] text-slate-400 font-mono">
-                              <span>{effectivePlan === 'elite' ? 'SLA VIP Prioritario 24/7' : effectivePlan === 'pro' ? 'SLA Estándar < 4h' : 'SLA Básico'}</span>
+                              <span>{(effectivePlan === 'elite' || effectivePlan === 'empresarial') ? 'SLA VIP Prioritario 24/7' : effectivePlan === 'pro' ? 'SLA Estándar < 4h' : 'SLA Independiente'}</span>
                               <span className="text-indigo-400">● {lang === 'en' ? 'Managed by Prestigia Master' : 'Controlado por Prestigia Master'}</span>
                             </div>
                           </div>
@@ -25273,10 +25334,39 @@ export default function PortalPage() {
                           </div>
                           
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1.5">
-                              <ShieldCheck className="w-3.5 h-3.5" />
-                              <span>{lang === 'en' ? 'Smart QR Shield Active' : 'Escudo Smart QR Activo'}</span>
-                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsScheduleDirty(true);
+                                const copy = [...profileBranches];
+                                if (copy[activeBranchEditIdx]) {
+                                  const curr = copy[activeBranchEditIdx].containmentEnabled !== false;
+                                  copy[activeBranchEditIdx] = {
+                                    ...copy[activeBranchEditIdx],
+                                    containmentEnabled: !curr,
+                                  };
+                                  setProfileBranches(copy);
+                                }
+                              }}
+                              className={`text-[11px] font-black px-3 py-1.5 rounded-xl border flex items-center gap-2 cursor-pointer transition active:scale-95 ${
+                                profileBranches[activeBranchEditIdx]?.containmentEnabled !== false
+                                  ? 'bg-emerald-500/15 text-emerald-500 border-emerald-500/40 shadow-sm'
+                                  : 'bg-slate-800/80 text-slate-400 border-slate-700'
+                              }`}
+                            >
+                              <span
+                                className={`w-2.5 h-2.5 rounded-full ${
+                                  profileBranches[activeBranchEditIdx]?.containmentEnabled !== false
+                                    ? 'bg-emerald-400 animate-pulse'
+                                    : 'bg-slate-500'
+                                }`}
+                              />
+                              <span>
+                                {profileBranches[activeBranchEditIdx]?.containmentEnabled !== false
+                                  ? (lang === 'en' ? 'Protocol: ON (Active)' : 'Protocolo: ENCENDIDO (ON)')
+                                  : (lang === 'en' ? 'Protocol: OFF (Silent)' : 'Protocolo: APAGADO (OFF)')}
+                              </span>
+                            </button>
                           </div>
                         </div>
 
@@ -26230,9 +26320,17 @@ export default function PortalPage() {
                   {lang === 'en' ? 'Upgrade Your Plan with an Official Advisor' : 'Comunícate con un Asesor para Mejorar tu Plan'}
                 </h3>
                 <p className="text-xs text-slate-400">
-                  {lang === 'en'
-                    ? 'This feature is available starting from the Pro or Elite plans. We activate your account in minutes keeping all your reviews and data intact.'
-                    : 'Esta función está disponible a partir del Plan Pro o Plan Élite. Activamos tu cuenta en minutos manteniendo todas tus reseñas y datos intactos.'}
+                  {effectivePlan === 'pro'
+                    ? (lang === 'en'
+                        ? 'Available in Plan Élite & Plan Empresarial. Upgrade seamlessly keeping all your reviews and data intact.'
+                        : 'Esta función está disponible en el Plan Élite y Plan Empresarial. Activamos tu ascenso en minutos manteniendo todas tus reseñas y datos intactos.')
+                    : effectivePlan === 'elite'
+                    ? (lang === 'en'
+                        ? 'Available in Plan Empresarial. Upgrade seamlessly keeping all your locations and data intact.'
+                        : 'Esta función está disponible en el Plan Empresarial. Activamos tu ascenso en minutos manteniendo todas tus sedes y datos intactos.')
+                    : (lang === 'en'
+                        ? 'This feature is available starting from the Pro or Elite plans. We activate your account in minutes keeping all your reviews and data intact.'
+                        : 'Esta función está disponible a partir del Plan Pro o Plan Élite. Activamos tu cuenta en minutos manteniendo todas tus reseñas y datos intactos.')}
                 </p>
               </div>
               <button
@@ -26269,8 +26367,8 @@ export default function PortalPage() {
                 <a
                   href={`https://wa.me/573058314049?text=${encodeURIComponent(
                     lang === 'en'
-                      ? `Hello Prestigia Team, I am using the Independent Plan for "${profileName || 'My Business'}" and I would like to speak with an advisor to upgrade my plan and activate advanced tools.`
-                      : `Hola Prestigia, tengo el Plan Independiente para "${profileName || 'Mi Negocio'}" y me gustaría comunicarme con un asesor para mejorar mi plan y activar nuevas funciones.`
+                      ? `Hello Prestigia Team, I am using ${effectivePlan === 'pro' ? 'Plan Pro' : effectivePlan === 'elite' ? 'Plan Élite' : 'Independent Plan'} for "${profileName || 'My Business'}" and I would like to speak with an advisor to upgrade my plan.`
+                      : `Hola Prestigia, tengo ${effectivePlan === 'pro' ? 'el Plan Pro' : effectivePlan === 'elite' ? 'el Plan Élite' : 'el Plan Independiente'} para "${profileName || 'Mi Negocio'}" y me gustaría comunicarme con un asesor para mejorar mi plan.`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -26292,9 +26390,10 @@ export default function PortalPage() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className={`grid grid-cols-1 ${effectivePlan === 'elite' ? 'sm:grid-cols-1' : 'sm:grid-cols-2'} gap-3 text-xs`}>
                   
-                  {/* PLAN PRO */}
+                  {/* PLAN PRO (only shown for Independiente) */}
+                  {(effectivePlan === 'independiente' || effectivePlan === 'basic') && (
                   <div className="p-4 rounded-2xl bg-gradient-to-b from-[#0F172A] to-[#0A0E1A] border border-indigo-500/40 space-y-3 relative shadow-md flex flex-col justify-between">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
@@ -26355,8 +26454,10 @@ export default function PortalPage() {
                       {lang === 'en' ? 'Request Plan Pro' : 'Solicitar Plan Pro'}
                     </a>
                   </div>
+                  )}
 
-                  {/* PLAN ÉLITE */}
+                  {/* PLAN ÉLITE (shown for Independiente & Pro) */}
+                  {(effectivePlan === 'independiente' || effectivePlan === 'basic' || effectivePlan === 'pro') && (
                   <div className="p-4 rounded-2xl bg-gradient-to-b from-[#181124] to-[#0A0E1A] border border-amber-500/40 space-y-3 relative shadow-md flex flex-col justify-between">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
@@ -26413,6 +26514,60 @@ export default function PortalPage() {
                       {lang === 'en' ? 'Request Plan Élite' : 'Solicitar Plan Élite'}
                     </a>
                   </div>
+                  )}
+
+                  {/* PLAN EMPRESARIAL (shown for Pro & Élite) */}
+                  {(effectivePlan === 'pro' || effectivePlan === 'elite') && (
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-[#1A1030] to-[#0A0E1A] border border-purple-500/40 space-y-3 relative shadow-md flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-black text-purple-400 text-sm">PLAN EMPRESARIAL</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">
+                            {lang === 'en' ? '4+ Locations' : '4+ Sedes'}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-purple-500 text-white">
+                          CORPORATIVO
+                        </span>
+                      </div>
+                      <div>
+                        <div className="text-base font-black text-white">
+                          {lang === 'en' ? 'Enterprise Multi-Branch Suite' : 'Suite Corporativa Sin Límites'}
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          {lang === 'en' ? 'Dedicated Account Manager & custom SLAs' : 'Consolidado corporativo, alertas prioritarias e historial VIP completo'}
+                        </div>
+                      </div>
+                      <ul className="space-y-1.5 text-[11px] text-slate-300 border-t border-slate-800 pt-2.5">
+                        <li className="flex items-start gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5" />
+                          <span><strong>{lang === 'en' ? 'All Élite Features Included' : 'Todo lo incluido en Élite'}</strong></span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5" />
+                          <span><strong>{lang === 'en' ? 'Up to 10+ Locations & Managers:' : 'Cadenas Multi-Sede & Encargados:'}</strong> {lang === 'en' ? 'Centralized audit' : 'Auditoría centralizada'}</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5" />
+                          <span><strong>{lang === 'en' ? 'Giveaway History & Top 5 VIP CRM' : 'Historial de Sorteos & Inteligencia VIP Top 5'}</strong></span>
+                        </li>
+                      </ul>
+                    </div>
+                    <a
+                      href={`https://wa.me/573058314049?text=${encodeURIComponent(
+                        lang === 'en'
+                          ? `Hello Prestigia, I want to upgrade to Plan Empresarial for "${profileName || 'My Brand'}".`
+                          : `Hola Prestigia, quiero solicitar el ascenso a Plan Empresarial para "${profileName || 'Mi Marca'}".`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs text-center block transition active:scale-95 shadow-md shadow-purple-500/25"
+                    >
+                      {lang === 'en' ? 'Request Plan Empresarial' : 'Solicitar Plan Empresarial'}
+                    </a>
+                  </div>
+                  )}
 
                 </div>
               </div>
@@ -27912,14 +28067,35 @@ export default function PortalPage() {
                 <button
                   type="button"
                   onClick={toggleLanguage}
-                  className={`px-2 py-1 rounded-xl border text-[11px] font-black transition cursor-pointer active:scale-95 flex items-center gap-1 ${
+                  className={`px-2 py-1 rounded-xl border text-[11px] font-black transition cursor-pointer active:scale-95 flex items-center gap-1.5 ${
                     wallboardTheme === 'light'
                       ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 shadow-sm'
                       : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-amber-400 shadow-sm'
                   }`}
                   title={lang === 'es' ? 'Switch display language to English' : 'Cambiar idioma a Español'}
                 >
-                  <span>{lang === 'es' ? '🇨🇴 ES' : '🇺🇸 EN'}</span>
+                  {lang === 'es' ? (
+                    <>
+                      <svg className="w-4 h-3 rounded-[2px] shrink-0" viewBox="0 0 20 14" aria-hidden="true">
+                        <rect width="20" height="7" fill="#FCD116" />
+                        <rect y="7" width="20" height="3.5" fill="#003893" />
+                        <rect y="10.5" width="20" height="3.5" fill="#CE1126" />
+                      </svg>
+                      <span>ES</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-3 rounded-[2px] shrink-0" viewBox="0 0 20 14" aria-hidden="true">
+                        <rect width="20" height="14" fill="#B22234" />
+                        <rect y="2" width="20" height="1.5" fill="#fff" />
+                        <rect y="5" width="20" height="1.5" fill="#fff" />
+                        <rect y="8" width="20" height="1.5" fill="#fff" />
+                        <rect y="11" width="20" height="1.5" fill="#fff" />
+                        <rect width="9" height="7.5" fill="#3C3B6E" />
+                      </svg>
+                      <span>EN</span>
+                    </>
+                  )}
                 </button>
 
                 {/* Sound chime test */}
@@ -27980,7 +28156,7 @@ export default function PortalPage() {
                     const bizId = session.business.id || 'la-burguesia';
                     const brParam = selectedBranchId || 'all';
                     window.open(
-                      `/wallboard?businessId=${encodeURIComponent(bizId)}&branchId=${encodeURIComponent(brParam)}&lang=${lang}`,
+                      `/portal?wallboard=1&businessId=${encodeURIComponent(bizId)}&branchId=${encodeURIComponent(brParam)}&lang=${lang}`,
                       'PrestigiaWallboardWindow',
                       `popup=yes,width=${width},height=${height},top=${top},left=${left},toolbar=no,menubar=no,location=no,status=no,resizable=yes`
                     );
@@ -28292,11 +28468,7 @@ export default function PortalPage() {
                     });
                   }
 
-                  const defaultStaff = getIndustryStaffMembers(session.business.category || '', lang === 'en');
-                  const branchStaff = (allTeam.length > 0
-                    ? allTeam
-                    : defaultStaff
-                  ).map((raw: any, sIdx: number) => {
+                  const branchStaff = allTeam.map((raw: any, sIdx: number) => {
                     const name = typeof raw === 'object' && raw !== null ? raw.name : String(raw);
                     const role = typeof raw === 'object' && raw !== null ? raw.role : (lang === 'en' ? 'Service / Support' : 'Servicio / Atención');
                     const branchName = typeof raw === 'object' && raw !== null && raw.branchName
@@ -28875,7 +29047,7 @@ export default function PortalPage() {
                     {lang === 'en' ? 'Campaign Intelligence & Audit' : 'Auditoría Oficial & Reportes de Campaña'}
                   </span>
                   <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
-                    {effectivePlan === 'elite' ? 'Plan Empresarial' : 'Plan Pro'}
+                    {effectivePlan === 'empresarial' ? 'Plan Empresarial' : effectivePlan === 'elite' ? 'Plan Élite' : 'Plan Pro'}
                   </span>
                 </div>
                 <h3 className="text-lg sm:text-xl font-black text-white">

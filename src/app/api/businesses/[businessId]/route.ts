@@ -60,6 +60,7 @@ export async function GET(
       scheduleHolidays: branch.scheduleHolidays || null,
       responseTimeSla: branch.responseTimeSla || (business as any).responseTimeSla || '< 15 min',
       containmentMessage: branch.containmentMessage || (business as any).containmentMessage || null,
+      containmentEnabled: branch.containmentEnabled !== undefined ? branch.containmentEnabled : ((business as any).containmentEnabled !== undefined ? (business as any).containmentEnabled : true),
       staffMembers: branch.staffMembers && branch.staffMembers.length > 0 ? branch.staffMembers : ((business as any).staffMembers || []),
       websiteUrl:
         branch.websiteUrl && !branch.websiteUrl.includes('search.google.com/local/writereview')
@@ -217,6 +218,7 @@ export async function PUT(
         scheduleHolidays: incoming.scheduleHolidays !== undefined ? String(incoming.scheduleHolidays) : b.scheduleHolidays,
         responseTimeSla: incoming.responseTimeSla !== undefined ? String(incoming.responseTimeSla) : b.responseTimeSla,
         containmentMessage: incoming.containmentMessage !== undefined ? String(incoming.containmentMessage) : b.containmentMessage,
+        containmentEnabled: incoming.containmentEnabled !== undefined ? Boolean(incoming.containmentEnabled) : (b.containmentEnabled !== undefined ? b.containmentEnabled : true),
         timezone: incoming.timezone !== undefined ? String(incoming.timezone) : (b.timezone || 'GMT-5 (Bogotá, Lima, Quito)'),
         lastAuditUpdate: incoming.lastAuditUpdate !== undefined ? String(incoming.lastAuditUpdate) : b.lastAuditUpdate,
         // Google Business Profile Sync & Place ID

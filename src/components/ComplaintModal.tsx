@@ -32,6 +32,7 @@ interface ComplaintModalProps {
   staffMembers?: any[];
   preselectedStaff?: string;
   containmentMessage?: string;
+  containmentEnabled?: boolean;
   responseTimeSla?: string;
   lang?: 'es' | 'en';
 }
@@ -48,6 +49,7 @@ export function ComplaintModal({
   staffMembers = [],
   preselectedStaff = '',
   containmentMessage,
+  containmentEnabled = true,
   responseTimeSla,
   lang = 'es',
 }: ComplaintModalProps) {
@@ -199,8 +201,8 @@ export function ComplaintModal({
               )}
             </p>
 
-            {/* Pro & Élite Plan Feature: Direct Urgent WhatsApp to Manager */}
-            {plan !== 'basic' && cleanManagerPhone && (
+            {/* Pro & Élite Plan Feature: Direct Urgent WhatsApp to Manager (when Containment Protocol is ON) */}
+            {containmentEnabled !== false && plan !== 'basic' && cleanManagerPhone && (
               <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-left space-y-2 mt-2">
                 <div className="flex items-center gap-2 text-emerald-300 text-xs font-bold">
                   <MessageCircle className="w-4 h-4 text-emerald-400" />
@@ -250,7 +252,7 @@ export function ComplaintModal({
               </div>
             </div>
 
-            {containmentMessage ? (
+            {containmentEnabled !== false && containmentMessage ? (
               <div className="mb-4 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 space-y-1.5">
                 <p className="text-xs text-amber-200/90 leading-relaxed font-medium italic">
                   "{containmentMessage}"
