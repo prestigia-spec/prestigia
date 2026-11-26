@@ -367,6 +367,81 @@ function writeDbFile(data: DatabaseSchema): void {
   }
 }
 
+function mapSupabaseBranch(br: any): Branch {
+  const schedObj = br.schedule && typeof br.schedule === 'object' ? br.schedule : {};
+  const oauth = schedObj.__googleOAuth || null;
+  const portalCfg = schedObj.__portalConfig || {};
+
+  return {
+    id: br.id,
+    name: br.name,
+    address: br.address || '',
+    city: br.city || '',
+    locality: br.locality || '',
+    googleReviewUrl: br.google_review_url || '',
+    googlePlaceId: br.google_place_id || undefined,
+    googleBusinessStatus: br.google_business_status || (oauth?.refreshToken ? 'connected' : 'pending'),
+    googleManagedBy: br.google_managed_by || undefined,
+    googleAuditedAt: br.google_audited_at || undefined,
+    googleAuditNotes: br.google_audit_notes || undefined,
+    managerPhone: br.manager_phone || '',
+    managerPassword: br.manager_password || undefined,
+    managerUsername: br.manager_username || undefined,
+    status: br.status || 'active',
+    containmentMessage: br.containment_message || undefined,
+    websiteUrl: portalCfg.websiteUrl ?? br.website_url ?? '',
+    instagramUrl: portalCfg.instagramUrl ?? '',
+    tiktokUrl: portalCfg.tiktokUrl ?? '',
+    facebookUrl: portalCfg.facebookUrl ?? '',
+    whatsappVipUrl: portalCfg.whatsappVipUrl ?? '',
+    menuUrl: portalCfg.menuUrl ?? '',
+    staffMembers: Array.isArray(portalCfg.staffMembers) ? portalCfg.staffMembers : undefined,
+    managers: Array.isArray(portalCfg.managers) ? portalCfg.managers : undefined,
+    customStaffRoles: Array.isArray(portalCfg.customStaffRoles) ? portalCfg.customStaffRoles : undefined,
+    scheduleWeekdays: portalCfg.scheduleWeekdays ?? undefined,
+    scheduleWeekends: portalCfg.scheduleWeekends ?? undefined,
+    scheduleHolidays: portalCfg.scheduleHolidays ?? undefined,
+    responseTimeSla: portalCfg.responseTimeSla ?? undefined,
+    timezone: portalCfg.timezone ?? undefined,
+    lastAuditUpdate: portalCfg.lastAuditUpdate ?? undefined,
+    schedule: br.schedule || undefined,
+    ...(oauth
+      ? {
+          googleAccessToken: oauth.accessToken,
+          googleRefreshToken: oauth.refreshToken,
+          googleConnectedEmail: oauth.connectedEmail,
+          googleAccountId: oauth.accountId,
+          googleLocationId: oauth.locationId,
+        }
+      : {}),
+  } as any;
+}
+
+function mapSupabaseBusiness(bData: any, branchesData: any[]): Business {
+  return {
+    id: bData.id,
+    name: bData.name,
+    legalName: bData.legal_name || undefined,
+    taxId: bData.tax_id || undefined,
+    address: bData.address || undefined,
+    ownerName: bData.owner_name,
+    ownerPhone: bData.owner_phone,
+    ownerEmail: bData.owner_email || undefined,
+    plan: bData.plan || 'pro',
+    status: bData.status || 'active',
+    trialEndsAt: bData.trial_ends_at || new Date(Date.now() + 30 * 86400000).toISOString(),
+    category: bData.category || 'General',
+    country: bData.country || 'Colombia',
+    createdAt: bData.created_at || new Date().toISOString(),
+    password: bData.password,
+    branding: bData.branding || {},
+    baseline: bData.baseline || {},
+    masterAddOns: bData.master_add_ons || {},
+    customStaffRoles: bData.custom_staff_roles || [],
+    branches: (branchesData || []).map(mapSupabaseBranch),
+  };
+}
+
 /**
  * Resolves a QR scan by either Branch ID (e.g. 'la-burguesia-chapinero') or Brand ID (e.g. 'la-burguesia')
  */
@@ -396,64 +471,10 @@ export async function getBranchOrBusiness(
           .from('branches')
           .select('*')
           .eq('business_id', bData.id);
-        const mappedBranches: Branch[] = (branchesData || []).map((br: any) => {
-          const oauth = br.schedule && typeof br.schedule === 'object' ? br.schedule.__googleOAuth : null;
-          return {
-            id: br.id,
-            name: br.name,
-            address: br.address || '',
-            city: br.city || '',
-            locality: br.locality || '',
-            googleReviewUrl: br.google_review_url || '',
-            googlePlaceId: br.google_place_id || undefined,
-            googleBusinessStatus: br.google_business_status || (oauth?.refreshToken ? 'connected' : 'pending'),
-            googleManagedBy: br.google_managed_by || undefined,
-            googleAuditedAt: br.google_audited_at || undefined,
-            googleAuditNotes: br.google_audit_notes || undefined,
-            managerPhone: br.manager_phone || '',
-            managerPassword: br.manager_password || undefined,
-            managerUsername: br.manager_username || undefined,
-            status: br.status || 'active',
-            containmentMessage: br.containment_message || undefined,
-            websiteUrl: br.website_url || '',
-            schedule: br.schedule || undefined,
-            ...(oauth
-              ? {
-                  googleAccessToken: oauth.accessToken,
-                  googleRefreshToken: oauth.refreshToken,
-                  googleConnectedEmail: oauth.connectedEmail,
-                  googleAccountId: oauth.accountId,
-                  googleLocationId: oauth.locationId,
-                }
-              : {}),
-          } as any;
-        });
+        const freshBusiness = mapSupabaseBusiness(bData, branchesData || []);
 
-        const freshBusiness: Business = {
-          id: bData.id,
-          name: bData.name,
-          legalName: bData.legal_name || undefined,
-          taxId: bData.tax_id || undefined,
-          address: bData.address || undefined,
-          ownerName: bData.owner_name,
-          ownerPhone: bData.owner_phone,
-          ownerEmail: bData.owner_email || undefined,
-          plan: bData.plan || 'pro',
-          status: bData.status || 'active',
-          trialEndsAt: bData.trial_ends_at || new Date(Date.now() + 30 * 86400000).toISOString(),
-          category: bData.category || 'General',
-          country: bData.country || 'Colombia',
-          createdAt: bData.created_at || new Date().toISOString(),
-          password: bData.password,
-          branding: bData.branding || {},
-          baseline: bData.baseline || {},
-          masterAddOns: bData.master_add_ons || {},
-          customStaffRoles: bData.custom_staff_roles || [],
-          branches: mappedBranches,
-        };
-
-        if (mappedBranches.length > 0) {
-          const matched = mappedBranches.find((br) => br.id.toLowerCase() === target) || mappedBranches[0];
+        if (freshBusiness.branches.length > 0) {
+          const matched = freshBusiness.branches.find((br) => br.id.toLowerCase() === target) || freshBusiness.branches[0];
           return { business: freshBusiness, branch: matched };
         }
       }
@@ -490,78 +511,28 @@ export async function getBusinessById(id: string): Promise<Business | null> {
   await syncWithRemoteKv();
   const db = ensureDbFile();
   const targetId = id.toLowerCase().trim();
-  const business = db.businesses.find(
-    (b) => b.id.toLowerCase() === targetId
-  );
-  if (business) return business;
 
-  // Supabase Cloud live fallback
+  // Supabase Cloud live first so portal reloads & PUTs always see persisted state
   try {
     const supabase = getSupabase();
     if (supabase) {
-      const { data: bData } = await supabase.from('businesses').select('*').eq('id', targetId).single();
+      const { data: bData } = await supabase.from('businesses').select('*').eq('id', targetId).maybeSingle();
       if (bData) {
-        const { data: branchesData } = await supabase.from('branches').select('*').eq('business_id', targetId);
-        const mappedBranches: Branch[] = (branchesData || []).map((br: any) => {
-          const oauth = br.schedule?.__googleOAuth;
-          return {
-            id: br.id,
-            name: br.name,
-            address: br.address || '',
-            city: br.city || '',
-            locality: br.locality || '',
-            googleReviewUrl: br.google_review_url || '',
-            googlePlaceId: br.google_place_id || undefined,
-            googleBusinessStatus: br.google_business_status || (oauth?.refreshToken ? 'connected' : 'pending'),
-            googleManagedBy: br.google_managed_by || undefined,
-            googleAuditedAt: br.google_audited_at || undefined,
-            googleAuditNotes: br.google_audit_notes || undefined,
-            managerPhone: br.manager_phone || '',
-            managerPassword: br.manager_password || undefined,
-            managerUsername: br.manager_username || undefined,
-            status: br.status || 'active',
-            containmentMessage: br.containment_message || undefined,
-            websiteUrl: br.website_url || '',
-            schedule: br.schedule || undefined,
-            ...(oauth ? {
-              googleAccessToken: oauth.accessToken,
-              googleRefreshToken: oauth.refreshToken,
-              googleConnectedEmail: oauth.connectedEmail,
-              googleAccountId: oauth.accountId,
-              googleLocationId: oauth.locationId,
-            } : {}),
-          } as any;
-        });
-
-        const restoredBusiness: Business = {
-          id: bData.id,
-          name: bData.name,
-          legalName: bData.legal_name || undefined,
-          taxId: bData.tax_id || undefined,
-          address: bData.address || undefined,
-          ownerName: bData.owner_name,
-          ownerPhone: bData.owner_phone,
-          ownerEmail: bData.owner_email || undefined,
-          plan: bData.plan || 'pro',
-          status: bData.status || 'active',
-          trialEndsAt: bData.trial_ends_at || new Date(Date.now() + 30 * 86400000).toISOString(),
-          category: bData.category || 'General',
-          country: bData.country || 'Colombia',
-          createdAt: bData.created_at || new Date().toISOString(),
-          password: bData.password,
-          branding: bData.branding || {},
-          baseline: bData.baseline || {},
-          masterAddOns: bData.master_add_ons || {},
-          customStaffRoles: bData.custom_staff_roles || [],
-          branches: mappedBranches,
-        };
-
-        db.businesses.push(restoredBusiness);
+        const { data: branchesData } = await supabase.from('branches').select('*').eq('business_id', bData.id);
+        const restoredBusiness = mapSupabaseBusiness(bData, branchesData || []);
+        const idx = db.businesses.findIndex((b) => b.id.toLowerCase() === targetId);
+        if (idx >= 0) db.businesses[idx] = restoredBusiness;
+        else db.businesses.push(restoredBusiness);
         writeDbFile(db);
         return restoredBusiness;
       }
     }
   } catch {}
+
+  const business = db.businesses.find(
+    (b) => b.id.toLowerCase() === targetId
+  );
+  if (business) return business;
 
   return null;
 }
@@ -577,63 +548,15 @@ export async function getAllBusinesses(): Promise<Business[]> {
       if (bList && bList.length > 0) {
         const { data: allBranches } = await supabase.from('branches').select('*');
         for (const bData of bList) {
-          const exists = db.businesses.find((b) => b.id.toLowerCase() === bData.id.toLowerCase());
-          if (!exists) {
-            const mappedBranches: Branch[] = (allBranches || [])
-              .filter((br: any) => br.business_id.toLowerCase() === bData.id.toLowerCase())
-              .map((br: any) => {
-                const oauth = br.schedule?.__googleOAuth;
-                return {
-                  id: br.id,
-                  name: br.name,
-                  address: br.address || '',
-                  city: br.city || '',
-                  locality: br.locality || '',
-                  googleReviewUrl: br.google_review_url || '',
-                  googlePlaceId: br.google_place_id || undefined,
-                  googleBusinessStatus: br.google_business_status || (oauth?.refreshToken ? 'connected' : 'pending'),
-                  googleManagedBy: br.google_managed_by || undefined,
-                  googleAuditedAt: br.google_audited_at || undefined,
-                  googleAuditNotes: br.google_audit_notes || undefined,
-                  managerPhone: br.manager_phone || '',
-                  managerPassword: br.manager_password || undefined,
-                  managerUsername: br.manager_username || undefined,
-                  status: br.status || 'active',
-                  containmentMessage: br.containment_message || undefined,
-                  websiteUrl: br.website_url || '',
-                  schedule: br.schedule || undefined,
-                  ...(oauth ? {
-                    googleAccessToken: oauth.accessToken,
-                    googleRefreshToken: oauth.refreshToken,
-                    googleConnectedEmail: oauth.connectedEmail,
-                    googleAccountId: oauth.accountId,
-                    googleLocationId: oauth.locationId,
-                  } : {}),
-                } as any;
-              });
-
-            db.businesses.push({
-              id: bData.id,
-              name: bData.name,
-              legalName: bData.legal_name || undefined,
-              taxId: bData.tax_id || undefined,
-              address: bData.address || undefined,
-              ownerName: bData.owner_name,
-              ownerPhone: bData.owner_phone,
-              ownerEmail: bData.owner_email || undefined,
-              plan: bData.plan || 'pro',
-              status: bData.status || 'active',
-              trialEndsAt: bData.trial_ends_at || new Date(Date.now() + 30 * 86400000).toISOString(),
-              category: bData.category || 'General',
-              country: bData.country || 'Colombia',
-              createdAt: bData.created_at || new Date().toISOString(),
-              password: bData.password,
-              branding: bData.branding || {},
-              baseline: bData.baseline || {},
-              masterAddOns: bData.master_add_ons || {},
-              customStaffRoles: bData.custom_staff_roles || [],
-              branches: mappedBranches,
-            });
+          const bizBranches = (allBranches || []).filter(
+            (br: any) => br.business_id.toLowerCase() === bData.id.toLowerCase()
+          );
+          const freshBiz = mapSupabaseBusiness(bData, bizBranches);
+          const existingIdx = db.businesses.findIndex((b) => b.id.toLowerCase() === bData.id.toLowerCase());
+          if (existingIdx >= 0) {
+            db.businesses[existingIdx] = freshBiz;
+          } else {
+            db.businesses.push(freshBiz);
           }
         }
       }
@@ -679,6 +602,27 @@ export async function saveBusiness(business: Business): Promise<void> {
 
       if (business.branches && business.branches.length > 0) {
         for (const br of business.branches) {
+          const prevSched = (br as any).schedule && typeof (br as any).schedule === 'object' ? (br as any).schedule : {};
+          const mergedSchedule = {
+            ...prevSched,
+            __portalConfig: {
+              websiteUrl: br.websiteUrl || '',
+              instagramUrl: br.instagramUrl || '',
+              tiktokUrl: br.tiktokUrl || '',
+              facebookUrl: br.facebookUrl || '',
+              whatsappVipUrl: br.whatsappVipUrl || '',
+              menuUrl: br.menuUrl || '',
+              staffMembers: br.staffMembers || [],
+              managers: br.managers || [],
+              customStaffRoles: br.customStaffRoles || [],
+              scheduleWeekdays: br.scheduleWeekdays || '',
+              scheduleWeekends: br.scheduleWeekends || '',
+              scheduleHolidays: br.scheduleHolidays || '',
+              responseTimeSla: br.responseTimeSla || '',
+              timezone: br.timezone || '',
+              lastAuditUpdate: br.lastAuditUpdate || '',
+            },
+          };
           await supabase.from('branches').upsert({
             id: br.id,
             business_id: business.id,
@@ -694,6 +638,7 @@ export async function saveBusiness(business: Business): Promise<void> {
             status: br.status,
             containment_message: br.containmentMessage || null,
             website_url: br.websiteUrl || null,
+            schedule: mergedSchedule,
           });
         }
       }
