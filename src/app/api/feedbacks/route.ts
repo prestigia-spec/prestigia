@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { createFeedback, getBranchOrBusiness, getFeedbacksByBusinessId, addCampaignParticipant } from '@/lib/db';
 import { getClientIp, checkIpRateLimit, recordIpAction, sanitizeInput } from '@/lib/security';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -16,7 +19,10 @@ export async function GET(request: Request) {
     }
 
     const feedbacks = await getFeedbacksByBusinessId(businessId, branchId);
-    return NextResponse.json({ success: true, feedbacks });
+    return NextResponse.json(
+      { success: true, feedbacks },
+      { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' } }
+    );
   } catch (error) {
     console.error('Error fetching feedbacks:', error);
     return NextResponse.json(

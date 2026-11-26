@@ -735,6 +735,32 @@ export async function archiveBusiness(id: string, reason?: string): Promise<Busi
   return business;
 }
 
+function mapSupabaseFeedback(row: any): Feedback {
+  return {
+    id: row.id,
+    businessId: row.business_id,
+    businessName: row.business_name || '',
+    branchId: row.branch_id || '',
+    branchName: row.branch_name || '',
+    rating: Number(row.rating || 1),
+    customerName: row.customer_name || '',
+    customerPhone: row.customer_phone || '',
+    complaintReason: row.complaint_reason || '',
+    attendedBy: row.attended_by || undefined,
+    clubConsent: Boolean(row.club_consent),
+    status: row.status || 'pending',
+    createdAt: row.created_at || new Date().toISOString(),
+    resolvedAt: row.resolved_at || undefined,
+    resolvedBy: row.resolved_by || undefined,
+    resolvedByRole: row.resolved_by_role || undefined,
+    rescueMessage: row.rescue_message || undefined,
+    category: row.category || undefined,
+    country: row.country || undefined,
+    city: row.city || undefined,
+    locality: row.locality || undefined,
+  };
+}
+
 export async function createFeedback(
   data: Omit<Feedback, 'id' | 'createdAt' | 'status'> & { staffAttended?: string; status?: FeedbackStatus }
 ): Promise<Feedback> {
@@ -751,31 +777,29 @@ export async function createFeedback(
   db.feedbacks.unshift(newFeedback);
   writeDbFile(db);
 
-  // Sync real-time to Supabase
+  // Sync real-time to Supabase (awaited so Vercel doesn't drop the write)
   try {
     const supabase = getSupabase();
     if (supabase) {
-      Promise.resolve(
-        supabase.from('feedbacks').insert({
-          id: newFeedback.id,
-          business_id: newFeedback.businessId,
-          business_name: newFeedback.businessName,
-          branch_id: newFeedback.branchId,
-          branch_name: newFeedback.branchName,
-          rating: newFeedback.rating,
-          customer_name: newFeedback.customerName,
-          customer_phone: newFeedback.customerPhone,
-          complaint_reason: newFeedback.complaintReason || null,
-          attended_by: newFeedback.attendedBy || null,
-          club_consent: Boolean(newFeedback.clubConsent),
-          status: newFeedback.status,
-          created_at: newFeedback.createdAt,
-          category: newFeedback.category || 'General',
-          country: newFeedback.country || 'Colombia',
-          city: newFeedback.city || 'Bogotá',
-          locality: newFeedback.locality || 'Centro',
-        })
-      ).catch(() => {});
+      await supabase.from('feedbacks').insert({
+        id: newFeedback.id,
+        business_id: newFeedback.businessId,
+        business_name: newFeedback.businessName,
+        branch_id: newFeedback.branchId,
+        branch_name: newFeedback.branchName,
+        rating: newFeedback.rating,
+        customer_name: newFeedback.customerName,
+        customer_phone: newFeedback.customerPhone,
+        complaint_reason: newFeedback.complaintReason || null,
+        attended_by: newFeedback.attendedBy || null,
+        club_consent: Boolean(newFeedback.clubConsent),
+        status: newFeedback.status,
+        created_at: newFeedback.createdAt,
+        category: newFeedback.category || 'General',
+        country: newFeedback.country || 'Colombia',
+        city: newFeedback.city || 'Bogotá',
+        locality: newFeedback.locality || 'Centro',
+      });
     }
   } catch {}
 
@@ -786,6 +810,24 @@ export async function getFeedbacksByBusinessId(
   businessId: string,
   branchId?: string
 ): Promise<Feedback[]> {
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      let query = supabase
+        .from('feedbacks')
+        .select('*')
+        .ilike('business_id', businessId.trim())
+        .order('created_at', { ascending: false });
+      if (branchId && branchId !== 'all') {
+        query = query.ilike('branch_id', branchId.trim());
+      }
+      const { data, error } = await query;
+      if (!error && Array.isArray(data)) {
+        return data.map(mapSupabaseFeedback);
+      }
+    }
+  } catch {}
+
   const db = ensureDbFile();
   return db.feedbacks
     .filter((f) => {
@@ -806,12 +848,44 @@ export async function updateFeedbackStatus(
   resolvedByRole?: UserRole,
   rescueMessage?: string
 ): Promise<boolean> {
+  let updatedRemote = false;
+  const resolvedAt = status === 'resolved' ? new Date().toISOString() : undefined;
+
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      const patch: Record<string, any> = { status };
+      if (status === 'resolved') {
+        patch.resolved_at = resolvedAt;
+        if (resolvedBy) patch.resolved_by = resolvedBy;
+        if (resolvedByRole) patch.resolved_by_role = resolvedByRole;
+        if (rescueMessage) patch.rescue_message = rescueMessage;
+      }
+      const { data, error } = await supabase
+        .from('feedbacks')
+        .update(patch)
+        .eq('id', id)
+        .select('id');
+      if (!error && data && data.length > 0) {
+        updatedRemote = true;
+      } else if (error) {
+        // Fallback if optional columns like resolved_by/rescue_message don't exist in SQL
+        const { data: minData } = await supabase
+          .from('feedbacks')
+          .update({ status })
+          .eq('id', id)
+          .select('id');
+        if (minData && minData.length > 0) updatedRemote = true;
+      }
+    }
+  } catch {}
+
   const db = ensureDbFile();
   const item = db.feedbacks.find((f) => f.id === id);
   if (item) {
     item.status = status;
     if (status === 'resolved') {
-      item.resolvedAt = new Date().toISOString();
+      item.resolvedAt = resolvedAt;
       if (resolvedBy) item.resolvedBy = resolvedBy;
       if (resolvedByRole) item.resolvedByRole = resolvedByRole;
       if (rescueMessage) item.rescueMessage = rescueMessage;
@@ -819,7 +893,7 @@ export async function updateFeedbackStatus(
     writeDbFile(db);
     return true;
   }
-  return false;
+  return updatedRemote;
 }
 
 export async function getGoogleReviews(
@@ -876,6 +950,19 @@ export async function updateGoogleReviewReply(
 }
 
 export async function getAllFeedbacks(): Promise<Feedback[]> {
+  try {
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('feedbacks')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error && Array.isArray(data)) {
+        return data.map(mapSupabaseFeedback);
+      }
+    }
+  } catch {}
+
   const db = ensureDbFile();
   return db.feedbacks.map((f) => ({
     ...f,
