@@ -72,12 +72,9 @@ Responde ÚNICAMENTE un arreglo JSON con exactamente 3 opciones:
 ]`;
 
         const candidateModels = [
-          'gemini-3.5-flash',
-          'gemini-3.5-flash-lite',
-          'gemini-flash-latest',
-          'gemini-flash-lite-latest',
-          'gemini-3.8-flash',
           'gemini-2.5-flash-lite',
+          'gemini-2.5-flash',
+          'gemini-2.0-flash',
         ];
         for (const modelName of candidateModels) {
           try {
@@ -86,6 +83,7 @@ Responde ÚNICAMENTE un arreglo JSON con exactamente 3 opciones:
               {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                signal: AbortSignal.timeout(4500),
                 body: JSON.stringify({
                   contents: [{ parts: [{ text: systemPrompt }] }],
                   generationConfig: {

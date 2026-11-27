@@ -9407,7 +9407,9 @@ export default function PortalPage() {
                     }`}
                   >
                     <option value="all" className={theme === 'light' ? 'bg-white text-slate-900 font-bold' : 'bg-slate-900 text-white font-bold'}>
-                      {t.navbar.allBranches}
+                      {effectivePlan === 'empresarial'
+                        ? (lang === 'en' ? '👑 All Locations (Enterprise Consolidated)' : '👑 Todas las Sedes (Consolidado Empresarial)')
+                        : t.navbar.allBranches}
                     </option>
                     {(profileBranches && profileBranches.length > 0 ? profileBranches : session.branches).map((b) => (
                       <option key={b.id} value={b.id} className={theme === 'light' ? 'bg-white text-slate-900' : 'bg-slate-900 text-white'}>
