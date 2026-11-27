@@ -9360,7 +9360,7 @@ export default function PortalPage() {
                   >
                     <Headphones className="w-3 h-3 text-amber-500 dark:text-amber-400 group-hover/sup:scale-110 transition shrink-0" />
                     <span className={`font-medium ${theme === 'light' ? 'text-slate-700' : 'text-slate-300'}`}>
-                      {effectivePlan === 'elite'
+                      {(effectivePlan === 'elite' || effectivePlan === 'empresarial')
                         ? (lang === 'en' ? 'VIP Support' : 'Soporte VIP')
                         : (lang === 'en' ? 'Support' : 'Soporte')}
                     </span>
@@ -13632,7 +13632,7 @@ export default function PortalPage() {
                             ? 'bg-indigo-100 text-indigo-950 border-indigo-200'
                             : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
                         }`}>
-                          {effectivePlan === 'elite' ? t.giveaways.eliteTag : t.giveaways.proTag}
+                          {effectivePlan === 'empresarial' ? (lang === 'en' ? 'Enterprise Suite' : 'Plan Empresarial') : effectivePlan === 'elite' ? t.giveaways.eliteTag : t.giveaways.proTag}
                         </span>
                       </div>
                       <h3 className={`text-lg sm:text-2xl font-black ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
@@ -15392,13 +15392,15 @@ export default function PortalPage() {
                     <span>{t.ai.badgeAiCenter}</span>
                   </span>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                    effectivePlan === 'elite'
+                    (effectivePlan === 'elite' || effectivePlan === 'empresarial')
                       ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
                       : effectivePlan === 'pro'
                       ? 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30'
                       : 'bg-slate-800 text-slate-400 border-slate-700'
                   }`}>
-                    {effectivePlan === 'elite'
+                    {effectivePlan === 'empresarial'
+                      ? (lang === 'en' ? '🏢 Enterprise AI Unlocked' : '🏢 Plan Empresarial Desbloqueado')
+                      : effectivePlan === 'elite'
                       ? t.ai.unlockedEliteBadge
                       : effectivePlan === 'pro'
                       ? t.ai.unlockedProBadge
@@ -18302,8 +18304,8 @@ export default function PortalPage() {
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2">
-                        {/* WhatsApp Shift Closing to Owner (Plan Empresarial) */}
-                        {effectivePlan === 'elite' ? (
+                        {/* WhatsApp Shift Closing to Owner (Plan Élite & Empresarial) */}
+                        {(effectivePlan === 'elite' || effectivePlan === 'empresarial') ? (
                           <a
                             href={`https://wa.me/${(session.business.ownerPhone || '573058314049').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
                               lang === 'en'
@@ -23051,6 +23053,10 @@ export default function PortalPage() {
                         <span className="font-extrabold text-amber-500">
                           {effectivePlan === 'independiente'
                             ? (lang === 'en' ? '1 of 1 Private Practice' : '1 de 1 Consultorio Privado')
+                            : effectivePlan === 'empresarial'
+                            ? (lang === 'en'
+                              ? `${profileBranches.length} Locations (Enterprise Unlimited)`
+                              : `${profileBranches.length} Sedes Activas (Plan Empresarial)`)
                             : effectivePlan === 'elite'
                             ? (lang === 'en'
                               ? `${profileBranches.length} of 3 Locations (Plan Élite Base)`
@@ -23070,7 +23076,7 @@ export default function PortalPage() {
                           ? (lang === 'en' ? 'Practice Managed by Prestigia Admin' : 'Consultorio Gestionado por Admin Prestigia')
                           : (lang === 'en' ? 'Locations Managed by Prestigia Admin' : 'Sedes Gestionadas por Admin Prestigia')}</span>
                       </div>
-                      {effectivePlan === 'elite' && (
+                      {(effectivePlan === 'elite' || effectivePlan === 'empresarial') && (
                         <button
                           type="button"
                           onClick={() => {
@@ -24007,15 +24013,15 @@ export default function PortalPage() {
                                 ? 'bg-indigo-50 text-indigo-800 border-indigo-200'
                                 : 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30'
                             }`}>
-                              {effectivePlan === 'elite'
+                              {(effectivePlan === 'elite' || effectivePlan === 'empresarial')
                                 ? (lang === 'en'
-                                  ? `${profileBranches[activeBranchEditIdx].managers?.length || 0} of ${profileBranches[activeBranchEditIdx].managersQuota || 1} Shift Managers (Base 1 per Branch)`
-                                  : `${profileBranches[activeBranchEditIdx].managers?.length || 0} de ${profileBranches[activeBranchEditIdx].managersQuota || 1} Encargados de Turno (Base 1 por Sede)`)
+                                  ? `${profileBranches[activeBranchEditIdx].managers?.length || 0} of ${profileBranches[activeBranchEditIdx].managersQuota || (effectivePlan === 'empresarial' ? 10 : 1)} Shift Managers`
+                                  : `${profileBranches[activeBranchEditIdx].managers?.length || 0} de ${profileBranches[activeBranchEditIdx].managersQuota || (effectivePlan === 'empresarial' ? 10 : 1)} Encargados de Turno`)
                                 : (lang === 'en'
                                   ? `${profileBranches[activeBranchEditIdx].managers?.length || 0} of ${profileBranches[activeBranchEditIdx].managersQuota || 3} Managers Used`
                                   : `${profileBranches[activeBranchEditIdx].managers?.length || 0} de ${profileBranches[activeBranchEditIdx].managersQuota || 3} Encargados Activos`)}
                             </span>
-                            {effectivePlan === 'elite' && (
+                            {(effectivePlan === 'elite' || effectivePlan === 'empresarial') && (
                               <button
                                 type="button"
                                 onClick={() => {
@@ -24324,15 +24330,15 @@ export default function PortalPage() {
                                 ? (lang === 'en'
                                   ? `${profileBranches[activeBranchEditIdx].staffMembers?.length || 0} of 10 Employees (Plan Pro Limit)`
                                   : `${profileBranches[activeBranchEditIdx].staffMembers?.length || 0} de 10 Empleados (Límite Plan Pro)`)
-                                : effectivePlan === 'elite'
+                                : (effectivePlan === 'elite' || effectivePlan === 'empresarial')
                                 ? (lang === 'en'
-                                  ? `${profileBranches[activeBranchEditIdx].staffMembers?.length || 0} of ${profileBranches[activeBranchEditIdx].staffQuota || 10} Employees (Base 10 per Branch)`
-                                  : `${profileBranches[activeBranchEditIdx].staffMembers?.length || 0} de ${profileBranches[activeBranchEditIdx].staffQuota || 10} Colaboradores (Base 10 por Sede)`)
+                                  ? `${profileBranches[activeBranchEditIdx].staffMembers?.length || 0} of ${profileBranches[activeBranchEditIdx].staffQuota || (effectivePlan === 'empresarial' ? 30 : 10)} Employees`
+                                  : `${profileBranches[activeBranchEditIdx].staffMembers?.length || 0} de ${profileBranches[activeBranchEditIdx].staffQuota || (effectivePlan === 'empresarial' ? 30 : 10)} Colaboradores`)
                                 : (lang === 'en'
                                   ? `${profileBranches[activeBranchEditIdx].staffMembers?.length || 0} of ${profileBranches[activeBranchEditIdx].staffQuota || 25} Staff Used`
                                   : `${profileBranches[activeBranchEditIdx].staffMembers?.length || 0} de ${profileBranches[activeBranchEditIdx].staffQuota || 25} Colaboradores Registrados`)}
                             </span>
-                            {effectivePlan === 'elite' && (
+                            {(effectivePlan === 'elite' || effectivePlan === 'empresarial') && (
                               <button
                                 type="button"
                                 onClick={() => {
@@ -26118,7 +26124,7 @@ export default function PortalPage() {
                   {t.modals.customerDatabase.badge}
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
-                  {effectivePlan === 'elite' ? t.modals.customerDatabase.planElite : t.modals.customerDatabase.planPro}
+                  {effectivePlan === 'empresarial' ? 'Plan Empresarial' : effectivePlan === 'elite' ? t.modals.customerDatabase.planElite : t.modals.customerDatabase.planPro}
                 </span>
               </div>
               <h3 className="text-xl font-black text-white">
