@@ -106,7 +106,7 @@ export async function POST(request: Request) {
     // -------------------------------------------------------------
     // 1. LIVE GEMINI 3.1 FLASH LITE ENGINE (Maximum Analytics & Low Token Footprint)
     // -------------------------------------------------------------
-    const geminiKey = process.env.GEMINI_API_KEY;
+    const geminiKey = process.env.GEMINI_API_KEY_LOCAL_STUDIO || process.env.GEMINI_API_KEY;
     if (geminiKey) {
       try {
         const prompt = `You are Prestigia's Elite Google Maps Local SEO & Local 3-Pack Algorithm Architect.
@@ -216,15 +216,13 @@ RETURN STRICTLY A COMPACT VALID JSON OBJECT (NO MARKDOWN WRAPPERS):
 }`;
 
         const candidateModels = [
-          'gemini-1.5-flash',
-          'gemini-2.0-flash',
-          'gemini-1.5-pro',
           'gemini-flash-lite-latest',
+          'gemini-flash-latest',
         ];
         for (const modelName of candidateModels) {
           try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 6000);
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
             const geminiRes = await fetch(
               `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiKey}`,
               {

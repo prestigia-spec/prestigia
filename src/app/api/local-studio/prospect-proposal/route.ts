@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     const isEn = lang === 'en';
 
     let generatedProposal: any = null;
-    const geminiKey = process.env.GEMINI_API_KEY;
+    const geminiKey = process.env.GEMINI_API_KEY_LOCAL_STUDIO || process.env.GEMINI_API_KEY;
 
     if (geminiKey) {
       try {
@@ -173,10 +173,11 @@ STRUCTURE TO PRODUCE (STRICT VALID JSON ONLY, NO MARKDOWN WRAPPERS):
 }`;
 
         const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${geminiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${geminiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: AbortSignal.timeout(10000),
             body: JSON.stringify({
               contents: [{ role: 'user', parts: [{ text: prompt }] }],
               generationConfig: {
