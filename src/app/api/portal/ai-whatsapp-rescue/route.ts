@@ -33,6 +33,7 @@ export async function POST(request: Request) {
     // 1. LIVE GOOGLE GEMINI 1.5 FLASH (When GEMINI_API_KEY is configured)
     // =========================================================================
     const geminiKey = process.env.GEMINI_API_KEY;
+    let lastGeminiError = geminiKey ? 'unknown' : 'missing_env_key';
     if (geminiKey) {
       try {
         const prompt = `Eres el Gerente o Administrador de "${cleanBusiness}" (aplica a cualquier negocio: clínicas, consultorios, estética, spas, hoteles, talleres, comercio, gastronomía o servicios). Un cliente tuvo una inconformidad con la atención o servicio y dejó esta queja privada:
@@ -80,7 +81,7 @@ Genera un JSON con exactamente 3 opciones:
               {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                signal: AbortSignal.timeout(4500),
+                signal: AbortSignal.timeout(8000),
                 body: JSON.stringify({
                   contents: [{ parts: [{ text: prompt }] }],
                   generationConfig: {
@@ -113,9 +114,16 @@ Genera un JSON con exactamente 3 opciones:
                     provider: `Google Gemini (${modelName})`,
                   });
                 }
+                lastGeminiError = `${modelName}:invalid_json_length`;
+              } else {
+                lastGeminiError = `${modelName}:empty_output`;
               }
+            } else {
+              const errTxt = await geminiRes.text().catch(() => '');
+              lastGeminiError = `${modelName}:HTTP_${geminiRes.status}:${errTxt.slice(0, 120)}`;
             }
-          } catch (modelErr) {
+          } catch (modelErr: any) {
+            lastGeminiError = `${modelName}:EXC_${modelErr?.name || modelErr?.message || 'err'}`;
             console.warn(`[AI-Rescue] Model ${modelName} error:`, modelErr);
           }
         }
@@ -165,6 +173,7 @@ Genera un JSON con exactamente 3 opciones:
       success: true,
       options,
       provider: 'Prestigia AI Rescue Engine (Optimized)',
+      geminiReason: lastGeminiError,
     });
   } catch (error) {
     console.error('Error generating AI WhatsApp rescue:', error);
