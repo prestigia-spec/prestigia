@@ -4171,7 +4171,7 @@ export default function PortalPage() {
 
   // Generate AI WhatsApp Customer Rescue (Inline for Tab 6 Command Center)
   const handleGenerateInlineAiRescue = async (item: Feedback) => {
-    if (session?.business.plan !== 'elite') {
+    if (effectivePlan !== 'elite' && effectivePlan !== 'empresarial') {
       setUpsellTier('elite');
       setUpsellModalOpen(true);
       return;
@@ -5843,7 +5843,7 @@ export default function PortalPage() {
         setAiOptions([]);
       }
     } else if (aiQueueType === 'complaints') {
-      if (session?.business.plan !== 'elite') return;
+      if (effectivePlan !== 'elite' && effectivePlan !== 'empresarial') return;
       const pending = sortedFeedbacks.filter((f) => f.status === 'pending');
       if (pending.length > 0) {
         const isCurrentValid = selectedFeedbackForRescue && pending.some((f) => f.id === selectedFeedbackForRescue.id);
