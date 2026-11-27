@@ -72,18 +72,46 @@ Responde ÚNICAMENTE un arreglo JSON con exactamente 3 opciones:
 ]`;
 
         const candidateModels = [
-          'gemini-2.5-flash-lite',
-          'gemini-2.5-flash',
-          'gemini-2.0-flash',
+          'gemini-flash-lite-latest',
+          'gemini-flash-latest',
         ];
-        for (const modelName of candidateModels) {
+        let orderedModels: string[] = [];
+        try {
+          const listRes = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models?key=${geminiKey}`,
+            { signal: AbortSignal.timeout(4000) }
+          );
+          if (listRes.ok) {
+            const listData = await listRes.json();
+            const textFlashModels: string[] = (listData.models || [])
+              .filter((m: any) =>
+                Array.isArray(m.supportedGenerationMethods) &&
+                m.supportedGenerationMethods.includes('generateContent') &&
+                /gemini.*flash/i.test(m.name) &&
+                !/tts|audio|image|imagen|veo|robotics|computer-use|embedding|live/i.test(m.name)
+              )
+              .map((m: any) => String(m.name).replace(/^models\//, ''));
+            textFlashModels.sort((a, b) => {
+              const score = (n: string) =>
+                (n.includes('flash-lite-latest') ? 1 : n.includes('flash-latest') ? 2 : n.includes('lite') ? 3 : 4);
+              return score(a) - score(b);
+            });
+            orderedModels = textFlashModels.slice(0, 3);
+          }
+        } catch {}
+
+        if (orderedModels.length === 0) {
+          orderedModels = candidateModels;
+        }
+
+        for (const modelName of orderedModels) {
           try {
             const geminiRes = await fetch(
               `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiKey}`,
               {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                signal: AbortSignal.timeout(4500),
+                signal: AbortSignal.timeout(12000),
                 body: JSON.stringify({
                   contents: [{ parts: [{ text: systemPrompt }] }],
                   generationConfig: {

@@ -70,8 +70,8 @@ Genera un JSON con exactamente 3 opciones:
 ]`;
 
         const candidateModels = [
-          'gemini-2.5-flash',
-          'gemini-2.5-flash-lite',
+          'gemini-3-flash-preview',
+          'gemini-3.5-flash',
           'gemini-flash-latest',
         ];
         const modelErrors: string[] = [];
@@ -83,7 +83,7 @@ Genera un JSON con exactamente 3 opciones:
               {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                signal: AbortSignal.timeout(8000),
+                signal: AbortSignal.timeout(12000),
                 body: JSON.stringify({
                   contents: [{ parts: [{ text: prompt }] }],
                   generationConfig: {
@@ -130,12 +130,8 @@ Genera un JSON con exactamente 3 opciones:
           return null;
         };
 
-        for (const modelName of candidateModels) {
-          const hit = await tryModel(modelName);
-          if (hit) return hit;
-        }
-
-        // Auto-discover active Flash model if static names rotated
+        // Discover active text Flash models first so we never waste time on deprecated ones
+        let orderedModels: string[] = [];
         try {
           const listRes = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models?key=${geminiKey}`,
@@ -143,25 +139,31 @@ Genera un JSON con exactamente 3 opciones:
           );
           if (listRes.ok) {
             const listData = await listRes.json();
-            const liveFlash = (listData.models || [])
+            const textFlashModels: string[] = (listData.models || [])
               .filter((m: any) =>
                 Array.isArray(m.supportedGenerationMethods) &&
                 m.supportedGenerationMethods.includes('generateContent') &&
-                /gemini.*flash/i.test(m.name)
+                /gemini.*flash/i.test(m.name) &&
+                !/tts|audio|image|imagen|veo|robotics|computer-use|embedding|live/i.test(m.name)
               )
-              .map((m: any) => String(m.name).replace(/^models\//, ''))
-              .find((n: string) => !candidateModels.includes(n));
-            if (liveFlash) {
-              const hit = await tryModel(liveFlash);
-              if (hit) return hit;
-            } else {
-              modelErrors.push(`list:no_flash_in_${(listData.models || []).length}`);
-            }
-          } else {
-            modelErrors.push(`list:${listRes.status}`);
+              .map((m: any) => String(m.name).replace(/^models\//, ''));
+            // Prefer lite / latest non-preview or newest flash first
+            textFlashModels.sort((a, b) => {
+              const score = (n: string) =>
+                (n.includes('flash-lite-latest') ? 1 : n.includes('flash-latest') ? 2 : n.includes('lite') ? 3 : 4);
+              return score(a) - score(b);
+            });
+            orderedModels = textFlashModels.slice(0, 3);
           }
-        } catch (listErr: any) {
-          modelErrors.push(`list:EXC_${listErr?.name || 'err'}`);
+        } catch {}
+
+        if (orderedModels.length === 0) {
+          orderedModels = candidateModels;
+        }
+
+        for (const modelName of orderedModels) {
+          const hit = await tryModel(modelName);
+          if (hit) return hit;
         }
         lastGeminiError = modelErrors.join(' | ');
       } catch (geminiErr) {
