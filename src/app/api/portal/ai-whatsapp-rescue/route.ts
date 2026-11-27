@@ -70,11 +70,13 @@ Genera un JSON con exactamente 3 opciones:
 ]`;
 
         const candidateModels = [
-          'gemini-2.5-flash-lite',
           'gemini-2.5-flash',
-          'gemini-2.0-flash',
+          'gemini-2.5-flash-lite',
+          'gemini-flash-latest',
         ];
-        for (const modelName of candidateModels) {
+        const modelErrors: string[] = [];
+
+        const tryModel = async (modelName: string) => {
           try {
             const geminiRes = await fetch(
               `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiKey}`,
@@ -114,19 +116,54 @@ Genera un JSON con exactamente 3 opciones:
                     provider: `Google Gemini (${modelName})`,
                   });
                 }
-                lastGeminiError = `${modelName}:invalid_json_length`;
+                modelErrors.push(`${modelName}:invalid_json`);
               } else {
-                lastGeminiError = `${modelName}:empty_output`;
+                modelErrors.push(`${modelName}:empty`);
               }
             } else {
               const errTxt = await geminiRes.text().catch(() => '');
-              lastGeminiError = `${modelName}:HTTP_${geminiRes.status}:${errTxt.slice(0, 120)}`;
+              modelErrors.push(`${modelName}:${geminiRes.status}:${errTxt.slice(0, 80)}`);
             }
           } catch (modelErr: any) {
-            lastGeminiError = `${modelName}:EXC_${modelErr?.name || modelErr?.message || 'err'}`;
-            console.warn(`[AI-Rescue] Model ${modelName} error:`, modelErr);
+            modelErrors.push(`${modelName}:EXC_${modelErr?.name || modelErr?.message || 'err'}`);
           }
+          return null;
+        };
+
+        for (const modelName of candidateModels) {
+          const hit = await tryModel(modelName);
+          if (hit) return hit;
         }
+
+        // Auto-discover active Flash model if static names rotated
+        try {
+          const listRes = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models?key=${geminiKey}`,
+            { signal: AbortSignal.timeout(4000) }
+          );
+          if (listRes.ok) {
+            const listData = await listRes.json();
+            const liveFlash = (listData.models || [])
+              .filter((m: any) =>
+                Array.isArray(m.supportedGenerationMethods) &&
+                m.supportedGenerationMethods.includes('generateContent') &&
+                /gemini.*flash/i.test(m.name)
+              )
+              .map((m: any) => String(m.name).replace(/^models\//, ''))
+              .find((n: string) => !candidateModels.includes(n));
+            if (liveFlash) {
+              const hit = await tryModel(liveFlash);
+              if (hit) return hit;
+            } else {
+              modelErrors.push(`list:no_flash_in_${(listData.models || []).length}`);
+            }
+          } else {
+            modelErrors.push(`list:${listRes.status}`);
+          }
+        } catch (listErr: any) {
+          modelErrors.push(`list:EXC_${listErr?.name || 'err'}`);
+        }
+        lastGeminiError = modelErrors.join(' | ');
       } catch (geminiErr) {
         console.warn('Google Gemini API live call fallback for WhatsApp rescue:', geminiErr);
       }
