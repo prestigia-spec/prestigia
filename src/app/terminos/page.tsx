@@ -56,7 +56,21 @@ export default function TerminosPage() {
         </section>
 
         <section className="space-y-3 text-sm leading-relaxed text-slate-300">
-          <h2 className="text-lg font-extrabold text-white">3. Privacidad y Contacto</h2>
+          <h2 className="text-lg font-extrabold text-white">3. Provisión &ldquo;Tal Cual&rdquo;, Deslinde de Responsabilidad y Tope Máximo</h2>
+          <p>
+            La plataforma se provee estrictamente &ldquo;TAL CUAL&rdquo; (as-is) y &ldquo;SEGÚN DISPONIBILIDAD&rdquo;, sin garantías implícitas ni promesas de resultados comerciales, posicionamiento o ingresos. Prestigia Technologies no es afiliada de Google LLC ni de Meta Platforms, Inc., y no asume responsabilidad por decisiones de terceros, sugerencias de IA revisadas por el cliente, sorteos locales ni por daños indirectos, lucro cesante, pérdida de datos o multas administrativas. En todo caso, cualquier responsabilidad máxima acumulada se limita estrictamente al valor pagado por el suscriptor en los últimos treinta (30) días (o $0 en planes gratuitos/prueba).
+          </p>
+        </section>
+
+        <section className="space-y-3 text-sm leading-relaxed text-slate-300">
+          <h2 className="text-lg font-extrabold text-white">4. Roles de Datos, Indemnidad Total y Prohibición de Datos Sensibles</h2>
+          <p>
+            El comercio suscriptor actúa como único <strong>Responsable del Tratamiento (Data Controller)</strong> frente a sus clientes finales y leyes locales o internacionales (Ley 1581, RGPD, CCPA, LFPDPPP), mientras Prestigia actúa únicamente como encargado tecnológico. Queda prohibido ingresar datos sensibles o historias clínicas. El suscriptor asume total indemnidad (Hold Harmless) y exoneración a favor de Prestigia frente a cualquier reclamo, sanción o demanda derivada del uso de datos, envíos de WhatsApp o promociones propias.
+          </p>
+        </section>
+
+        <section className="space-y-3 text-sm leading-relaxed text-slate-300">
+          <h2 className="text-lg font-extrabold text-white">5. Privacidad y Contacto</h2>
           <p>
             El tratamiento de datos se rige por nuestra{' '}
             <Link href="/privacidad" className="text-amber-400 underline">

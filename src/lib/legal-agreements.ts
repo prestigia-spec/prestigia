@@ -131,24 +131,24 @@ export function getLegalDocuments(data: {
             content: 'The source code, technological architecture, database schemas, smart routing algorithms, trademarks, visual interfaces, scripts, and documentation of Prestigia constitute strictly confidential trade secrets and exclusive intellectual property owned solely by Prestigia under banking-grade security standards and international copyright treaties (WIPO, DMCA). Under no circumstances is Subscriber or any third party granted ownership, inspection rights, or access to the source code. Subscriber is strictly prohibited from, under penalty of criminal prosecution for industrial espionage and statutory civil damages: (a) Decompiling, reverse engineering, disassembling, or extracting source code or operational logic; (b) Copying, cloning, benchmarking for competitive purposes, or creating derivative works; (c) Sublicensing, reselling, leasing, or distributing platform access to unauthorized third parties; (d) Circumventing or tampering with any security or licensing control.',
           },
           {
-            title: 'Section 4: Third-Party Disclaimers (Google Maps & WhatsApp)',
-            content: 'Subscriber acknowledges and agrees that Prestigia operates as an independent technological intermediary. Prestigia is NOT affiliated with, sponsored by, or an agent of Google LLC (Google Maps) or Meta Platforms, Inc. (WhatsApp). Prestigia bears no liability for unilateral third-party actions, including Google content moderation policies, Google Maps ranking changes, or account suspensions resulting from Subscriber non-compliance.',
+            title: 'Section 4: Third-Party Disclaimers, AI Outputs & Raffles (No Warranties)',
+            content: 'Subscriber acknowledges and agrees that Prestigia operates strictly as an independent technological software tool provided "AS IS" and "AS AVAILABLE", without warranties of any kind (express or implied). Prestigia is NOT affiliated with, sponsored by, or an agent of Google LLC (Google Maps) or Meta Platforms, Inc. (WhatsApp), and bears zero liability for third-party policies, API changes, ranking shifts, or account suspensions. Furthermore: (a) AI-generated reply drafts are mere suggestions that Subscriber must review and approve before sending; Subscriber assumes 100% responsibility for any published reply or message; (b) For VIP Giveaways or promotions, Subscriber is solely responsible for compliance with local gaming/sweepstakes laws and prize fulfillment; (c) Prestigia does not provide legal advice or guarantee specific commercial results or review volume.',
           },
           {
-            title: 'Section 5: Limitation of Liability (Liability Cap) & Disclaimer of Consequential Damages',
-            content: 'To the maximum extent permitted by applicable law: (a) Under no circumstances shall Provider be liable to Subscriber, its customers, or any third party for indirect, incidental, special, consequential, or punitive damages, including loss of profits, loss of business revenue, commercial interruption, or reputational harm; (b) Provider’s total aggregate liability arising out of or related to this Agreement or the SaaS services shall strictly under no circumstances exceed the total fees actually paid by Subscriber to Provider during the three (3) months preceding the event giving rise to liability.',
+            title: 'Section 5: Limitation of Liability (30-Day Cap) & Exclusion of Damages',
+            content: 'To the maximum extent permitted by applicable law: (a) Under NO circumstances shall Provider be liable to Subscriber, its customers, employees, or any third party for any direct, indirect, incidental, special, consequential, exemplary, or punitive damages, including loss of profits, revenue, goodwill, data loss, regulatory fines, or business interruption; (b) Provider’s total aggregate liability arising out of or related to this Agreement or the SaaS services shall strictly never exceed the subscription fees actually paid by Subscriber to Provider during the thirty (30) days immediately preceding the event giving rise to liability (or $0 USD during free trials or demos).',
           },
           {
-            title: 'Section 6: Global Resellers & Authorized Distribution Partners',
-            content: 'Prestigia may distribute platform subscriptions through authorized international agents, resellers, and channel partners across different countries. Said partners act as certified sales intermediaries, while the SaaS technology license and data custody relationship is established directly between Subscriber and Prestigia.',
+            title: 'Section 6: Indemnification & Hold Harmless (Protección Total al Proveedor)',
+            content: 'Subscriber agrees to defend, indemnify, and hold harmless Prestigia, its founders, directors, employees, partners, and licensors from and against any and all claims, lawsuits, regulatory investigations, fines, sanctions, damages, losses, or legal fees arising out of or related to: (a) Subscriber’s collection, use, export, or messaging of end-customer personal data (including WhatsApp dispatches or Habeas Data compliance); (b) Any sensitive, health, or financial data entered by Subscriber or its customers; (c) Subscriber’s giveaways, promotions, or failure to deliver prizes; or (d) Subscriber’s breach of this Agreement or applicable local/international laws.',
           },
           {
-            title: 'Section 7: Term, Renewal & Notice of Cancellation',
-            content: 'This Agreement remains in effect on a monthly or annual recurring basis as specified in the Order Form, renewing automatically unless either party provides written notice via the official support channel at least five (5) business days prior to the next billing cycle.',
+            title: 'Section 7: Global Resellers & Force Majeure',
+            content: 'Prestigia may distribute platform subscriptions through authorized international agents and resellers. Neither party shall be liable for delays or failures caused by Force Majeure, including cloud provider outages (Vercel, Supabase, Google Cloud, AWS), internet disruptions, cyberattacks, or government/regulatory orders.',
           },
           {
-            title: 'Section 8: Governing Law & Jurisdiction',
-            content: `Any dispute arising from this Agreement shall first be submitted to good-faith direct mediation for thirty (30) days. Failing amicable resolution, the parties submit to the exclusive jurisdiction of the competent courts of ${jur.courtLocation}, governed under the oversight of ${jur.authority}.`,
+            title: 'Section 8: Term, Cancellation & Governing Law',
+            content: `This Agreement remains in effect on a monthly or annual basis and renews automatically unless cancelled in writing at least five (5) business days prior to the next billing date. Any dispute shall first undergo thirty (30) days of good-faith mediation; failing resolution, the parties submit to the competent courts of ${jur.courtLocation}.`,
           },
         ],
       },
@@ -176,8 +176,8 @@ export function getLegalDocuments(data: {
 • Prestigia will never broadcast cross-promotions or unauthorized advertisements to Subscriber guests.`,
           },
           {
-            title: 'Section 4: Enterprise Information Security Standards',
-            content: 'Prestigia employs banking-grade administrative and technical security safeguards, including TLS 1.3 256-bit encryption in transit, SOC2-compliant cloud database infrastructure, continuous encrypted backups, and role-based access controls.',
+            title: 'Section 4: Technical Security Safeguards & Sensitive Data Prohibition',
+            content: 'Prestigia implements reasonable administrative and technical safeguards, including HTTPS/TLS encryption in transit, cloud database infrastructure, and role-based access controls. Subscriber is strictly prohibited from using Prestigia to store special categories of sensitive data (medical records, clinical diagnoses, payment card numbers, or government IDs). Subscriber assumes sole liability for any data entered in violation of this prohibition.',
           },
           {
             title: 'Section 5: Exercise of Privacy Rights (CCPA / GDPR)',
@@ -192,12 +192,12 @@ export function getLegalDocuments(data: {
         subtitle: 'Platform Availability, Incident Response Times & VIP Escalation',
         sections: [
           {
-            title: '1. Platform Availability Commitment & Best Commercial Efforts',
-            content: 'Provider shall use commercially reasonable efforts to maintain 99.5% monthly availability for the Prestigia Portal and Smart QR routing engine. The service is provided on an "as-is" and "as-available" basis. Outages resulting from third-party cloud infrastructure (AWS, Cloudflare, Google Cloud, Vercel), local internet disruptions at Subscriber locations, or unilateral third-party platform actions (Google Maps API or WhatsApp outages) shall not constitute an SLA breach nor give rise to financial damages or compensation beyond proportional service credits.',
+            title: '1. Service Availability & As-Is Basis',
+            content: 'Provider uses commercially reasonable efforts to keep the Prestigia Portal and Smart QR operational. The platform is provided strictly "AS IS" and "AS AVAILABLE". Interruptions caused by third-party cloud infrastructure (AWS, Cloudflare, Google Cloud, Supabase, Vercel), local internet failures, or third-party APIs (Google Maps, Gemini AI, WhatsApp) do not constitute a breach and shall never give rise to financial penalties, refunds, or indemnities.',
           },
           {
-            title: '2. Support Tiers by Subscription Plan',
-            content: '• ELITE PLAN (👑 Multi-Location VIP): Includes four (4) priority technical support requests per month via dedicated VIP WhatsApp, with rapid turnaround (< 4 business hours) for operational issues, staff onboarding, campaign setup, or multi-location routing.\n• PRO PLAN (⭐ Advanced): Includes two (2) priority support requests per month (< 8 business hours).\n• BASIC PLAN: Includes one (1) standard support ticket per month via email (< 24 business hours).',
+            title: '2. Support Scope (Best-Effort Response)',
+            content: 'Support requests are handled on a best-effort basis according to the active subscription plan (Enterprise, Élite, Pro, or Independent) during standard business hours, without binding penalty SLAs.',
           },
           {
             title: '3. Official Channels & Escalation Procedures',
@@ -259,24 +259,24 @@ export function getLegalDocuments(data: {
           content: 'El código fuente, arquitectura técnica, esquemas de bases de datos, algoritmos de enrutamiento inteligente, marcas comerciales, isotipos, interfaces de usuario, scripts y documentación de Prestigia constituyen secretos comerciales y propiedad intelectual exclusiva e inalienable de Prestigia, protegida bajo estándares de seguridad de nivel bancario y tratados internacionales de derechos de autor (OMPI, Decisión Andina 486). Bajo ninguna circunstancia se concede a El Suscriptor ni a terceros acceso, inspección ni derecho sobre el código fuente. Queda terminantemente prohibido bajo apercibimiento de acciones penales por espionaje industrial y demandas civiles de indemnización agravada: (a) Descompilar, desensamblar, realizar ingeniería inversa o intentar extraer el código fuente o lógica operativa; (b) Copiar, clonar, emular o crear obras derivadas; (c) Alquilar, revender, transferir o sublicenciar el acceso a terceros ajenos a la organización autorizada; (d) Eludir, vulnerar o alterar cualquier medida tecnológica de seguridad o control de licencias.',
         },
         {
-          title: 'Cláusula 4: Deslinde de Responsabilidad sobre Terceros (Google Maps & WhatsApp)',
-          content: 'El Suscriptor reconoce y acepta expresamente que Prestigia es una herramienta tecnológica independiente de intermediación y blindaje. Prestigia NO es propietaria, afiliada ni representante de Google LLC (Google Maps) ni de Meta Platforms, Inc. (WhatsApp). Por tanto, Prestigia no asume responsabilidad alguna sobre decisiones unilaterales de terceros, tales como: políticas de moderación de reseñas de Google, cambios en el algoritmo de posicionamiento de Google Maps, suspensiones o bloqueos de fichas causados por infracciones cometidas directamente por El Suscriptor.',
+          title: 'Cláusula 4: Deslinde sobre Terceros, IA, Sorteos y Ausencia de Garantías ("Tal Cual")',
+          content: 'El Suscriptor reconoce y acepta expresamente que Prestigia es una herramienta tecnológica independiente provista estrictamente "TAL CUAL" (AS IS) y "SEGÚN DISPONIBILIDAD", sin garantías explícitas ni implícitas de resultados comerciales, ventas, posicionamiento o volumen de reseñas. Prestigia NO es afiliada ni representante de Google LLC ni de Meta Platforms, Inc. (WhatsApp), por lo que no asume responsabilidad por cambios en APIs, moderación, algoritmos o suspensiones. Asimismo: (a) Los borradores generados por Inteligencia Artificial son meras sugerencias que El Suscriptor debe revisar antes de enviar, asumiendo el 100% de responsabilidad por el texto publicado; (b) En Sorteos VIP o promociones, El Suscriptor es el único responsable de cumplir permisos locales (como Coljuegos, SEGOB o normativa vigente) y entregar premios; (c) Prestigia no presta asesoría jurídica.',
         },
         {
-          title: 'Cláusula 5: Límite Máximo de Responsabilidad (Liability Cap) y Exclusión de Lucro Cesante',
-          content: 'En la máxima medida permitida por la ley aplicable: (a) En ningún caso El Proveedor será responsable frente a El Suscriptor, sus clientes o terceros por daños indirectos, incidentales, punitivos o consecuenciales, incluyendo lucro cesante, pérdida de ingresos comerciales, interrupción de operaciones, daño reputacional o pérdida de clientes; (b) La responsabilidad económica acumulada total y agregada de El Proveedor por cualquier reclamo derivado del servicio o del presente contrato se limitará estrictamente al monto total efectivamente pagado por El Suscriptor a Prestigia durante los tres (3) meses inmediatamente anteriores al evento generador del reclamo.',
+          title: 'Cláusula 5: Límite Máximo de Responsabilidad (Tope 30 Días) y Exclusión de Daños',
+          content: 'En la máxima medida permitida por la ley nacional e internacional: (a) En NINGÚN caso El Proveedor responderá frente a El Suscriptor, sus clientes, empleados o terceros por daños directos, indirectos, incidentales, punitivos o consecuenciales, incluyendo lucro cesante, pérdida de ingresos, pérdida de datos, multas regulatorias o daño reputacional; (b) La responsabilidad económica acumulada total de El Proveedor por cualquier concepto se limitará estrictamente al valor efectivamente pagado por El Suscriptor durante los últimos treinta (30) días calendario previos al evento (o $0 durante períodos gratuitos o de prueba).',
         },
         {
-          title: 'Cláusula 6: Distribuidores y Colaboradores Internacionales (Reseller Clause)',
-          content: 'Prestigia podrá comercializar el acceso a la plataforma mediante agentes comerciales, distribuidores y colaboradores autorizados en diferentes países. Dichos colaboradores actúan como intermediarios comerciales autorizados para coordinar la vinculación, pero la relación tecnológica de licenciamiento y custodia de la plataforma se rige formalmente entre El Suscriptor y Prestigia.',
+          title: 'Cláusula 6: Indemnidad Total y Exoneración de Responsabilidad (Hold Harmless)',
+          content: 'El Suscriptor se obliga a defender, indemnizar y mantener totalmente indemne a Prestigia, sus fundadores, directores, empleados y aliados frente a cualquier demanda, queja, sanción, multa administrativa (SIC, INAI, AEPD, FTC o cualquier autoridad), reclamación laboral, civil o indemnización presentada por clientes finales o terceros derivada de: (a) La recolección, exportación, uso o envío de mensajes (incluyendo WhatsApp) realizado por El Suscriptor; (b) El ingreso de datos sensibles o historias clínicas por parte del Suscriptor o sus usuarios; (c) Sorteos, promociones o incumplimiento de ofertas del Suscriptor; o (d) Cualquier infracción del Suscriptor a este contrato o a la ley aplicable.',
         },
         {
-          title: 'Cláusula 7: Duración, Terminación y Preaviso',
-          content: 'El presente contrato tiene vigencia mensual o anual según lo estipulado en la Carátula de Suscripción, y se renovará automáticamente por períodos iguales a menos que cualquiera de las partes notifique por escrito o a través del canal oficial de soporte su intención de no renovar con una antelación mínima de cinco (5) días hábiles antes de la siguiente fecha de corte.',
+          title: 'Cláusula 7: Distribuidores Internacionales y Fuerza Mayor',
+          content: 'Prestigia podrá comercializar suscripciones mediante distribuidores y aliados autorizados. Ninguna parte responderá por fallas o retrasos derivados de Fuerza Mayor, incluyendo caídas de infraestructura cloud (Vercel, Supabase, Google Cloud, AWS), internet, ciberataques o disposiciones gubernamentales.',
         },
         {
-          title: 'Cláusula 8: Ley Aplicable y Jurisdicción',
-          content: `Para controversias derivadas del presente contrato, las partes acuerdan someterse en primera instancia a un proceso de arreglo directo o mediación virtual de buena fe durante un término máximo de treinta (30) días. En su defecto, las partes fijan como domicilio contractual y ley rectora los tribunales competentes de ${jur.courtLocation}, bajo la tutela normativa de ${jur.authority}.`,
+          title: 'Cláusula 8: Vigencia, Cancelación y Jurisdicción',
+          content: `Este contrato se renueva por períodos mensuales o anuales salvo aviso escrito con al menos cinco (5) días hábiles de anticipación. Toda controversia se someterá primero a arreglo directo durante treinta (30) días y, en su defecto, a los tribunales competentes de ${jur.courtLocation}.`,
         },
       ],
     },
@@ -304,8 +304,8 @@ export function getLegalDocuments(data: {
 • Prestigia no enviará publicidad cruzada a los clientes y usuarios registrados en la plataforma.`,
         },
         {
-          title: 'Cláusula 4: Medidas de Seguridad de la Información',
-          content: 'Prestigia implementa medidas de seguridad técnicas y organizativas de estándar bancario, incluyendo: Cifrado en tránsito mediante protocolos TLS 1.3 de 256 bits, almacenamiento seguro en infraestructura cloud de alta disponibilidad con copias de seguridad redundantes y control de accesos estricto basado en roles.',
+          title: 'Cláusula 4: Medidas Técnicas de Seguridad y Prohibición de Datos Sensibles',
+          content: 'Prestigia implementa medidas de seguridad razonables conforme al estado de la técnica, incluyendo cifrado en tránsito HTTPS/TLS, infraestructura cloud con respaldo y control de accesos por cuenta y sede. Queda prohibido que El Suscriptor o sus usuarios registren categorías especiales de datos sensibles (historias clínicas, diagnósticos médicos, datos financieros/tarjetas o documentos de identidad). El Suscriptor asume responsabilidad exclusiva por cualquier dato ingresado contraviniendo esta prohibición.',
         },
         {
           title: 'Cláusula 5: Ejercicio de Derechos ARCO (Habeas Data)',
@@ -320,12 +320,12 @@ export function getLegalDocuments(data: {
       subtitle: 'Disponibilidad de la Plataforma, Tiempos de Respuesta y Asistencia VIP',
       sections: [
         {
-          title: '1. Compromiso de Disponibilidad y Mejores Esfuerzos Comerciales',
-          content: 'El Proveedor empleará sus mejores esfuerzos comerciales para mantener una disponibilidad mensual de la plataforma Prestigia y del enrutador Smart QR del 99.5% durante los 365 días del año. La plataforma se provee bajo modalidad de software como servicio "tal cual" (as-is). No se imputarán como fallas de servicio ni darán lugar a indemnizaciones las interrupciones ocasionadas por: (a) Caídas globales de infraestructura cloud o de hosting (AWS, Cloudflare, Vercel, Google Cloud); (b) Fallas de conectividad del proveedor local de internet del establecimiento; (c) Decisiones o caídas de plataformas de terceros ajenos a Prestigia (tales como mantenimientos de Google Maps o de la red de WhatsApp).',
+          title: '1. Disponibilidad del Servicio y Provisión "Tal Cual"',
+          content: 'El Proveedor empleará sus mejores esfuerzos razonables para mantener operativa la plataforma Prestigia y el enrutador Smart QR. El servicio se provee estrictamente "TAL CUAL" (as-is) y "SEGÚN DISPONIBILIDAD". Las interrupciones por infraestructura cloud de terceros (AWS, Cloudflare, Vercel, Supabase, Google Cloud), fallas de internet local o cambios/caídas de APIs externas (Google Maps, Gemini IA, WhatsApp) no constituyen incumplimiento ni generan indemnizaciones, multas o devoluciones económicas.',
         },
         {
-          title: '2. Paquetes de Soporte Técnico por Nivel de Plan',
-          content: '• PLAN ÉLITE (👑 Multi-Sede VIP): Incluye cuatro (4) asistencias técnicas prioritarias mensuales vía WhatsApp VIP dedicado, con atención en tiempo récord (< 4 horas hábiles) para incidentes operativos, asesoría en campañas, adición de sedes o soporte con personal.\n• PLAN PRO (⭐ Avanzado): Incluye dos (2) asistencias técnicas mensuales con tiempo de respuesta prioritario (< 8 horas hábiles).\n• PLAN BÁSICO: Incluye una (1) asistencia técnica mensual estándar por canal de tickets/correo electrónico (< 24 horas hábiles).',
+          title: '2. Alcance de Soporte Técnico (Mejores Esfuerzos)',
+          content: 'Las solicitudes de soporte se atienden bajo modalidad de mejores esfuerzos en horario hábil según el plan activo (Empresarial, Élite, Pro o Independiente), sin compromisos vinculantes de penalidad económica por tiempos de respuesta.',
         },
         {
           title: '3. Canales Oficiales y Procedimiento de Escalamiento',

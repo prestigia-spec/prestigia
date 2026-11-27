@@ -96,7 +96,7 @@ export function LegalModal({
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Garantía Jurídica, Protección de Datos y Contrato Oficial de Suscripción
+                Marco Normativo SaaS, Protección de Datos y Términos de Suscripción
               </p>
             </div>
           </div>
