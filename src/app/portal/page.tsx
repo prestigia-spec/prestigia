@@ -22099,7 +22099,7 @@ export default function PortalPage() {
                         </span>
                       </div>
                       {(() => {
-                        const maxQuota = session.business.supportTicketsQuota ?? (effectivePlan === 'empresarial' ? 10 : effectivePlan === 'elite' ? 4 : effectivePlan === 'pro' ? 2 : 1);
+                        const maxQuota = session.business.supportTicketsQuota ?? (effectivePlan === 'empresarial' ? 12 : effectivePlan === 'elite' ? 8 : effectivePlan === 'pro' ? 4 : 2);
                         const usedTickets = session.business.supportTicketsUsed ?? 1;
                         const remaining = Math.max(0, maxQuota - usedTickets);
                         const percentUsed = Math.min(100, Math.round((usedTickets / maxQuota) * 100));
