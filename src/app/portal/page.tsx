@@ -8740,9 +8740,9 @@ export default function PortalPage() {
               ) : (
                 <>
                   <svg className="w-4 h-3 rounded-[2px] shrink-0" viewBox="0 0 20 14" aria-hidden="true">
-                    <rect width="20" height="7" fill="#FCD116" />
-                    <rect y="7" width="20" height="3.5" fill="#003893" />
-                    <rect y="10.5" width="20" height="3.5" fill="#CE1126" />
+                    <rect width="20" height="3.5" fill="#AA151B" />
+                    <rect y="3.5" width="20" height="7" fill="#F1BF00" />
+                    <rect y="10.5" width="20" height="3.5" fill="#AA151B" />
                   </svg>
                   <span>Español</span>
                 </>
@@ -9593,7 +9593,22 @@ export default function PortalPage() {
               }`}
               title={lang === 'es' ? 'Switch interface to English' : 'Cambiar interfaz a Español'}
             >
-              <span className="text-xs">{lang === 'es' ? '🇨🇴' : '🇺🇸'}</span>
+              {lang === 'es' ? (
+                <svg className="w-4 h-3 rounded-[2px] shrink-0" viewBox="0 0 20 14" aria-hidden="true">
+                  <rect width="20" height="3.5" fill="#AA151B" />
+                  <rect y="3.5" width="20" height="7" fill="#F1BF00" />
+                  <rect y="10.5" width="20" height="3.5" fill="#AA151B" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-3 rounded-[2px] shrink-0" viewBox="0 0 20 14" aria-hidden="true">
+                  <rect width="20" height="14" fill="#B22234" />
+                  <rect y="2" width="20" height="1.5" fill="#fff" />
+                  <rect y="5" width="20" height="1.5" fill="#fff" />
+                  <rect y="8" width="20" height="1.5" fill="#fff" />
+                  <rect y="11" width="20" height="1.5" fill="#fff" />
+                  <rect width="9" height="7.5" fill="#3C3B6E" />
+                </svg>
+              )}
               <span className="font-mono text-[11px] font-black">{lang.toUpperCase()}</span>
             </button>
 
@@ -28085,9 +28100,9 @@ export default function PortalPage() {
                   {lang === 'es' ? (
                     <>
                       <svg className="w-4 h-3 rounded-[2px] shrink-0" viewBox="0 0 20 14" aria-hidden="true">
-                        <rect width="20" height="7" fill="#FCD116" />
-                        <rect y="7" width="20" height="3.5" fill="#003893" />
-                        <rect y="10.5" width="20" height="3.5" fill="#CE1126" />
+                        <rect width="20" height="3.5" fill="#AA151B" />
+                        <rect y="3.5" width="20" height="7" fill="#F1BF00" />
+                        <rect y="10.5" width="20" height="3.5" fill="#AA151B" />
                       </svg>
                       <span>ES</span>
                     </>
